@@ -1,0 +1,56 @@
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr height="37" align="center">
+<td width="13" height="37" class="rol">&nbsp;</td>
+<td width="25" class="ro">Platz</td>
+<td width="60" class="ro">Rang</td>
+<td width="50" class="ro">System</td>
+<td width="160" class="ro">Name</td>
+<td width="60" class="ro">Kollektoren</td>
+<td width="80" class="ro">Punkte</td>
+<td width="13" class="ro">&nbsp;</td>
+<td width="13" class="ror">&nbsp;</td>
+</tr>
+<tr>
+<td width="13" class="rl">&nbsp;</td>
+<td colspan="7">
+<table border="0" cellpadding="0" cellspacing="1" width="100%">
+<colgroup>
+<col width="25">
+<col width="60">
+<col width="50">
+<col width="160">
+<col width="60">
+<col width="80">
+<col width="13">
+</colgroup>
+<script type="text/javascript">
+<!--
+var r=new Array("Alpha","Beta","Gamma","Delta","Delta","Epsilon","Zeta","Eta","Eta","Theta","Iota","Kappa","Kappa","Lambda","My","Ny","Xi","Xi","Omikron","Pi","Rho","Rho","Sigma","Tau","Ypsilon","Ypsilon","Phi","Chi","Psi");var s=new Array(13,2,2,3,15,6,5,9,10,9,8,11,3,13,5,6,6,5,3,7,10,10,9,7,11,7,1,11,13);var t=new Array(3,1,2,2,1,1,3,1,1,2,1,2,3,1,2,2,3,1,1,3,2,3,3,2,3,1,1,1,2);var n=new Array("Issomad","HugoDerBoss","Alagos","werbung1","Kid--Rock","Lysco","Morphi","narok","DJ16EL","NeVaR","Aendy","werber","ThE_GuArDiAn","nsp-CrazyOrca","Lady_Sirius","BarneY","Coldan","Jagoddaa","VEGE7A","Sharynn","MightyWeeny","DSB","Diabolic-Angel","Djarim","Sandtiger","Pallando","SPY","werbung12","werbung");var c=new Array("228","124","19","45","56","48","34","51","34","27","59","48","27","7","46","28","39","33","40","33","28","28","31","31","25","18","0","29","23");var p=new Array("112.380.731","4.667.914","2.297.006","2.008.355","1.775.367","1.747.368","1.744.607","1.713.741","1.673.749","1.634.526","1.614.239","1.609.474","1.595.621","1.497.138","1.493.081","1.475.806","1.448.350","1.437.188","1.425.828","1.400.895","1.377.738","1.376.034","1.372.824","1.284.793","1.171.943","990.484","970.392","892.597","807.681");var o=new Array("g","g","g","g","g","g","g","g","g","u|3","d|1","d|1","d|1","g","u|7","d|1","d|1","d|1","d|1","d|1","u|2","d|2","d|2","g","g","g","d|27","d|1","d|1");for (i=0; i<r.length; i++){
+var temp=o[i].split("|");
+if(temp[0]=="u")
+grafik="<img border=\"0\" src=\""+gpfad+"/g/tl_up.gif\" width=\"11\" height=\"11\" title=\"+"+temp[1]+"\" alt=\"+"+temp[1]+"\">";
+if(temp[0]=="d")
+grafik="<img border=\"0\" src=\""+gpfad+"/g/tl_down.gif\" width=\"11\" height=\"11\" title=\"-"+temp[1]+"\" alt=\"-"+temp[1]+"\">";
+if(temp[0]=="g")
+grafik="<img border=\"0\" src=\""+gpfad+"/g/tl_constant.gif\" width=\"11\" height=\"11\" title=\"unverändert\" alt=\"unverändert\">";
+var j=i+1;document.write("<tr><td class=\"cc\">"+j+"</td><td class=\"cc\">"+r[i]+"</td><td class=\"cc\">"+s[i]+":"+t[i]+"</td><td class=\"cc\"><a href=\"details.php?se="+s[i]+"&sy="+t[i]+"\">"+n[i]+"</a></td><td class=\"cc\">"+c[i]+"</td><td class=\"cr\">"+p[i]+"</td><td class=\"cr\">"+grafik+"</td></tr>");}
+// -->
+</script>
+</table>
+</td>
+<td width="13" class="rr">&nbsp;</td>
+</tr>
+<tr height="20">
+<td height="20" class="rul" width="13">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="rur" width="13">&nbsp;</td>
+</tr>
+</table>
+<br>

@@ -1,0 +1,31 @@
+<?php
+$ss_lang['aktion']='Aktion';
+$ss_lang['allianz']='Allianz';
+$ss_lang['angreifer']='Angreifer';
+$ss_lang['angreiferanzeigen']='Angreifer anzeigen';
+$ss_lang['angriff']='Angriff';
+$ss_lang['archaeologie']='Mission';
+$ss_lang['def']='DEF';
+$ss_lang['eta']='ETA';
+$ss_lang['herkunft']='Herkunft';
+$ss_lang['inc']='INC';
+$ss_lang['irc']='IRC';
+$ss_lang['rasse']='Rasse';
+$ss_lang['rueckflug']='R&uuml;ckflug';
+$ss_lang['schiffe']='Schiffe';
+$ss_lang['secstatdisable']='Du kannst nicht alle Daten im Sektorstatus einsehen, da der Sektorkommandant Dir das Recht daf&uuml;r genommen hat.';
+$ss_lang['sektor']='Sektor';
+$ss_lang['sektorflotten']='Sektorflotten';
+$ss_lang['status']='Status';
+$ss_lang['systemstatus']='Systemstatus';
+$ss_lang['systemstatusvon']='Systemstatus von';
+$ss_lang['systemverteidigung']='Systemverteidigung';
+$ss_lang['text']='Text';
+$ss_lang['title']='Sektorstatus';
+$ss_lang['verteidige']='verteidige';
+$ss_lang['verteidiger']='Verteidiger';
+$ss_lang['verteidigeranzeigen']='Verteidiger Anzeigen';
+$ss_lang['verteidigung']='Verteidigung';
+$ss_lang['zeit']='Zeit';
+$ss_lang['ziel']='Ziel';
+?>

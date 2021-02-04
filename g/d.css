@@ -1,0 +1,36 @@
+//@font-face { font-family: 'envy'; src: url('EnvyCodeR.ttf');}
+//@font-face { font-family: 'Roboto', sans-serif; src: url('https://fonts.googleapis.com/css?family=Roboto');}
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@font-face { font-family: 'de1'; src: url('de1.ttf');}
+
+body{
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* Internet Explorer */
+	-khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+	-webkit-user-select: none; /* Chrome, Safari, and Opera */
+	-webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+	font-family: 'Roboto';
+}
+
+.text1{color: #ffffff;}
+.text2{color: #ff0000;}
+.text3{color: #00ff00;}
+.fett{font-weight: bold;}
+.tac{text-align: center;}
+.tc1{color: #ffffff;}
+.tc2{color: #ff0000;}
+.tc3{color: #00ff00;}
+.tc4{color: #FDFB59;}
+
+#gamename{
+	position: absolute;
+	font-size: 512px;
+	font-family: de1;
+	color: #DDDDDD;
+}
+
+#serverdesc{
+	position: absolute;
+	font-size: 256px;
+	color: #DDDDDD;
+}

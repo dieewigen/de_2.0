@@ -1,0 +1,29 @@
+<?php
+$index_lang['accnochnichtaktiv']='Ihr Account wurde noch nicht aktiviert! Verwenden Sie bitte den Aktivierungslink, falls sie dies noch nicht getan haben und warten danach ca. 5 Minuten.';
+$index_lang['accountistgesperrt']='Ihr Account wurde gesperrt, wenden Sie sich bitte mit Angabe von Server und Loginname an';
+$index_lang['botmsg1']='Logout in';
+$index_lang['botmsg2']='Minuten und';
+$index_lang['botmsg3']='Sekunden';
+$index_lang['botmsg4']='Logout steht unmittelbar bevor';
+$index_lang['framemsg']='Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht unterst&uuml;tzt.';
+$index_lang['falscheip']='Die IP-Adresse pa&szlig;t nicht zu dem Link.';
+$index_lang['falschesergebnisgesperrt']='Ihr eingegebenes Ergebnis war nicht richtig. Es wurde zu oft ein falsches Ergebnis eingegeben und der Account wurde gesperrt.';
+$index_lang['falschezahl']='Ihre eingegebene Zahl war nicht richtig. Bitte versuchen Sie es noch einmal.';
+$index_lang['umode1']='Der Account befindet sich im Urlaubsmodus. Endtermin: ';
+$index_lang['umode2']='Fr&uuml;hstm&ouml;glicher Abbruchtermin: ';
+$index_lang['umodebeendet']='Der Account befand sich im Urlaubsmodus, dieser wurde jetzt abgebrochen und ein Login ist m&ouml;glich.';
+$index_lang['accumzug']='Der Account zieht gerade um. Der Vorgang sollte maximal 10 Minuten dauern.';
+$index_lang['falschezugangsdaten']='Ihre angegebenen Zugangsdaten waren nicht richtig. Bitte versuchen Sie es noch einmal.';
+$index_lang['login']='Login';
+$index_lang['bild']='Bild';
+$index_lang['loginname']='Loginname';
+$index_lang['passwort']='Passwort';
+$index_lang['grapaaus']='Grafikpack deaktivieren';
+$index_lang['newaccount']='Neuen Account anlegen';
+$index_lang['pwvergessen']='Passwort vergessen?';
+$index_lang['botinfo']='Ist die Zahl nicht  erkennbar, klicke bitte die Grafik an, um eine neue Aufgabe zu erhalten.';
+$index_lang['portal']='Portal';
+$index_lang['serverstatistik']='Serverstatistik';
+$index_lang['externeranglisten']='Externe Ranglisten';
+$index_lang['zahl']='Zahl (in Ziffern)';
+?>

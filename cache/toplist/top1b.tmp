@@ -1,0 +1,48 @@
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr height="37" align="center">
+<td width="13" height="37" class="rol">&nbsp;</td>
+<td width="25" class="ro"><div class="cellu">Platz</div></td>
+<td width="60" class="ro"><div class="cellu">Rang</div></td>
+<td width="50" class="ro"><div class="cellu">System</div></td>
+<td width="200" class="ro"><div class="cellu">Name</div></td>
+<td width="110" class="ro"><div class="cellu">Kollektoren</div></td>
+<td width="100" class="ro"><div class="cellu">Punkte</div></td>
+<td width="13" class="ro">&nbsp;</td>
+<td width="13" class="ror">&nbsp;</td>
+</tr>
+<tr>
+<td width="13" class="rl">&nbsp;</td>
+<td colspan="7">
+<table border="0" cellpadding="0" cellspacing="1" width="100%">
+<colgroup>
+<col width="25">
+<col width="60">
+<col width="50">
+<col width="200">
+<col width="110">
+<col width="100">
+<col width="13">
+</colgroup>
+<script type="text/javascript">
+<!--
+var r=new Array("Gamma","Alpha","Delta","Theta","Eta","Xi","Pi","Omikron","Kappa","Chi","Phi","Rho","Zeta","Lambda","Theta","Psi","Ypsilon","Omega","Omega","Omikron","Omega","My","Epsilon","Tau","Omega","Omega","Omega","Beta","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Ny");var s=new Array(12,15,16,17,4,14,20,16,17,10,3,11,9,13,18,5,7,14,18,19,15,6,8,5,1,1,1,20,1,19,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10);var t=new Array(1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,2,2,1,2,1,1,2,22,25,21,2,14,2,10,16,2,19,1,26,24,15,8,3,6,9,12,13,7,4,20,5,18,17,2);var n=new Array("Silberdun_II","_-Hakke-_","Lothian","Das_Ding","=Soulfire=","Cmdr_Akilah_Falow","oO","LostAngel","zegbert","Raufbold","Cannopio","Mathayus","RAPY","neversleep","John_Smith","Schnuffel","Mr_Minister","NeXuS","-=Takti=-","Fossil3009","KnuddelPardi","DDE-Account","Paul","Issomadium","Papperlapp","The_Bhaal","ARABICA","Pardua","KÃ¶nig_der_Dummen","Fischauge","Downy","dirty-magic","AGING_FLAVOR","DJ16EL","Jejune","LaLiLu","DDE","extern","=ich_mag_pizza=","n0b0dy","Yings","Fakefox","Lich","ibra_kadabra","Schlafbaer","LASST_UNS_LACHEN","antischlumpf","ooooooh","Corbin","TÃ¼rmchen","worriar");var c=new Array("653","553","530","477","314","224","222","219","218","174","171","170","153","124","115","85","84","82","77","76","70","66","38","32","25","25","25","23","20","20","9","9","9","9","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0");var p=new Array("35.744.285","38.218.505","30.701.045","19.805.160","20.633.655","7.054.000","4.249.700","6.319.200","13.013.705","2.238.075","2.344.225","3.589.450","22.901.730","10.307.850","18.850.025","1.045.145","2.485.620","820.000","906.930","4.659.130","810.235","10.248.935","24.759.820","2.615.275","1.065.125","14.471.309","671.290","37.638.555","2.812.947","420.075","90.000","202.200","176.408","905.000","73.914","0","0","64.684","123.376","64.752","63.874","63.544","60.944","64.428","0","110.012","64.216","63.896","0","61.732","8.490.730");var o=new Array("u|3","g","g","u|1","u|1","u|1","u|2","g","u|1","u|3","u|1","u|4","u|2","d|14","u|2","u|4","u|1","u|1","u|2","u|3","d|20","u|4","d|1","d|10","u|5","u|5","u|2","g","u|4","d|6","u|1","d|5","u|1","u|2","u|2","u|2","d|12","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","d|47","g","d|15","d|1");for (i=0; i<r.length; i++){var j=i+1;var colag=c[i].replace(".","")/c[0].replace(".","")*0.35;if(colag<0.2)colag=0.2;document.write("<tr><td class=\"cc\">"+j+"</td><td class=\"cc\">"+r[i]+"</td><td class=\"cc\">"+s[i]+":"+t[i]+"</td><td class=\"cc\"><a href=\"details.php?se="+s[i]+"&sy="+t[i]+"\">"+n[i]+"</a></td><td class=\"cc\" title=\""+(Math.round(colag*c[i].replace(".","")))+"\">"+c[i]+"</td><td class=\"cr\">"+p[i]+"</td></tr>");}
+// -->
+</script>
+</table>
+</td>
+<td width="13" class="rr">&nbsp;</td>
+</tr>
+<tr height="20">
+<td height="20" class="rul" width="13">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="rur" width="13">&nbsp;</td>
+</tr>
+</table>
+<br>

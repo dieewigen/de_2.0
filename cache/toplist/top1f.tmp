@@ -1,0 +1,48 @@
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr height="37" align="center">
+<td width="13" height="37" class="rol">&nbsp;</td>
+<td width="25" class="ro"><div class="cellu">Platz</div></td>
+<td width="60" class="ro"><div class="cellu">Rang</div></td>
+<td width="50" class="ro"><div class="cellu">System</div></td>
+<td width="190" class="ro"><div class="cellu">Name</div></td>
+<td width="120" class="ro"><div class="cellu">Gesamtwert&nbsp;in&nbsp;M</div></td>
+<td width="100" class="ro"><div class="cellu">Punkte</div></td>
+<td width="13" class="ro">&nbsp;</td>
+<td width="13" class="ror">&nbsp;</td>
+</tr>
+<tr>
+<td width="13" class="rl">&nbsp;</td>
+<td colspan="7">
+<table border="0" cellpadding="0" cellspacing="1" width="100%">
+<colgroup>
+<col width="25">
+<col width="60">
+<col width="50">
+<col width="200">
+<col width="110">
+<col width="100">
+<col width="13">
+</colgroup>
+<script type="text/javascript">
+<!--
+var r=new Array("Tau","Phi","Delta","Omega","Omikron","Kappa","Omega","Omega","Beta","Pi","Omikron","Theta","Theta","Alpha","Eta","Xi","Lambda","Gamma","Rho","Chi","Zeta","Epsilon","Ypsilon","My","Psi","Omega","Ny");var s=new Array(5,3,16,15,16,17,18,19,20,20,19,18,17,15,4,14,13,12,11,10,9,8,7,6,5,14,10);var t=new Array(2,1,1,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2);var n=new Array("Issomadium","Cannopio","Lothian","KnuddelPardi","LostAngel","zegbert","-=Takti=-","Fischauge","Pardua","oO","Fossil3009","John_Smith","Das_Ding","_-Hakke-_","=Soulfire=","Cmdr_Akilah_Falow","neversleep","Silberdun_II","Mathayus","Raufbold","RAPY","Paul","Mr_Minister","DDE-Account","Schnuffel","NeXuS","worriar");var c=new Array("0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0");var p=new Array("2.615.275","2.344.225","30.701.045","810.235","6.319.200","13.013.705","906.930","420.075","37.638.555","4.249.700","4.659.130","18.850.025","19.805.160","38.218.505","20.633.655","7.054.000","10.307.850","35.744.285","3.589.450","2.238.075","22.901.730","24.759.820","2.485.620","10.248.935","1.045.145","820.000","8.490.730");var o=new Array("u|3","g","g","u|1","u|1","u|1","u|2","g","u|1","u|3","u|1","u|4","u|2","d|14","u|2","u|4","u|1","u|1","u|2","u|3","d|20","u|4","d|1","d|10","u|5","u|5","u|2","g","u|4","d|6","u|1","d|5","u|1","u|2","u|2","u|2","d|12","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","d|47","g","d|15","d|1");for (i=0; i<r.length; i++){var j=i+1;document.write("<tr><td class=\"cc\">"+j+"</td><td class=\"cc\">"+r[i]+"</td><td class=\"cc\">"+s[i]+":"+t[i]+"</td><td class=\"cc\"><a href=\"details.php?se="+s[i]+"&sy="+t[i]+"\">"+n[i]+"</a></td><td class=\"cr\">"+c[i]+"</td><td class=\"cr\">"+p[i]+"</td></tr>");}
+// -->
+</script>
+</table>
+</td>
+<td width="13" class="rr">&nbsp;</td>
+</tr>
+<tr height="20">
+<td height="20" class="rul" width="13">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="rur" width="13">&nbsp;</td>
+</tr>
+</table>
+<br>

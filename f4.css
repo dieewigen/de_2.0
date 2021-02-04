@@ -1,0 +1,50 @@
+body {scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333; scrollbar-3dlight-color: #8CA0B4;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;
+ scrollbar-arrow-color: #8CA0B4;background-image:url(http://ewiges-lager.de/de/g/bg.gif); background-repeat:repeat;
+ background-attachment:fixed; padding:0px; color: #3399FF; margin-left:0px; margin-top:0px; margin-right:0px; margin-bottom:0px;
+ font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}
+th {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; font-weight: normal; background-color: #D3DCE3;}
+td {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt;}
+form {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt}
+h1 {font-family: helvetica, arial, geneva, sans-serif; font-size: 16pt; font-weight: normal}
+A:link {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; text-decoration: none; color: #3399FF}
+A:visited {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; text-decoration: none; color: #3399FF}
+A:hover {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; text-decoration: underline; color: #3399FF}
+A:link.nav {font-family: helvetica, arial, geneva, sans-serif; color: #000000}
+A:visited.nav {font-family: helvetica, arial, geneva, sans-serif; color: #000000}
+A:hover.nav {font-family: helvetica, arial, geneva, sans-serif; color: red;}
+.nav {font-family: helvetica, arial, geneva, sans-serif; color: #000000}
+.c {font-weight:normal;text-align:center; background-color:#202020; color: #3399FF}
+.cl {font-weight:normal;text-align:left; background-color:#202020; color: #3399FF}
+.cc {font-weight:normal;text-align:center; background-color:#202020; color: #3399FF}
+.ccg {font-weight:normal;text-align:center; background-color:#202020; color: #28FF50}
+.ccr {font-weight:normal;text-align:center; background-color:#202020; color: #FF2828}
+.cr {font-weight:normal;text-align:right; background-color:#202020; color: #3399FF}
+.tl {font-weight:normal;text-align:left; background-color:#202020; color: #E0E0E0}
+.tc {font-weight:normal;text-align:center; background-color:#202020; color: #E0E0E0}
+.tr {font-weight:normal;text-align:right; background-color:#202020; color: #E0E0E0}
+input {font-size:8pt;font-family:Tahoma;}
+.cell {background-color:#1f1f1f; color: #ffffff; font-size:8pt;}
+.cell1 {background-color:#184373; color: #ffffff; font-size:8pt;}
+.link:link {color: #ffffff; font-size:8pt;}
+.link:visited {color: #ffffff; font-size:8pt;}
+.link:hover {color: #ffffff; font-size:8pt;}
+.ro {background:url(http://ewiges-lager.de/de/g/rand_oben_g.gif) repeat; color: #ffffff; font-weight: bold;}
+.rol {background:url(http://ewiges-lager.de/de/g/rand_oben_l_g.gif) repeat; color: #ffffff; font-weight: bold;}
+.ror {background:url(http://ewiges-lager.de/de/g/rand_oben_r_g.gif) repeat; color: #ffffff; font-weight: bold;}
+.rml {background:url(http://ewiges-lager.de/de/g/rand_mitte_l_g.gif) repeat; color: #ffffff; font-weight: bold;}
+.rmr {background:url(http://ewiges-lager.de/de/g/rand_mitte_r_g.gif) repeat; color: #ffffff; font-weight: bold;}
+.ru {background:url(http://ewiges-lager.de/de/g/rand_unten_g.gif) repeat; color: #ffffff; font-weight: bold;} 
+.rul {background:url(http://ewiges-lager.de/de/g/rand_unten_l_g.gif) repeat;}
+.rur {background:url(http://ewiges-lager.de/de/g/rand_unten_r_g.gif) repeat;}
+.rl {background:url(http://ewiges-lager.de/de/g/rand_l_g.gif) repeat;}  
+.rr {background:url(http://ewiges-lager.de/de/g/rand_r_g.gif) repeat;}
+.k1 {font-size:8pt;font-family:Tahoma;color:#3399FF;border-color:606060;background-color:#000000;}
+.k2 {font-size:8pt;font-family:Tahoma;color:#3399FF;border-color:606060;background-color:#202020;}
+.k3 {font-size:8pt;font-family:Tahoma;color:#000000;border-color:606060;background-color:#969696;}
+.k4 {font-size:8pt;font-family:Tahoma;color:#000000;border-color:606060;background-color:#BABABA;}
+.k5 {font-size:8pt;font-family:Tahoma;color:#FFB0B0;border-color:606060;background-color:#640404;}
+.k6 {font-size:8pt;font-family:Tahoma;color:#FFB0B0;border-color:606060;background-color:#920606;}
+.k7 {font-size:8pt;font-family:Tahoma;color:#ED951E;border-color:606060;background-color:#304802;}
+.k8 {font-size:8pt;font-family:Tahoma;color:#ED951E;border-color:606060;background-color:#3A5C02;}
+.k9 {font-size:8pt;font-family:Tahoma;color:#FFFF40;border-color:606060;background-color:#710272;}
+.k10 {font-size:8pt;font-family:Tahoma;color:#FFFF40;border-color:606060;background-color:#7A048C;}

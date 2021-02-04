@@ -1,0 +1,5 @@
+AuthName "Admin Area"
+AuthType Basic
+AuthUserFile /var/.htpasswddez
+require valid-user
+

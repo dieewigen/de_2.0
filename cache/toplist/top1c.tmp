@@ -1,0 +1,48 @@
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr height="37" align="center">
+<td width="13" height="37" class="rol">&nbsp;</td>
+<td width="25" class="ro"><div class="cellu">Platz</div></td>
+<td width="60" class="ro"><div class="cellu">Rang</div></td>
+<td width="50" class="ro"><div class="cellu">System</div></td>
+<td width="200" class="ro"><div class="cellu">Name</div></td>
+<td width="110" class="ro"><div class="cellu">T&uuml;rme</div></td>
+<td width="100" class="ro"><div class="cellu">Punkte</div></td>
+<td width="13" class="ro">&nbsp;</td>
+<td width="13" class="ror">&nbsp;</td>
+</tr>
+<tr>
+<td width="13" class="rl">&nbsp;</td>
+<td colspan="7">
+<table border="0" cellpadding="0" cellspacing="1" width="100%">
+<colgroup>
+<col width="25">
+<col width="60">
+<col width="50">
+<col width="200">
+<col width="110">
+<col width="100">
+<col width="13">
+</colgroup>
+<script type="text/javascript">
+<!--
+var r=new Array("My","Theta","Kappa","Delta","Alpha","Tau","Omikron","Omega","Eta","Lambda","Xi","Phi","Chi","Omega","Omega","Theta","Beta","Psi","Gamma","Omega","Omega","Omikron","Zeta","Epsilon","Ypsilon","Pi","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Rho","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Omega","Ny");var s=new Array(6,18,17,16,15,5,19,1,4,13,14,3,10,15,19,17,20,5,12,1,18,16,9,8,7,20,1,1,1,1,1,1,1,11,1,1,1,1,1,1,1,1,1,1,1,1,1,14,1,1,10);var t=new Array(1,1,2,1,1,2,1,14,1,1,1,1,1,2,2,1,2,1,1,25,2,2,1,1,1,1,22,8,26,10,24,15,1,1,16,20,9,2,4,13,7,12,6,3,5,18,17,2,19,21,2);var n=new Array("DDE-Account","John_Smith","zegbert","Lothian","_-Hakke-_","Issomadium","Fossil3009","KÃ¶nig_der_Dummen","=Soulfire=","neversleep","Cmdr_Akilah_Falow","Cannopio","Raufbold","KnuddelPardi","Fischauge","Das_Ding","Pardua","Schnuffel","Silberdun_II","The_Bhaal","-=Takti=-","LostAngel","RAPY","Paul","Mr_Minister","oO","Papperlapp","=ich_mag_pizza=","LaLiLu","Downy","DDE","extern","Jejune","Mathayus","dirty-magic","antischlumpf","Fakefox","AGING_FLAVOR","LASST_UNS_LACHEN","ibra_kadabra","Schlafbaer","Lich","Yings","n0b0dy","ooooooh","Corbin","TÃ¼rmchen","NeXuS","DJ16EL","ARABICA","worriar");var c=new Array("14.482","13.157","2.759","2.387","1.632","1.510","393","353","315","260","228","215","204","156","149","147","131","108","79","62","62","42","28","24","24","20","17","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0");var p=new Array("10.248.935","18.850.025","13.013.705","30.701.045","38.218.505","2.615.275","4.659.130","2.812.947","20.633.655","10.307.850","7.054.000","2.344.225","2.238.075","810.235","420.075","19.805.160","37.638.555","1.045.145","35.744.285","14.471.309","906.930","6.319.200","22.901.730","24.759.820","2.485.620","4.249.700","1.065.125","123.376","0","90.000","0","64.684","73.914","3.589.450","202.200","64.216","63.544","176.408","110.012","64.428","0","60.944","63.874","64.752","63.896","0","61.732","820.000","905.000","671.290","8.490.730");var o=new Array("u|3","g","g","u|1","u|1","u|1","u|2","g","u|1","u|3","u|1","u|4","u|2","d|14","u|2","u|4","u|1","u|1","u|2","u|3","d|20","u|4","d|1","d|10","u|5","u|5","u|2","g","u|4","d|6","u|1","d|5","u|1","u|2","u|2","u|2","d|12","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","u|1","d|47","g","d|15","d|1");for (i=0; i<r.length; i++){var j=i+1;document.write("<tr><td class=\"cc\">"+j+"</td><td class=\"cc\">"+r[i]+"</td><td class=\"cc\">"+s[i]+":"+t[i]+"</td><td class=\"cc\"><a href=\"details.php?se="+s[i]+"&sy="+t[i]+"\">"+n[i]+"</a></td><td class=\"cc\">"+c[i]+"</td><td class=\"cr\">"+p[i]+"</td></tr>");}
+// -->
+</script>
+</table>
+</td>
+<td width="13" class="rr">&nbsp;</td>
+</tr>
+<tr height="20">
+<td height="20" class="rul" width="13">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="ru">&nbsp;</td>
+<td class="rur" width="13">&nbsp;</td>
+</tr>
+</table>
+<br>
