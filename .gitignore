@@ -1,10 +1,12 @@
 eftadata/
+fonts/
 npcx/
 ourdetool/
 ranglisten/
 sekretariat/
 soudata/
 tickler/
+.gitignore
 inc/env.inc.php
 inccon.php
 rpc.php

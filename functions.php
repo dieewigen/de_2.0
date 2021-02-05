@@ -1309,16 +1309,7 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message){
 	////////////////////////////////////////////////////////////
 	//DISCORD
 	////////////////////////////////////////////////////////////
-	$webhooks=array();
-	$webhooks['global']='https://discordapp.com/api/webhooks/716989128729821185/AOJamN6p5nk0pPLRV5ZTldGA7HRE4WHIB2KYvgTW87n5HJtMMUivIBqsn4eHLcP5EE6E';
-	$webhooks['CDE']='https://discordapp.com/api/webhooks/717002717763076097/dVu_7Y3uyyX93u2ys5808v_B5hx454AwNOggikW_zn0FjjH1-xY6WVCZlf1bRbUZTZKa';
-	$webhooks['DDE']='https://discordapp.com/api/webhooks/717003507005390898/c2vw-au6IcBCgQYXlJB1J_al_5OWhbL4KIgtcO1ijuxzYtZPaeK1Y4hc-KsemCKjfYJZ';
-	$webhooks['EDE']='https://discordapp.com/api/webhooks/717004022833217657/NKZDgGgpnsQ-jMhoIunkY_hU_42gyTHRcT8vHqT7sEvg0jyL5jfnWUFnrdKkIHzk5pvv';
-	$webhooks['RDE']='https://discordapp.com/api/webhooks/717004199241711756/MsxPGA8MyLhs3aVLFCnJNftxoLuGRcacLyxAUskjx9Lly0_Wql3o4-Yhi4tilPQ8gjY-';
-	$webhooks['SDE']='https://discordapp.com/api/webhooks/716999483451375747/T2v3mlbUN14HLIDKyRERgsH05xjOVl4eudDtuGimnQSp5_LCru00gormhWDV-i34lgMf';
-	$webhooks['xDE']='https://discordapp.com/api/webhooks/717004416468647997/_rz98IMmTkNHPzjv6zZpJip4xVTlSWRzW8htil8pz6Js9I-Ryc-EGMf_1t7mmKXhdv9w';
-	
-
+	$webhooks=$GLOBALS['webhooks'];
 	$webhook=array();
 
 	//Global
