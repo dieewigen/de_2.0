@@ -134,7 +134,7 @@ if(isset($_REQUEST['chatinsert'])){
 // managechat
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-if($_REQUEST['managechat']){
+if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	
 	//sleep(8);
 	$output='';
