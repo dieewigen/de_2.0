@@ -1296,7 +1296,7 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message){
 	}
 
 	$time=time();
-
+	
 	if($channeltyp==3){//gloabler Chat
 		mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
 		('$channel', '$channeltyp', '$sv_server_tag', '$spielername', '$chat_message', '$time', '$owner_id')",$soudb);
