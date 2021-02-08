@@ -50,12 +50,11 @@ function fehlermsg($msg){
 if (!isset($_SESSION['ums_user_id'])){
 	$usestdtemplate=1; 
 
-	$topban_votebutton='&nbsp;<a href="http://www.galaxy-news.de/?page=charts&op=vote&game_id=108" target="_blank"><img src="http://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
+	$topban_votebutton='&nbsp;<a href="https://de.mmofacts.com/die-ewigen-das-browsergame-108" target="_blank"><img src="http://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
 	//$topban_votebutton.='&nbsp;<a href="http://www.gamingfacts.de/charts.php?was=abstimmen2&spielstimme=75" target="_blank"><img src="http://grafik-de.bgam.es/b/gamingfacts_charts.gif" border="0"></a>';
 	//$topban_votebutton[]='&nbsp;<a href="http://www.browsergames24.de" target="_blank"><img src="http://www.browsergames24.de/bg24._vbgrau.jpg" alt="Vote for us @ BG24" border="0"></a>';
 	//$topban_votebutton[2]='&nbsp;<a href="http://www.rawnews.de/index.php?pg=charts&at=vote&game_id=30" target="_blank"><img src="http://www.rawnews.de/vote.php?img=vote&game_id=30" border="0"></a>';
-
-	$topban_votebutton.='<span style="width:88px; height:31px; display:inline-block; overflow:hidden; background-image:url(http://www.browsergames.info/images/bgbutton.gif); background-repeat:no-repeat; text-align:left;"><a href="http://www.die-ewigen.com/bgiredirect.php" target="_blank" style="width:87px; height:27px; display:inline-block; margin: 4px 0 0 1px; font-family:Arial,sans-serif; font-size:11px; font-weight:bold; line-height:12px; letter-spacing:0px; color:#ffffff; text-decoration:none;">kostenlose browsergames</a></span>';
+	//$topban_votebutton.='<span style="width:88px; height:31px; display:inline-block; overflow:hidden; background-image:url(http://www.browsergames.info/images/bgbutton.gif); background-repeat:no-repeat; text-align:left;"><a href="http://www.die-ewigen.com/bgiredirect.php" target="_blank" style="width:87px; height:27px; display:inline-block; margin: 4px 0 0 1px; font-family:Arial,sans-serif; font-size:11px; font-weight:bold; line-height:12px; letter-spacing:0px; color:#ffffff; text-decoration:none;">kostenlose browsergames</a></span>';
 
 	fehlermsg('
 	<link href="https://grafik-de.bgam.es/die-ewigen.com/default.css" rel="stylesheet" type="text/css">
