@@ -50,7 +50,7 @@ function fehlermsg($msg){
 if (!isset($_SESSION['ums_user_id'])){
 	$usestdtemplate=1; 
 
-	$topban_votebutton='&nbsp;<a href="https://de.mmofacts.com/die-ewigen-das-browsergame-108" target="_blank"><img src="http://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
+	$topban_votebutton='&nbsp;<a href="https://de.mmofacts.com/die-ewigen-das-browsergame-108" target="_blank"><img src="https://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
 	//$topban_votebutton.='&nbsp;<a href="http://www.gamingfacts.de/charts.php?was=abstimmen2&spielstimme=75" target="_blank"><img src="http://grafik-de.bgam.es/b/gamingfacts_charts.gif" border="0"></a>';
 	//$topban_votebutton[]='&nbsp;<a href="http://www.browsergames24.de" target="_blank"><img src="http://www.browsergames24.de/bg24._vbgrau.jpg" alt="Vote for us @ BG24" border="0"></a>';
 	//$topban_votebutton[2]='&nbsp;<a href="http://www.rawnews.de/index.php?pg=charts&at=vote&game_id=30" target="_blank"><img src="http://www.rawnews.de/vote.php?img=vote&game_id=30" border="0"></a>';
