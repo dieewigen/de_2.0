@@ -1005,13 +1005,13 @@ echo '
 		echo '<td class="cc" id="m'.$c1.'_0">'.number_format($e0, 0,"",".").'</td>';
 		//flotte 1
 		if($fleet_a[1]!=0){$h1=number_format($e1, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_1">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_1" name="m'.$i.'_1" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+		echo '<td class="cc" id="mn'.$c1.'_1">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_1" name="m'.$i.'_1" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
 		//flotte 2
 		if($fleet_a[2]!=0){$h1=number_format($e2, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_2">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_2" name="m'.$i.'_2" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+		echo '<td class="cc" id="mn'.$c1.'_2">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_2" name="m'.$i.'_2" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
 		//flotte 3
 		if($fleet_a[3]!=0){$h1=number_format($e3, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_3">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_3" name="m'.$i.'_3" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+		echo '<td class="cc" id="mn'.$c1.'_3">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_3" name="m'.$i.'_3" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
 		echo '</tr>';
 		$c1++;
     }
