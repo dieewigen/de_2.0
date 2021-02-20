@@ -217,13 +217,15 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 			//if ($zsec<$ownsector+5 and $zsec>$ownsector-5) $rz=$rz+0;else $rz=$rz+2;
 
 			//wenn angriff akttyp=1 dann addiere sprungfeldbegrenzer
-			if ($akttyp==1 && $rz>0 && $ztechs[2]==1) $rz++;
+			if ($akttyp==1 && $rz>0 && $ztechs[2]==1){
+        $rz++;
+      }
 
 			//nachricht an den account schicken
 			//bk rausfinden
 			//$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$zsec'",$db);
-      		//$bk=mysql_result($db_daten, 0, "bk");
-	  		$bk=getSKSystemBySecID($zsec);
+      //$bk=mysql_result($db_daten, 0, "bk");
+	  	$bk=getSKSystemBySecID($zsec);
 
 			//user_id vom bk rausfinden
 			$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' and system='$bk'",$db);

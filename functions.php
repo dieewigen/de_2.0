@@ -1310,11 +1310,6 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message){
 	//DISCORD
 	////////////////////////////////////////////////////////////
 	$webhooks=$GLOBALS['webhooks'];
-
-	if($_SESSION['ums_user_id']==1){
-		print_r($webhooks);
-	}
-
 	$webhook=array();
 
 	//Global

@@ -5,6 +5,7 @@ include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_resource.lang.php';
 include 'inc/sabotage.inc.php';
 include "functions.php";
+include "issectork.php";
 
 //$db_daten=mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 //$row = mysql_fetch_array($db_daten);
@@ -438,15 +439,17 @@ if ($_POST["mtr"] OR $_POST["dtr"] OR $_POST["itr"] OR $_POST["etr"] OR $_POST["
 				$restyp05=$restyp05-$ttr;
 				//an den bk ne info schicken
 				///zuerst schauen wer bk ist
-				$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$sector'",$db);
-				$bk=mysql_result($db_daten, 0,0);
+				//$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$sector'",$db);
+				//$bk=mysql_result($db_daten, 0,0);
+				$bk=getSKSystemBySecID($sector);
+
 				if ($bk>0){ //bk vorhanden, dann dessen daten raussuchen und nachricht einf&uuml;gen
 					$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' and system='$bk'",$db);
 					$anz = mysql_num_rows($db_daten);
 					if ($anz>0){//bk-system ist auch besetzt
 						$uid=mysql_result($db_daten, 0,0);
 						$time=strftime("%Y%m%d%H%M%S");
-						$nachricht=$resource_lang[sekeinzahlung].$ums_spielername.': '.number_format($mtr, 0,"",".").' M -- '.number_format($dtr, 0,"",".").' D -- '.number_format($itr, 0,"",".").' I -- '.number_format($etr, 0,"",".").' E -- '.number_format($ttr, 0,"",".").' T';
+						$nachricht=$resource_lang['sekeinzahlung'].$ums_spielername.': '.number_format($mtr, 0,"",".").' M -- '.number_format($dtr, 0,"",".").' D -- '.number_format($itr, 0,"",".").' I -- '.number_format($etr, 0,"",".").' E -- '.number_format($ttr, 0,"",".").' T';
 						mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 7,'$time','$nachricht')",$db);
 						mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
 					}
@@ -460,10 +463,10 @@ if ($_POST["mtr"] OR $_POST["dtr"] OR $_POST["itr"] OR $_POST["etr"] OR $_POST["
 		if ($erg){
 				//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{
-				print($resource_lang[releaselock].$ums_user_id.$resource_lang[releaselock2]."<br><br><br>");
+				print($resource_lang[releaselock].$ums_user_id.$resource_lang['releaselock2']."<br><br><br>");
 		}
 	}// if setlock-ende
-	else echo '<br><font color="#FF0000">'.$resource_lang[releaselock3].'</font><br><br>';
+	else echo '<br><font color="#FF0000">'.$resource_lang['releaselock3'].'</font><br><br>';
 
 }
 
