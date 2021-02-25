@@ -20,7 +20,7 @@ $row=$pd;
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 $punkte=$row["score"];$techs=$row["techs"];$defenseexp=$row["defenseexp"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$design=$row["design"];$spec4=$row['spec4'];$mysc4=$row["sc4"];
+$spec4=$row['spec4'];$mysc4=$row["sc4"];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 
 
@@ -332,7 +332,7 @@ include "cssinclude.php";
 <body>
 <?php
 
-if($sv_deactivate_missions==1){
+if(isset($sv_deactivate_missions) && $sv_deactivate_missions==1){
 	include "resline.php";
 	echo '<br><div class="info_box text2">Auf diesem Server sind Missionen deaktiviert.</div>';
 
@@ -357,7 +357,7 @@ if(!hasTech($pt,29)){
 			<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 		</tr>
 	</table>';
-	$content.=rahmen_unten(false); 
+	$content.=rahmen_unten(false);
 }else{
 
 	///////////////////////////////////////////////////////////
@@ -417,21 +417,22 @@ if(!hasTech($pt,29)){
 			}
 
 			//Missions-Subtyp
-			switch($md[$m]['subtyp']){
-				case 0: //kein spezielle Subtyp
+			if(isset($md[$m]['subtyp'])){
+				switch($md[$m]['subtyp']){
+					case 0: //kein spezielle Subtyp
 
-				break;
+					break;
 
-				case 1: //ARES
-					$missionstyp.=' (ARES)';
-				break;
+					case 1: //ARES
+						$missionstyp.=' (ARES)';
+					break;
 
-				case 2: //HEPHAISTOS
-					$missionstyp.=' (HEPHAISTOS)';
-				break;
-
-				
-			}		
+					case 2: //HEPHAISTOS
+						$missionstyp.=' (HEPHAISTOS)';
+					break;
+		
+				}
+			}
 
 			if($md[$m]['typ']==0 || $md[$m]['typ']==1 || $md[$m]['typ']==2){
 				$err_msg='';
@@ -512,9 +513,12 @@ if(!hasTech($pt,29)){
 								mysqli_query($GLOBALS['dbi'],$sql);
 
 								//Kosten abziehen
-								if(count($md[$m]['cost'])>0){
+								if(isset($md[$m]['cost']) && count($md[$m]['cost'])>0){
 									substractMissionCost($md[$m]['cost'], $reward_percentage);
 								}
+
+								//infocenter zum schnelleren Reload vormerken
+								$_SESSION['ic_last_refresh']=0;								
 
 								//Mission-Datensatz generieren
 								$end_time=round(time()+$md[$m]['time']*$GLOBALS['tech_build_time_faktor']);
@@ -696,7 +700,7 @@ if(!hasTech($pt,29)){
 								$sql="UPDATE de_user_mission SET get_reward=1, counter=counter+1 WHERE mission_id=".$m." AND user_id=".$_SESSION['ums_user_id'].";";
 								mysqli_query($GLOBALS['dbi'],$sql);
 								
-								$um[$m]['end_time']=$end_time;
+								$um[$m]['end_time']=0;
 								$um[$m]['get_reward']=1;
 
 								//die Spielerdaten neu für die Ressourcenleiste laden
@@ -705,9 +709,10 @@ if(!hasTech($pt,29)){
 								$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 								$punkte=$row["score"];$techs=$row["techs"];$defenseexp=$row["defenseexp"];
 								$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-								$design=$row["design"];
 								$gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 															
+								//infocenter zum schnelleren Reload vormerken
+								$_SESSION['ic_last_refresh']=0;
 
 							}else{
 								$err_msg='<div style="color: #FF0000; font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">Im Artefaktgeb&auml;ude ist kein freier Platz.</div>';	
@@ -880,7 +885,7 @@ if(!hasTech($pt,29)){
 				}
 
 				//gibt es Kosten?
-				if(is_array($md[$m]['cost']) && count($md[$m]['cost'])>0){
+				if(isset($md[$m]['cost']) && is_array($md[$m]['cost']) && count($md[$m]['cost'])>0){
 					if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
 						$kosten.=generateMissionReward($md[$m]['cost']);
 					}else{

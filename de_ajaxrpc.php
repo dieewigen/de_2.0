@@ -55,8 +55,8 @@ if(isset($_REQUEST['changechatchannel'])){
 	echo json_encode($data);
 }
 
-//die PHP-Session aus Performancegr�nden schlie�en
-session_write_close();
+//die PHP-Session aus Performancegründen schließen
+//session_write_close();
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -323,7 +323,21 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	//echo $output;
 	//die();
 
-	$data[] = array ('output' => $output, 'chatid' => $chatid, 'chatidallg' => $chatidallg);
+	//ggf. die Daten vom Infocenter dranhängen
+	$infocenter='';
+	if(isset($_SESSION['new_desktop_version']) && $_SESSION['new_desktop_version']==1){
+		if(!isset($_SESSION['ic_last_refresh'])){
+			$_SESSION['ic_last_refresh']=0;
+		}
+
+		if($_SESSION['ic_last_refresh']+20<time()){
+			$infocenter.=getInfocenter();
+
+			$_SESSION['ic_last_refresh']=time();
+		}
+	}
+
+	$data[] = array ('output' => $output, 'chatid' => $chatid, 'chatidallg' => $chatidallg, 'infocenter' => $infocenter);
 	echo json_encode($data);
 	//print_r($data);
 }

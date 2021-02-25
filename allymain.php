@@ -299,6 +299,7 @@ echo '
 //////////////////////////////////////////////////////////////////////////////
 //partnerallianz
 $allyidpartner=get_allyid_partner($allyid);
+$partnerallianz='';
 if($allyidpartner>0){
   	$db_daten2=mysql_query("SELECT * FROM de_allys WHERE id='$allyidpartner'", $db);
 	$row2 = mysql_fetch_array($db_daten2);

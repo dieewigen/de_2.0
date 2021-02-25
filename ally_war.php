@@ -114,8 +114,8 @@ if($peaceto and ($isleader || $iscoleader))
 	}
 }
 
-if($an and ($isleader || $iscoleader))
-{
+$an=isset($_POST['an']) ? $_POST['an'] : false;
+if($an and ($isleader || $iscoleader)){
 	$query = "select count(*) from de_ally_war where ally_id_angreifer = $allyid or ally_id_angegriffener = $allyid";
 	$result = mysql_query($query);
 	$alreadyinXallys = mysql_result($result,0,0);
@@ -171,12 +171,11 @@ if($an and ($isleader || $iscoleader))
 	include("ally/allyfunctions.inc.php");
 	writeHistory($allytag, "$allywar_lang[msg_15_1] <i>$an</i> $allywar_lang[msg_15_2]",true);
 	writeHistory($an, "$allywar_lang[msg_16_1] <i>$allytag</i> $allywar_lang[msg_16_2]",true);
-}
-else {
+
+}else {
   	$query = "SELECT ally_id_angegriffener, ally_id_angreifer FROM de_ally_war where ((ally_id_angegriffener=$allyid) or (ally_id_angreifer=$allyid))";
 	$result = mysql_query($query);
-	if (mysql_num_rows($result))
-	{
+	if (mysql_num_rows($result))	{
 		echo 	"<table border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\">\n".
 			"<tr align=\"center\">\n".
 			"<td width=\"13\" height=\"37\" class=\"rol\">&nbsp;</td>\n".

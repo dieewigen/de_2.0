@@ -16,6 +16,87 @@ function write2agentlog($uid, $reason, $change_amount){
 	*/
 }
 
+function getInfocenter(){
+	//mögliche Punkte: Flotten, Rohstofflieferung, Spezialisierung,  Sabotage, Missionen/VS-Missionen, Anzahl erforschte VS, Technologien(erforsch/offen)
+	$content='';
+	$pt=loadPlayerTechs($_SESSION['ums_user_id']);
+
+	//$content.='<div class="red mb10">under construction</div>';
+
+	/////////////////////////////////////////////////
+	// Missionen
+	/////////////////////////////////////////////////
+	$content.='<div class="header">Missionen</div>';
+	if(!hasTech($pt,29)){
+		$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=29";
+		$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
+		$row_techcheck = mysqli_fetch_array($db_tech);
+	
+		$content.='<div>Fehlende Technologie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'<div>';
+
+	}else{
+		//die Missionsdatensätze auslesen
+		$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".$_SESSION['ums_user_id'].";");
+		$m_abholbereit=0;
+		$m_laufen=0;
+		while($row = mysqli_fetch_array($db_daten)){
+			if($row['end_time']<=time() && $row['get_reward']==0){
+				$m_abholbereit++;
+			}
+
+			if($row['end_time']>time()){
+				$m_laufen++;
+			}
+
+		}
+
+		if($m_abholbereit>0){
+			$content.='<div class="green">abholbereit: '.$m_abholbereit.'</div>';
+		}else{
+			if($m_laufen==0){
+				$content.='<div class="red">aktiv: 0</div>';
+			}else{
+				$content.='<div>aktiv: '.$m_laufen.'</div>';
+			}
+				
+		}
+	}
+
+	/////////////////////////////////////////////////
+	// Technologien
+	/////////////////////////////////////////////////
+	//zuerst checken ob man evtl. schon alle Techs hat, dann braucht man den Punkt gar nicht mehr anzeigen
+	$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_tech_data WHERE tech_sort_id < 1000");
+	$row = mysqli_fetch_array($db_daten);
+	$tech_max=$row['anzahl'];
+	$tech_anzahl=count($pt);
+
+	if($tech_anzahl<$tech_max){
+		$content.='<div class="header mt10">Technologien</div>';
+		//wird aktuell etwas erforscht?
+		$t_aktiv=0;
+		foreach($pt AS $tech){
+			if($tech['time_finished']>time()){
+				$t_aktiv++;
+			}
+		}
+
+		if($t_aktiv>0){
+			$content.='<div>aktiv: '.$t_aktiv.'</div>';
+		}else{
+			$content.='<div class="red">aktiv: 0</div>';
+		}
+
+		//$content.=count($pt).'/'.$tech_max;
+	
+		//$content.=print_r($pt,true);
+
+	}
+
+
+	return $content;
+}
+
 function getStolenColByUID($user_id){
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id='$user_id' AND colanz>0;");
 	$row = mysqli_fetch_array($db_daten);
@@ -684,7 +765,9 @@ function getFleetFK($user_id){
 		$fk=0;
 		//jedes Schiff der Flotte auf Frachtkapazität überpüfen
 		for($i=0;$i<$sv_anz_schiffe;$i++){
-			$fk+=$row['e'.($i+81)]*$GLOBALS['unit'][$rasse-1][$i]['fk'];
+			if(isset($GLOBALS['unit'][$rasse-1][$i]['fk'])){
+				$fk+=$row['e'.($i+81)]*$GLOBALS['unit'][$rasse-1][$i]['fk'];
+			}
 
 			//echo '<br>'.$i.': '.$GLOBALS['unit'][$rasse-1][$i]['fk'];
 

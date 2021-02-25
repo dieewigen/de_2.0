@@ -7,6 +7,10 @@ include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
 //<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 unset($_SESSION["de_frameset"]);
+
+//zeigt an, dass die neue Desktopversion verwendet wird, wird z.B. für das Infocenter benötigt
+$_SESSION['new_desktop_version']=1;
+$_SESSION['ic_last_refresh']=0;
 ?>
 <!doctype html>
 <html lang="de-de">
@@ -191,6 +195,13 @@ unset($_SESSION["de_frameset"]);
 
 		echo '</div>
 		</div>';
+
+		////////////////////////////////////////////////////////
+		//Infocenter
+		////////////////////////////////////////////////////////
+		echo '<div id="ic-button" onclick="$(\'#ic\').toggle()">Infocenter</div>';
+		echo '<div id="ic">Daten werden geladen...</div>';
+
 		
 		////////////////////////////////////////////////////////
 		//Icons direkt auf der Karte

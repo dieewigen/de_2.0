@@ -237,8 +237,9 @@ if (window.Worker) {
 	var worker = new Worker('de_chat.js');
 	
 	worker.addEventListener('message', function(e) {
-		if(e.data!=''){
-			$('#chatcontent').html($('#chatcontent').html()+e.data);
+		console.log(e);
+		if(e.data.output!=''){
+			$('#chatcontent').html($('#chatcontent').html()+e.data.output);
 			
 			if($('#autoscroll').prop('checked')){
 				$(window.opera?'html':'html, body, container, chatcontent').animate({ 
@@ -249,6 +250,11 @@ if (window.Worker) {
 				objDiv.scrollTop = objDiv.scrollHeight;
 			}
 		}
+
+		if(e.data.infocenter!=''){
+			$('#ic', parent.document).html(e.data.infocenter);
+		}
+
 	  //alert('Worker said: '+e.data);
 	}, false);
 }
