@@ -5,9 +5,7 @@ ourdetool/
 ranglisten/
 sekretariat/
 soudata/
-tickler/
 .gitignore
 dieewigen.code-workspace
 inc/env.inc.php
-inccon.php
 rpc.php

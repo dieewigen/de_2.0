@@ -1,0 +1,65 @@
+#111111111111111111111111111111111111111111111111111111111111
+#100000000000100000000000100000000000100000000000100000000000
+cd /var/www/server01/tickler/
+minute=`date "+%M"`
+./register.sh
+if [ $minute = "00" ]; then
+./kt_wt.sh
+fi
+if [ $minute = "03" ]; then
+./wt.sh
+fi
+if [ $minute = "06" ]; then
+./wt.sh
+fi
+if [ $minute = "09" ]; then
+./wt.sh
+fi
+if [ $minute = "12" ]; then
+./kt_wt.sh
+fi
+if [ $minute = "15" ]; then
+./wt.sh
+fi
+if [ $minute = "18" ]; then
+./wt.sh
+fi
+if [ $minute = "21" ]; then
+./wt.sh
+fi
+if [ $minute = "24" ]; then
+./kt_wt.sh
+fi
+if [ $minute = "27" ]; then
+./wt.sh
+fi
+if [ $minute = "30" ]; then
+./wt.sh
+fi
+if [ $minute = "33" ]; then
+./wt.sh
+fi
+if [ $minute = "36" ]; then
+./kt_wt.sh
+fi
+if [ $minute = "39" ]; then
+./wt.sh
+fi
+if [ $minute = "42" ]; then
+./wt.sh
+fi
+if [ $minute = "45" ]; then
+./wt.sh
+fi
+if [ $minute = "48" ]; then
+./kt_wt.sh
+fi
+if [ $minute = "51" ]; then
+./wt.sh
+fi
+if [ $minute = "54" ]; then
+./wt.sh
+fi
+if [ $minute = "57" ]; then
+./wt.sh
+fi
