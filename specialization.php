@@ -55,21 +55,7 @@ if(isset($_REQUEST['reset'])){
 	$spec[4]=0;
 }
 
-if(isset($_REQUEST['level'])){
-	$level=intval($_REQUEST['level']);
-	$choose=intval($_REQUEST['choose']);	
-	
-	if($level>0 AND $level<6 AND $choose>0 AND $choose<4)	{
-		if($spec[$level-1]==0)		{
-			$spec[$level-1]=$choose;
-			//db updaten
-			mysql_query("UPDATE de_user_data SET spec".($level)."='".$choose."'WHERE user_id='$ums_user_id';",$db);
-		}		
-	}
-}
-
-
-//grenzen f�r die einzelnen stufen anhand der m�glichen errungenschaften berechnen
+//grenzen für die einzelnen stufen anhand der möglichen errungenschaften berechnen
 //echo $max_achievement_points;	
 $needa=array(
 round($max_achievement_points/30),
@@ -77,7 +63,7 @@ round($max_achievement_points/12.3),
 round($max_achievement_points/6.16),
 round($max_achievement_points/3.08),
 round($max_achievement_points/1.54));
-//beschreibungen der einzelnen auswahlm�glichkeiten
+//beschreibungen der einzelnen auswahlmäglichkeiten
 $specdesc[0][0]='Verringert die Bauzeit von Verteidigungseinheiten um 50%. Erg&auml;nzt sich mit der Erfahrungspunkte-Bauzeitreduzierung, wobei die Bauzeit nicht kleiner als 1 WT sein kann.';
 $specdesc[0][1]='Verteidigungsanlagen erhalten bei K&auml;mpfen 50% mehr Erfahrungspunkte (wirkt sich auch auf den Erhalt von Kriegsartefakten aus).';
 $specdesc[0][2]='Der planetare Schutzschild und dessen Erweiterung werden um 10% st&auml;rker.';
@@ -106,7 +92,22 @@ else{
 	$achievements=0;
 } 
 
-//$achievements=1000;
+if(isset($_REQUEST['level'])){
+	$level=intval($_REQUEST['level']);
+	$choose=intval($_REQUEST['choose']);	
+	
+	//hat man die benötigten Achievements?
+	if($achievements>=$needa[$level-1]){
+
+		if($level>0 AND $level<6 AND $choose>0 AND $choose<4)	{
+			if($spec[$level-1]==0)		{
+				$spec[$level-1]=$choose;
+				//db updaten
+				mysql_query("UPDATE de_user_data SET spec".($level)."='".$choose."'WHERE user_id='$ums_user_id';",$db);
+			}		
+		}
+	}
+}
 
 //echo '<div class="info_box" style="font-size: 20px;">Dies sind die vorl�ufig geplanten Spezialisierungen. Vor Einbau wird um Feedback gebeten, damit diese ggf. noch angepa�t werden k�nnen. Bitte die Feedback-Funktion bei den News verwenden, oder im Forum im Spezialisierungen-Diskussionsthread posten.</div><br>';
 
@@ -125,8 +126,7 @@ for($i=0;$i<5;$i++){
 	$linkende='';
 	
 	//farbiger hintergrund/beschreibung
-	if($achievements>=$needa[$i])
-	{
+	if($achievements>=$needa[$i]){
 		$bgcolor='#00AA00';
 		$zeiledesc='Dieser Bereich ist freigeschaltet.';
 		if($spec[$i]==0){
@@ -153,10 +153,10 @@ for($i=0;$i<5;$i++){
 	//zeile darstellen
 	//echo '<div class="bgpic3" style="width: 100%; height: 100%;">';
 	
-	//info, dass man eins ausw�hlen kann, wenn noch nichts gew�hlt wurde
+	//info, dass man eins auswählen kann, wenn noch nichts gewählt wurde
 	echo $upgradeinfo;
 	
-	//ben�tigte achievement-punkte
+	//benötigte achievement-punkte
 	echo '<div style="float: left; width: 130px; font-size: 20px; text-align: center; padding-top: 30px; color: '.$bgcolor.';" title="'.$zeiledesc.'">'.$needa[$i].'</div>';
 	
 	//1. spalte
@@ -183,7 +183,9 @@ for($i=0;$i<5;$i++){
 	//auslesen wie oft es gewählt worden ist
 	$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND spec".($i+1)."=3;",$db);
 	$bonuswert = ' Aktueller Wert: '.mysql_num_rows($db_daten) * $specboni[$i];
-	if($i!=4)$bonuswert.='%';	
+	if($i!=4){
+		$bonuswert.='%';	
+	}
 
 	if(($spec[$i]==3 OR $spec[$i]==0) AND $achievements>=$needa[$i]){$picsize=50; $cssfontsize=26; $csspadding=9;}else {$picsize=30; $cssfontsize=10; $csspadding=9; $cssletterspacing=0;}
 	if($spec[$i]==3 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;

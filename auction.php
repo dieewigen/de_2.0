@@ -241,19 +241,23 @@ if(!hasTech($pt,4)){
 			switch($reward[0]){
 				case 'A': //Artefakt
 					$artid=$reward[1];
-					//bietet man dafür?
-					if($bid==$row['id']){
+					//bietet man dafür und hat Platz im Artefaktgebäude?
+					if($bid==$row['id'] && $free_artefact_places>0){
 						if($bid_has_all){
 							$sql="INSERT INTO de_user_artefact (user_id, id, level) VALUES ('".$_SESSION['ums_user_id']."', '$artid', '1')";
 							mysqli_query($GLOBALS['dbi'],$sql);
 							$free_artefact_places--;
 						}
+					}else{
+						$bid_has_all=false;
 					}
+
 					$artikel.='<div style="display: flex;">';
 					$artikel.='<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid-1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid-1].'"><img src="'.$ums_gpfad.'g/arte'.$artid.'.gif"></div>';
 					$artikel.='<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.$ua_name[$reward[1]-1].$tradesystemscore_str.'</div>';
 					$artikel.='</div>';
 					$is_artefact=true;
+
 				break;
 				case 'R': //Standard-Rohstoffe
 					//bietet man dafür?
