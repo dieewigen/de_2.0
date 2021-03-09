@@ -526,7 +526,7 @@ if(count($sc) > 0){
 						$db_daten=mysql_query("UPDATE de_user_data SET show_ally_secstatus='$show_ally_secstatus' WHERE sector='".$sector."' AND system='".$sc[$i][1][0]."';",$db);
 						//eintrag im allianzchat
 						$chattext='<font color="#ff0101">Status&uuml;bermittlung von ('.$sector.':'.$sc[$i][1][0].') durch '.$ums_spielername.'</font>';
-						insert_chat_msg($allyid, 1, '', $chattext);
+						insert_chat_msg($ally_id, 1, '', $chattext);
 						
 						
 					}else{
