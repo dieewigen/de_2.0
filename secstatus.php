@@ -481,45 +481,46 @@ if(count($sc) > 0){
 		
 			//inc soll an die allianz meldbar sein, wenn der spieler in einer allianz ist und es noch nicht gemeldet worden ist
 			//test auf ally
-			$db_daten=mysql_query("SELECT allytag, status, show_ally_secstatus FROM de_user_data WHERE sector='".$sector."' AND system='".$sc[$i][1][0]."';",$db);
+			$db_daten=mysql_query("SELECT allytag, ally_id, status, show_ally_secstatus FROM de_user_data WHERE sector='".$sector."' AND system='".$sc[$i][1][0]."';",$db);
 			$row = mysql_fetch_array($db_daten);
-			if ($row["status"]==1) $allytag = $row["allytag"]; else$allytag='';
+			if ($row["status"]==1){
+				$ally_id=$row['ally_id'];
+				$allytag=$row['allytag'];
+			}else{
+				$ally_id='';
+				$allytag='';
+			}
 			$show_ally_secstatus=$row['show_ally_secstatus'];
-			if($allytag!=''){
-				//allyid auslesen
-				$db_daten=mysql_query("SELECT id FROM de_allys WHERE allytag='$allytag'",$db);
-				$row = mysql_fetch_array($db_daten);
-				$allyid=$row['id'];		
+			if($ally_id>0){
 
-				//test ob der status aktuell bereits �bermittelt wird
-				if($show_ally_secstatus>time()){//wird �bermittelt
-					//anzeigen bis wann es �bermittelt wird
+				//test ob der status aktuell bereits übermittelt wird
+				if($show_ally_secstatus>time()){//wird übermittelt
+					//anzeigen bis wann es übermittelt wird
 					echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $show_ally_secstatus).')';
 				}else{//wird nicht übermittelt, melden link einblenden/überprüfen
 					//test auf aktivierung
 					if(isset($_REQUEST['sassys']) && $_REQUEST['sassys']==$sc[$i][1][0]){
 						//Sichtbarkeit berechnen
-						$sichtbarkeit=3600/$anzkticksprostunde;
+						//$sichtbarkeit=3600/$anzkticksprostunde;
+						$sichtbarkeit=$GLOBALS['sv_show_ally_secstatus'];
 						//Sichtbarkeit um Allianzgebäude verlängern
-						$allybldg=get_allybldg($allyid);
+						$allybldg=get_allybldg($ally_id);
 						$geb_stufe=$allybldg[7];
 						//echo '<br>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: '.$allybldg[0].'<br>';
 						//print_r($allybldg);
 						//boni durch allianzpartner
-						$allyidpartner=get_allyid_partner($allyid);
+						$allyidpartner=get_allyid_partner($ally_id);
 						if($allyidpartner>0){
 							$allybldgpartner=get_allybldg($allyidpartner);
 							$geb_stufe+=$allybldgpartner[7]/100*$allybldgpartner[1];
 						}
 			
-						//$sichtbarkeit=$sichtbarkeit+($sichtbarkeit/100*$geb_stufe);
+						$sichtbarkeit=$sichtbarkeit+($sichtbarkeit/100*$geb_stufe);
+						
 						//echo 'AAA:'.$sichtbarkeit;
-
 						$show_ally_secstatus=time()+$sichtbarkeit;
-						if($GLOBALS['sv_ang']==1){
-							$show_ally_secstatus=time()+$GLOBALS['sv_show_ally_secstatus'];
-						}
-						//anzeigen bis wann es �bermittelt wird
+
+						//anzeigen bis wann es übermittelt wird
 						echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $show_ally_secstatus).')';
 						//db updaten
 						$db_daten=mysql_query("UPDATE de_user_data SET show_ally_secstatus='$show_ally_secstatus' WHERE sector='".$sector."' AND system='".$sc[$i][1][0]."';",$db);
