@@ -428,13 +428,16 @@ if(isset($_REQUEST['getsectordata'])){
 				$rasse='';
 				//hat man scandaten über die rasse/allianz?
 				unset($allytagscan);
-				for($i=0;$i<count($scandaten);$i++)
+				if (isset($scandaten))
 				{
-					if($scandaten[$i]['zuser_id']==$row['user_id'])
+					for($i=0;$i<count($scandaten);$i++)
 					{
-						if($scandaten[$i]['rasse']>0)$knowrasse=1;
-						$playerstatus=$scandaten[$i]['ps'];
-						$allytagscan=$scandaten[$i]['allytag'];
+						if($scandaten[$i]['zuser_id']==$row['user_id'])
+						{
+							if($scandaten[$i]['rasse']>0)$knowrasse=1;
+							$playerstatus=$scandaten[$i]['ps'];
+							$allytagscan=$scandaten[$i]['allytag'];
+						}
 					}
 				}
 
