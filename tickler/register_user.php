@@ -2,7 +2,7 @@
 //anzeige in der logdatei
 include "croninfo.inc.php";
 
-$directory=str_replace("\\\\","/",$HTTP_SERVER_VARS["SCRIPT_FILENAME"]);
+$directory=str_replace("\\\\","/",$_SERVER["SCRIPT_FILENAME"]);
 $directory=str_replace("/tickler/register_user.php","/",$directory);
 if ($directory=='')$directory='../';
 $directory="../";
@@ -73,9 +73,9 @@ if($dortick==1){
 
 	//schauen wieviele sektoren frei sind
 	$freesectors=0;
-	for ($i=1;$i<=$sv_maxsector;$i++)
+	for ($i=2;$i<=$sv_maxsector;$i++)
 	{
-	  if ($bewsector[$i]==0)$freesectors++;
+	if (!isset($bewsector[$i]) || $bewsector[$i]==0) $freesectors++;
 	}
 	echo 'Freesectors: '.$freesectors.'<br>';
 

@@ -397,7 +397,7 @@ if($ally_id>0 && $allystatus==1){
 	$css=array();
 	for($i=0;$i<=6;$i++){
 		if($allyrelverbreitung>=$allyrelverbreitung_need[$i]){
-			if($allyrelverbreitung>=$allyrelverbreitung_need[$i+1] AND $i<count($allydailygift_lang[bonusname])-1){ 
+			if($allyrelverbreitung>=$allyrelverbreitung_need[$i+1] AND $i<count($allydailygift_lang['bonusname'])-1){ 
 				//grau
 				$css[]=' style="background-color: rgba(50,50,50, 0.5);"';
 			}else{
