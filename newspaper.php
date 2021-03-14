@@ -17,10 +17,10 @@ $secmoves=$row["secmoves"];
 </head>
 <body>
 <center>
-<?
+<?php
 include "resline.php";
 
-$id=(int)$id;
+$id=isset($id)?(int)$id:-1;
 //news anzeigen
 if($action!="archiv"){
 	$sel_news_show = mysql_query("SELECT * FROM de_news_overview where id='$id'");
@@ -118,7 +118,7 @@ else  //archiv
 <tr>
     <td width="13" class="rl" height="35"></td>
     <td><div class="cell"><br>
-    <?
+    <?php
      $typ=(int)$typ;
      $sel_news=mysql_query("SELECT * FROM de_news_overview where typ='$typ' order by id desc");
 
@@ -139,7 +139,7 @@ else  //archiv
 </tr>
 </table>
 
-<?
+<?php
 }
 ?>
 </center>

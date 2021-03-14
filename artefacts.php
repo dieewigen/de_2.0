@@ -36,7 +36,7 @@ if($allyid>0){
 }
 
 //Artefakt in ein Basisschiff verschieben
-if ($_GET["a"]==1){
+if (isset($_GET["a"]) && $_GET["a"]==1){
 	//artefakt einf�gen
 	//transaktionsbeginn
 	if (setLock($ums_user_id)){
@@ -103,7 +103,7 @@ if ($_GET["a"]==1){
 	}// if setlock-ende
 	else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
 }
-elseif ($_GET["a"]==2)
+elseif (isset($_GET["a"]) && $_GET["a"]==2)
 {
   //Artefakt aus einem Basisschiff entfernen
   //transaktionsbeginn
@@ -175,7 +175,7 @@ elseif ($_GET["a"]==2)
 <body>
 <?php
 //artefakt zerst�ren
-if($_REQUEST['destroyartefact']==1){
+if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 	//transaktionsbeginn
 	if (setLock($ums_user_id)){
 		$lid=intval($_REQUEST['lid']);
@@ -214,7 +214,7 @@ if($_REQUEST['destroyartefact']==1){
 }//ende submit1
 
 //artefakt benutzen
-	if($_REQUEST['useartefact']==1){
+	if(isset($_REQUEST['useartefact']) && $_REQUEST['useartefact']==1){
 	//transaktionsbeginn
 	if (setLock($ums_user_id)){
 		$lid=intval($_REQUEST['lid']);
@@ -451,7 +451,7 @@ if($_REQUEST['destroyartefact']==1){
 
 
 //artefaktupgrade
-if($_REQUEST['mergeartefacts']==1)
+if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
 {
   //transaktionsbeginn
   if (setLock($ums_user_id))
@@ -566,7 +566,7 @@ if($_REQUEST['mergeartefacts']==1)
 
 
 //geb�udeupgrade
-if ($_REQUEST["bupgrade"] AND hasTech($pt,28) AND $artbldglevel<$maxlevel){
+if (isset($_REQUEST["bupgrade"]) AND hasTech($pt,28) AND $artbldglevel<$maxlevel){
   //transaktionsbeginn
   if (setLock($ums_user_id))
   {
@@ -619,7 +619,7 @@ else echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br
 //stelle die ressourcenleiste dar
 include "resline.php";
 
-if ($errmsg!='')echo '<div class="info_box">'.$errmsg.'</div><br>';
+if (isset($errmsg) && $errmsg!='')echo '<div class="info_box">'.$errmsg.'</div><br>';
 
 if(!hasTech($pt,28)){
 	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=28";
@@ -861,7 +861,7 @@ if(!hasTech($pt,28)){
 
 	rahmen_oben('Informationen zu den Artefakten');
 	echo '<div class="cell" style="width: 576px; top: 0px; position: relative; font-size: 10px; text-align: left;">';
-	if($_REQUEST['showinfo']==1)
+	if(isset($_REQUEST['showinfo']) && $_REQUEST['showinfo']==1)
 	{
 		echo '<b>Woher bekomme ich Artefakte?</b>
 		<br>- Du kannst diese durch Angriffe auf NPC-Systeme der DX61a23 bekommen.

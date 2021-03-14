@@ -966,14 +966,14 @@ unset($sc);
 /////////////////////////////////////////////////////////////////
 //allytag von einer evtl. partnerallianz auslesen
 /////////////////////////////////////////////////////////////////
-$allypartnertag=$allypartner[0];
+$allypartnertag=isset($allypartner[0])?$allypartner[0]:'';
 $time=time();
 $sql="SELECT *, de_user_fleet.user_id, de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.aktion, de_user_fleet.aktzeit, de_user_fleet.hsec, 
 de_user_fleet.hsys, de_user_fleet.zeit, de_user_fleet.fleetsize, de_user_data.show_ally_secstatus
 FROM de_user_fleet LEFT JOIN de_user_data ON(de_user_data.sector=de_user_fleet.zielsec AND de_user_data.system=de_user_fleet.zielsys) 
 WHERE de_user_fleet.zielsec != '$sector' AND (de_user_fleet.aktion = 1 OR de_user_fleet.aktion = 2) AND de_user_fleet.entdeckt > 0 
 AND de_user_fleet.entdecktsec > 0 AND de_user_data.show_ally_secstatus>'$time' AND de_user_data.status=1 AND de_user_data.allytag<>'' AND 
-(de_user_data.allytag='$ownally' OR de_user_data.allytag='$allypartnertag') 
+(de_user_data.allytag='$ownally'". ($allypartnertag!=''? "OR de_user_data.allytag='$allypartnertag'" : "") .")
 ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_user_fleet.hsec, de_user_fleet.hsys ASC";
 
 //echo $sql;
@@ -1254,7 +1254,7 @@ for($s=81;$s<=90;$s++){
 //jetzt die Übersicht der einzelnen system ausgeben
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-if ($sc!='')
+if (isset($sc) && $sc!='')
 for ($i=0;$i<=$ssc;$i++){
   $jsirc1='';
   $jsirc2='';

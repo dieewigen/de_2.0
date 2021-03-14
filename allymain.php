@@ -235,11 +235,11 @@ $ausrichtung = mysql_result($result,0,"ausrichtung");
 $regierungsform = mysql_result($result,0,"regierungsform");
 $allianzform = mysql_result($result,0,"allianzform");
 
-if (strlen($message) > 0){
+/*if (strlen($message) > 0){
 	print('<br><table width="600px"><tr>');
 	print("<td width=30 align=left valign=top><img src=\"".$ums_gpfad."g/trade/".$ums_rasse."_arz.gif\" alt=Information border=0> </td><td align=left><font size=1> $message</font><br>");
 	print("</td></tr></table>");
-}
+}*/
 
 echo '<div class="cell" style="width: 600px;">';
 //////////////////////////////////////////////////////////////////////////////
