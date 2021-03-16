@@ -376,10 +376,9 @@ if(!hasTech($pt,9)){
 
 	//playerstatus setzen
 	$showscanhistory=0;
-	$ps=isset($_POST['ps']) ? $_POST['ps'] : '';
-	if(isset($zsec1) AND isset($zsys1) AND isset($ps)){
+	if(isset($zsec1) AND isset($zsys1) AND isset($_POST['ps'])){
 		//playerstatus festellen
-		$psstr = $ps;
+		$psstr=trim($_POST['ps']);
 		if($psstr==$secret_lang['ps0'])$ps=0;
 		elseif($psstr==$secret_lang['ps1'])$ps=1;
 		elseif($psstr==$secret_lang['ps2'])$ps=2;
@@ -581,7 +580,7 @@ if(!hasTech($pt,9)){
 	//spionage sonde benutzen / sondeneinsatz
 	////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////
-	if (($_POST["startsonde"] OR $_GET["a"]=='s') AND ($zsec1!='' AND $zsys1!='') AND !$_POST["b110"] AND !$_POST["b111"]
+	if ((isset($_POST["startsonde"]) OR isset($_GET["a"]) AND $_GET["a"]=='s') AND ($zsec1!='' AND $zsys1!='') AND !isset($_POST["b110"]) AND !isset($_POST["b111"])
 	 AND hasTech($pt,9) AND hasTech($pt,110))
 	if(validDigit($zsec1)&&validDigit($zsys1)&&$sonde>0){
 	  if ($zsec1=='')$zsec1=0;
@@ -813,9 +812,9 @@ if(!hasTech($pt,9)){
 	//agenteneinsatz
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
-	$etyp=$_POST['etyp'];
-	$az=$_POST['az'];
-	if ($_POST["zsec2"] AND $_POST["zsys2"] AND !$_POST["b110"] AND !$_POST["b111"] AND hasTech($pt,111))
+	$etyp=isset($_POST['etyp'])? $_POST['etyp']:'';
+	$az=isset($_POST['az'])? $_POST['az']:'';
+	if (isset($_POST["zsec2"]) AND isset($_POST["zsys2"]) AND !isset($_POST["b110"]) AND !isset($_POST["b111"]) AND hasTech($pt,111))
 	if(validDigit($zsec2)&&validDigit($zsys2)&&validDigit($az)){
 		if ($zsec2=='')$zsec2=0;
 		$zsec2=(int)$zsec2;
