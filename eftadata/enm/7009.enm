@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Druuv-Anh&auml;nger';
+$enm_hpmin='432';
+$enm_hpmax='490';
+$enm_attmin='405';
+$enm_attmax='495';
+$enm_lootid='7009';
+?>

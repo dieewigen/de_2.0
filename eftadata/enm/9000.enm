@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Greob-Tilger';
+$enm_hpmin='531';
+$enm_hpmax='637';
+$enm_attmin='544';
+$enm_attmax='631';
+$enm_lootid='9000';
+?>

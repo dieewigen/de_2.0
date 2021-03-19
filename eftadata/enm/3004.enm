@@ -1,0 +1,9 @@
+<?php
+$enm_level='3';
+$enm_name='Brunar-Schl&auml;ger';
+$enm_hpmin='237';
+$enm_hpmax='281';
+$enm_attmin='185';
+$enm_attmax='204';
+$enm_lootid='3004';
+?>

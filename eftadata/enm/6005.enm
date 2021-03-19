@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Syratur-Sch&uuml;tze';
+$enm_hpmin='391';
+$enm_hpmax='468';
+$enm_attmin='382';
+$enm_attmax='390';
+$enm_lootid='6005';
+?>

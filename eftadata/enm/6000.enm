@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Hziirus-Gestalter';
+$enm_hpmin='404';
+$enm_hpmax='434';
+$enm_attmin='382';
+$enm_attmax='413';
+$enm_lootid='6000';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Xyulioya-Schattenverschlinger';
+$enm_hpmin='626';
+$enm_hpmax='651';
+$enm_attmin='585';
+$enm_attmax='662';
+$enm_lootid='10006';
+?>

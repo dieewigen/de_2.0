@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Lafar-Schwertk&auml;mpfer';
+$enm_hpmin='366';
+$enm_hpmax='374';
+$enm_attmin='296';
+$enm_attmax='354';
+$enm_lootid='5007';
+?>

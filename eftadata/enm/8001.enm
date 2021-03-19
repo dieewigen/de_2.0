@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Craan-Jungtier';
+$enm_hpmin='519';
+$enm_hpmax='567';
+$enm_attmin='483';
+$enm_attmax='545';
+$enm_lootid='8001';
+?>

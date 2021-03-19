@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Ovra-Alb';
+$enm_hpmin='531';
+$enm_hpmax='643';
+$enm_attmin='538';
+$enm_attmax='625';
+$enm_lootid='9005';
+?>

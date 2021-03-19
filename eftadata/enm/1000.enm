@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger Elchk&auml;fer';
+$enm_hpmin='141';
+$enm_hpmax='161';
+$enm_attmin='61';
+$enm_attmax='67';
+$enm_lootid='1000';
+?>

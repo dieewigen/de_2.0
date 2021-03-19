@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Qurtala-Zuchtmeister';
+$enm_hpmin='600';
+$enm_hpmax='651';
+$enm_attmin='617';
+$enm_attmax='669';
+$enm_lootid='10002';
+?>

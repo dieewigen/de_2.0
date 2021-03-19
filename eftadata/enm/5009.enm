@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Lafar-Anh&auml;nger';
+$enm_hpmin='344';
+$enm_hpmax='392';
+$enm_attmin='296';
+$enm_attmax='350';
+$enm_lootid='5009';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Zolit-Schl&auml;ger';
+$enm_hpmin='306';
+$enm_hpmax='321';
+$enm_attmin='247';
+$enm_attmax='270';
+$enm_lootid='4006';
+?>

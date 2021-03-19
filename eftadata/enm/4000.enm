@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Cenor-Sch&uuml;tze';
+$enm_hpmin='309';
+$enm_hpmax='331';
+$enm_attmin='247';
+$enm_attmax='265';
+$enm_lootid='4000';
+?>

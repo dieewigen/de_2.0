@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger Waldwolf';
+$enm_hpmin='140';
+$enm_hpmax='162';
+$enm_attmin='62';
+$enm_attmax='66';
+$enm_lootid='1001';
+?>

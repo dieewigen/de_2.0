@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Gaschra-L&auml;ufer';
+$enm_hpmin='337';
+$enm_hpmax='396';
+$enm_attmin='302';
+$enm_attmax='325';
+$enm_lootid='5005';
+?>

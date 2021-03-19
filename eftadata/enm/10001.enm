@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Qurtala-Streiter';
+$enm_hpmin='600';
+$enm_hpmax='651';
+$enm_attmin='611';
+$enm_attmax='649';
+$enm_lootid='10001';
+?>

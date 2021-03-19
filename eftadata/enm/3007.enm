@@ -1,0 +1,9 @@
+<?php
+$enm_level='3';
+$enm_name='Fellar-Schleicher';
+$enm_hpmin='255';
+$enm_hpmax='268';
+$enm_attmin='174';
+$enm_attmax='204';
+$enm_lootid='3007';
+?>

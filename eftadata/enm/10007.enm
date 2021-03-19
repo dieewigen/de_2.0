@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Buratol-M&auml;chtiger';
+$enm_hpmin='632';
+$enm_hpmax='697';
+$enm_attmin='630';
+$enm_attmax='707';
+$enm_lootid='10007';
+?>

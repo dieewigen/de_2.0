@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Syratur-Knecht';
+$enm_hpmin='383';
+$enm_hpmax='451';
+$enm_attmin='370';
+$enm_attmax='424';
+$enm_lootid='6003';
+?>

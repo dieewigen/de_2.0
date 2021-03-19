@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Eruhal-Druide';
+$enm_hpmin='508';
+$enm_hpmax='567';
+$enm_attmin='468';
+$enm_attmax='555';
+$enm_lootid='8003';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Kron-Verblendeter';
+$enm_hpmin='290';
+$enm_hpmax='343';
+$enm_attmin='249';
+$enm_attmax='275';
+$enm_lootid='4008';
+?>

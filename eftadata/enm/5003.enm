@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Gaschra-Schreiter';
+$enm_hpmin='337';
+$enm_hpmax='403';
+$enm_attmin='305';
+$enm_attmax='344';
+$enm_lootid='5003';
+?>

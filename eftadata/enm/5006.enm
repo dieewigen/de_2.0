@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Gaschra-Springer';
+$enm_hpmin='359';
+$enm_hpmax='374';
+$enm_attmin='315';
+$enm_attmax='354';
+$enm_lootid='5006';
+?>

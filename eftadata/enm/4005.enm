@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Zolit-Knecht';
+$enm_hpmin='296';
+$enm_hpmax='337';
+$enm_attmin='237';
+$enm_attmax='270';
+$enm_lootid='4005';
+?>

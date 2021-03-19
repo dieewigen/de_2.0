@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger Klarhirsch';
+$enm_hpmin='144';
+$enm_hpmax='165';
+$enm_attmin='61';
+$enm_attmax='68';
+$enm_lootid='1005';
+?>

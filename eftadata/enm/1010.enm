@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Höhlenwächter';
+$enm_hpmin='157';
+$enm_hpmax='177';
+$enm_attmin='65';
+$enm_attmax='77';
+$enm_lootid='1000';
+?>

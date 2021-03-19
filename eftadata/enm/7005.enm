@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Truhal-Schl&auml;chter';
+$enm_hpmin='446';
+$enm_hpmax='514';
+$enm_attmin='432';
+$enm_attmax='477';
+$enm_lootid='7005';
+?>

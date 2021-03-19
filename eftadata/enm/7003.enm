@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Truhal-Ge&auml;chteter';
+$enm_hpmin='451';
+$enm_hpmax='494';
+$enm_attmin='414';
+$enm_attmax='491';
+$enm_lootid='7003';
+?>

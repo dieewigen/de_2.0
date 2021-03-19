@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Gaschra-Kriecher';
+$enm_hpmin='333';
+$enm_hpmax='389';
+$enm_attmin='305';
+$enm_attmax='341';
+$enm_lootid='5004';
+?>

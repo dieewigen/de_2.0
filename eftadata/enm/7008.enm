@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Druuv-Gr&auml;ber';
+$enm_hpmin='475';
+$enm_hpmax='514';
+$enm_attmin='428';
+$enm_attmax='464';
+$enm_lootid='7008';
+?>

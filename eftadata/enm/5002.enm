@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Kalma-Ducker';
+$enm_hpmin='337';
+$enm_hpmax='374';
+$enm_attmin='305';
+$enm_attmax='350';
+$enm_lootid='5002';
+?>

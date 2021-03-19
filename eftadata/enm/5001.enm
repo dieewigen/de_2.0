@@ -1,0 +1,9 @@
+<?php
+$enm_level='5';
+$enm_name='Kulma-Beh&uuml;ter';
+$enm_hpmin='337';
+$enm_hpmax='389';
+$enm_attmin='315';
+$enm_attmax='331';
+$enm_lootid='5001';
+?>

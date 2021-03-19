@@ -1,0 +1,32 @@
+<?php
+$mapname[0]='Startgebiet';
+$mapname[1]='Map 2';
+$mapname[2]='Map 3';
+$mapname[3]='Map 4';
+$mapname[4]='Map 5';
+$mapname[5]='Map 6';
+$mapname[6]='Map 7';
+$mapname[7]='Map 8';
+$mapname[8]='Map 9';
+$mapname[9]='Map 10';
+$mapname[10]='Map 11';
+$mapname[11]='Map 12';
+$mapname[12]='Map 13';
+$mapname[13]='Map 14';
+$mapname[14]='Map 15';
+$mapname[15]='Map 16';
+$mapname[16]='Der Falkenfederdurchgang';
+$mapname[17]='Waldmond';
+$mapname[18]='Die Schran-Insel';
+$mapname[19]='Helgir-Gebiet';
+$mapname[20]='Der geteilte Pfad';
+$mapname[21]='Shirek-Gebirge';
+$mapname[22]='Der Branwald';
+$mapname[23]='Kreuzpfade';
+$mapname[24]='Der Knochenbergausläufer';
+$mapname[25]='Oberer Menetalflußlauf';
+$mapname[26]='Unterer Menetalflußlauf';
+$mapname[27]='Menetal Küstenpfad';
+$mapname[28]='Zur Hohen Eiche';
+$mapname[29]='Dunkelpfad';
+?>

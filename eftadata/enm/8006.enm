@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Eruhal-Gehilfe';
+$enm_hpmin='514';
+$enm_hpmax='578';
+$enm_attmin='483';
+$enm_attmax='519';
+$enm_lootid='8006';
+?>

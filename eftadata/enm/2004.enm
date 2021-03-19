@@ -1,0 +1,9 @@
+<?php
+$enm_level='2';
+$enm_name='Wildeber';
+$enm_hpmin='191';
+$enm_hpmax='226';
+$enm_attmin='126';
+$enm_attmax='136';
+$enm_lootid='2004';
+?>

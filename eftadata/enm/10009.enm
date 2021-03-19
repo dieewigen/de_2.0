@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Buratol-Vernichter';
+$enm_hpmin='613';
+$enm_hpmax='658';
+$enm_attmin='579';
+$enm_attmax='701';
+$enm_lootid='10009';
+?>

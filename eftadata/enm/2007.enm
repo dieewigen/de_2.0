@@ -1,0 +1,9 @@
+<?php
+$enm_level='2';
+$enm_name='H&ouml;hlenfledermaus';
+$enm_hpmin='197';
+$enm_hpmax='223';
+$enm_attmin='127';
+$enm_attmax='132';
+$enm_lootid='2007';
+?>

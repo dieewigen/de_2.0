@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Ovra-Gr&auml;ßlichkeit';
+$enm_hpmin='584';
+$enm_hpmax='643';
+$enm_attmin='532';
+$enm_attmax='631';
+$enm_lootid='9003';
+?>

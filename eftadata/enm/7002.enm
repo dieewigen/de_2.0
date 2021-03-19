@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Vuunuuur-Bestie';
+$enm_hpmin='442';
+$enm_hpmax='518';
+$enm_attmin='419';
+$enm_attmax='486';
+$enm_lootid='7002';
+?>

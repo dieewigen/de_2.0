@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Neolit-K&auml;mpfer';
+$enm_hpmin='400';
+$enm_hpmax='463';
+$enm_attmin='366';
+$enm_attmax='401';
+$enm_lootid='6008';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Neahel-Zerfleischer';
+$enm_hpmin='492';
+$enm_hpmax='572';
+$enm_attmin='468';
+$enm_attmax='530';
+$enm_lootid='8009';
+?>

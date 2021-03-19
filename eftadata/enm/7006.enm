@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Truhal-Axtk&auml;mpfer';
+$enm_hpmin='432';
+$enm_hpmax='490';
+$enm_attmin='432';
+$enm_attmax='464';
+$enm_lootid='7006';
+?>

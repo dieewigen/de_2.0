@@ -1,0 +1,9 @@
+<?php
+$enm_level='2';
+$enm_name='Rezoschlange';
+$enm_hpmin='199';
+$enm_hpmax='213';
+$enm_attmin='126';
+$enm_attmax='132';
+$enm_lootid='2002';
+?>

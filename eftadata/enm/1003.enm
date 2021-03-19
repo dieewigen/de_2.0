@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger Bergl&ouml;we';
+$enm_hpmin='137';
+$enm_hpmax='164';
+$enm_attmin='63';
+$enm_attmax='66';
+$enm_lootid='1003';
+?>

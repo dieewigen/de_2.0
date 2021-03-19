@@ -1,0 +1,9 @@
+<?php
+$enm_level='2';
+$enm_name='Braunb&auml;r';
+$enm_hpmin='193';
+$enm_hpmax='215';
+$enm_attmin='123';
+$enm_attmax='140';
+$enm_lootid='2006';
+?>

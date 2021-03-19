@@ -1,0 +1,9 @@
+<?php
+$enm_level='2';
+$enm_name='H&ouml;hlenb&auml;r';
+$enm_hpmin='203';
+$enm_hpmax='207';
+$enm_attmin='122';
+$enm_attmax='139';
+$enm_lootid='2008';
+?>

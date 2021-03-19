@@ -1,0 +1,9 @@
+<?php
+$enm_level='3';
+$enm_name='Fellar-Treiber';
+$enm_hpmin='237';
+$enm_hpmax='265';
+$enm_attmin='191';
+$enm_attmax='208';
+$enm_lootid='3008';
+?>

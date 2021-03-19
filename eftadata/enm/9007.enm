@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Gwonla-Dunkelstreiter';
+$enm_hpmin='543';
+$enm_hpmax='596';
+$enm_attmin='532';
+$enm_attmax='596';
+$enm_lootid='9007';
+?>

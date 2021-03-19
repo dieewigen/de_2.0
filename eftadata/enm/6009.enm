@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Neolit-J&uuml;nger';
+$enm_hpmin='421';
+$enm_hpmax='459';
+$enm_attmin='382';
+$enm_attmax='405';
+$enm_lootid='6009';
+?>

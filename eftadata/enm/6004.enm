@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Syratur-Treiber';
+$enm_hpmin='408';
+$enm_hpmax='429';
+$enm_attmin='374';
+$enm_attmax='393';
+$enm_lootid='6004';
+?>

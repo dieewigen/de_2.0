@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Craan-Br&uuml;ter';
+$enm_hpmin='519';
+$enm_hpmax='578';
+$enm_attmin='499';
+$enm_attmax='519';
+$enm_lootid='8002';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='10';
+$enm_name='Xyulioya-Schattenmeister';
+$enm_hpmin='613';
+$enm_hpmax='677';
+$enm_attmin='617';
+$enm_attmax='669';
+$enm_lootid='10003';
+?>

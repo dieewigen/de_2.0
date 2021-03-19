@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Kron-J&uuml;nger';
+$enm_hpmin='284';
+$enm_hpmax='328';
+$enm_attmin='242';
+$enm_attmax='278';
+$enm_lootid='4007';
+?>

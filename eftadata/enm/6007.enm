@@ -1,0 +1,9 @@
+<?php
+$enm_level='6';
+$enm_name='Neolit-Schamane';
+$enm_hpmin='387';
+$enm_hpmax='446';
+$enm_attmin='366';
+$enm_attmax='417';
+$enm_lootid='6007';
+?>

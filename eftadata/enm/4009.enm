@@ -1,0 +1,9 @@
+<?php
+$enm_level='4';
+$enm_name='Kron-Gehilfe';
+$enm_hpmin='284';
+$enm_hpmax='331';
+$enm_attmin='247';
+$enm_attmax='283';
+$enm_lootid='4009';
+?>

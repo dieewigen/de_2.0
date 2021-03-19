@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Gwonla-Dunkelschleicher';
+$enm_hpmin='537';
+$enm_hpmax='608';
+$enm_attmin='573';
+$enm_attmax='631';
+$enm_lootid='9008';
+?>

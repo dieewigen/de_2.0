@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Eruhal-Anh&auml;nger';
+$enm_hpmin='530';
+$enm_hpmax='556';
+$enm_attmin='468';
+$enm_attmax='525';
+$enm_lootid='8004';
+?>

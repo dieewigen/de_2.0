@@ -1,0 +1,9 @@
+<?php
+$enm_level='3';
+$enm_name='Morg-L&auml;ufer';
+$enm_hpmin='242';
+$enm_hpmax='281';
+$enm_attmin='181';
+$enm_attmax='203';
+$enm_lootid='3002';
+?>

@@ -1,0 +1,9 @@
+<?php
+$enm_level='7';
+$enm_name='Vuunuuur-Welpe';
+$enm_hpmin='442';
+$enm_hpmax='514';
+$enm_attmin='405';
+$enm_attmax='482';
+$enm_lootid='7000';
+?>

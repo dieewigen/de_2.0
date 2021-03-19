@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Craan-Larve';
+$enm_hpmin='530';
+$enm_hpmax='583';
+$enm_attmin='499';
+$enm_attmax='566';
+$enm_lootid='8000';
+?>

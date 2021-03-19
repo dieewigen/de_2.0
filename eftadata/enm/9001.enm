@@ -1,0 +1,9 @@
+<?php
+$enm_level='9';
+$enm_name='Greob-Schatten';
+$enm_hpmin='561';
+$enm_hpmax='608';
+$enm_attmin='555';
+$enm_attmax='631';
+$enm_lootid='9001';
+?>

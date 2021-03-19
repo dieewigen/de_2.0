@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger H&ouml;hlenb&auml;r';
+$enm_hpmin='137';
+$enm_hpmax='156';
+$enm_attmin='58';
+$enm_attmax='71';
+$enm_lootid='1008';
+?>

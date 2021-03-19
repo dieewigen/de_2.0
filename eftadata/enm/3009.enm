@@ -1,0 +1,9 @@
+<?php
+$enm_level='3';
+$enm_name='Fellar-Br&uuml;ter';
+$enm_hpmin='234';
+$enm_hpmax='278';
+$enm_attmin='177';
+$enm_attmax='208';
+$enm_lootid='3009';
+?>

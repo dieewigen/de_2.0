@@ -1,0 +1,9 @@
+<?php
+$enm_level='1';
+$enm_name='Junger Braunb&auml;r';
+$enm_hpmin='135';
+$enm_hpmax='162';
+$enm_attmin='62';
+$enm_attmax='67';
+$enm_lootid='1006';
+?>

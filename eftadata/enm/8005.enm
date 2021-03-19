@@ -1,0 +1,9 @@
+<?php
+$enm_level='8';
+$enm_name='Eruhal-Einweiser';
+$enm_hpmin='492';
+$enm_hpmax='562';
+$enm_attmin='494';
+$enm_attmax='535';
+$enm_lootid='8005';
+?>
