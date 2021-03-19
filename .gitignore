@@ -8,4 +8,3 @@ soudata/
 .gitignore
 dieewigen.code-workspace
 inc/env.inc.php
-rpc.php
