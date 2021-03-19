@@ -1,0 +1,21 @@
+<?php
+$item_typ='7';
+$item_level='64';
+$item_stack='1';
+$item_mindmg='0';
+$item_maxdmg='0';
+$item_armor='319';
+$item_worth='640';
+$item_bind='0';
+$item_durability='1064';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Berater-Handschuhe des Wolfes (hei&szlig;)';
+?>

@@ -1,0 +1,21 @@
+<?php
+$item_typ='2';
+$item_level='21';
+$item_stack='1';
+$item_mindmg='0';
+$item_maxdmg='0';
+$item_armor='156';
+$item_worth='315';
+$item_bind='0';
+$item_durability='1521';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Drachenschild (stark)';
+?>

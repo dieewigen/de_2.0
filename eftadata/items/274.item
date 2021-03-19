@@ -1,0 +1,21 @@
+<?php
+$item_typ='1';
+$item_level='5';
+$item_stack='1';
+$item_mindmg='181';
+$item_maxdmg='196';
+$item_armor='0';
+$item_worth='125';
+$item_bind='0';
+$item_durability='2505';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Streitkolben der Schlange (ramponiert)';
+?>

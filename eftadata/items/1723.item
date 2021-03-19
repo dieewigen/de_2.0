@@ -1,0 +1,21 @@
+<?php
+$item_typ='1';
+$item_level='26';
+$item_stack='1';
+$item_mindmg='960';
+$item_maxdmg='992';
+$item_armor='0';
+$item_worth='650';
+$item_bind='0';
+$item_durability='2526';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Kriegshammer (l&auml;rmend)';
+?>

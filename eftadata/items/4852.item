@@ -1,0 +1,22 @@
+<?php
+$item_typ='22';
+$item_level='0';
+$item_stack='0';
+$item_mindmg='0';
+$item_maxdmg='0';
+$item_armor='0';
+$item_worth='95';
+$item_bind='0';
+$item_durability='0';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Sense';
+$item_desc='Mit eine Sense ist es m&ouml;glich die Getreidevorkommen eines Feldes abzuernten.';
+?>

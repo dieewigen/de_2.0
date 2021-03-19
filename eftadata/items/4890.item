@@ -1,0 +1,22 @@
+<?php
+$item_typ='21';
+$item_level='0';
+$item_stack='5';
+$item_mindmg='0';
+$item_maxdmg='0';
+$item_armor='0';
+$item_worth='10';
+$item_bind='0';
+$item_durability='0';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='1';
+$item_useable='1';
+$item_uses='0';
+$item_name='Trank der Rast';
+$item_desc='Die blasenschlagende Fl&uuml;ssigkeit regeneriert deine Aktionspunkte um maximal 2500 Punkte. Es ist nicht m&ouml;glich damit mehr als die maximal m&ouml;gliche Aktionspunktezahl zu erreichen.';
+?>

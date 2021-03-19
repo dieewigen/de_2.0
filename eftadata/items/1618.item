@@ -1,0 +1,21 @@
+<?php
+$item_typ='1';
+$item_level='24';
+$item_stack='1';
+$item_mindmg='897';
+$item_maxdmg='915';
+$item_armor='0';
+$item_worth='600';
+$item_bind='0';
+$item_durability='2524';
+$item_bihand='0';
+$item_reqstr='0';
+$item_reqdex='0';
+$item_healhpmin='0';
+$item_healhpmax='0';
+$item_sell_lock='0';
+$item_auction_lock='0';
+$item_useable='0';
+$item_uses='0';
+$item_name='Morgenstern der Schlange (vibrierend)';
+?>
