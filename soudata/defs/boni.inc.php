@@ -1,0 +1,11 @@
+<?php
+$bonindex=0;
+$boni_def[$bonindex][0]='1';//preis
+$boni_def[$bonindex][1]='1';//bonus
+$bonindex++;
+$boni_def[$bonindex][0]='1';//preis
+$boni_def[$bonindex][1]='3';//bonus
+$bonindex++;
+$boni_def[$bonindex][0]='1';//preis
+$boni_def[$bonindex][1]='6';//bonus
+?>

@@ -1,9 +1,11 @@
+g/*.ttf
+g/*.otf
 fonts/
 npcx/
 ourdetool/
 ranglisten/
 sekretariat/
-soudata/
+soudata/source/sou_showdata.php
 .gitignore
 dieewigen.code-workspace
 inc/env.inc.php
