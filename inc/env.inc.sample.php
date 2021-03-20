@@ -1,6 +1,9 @@
 <?php
 //in env.inc.php umbenennen und die Daten hinterlegen
 
+//Admin-E-Mail-Adresse
+$GLOBALS['env_admin_email']='';
+
 //Forum
 $GLOBALS['env_db_forum_host']='';
 $GLOBALS['env_db_forum_user']='';

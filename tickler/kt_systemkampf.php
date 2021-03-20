@@ -1450,7 +1450,7 @@ a:6:{s:5:"daten";a:7:{s:9:"colstolen";i:-1;s:6:"sector";s:1:"2";s:6:"system";s:2
 					$text.="\r\n".'$anteil: '.$anteil;
 					$text.="\r\n".'Zielrasse: '.($d_userdata[0][3]-1);
 
-					@mail('info@tau-soft.de', $sv_server_tag.' KG '.$uid, $text.'<br>'.$nachricht, 'FROM: noreply@die-ewigen.com');				
+					@mail($GLOBALS['env_admin_email'], $sv_server_tag.' KG '.$uid, $text.'<br>'.$nachricht, 'FROM: '.$GLOBALS['env_admin_email']);
 					*/
 				}
 			}
@@ -1810,7 +1810,7 @@ a:6:{s:5:"daten";a:7:{s:9:"colstolen";i:-1;s:6:"sector";s:1:"2";s:6:"system";s:2
 			$text.="\r\n".'$anteil: '.$anteil;
 			$text.="\r\n".'Turmrasse: '.$d_userdata[0][3];
 			
-			@mail('info@tau-soft.de', $sv_server_tag.' KG '.$uid, $text, 'FROM: noreply@die-ewigen.com');
+			@mail($GLOBALS['env_admin_email'], $sv_server_tag.' KG '.$uid, $text, 'FROM: '.$GLOBALS['env_admin_email']);
 			*/
 		}
 		

@@ -1397,7 +1397,7 @@ if ($dodel==1){
 				  mysql_select_db($sv_database_de,$db);
 			}
 	   }else{
-		   @mail_smtp('issomad@die-ewigen.com', $sv_server_tag.' Versuche PA-Spieler zu löschen. user_id: '.$uid.' - Spielername: '.$spielername, ' ');
+		   @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Versuche PA-Spieler zu löschen. user_id: '.$uid.' - Spielername: '.$spielername, ' ');
 	   }
 	}
 
@@ -1601,7 +1601,7 @@ if($sv_ewige_runde==1){
 			echo '<br>'.$user_id;
 			
 			//mail bzgl. EH
-			@mail_smtp('detintern@die-ewigen.com', $sv_server_tag.' Ewige Runde: Neuer EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
+			@mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Ewige Runde: Neuer EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
 			
 			//der ally den Sieg mit anrechnen
 			$ally_id=get_player_allyid($user_id);
@@ -1697,7 +1697,7 @@ if($sv_ewige_runde==1){
 					//mail an den detverteiler, wenn es ein bezahlserver ist
 					//da pde-server wegfallen immer eine e-mail schicken
 					//if($sv_pcs_id>0)
-					@mail_smtp('detintern@die-ewigen.com', 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
+					@mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
 
 					//die rundenpunkte verteilen
 					//der erhabene bekommt 1 extra
@@ -1755,7 +1755,7 @@ if($sv_ewige_runde==1){
 				echo '<br>'.$user_id;
 
 				//mail bzgl. EH
-				@mail_smtp('detintern@die-ewigen.com', $sv_server_tag.' Hardcore: Neuer Teil-EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
+				@mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Hardcore: Neuer Teil-EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
 
 				//meldung an den Chat
 				$meldung=''.$spielername.' hat einen ERHABENEN-Teilsieg errungen.';
@@ -1796,7 +1796,7 @@ if($sv_ewige_runde==1){
 		//////////////////////////////////////////////////////////////////////
 		if ($score>=$sv_winscore AND $roundpointsflag==0){
 			//info bzgl. start eh-kampf
-			@mail_smtp('detintern@die-ewigen.com', 'Bei der Runde auf '.$sv_server_tag.' hat der Erhabenenkampf begonnen.', 'Bei der Runde auf '.$sv_server_tag.' hat der Erhabenenkampf begonnen.');
+			@mail_smtp($GLOBALS['env_admin_email'], 'Bei der Runde auf '.$sv_server_tag.' hat der Erhabenenkampf begonnen.', 'Bei der Runde auf '.$sv_server_tag.' hat der Erhabenenkampf begonnen.');
 
 			//flag setzen, dass nur einmal pro runde die verteilung stattfindet
 			mysql_query("UPDATE de_system SET roundpointsflag=1",$db);
@@ -1892,7 +1892,7 @@ if($sv_ewige_runde==1){
 					//mail an den detverteiler, wenn es ein bezahlserver ist
 					//da pde-server wegfallen immer eine e-mail schicken
 					//if($sv_pcs_id>0)
-					@mail_smtp('detintern@die-ewigen.com', 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
+					@mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
 
 					//die rundenpunkte verteilen
 					//der erhabene bekommt 1 extra
@@ -2056,9 +2056,9 @@ else //die runde ist zu ende
   
   //sql-befehl f�r das l�schen der logdaten
   $logtime=date('Y-m-d H:i:s', time());
-  $ranglistendaten.="SQL-Logfilel�schung: DELETE FROM gameserverlogdata WHERE serverid=$sv_servid AND time<'$logtime'\n";
+  $ranglistendaten.="SQL-Logfilelöschung: DELETE FROM gameserverlogdata WHERE serverid=$sv_servid AND time<'$logtime'\n";
   
-  @mail_smtp('detintern@die-ewigen.com', 'Die Runde auf '.$sv_server_tag.' ist vorbei - Ranglistendaten', $ranglistendaten);
+  @mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei - Ranglistendaten', $ranglistendaten);
   
   //�berpr�fen ob es einen automatischen reset geben soll
   if($sv_auto_reset==1){

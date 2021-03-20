@@ -553,7 +553,7 @@ if($GLOBALS['sv_ang']==1 && $_SESSION['ums_mobi']!=1 && $_SESSION['de_frameset']
 			<div style="flex-grow: 1;"><a style="font-size: 20px;" href="https://paypal.me/pools/c/8vL9wuicz9" target="_blank">Spendenseite</a></div>
 			<div style="flex-grow: 1; cursor: pointer;" onclick="$(\'#sf_desc\').show();">?</div>
 		</div>
-		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:issomad@die-ewigen.com">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
+		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:'.$GLOBALS['env_admin_email'].'">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
 		<div id="sf_desc" style="display: none; margin-top: 20px; font-size: 16px;">
 			Die Ewigen kostet ca. 145 Euro pro Jahr f&uuml;r Domains/Hosting/Server. Eine Beteiligung der Spieler an den Kosten w&auml;re begr&uuml;&szlig;enswert. Aktuell wird f&uuml;r das Jahr 2021 gesammelt.
 		</div>
@@ -586,7 +586,7 @@ if($GLOBALS['sv_ang']==1 && $_SESSION['ums_mobi']!=1 && $_SESSION['de_frameset']
 			<div style="flex-grow: 1; cursor: pointer;" onclick="$(\'#sf_desc\').show();">?</div>
 		</div>
 		'.$forum_output.'
-		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:issomad@die-ewigen.com">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
+		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:'.$GLOBALS['env_admin_email'].'">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
 		<div id="sf_desc" style="display: none; margin-top: 20px; font-size: 16px;">
 			Der Counter l&auml;uft mindestens bis zum 01.12.2019. Für jeden Spieler über 100 verl&auml;ngert sich der Counter um 3 Tage. Sollten die Spielerzahlen stark steigen, kann der Counter wieder entfernt werden.
 		</div>

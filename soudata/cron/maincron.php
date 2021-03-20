@@ -381,9 +381,9 @@ while($row = mysql_fetch_array($result))
   
   //per e-mail info wie teuer das item verkauft wurde, wenn es als w�hrung um credits geht
   if($auctioncurrency==1){
-  	@mail("issomad@die-ewigen.com", "$price C - $modulname - F$modulfraction - EA Modulverkauf - $bidder", "", 'FROM: noreply@die-ewigen.com');
+  	@mail($GLOBALS['env_admin_email'], "$price C - $modulname - F$modulfraction - EA Modulverkauf - $bidder", "", 'FROM: noreply@die-ewigen.com');
   }elseif($auctioncurrency==3){
-  	@mail("issomad@die-ewigen.com", "$price Baosin - $modulname - F$modulfraction - EA Modulverkauf - $bidder", "", 'FROM: noreply@die-ewigen.com');
+  	@mail($GLOBALS['env_admin_email'], "$price Baosin - $modulname - F$modulfraction - EA Modulverkauf - $bidder", "", 'FROM: noreply@die-ewigen.com');
   }
 
   echo '<br><br>';

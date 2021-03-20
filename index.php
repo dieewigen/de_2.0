@@ -350,19 +350,6 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$ip_adresse=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
 		mysql_query("INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp)VALUES('$ums_user_id','$ip_adresse',NOW(), '$_SERVER[HTTP_USER_AGENT]', '$loginhelpstr')");
 
-		//Test auf TOR-Browser
-		/*
-		unset($tor_browser);
-		$tor_browser[]='Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0';
-		$tor_browser[]='Mozilla/5.0 (Windows NT 6.1; rv:31.0) Gecko/20100101 Firefox/31.0';
-		//$tor_browser[]='Mozilla/5.0 (Windows NT 6.1; rv:45.0) Gecko/20100101 Firefox/45.0';
-		  
-		if(in_array($_SERVER['HTTP_USER_AGENT'], $tor_browser)){
-			@mail("issomad@die-ewigen.com", "TOR-Login: ".$sv_server_tag." ".$ums_user_id.' (HA: '.$_SESSION["ums_owner_id"].')', $_SERVER['HTTP_USER_AGENT'], 'FROM: noreply@die-ewigen.com');
-			//@mail("kleines_etwas@die-ewigen.com", "TOR-Login: ".$sv_server_tag." ".$ums_user_id.' (HA: '.$_SESSION["ums_owner_id"].')', $_SERVER['HTTP_USER_AGENT'], 'FROM: noreply@die-ewigen.com');
-		}
-		*/
-
 		//Logout anzeige f�r den title
 		$sekundenbiszumlogout=($_SESSION['ums_session_start']+$sv_session_lifetime)-time();
 		$restminuten=floor($sekundenbiszumlogout/60);

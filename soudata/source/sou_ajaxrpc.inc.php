@@ -86,22 +86,22 @@ include_once 'sou_ajax_quests.inc.php';
   
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-//  die daten für infobar1 zurückliefern  
+//  die daten fï¿½r infobar1 zurï¿½ckliefern  
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 if($_REQUEST['timeboost']==1){
-	//überprüfen ob etwas läuft
+	//ï¿½berprï¿½fen ob etwas lï¿½uft
 	if($player_atimer1time>time()){
 		//transaktionsbeginn
 		if (setLock($_SESSION["sou_user_id"]))
 		{
-		  //überprüfen ob es der richtige typ ist. geht nur bei folgenden typen
+		  //ï¿½berprï¿½fen ob es der richtige typ ist. geht nur bei folgenden typen
 		  if($player_atimer1typ>=1 AND $player_atimer1typ<=5 AND $player_atimer1typ!=2 AND $player_atimer1typ!=4)
 		  {
-			//überprüfen wieviel credits es kosten wird
+			//ï¿½berprï¿½fen wieviel credits es kosten wird
 			$needcredits=ceil(($player_atimer1time-time())/60/5);
 
-			//überprüfen ob man genug credits hat
+			//ï¿½berprï¿½fen ob man genug credits hat
 			$has_credits=has_credits($ums_user_id);
 			if($has_credits>=$needcredits)
 			{
@@ -117,7 +117,7 @@ if($_REQUEST['timeboost']==1){
 			  change_credits($ums_user_id, $needcredits*(-1), 'EA-Aktionsbeschleunigung');
 
 			  //den kauf im logfile hinterlegen
-			  //@mail('issomad@die-ewigen.com', 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
+			  //@mail($GLOBALS['env_admin_email'], 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
 			  if($ums_user_id>1)
 			  {
 				$datum=date("Y-m-d H:i:s",time());
@@ -130,7 +130,7 @@ if($_REQUEST['timeboost']==1){
 			else $output=-2;//nicht genug credits
 		  }
 		  //lock wieder entfernen
-		  $erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+		  $erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
 		  if ($erg)
 		  {
 			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -154,7 +154,7 @@ if($_REQUEST['timeboost']==1){
   
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-//  die daten für infobar1 zurückliefern  
+//  die daten fï¿½r infobar1 zurï¿½ckliefern  
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 if($_REQUEST['loadinfobar1']==1)
@@ -191,7 +191,7 @@ if($_REQUEST['loadinfobar1']==1)
 		$text.='<br>Die Reisezeit berechnet sich aus Beschleunigungsphase, &Uuml;berlichtflug und Verz&ouml;gerungsphase. F&uuml;r die Beschleunigung und Verz&ouml;gerung werden jeweils 120 Sekunden ben&ouml;tigt.';
 		$canboost=0;
 	}
-    elseif($player_atimer1typ==3)//brücke der erbauer
+    elseif($player_atimer1typ==3)//brï¿½cke der erbauer
     { 
       $text.='Das Raumschiff befindet sich gerade im Hyperraumflug zwischen 2 Stationen einer Br&uuml;cke der ERBAUER.<br>Zielkoordinaten: '.$player_x.':'.$player_y;
 	  $canboost=1;
@@ -237,7 +237,7 @@ if($_REQUEST['loadinfobar1']==1)
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-//  die daten für die karte zurückliefern  
+//  die daten fï¿½r die karte zurï¿½ckliefern  
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 if($_REQUEST['loadmapdata'])
@@ -245,11 +245,11 @@ if($_REQUEST['loadmapdata'])
   $sbx=round($_REQUEST['xpos']/15);
   $sby=round($_REQUEST['ypos']/15);
 
-  //zuerst die sektoren überprüfen, ob sie erforscht worden sind
+  //zuerst die sektoren ï¿½berprï¿½fen, ob sie erforscht worden sind
   unset($knownflag, $knownx, $knowny, $knowncost, $systemx, $systemy, $systemname, $systemfraction, $systempic, $systemhb, $systemua, 
   $srb_pic, $srb_fraction, $srb_x, $srb_y, $srb_special, $find_x, $find_y, $quest_x, $quest_y, $fraction_money);
   
-  //kosten für die sektorerforschung
+  //kosten fï¿½r die sektorerforschung
   $ekosten = array (244400,306802,359255,417052,600925,688646,785306,1070179,1211014,1366201,1793402,2013231,2577670,2882713,3621196,4037873,4996676,5558812,6796051,7546840,9135420,10974045,12161167,14505352,17204583,19037192,22460312,26385887,30880233,36017965,41882995,48569662,56183973,64845010,74686495, 85858527,98529544,117069547,133759663,157718804,179566008,210410382,245680212,278430892,323593544,375070444,433678404,500335139,588328184,675555314);
   
   //fraktionskasse auslesen
@@ -268,7 +268,7 @@ if($_REQUEST['loadmapdata'])
 	  $fraction=$player_fraction;
 	  
       //berechnen wie teuer die expedition ist
-	  //entfernung zum nächsten nullpunkt berechnen
+	  //entfernung zum nï¿½chsten nullpunkt berechnen
       $s1=$sv_sou_galcenter[0][0]-$searchx;
       $s2=$sv_sou_galcenter[0][1]-$searchy;
       if($s1<0)$s1=$s1*(-1);
@@ -278,7 +278,7 @@ if($_REQUEST['loadmapdata'])
       $w1=$s1+$s2;
       $entfernung=sqrt($w1);
     
-      //die kosten in abhängigkeit zur entfernung berechnen
+      //die kosten in abhï¿½ngigkeit zur entfernung berechnen
       $teiler=$sv_sou_galcenter[0][2]/50;
     
       $kostenstelle=round($entfernung/$teiler);
@@ -295,7 +295,7 @@ if($_REQUEST['loadmapdata'])
 	  $knowny[]=$searchy;
 	  if($num==1)//bekannt
 	  {
-	    //da bekannt noch überprüfen wem der sektor gehört
+	    //da bekannt noch ï¿½berprï¿½fen wem der sektor gehï¿½rt
 	    $knownflag[]=get_sector_owner($x, $y);
 	    
 	    //die sonnensysteme auslesen
@@ -366,7 +366,7 @@ if($_REQUEST['loadmapdata'])
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-// daten für showdata sonnensystemübersicht
+// daten fï¿½r showdata sonnensystemï¿½bersicht
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 if($_REQUEST['showdataload'])
@@ -386,7 +386,7 @@ if($_REQUEST['showdataload'])
     $resstring='';
 	for($i=0;$i<count($r_def);$i++)
 	{
-  	  //überprüfen ob der rohstoff möglich ist
+  	  //ï¿½berprï¿½fen ob der rohstoff mï¿½glich ist
  
   	  if(res_is_availableXY($row['x'], $row['y'], $i)==1)
   	  {
@@ -454,9 +454,9 @@ if($_REQUEST['chatinsert']){
 // manage chat
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-//Im Laufe des Tages wird vermutlich ein neues Chatsystem online gestellt. Während der Wartungsarbeiten steht der Chat nicht zur Verfügung und es können Fehlermeldungen erscheinen. Es wird notwendig sein, das Spiel komplett neu zu laden um auf den neuen Chat zugreifen zu können.
+//Im Laufe des Tages wird vermutlich ein neues Chatsystem online gestellt. Wï¿½hrend der Wartungsarbeiten steht der Chat nicht zur Verfï¿½gung und es kï¿½nnen Fehlermeldungen erscheinen. Es wird notwendig sein, das Spiel komplett neu zu laden um auf den neuen Chat zugreifen zu kï¿½nnen.
 if($_REQUEST['managechat']){
-	//die PHP-Session aus Performancegründen schließen
+	//die PHP-Session aus Performancegrï¿½nden schlieï¿½en
 	session_write_close();
 	$chatid=intval($_REQUEST['chatid']);
 	
@@ -468,7 +468,7 @@ if($_REQUEST['managechat']){
 	$chan_global=0;
 	$chan_frac=$_SESSION["sou_fraction"];
 
-	//nur etwas machen, wenn die lastid größer ist als beim letzten aufruf, sonst werden zuviele daten übertragen
+	//nur etwas machen, wenn die lastid grï¿½ï¿½er ist als beim letzten aufruf, sonst werden zuviele daten ï¿½bertragen
 	$db_daten=mysql_query("SELECT MAX(id) AS wert FROM $tbl_chat WHERE (channel='$chan_global' OR channel='$chan_frac') ORDER BY timestamp DESC",$soudb);
 	$row = mysql_fetch_array($db_daten);
 	$maxid=$row['wert'];
@@ -484,7 +484,7 @@ if($_REQUEST['managechat']){
 	  $chat_allycolor='#4a91fc';
 
 
-	  $validchars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ß?!+-/<>()[].,;_:"%&@=#* ';
+	  $validchars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ï¿½?!+-/<>()[].,;_:"%&@=#* ';
 
 	  //$db_daten=mysql_query("SELECT * FROM $tbl_chat WHERE (channel='$chan_global' OR channel='$chan_frac') AND id>'$lastid' ORDER BY timestamp ASC",$soudb);
 	  $db_daten=mysql_query("SELECT * FROM $tbl_chat WHERE (channel='$chan_global' OR channel='$chan_frac') AND id>'".$chatid."'ORDER BY timestamp DESC",$soudb);
@@ -539,7 +539,7 @@ if($_REQUEST['managechat']){
 		  else //allgemeiner chat
 		  {
 			$color=$chat_sectorcolor;
-			//ist es ein logeintrag für gebäude/forschungen/usw?
+			//ist es ein logeintrag fï¿½r gebï¿½ude/forschungen/usw?
 			if($outputid==0)
 			{
 			  if($lines[$outputid]<=$maxlines)$output[$outputid]='<br><font color="'.$color.'"><span title="'.$datum.'">'.$zeit.'</span> '.$row["message"].'</font>'.$output[$outputid];
@@ -552,7 +552,7 @@ if($_REQUEST['managechat']){
 		}
 	  }
 
-	  //den output auf sonderzeichen abchecken, die das js-system stören
+	  //den output auf sonderzeichen abchecken, die das js-system stï¿½ren
 	  $output[0]=umlaut($output[0]);
 	  $output[1]=umlaut($output[1]);
 	  for($c=0;$c<=1;$c++)
@@ -583,13 +583,13 @@ if($_REQUEST['managechat']){
 
 function umlaut($fieldname)
 {
-    $fieldname = str_replace ("ä", "&auml;", $fieldname);
-    $fieldname = str_replace ("Ä", "&Auml;", $fieldname);
-    $fieldname = str_replace ("ö", "&ouml;", $fieldname);
-    $fieldname = str_replace ("Ö", "&Ouml;", $fieldname);
-    $fieldname = str_replace ("ü", "&uuml;", $fieldname);
-    $fieldname = str_replace ("Ü", "&Uuml;", $fieldname);
-    $fieldname = str_replace ("ß", "&szlig;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&auml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&Auml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&ouml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&Ouml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&uuml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&Uuml;", $fieldname);
+    $fieldname = str_replace ("ï¿½", "&szlig;", $fieldname);
     $fieldname = str_replace ("Ã¤", "&auml;", $fieldname);
     $fieldname = str_replace ("Ã„", "&Auml;", $fieldname);
     $fieldname = str_replace ("Ã¶", "&ouml;", $fieldname);
@@ -608,13 +608,13 @@ function umlaut($fieldname)
 
 function reumlaut($fieldname)
 {
-    $fieldname = str_replace ("&auml;", "ä", $fieldname);
-    $fieldname = str_replace ("&Auml;", "Ä", $fieldname);
-    $fieldname = str_replace ("&ouml;", "ö", $fieldname);
-    $fieldname = str_replace ("&Ouml;", "Ö", $fieldname);
-    $fieldname = str_replace ("&uuml;", "ü", $fieldname);
-    $fieldname = str_replace ("&Uuml;", "Ü", $fieldname);
-    $fieldname = str_replace ("&szlig;", "ß", $fieldname);
+    $fieldname = str_replace ("&auml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&Auml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&ouml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&Ouml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&uuml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&Uuml;", "ï¿½", $fieldname);
+    $fieldname = str_replace ("&szlig;", "ï¿½", $fieldname);
     return $fieldname;
 }
 ?>

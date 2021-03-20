@@ -1574,7 +1574,7 @@ case "":break;
 default:
 @$time=strftime("%Y%m%d%H%M%S");
 @$param = "Der folgende Spieler $ums_spielername ($asec:$asys)[UserID:$ums_user_id] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $action";
-@mail_smpt("issomad@die-ewigen.com","Scriptkiddi auf Server $sv_server_name am Werk.",$param);
+@mail_smpt($GLOBALS['env_admin_email'],"Scriptkiddi auf Server $sv_server_name am Werk.",$param);
 break;
 }
 
@@ -1588,7 +1588,7 @@ switch($l){
     default:
     @$time=strftime("%Y%m%d%H%M%S");
     @$para = "Der folgende Spieler $ums_spielername ($asec:$asys)[UserID:$ums_user_id] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $l";
-    @mail_smtp("ThE_GuArDiAn@Die-Ewigen.com","Scriptkiddi auf Server $sv_server_name am Werk.",$para);
+    @mail_smtp($GLOBALS['env_admin_email'],"Scriptkiddi auf Server $sv_server_name am Werk.",$para);
     break;
 }
 ?>

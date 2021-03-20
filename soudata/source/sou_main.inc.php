@@ -279,7 +279,7 @@ if($_REQUEST["cboost"])
   		  change_credits($ums_user_id, $needcredits*(-1), 'EA-Aktionsbeschleunigung');
   		
 		  //den kauf im logfile hinterlegen
-      	  //@mail('issomad@die-ewigen.com', 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
+      	  //@mail($GLOBALS['env_admin_email'], 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
       	  if($ums_user_id>1)
       	  {
   		    $datum=date("Y-m-d H:i:s",time());

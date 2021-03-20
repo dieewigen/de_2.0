@@ -196,7 +196,7 @@ if($num==1 OR $numsrb==1)
     $owner_fraction=$row["fraction"];
   }
   
-  //überprüfen ob das sonnenystem zur eigenen fraktion gehört
+  //ï¿½berprï¿½fen ob das sonnenystem zur eigenen fraktion gehï¿½rt
   if($numsrb==0)//es ist ein sonnensystem
   {
   	if($player_fraction!=$owner_fraction)
@@ -278,7 +278,7 @@ $fm=0;
 if($fraktionsstatus==0)$fm=3;
 elseif($fraktionsstatus==1)$fm=1.5;
 
-//preis für ein fraktionsstatusmodul
+//preis fï¿½r ein fraktionsstatusmodul
 $fpreis=1000;
 */
 
@@ -293,8 +293,8 @@ if($_REQUEST["do"]=='1' AND ($fraktionsstatus==0 OR $fraktionsstatus==1))
   //transaktionsbeginn
   if (setLock($_SESSION["sou_user_id"]))
   {
-	//überprüfen ob platz im modulkomplex ist
-    //zuerst die dortigen hinterlegen module zählen
+	//ï¿½berprï¿½fen ob platz im modulkomplex ist
+    //zuerst die dortigen hinterlegen module zï¿½hlen
 	$db_datenx=mysql_query("SELECT id FROM sou_ship_module WHERE user_id='$player_user_id' AND location=1",$soudb);
 	$num_lager = mysql_num_rows($db_datenx);
 			
@@ -303,7 +303,7 @@ if($_REQUEST["do"]=='1' AND ($fraktionsstatus==0 OR $fraktionsstatus==1))
             
     if($num_lager < $max_lager)
     {
-      //überprüfen ob man genug geld hat
+      //ï¿½berprï¿½fen ob man genug geld hat
       $hasmoney=has_money($player_user_id);
       if($hasmoney>=$fpreis)
       {
@@ -331,7 +331,7 @@ if($_REQUEST["do"]=='1' AND ($fraktionsstatus==0 OR $fraktionsstatus==1))
  	
   	
   	//lock wieder entfernen
-    $erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    $erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     if ($erg)
     {
       //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -356,8 +356,8 @@ if($_REQUEST["do"]=='2')
   //transaktionsbeginn
   if (setLock($_SESSION["sou_user_id"]))
   {
-	//überprüfen ob platz im modulkomplex ist
-    //zuerst die dortigen hinterlegen module zählen
+	//ï¿½berprï¿½fen ob platz im modulkomplex ist
+    //zuerst die dortigen hinterlegen module zï¿½hlen
 	$db_datenx=mysql_query("SELECT id FROM sou_ship_module WHERE user_id='$player_user_id' AND location=1",$soudb);
 	$num_lager = mysql_num_rows($db_datenx);
 			
@@ -366,11 +366,11 @@ if($_REQUEST["do"]=='2')
             
     if($num_lager < $max_lager)
     {
-      //überprüfen ob man genug geld hat
+      //ï¿½berprï¿½fen ob man genug geld hat
       $hasmoney=has_credits($ums_user_id);
       if($hasmoney>=$fpreis)
       {
-      	//überprüfen ob es das angebot auch wirklich gibt
+      	//ï¿½berprï¿½fen ob es das angebot auch wirklich gibt
       	if(isset($angebot[$aid][name]))
       	{
       	  //geld abziehen
@@ -385,7 +385,7 @@ if($_REQUEST["do"]=='2')
           mysql_query($sql,$soudb);
           
           //status	
-          //mail('issomad@die-ewigen.com', 'EA Itemkauf '.$angebot[$aid][name].'('.$angebot[$aid][creditpreis].') - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
+          //mail($GLOBALS['env_admin_email'], 'EA Itemkauf '.$angebot[$aid][name].'('.$angebot[$aid][creditpreis].') - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
         
           //msg ausgeben
       	  echo '<font color="#00FF00">Das Modul ist jetzt im Modulkomplex verf&uuml;gbar.</font><br>';
@@ -398,7 +398,7 @@ if($_REQUEST["do"]=='2')
  	
   	
   	//lock wieder entfernen
-    $erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    $erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     if ($erg)
     {
       //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -423,11 +423,11 @@ if($_REQUEST["do"]=='3')
   //transaktionsbeginn
   if (setLock($_SESSION["sou_user_id"]))
   {
-    //überprüfen ob man genug geld hat
+    //ï¿½berprï¿½fen ob man genug geld hat
     $hasmoney=has_baosin($player_user_id);
     if($hasmoney>=$fpreis)
     {
-      //überprüfen ob es das angebot auch wirklich gibt
+      //ï¿½berprï¿½fen ob es das angebot auch wirklich gibt
       if(isset($bangebot[$baid]['name']))
       {
       	//geld abziehen
@@ -444,7 +444,7 @@ if($_REQUEST["do"]=='3')
 		  change_specialres($player_user_id,$baid-1, 1);
           echo '<font color="#00FF00">Die Ware befindet sich jetzt an Bord deines Raumschiffes.</font>';
         }
-		//Geistige Stärke
+		//Geistige Stï¿½rke
         if($baid>=11 AND $baid<=13){
           $sql="INSERT INTO sou_ship_module (user_id, fraction, name, craftedby, lifetime, hasspace, needspace, needenergy, giveenergy, canmine, 
             givelife, givesubspace, givecenter, givehyperdrive, giveresearch, location, uomlock, quality, buff, mapbuff) VALUES 
@@ -460,7 +460,7 @@ if($_REQUEST["do"]=='3')
     else echo '<font color="#FF0000">Es sind nicht genug Baosin vorhanden.</font><br>';
   	
   	//lock wieder entfernen
-    $erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    $erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     if ($erg)
     {
       //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -534,7 +534,7 @@ echo '</table>';
 */
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
-//angebote für credits
+//angebote fï¿½r credits
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 echo '<table width="100%" border="0" cellpadding="1" cellspacing="1">';
@@ -566,7 +566,7 @@ echo '</table>';
 echo '<br>';
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
-//angebote für baosin
+//angebote fï¿½r baosin
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 echo '<table width="100%" border="0" cellpadding="1" cellspacing="1">';

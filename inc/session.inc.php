@@ -178,7 +178,9 @@ if ((($_SESSION['ums_session_start']+$sv_session_lifetime)<time()) && ($eftachat
 	}
 	
 
-	if($_SESSION['botaccesscounter']>10)@mail('issomad@die-ewigen.com', $sv_server_tag.'botaccesscounter '.$_SESSION['botaccesscounter'].' user_id '.$ums_user_id, time(), 'FROM: issomad@die-ewigen.com');
+	if($_SESSION['botaccesscounter']>10){
+		@mail($GLOBALS['env_admin_email'], $sv_server_tag.'botaccesscounter '.$_SESSION['botaccesscounter'].' user_id '.$ums_user_id, time(), 'FROM: '.$GLOBALS['env_admin_email']);
+	}
 
 	//dateiname speichern um sp�ter darauf weiterleiten zu k�nnen
 	$_SESSION['ums_bot_protection_filename']=$_SERVER['PHP_SELF'];

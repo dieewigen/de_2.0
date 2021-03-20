@@ -332,7 +332,7 @@ if($kampf==1 OR $kampf==3)
              if($player_killcounter % 100 ==0 AND $killcounter==1 AND $player_killcounter>0)
              {
                //info um zu testen ob jemand artefakte farmt
-               //@mail('issomad@die-ewigen.com',"$sv_server_tag - $ums_spielername - Level: $level - Gegnerlevel: $enm_level", '');
+               //@mail($GLOBALS['env_admin_email'],"$sv_server_tag - $ums_spielername - Level: $level - Gegnerlevel: $enm_level", 'FROM: '.$GLOBALS['env_admin_email']);
            	   //noch schauen ob es platz f�r das artefakt gibt
                $db_datenx=mysql_query("SELECT user_id FROM de_user_artefact WHERE user_id='$ums_user_id'",$db);
                $numx = mysql_num_rows($db_datenx);

@@ -179,9 +179,9 @@ if($dortick==1){
 	  mysql_query("UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
 	  mysql_query("UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0",$db);
 
-	  if($secz>1){
-		  //mail('tauchmann@gmx.de', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: issomad@die-ewigen.com');
-	  }
+		if($secz>1){
+			//mail($GLOBALS['env_admin_email'], $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: '.$GLOBALS['env_admin_email']);
+		}
 	}
 
 	echo "<br>$num Spieler-Systeme registriert.<br>";
@@ -316,7 +316,7 @@ if($dortick==1){
 		mysql_query("DELETE FROM de_sector_umzug WHERE typ=0 AND user_id='$uid'",$db);
 
 		if($secz>1){
-			mail('tauchmann@gmx.de', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: issomad@die-ewigen.com');
+			mail($GLOBALS['env_admin_email'], $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: '.$GLOBALS['env_admin_email']);
 		}		
 	}
 

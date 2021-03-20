@@ -33,12 +33,6 @@ include "functions.php";
 
 if ($_POST["itr"] AND $techs[4]!=0)
 {
-  //test auf korrekten scriptaufruf
-  if ($HTTP_SERVER_VARS["REQUEST_METHOD"]=='GET')
-  {
-    @mail('issomad@die-ewigen.com', 'Siegel1', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
-    die('<font color="FF0000"><br>Es ist ein Fehler aufgetreten.<br>');
-  }
 
   //transaktionsbeginn
   if (setLock($ums_user_id))
@@ -88,7 +82,7 @@ if ($techs[4]==0)
   $techcheck="SELECT tech_name FROM de_tech_data".$ums_rasse." WHERE tech_id=4";
   $db_tech=mysql_query($techcheck,$db);
   $row_techcheck = mysql_fetch_array($db_tech);
-  echo "Um auf das Siegel zugreifen zu können wird ein(e) ".$row_techcheck[tech_name]." benötigt.<br><br>";
+  echo "Um auf das Siegel zugreifen zu kï¿½nnen wird ein(e) ".$row_techcheck[tech_name]." benï¿½tigt.<br><br>";
 }
 else
 {
@@ -170,7 +164,7 @@ else
   if($info==1)
   {
     echo '<table width=600>';
-    echo '<tr class="cc"><td>Das Siegel von Basranur bezeichnet ein Sonnensystem in dem durch die Aktivit&auml;t der DX61a23 eine uralte Anlage wieder zum Leben erweckt worden ist, die vermutlich auf die Erbauerrasse zur&uuml;ckgeht, wobei jedoch Modifikationen durchgef&uuml;hrt worden sind. Die Anlage diente vermutlich fr&uuml;her der Verstärkung von Kollektorenergie, jetzt jedoch verursacht sie nach einer Aufladungsphase eine Schockwelle, welche zu einer Kollabierung und somit zur Zerst&ouml;rung von Kollektoren f&uuml;hrt. Die Anlage orientiert sich an der Trägerenergie der Umwandler und da diese bei den Rassen leicht voneinander abweichen, kann die Schockwelle nur immer eine Rasse treffen. Durch die richtige Positionierung von Iradium als St&uuml;tzmasse k&ouml;nnen die Rassen die Frequenz zu ihren Gunsten modifizieren und somit die Gefahr, dass sie die Schockwelle trifft abwenden.</td></tr>';
+    echo '<tr class="cc"><td>Das Siegel von Basranur bezeichnet ein Sonnensystem in dem durch die Aktivit&auml;t der DX61a23 eine uralte Anlage wieder zum Leben erweckt worden ist, die vermutlich auf die Erbauerrasse zur&uuml;ckgeht, wobei jedoch Modifikationen durchgef&uuml;hrt worden sind. Die Anlage diente vermutlich fr&uuml;her der Verstï¿½rkung von Kollektorenergie, jetzt jedoch verursacht sie nach einer Aufladungsphase eine Schockwelle, welche zu einer Kollabierung und somit zur Zerst&ouml;rung von Kollektoren f&uuml;hrt. Die Anlage orientiert sich an der Trï¿½gerenergie der Umwandler und da diese bei den Rassen leicht voneinander abweichen, kann die Schockwelle nur immer eine Rasse treffen. Durch die richtige Positionierung von Iradium als St&uuml;tzmasse k&ouml;nnen die Rassen die Frequenz zu ihren Gunsten modifizieren und somit die Gefahr, dass sie die Schockwelle trifft abwenden.</td></tr>';
     echo '</table>';
   }
   else

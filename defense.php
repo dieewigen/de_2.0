@@ -153,12 +153,6 @@ $defstatus = $defense_lang['statusinformationen'].'&'.$infostring;
 
 if ($submit AND $sabotage==0 AND $techs[22]==1)//ja, es wurde ein button gedrueckt
 {
-  //test auf korrekten scriptaufruf
-  if ($HTTP_SERVER_VARS["REQUEST_METHOD"]=='GET')
-  {
-    @mail('issomad@die-ewigen.com', 'GET-Scriptfehler Verteidigung', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
-    die('<font color="FF0000"><br>'.$defense_lang[fehler].'<br>');
-  }
 
   //transaktionsbeginn
   if (setLock($ums_user_id))

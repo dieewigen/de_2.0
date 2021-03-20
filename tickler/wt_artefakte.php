@@ -491,7 +491,6 @@ while($row = mysql_fetch_array($res)){
 		$wm=0;
 	}
 
-    //@mail('issomad@die-ewigen.com', 'Info-Artefakte', 'wm:'.$wm);
     $w=sqrt($artanzahl)*535*$wm;
     $r=rand (1, 1000000);
     echo 'W: '.$w.'<br>';

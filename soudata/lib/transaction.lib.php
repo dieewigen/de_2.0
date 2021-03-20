@@ -19,7 +19,7 @@
 			}
 			elseif ($lockarray_num > 1)
 			{
-				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:issomad@die-ewigen.com>issomad@die-ewigen.com</a> damit Ihr Problem behoben wird.");
+				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:".$GLOBALS['env_admin_email'].">".$GLOBALS['env_admin_email']."</a> damit Ihr Problem behoben wird.");
 				$returnvalue = true;
 			}
 		}
@@ -50,7 +50,7 @@
 			}
 			elseif ($lockarray_num > 1)
 			{
-				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:issomad@die-ewigen.com>issomad@die-ewigen.com</a> damit Ihr Problem behoben wird.");
+				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:".$GLOBALS['env_admin_email'].">".$GLOBALS['env_admin_email']."</a> damit Ihr Problem behoben wird.");
 				$returnvalue = false;
 			}
 			elseif ($lockarray_num == 0)
@@ -84,7 +84,7 @@
 			}
 			elseif ($lockarray_num > 1)
 			{
-				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:issomad@die-ewigen.com>issomad@die-ewigen.com</a> damit Ihr Problem behoben wird.");
+				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:".$GLOBALS['env_admin_email'].">".$GLOBALS['env_admin_email']."</a> damit Ihr Problem behoben wird.");
 				$returnvalue = false;
 			}
 			elseif ($lockarray_num == 0)

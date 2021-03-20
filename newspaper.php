@@ -60,10 +60,10 @@ if($action!="archiv"){
 //e-mail senden
 if($_REQUEST['feedback']){
 	echo '<div class="info_box text3">Vielen Dank, das Feedback wurde gespeichert.</div><br>';
-	$sendto='issomad@die-ewigen.com';
+	$sendto=$GLOBALS['env_admin_email'];
 	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$ums_user_id.' '.$ums_spielername;
 	$text=str_replace('\r\n',"\r\n",$_REQUEST['feedback']);
-	$sendfrom='FROM: issomad@die-ewigen.com';
+	$sendfrom='FROM: '.$GLOBALS['env_admin_email'];
 	@mail($sendto, $betreff, $text, $sendfrom);
 }
 

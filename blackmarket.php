@@ -535,7 +535,6 @@ if($submit100 OR $submit104 OR $submit105 OR $submit106){
 						$credits=$credits-$artefaktpreis[$artid];
 						refererbonus($artefaktpreis[$artid]);
 						$row["sm_art$ai"]++;
-						//@mail('issomad@die-ewigen.com', "$ua_name[$artid]-Artefaktgutschrift", $ums_user_id.' - '.$ums_nic.' - '.$ums_spielername);
 						writetocreditlog("$ua_name[$artid]-".$tradeblackmarketinc_lang[artefaktgutschrift]);
 						updatesmstat($artid+100, $artefaktpreis[$artid]);
 						$errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang[msg_9].'<br><br></font>';

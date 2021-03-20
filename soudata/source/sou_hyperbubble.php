@@ -4,7 +4,7 @@ include "soudata/defs/buildings.inc.php";
 
 echo '<br>';
 
-//maximalen gebäudelevel auslesen
+//maximalen gebï¿½udelevel auslesen
 $geb_level=get_max_frac_bldg_level(13);
 
 
@@ -37,7 +37,7 @@ if($player_in_hb>0)
 
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
-  //überprüfen ob man kämpfen möchte
+  //ï¿½berprï¿½fen ob man kï¿½mpfen mï¿½chte
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
   if($_REQUEST["hbdo"]==1 AND $player_atimer1time<=time() AND $_REQUEST['st']==$_SESSION['sou_hb_token'])
@@ -50,15 +50,15 @@ if($player_in_hb>0)
   	if(isset($_REQUEST['mmc']) OR isset($_REQUEST['mma']) OR isset($_REQUEST['mmb']) OR $_REQUEST['mmd']!=5)
   	{
   		$body='mma: '.$_REQUEST['mma'].' mmb: '.$_REQUEST['mmb'].' mmc: '.$_REQUEST['mmc'].' mmd: '.$_REQUEST['mmd'];
-  		mail('issomad@die-ewigen.com', $sv_server_tag.' HB: '.$ums_user_id.' F'.$player_fraction.'('.$_REQUEST['st'].'/'.$_SESSION['sou_hb_token'].')', $body, 'FROM: issomad@die-ewigen.com');
+  		mail($GLOBALS['env_admin_email'], $sv_server_tag.' HB: '.$ums_user_id.' F'.$player_fraction.'('.$_REQUEST['st'].'/'.$_SESSION['sou_hb_token'].')', $body, 'FROM: '.$GLOBALS['env_admin_email']);
   	}
   	//token unbrauchbar machen
   	$_SESSION['sou_hb_token']=mt_rand(1000000,9999999);
   	
-    //überprüfen ob man auf der stufe zugreifen kann
+    //ï¿½berprï¿½fen ob man auf der stufe zugreifen kann
   	if(($id+1)<=$geb_level OR $geb_level>=50)
   	{
-    	//überprüfen ob man genug aktionspunkte hat
+    	//ï¿½berprï¿½fen ob man genug aktionspunkte hat
     	if($player_hb_ap>0)
     	{
     		$player_hb_ap--;
@@ -73,7 +73,7 @@ if($player_in_hb>0)
   	  
   	  //////////////////////
   	  //////////////////////
-  	  //spielerdaten bestimmen, die es nicht in der session gibt, um sie beim gegner für den kampf zu hinterlegen
+  	  //spielerdaten bestimmen, die es nicht in der session gibt, um sie beim gegner fï¿½r den kampf zu hinterlegen
   	  //////////////////////
   	  //////////////////////
   	  $enm1['name']=$player_ship_name;
@@ -95,11 +95,11 @@ if($player_in_hb>0)
   	  //$enm1['level']=$hb_def[$player_in_hb-1][2][$cid][0];
   	  $enm2['name']='Stationswachschiff';
   	  $enm2['ship_diameter']=$shipsizes[$id];
-  	  //hitpoints aus schiffgröße berechnen
+  	  //hitpoints aus schiffgrï¿½ï¿½e berechnen
   	  $enm2['hp']=$enm2['ship_diameter']*1000;
-  	  //anzahl der module für waffen/schilde reaktoren (-3 module für grundversorgung)
+  	  //anzahl der module fï¿½r waffen/schilde reaktoren (-3 module fï¿½r grundversorgung)
   	  $enm_fight_module=(2+round(sqrt($enm2['ship_diameter'])))*1.8;
-  	  //feuerkraft/schilde berechnen, reaktoren werden aufgrund der überlegenen technologie nicht benötigt, diese sind bereits integriert
+  	  //feuerkraft/schilde berechnen, reaktoren werden aufgrund der ï¿½berlegenen technologie nicht benï¿½tigt, diese sind bereits integriert
   	  $enm2['att']=$enm_fight_module/2*1000*($id+1)*0.6;
   	  $enm2['shield']=$enm_fight_module/2*6000*($id+1)*0.6;
   	    	  
@@ -107,7 +107,7 @@ if($player_in_hb>0)
   	  //kampf starten
   	  $fightdata=do_fight($enm1, $enm2);
 
-  	  	  //überprüfen wer gewonnen/verloren hat
+  	  	  //ï¿½berprï¿½fen wer gewonnen/verloren hat
   	  if($fightdata['haswon']==1)//man hat gewonnen
   	  {
   	    //change_darkmatter($player_user_id, $id+1);
@@ -121,10 +121,10 @@ if($player_in_hb>0)
     	{
     		mysql_query("UPDATE sou_hbpoints SET owner='$player_fraction', points=points+1 WHERE id='".($id+1)."'",$soudb);
     	}
-    	else//sie gehört jemand anderem 
+    	else//sie gehï¿½rt jemand anderem 
     	{
     		mysql_query("UPDATE sou_hbpoints SET points=points-1 WHERE points>0 AND id='".($id+1)."'",$soudb);
-    		//fraktion ggf zurücksetzen
+    		//fraktion ggf zurï¿½cksetzen
     		mysql_query("UPDATE sou_hbpoints SET owner=0 WHERE points=0;",$soudb);
     	}
     	 
@@ -162,7 +162,7 @@ if($player_in_hb>0)
   
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
-  //überprüfen ob man vielleicht die hb verlassen möchte
+  //ï¿½berprï¿½fen ob man vielleicht die hb verlassen mï¿½chte
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
   if(isset($_REQUEST["leavehb"]) AND $player_atimer1time<=time())
@@ -192,11 +192,11 @@ if($player_in_hb>0)
 
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
-  //linker teil mit der übersicht
+  //linker teil mit der ï¿½bersicht
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
   
-  //token für eine erkennung der automatisierung
+  //token fï¿½r eine erkennung der automatisierung
   $_SESSION['sou_hb_token']=mt_rand(1000000,9999999);
   
   echo '<tr valign="top"><td width="625">';
@@ -252,7 +252,7 @@ if($player_in_hb>0)
   echo '</td><td width="300">';
   
   
-  //aktionsmöglichkeiten
+  //aktionsmï¿½glichkeiten
   rahmen1_oben('<div align="center"><b>Aktionsm&ouml;glichkeiten</b></div>');
   echo '<div align="left"><a href="sou_main.php?action=systempage&leavehb=1" class="btn">Blase verlassen</a>';
   echo '</div>';
@@ -309,7 +309,7 @@ if($num==1)
   $owner_id=$row["id"];
   $owner_fraction=$row["fraction"];
   
-  //überprüfen ob das system zur eigenen fraktion gehört
+  //ï¿½berprï¿½fen ob das system zur eigenen fraktion gehï¿½rt
   if($player_fraction!=$owner_fraction)
   {
   	rahmen2_oben();

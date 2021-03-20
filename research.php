@@ -33,24 +33,12 @@ if($_REQUEST["setdesign"])
 <body>
 <?php
 
-//wurde ein button gedrueckt??
-/*
-$t=0;$str='if ($b40)$t=40;';
-for ($i=41;$i<=79;$i++) $str = $str."elseif (\$b$i)\$t=$i;";
-eval($str);
-
-//test auf korrekten scriptaufruf
-if ($t>0)
-{
-	@mail('issomad@die-ewigen.com', 'Parameterfehler Gebaeude', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
-}*/
-
 if(isset($_REQUEST['ida']))
 {
 	$t=intval($_REQUEST['ida']);
 	if(!isset($_REQUEST['st']))
 	{
-		@mail('issomad@die-ewigen.com', 'Fehlendes Sectoken Forschung', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
+		@mail($GLOBALS['env_admin_email'], 'Fehlendes Sectoken Forschung', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
 		$fehlermsg='<div class="info_box text2">Es ist ein Fehler aufgetreten, versuche es bitte erneut.</div>';
 	}
 }
@@ -76,7 +64,7 @@ if ($t>0 && $resnr==0 && $_SESSION['research_sec_token']==$_REQUEST['st'])//ja, 
     if ($techs[$einzelb]==1) $z2++;
     if ($einzelb==0) {$z1=0;$z2=0;}
   }
-  if ($z1==$z2) $fehlermsg='';//echo "Vorbedingung erfüllt";
+  if ($z1==$z2) $fehlermsg='';//echo "Vorbedingung erfï¿½llt";
   else $fehlermsg='<font color="FF0000">'.$research_lang[vorbedingung];
 
   if ($techs[$t]==1) $fehlermsg='<font color="FF0000">'.$research_lang[schonerforscht];
@@ -107,7 +95,7 @@ if ($t>0 && $resnr==0 && $_SESSION['research_sec_token']==$_REQUEST['st'])//ja, 
   }
 
   //transaktionsende
-  $erg = releaseLock($ums_user_id); //Lösen des Locks und Ergebnisabfrage
+  $erg = releaseLock($ums_user_id); //Lï¿½sen des Locks und Ergebnisabfrage
   if ($erg)
   {
         //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -129,7 +117,7 @@ else echo '<br><font color="#FF0000">'.$research_lang[releaselock3].'</font><br>
 ///////////////////////////////////////////////////////////////////////////
 $buildgnr=$resnr;
 if(isset($_REQUEST['cancel'])){
-	//Gebäude gilt für tech_id<40
+	//Gebï¿½ude gilt fï¿½r tech_id<40
 	$cancel_id=intval($_REQUEST['cancel']);
 	if($cancel_id>39 && $cancel_id<80 && $cancel_id==$buildgnr){
 		//techdaten laden
@@ -142,12 +130,12 @@ if(isset($_REQUEST['cancel'])){
 			//Info bzgl. Abbruch
 			$errmsg='<div class="info_box text3">Die Forschung wurde abgebrochen und die Rohstoffe gutgeschrieben.</div>';
 			
-			//Anzeige des Gebäudebaues entfernen		
+			//Anzeige des Gebï¿½udebaues entfernen		
 			$buildgnr=0;
 			$verbtime=0;
 			$resnr=0;
 
-			//den Gebäudebau in der DB canceln
+			//den Gebï¿½udebau in der DB canceln
 			mysql_query("UPDATE de_user_data SET 
 				restyp01 = restyp01 + '".$row['restyp01']."',
 				restyp02 = restyp02 + '".$row['restyp02']."',
@@ -156,7 +144,7 @@ if(isset($_REQUEST['cancel'])){
 				restyp05 = restyp05 + '".$row['restyp05']."',
 				resnr = 0, restime = 0 WHERE user_id = '$ums_user_id'",$db);
 			
-			//Rohstoffe für die Resline updaten
+			//Rohstoffe fï¿½r die Resline updaten
 			$restyp01+=$row['restyp01'];
 			$restyp02+=$row['restyp02'];
 			$restyp03+=$row['restyp03'];
@@ -164,7 +152,7 @@ if(isset($_REQUEST['cancel'])){
 			$restyp05+=$row['restyp05'];
 			
 			//transaktionsende
-			$erg = releaseLock($ums_user_id); //Lösen des Locks und Ergebnisabfrage
+			$erg = releaseLock($ums_user_id); //Lï¿½sen des Locks und Ergebnisabfrage
 			if ($erg){
 			  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			} else{
@@ -188,7 +176,7 @@ echo '
 
 if ($fehlermsg!='')
 {
-  @mail('issomad@die-ewigen.com', 'Forschung noch nicht erlaubt.', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
+  @mail($GLOBALS['env_admin_email'], 'Forschung noch nicht erlaubt.', $ums_user_id.' '.$ums_nic.' '.$ums_spielername);
   echo $fehlermsg.'<br>';
 }
 
@@ -222,7 +210,7 @@ else
 $buildgnr=$resnr;
 if($buildgnr>0)
 {
-  //gebäudedaten laden
+  //gebï¿½udedaten laden
   $db_daten=mysql_query("SELECT tech_name, tech_ticks, score FROM de_tech_data$ums_rasse WHERE tech_id='$buildgnr'",$db);
   $row = mysql_fetch_array($db_daten);
 
@@ -244,7 +232,7 @@ if($buildgnr>0)
   //endzeitpunkt berechnet 
   $zieldatum=date("G:i d.m.Y", ($lastticktimestamp+$bauzeitinsekunden));
   
-  //überschrift
+  //ï¿½berschrift
   rahmen_oben($research_lang[aktuellerauftrag]);
   echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
   echo '<tr align="left" class="cell">
@@ -270,7 +258,7 @@ if($buildgnr>0)
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-//für den auftrag ein sectoken in der session ablegen
+//fï¿½r den auftrag ein sectoken in der session ablegen
 $_SESSION['research_sec_token']=mt_rand(1,999);
 
 ?>
@@ -316,7 +304,7 @@ while($row = mysql_fetch_array($db_daten)) //jeder gefundene datensatz wird gepr
     if ($techs[$einzelb]==1) $z2++;
     if ($einzelb==0) {$z1=0;$z2=0;}
   }
-  if ($z1==$z2) //echo "Vorbedingung erfüllt";
+  if ($z1==$z2) //echo "Vorbedingung erfï¿½llt";
   {
     if ($c2>4)
     {

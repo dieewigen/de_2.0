@@ -171,7 +171,7 @@ $rowmail = mysql_fetch_array($db_mail);
 
 //jetzt die e-mail versenden
 
-sendmail_att($rowmail[reg_mail], 'Mailservice@Die-Ewigen.com', $sn_lang["mailbetreff"], $mailbody , $filename, $allenachrichten);
+sendmail_att($rowmail[reg_mail], 'noreply@die-ewigen.com', $sn_lang["mailbetreff"], $mailbody , $filename, $allenachrichten);
 
 //die nachrichten nach dem versand l�schen
 mysql_query("DELETE FROM de_user_news WHERE user_id='$ums_user_id' AND seen=1",$db);
