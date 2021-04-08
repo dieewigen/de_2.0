@@ -87,8 +87,6 @@ if($getpa>0){
 
 			for($i=0;$i<count($server_liste);$i++){
 				$db_table=$server_liste[$i];
-				//$GLOBALS['dbconnect'] = mysqli_connect("127.0.0.1","dbuser","c0j9XIrL5Rwm", $db_table);
-
 
 				//schauen ob es den account gibt
 				$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'");

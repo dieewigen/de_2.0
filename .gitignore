@@ -1,5 +1,6 @@
 g/*.ttf
 g/*.otf
+cache/
 fonts/
 npcx/
 ourdetool/
