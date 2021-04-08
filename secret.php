@@ -610,6 +610,8 @@ if(!hasTech($pt,9)){
 			$ztechs=$row["techs"];$zcol=$row["col"];
 			$zres=array($row["restyp01"],$row["restyp02"],$row["restyp03"],$row["restyp04"],$row["restyp05"]);
 			$npc=$row["npc"];
+			
+			$zpt=loadPlayerTechs($uid);
 
 			$zname=$row["spielername"];
 			$zrasse=$row["rasse"];
@@ -622,10 +624,20 @@ if(!hasTech($pt,9)){
 			//zaehle alle schiffe, die schon vorhanden sind - anfang
 			$fid0=$uid.'-0';$fid1=$uid.'-1';$fid2=$uid.'-2';$fid3=$uid.'-3';
 			$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+			$ec81=0;
+			$ec82=0;
+			$ec83=0;
+			$ec84=0;
+			$ec85=0;
+			$ec86=0;
+			$ec87=0;
+			$ec88=0;
+			$ec89=0;
+			$ec90=0;
 			while($row = mysqli_fetch_array($db_daten))
 			{
 			  $str='';
-			  for ($i=81;$i<=99;$i++) $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
+			  for ($i=81;$i<=90;$i++) $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
 			  eval ($str); //variablen -> ec81, ec82...
 			}
 			$zeinheiten=$ec81+$ec82+$ec83+$ec84+$ec85+$ec86+$ec87+$ec88+$ec89+$ec90;
