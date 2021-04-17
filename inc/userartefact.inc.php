@@ -8,7 +8,7 @@ $userartefact_lang[5]='Dieses Artefakt erh&ouml;ht die Feuerkraft der Schiffe un
 $userartefact_lang[6]='Dieses Artefakt erh&ouml;ht die L&auml;hmkraft der Schiffe und wird in einem Basisschiff verwendet.';
 $userartefact_lang[7]='Dieses Artefakt erh&ouml;ht die Feuerkraft von T&uuml;rmen.';
 $userartefact_lang[8]='Dieses Artefakt erh&ouml;ht die L&auml;hmkraft von T&uuml;rmen.';
-if($sv_oscar==1){
+if(isset($sv_oscar) && $sv_oscar==1){
 	$userartefact_lang[9]='Dieses Artefakt ist auf diesem Server ohne Wirkung.';
 }else{
 	$userartefact_lang[9]='Dieses Artefakt erh&ouml;ht die Kraft mit der Schiffe nach Schlachten im Heimatsystem recycelt werden.';
@@ -24,7 +24,7 @@ $userartefact_lang[11]='Dieses Artefakt verringert die Baudauer von Gebäuden in
 $userartefact_lang[12]='Dieses Artefakt erh&ouml;ht die Leistungsf&auml;higkeit der Planetaren Schilderweiterung gegen EMP-Waffen.';
 $userartefact_lang[13]='Dieses Artefakt verringert die Leistunsf&auml;higkeit der Planetaren Schilderweiterung des Ziels gegen EMP-Waffen und wird in einem Basisschiff verwendet.';
 
-if($sv_oscar==1){
+if(isset($sv_oscar) && $sv_oscar==1){
 	$userartefact_lang[14]='Dieses Artefakt ist auf diesem Server ohne Wirkung.';
 }else{
 	$userartefact_lang[14]='Dieses Artefakt st&ouml;rt die Kraft des feindlichen Recyclotrons und wird in einem Basisschiff verwendet.';

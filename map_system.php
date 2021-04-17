@@ -18,7 +18,7 @@ $row=$pd;
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 $punkte=$row["score"];$techs=$row["techs"];$defenseexp=$row["defenseexp"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$design=$row["design"];$mysc2=$row["sc2"];
+$mysc2=$row["sc2"];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 $spec1=$row['spec1'];$spec3=$row['spec3'];
 
@@ -65,7 +65,7 @@ if(!empty($pd['allytag']) && $pd['ally_status']==1){
 }
 
 
-if($sv_deactivate_vsystems==1){
+if(isset($sv_deactivate_vsystems) && $sv_deactivate_vsystems==1){
 	include "resline.php";
 	echo '<br><div class="info_box text2">Auf diesem Server sind die Vergessenen Systeme deaktiviert.</div>';
 

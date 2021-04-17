@@ -192,6 +192,8 @@ function vs_system_init(){
 				window.location.href = href;
 			}
 
+		}else if(e.which == 32) {
+			$("#upgrade_all").click();
 		}
 
 		console.log(e.which);

@@ -240,7 +240,7 @@ class map_system{
 			$bldg_id=-1;
 			for($b=0;$b<count($this->playerBldg);$b++){
 				if($this->playerBldg[$b]['field_id']==$i){
-					$factory_id=$GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['factory_id'];
+					$factory_id=isset($GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['factory_id']) ? $GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['factory_id'] : -1;
 					$bldg_id=$this->playerBldg[$b]['bldg_id'];
 					$bldg_level=$this->playerBldg[$b]['bldg_level'];
 					//wird das Gebäude gerade ausgebaut?
@@ -279,7 +279,7 @@ class map_system{
 					}
 					$content.='
 					<div style="text-align:center; font-size: 20px;">
-						<img style="width: 40px; border-radius: 5px;'.$border.'" src="'.$ums_gpfad.'g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">
+						<img style="width: 40px; border-radius: 5px;'.$border.'" src="g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">
 						'.$stufeninfo.
 					'</div>';
 				}else{
@@ -384,7 +384,7 @@ class map_system{
 			<input name="upgradeallbuildings" value="1" type="hidden">
 	
 			<div style="margin-top: 30px; margin-bottom: 20px; width: 100%; text-align: center;">
-			<a href="javascript: void(0);" onclick="$(this).parents(\'form:first\').submit();" style="background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box; padding: 8px;">Alle Geb&auml;ude upgraden</a>
+			<a id="upgrade_all" href="javascript: void(0);" onclick="$(this).parents(\'form:first\').submit();" style="background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box; padding: 8px;" title="Hotkey: Leertaste">Alle Geb&auml;ude upgraden</a>
 			</div>
 		</form>';
 
@@ -702,7 +702,7 @@ class map_system{
 		}
 
 		//für alle Gebäude ein Upgradeauftrag starten
-		if($_POST['upgradeallbuildings']==1){
+		if(isset($_POST['upgradeallbuildings']) && $_POST['upgradeallbuildings']==1){
 			for($fieldid=0;$fieldid<count($this->fields);$fieldid++){
 				if(isset($this->fields[$fieldid][1])){
 					$content.='Feldblocker: '.$this->fields[$fieldid][1][1].'x '.$GLOBALS['map_field_blocker'][$this->fields[$fieldid][1][0]]['name'].'<br>';
@@ -825,7 +825,7 @@ class map_system{
 		//////////////////////////////////////////////////////////////
 		//Test auf besonderes System
 		//////////////////////////////////////////////////////////////
-		if($this->special_system>0){
+		if(isset($this->special_system) && $this->special_system>0){
 			$content.=$this->showSpecialSystem($this->system_id,$ps);
 		}else{
 
@@ -925,7 +925,7 @@ class map_system{
 			$mission_active=false;
 			for($f=1;$f<=3;$f++){
 				$mission_data=unserialize($fleet_data[$f]['mission_data']);
-				if($mission_data['action_typ']==1 && $mission_data['system_id']==$this->system_id){
+				if((isset($mission_data['action_typ']) && $mission_data['action_typ']==1) && (isset($mission_data['system_id']) && $mission_data['system_id']==$this->system_id)){
 					$mission_active=true;
 					$mission_time=$fleet_data[$f]['mission_time']-time();
 				}
@@ -945,7 +945,7 @@ class map_system{
 						if($fleet_data[$f]['aktion']==0){
 							//geht nur, wenn genug Frachkapazität vorhanden ist
 							if($fleet_fk[$f]>=$GLOBALS['map_buildings'][$bldg_id]['bldg_need_fk']){
-								if($_REQUEST['action']==createoutpost && $_REQUEST['fleet_id']==$f){
+								if(isset($_REQUEST['action']) && $_REQUEST['action']=='createoutpost' && isset($_REQUEST['fleet_id']) && $_REQUEST['fleet_id']==$f){
 									//Rohstoffe abziehen
 									$this->doBaukosten($GLOBALS['map_buildings'][$bldg_id]['bldg_cost'][0]);
 
@@ -1003,7 +1003,7 @@ class map_system{
 							//Gebäudestufe bestimmen
 							$stufeninfo='';
 
-							if($bldg[$row['id']][$i]>0){
+							if(isset($row['id']) && $bldg[$row['id']][$i]>0){
 								$stufeninfo='<br>'.$bldg[$row['id']][$i];
 							}
 
@@ -1021,7 +1021,7 @@ class map_system{
 	
 				}
 
-				$conten.='</div>';
+				$content.='</div>';
 
 			}else{
 				//die Mission läuft schon, daher Restzeit angeben
@@ -1136,7 +1136,8 @@ class map_system{
 		$pd=loadPlayerData($_SESSION['ums_user_id']);
 
 		$has_all=true;
-		
+		$kosten='';
+
 		$einzelkosten=explode(';', $baukosten);
 		foreach ($einzelkosten as $value) {
 			$parts=explode("x", $value);
@@ -1189,6 +1190,8 @@ class map_system{
 
 	public function showLoot(){
 		include 'inc/userartefact.inc.php';
+
+		$content='';
 
 		//alle geborgenen Items aus der DB holen
 		$looted=getUserLootByMapID($_SESSION['ums_user_id'],$this->system_id);

@@ -857,13 +857,14 @@ function getBldgByFieldID($pb, $field_id){
 }
 
 function loadPlayerBuildings($uid, $map_id){
-		$sql="SELECT * FROM de_user_map_bldg WHERE user_id='$uid' AND map_id='$map_id';";
-		$db_daten = mysqli_query($GLOBALS['dbi'],$sql);
-		while($row = mysqli_fetch_array($db_daten)){
-			$data[]=$row;
-		}	
+	$data=array();
+	$sql="SELECT * FROM de_user_map_bldg WHERE user_id='$uid' AND map_id='$map_id';";
+	$db_daten = mysqli_query($GLOBALS['dbi'],$sql);
+	while($row = mysqli_fetch_array($db_daten)){
+		$data[]=$row;
+	}	
 
-		return $data;
+	return $data;
 }
 
 function loadPlayerStorage($uid){
@@ -1259,7 +1260,9 @@ function get_allybldg($allyid){
 		$db_daten=mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
 		$row = mysql_fetch_array($db_daten);
 		for($i=0;$i<=30;$i++)		{
-			if($row["bldg$i"]!='')$bldg[$i]=$row["bldg$i"];
+			if(isset($row["bldg$i"]) && $row["bldg$i"]!=''){
+				$bldg[$i]=$row["bldg$i"];
+			}
 		}
 	}
 	return($bldg);
