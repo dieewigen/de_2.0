@@ -1448,10 +1448,10 @@ while($row = mysqli_fetch_array($db_daten)){
   mysql_query("UPDATE de_allys SET questreach='$newmaxscorecount' WHERE id='$wt_a_id' AND questtyp=2",$db);
 
   //die Punkte-Prozentzahl der Allianz
-  $p_allianz_score=$row['score']*100/$server_gesamt_score;
+  $p_allianz_score= $server_gesamt_score!=0 ? $row['score']*100/$server_gesamt_score : 0;
 
   //die Kollektoren-Prozentzahl der Allian
-  $p_allianz_col=$row['col']*100/$server_gesamt_col;
+  $p_allianz_col= $server_gesamt_col!=0 ? $row['col']*100/$server_gesamt_col : 0;
 	
   $schnitt=$row["score"]/$row["am"];
   $schnitt=round($schnitt);
