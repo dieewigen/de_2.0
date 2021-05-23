@@ -1,24 +1,24 @@
 <?php
-$ranglisten_lang[title]='Die Ewigen ranking list';
-$ranglisten_lang[spieler] = 'Player';
-$ranglisten_lang[sektor] = 'Sector';
-$ranglisten_lang[allianz] = 'Alliance';
-$ranglisten_lang[cyborg] = 'Cyborg';
-$ranglisten_lang[platz] = 'Pos.';
-$ranglisten_lang[rang] = 'Rank';
-$ranglisten_lang[spielername] = 'Player name';
-$ranglisten_lang[punkte] = 'Score';
-$ranglisten_lang[rangnamen]=array("The Raisen One", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
-$ranglisten_lang[mitglieder] = 'Member';
-$ranglisten_lang[schnitt] = 'Average';
-$ranglisten_lang[kollektoren] = 'Collectors';
-$ranglisten_lang[name] = 'Name';
-$ranglisten_lang[level] = 'Level';
-$ranglisten_lang[questpunkte] = 'Quest points';
-$ranglisten_lang[stand] = 'Last update';
-$ranglisten_lang[download] = 'Please click here to download the<br>raw data (archived in gzip format)';
-$ranglisten_lang[faq] = 'FAQ for the ranking lists';
-$ranglisten_lang[faq_text] = '<br><br><br><br>
+$ranglisten_lang['title']='Die Ewigen ranking list';
+$ranglisten_lang['spieler'] = 'Player';
+$ranglisten_lang['sektor'] = 'Sector';
+$ranglisten_lang['allianz'] = 'Alliance';
+$ranglisten_lang['cyborg'] = 'Cyborg';
+$ranglisten_lang['platz'] = 'Pos.';
+$ranglisten_lang['rang'] = 'Rank';
+$ranglisten_lang['spielername'] = 'Player name';
+$ranglisten_lang['punkte'] = 'Score';
+$ranglisten_lang['rangnamen']=array("The Raisen One", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
+$ranglisten_lang['mitglieder'] = 'Member';
+$ranglisten_lang['schnitt'] = 'Average';
+$ranglisten_lang['kollektoren'] = 'Collectors';
+$ranglisten_lang['name'] = 'Name';
+$ranglisten_lang['level'] = 'Level';
+$ranglisten_lang['questpunkte'] = 'Quest points';
+$ranglisten_lang['stand'] = 'Last update';
+$ranglisten_lang['download'] = 'Please click here to download the<br>raw data (archived in gzip format)';
+$ranglisten_lang['faq'] = 'FAQ for the ranking lists';
+$ranglisten_lang['faq_text'] = '<br><br><br><br>
 <table border="0" cellpadding="0" cellspacing="0">
 
 <tr height="37" align="center">

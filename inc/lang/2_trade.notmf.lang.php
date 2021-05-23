@@ -1,5 +1,5 @@
 <?php
-$tradenotmf_lang[msg_1]='<br><br><center><font size=3 color=red>Missing technology!</font></center><br>
+$tradenotmf_lang['msg_1']='<br><br><center><font size=3 color=red>Missing technology!</font></center><br>
 			<br><br><font size=2>
 			Unfortunately an important technology is missing to access the trading system. <br>
 			Please build the transmitter field to access the trading system.<br><br>

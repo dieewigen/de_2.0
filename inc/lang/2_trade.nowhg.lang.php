@@ -1,5 +1,5 @@
 <?php
-$tradenowhg_lang[msg_1]='<br><br><center><font size=3 color=red>Missing technology!</font></center><br>
+$tradenowhg_lang['msg_1']='<br><br><center><font size=3 color=red>Missing technology!</font></center><br>
 			<br><br><font size=2>
 			Unfortunately an important technology is missing to access the trading system. <br>
 			Please build the interstellar trading guild to access the trading system.<br><br>

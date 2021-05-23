@@ -1,17 +1,17 @@
 <?php
 //beschriftungen f&uuml;r die &uuml;bersichtsfelder
-$ovbes[]='inaktiv';
-$ovbes[]='DET-Meldungen / Kristallpalast';
-$ovbes[]='Ewiger Nachrichtendienst';
-$ovbes[]='Zufallsfrage aus der ewigen FAQ';
-$ovbes[]='Informationen vom SK';
-$ovbes[]='System&uuml;bersicht';
-$ovbes[]='Schiffseinheiten';
-$ovbes[]='Verteidigungsanlagen';
+$ovbes[']='inaktiv';
+$ovbes[']='DET-Meldungen / Kristallpalast';
+$ovbes[']='Ewiger Nachrichtendienst';
+$ovbes[']='Zufallsfrage aus der ewigen FAQ';
+$ovbes[']='Informationen vom SK';
+$ovbes[']='System&uuml;bersicht';
+$ovbes[']='Schiffseinheiten';
+$ovbes[']='Verteidigungsanlagen';
 
-$secanzeige[]='oben anzeigen';
-$secanzeige[]='nicht anzeigen';
-$secanzeige[]='unten anzeigen';
+$secanzeige[']='oben anzeigen';
+$secanzeige[']='nicht anzeigen';
+$secanzeige[']='unten anzeigen';
 
 $options_lang['accountdetails']='Accountdetails';
 $options_lang['accountid']='Account-ID';
