@@ -212,6 +212,10 @@ if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){ //post und ge
   {
   	//die aktivität mitloggen
   	//update aus performancegründen nur alle 5 minuten
+    if(!isset($_SESSION["aktivitaet_chat_time"])){
+      $_SESSION["aktivitaet_chat_time"]=0;
+    }
+
   	if($_SESSION["aktivitaet_chat_time"]+300<time())
   	{
   	  $time=(int)strftime("%H");
