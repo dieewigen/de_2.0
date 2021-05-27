@@ -330,15 +330,8 @@ if($ums_premium==0){
 	$ea=$col*($sv_kollieertrag_pa-$malus-$sabotagemalus);
 }
 */
-//bei einer Hyperraumtunneletablierung gibt es keine Energie
-$sql="SELECT * FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>'".time()."' LIMIT 1";
-$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
-$num = mysqli_num_rows($db_daten);
-if($num==0){
-	$ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
-}else{
-	$ea=0;
-}
+	
+$ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
 
 //eftaartefakt
 //$eartefaktenergie=floor($ea/10000*$eartefakt);
@@ -351,6 +344,16 @@ $kartefaktenergie=$sv_kriegsartefaktertrag*$kartefakt;
 $dartefaktenergie=floor($ea/100*$dartefakt);
 $sartefaktenergie=floor($ea/100*$sartefakt);
 $paleniumenergie=floor($ea/10000*$palenium);
+
+//bei einer Hyperraumtunneletablierung geben die Kollies keine Energie
+// (Artefakte wie die Gabe der Reichen aber schon, weil zu diesem Zeitpunkt der Hyperraumtunnel schon fertig ist)
+$sql="SELECT * FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>'".time()."' LIMIT 1";
+$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+$num = mysqli_num_rows($db_daten);
+if ($num>0)
+{
+  $ea=0;
+}
 
 //maximale anzahl von kollektoren auslesen
 $db_daten=mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0",$db);
@@ -575,11 +578,11 @@ if (!hasTech($pt,7)){
   //echo $resource_lang[kollibau].$row_techcheck[tech_name].$resource_lang[kollibau2]."<br><br>";
 
 	echo '<br>';
-	rahmen_oben($resource_lang[fehlendesgebaeude]);
+	rahmen_oben($resource_lang['fehlendesgebaeude']);
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
 	<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=7" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_7.jpg" border="0"></a></td>
-	<td valign="top">'.$resource_lang[gebaeudeinfo].': '.$row_techcheck[tech_name].'</td>
+	<td valign="top">'.$resource_lang['gebaeudeinfo'].': '.$row_techcheck['tech_name'].'</td>
 	</tr>';
 	echo '</table>';
 	rahmen_unten();

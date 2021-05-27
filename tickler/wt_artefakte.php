@@ -1,4 +1,5 @@
 <?php
+
 echo 'Sektorartefakte berechnen:<br>';
 
 //größter tick
@@ -17,6 +18,7 @@ $num = mysql_num_rows($res);
 for ($i=0; $i<$num; $i++){
 	//rohstoffe - anfang
 	$uid   = mysql_result($res, $i, "user_id");
+
 	$pt=loadPlayerTechs($uid);
 	$col   = mysql_result($res, $i, "col");
 	$ekey  = mysql_result($res, $i, "ekey");
@@ -52,7 +54,7 @@ for ($i=0; $i<$num; $i++){
 
   //falls es keine materieumwandler gibt, erhält man keine res
   /*
-	if($techs[14]==0){
+	if(!hasTech($pt,14)){
 	  $rm=0;
 	  $rd=0;
 	  $ri=0;
@@ -125,6 +127,7 @@ for ($i=0; $i<$num; $i++)
 {
   //rohstoffe - anfang
   $uid   = mysql_result($res, $i, "user_id");
+
   $pt=loadPlayerTechs($uid);
   $col   = mysql_result($res, $i, "col");
   $ekey  = mysql_result($res, $i, "ekey");
@@ -160,8 +163,7 @@ for ($i=0; $i<$num; $i++)
 
   //falls es keine materieumwandler gibt, erh�lt man keine res
   /*
-  if ($techs[14]==0)
-  {
+  if (!hasTech($pt,14)) {
     $rm=0;
     $rd=0;
     $ri=0;
@@ -185,6 +187,7 @@ for ($i=0; $i<$num; $i++)
 {
   //rohstoffe - anfang
   $uid   = mysql_result($res, $i, "user_id");
+
   $pt=loadPlayerTechs($uid);
   $col   = mysql_result($res, $i, "col");
   $ekey  = mysql_result($res, $i, "ekey");
@@ -220,8 +223,7 @@ for ($i=0; $i<$num; $i++)
 
   //falls es keine materieumwandler gibt, erh�lt man keine res
   /*
-  if ($techs[14]==0)
-  {
+  if (!hasTech($pt,14))	{
     $rm=0;
     $rd=0;
     $ri=0;
@@ -244,6 +246,7 @@ for ($i=0; $i<$num; $i++)
 {
   //rohstoffe - anfang
   $uid   = mysql_result($res, $i, "user_id");
+
   $pt=loadPlayerTechs($uid);
   $col   = mysql_result($res, $i, "col");
   $ekey  = mysql_result($res, $i, "ekey");
@@ -279,7 +282,7 @@ for ($i=0; $i<$num; $i++)
 
   //falls es keine materieumwandler gibt, erh�lt man keine res
   /*
-  if ($techs[14]==0)
+  if (!hasTech($pt,14))
   {
     $rm=0;
     $rd=0;
@@ -370,34 +373,28 @@ for ($i=0; $i<$num; $i++){
 }
 
 //ID=11-20 Die Gabe der Reichen
-	for($k=11;$k<=20;$k++){
+for($k=11;$k<=20;$k++){
 	$res = mysql_query("SELECT sector FROM de_artefakt WHERE id='$k'",$db);
 	$row = mysql_fetch_array($res);
 	$artsec=$row["sector"];
 
-	$res = mysql_query("SELECT de_user_data.user_id, de_user_data.col, de_user_data.techs, de_user_data.ekey, de_user_data.premium FROM de_user_data, de_login where de_login.status=1 AND de_login.user_id = de_user_data.user_id AND de_user_data.sector='$artsec'",$db);
+	$res = mysql_query("SELECT de_user_data.user_id, de_user_data.col, de_user_data.techs, de_user_data.ekey FROM de_user_data, de_login where de_login.status=1 AND de_login.user_id = de_user_data.user_id AND de_user_data.sector='$artsec'",$db);
 	$num = mysql_num_rows($res);
 	for ($i=0; $i<$num; $i++){
+
 		//rohstoffe - anfang
 		$uid   = mysql_result($res, $i, "user_id");
+		
 		$pt=loadPlayerTechs($uid);
 		$col   = mysql_result($res, $i, "col");
 		$ekey  = mysql_result($res, $i, "ekey");
-		$premium = mysql_result($res, $i, "premium");
 
 		//ekey aufsplitten
 		$hv=explode(";",$ekey);
 		$keym=$hv[0];$keyd=$hv[1];$keyi=$hv[2];$keye=$hv[3];
 
-		//gesamtenergie pro tick, energieausbeute
-		//$ea=$col*$sv_artefakt[$k-1][0]; //die x% energie f�r das artefakt
-		if($premium==0){
-			//$ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
-			$ea=$col*$sv_kollieertrag/100*$sv_artefakt[$k-1][0]; //die x% energie f�r das artefakt
-		}else{
-			//$ea=$col*($sv_kollieertrag_pa-$malus-$sabotagemalus);
-			$ea=$col*$sv_kollieertrag_pa/100*$sv_artefakt[$k-1][0]; //die x% energie f�r das artefakt
-		}	
+		//bonusressourcen durch die gabe. $sv_kollieertrag_pa wird hier nicht mehr genutzt
+		$ea=$col*$sv_kollieertrag/100*$sv_artefakt[$k-1][0];
 
 		//energieinput pro rohstoff
 		$em=(int)$ea/100*$keym;
@@ -406,17 +403,11 @@ for ($i=0; $i<$num; $i++){
 		$ee=(int)$ea/100*$keye;
 
 		//energie->materie verhaeltnis
-		/*
-		if ($techs[18]==1)$emvm=1; else $emvm=2;
-		if ($techs[19]==1)$emvd=2; else $emvd=4;
-		if ($techs[20]==1)$emvi=3; else $emvi=6;
-		if ($techs[21]==1)$emve=4; else $emve=8;
-    */
-    
-		$emvm=1;
-		$emvd=2;
-		$emvi=3;
-		$emve=4;
+
+		if (hasTech($pt,18))$emvm=1; else $emvm=2;
+		if (hasTech($pt,19))$emvd=2; else $emvd=4;
+		if (hasTech($pt,10))$emvi=3; else $emvi=6;
+		if (hasTech($pt,21))$emve=4; else $emve=8;
 
 		//rohstoffoutput
 		$rm=$em/$emvm;
@@ -430,7 +421,7 @@ for ($i=0; $i<$num; $i++){
 
 		//falls es keine materieumwandler gibt, erh�lt man keine res
 		/*
-		if ($techs[14]==0){
+		if (!hasTech($pt,14)){
 			$rm=0;
 			$rd=0;
 			$ri=0;
