@@ -1,3 +1,12 @@
+-- phpMyAdmin SQL Dump
+-- version 5.1.0
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Erstellungszeit: 28. Mai 2021 um 18:16
+-- Server-Version: 5.7.31-log
+-- PHP-Version: 8.0.0
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -7,6 +16,10 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Datenbank: `de_ang_export`
+--
 
 -- --------------------------------------------------------
 
@@ -2834,6 +2847,30 @@ CREATE TABLE `de_sector_voteout` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_server_round_toplist`
+--
+
+CREATE TABLE `de_server_round_toplist` (
+  `round_id` mediumint(8) UNSIGNED NOT NULL,
+  `player_owner_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
+  `player_spielername` varchar(20) CHARACTER SET utf8mb4 NOT NULL,
+  `player_sector` mediumint(9) NOT NULL,
+  `player_system` smallint(5) UNSIGNED NOT NULL,
+  `player_col` int(10) UNSIGNED NOT NULL,
+  `player_score` bigint(20) UNSIGNED NOT NULL,
+  `player_rasse` smallint(6) NOT NULL,
+  `round_wt` int(11) NOT NULL,
+  `sector_id` mediumint(8) UNSIGNED NOT NULL,
+  `sector_name` varchar(30) CHARACTER SET utf8mb4 NOT NULL,
+  `sector_score` bigint(20) UNSIGNED NOT NULL,
+  `ally_id` smallint(5) UNSIGNED NOT NULL,
+  `ally_tag` varchar(7) CHARACTER SET utf8mb4 NOT NULL,
+  `ally_roundpoints` int(10) UNSIGNED NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_server_stat`
 --
 
@@ -4884,6 +4921,12 @@ ALTER TABLE `de_sector_voteout`
   ADD KEY `sector_id` (`sector_id`);
 
 --
+-- Indizes für die Tabelle `de_server_round_toplist`
+--
+ALTER TABLE `de_server_round_toplist`
+  ADD PRIMARY KEY (`round_id`);
+
+--
 -- Indizes für die Tabelle `de_server_stat`
 --
 ALTER TABLE `de_server_stat`
@@ -5307,6 +5350,12 @@ ALTER TABLE `de_sectorforum_posts`
 --
 ALTER TABLE `de_sectorforum_threads`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT für Tabelle `de_server_round_toplist`
+--
+ALTER TABLE `de_server_round_toplist`
+  MODIFY `round_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT für Tabelle `de_server_stat`

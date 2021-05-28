@@ -18,6 +18,9 @@ $rassenzahl[4] = mysql_result($db_daten,0,0);
 //spiele die kein npc sind
 $db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE npc=0 AND sector > 1",$db);
 $pcspieler = mysql_result($db_daten,0,0);
+if($pcspieler==0){
+	$pcspieler=1;
+}
 
 //inaktivenscript aktiv
 if ($dodel==1){

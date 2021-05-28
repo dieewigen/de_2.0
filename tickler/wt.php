@@ -145,7 +145,7 @@ if($sv_deactivate_sec1moveout==0){
 		//account in den umzugsmodus versetzen
 		mysql_query("UPDATE de_login set status = 4, savestatus=1 WHERE user_id = '$uid'",$db);
 		//umzug hinterlegen
-		mysql_query("INSERT de_sector_umzug set user_id='$uid', typ=0, sector='$sector', system='$system'",$db);
+		mysql_query("INSERT INTO de_sector_umzug set user_id='$uid', typ=0, sector='$sector', system='$system'",$db);
 	}
 }
 
@@ -1553,7 +1553,7 @@ if($sv_ewige_runde==1){
 			$user_id=$row['user_id'];
 			$spielername=$row['spielername'];
 			$sector=$row['sector'];
-			//account zur�cksetzen, in sektor 1 (0:0) verschieben, eh_siege um 1 erh�hen
+			//account zurücksetzen, in sektor 1 (0:0) verschieben, eh_siege um 1 erh�hen
 			$sql=array();
 			//aktuellen Sektor speichern
 			$sql[]="UPDATE de_user_data set tick=1, score=0, restyp01=1000000, restyp02=500000, restyp03=250000, restyp04=125000, restyp05=100, 
@@ -1681,28 +1681,28 @@ if($sv_ewige_runde==1){
 			
 			
 			//////////////////////////////////////////////////////////////////////
-			//�berpr�fen ob er evtl. mit dem Teilsieg EH geworden ist
+			//überprüfen ob er evtl. mit dem Teilsieg EH geworden ist
 			//////////////////////////////////////////////////////////////////////
 			if ($eh_siege+1>=$sv_hardcore_need_wins){
 				//er ist erhabener
 
-					//er hat gewonnen, server anhalten
-					mysql_query("UPDATE de_system SET domtick=0, doetick=0",$db);
-					$erhabenenstop=1;
-					//dem erhabenen die credits geben
-					echo '<hr>Erhabenercreditgewinn:<br>';
-					wt_change_credits($user_id, 1000, 'Creditgewinn Erhabener');
-					echo '<br>'.$user_id;
+				//er hat gewonnen, server anhalten
+				mysql_query("UPDATE de_system SET domtick=0, doetick=0",$db);
+				$erhabenenstop=1;
+				//dem erhabenen die credits geben
+				echo '<hr>Erhabenercreditgewinn:<br>';
+				wt_change_credits($user_id, 1000, 'Creditgewinn Erhabener');
+				echo '<br>'.$user_id;
 
 
-					//mail an den detverteiler, wenn es ein bezahlserver ist
-					//da pde-server wegfallen immer eine e-mail schicken
-					//if($sv_pcs_id>0)
-					@mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
+				//mail an den detverteiler, wenn es ein bezahlserver ist
+				//da pde-server wegfallen immer eine e-mail schicken
+				//if($sv_pcs_id>0)
+				@mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
 
-					//die rundenpunkte verteilen
-					//der erhabene bekommt 1 extra
-					mysql_query("UPDATE de_user_data SET roundpoints=roundpoints+1 WHERE user_id=$user_id AND npc=0",$db);
+				//die rundenpunkte verteilen
+				//der erhabene bekommt 1 extra
+				mysql_query("UPDATE de_user_data SET roundpoints=roundpoints+1 WHERE user_id=$user_id AND npc=0",$db);
 
 				//den rang des spielers in der DB updaten
 				mysql_query("UPDATE de_user_data SET rang = 0 WHERE user_id = $user_id",$db);
@@ -2014,59 +2014,129 @@ include "wt_cron.php";
 
 
 //tick wieder aktivieren nachdem alles abgearbeitet worden ist, au�er es gibt nen erhabenen
+$erhabenenstop=1;
 if($erhabenenstop!=1){
 	$sql="UPDATE de_system set doetick=1";
 	echo $sql;
   	mysql_query($sql,$db);
-}
-else //die runde ist zu ende
-{
-  //verteilungsflag zur�cksetzen
-  mysql_query("UPDATE de_system SET roundpointsflag=0",$db);
+}else{ //die runde ist zu ende
+	//verteilungsflag zurücksetzen
+	mysql_query("UPDATE de_system SET roundpointsflag=0",$db);
+		
+	//email mit gewinnerdaten verschicken
+	//spieler - name, koordinaten, kollektoren, punkte, rasse, rundelaufzeit
+	$db_daten = mysql_query("SELECT * FROM de_user_data LEFT JOIN de_login ON (de_login.user_id=de_user_data.user_id) WHERE de_user_data.rang=0 OR de_user_data.user_id=1 LIMIT 1",$db);
+	$row = mysql_fetch_array($db_daten);
+	$ranglistendaten="Spielername: ".$row["spielername"]."\n".
+	"Koordinaten: ".$row["sector"].":".$row["system"]."\n".
+	"Kollektoren: ".$row["col"]."\n".
+	"Punkte: ".$row["score"]."\n".
+	"Rasse: ".$row["rasse"]."\n";
+
+	$player_owner_id=$row["owner_id"];
+	$player_spielername=$row["spielername"];
+	$player_sector=$row["sector"];
+	$player_system=$row["system"];
+	$player_col=$row["col"];
+	$player_score=$row["score"];
+	$player_rasse=$row["rasse"];
+
+	$db_daten = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);  
+	$row = mysql_fetch_array($db_daten);
+	$ranglistendaten.="Rundenlaufzeit: ".$row["tick"]."\n\n\n";
+	$round_wt=$row['tick'];
+
 	
-  //email mit gewinnerdaten verschicken
-  //spieler - name, koordinaten, kollektoren, punkte, rasse, rundelaufzeit
-  $db_daten = mysql_query("SELECT * FROM de_user_data WHERE rang=0 LIMIT 1",$db);
-  $row = mysql_fetch_array($db_daten);
-  $ranglistendaten="Spielername: ".$row["spielername"]."\n".
-  "Koordinaten: ".$row["sector"].":".$row["system"]."\n".
-  "Kollektoren: ".$row["col"]."\n".
-  "Punkte: ".$row["score"]."\n".
-  "Rasse: ".$row["rasse"]."\n";
+	//sektor - sektor, name, punkte
+	$db_daten = mysql_query("SELECT * FROM de_sector WHERE sec_id>1 AND npc=0 AND platz>0 OR sec_id=5 ORDER BY platz ASC LIMIT 1",$db);  
+	$row = mysql_fetch_array($db_daten);
+	$sec_id=$row["sec_id"];
+	$ranglistendaten.="Sektor: ".$row["sec_id"]."\n".
+	"Name: ".$row["name"]."\n";
+	$sector_id=$row['sec_id'];
+	$sector_name=$row['name'];
 
-  $db_daten = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);  
-  $row = mysql_fetch_array($db_daten);
-  $ranglistendaten.="Rundenlaufzeit: ".$row["tick"]."\n\n\n";
+	/*
+	CREATE TABLE `de_server_round_toplist` (
+		`round_id` mediumint(8) UNSIGNED NOT NULL,
+		`player_owner_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
+		`player_spielername` varchar(20) CHARACTER SET utf8mb4 NOT NULL,
+		`player_sector` mediumint(9) NOT NULL,
+		`player_system` smallint(5) UNSIGNED NOT NULL,
+		`player_col` int(10) UNSIGNED NOT NULL,
+		`player_score` bigint(20) UNSIGNED NOT NULL,
+		`player_rasse` smallint(6) NOT NULL,
+		`round_wt` int(11) NOT NULL,
+		`sector_id` mediumint(8) UNSIGNED NOT NULL,
+		`sector_name` int(10) UNSIGNED NOT NULL,
+		`sector_score` bigint(20) UNSIGNED NOT NULL,
+		`ally_id` smallint(5) UNSIGNED NOT NULL,
+		`ally_tag` varchar(7) CHARACTER SET utf8mb4 NOT NULL,
+		`ally_roundpoints` int(10) UNSIGNED NOT NULL
+	  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+	  
+	  --
+	  -- Indizes der exportierten Tabellen
+	  --
+	  
+	  --
+	  -- Indizes für die Tabelle `de_server_round_toplist`
+	  --
+	  ALTER TABLE `de_server_round_toplist`
+		ADD PRIMARY KEY (`round_id`);
+	  
+	  --
+	  
+*/
 
-  
-  //sektor - sektor, name, punkte
-  $db_daten = mysql_query("SELECT * FROM de_sector WHERE sec_id>1 AND npc=0 AND platz>0 ORDER BY platz ASC LIMIT 1",$db);  
-  $row = mysql_fetch_array($db_daten);
-  $sec_id=$row["sec_id"];
-  $ranglistendaten.="Sektor: ".$row["sec_id"]."\n".
-  "Name: ".$row["name"]."\n";
+	//Sektorpunkte
+	$db_daten = mysql_query("SELECT SUM(score) AS gespunkte FROM de_user_data WHERE sector='$sec_id'",$db);  
+	$row = mysql_fetch_array($db_daten);
+	$ranglistendaten.="Punkte: ".$row["gespunkte"]."\n\n\n";
+	$sector_score=$row['gespunkte'];
+	
+	//allianz siegartefakte
+	$db_daten=mysql_query("SELECT id, allytag, questpoints FROM de_allys ORDER BY questpoints DESC, id ASC LIMIT 1",$db);
+	$row = mysql_fetch_array($db_daten);
+	$ranglistendaten.="Allianz: ".$row['allytag']." Roundpoints: ".$row['questpoints']."\n".
+	$ally_id=$row['id'];
+	$ally_tag=$row['allytag'];
+	$ally_roundpoints=$row['questpoints'];
+	
+	//sql-befehl für das löschen der logdaten
+	$logtime=date('Y-m-d H:i:s', time());
+	$ranglistendaten.="SQL-Logfilelöschung: DELETE FROM gameserverlogdata WHERE serverid=$sv_servid AND time<'$logtime'\n";
+	
+	//Ranglistendaten per E-Mail an den Admin schicken
+	@mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei - Ranglistendaten', $ranglistendaten);
 
-  $db_daten = mysql_query("SELECT SUM(score) AS gespunkte FROM de_user_data WHERE sector='$sec_id'",$db);  
-  $row = mysql_fetch_array($db_daten);
-  $ranglistendaten.="Punkte: ".$row["gespunkte"]."\n\n\n";
-  
-  //allianz siegartefakte
-  $db_daten=mysql_query("SELECT id, allytag, questpoints FROM de_allys ORDER BY questpoints DESC, id ASC LIMIT 1",$db);
-  $row = mysql_fetch_array($db_daten);
-  $ranglistendaten.="Allianz: ".$row['allyname']." (".$row['allytag'].")- ".$row['questpoints']."\n".
-  
-  //sql-befehl f�r das l�schen der logdaten
-  $logtime=date('Y-m-d H:i:s', time());
-  $ranglistendaten.="SQL-Logfilelöschung: DELETE FROM gameserverlogdata WHERE serverid=$sv_servid AND time<'$logtime'\n";
-  
-  @mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei - Ranglistendaten', $ranglistendaten);
-  
-  //�berpr�fen ob es einen automatischen reset geben soll
-  if($sv_auto_reset==1){
-  	include "wt_auto_reset.php";
-  	//ticks wieder starten
-  	mysql_query("UPDATE de_system SET doetick=1, domtick=1",$db);
-  }
+	//Ranglistendaten in der DB speichern
+	$sql="INSERT INTO de_server_round_toplist SET 
+	player_owner_id='$player_owner_id', 
+	player_spielername='$player_spielername', 
+	player_sector='$player_sector', 
+	player_system='$player_system', 
+	player_col='$player_col', 
+	player_score='$player_score', 
+	player_rasse='$player_rasse', 
+	round_wt='$round_wt', 
+	sector_id='$sector_id', 
+	sector_name='$sector_name', 
+	sector_score='$sector_score', 
+	ally_id='$ally_id', 
+	ally_tag='$ally_tag',
+	ally_roundpoints='$ally_roundpoints' 
+	";
+	echo $sql;
+
+	mysqli_query($GLOBALS['dbi'], $sql);
+	
+	//überprüfen ob es einen automatischen reset geben soll
+	if($sv_auto_reset==1){
+		include "wt_auto_reset.php";
+		//ticks wieder starten
+		mysql_query("UPDATE de_system SET doetick=1, domtick=1",$db);
+	}
 }
 
 //beim communityserver ggf. das dazugeh�rige script einbinden
