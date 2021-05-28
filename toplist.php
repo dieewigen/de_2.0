@@ -59,7 +59,7 @@ if(isset($_GET['show_history']) && $_GET['show_history']==1){
 
 		echo '<div>Punkte: '.number_format($row['player_score'], 0,"",".").'</div>';
 		echo '<div>Rasse: '.$rasse.'</div>';
-		echo '<div>Wirtschaftsticks: '.$row['round_wt'].'</div>';
+		echo '<div>Wirtschaftsticks: '.number_format($row['round_wt'], 0,"",".").'</div>';
 
 		echo '<div style="height: 20px;"></div>';
 
@@ -67,12 +67,14 @@ if(isset($_GET['show_history']) && $_GET['show_history']==1){
 		echo '<div>Sektorname: '.$row['sector_name'].'</div>';
 		echo '<div>Sektorpunkte: '.number_format($row['sector_score'], 0,"",".").'</div>';
 
-		echo '<div style="height: 20px;"></div>';
+		if(!empty($row['ally_tag'])){
+			echo '<div style="height: 20px;"></div>';
 
-		echo '<div>Allianz: '.$row['ally_tag'].'</div>';
-		echo '<div>Allianzrundensiegartefakte: '.number_format($row['ally_roundpoints'], 0,"",".").'</div>';		
+			echo '<div>Allianz: '.$row['ally_tag'].'</div>';
+			echo '<div>Allianzrundensiegartefakte: '.number_format($row['ally_roundpoints'], 0,"",".").'</div>';		
+		}
 
-
+		echo '<div style="height: 40px;"></div>';
 	}
 
 	rahmen_unten();
