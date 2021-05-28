@@ -315,9 +315,11 @@ if($dortick==1){
 		//datensatz aus dem umzug entfernen
 		mysql_query("DELETE FROM de_sector_umzug WHERE typ=0 AND user_id='$uid'",$db);
 
+		/*
 		if($secz>1){
 			mail($GLOBALS['env_admin_email'], $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: '.$GLOBALS['env_admin_email']);
-		}		
+		}
+		*/		
 	}
 
 
