@@ -2014,7 +2014,6 @@ include "wt_cron.php";
 
 
 //tick wieder aktivieren nachdem alles abgearbeitet worden ist, au�er es gibt nen erhabenen
-$erhabenenstop=1;
 if($erhabenenstop!=1){
 	$sql="UPDATE de_system set doetick=1";
 	echo $sql;
