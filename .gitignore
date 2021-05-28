@@ -1,6 +1,9 @@
 g/*.ttf
 g/*.otf
-cache/
+cache/*.tmp
+cache/creditlogs/*.txt
+cache/toplist/*.tmp
+cache/overview/*.tmp
 fonts/
 npcx/
 ourdetool/
