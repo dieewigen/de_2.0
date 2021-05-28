@@ -5,7 +5,6 @@
 //datenbankdefinitionen
 $sv_database_de="de2bugtest";
 $sv_database_sou="sou_server_main";
-$sv_database_loginsystem="loginsystem";
 
 //server auf dem die grafiken liegen
 $sv_image_server='';
