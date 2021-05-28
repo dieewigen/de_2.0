@@ -2024,7 +2024,7 @@ if($erhabenenstop!=1){
 		
 	//email mit gewinnerdaten verschicken
 	//spieler - name, koordinaten, kollektoren, punkte, rasse, rundelaufzeit
-	$db_daten = mysql_query("SELECT * FROM de_user_data LEFT JOIN de_login ON (de_login.user_id=de_user_data.user_id) WHERE de_user_data.rang=0 OR de_user_data.user_id=1 LIMIT 1",$db);
+	$db_daten = mysql_query("SELECT * FROM de_user_data LEFT JOIN de_login ON (de_login.user_id=de_user_data.user_id) WHERE de_user_data.rang=0 LIMIT 1",$db);
 	$row = mysql_fetch_array($db_daten);
 	$ranglistendaten="Spielername: ".$row["spielername"]."\n".
 	"Koordinaten: ".$row["sector"].":".$row["system"]."\n".

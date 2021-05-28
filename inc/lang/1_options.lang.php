@@ -1,5 +1,6 @@
 <?php
 //beschriftungen f&uuml;r die &uuml;bersichtsfelder
+/*
 $ovbes[']='inaktiv';
 $ovbes[']='DET-Meldungen / Kristallpalast';
 $ovbes[']='Ewiger Nachrichtendienst';
@@ -12,6 +13,7 @@ $ovbes[']='Verteidigungsanlagen';
 $secanzeige[']='oben anzeigen';
 $secanzeige[']='nicht anzeigen';
 $secanzeige[']='unten anzeigen';
+*/
 
 $options_lang['accountdetails']='Accountdetails';
 $options_lang['accountid']='Account-ID';
