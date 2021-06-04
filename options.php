@@ -498,6 +498,7 @@ include "resline.php";
 
 $urlacc=$_POST['urlacc'];
 if($urlacc){ //account in urlaubsmodus versetzen
+  $urlpass=isset($_POST['urlpass']) ? $_POST['urlpass'] : '';
 	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$urlpass')");
 	$num = mysql_num_rows($db_daten);
 	if ($num==1 OR $ums_cooperation!=0){ //oldpass ist korrekt
