@@ -532,7 +532,7 @@ if($_REQUEST['sn']){
 				}		
 
 				//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-				$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id';",$soudb);
+				$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';",$soudb);
 				$num = mysql_num_rows($db_daten);
 
 
