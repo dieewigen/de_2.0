@@ -67,6 +67,7 @@ function chat_input()
 {
   var inputfield=$("#chatinputfield").val();
   $("#chatinputfield").val('');
+  if (inputfield==='') return false;
   inputfield = escape(inputfield);
   inputfield = inputfield.replace(/\+/g, "%2B");
   $.getJSON("sou_ajaxrpc.php?chatinsert=1&insert="+inputfield,
