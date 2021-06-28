@@ -16,7 +16,11 @@ pve_score=0, pve_bldg_score=0, bgscore0=0, bgscore1=1, bgscore2=0, bgscore3=0, b
 mysql_query("UPDATE de_login set logins=2, clicks=0;",$db);
 mysql_query("UPDATE de_login set status=1 WHERE (status > 2 AND delmode=0);",$db);
 
-mysql_query("UPDATE de_user_data SET sector=0, system=0 WHERE npc=0;",$db);
+if(isset($GLOBALS['sv_autostart_move_player_to_sector_1']) && $GLOBALS['sv_autostart_move_player_to_sector_1']==1){
+	mysql_query("UPDATE de_user_data SET sector=0, system=0 WHERE npc=0;",$db);
+}else{
+	mysql_query("UPDATE de_system SET reshuffle=1;",$db);
+}
 
 mysql_query("UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
 e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0, e90=0, artid1=0, artlvl1=0, artid2=0, artlvl2=0, artid3=0, artlvl3=0, artid4=0, artlvl4=0, artid5=0, artlvl5=0, artid6=0, artlvl6=0;",$db);

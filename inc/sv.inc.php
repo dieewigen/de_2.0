@@ -283,6 +283,9 @@ $sv_max_alien_col_typ=1;
 //neue DE-Version
 $GLOBALS['sv_ang']=1;
 
+//Spieler beim Autoreset in Sektor 1 verschieben?
+$GLOBALS['sv_autostart_move_player_to_sector_1']=0;
+
 $GLOBALS['tech_build_time_faktor']=1;
 //$GLOBALS['tech_build_time_faktor']=0.05;
 //$GLOBALS['tech_build_time_faktor']=0.001;
