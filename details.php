@@ -525,7 +525,7 @@ if($_REQUEST['sn']){
 				if(isset($_REQUEST['ignore_add']) && $zowner_id>0){
 					$ignore_until=time()+(3600*24*intval($_REQUEST['ignore_time']));
 					$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
-						spielername='".$_REQUEST['sn']."';";
+						spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
 
 					mysql_query($sql,$soudb);
 
@@ -590,14 +590,14 @@ if($_REQUEST['sn']){
 			if(isset($_REQUEST['ignore_add']) && $zowner_id>0){
 				$ignore_until=time()+(3600*24*intval($_REQUEST['ignore_time']));
 				$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
-					spielername='".$_REQUEST['sn']."';";
+					spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
 
 				mysql_query($sql,$soudb);
 
 			}		
 
 			//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-			$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id';",$soudb);
+			$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';",$soudb);
 			$num = mysql_num_rows($db_daten);
 
 
