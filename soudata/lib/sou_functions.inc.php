@@ -65,17 +65,17 @@ function specialres_is_available($resid)
   
   $available=0;
   
-  //überprüfen welche rohstoffe hier möglich sind
+  //ï¿½berprï¿½fen welche rohstoffe hier mï¿½glich sind
   for($ri=0;$ri<count($srv_def[$resid]);$ri++)
   {
     if (($player_x*$player_x+$player_y*$player_y) <= ($srv_def[$resid][$ri][2]*$srv_def[$resid][$ri][2])) 
     {
-      //echo '<br>'.$resid.' verfügbar';
+      //echo '<br>'.$resid.' verfï¿½gbar';
       $available=1;
     }
     else 
     {
-      //echo '<br><br>'.$resid.' nicht verfügbar';
+      //echo '<br><br>'.$resid.' nicht verfï¿½gbar';
     }
     //echo '<br>player: '.($player_x*$player_x+$player_y*$player_y);
     //echo '<br>radius: '.($rv_def[$resid][$ri][2]*$rv_def[$resid][$ri][2]);
@@ -88,7 +88,7 @@ function get_player_advertised($werberid)
   global $soudb, $ums_premium;
   $num=0;
   if($werberid>0){
-	//es zählen alle spieler, die in den letzten x tagen aktiv waren
+	//es zï¿½hlen alle spieler, die in den letzten x tagen aktiv waren
 	$time=time()-3600*24*3;
 
 	$db_daten=mysql_query("SELECT user_id FROM sou_user_data WHERE werberid='$werberid' AND lastclick>'$time' GROUP BY owner_id",$soudb);
@@ -108,7 +108,7 @@ function get_playername($uid)
   $db_daten=mysql_query("SELECT spielername, sn_ext1 FROM `sou_user_data` WHERE user_id='$uid'",$soudb);
   $row = mysql_fetch_array($db_daten);
 
-  return($row[spielername].' {'.$row[sn_ext1].'}');
+  return($row[spielername].' {'.$row['sn_ext1'].'}');
 }
 
 function get_skill($typ)
@@ -120,7 +120,7 @@ function get_skill($typ)
   if($num==1)
   {
     $row = mysql_fetch_array($db_daten);
-    $value=$row[value];
+    $value=$row['value'];
   }
   else 
   {
@@ -168,7 +168,7 @@ function get_baonadaskala()
   	$zeitgrenze=time()-24*3600*7;
   	for($i=1;$i<=6;$i++)
   	{ 
-		//aktive spieler und deren ausrüstung für den bonus berechnen
+		//aktive spieler und deren ausrï¿½stung fï¿½r den bonus berechnen
   		$db_daten=mysql_query("SELECT f".$i."canminehasspace AS wert FROM sou_system",$soudb);
   
   		$row = mysql_fetch_array($db_daten);
@@ -241,17 +241,17 @@ function res_is_available($resid)
   
   $available=0;
   
-  //überprüfen welche rohstoffe hier möglich sind
+  //ï¿½berprï¿½fen welche rohstoffe hier mï¿½glich sind
   for($ri=0;$ri<count($rv_def[$resid]);$ri++)
   {
     if (($player_x*$player_x+$player_y*$player_y) <= ($rv_def[$resid][$ri][2]*$rv_def[$resid][$ri][2])) 
     {
-      //echo '<br>'.$resid.' verfügbar';
+      //echo '<br>'.$resid.' verfï¿½gbar';
       $available=1;
     }
     else 
     {
-      //echo '<br><br>'.$resid.' nicht verfügbar';
+      //echo '<br><br>'.$resid.' nicht verfï¿½gbar';
     }
     //echo '<br>player: '.($player_x*$player_x+$player_y*$player_y);
     //echo '<br>radius: '.($rv_def[$resid][$ri][2]*$rv_def[$resid][$ri][2]);
@@ -265,17 +265,17 @@ function res_is_availableXY($player_x, $player_y, $resid)
   
   $available=0;
   
-  //überprüfen welche rohstoffe hier möglich sind
+  //ï¿½berprï¿½fen welche rohstoffe hier mï¿½glich sind
   for($ri=0;$ri<count($rv_def[$resid]);$ri++)
   {
     if (($player_x*$player_x+$player_y*$player_y) <= ($rv_def[$resid][$ri][2]*$rv_def[$resid][$ri][2])) 
     {
-      //echo '<br>'.$resid.' verfügbar';
+      //echo '<br>'.$resid.' verfï¿½gbar';
       $available=1;
     }
     else 
     {
-      //echo '<br><br>'.$resid.' nicht verfügbar';
+      //echo '<br><br>'.$resid.' nicht verfï¿½gbar';
     }
     //echo '<br>player: '.($player_x*$player_x+$player_y*$player_y);
     //echo '<br>radius: '.($rv_def[$resid][$ri][2]*$rv_def[$resid][$ri][2]);
@@ -301,7 +301,7 @@ function insert_chat_msg($spielername, $chat_message, $fraction, $channel)
   */
   mysql_query("INSERT INTO sou_chat_msg (spielername, message, timestamp, fraction, counter, channel) VALUES ('$spielername', '$chat_message', '$time', '$fraction','$counter', '$channel')",$soudb);
   /*
-    //für check4new nen file anlegen mit id und timestampt
+    //fï¿½r check4new nen file anlegen mit id und timestampt
     $filename="soudata/cache/chat/chan$channel.tmp";
     if(is_file($filename))
     {
@@ -353,7 +353,7 @@ function get_sector_owner($sbx, $sby)
   {
   	while($row = mysql_fetch_array($db_daten))
     {
-      //alle ss durchgehen und schauen welcher fraktion es gehört
+      //alle ss durchgehen und schauen welcher fraktion es gehï¿½rt
       $fraction=$row["fraction"];
       if($fraction>0)
       {
@@ -371,7 +371,7 @@ function get_sector_owner($sbx, $sby)
         $owner=$i+1;
       }
     }
-    //maxwert auf einzigartigkeit überprüfen, d.h. wenn größer null
+    //maxwert auf einzigartigkeit ï¿½berprï¿½fen, d.h. wenn grï¿½ï¿½er null
     if($max>0)
     {
       $anzmax=0;
@@ -379,7 +379,7 @@ function get_sector_owner($sbx, $sby)
       {
         if($f[$i]==$max)$anzmax++;
       }
-      //wenn es nur einen maxwert gibt, dann den zurückgeben
+      //wenn es nur einen maxwert gibt, dann den zurï¿½ckgeben
       if($anzmax==1)
       {
         return($owner);
@@ -482,7 +482,7 @@ function make_modul_info($row)
   if($row["canbldgupgrade"]>0)
   {
     if($moduloutput!='')$moduloutput.='<br>';
-  	$moduloutput.='Dieses Modul kann ein Geb&auml;ude der Stufe '.$row["canbldgupgrade"].' zu Stufe '.($row["canbldgupgrade"]+1).' aufwerten, wobei nat&uuml;rlich die Voraussetzungen f&uuml;r die n&auml;chste Geb&auml;udestufe erf&uuml;llt sein m&uuml;ssen. Bereits eingezahlte Rohstoffe werden verwendet. Das Modul wird bei der Verwendung leider zerst&ouml;rt. Zur Verwendung muß sich das Modul an Bord eines Raumschiffes befinden.';
+  	$moduloutput.='Dieses Modul kann ein Geb&auml;ude der Stufe '.$row["canbldgupgrade"].' zu Stufe '.($row["canbldgupgrade"]+1).' aufwerten, wobei nat&uuml;rlich die Voraussetzungen f&uuml;r die n&auml;chste Geb&auml;udestufe erf&uuml;llt sein m&uuml;ssen. Bereits eingezahlte Rohstoffe werden verwendet. Das Modul wird bei der Verwendung leider zerst&ouml;rt. Zur Verwendung muï¿½ sich das Modul an Bord eines Raumschiffes befinden.';
   }
 
   if($row["canrecover"]>0)
@@ -584,10 +584,10 @@ function change_credits($uid, $amount, $reason)
   $db_daten=mysql_query("SELECT credits FROM de_user_data WHERE user_id='$uid'",$db);
   $row = mysql_fetch_array($db_daten);
   $hascredits=$row["credits"];
-  //wert in der db ändern
+  //wert in der db ï¿½ndern
   $db_daten=mysql_query("UPDATE de_user_data SET credits=credits+'$amount' WHERE user_id='$uid'",$db);
   
-  //creditanzahl ändern
+  //creditanzahl ï¿½ndern
   $hascredits=$hascredits+$amount;
   
   //die creditausgabe im billing-logfile hinterlegen
@@ -616,7 +616,7 @@ function has_money($uid)
   return($row["money"]);
 }
 
-//geldbestand ändern
+//geldbestand ï¿½ndern
 function change_money($uid, $amount)
 {
   global $soudb;
@@ -635,7 +635,7 @@ function has_darkmatter($uid)
   return($row["darkmatter"]);
 }
 
-//dunkle materie ändern
+//dunkle materie ï¿½ndern
 function change_darkmatter($uid, $amount)
 {
   global $soudb;
@@ -653,7 +653,7 @@ function has_baosin($uid)
   return($row['baosin']);
 }
 
-//baosin ändern
+//baosin ï¿½ndern
 function change_baosin($uid, $amount)
 {
   global $soudb;
@@ -666,7 +666,7 @@ function get_bldg_level($owner_id, $bldg_id)
 {
   global $soudb;
   
-  //überprüfen ob es bereits einen datensatz von dem gebäude gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz von dem gebï¿½ude gibt
   $db_daten=mysql_query("SELECT level FROM `sou_map_buildings` WHERE owner_id='$owner_id' AND bldg_id='$bldg_id'",$soudb);
   $num = mysql_num_rows($db_daten);
   if($num==1) //es gibt einen datensatz
@@ -686,7 +686,7 @@ function get_max_frac_bldg_level($bldg_id)
 {
   global $soudb, $player_fraction;
   
-  //überprüfen ob es bereits einen datensatz von dem gebäude gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz von dem gebï¿½ude gibt
   $sql="SELECT MAX(sou_map_buildings.level) AS level FROM `sou_map` LEFT JOIN `sou_map_buildings` ON(sou_map.id = sou_map_buildings.owner_id) WHERE sou_map_buildings.bldg_id='$bldg_id' AND sou_map.fraction='$player_fraction'";
   $db_daten=mysql_query($sql,$soudb);
   $num = mysql_num_rows($db_daten);
@@ -709,7 +709,7 @@ function has_systemhold_amount($uid, $res_id)
 {
   global $soudb;
   
-  //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz mit der rohstoff-id gibt
   //$db_daten=mysql_query("SELECT * FROM `sou_user_systemhold` WHERE owner_id='$owner_id' AND user_id='$uid' AND res_id='$res_id'",$soudb);
   $db_daten=mysql_query("SELECT * FROM `sou_user_systemhold` WHERE user_id='$uid' AND res_id='$res_id'",$soudb);
   $num = mysql_num_rows($db_daten);
@@ -726,13 +726,13 @@ function has_systemhold_amount($uid, $res_id)
   return($return);
 }
 
-//lagerkomplexbestand ändern
+//lagerkomplexbestand ï¿½ndern
 //function change_systemhold_amount($owner_id, $uid, $restyp, $amount)
 function change_systemhold_amount($uid, $restyp, $amount)
 {
   global $soudb;
 	
-  //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz mit der rohstoff-id gibt
   //$db_daten=mysql_query("SELECT * FROM `sou_user_systemhold` WHERE owner_id='$owner_id' AND user_id='$uid' AND res_id='$restyp'",$soudb);
   $db_daten=mysql_query("SELECT * FROM `sou_user_systemhold` WHERE user_id='$uid' AND res_id='$restyp'",$soudb);
   $num = mysql_num_rows($db_daten);
@@ -757,7 +757,7 @@ function has_hold_amount($uid, $res_id)
 {
   global $soudb;
   
-  //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz mit der rohstoff-id gibt
   $db_daten=mysql_query("SELECT * FROM `sou_ship_hold` WHERE user_id='$uid' AND res_id='$res_id'",$soudb);
   $num = mysql_num_rows($db_daten);
   if($num==1) //es gibt einen datensatz
@@ -774,12 +774,12 @@ function has_hold_amount($uid, $res_id)
 }
 
 
-//schiffs-lagerbestand ändern
+//schiffs-lagerbestand ï¿½ndern
 function change_hold_amount($uid, $restyp, $amount)
 {
   global $soudb;
 	
-  //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
+  //ï¿½berprï¿½fen ob es bereits einen datensatz mit der rohstoff-id gibt
   $db_daten=mysql_query("SELECT * FROM `sou_ship_hold` WHERE user_id='$uid' AND res_id='$restyp'",$soudb);
   $num = mysql_num_rows($db_daten);
   if($num==0) //es gibt noch keinen datensatz
@@ -796,7 +796,7 @@ function change_hold_amount($uid, $restyp, $amount)
 }
 */
 
-//gesamte laderaumkapazität auslesen
+//gesamte laderaumkapazitï¿½t auslesen
 function get_sum_hold($uid)
 {
   global $soudb;
@@ -840,7 +840,7 @@ function get_free_hold($uid)
 }
 */
 
-//überprüfen wie groß die förderkapazität des schiffes ist
+//ï¿½berprï¿½fen wie groï¿½ die fï¿½rderkapazitï¿½t des schiffes ist
 function get_canmine($uid)
 {
   global $soudb;

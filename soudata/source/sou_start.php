@@ -5,7 +5,7 @@ include_once "soudata/defs/resources.inc.php";
 
 
 //wenn ein submit gekommen ist, dann schauen ob er zastari einzahlen m�chte
-if($_REQUEST["do"]=='1')
+if(isset($_REQUEST["do"]) && $_REQUEST["do"]=='1')
 {
   //transaktionsbeginn
   if (setLock($_SESSION["sou_user_id"]))
@@ -50,7 +50,7 @@ if($_REQUEST["do"]=='1')
 }
 
 //wenn ein submit gekommen ist, dann schauen ob er einen bonus erwerben m�chte
-if($_REQUEST["do"]=='2')
+if(isset($_REQUEST["do"]) && $_REQUEST["do"]=='2')
 {
   //transaktionsbeginn
   if (setLock($_SESSION["sou_user_id"]))
@@ -306,7 +306,7 @@ $db_daten=mysql_query("SELECT id, lastactive, threadname FROM sou_forum_threads 
 if(mysql_num_rows($db_daten)==1)
 {
   $row = mysql_fetch_array($db_daten);	
-  echo '<br><br>Letzter Forenbeitrag: <a href="sou_main.php?action=fracforumpage&id='.$row["id"].'">'.$row["threadname"]. ' - '.date ("d.m.Y \u\m H:i", $row[lastactive]).'</a>';
+  echo '<br><br>Letzter Forenbeitrag: <a href="sou_main.php?action=fracforumpage&id='.$row["id"].'">'.$row["threadname"]. ' - '.date ("d.m.Y \u\m H:i", $row['lastactive']).'</a>';
 }
 
 //eine liste der boni

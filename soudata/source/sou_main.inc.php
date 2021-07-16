@@ -83,10 +83,10 @@ if($_SESSION["sou_user_id"]>0)
 {
   $db_daten=mysql_query("SELECT * FROM sou_user_data WHERE user_id='$_SESSION[sou_user_id]'",$soudb);  	
   $row = mysql_fetch_array($db_daten);
-  $player_user_id=$_SESSION[sou_user_id];
+  $player_user_id=$_SESSION['sou_user_id'];
   $_SESSION["sou_spielername"]=$row["spielername"].' {'.$row["sn_ext1"].'}';
   $player_name=$row["spielername"];
-  $player_age=$row[playerage];
+  $player_age=$row['playerage'];
   $_SESSION["sou_fraction"]=$row["fraction"];
   $player_fraction=$row["fraction"];
   $_SESSION["sou_shipname"]=$row["shipname"];
@@ -115,16 +115,16 @@ if($_SESSION["sou_user_id"]>0)
   $player_atimer2time=$row["atimer2time"];
   $player_atimer3time=$row["atimer3time"];
   
-  $player_specialres[1]=$row[specialres1];
-  $player_specialres[2]=$row[specialres2];
-  $player_specialres[3]=$row[specialres3];
-  $player_specialres[4]=$row[specialres4];
-  $player_specialres[5]=$row[specialres5];
-  $player_specialres[6]=$row[specialres6];
-  $player_specialres[7]=$row[specialres7];
-  $player_specialres[8]=$row[specialres8];
-  $player_specialres[9]=$row[specialres9];
-  $player_specialres[10]=$row[specialres10];
+  $player_specialres[1]=$row['specialres1'];
+  $player_specialres[2]=$row['specialres2'];
+  $player_specialres[3]=$row['specialres3'];
+  $player_specialres[4]=$row['specialres4'];
+  $player_specialres[5]=$row['specialres5'];
+  $player_specialres[6]=$row['specialres6'];
+  $player_specialres[7]=$row['specialres7'];
+  $player_specialres[8]=$row['specialres8'];
+  $player_specialres[9]=$row['specialres9'];
+  $player_specialres[10]=$row['specialres10'];
   $player_owner_id=$row['owner_id'];
   $player_werberid=$row['werberid'];
   $player_dailygift=$row['dailygift'];
@@ -230,7 +230,7 @@ Der Erwerb eines Premiumaccounts ist &uuml;ber die zentrale Accountverwaltung be
 }
 
 
-if($show_activetime_msg==1) 
+if(isset($show_activetime_msg) && $show_activetime_msg==1) 
 {
   echo '<br>';
   rahmen0_oben();
@@ -327,7 +327,7 @@ include "bannerunterbrechung.php";
 //men� ende
 
 //wenn nichts gew�hlt wurde die startseite nehmen
-if($_REQUEST["action"]=="")$_REQUEST["action"]="systempage";
+if(!isset($_REQUEST["action"]))$_REQUEST["action"]="systempage";
 
 //auf die einzelnen unterseiten verzweigen
 if($_REQUEST["action"]=="optionspage")

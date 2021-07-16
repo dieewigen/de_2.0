@@ -13,11 +13,10 @@ include 'inc/lang/'.$sv_server_lang.'_sou_start.lang.php';
 <body>
 <div align="center">
 <?php
-$btip1 = $soustart_lang[start4a].'&'.$soustart_lang[start4b];
+$btip1 = $soustart_lang['start4a'].'&'.$soustart_lang['start4b'];
 
-//efta aktivieren
-if ($_POST["eftaactivate"])
-{
+//ea aktivieren
+if(isset($_POST["eftaactivate"])){
   mysql_query("UPDATE de_user_data SET useefta=1 WHERE user_id = '$ums_user_id'",$db);
   $_SESSION["ums_useefta"]=1;
 }
@@ -33,16 +32,16 @@ else $qlstr="top.document.getElementById('gf').cols = '205, 630, *, 0, 0';top.do
 
 //rahmen oben
 echo '<br>';
-rahmen_oben($soustart_lang[willkommen].' <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$btip1.'">');
+rahmen_oben($soustart_lang['willkommen'].' <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$btip1.'">');
 
 echo '<table width=580>';
 //startlinks
 $bg='cell';
 echo '<tr align="center">
-        <td class="'.$bg.'"><b><a href="sou_index.php" >'.$soustart_lang[starten].'</a></b></td>
+        <td class="'.$bg.'"><b><a href="sou_index.php" >'.$soustart_lang['starten'].'</a></b></td>
       </tr>';
 echo '<tr align="center">
-        <td class="'.$bg.'"><b><a href="#" onclick="'.$qlstr.'">'.$soustart_lang[kommandozentrale].'</a></b></td>
+        <td class="'.$bg.'"><b><a href="#" onclick="'.$qlstr.'">'.$soustart_lang['kommandozentrale'].'</a></b></td>
      </tr>';
 echo '<tr align="center">
         <td class="'.$bg.'"><font color="#FF0000"><b>Achtung</b></font><br>Die Erweiterte Arch&auml;ologie (EA) befindet sich noch im Beta-Stadium, was bedeutet, dass es h&auml;ufiger zu Ver&auml;nderungen und Resets/Teilresets kommen wird. Das bedeutet, dass Errungenschaften im Spiel verlorengehen k&ouml;nnen. Ich bitte alle Spieler, die nicht in der Lage sind bei einer Beta-Version mitzuspielen, sich zu &uuml;berlegen hier erst zu spielen, wenn eine stabile Version erreicht ist, welche weniger Ver&auml;nderungen/Resets/Teilresets ben&ouml;tigt.<br>Vielen Dank</td>

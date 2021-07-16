@@ -64,7 +64,7 @@ if($num==1 OR $numsrb==1)
     }
   }*/
   
-  //überprüfen ob das sonnenystem zur eigenen fraktion gehört
+  //ï¿½berprï¿½fen ob das sonnenystem zur eigenen fraktion gehï¿½rt
   if($numsrb==0)//es ist ein sonnensystem
   {
   	if($player_fraction!=$owner_fraction)
@@ -120,7 +120,7 @@ if($num==1 OR $numsrb==1)
   if($geb_level>0 OR $numsrb==1)
   {
     /*
-  	//den preis für die versicherung berechnen
+  	//den preis fï¿½r die versicherung berechnen
     $db_daten=mysql_query("SELECT MAX(shipdiameter) AS wert FROM `sou_user_data` WHERE fraction='$player_fraction'",$soudb);
     $row = mysql_fetch_array($db_daten);
     $insuranceprice=$row["wert"]*10000;*/
@@ -136,7 +136,7 @@ if($num==1 OR $numsrb==1)
 
 
   	//wenn ein submit gekommen ist, dann schauen ob die notfallmodule angefordert wurden
-    if($_REQUEST["sd"]==1 AND $numsrb==0)
+    if(isset($_REQUEST["sd"]) && $_REQUEST["sd"]==1 AND $numsrb==0)
     {
   	  mysql_query("INSERT INTO sou_ship_module (user_id, fraction, name, location, canmine) VALUES ('$_SESSION[sou_user_id]', '$_SESSION[sou_fraction]', 'Bergbaumodul Standard', 1, 50)",$soudb);
   	  mysql_query("INSERT INTO sou_ship_module (user_id, fraction, name, location, canmine) VALUES ('$_SESSION[sou_user_id]', '$_SESSION[sou_fraction]', 'Bergbaumodul Standard', 1, 50)",$soudb);
@@ -145,10 +145,10 @@ if($num==1 OR $numsrb==1)
     
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
-  	//wenn ein submit gekommen ist, dann schauen ob er ein modul löschen möchte
+  	//wenn ein submit gekommen ist, dann schauen ob er ein modul lï¿½schen mï¿½chte
   	///////////////////////////////////////////////////////////////////////////////
   	///////////////////////////////////////////////////////////////////////////////
-    if($_REQUEST["do"]==1)
+    if(isset($_REQUEST["do"]) && $_REQUEST["do"]==1)
     {
       $mid=intval($_REQUEST["di"]);
       mysql_query("DELETE FROM `sou_ship_module` WHERE user_id='$player_user_id' AND id='$mid' AND (location=0 OR location=1)",$soudb);
@@ -161,25 +161,25 @@ if($num==1 OR $numsrb==1)
     //modul verschieben
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
-    if($_REQUEST["do"]==2)
+    if(isset($_REQUEST["do"]) && $_REQUEST["do"]==2)
     {
       //modul-id auslesen
       $mid=intval($_REQUEST["di"]);
-      //feststellen, ob das modul einem gehört und an der richtigen position ist
+      //feststellen, ob das modul einem gehï¿½rt und an der richtigen position ist
       $db_daten=mysql_query("SELECT * FROM `sou_ship_module` WHERE user_id='$_SESSION[sou_user_id]' AND (location=0 OR location=1) AND id='$mid' ORDER BY name",$soudb);
       $num = mysql_num_rows($db_daten);
       
       if($num==1)
       {
       	$row = mysql_fetch_array($db_daten);
-      	//überprüfen ob es im schiff, oder im modulkomplex ist
+      	//ï¿½berprï¿½fen ob es im schiff, oder im modulkomplex ist
       	if($row["location"]==0)//es ist im schiff
       	{
-      	  //überprüfen ob ein forschungsmodul entfernt werden soll während es aktiv ist
+      	  //ï¿½berprï¿½fen ob ein forschungsmodul entfernt werden soll wï¿½hrend es aktiv ist
       	  if($player_atimer2typ>0 AND $row["giveresearch"]>0)$msg='<font color="#FF0000">Aufgrund einer aktiven Forschung kann das Modul nicht entfernt werden. Der Forschungsfortschritt kann unter unter Schiff -> Forschung &uuml;berpr&uuml;ft werden. Fertige Forschungen k&ouml;nnen dort abgeschlossen werden.</font>';
       		
-      	  //überprüfen ob im modulkomplex platz ist
-          //zuerst die dortigen hinterlegen module zählen
+      	  //ï¿½berprï¿½fen ob im modulkomplex platz ist
+          //zuerst die dortigen hinterlegen module zï¿½hlen
 		  $db_datenx=mysql_query("SELECT id FROM sou_ship_module WHERE user_id='$player_user_id' AND location=1",$soudb);
 		  $num_lager = mysql_num_rows($db_datenx);
 			
@@ -251,7 +251,7 @@ if($num==1 OR $numsrb==1)
             }
           	else $msg='<font color="#FF0000">Diese Art von Modul kann nicht in das Raumschiff transferiert werden.</font>'; 
     		//lock wieder entfernen
-    		$erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    		$erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     		if ($erg)
     		{
       		  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -281,7 +281,7 @@ if($num==1 OR $numsrb==1)
       //transaktionsbeginn
       if (setLock($_SESSION["sou_user_id"]))
       {
-    	//überprüfen ob er genug geld hat
+    	//ï¿½berprï¿½fen ob er genug geld hat
     	$hasmoney=has_money($player_user_id);
       	if($hasmoney>=$insuranceprice)
       	{
@@ -291,13 +291,13 @@ if($num==1 OR $numsrb==1)
       	  //versicherung hinterlegen
       	  mysql_query("UPDATE sou_ship_module SET insurance=1 WHERE user_id='$player_user_id' AND id='$mid'",$soudb);
       	  
-      	  //bestätigung ausgeben
+      	  //bestï¿½tigung ausgeben
       	  $msg='<font color="#00FF00">Das Modul wurde versichert.</font>';
       	}
       	else $msg='<font color="#FF0000">Du hast nicht genug Zastari.</font>';
       	
       	//lock wieder entfernen
-    	$erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    	$erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     	if ($erg)
     	{
       	  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -315,7 +315,7 @@ if($num==1 OR $numsrb==1)
     //modul verwenden
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
-    if($_REQUEST["do"]==4)
+    if(isset($_REQUEST["do"]) && $_REQUEST["do"]==4)
     {
       //modul-id auslesen
       $mid=intval($_REQUEST["di"]);
@@ -323,7 +323,7 @@ if($num==1 OR $numsrb==1)
       //transaktionsbeginn
       if (setLock($_SESSION["sou_user_id"]))
       {
-        //feststellen, ob das modul einem gehört
+        //feststellen, ob das modul einem gehï¿½rt
         $db_daten=mysql_query("SELECT * FROM `sou_ship_module` WHERE user_id='$_SESSION[sou_user_id]' AND (location=0 OR location=1) AND id='$mid' ORDER BY name",$soudb);
         $num = mysql_num_rows($db_daten);
       
@@ -333,7 +333,7 @@ if($num==1 OR $numsrb==1)
           //buffdaten zuerst auslesen
           $row = mysql_fetch_array($db_daten);
           
-  		  if($row[buff]!='')
+  		  if($row['buff']!='')
   		  {
   		    //wert parsen
     		$value=explode(";",$row[buff]);
@@ -349,7 +349,7 @@ if($num==1 OR $numsrb==1)
       		    $bvalue=$einzelvalue[1];
       		    $btime=$einzelvalue[2]*24*3600+time();
 				
-      		    //buff in der db hinterlegen, dazu überprüfen ob es schon einen buff dieser art gibt und den ggf. verlängern
+      		    //buff in der db hinterlegen, dazu Ã¼berprÃ¼fen ob es schon einen buff dieser art gibt und den ggf. verlï¿½ngern
       		    $db_daten=mysql_query("SELECT * FROM `sou_user_buffs` WHERE user_id='$player_user_id' AND time>'$time' AND typ='$btyp' AND value='$bvalue'",$soudb);
       		    $num = mysql_num_rows($db_daten);
       		    if($num==1) //datensatz updaten
@@ -366,7 +366,7 @@ if($num==1 OR $numsrb==1)
       		  }
     		}
             
-    		//bestätigung ausgeben
+    		//bestï¿½tigung ausgeben
         	$msg='<font color="#00FF00">Das Modul wurde verwendet.</font>';
   		  }
   		  
@@ -377,13 +377,14 @@ if($num==1 OR $numsrb==1)
     		for($n=0;$n<count($value);$n++){
       		  $einzelvalue=explode("x",$value[$n]);
       		  
-      		  //typ 1 geistige stärke
-      		  if($einzelvalue[0]==1){
+      		  //typ 1 geistige stÃ¤rke
+			  //deaktiviert wÃ¤hrend der Apokalypse
+      		  if($einzelvalue[0]==1 && 1==2){
 				$btyp=$einzelvalue[0];
       		    $bvalue=$einzelvalue[1];
       		    $btime=$einzelvalue[2]*24*3600+time();
 				
-      		    //buff in der db hinterlegen, wenn er länger ist, als ein bestehende Buff
+      		    //buff in der db hinterlegen, wenn er lï¿½nger ist, als ein bestehende Buff
 				$db_daten=mysql_query("SELECT * FROM `sou_map_buffs` WHERE owner_id='$owner_id'",$soudb);
 				$possible=true;
 				while($row = mysql_fetch_array($db_daten)){
@@ -395,7 +396,7 @@ if($num==1 OR $numsrb==1)
 
 					//modul entfernen
 					mysql_query("DELETE FROM `sou_ship_module` WHERE user_id=".$_SESSION['sou_user_id']." AND id='$mid';",$soudb);
-					//bestätigung ausgeben
+					//bestï¿½tigung ausgeben
 					$msg='<font color="#00FF00">Das Modul wurde verwendet.</font>';
 					
 				}else $msg='<font color="#FF0000">Es besteht bereits ein l&auml;nger anhaltender Schutz.</font>';
@@ -407,7 +408,7 @@ if($num==1 OR $numsrb==1)
       	else $msg='<font color="#FF0000">Dieses Modul geh&ouml;rt Dir nicht.</font>';
       	
       	//lock wieder entfernen
-    	$erg = releaseLock($_SESSION["sou_user_id"]); //Lösen des Locks und Ergebnisabfrage
+    	$erg = releaseLock($_SESSION["sou_user_id"]); //Lï¿½sen des Locks und Ergebnisabfrage
     	if ($erg)
     	{
       	  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -433,8 +434,8 @@ if($num==1 OR $numsrb==1)
 	
   	//alle module auslesen und auswerten
   	echo '<script language="javascript">';
- 	echo 'var delmsg = "Soll das Modul wirklich gelöscht werden? Achtung: Bei unsachgemäßer Handhabung kann das Schiff unbrauchbar werden.";';
- 	//echo 'var insurancemsg = new Array("Versicherung","Hier kann das Modul versichert werden, um bei einer Zerst&ouml;rung des Raumschiffes wieder ersetzt zu werden. Bei einer Zerst&ouml;rung werden die Ersatzmodule von der Versicherung im Modulkomplex hinterlegt. Die Versicherung ist einmalig und muß nach einer Inanspruchname erneuert werden.<br>Versicherungkosten: '.number_format($insuranceprice, 0,",",".").' Zastari");';
+ 	echo 'var delmsg = "Soll das Modul wirklich gelï¿½scht werden? Achtung: Bei unsachgemï¿½ï¿½er Handhabung kann das Schiff unbrauchbar werden.";';
+ 	//echo 'var insurancemsg = new Array("Versicherung","Hier kann das Modul versichert werden, um bei einer Zerst&ouml;rung des Raumschiffes wieder ersetzt zu werden. Bei einer Zerst&ouml;rung werden die Ersatzmodule von der Versicherung im Modulkomplex hinterlegt. Die Versicherung ist einmalig und muï¿½ nach einer Inanspruchname erneuert werden.<br>Versicherungkosten: '.number_format($insuranceprice, 0,",",".").' Zastari");';
  	$modulusemsg = 'Modul verwenden&Anklicken um das Modul zu verwenden.';
   	$output2='<table width="100%" border="0" cellpadding="1" cellspacing="0">';
   	$output1='<table width="100%" border="0" cellpadding="1" cellspacing="0">
@@ -450,7 +451,7 @@ if($num==1 OR $numsrb==1)
       
       $atip[$atipc] = make_modul_name_js($row).'&'.make_modul_info($row);
       
-      //link zur modullöschung
+      //link zur modullï¿½schung
       $deletelink='<a href="sou_main.php?action=modulholdpage&do=1&di='.$row["id"].'" onClick="return confirm(delmsg)"><img border="0" 
       style="vertical-align: middle;" src="'.$gpfad.'abutton3.gif" alt="Modul zerst&ouml;ren"></a>';
       
@@ -466,7 +467,7 @@ if($num==1 OR $numsrb==1)
       $insurancelink='';
       else $insurancelink='';
       
-      //bei buffmodulen stehen nicht alle funktionen zur verfügung
+      //bei buffmodulen stehen nicht alle funktionen zur verfï¿½gung
       $uselink='';
       if($row[buff]!='' OR $row[mapbuff]!='')
       {
@@ -480,7 +481,7 @@ if($num==1 OR $numsrb==1)
     	
       if($row["location"]==0)//das modul ist im schiff
       {
-        //daten für die schiffszusammenfassung
+        //daten fï¿½r die schiffszusammenfassung
       	$gesamtneedspace+=$row["needspace"];
     	$gesamtneedenergy+=$row["needenergy"];
     	$gesamtgiveenergy+=$row["giveenergy"];
@@ -632,7 +633,7 @@ echo '<br>Schildkapazit&auml;t: '.number_format($gesamtgiveshield, 0,",",".").' 
 
 //echo '<br>Vorhandener Frachtraum: '.number_format($gesamthasspace, 0,",",".").' <font color="#00FF00">('.number_format($gesamthasspace+$addvaluehasspace_absolute+($gesamthasspace/100*$addvaluehasspace_percentage), 0,",",".").')</font> m&sup3;';
 
-//bergbaukapazität
+//bergbaukapazitï¿½t
 $tooltip='Rohstoffmenge&';
 for($resid=0;$resid<count($r_def);$resid++)
 {
@@ -647,7 +648,7 @@ echo '<br>Bergungskapazit&auml;t: '.number_format($gesamtcanrecover, 0,",",".").
 
 echo '</td></tr></table> ';
 
-//überprüfen ob das schiff funktionsfähig ist
+//ï¿½berprï¿½fen ob das schiff funktionsfï¿½hig ist
 /*
 if($gesamtgivelife<1 OR ($gesamtgiveenergy-$gesamtneedenergy)<0 OR $gesamtgivesubspace<=0 OR $freehold<0 OR $gesamtgivecenter<=0)
 {
@@ -664,7 +665,7 @@ rahmen1_unten();
 echo '</td></tr></table>';
 
 
-    //die möglichkeit geben komplett neu anzufangen, nicht möglich auf einer srb
+    //die mï¿½glichkeit geben komplett neu anzufangen, nicht mï¿½glich auf einer srb
 	if($numsrb==0)
 	{
       echo '<br>';

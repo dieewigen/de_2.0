@@ -1,7 +1,7 @@
 <?php 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-// überprüfen ob man vielleicht in einer hyperraumblase ist
+// ï¿½berprï¿½fen ob man vielleicht in einer hyperraumblase ist
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 if($player_in_hb>0)
@@ -99,26 +99,26 @@ if($num==1)
 	  /*
       if($_REQUEST["dotakeover"] AND $systemstatus==2 AND $srb_fraction!=$player_fraction AND  $player_atimer1time<time())
 	  {
-		//überprüfen ob der nachbarsektor eine übernahme ermöglicht
+		//ï¿½berprï¿½fen ob der nachbarsektor eine ï¿½bernahme ermï¿½glicht
   		$sbx=round($player_x/15);
   		$sby=round($player_y/15);
 		if(get_sector_owner($sbx, $sby+1)==$player_fraction OR get_sector_owner($sbx+1, $sby)==$player_fraction OR get_sector_owner($sbx, $sby-1)==$player_fraction OR get_sector_owner($sbx-1, $sby)==$player_fraction OR get_sector_owner($sbx, $sby+1)==999 OR get_sector_owner($sbx+1, $sby)==999 OR get_sector_owner($sbx, $sby-1)==999 OR get_sector_owner($sbx-1, $sby)==999)
 		{
-	  	  //überprüfen ob man genug geld hat
+	  	  //ï¿½berprï¿½fen ob man genug geld hat
 	  	  $hasmoney=has_money($player_user_id);
 	  	  if($hasmoney>=$preis)
 	  	  {
-	  	    //überprüfen ob man schon wieder in dem bereich aktiv werden kann
+	  	    //ï¿½berprï¿½fen ob man schon wieder in dem bereich aktiv werden kann
 	  	    if($player_atimer3time<=time()-3600*2)
 	  	    {
-	  	  	  //srb übernehmen
+	  	  	  //srb ï¿½bernehmen
 	  		  mysql_query("UPDATE sou_map_base SET fraction='$player_fraction', takeover=takeover+1 WHERE x='$searchx' AND y='$searchy'",$soudb);
 	  		
-	  		  //persönlichen counter setzen
+	  		  //persï¿½nlichen counter setzen
 	  		  $time=time();
 	  		  mysql_query("UPDATE sou_user_data SET srbtakeover=srbtakeover+1, atimer3time='$time' WHERE user_id='$player_user_id'",$soudb);
 	  		
-	  		  //info für den chat
+	  		  //info fï¿½r den chat
 	  		  $text='<font color="#FF0000">F'.$srb_fraction.' hat eine Sektorraumbasis an F'.$player_fraction.' verloren. Koordinaten: '.$searchx.':'.$searchy.'</font>';
         	  insert_chat_msg('^Der Reporter^', $text, 0, 0);
         	  
@@ -128,7 +128,7 @@ if($num==1)
         	  //dieses als spende notieren
 		      mysql_query("UPDATE `sou_user_data` SET donate=donate+'$preis' WHERE user_id='$player_user_id'",$soudb);
 			  
-			  //logging für multisuche
+			  //logging fï¿½r multisuche
 				$datum=date("Y-m-d H:i:s",time());
 				$ip=getenv("REMOTE_ADDR");
 				$datenstring="Zeit: $datum\nIP: $ip\nuser_id: $ums_user_id\n".$text."\n--------------------------------------\n";
@@ -187,7 +187,7 @@ if($systemstatus==1)
   $db_daten=mysql_query("SELECT * FROM `sou_map_buffs` WHERE owner_id='$owner_id' AND time>'$time'",$soudb);
   while($row = mysql_fetch_array($db_daten))
   {
-    if($row[typ]==1) {$grafikname="sym4.png";$tooltip='Geistige St&auml;rke&Feindliche Fraktionen haben in diesem Sonnensystem keinen Einfluss auf das Ansehen.<br>Aktiv bis: '.date ("d.m.Y H:i", $row[time]);}
+    if($row['typ']==1) {$grafikname="sym4.png";$tooltip='Geistige St&auml;rke&Feindliche Fraktionen haben in diesem Sonnensystem keinen Einfluss auf das Ansehen.<br>Aktiv bis: '.date ("d.m.Y H:i", $row['time']);}
  
     $sysbuffstr.='<img src="'.$gpfad.$grafikname.'" width="64px" height="64px" title="'.$tooltip.'">';
     $c++;
@@ -243,7 +243,7 @@ if($systemstatus==1)
 	// 100 = Radius, 125/110 = Nullpunkt
 	// 0.0628 = 2*Pi/Punkteanzahl pro Kreis = 2*Pi/100
 	// = Abstand der Elemente zueinander in Radiant (rad)
-	// Diese Angaben bestimmen die Größe des Kreises
+	// Diese Angaben bestimmen die Grï¿½ï¿½e des Kreises
 ?>
 	var alpha=new Array();
 	for(i=0;i<<?php echo $num ?>;i++) {
@@ -271,7 +271,7 @@ if($systemstatus==1)
   {
     //es wurden noch keine planeten in der db angelegt
     echo '<br>&Uuml;ber dieses Sonnensystem liegen noch keine Informationen vor. Die gesammelten Daten werden aktuell ausgewertet und stehen in wenigen Augenblicken zur Verf&uuml;gung.<br>';	
-    //auftrag für die anlegung in der db hinterlegen
+    //auftrag fï¿½r die anlegung in der db hinterlegen
     mysql_query("INSERT INTO sou_cronjobs (job, flag1, time) VALUES (1, '$owner_id', 0)",$soudb);
   }
 }
@@ -295,12 +295,12 @@ if($systemstatus==2)
   
   ////////////////////////////////////////////////////
   ////////////////////////////////////////////////////
-  // hauptmenü
+  // hauptmenï¿½
   ////////////////////////////////////////////////////
   ////////////////////////////////////////////////////
   
   
-  //wahlmöglichkeit für sektor/strategische karte
+  //wahlmï¿½glichkeit fï¿½r sektor/strategische karte
   echo '<div style="margin-left: 0px; margin-bottom: 4px; width: 142px; padding: 0px; float: left;">';
   echo '
 <a title="&Zur strategischen Karte wechseln" href="sou_main.php?action=stratmappage"><img style="border: 1px solid #888888" src="'.$gpfad.'sym9.png" width="64px" height="64px"></a>
@@ -313,7 +313,7 @@ if($systemstatus==2)
   echo '<div title="Infocenter" style="height: 42px; width: 42px; float: left;"><a href="sou_main.php?action=systempage&underpage=1"><img border="0" src="'.$gpfad.'sym12.png" width="100%" height="100%"></a></div>';  
   echo '<div title="Fraktionsaufgaben" style="height: 42px; width: 42px; float: left;"><a href="sou_main.php?action=systempage&underpage=4"><img border="0" src="'.$gpfad.'sym13.png" width="100%" height="100%"></a></div>';
 
-  //überprüfen ob die forschung aktiv ist, pa feature
+  //ï¿½berprï¿½fen ob die forschung aktiv ist, pa feature
   if($ums_premium==1 AND $player_atimer2time<time())
   {
     //nur anzeigen, wenn ein forschungsmodul vorhanden ist
@@ -354,9 +354,9 @@ if($systemstatus==2)
   //seitenteiler
   echo '</td><td width="500" valign="top">';
     
-  //zieldiv für content
+  //zieldiv fï¿½r content
   //echo '<div id="maincontent"></div>';
-  if(!$_REQUEST['underpage'])$_REQUEST['underpage']=1;
+  if(!isset($_REQUEST['underpage']))$_REQUEST['underpage']=1;
   if($_REQUEST['underpage']==1 OR $_REQUEST['underpage']==3 OR $_REQUEST['underpage']==4)
       include_once('soudata/source/sou_start.php');
 
@@ -368,7 +368,7 @@ if($systemstatus==2)
   echo '</td><td width="310" valign="top">';
 
   if($systemstatus==1){
-	//rechte spalte mit daten über das sonnensystem
+	//rechte spalte mit daten ï¿½ber das sonnensystem
 	rahmen1_oben('<div align="center"><b><a href="sou_main.php?action=showdatapage&styp=4&systemname='.utf8_encode($sysname).'">'.$sysname.'</a></b></div>');
     //echo '<table width="100%" border="0" cellpadding="0" cellspacing="2">';
 	//ansehen der fraktionen im ss
@@ -401,7 +401,7 @@ if($systemstatus==2)
 	//sonnensystembuffs
 	echo $sysbuffstr;
 	
-	//im heimatsystem könnte es evtl. eine virtuelle omegabrücke geben
+	//im heimatsystem kï¿½nnte es evtl. eine virtuelle omegabrï¿½cke geben
 	if($sv_omega_position[0][$player_fraction-1][0]==$player_x AND $sv_omega_position[0][$player_fraction-1][1]==$player_y)
 	{
 	  $db_daten=mysql_query("SELECT * FROM `sou_frac_techs` WHERE tech_id=60008 AND f".$player_fraction."lvl>0",$soudb);
@@ -412,7 +412,7 @@ if($systemstatus==2)
 	  }	
 	}
 	
-	//im deep fraction-system könnte es auch eine virtuelle omega-brücke geben
+	//im deep fraction-system kï¿½nnte es auch eine virtuelle omega-brï¿½cke geben
 	if($sv_omega_position[1][$player_fraction-1][0]==$player_x AND $sv_omega_position[1][$player_fraction-1][1]==$player_y)
 	{
 	  $db_daten=mysql_query("SELECT * FROM `sou_frac_techs` WHERE tech_id=60010 AND f".$player_fraction."lvl>0",$soudb);
@@ -423,11 +423,11 @@ if($systemstatus==2)
 	  }	
 	}
 	
-	//verfügbare rohstoffe im sonnensystem
+	//verfï¿½gbare rohstoffe im sonnensystem
     $title='Rohstoffvorkommen&';
 	for($i=0;$i<count($r_def);$i++)
 	{
-  	  //überprüfen ob der rohstoff möglich ist
+  	  //ï¿½berprï¿½fen ob der rohstoff mï¿½glich ist
  
   	  if(res_is_available($i)==1)
   	  {
@@ -436,13 +436,13 @@ if($systemstatus==2)
 	}
 	echo '<img src="'.$gpfad.'px1.gif" width="64" height="64" title="'.$title.'">';
 	
-	//omega-brücke
+	//omega-brï¿½cke
 	echo check4creatorbridge();
 	
-	//fundstücke
+	//fundstï¿½cke
 	echo check4find();
 
-   //wenn es piraten gibt, ist kein zugriff möglich, erst muß man das system freikämpfen
+   //wenn es piraten gibt, ist kein zugriff mï¿½glich, erst muï¿½ man das system freikï¿½mpfen
   if($pirates>0)
   {
     //stufe der piraten bestimmen
@@ -495,9 +495,9 @@ if($systemstatus==2)
 	echo '</div>';
 	
 	
-	//omega-brücke
+	//omega-brï¿½cke
 	echo check4creatorbridge();	
-	//fundstücke
+	//fundstï¿½cke
 	echo check4find();
     echo '<table width="100%" border="0" cellpadding="0" cellspacing="2">';
 	echo '<tr align="left"><td>Baujahr: '.number_format($srb_baujahr, 0,",",".").'</td></tr>';
@@ -512,9 +512,9 @@ if($systemstatus==2)
   if($systemstatus==0)
   {
 	rahmen1_oben('<div align="center"><b>Informationen</b></div>');
-	//omega-brücke
+	//omega-brï¿½cke
 	echo check4creatorbridge();	
-	//fundstücke
+	//fundstï¿½cke
 	echo check4find();
     echo '<table width="100%" border="0" cellpadding="0" cellspacing="2">';
 	echo '<tr align="left"><td>Hier gibt es nur den leeren Raum.</td></tr>';
@@ -524,7 +524,7 @@ if($systemstatus==2)
   
   if($systemstatus==1)
   {
-    //rechte spalte mit den möglichen aktionen
+    //rechte spalte mit den mï¿½glichen aktionen
     if($owner_fraction>0)
     {
       echo '<div style="margin-top: 4px;">';
