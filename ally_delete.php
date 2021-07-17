@@ -1,12 +1,12 @@
 <?php
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.delete.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.delete.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, ally_id FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$ally_id=$row["ally_id"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];$ally_id=$row['ally_id'];
 $allytag=$row['allytag'];
 
 ?>
@@ -14,19 +14,19 @@ $allytag=$row['allytag'];
 <html>
 <head>
 <title><?php echo $allydelete_lang['title']?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 
 if(!$isleader){
-	echo $allydelete_lang[msg_1];
+	echo $allydelete_lang['msg_1'];
 }
 else
 {
-	if($a == 1)
+	if(isset($a) && $a == 1)
 	{
 		$query = "select id from de_allys where leaderid=$ums_user_id";
 		if ($result = @mysql_query($query))
@@ -80,11 +80,11 @@ else
 	else
 	{
 		echo '<div class="cell text2" style="width: 600px;">'.$allydelete_lang['msg_4'];
-		echo "<a href=\"ally_delete.php?a=1\"><font face=\"tahoma\" style=\"font-size:14pt;\"><b>$allydelete_lang[msg_5]</a><BR>";
+		echo '<a href="ally_delete.php?a=1"><font face="tahoma" style="font-size:14pt;"><b>'.$allydelete_lang['msg_5'].'</a><br />';
 	}
 }
 
 
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
+<?php include('ally/ally.footer.inc.php'); ?>

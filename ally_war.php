@@ -9,32 +9,37 @@
 //	05.02.2002 (Ascendant)	- Erweiterung der Änderungsbefugnis der Kriege
 //							  auf Coleader
 //  --------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.war.lang.php';
-include_once 'functions.php';
+
+$bestehende_kriege[] = '';
+$an = '';
+$selected = '';
+
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.war.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$allytag=$row["allytag"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
+$allytag=$row['allytag'];
 
 /*$db_daten=mysql_query("SELECT nic FROM de_login WHERE user_id='$ums_user_id'");
 $row = mysql_fetch_array($db_daten);
-$nic=$row["nic"];*/
+$nic=$row['nic'];*/
 
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?php echo $allywar_lang[title];?></title>
-<?php include "cssinclude.php"; ?>
+<title><?php echo $allywar_lang['title'];?></title>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
-include "resline.php";
+include('resline.php');
 
-include ("ally/ally.menu.inc.php");
+include('ally/ally.menu.inc.php');
 
 if($isleader || $iscoleader)
 {
@@ -49,7 +54,7 @@ else
 	$allyid = mysql_result($result,0,"id");
 }
 
-if($peaceto and ($isleader || $iscoleader))
+if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
 {
 	$query = "SELECT id FROM de_allys WHERE allytag='$peaceto'";
 	$result = mysql_query($query);
@@ -98,19 +103,19 @@ if($peaceto and ($isleader || $iscoleader))
 	{
 		$query="UPDATE de_ally_war set friedensangebot = $allyid where (ally_id_angreifer=$allyid and ally_id_angegriffener=$peaceto_id) or (ally_id_angreifer=$peaceto_id and ally_id_angegriffener=$allyid)";
 		$result = mysql_query($query);
-		echo "$allywar_lang[msg_5_1] $peaceto $allywar_lang[msg_5_2] $peaceto $allywar_lang[msg_5_3].";
-		include("ally/allyfunctions.inc.php");
+		echo $allywar_lang['msg_5_1'].' '.$peaceto.' '.$allywar_lang['msg_5_2'].' '.$peaceto.' '.$allywar_lang['msg_5_3'];
+		include('ally/allyfunctions.inc.php');
 		writeHistory($allytag, "$allywar_lang[msg_6_1] <i>$peaceto</i> $allywar_lang[msg_6_2]",true);
 		writeHistory($peaceto, "$allywar_lang[msg_7_1] <i>$allytag</i> $allywar_lang[msg_7_2]",true);
 
 	}
 	elseif ($friedensangebot == $allyid)
 	{
-		echo "$allywar_lang[msg_8_1] $peaceto $allywar_lang[msg_8_2] <a href=\"ally_message_leader.php?select=".urlencode($peaceto)."\">$allywar_lang[msg_8_3]</a>.";
+		echo $allywar_lang['msg_8_1'].' '.$peaceto.' '.$allywar_lang['msg_8_2'].' <a href="ally_message_leader.php?select='.urlencode($peaceto).'">'.$allywar_lang['msg_8_3'].'</a>';
 	}
 	else
 	{
-		echo "$allywar_lang[msg_1].. ?";
+		echo $allywar_lang['msg_1'].'.. ?';
 	}
 }
 
@@ -132,7 +137,7 @@ if($an and ($isleader || $iscoleader)){
 	$result = mysql_query($query);
 	$alreadyinXallys = mysql_result($result,0,0);
 	if ($alreadyinXallys >= 2)
-		die ("$an ist schon genug in K�mpfe verwickelt...");
+		die ("$an ist schon genug in Kämpfe verwickelt...");
 	*/
 
 	$query = "select count(user_id), sum(score) from de_user_data where allytag='$an'";
@@ -167,8 +172,8 @@ if($an and ($isleader || $iscoleader)){
 	$sqlquery = "INSERT into de_ally_war (ally_id_angreifer , ally_id_angegriffener , kriegsstart, friedensangebot  ) VALUES ($allyid, $angegriffener, NOW(), 0)";
 	$result = @mysql_query($sqlquery);
 
-	echo "$allywar_lang[msg_14] !";
-	include("ally/allyfunctions.inc.php");
+	echo $allywar_lang['msg_14'].' !';
+	include('ally/allyfunctions.inc.php');
 	writeHistory($allytag, "$allywar_lang[msg_15_1] <i>$an</i> $allywar_lang[msg_15_2]",true);
 	writeHistory($an, "$allywar_lang[msg_16_1] <i>$allytag</i> $allywar_lang[msg_16_2]",true);
 
@@ -176,18 +181,31 @@ if($an and ($isleader || $iscoleader)){
   	$query = "SELECT ally_id_angegriffener, ally_id_angreifer FROM de_ally_war where ((ally_id_angegriffener=$allyid) or (ally_id_angreifer=$allyid))";
 	$result = mysql_query($query);
 	if (mysql_num_rows($result))	{
-		echo 	"<table border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\">\n".
-			"<tr align=\"center\">\n".
-			"<td width=\"13\" height=\"37\" class=\"rol\">&nbsp;</td>\n".
-			"<td width=\"500\" align=\"center\" class=\"ro\">$allywar_lang[msg_17]:</td>\n".
-			"<td width=\"13\" class=\"ror\">&nbsp;</td>\n".
-			"</tr>\n".
-			"<tr><td width=\"13\" class=\"rl\">&nbsp;</td><td>\n".
-			"<table border=\"0\" width=\"100%\" cellspacing=\"1\" cellpadding=\"0\">\n".
-			"<tr class=\"tc\"><td><b>$allywar_lang[gegner]</td>";
-			if($isleader || $iscoleader)
-				echo "<td><b>$allywar_lang[peace]</td>";
-			echo "</tr>";
+		echo '
+			<table border="0" width="600" cellspacing="0" cellpadding="0">
+				<tr align="center">
+					<td width="13" height="37" class="rol">&nbsp;</td>
+					<td width="500" align="center" class="ro">'.$allywar_lang['msg_17'].':</td>
+					<td width="13" class="ror">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="13" class="rl">&nbsp;</td>
+					<td>
+						<table border="0" width="100%" cellspacing="1" cellpadding="0">
+							<tr class="tc">
+								<td><b>'.$allywar_lang['gegner'].'</td>
+		';
+		
+		if($isleader || $iscoleader) {
+			
+			echo '
+								<td><b>'.$allywar_lang['peace'].'</td>';
+			
+		}
+		
+		echo '
+							</tr>
+		';
 
 		while ($row = @mysql_fetch_array($result))
 		{
@@ -199,48 +217,65 @@ if($an and ($isleader || $iscoleader)){
 			$result2 = mysql_query($query);
 			$angegriffener = @mysql_result($result2,0,"allytag");
 
-			echo 	"<tr class=\"cl\">".
-					"<td>".$angegriffener."</td>";
-					if($isleader || $iscoleader)
-						echo "<td><a href=\"$PHP_SELF?SID=$SID&peaceto=".urlencode($angegriffener)."\">$allywar_lang[declarepeace]</a></td>";
-				echo "</tr>";
+			echo '
+							<tr class="cl">
+								<td>'.$angegriffener.'</td>
+			';
+			
+			if($isleader || $iscoleader) { 
+			
+				echo '
+								<td><a href="'.$_SERVER['PHP_SELF'].'?SID='.$SID.'&peaceto='.urlencode($angegriffener).'">'.$allywar_lang['declarepeace'].'</a></td>
+				';
+			
+			}
+			
+			echo '
+							</tr>
+			';
+			
 			$bestehende_kriege[] = $angegriffener;
 		}
 
-		echo "</table>".
-			'<td width="13" class="rr">&nbsp;</td></tr>'.
-			'<tr><td width="13" class="rul">&nbsp;</td>'.
-			'<td width="13" class="ru">&nbsp;</td>'.
-			'<td width="13" class="rur">&nbsp;</td>'.
-			'</tr>'.
-			'</table><BR>';
+		echo '
+						</table>
+					<td width="13" class="rr">&nbsp;</td></tr>
+					<tr><td width="13" class="rul">&nbsp;</td>
+					<td width="13" class="ru">&nbsp;</td>
+					<td width="13" class="rur">&nbsp;</td>
+				</tr>
+			</table>
+			<br />
+		';
 	}
 	if($isleader || $iscoleader)
 	{
 
-		echo "<form name=\"krieg\" method=\"POST\" action=\"$PHP_SELF\">\n".
-			  "<table border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" class=\"cell\">".
-			     "<tr class=\"tc\"><td colspan=\"2\"><br>$allywar_lang[war]</td></tr>".
-			     "<tr class=\"cl\">\n".
-			      "<td width=\"50%\"><br>$allywar_lang[an]:</td>\n".
-			      "<td width=\"50%\">".
-			      "<select name=\"an\">\n";
+		echo '
+			<form name="krieg" method="POST" action="'.$_SERVER['PHP_SELF'].'">
+				<table border="0" width="600" cellspacing="0" cellpadding="0" class="cell">
+				<tr class="tc"><td colspan="2"><br>'.$allywar_lang['war'].'</td></tr>
+				<tr class="cl">
+				<td width="50%"><br>'.$allywar_lang['an'].':</td>
+				<td width="50%">
+					<select name="an">
+		';
 
-			      	$query = "SELECT allytag, id FROM de_allys order by allytag";
+				$query = "SELECT allytag, id FROM de_allys order by allytag";
 				$result = mysql_query($query);
 				while ($row = mysql_fetch_array($result))
 				{
-					if (!in_array($row[allytag],$bestehende_kriege) and $allytag != $row[allytag])
+					if (!in_array($row['allytag'],$bestehende_kriege) and $allytag != $row['allytag'])
 					{
-						echo "<option value=\"".$row[allytag]."\"";
-						if ($selected==$row[id]) echo " selected";
-						echo ">".$row[allytag]."</option>\n";
+						echo '<option value="'.$row['allytag'].'"';
+						if ($selected==$row['id']) echo ' selected';
+						echo '>'.$row['allytag'].'</option>\n';
 					}
 				}
 
-		echo	    "</select></td>
-			    </tr>";
-		echo '<tr><td align="center" colspan="2"><input type="submit" value="'.$allywar_lang[abschicken].'" name="B1"></td></tr>';
+		echo	    '</select></td>
+			    </tr>';
+		echo '<tr><td align="center" colspan="2"><input type="submit" value="'.$allywar_lang['abschicken'].'" name="B1"></td></tr>';
 		echo '</table>';
 			  
 		echo '</form>';
@@ -250,7 +285,7 @@ if($an and ($isleader || $iscoleader)){
 
 ?>
 <br>
-<?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
+<?php include('ally/ally.footer.inc.php'); ?>
+<?php include('fooban.php'); ?>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 $skforumvt_lang['title']='SK-Forum';
-$skforumvt_lang['zurueck']='zur&uuml;ck';
+$skforumvt_lang['zurueck']='zurück';
 $skforumvt_lang['tolastpost']='Zum letzten Post der Seite springen';
 $skforumvt_lang['thema']='THEMA';
 $skforumvt_lang['re']='RE';
@@ -13,15 +13,15 @@ $skforumvt_lang['antwortauf']='Antwort auf';
 $skforumvt_lang['erstellen']='erstellen';
 $skforumvt_lang['titel']='Titel';
 $skforumvt_lang['nachricht']='Nachricht';
-$skforumvt_lang['aenderungspeichern']='&Auml;nderung speichern';
+$skforumvt_lang['aenderungspeichern']='änderung speichern';
 $skforumvt_lang['antworten']='Antworten';
 $skforumvt_lang['ontopaktivieren']='OnTop aktivieren';
 $skforumvt_lang['ontopdeaktivieren']='OnTop deaktivieren';
 $skforumvt_lang['threadschliessen']='Thread schlie&szlig;en';
-$skforumvt_lang['threadloeschen']='Thread l&ouml;schen';
-$skforumvt_lang['threadoeffnen']='Thread &ouml;ffnen';
+$skforumvt_lang['threadloeschen']='Thread löschen';
+$skforumvt_lang['threadoeffnen']='Thread öffnen';
 
-$skforumvt_lang['msg_0']='Nur f&uuml;r SKs';
+$skforumvt_lang['msg_0']='Nur für SKs';
 $skforumvt_lang['msg_1']='Leider haben Sie keinen Zugriff auf dieses Dokument.  ';
 $skforumvt_lang['msg_2']='Sie sind nicht berechtigt, dieses Dokument zu editieren.';
 $skforumvt_lang['msg_3']='Keine Nachricht eingetragen.<br>';
@@ -35,5 +35,5 @@ $skforumvt_lang['msg_8_3']='Uhr';
 $skforumvt_lang['msg_8_4']='\u\m';
 $skforumvt_lang['msg_9_1']='Dieser Beitrag wurde';
 $skforumvt_lang['msg_9_2']='mal editiert, das letzte Mal am';
-$skforumvt_lang['msg_10']='M&ouml;chten Sie diesen Thread wirklich l&ouml;schen?';
+$skforumvt_lang['msg_10']='Möchten Sie diesen Thread wirklich löschen?';
 ?>

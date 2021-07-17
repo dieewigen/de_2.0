@@ -1,7 +1,7 @@
 <?php
-$religion_lang['anhaenger']='Anh&auml;nger';
+$religion_lang['anhaenger']='Anhänger';
 $religion_lang['accountalter']='je 6 Monate Accountalter';
-$religion_lang['benoetigte']='Ben&ouml;tigte';
+$religion_lang['benoetigte']='Benötigte';
 $religion_lang['bonuspunkte']='Zusatzpunkte';
 $religion_lang['credits']='Credits';
 $religion_lang['gesamt']='gesamt';
@@ -11,9 +11,9 @@ $religion_lang['koordinaten']='Koordinaten';
 $religion_lang['premiumaccount']='ein aktiver Premiumaccount';
 $religion_lang['rang']='Rang';
 $religion_lang['religion']='Bonuspunkte';
-$religion_lang['religiondesc']='Indem man Gleichgesinnte um sich sammelt w&auml;chst das eigene Ansehen, woraus man Vorteile schlagen kann.<br><br>Werbe neue Spieler, die aktiv teilnehmen und erringe die Angebotenen Vorteile. Eine Anleitung f&uuml;r Freundschaftswerbung ist in der Accountverwaltung unter dem Punkt Credits zu finden.<br><br>Neu geworbenen Spielern kannst Du eine Hyperfunknachricht senden und ihnen Einstiegshilfe anbieten.';
-$religion_lang['religiondesc1']='Indem man Credits vom Hauptaccount auf den Server transferiert und/oder einen Premiumaccount besitzt, kann man im Bonusrang aufsteigen. Je &auml;lter ein Account wird, desto mehr Bonuspunkte erh&auml;lt man.';
-//$religion_lang['religionraenge']=array('Ungl&auml;ubiger', 'Novize', 'Vestiar', 'Sakristan', 'Adept', 'Infirmar', 'Prior', 'Mystiker', 'Erleuchteter', 'M&auml;rtyrer', 'Heiliger');
+$religion_lang['religiondesc']='Indem man Gleichgesinnte um sich sammelt wächst das eigene Ansehen, woraus man Vorteile schlagen kann.<br><br>Werbe neue Spieler, die aktiv teilnehmen und erringe die Angebotenen Vorteile. Eine Anleitung für Freundschaftswerbung ist in der Accountverwaltung unter dem Punkt Credits zu finden.<br><br>Neu geworbenen Spielern kannst Du eine Hyperfunknachricht senden und ihnen Einstiegshilfe anbieten.';
+$religion_lang['religiondesc1']='Indem man Credits vom Hauptaccount auf den Server transferiert und/oder einen Premiumaccount besitzt, kann man im Bonusrang aufsteigen. Je älter ein Account wird, desto mehr Bonuspunkte erhält man.';
+//$religion_lang['religionraenge']=array('Ungläubiger', 'Novize', 'Vestiar', 'Sakristan', 'Adept', 'Infirmar', 'Prior', 'Mystiker', 'Erleuchteter', 'Märtyrer', 'Heiliger');
 $religion_lang['religionraenge']=array('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11');
 $religion_lang['religioeseraenge']='Bonusrang';
 $religion_lang['religionspunkte']='Bonuspunkte';

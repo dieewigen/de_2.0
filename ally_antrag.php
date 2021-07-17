@@ -9,9 +9,9 @@
 //        05.02.2002 (Ascendant)        - Erweiterung der &Auml;nderungsbefugnis der B&uuml;ndnisantr&auml;ge
 //                                                          auf Coleader
 //  --------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.antrag.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.antrag.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
@@ -21,19 +21,19 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?php echo $allyantrag_lang[title];?></title>
-<?php include "cssinclude.php"; ?>
+<title><?php echo $allyantrag_lang['title'];?></title>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 ?>
 
 <table border="0" width="600" cellspacing="0" cellpadding="0">
 <tr>
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td  align="center" class="ro"><?=$allyantrag_lang[memberantraege]?></td>
+<td  align="center" class="ro"><?=$allyantrag_lang['memberantraege']?></td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
 <?php
@@ -108,32 +108,45 @@ while ($row < $nb){
 			$activity=100;
 		}*/
 
-        echo        "<tr>".
-                        "<td width=\"13\" class=\"rl\">&nbsp;</td>".
-                        "<td>".
-                        "<table border=\"0\" cellspacing=\"1\" cellpadding=\"0\" width=\"100%\">".
-                                "<tr>\n".
-                                        "<td colspan=4 class=\"cl\"><div align=left><strong>$name ($b_sector".":"."$b_system)</strong><br>$allyantrag_lang[punkte]: ".number_format($b_score, 0,'','.')." - $allyantrag_lang[kollektoren]: $b_cols - $allyantrag_lang[rasse]: $r_text</div></a></td>\n".
-                                "</tr>".
-                                "<tr>".
-                                        "<td colspan=4 class=\"cl\">$antragstext</td>".
-                                "</tr>".
-                                "<tr>".
-                                        "<td class=\"tc\"><a href=\"ally_annehmen.php?userid=$userid\"><font face=\"tahoma\" style=\"font-size:8pt;\">$allyantrag_lang[annehmen] !</font></a></td>\n".
-                                        "<td class=\"tc\"><a href=\"ally_ablehnen.php?userid=$userid\"><font face=\"tahoma\" style=\"font-size:8pt;\">$allyantrag_lang[anablehnen] !</font></a></td>\n".
-                                        "<td class=\"tc\"><a href=\"details.php?se=$se&sy=$sy\"><font face=\"tahoma\" style=\"font-size:8pt;\">$allyantrag_lang[sendhfn]</font></a></td>\n".
-                                        "<td class=\"tc\"><form name=\"f".$b_sector."x".$b_system."\" action=\"sector.php?sf=".$b_sector."\" method=\"POST\"></form><a href=\"javascript:document.f".$b_sector."x".$b_system.".submit()\"><font face=\"tahoma\" style=\"font-size:8pt;\">$allyantrag_lang[showsec]</font></a></td>\n".
-                                "</tr>".
-                        "</table>".
-                        "</td>".
-                        "<td width=\"13\" class=\"rr\">&nbsp;</td>".
-                "</tr>";
+        echo '
+			<tr>
+				<td width="13" class="rl">&nbsp;</td>
+				<td>
+				
+					<table border="0" cellspacing="1" cellpadding="0" width="100%">
+						<tr>
+							<td colspan="4" class="cl">
+								<div align="left">
+									<strong>'.$name.' ('.$b_sector.':'.$b_system.')</strong>
+									<br>'.$allyantrag_lang['punkte'].': '. number_format($b_score, 0,'','.') .' - '.$allyantrag_lang['kollektoren'].': '.$b_cols.' - '.$allyantrag_lang['rasse'].': '.$r_text.'
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4" class="cl">'.$antragstext.'</td>
+						</tr>
+						<tr>
+							<td class="tc"><a href="ally_annehmen.php?userid='.$userid.'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['annehmen'].'!</font></a></td>
+							<td class="tc"><a href="ally_ablehnen.php?userid='.$userid.'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['anablehnen'].'!</font></a></td>
+							<td class="tc"><a href="details.php?se='.$se.'&sy='.$sy.'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['sendhfn'].'</font></a></td>
+							<td class="tc">
+								<a href="javascript:document.f'.$b_sector.'x'.$b_system.'.submit()">
+									<font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['showsec'].'</font>
+								</a></td>
+						</tr>
+					</table>
+
+				</td>
+				<td width="13" class="rr">&nbsp;</td>
+			</tr>
+		';
+		
         $row++;
 }
 ?>
 <tr>
 <td width="13" height="37" class="rml">&nbsp;</td>
-<td  align="center" class="ro"><?=$allyantrag_lang[allyantraege]?></td>
+<td  align="center" class="ro"><?=$allyantrag_lang['allyantraege']?></td>
 <td width="13" class="rmr">&nbsp;</td>
 </tr>
 <?php
@@ -148,26 +161,25 @@ $query =         "SELECT allytag, antrag, ally_id_antragsteller ".
 $result = @mysql_query($query);
 
 while($row = @mysql_fetch_array($result)) {
-        $name = $row[allytag];
-        $antragstext = $row[antrag];
-        $ally_id_antragsteller = $row[ally_id_antragsteller];
-        echo        "<tr>\n".
-                        "<td width=\"13\" class=\"rl\">&nbsp;</td>".
-                            "<td>".
-                              "<table border=\"0\" cellspacing=\"1\" cellpadding=\"0\" width=\"100%\">".
-                                    "<tr>".
-                                            "<td colspan=3 class=\"tc\">$name</font></a></td></tr>\n".
-                                            "<tr><td colspan=3 class=\"cl\">$antragstext</td></tr>".
-                                            "<td class=\"tc\"><a href=\"ally_annehmen.php?allyid=$ally_id_antragsteller\"><font face=\"tahoma\" style=\"font-size:8pt;\">".$allyantrag_lang[annehmen]." !</font></a></td>\n".
-                                            "<td class=\"tc\"><a href=\"ally_ablehnen.php?allyid=$ally_id_antragsteller\"><font face=\"tahoma\" style=\"font-size:8pt;\">".$allyantrag_lang[anablehnen]." !</font></a></td>\n".
-                                            "<td class=\"tc\"><a href=\"ally_message_leader.php?select=".urlencode($name)."\"><font face=\"tahoma\" style=\"font-size:8pt;\">".$allyantrag_lang[sendhfn]."</font></a></td>\n".
-                                            //"<td width=\"25%\"><a href=\"ally_antrag.php?userid=$userid\" target=\"Antrag\" onClick=\"window.open('','Antrag', 'width=310,height=260,resizable=no,scrollbars=no')\"><font face=\"tahoma\" style=\"font-size:8pt;\">Antrag lesen !</font></a></td>\n".
-                                        "</tr>".
-                                "</tr>".
-                          "</table>".
-                        "</td>".
-                        "<td width=\"13\" class=\"rr\">&nbsp;</td>".
-                "</tr>";
+        $name = $row['allytag'];
+        $antragstext = $row['antrag'];
+        $ally_id_antragsteller = $row['ally_id_antragsteller'];
+		echo '<tr>\n
+				<td width="13" class="rl">&nbsp;</td>
+					<td>
+					  <table border="0" cellspacing="1" cellpadding="0" width="100%">
+							<tr>
+									<td colspan="3" class="tc">'.$name.'</font></a></td></tr>\n
+									<tr><td colspan=3 class="cl">'.$antragstext.'</td></tr>\n
+									<td class="tc"><a href="ally_annehmen.php?allyid='.$ally_id_antragsteller.'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['annehmen'].' !</font></a></td>\n
+									<td class="tc"><a href="ally_ablehnen.php?allyid='.$ally_id_antragsteller.'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['anablehnen'].' !</font></a></td>\n
+									<td class="tc"><a href="ally_message_leader.php?select='.urlencode($name).'"><font face="tahoma" style="font-size:8pt;">'.$allyantrag_lang['sendhfn'].'</font></a></td>\n
+								</tr>
+						</tr>
+				  </table>
+				</td>
+				<td width="13" class="rr">&nbsp;</td>
+			</tr>';
 }
 
 
@@ -183,7 +195,7 @@ echo         '<tr>'.
 
 ?>
 <br>
-<?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
+<?php include('ally/ally.footer.inc.php'); ?>
+<?php include('fooban.php'); ?>
 </body>
 </html>

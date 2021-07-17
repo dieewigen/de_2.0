@@ -80,7 +80,8 @@ $zahleins = $zahl[$zahleins-1];
 
  $decolor = ImageColorAllocate($image, 200, 200, 200);
 
- $schriftart=getcwd().'/fonts/font'.$schriftart.'.ttf';
+ //$schriftart=getcwd().'/fonts/font'.$schriftart.'.ttf';
+ $schriftart=getcwd().'/fonts/example_font.ttf';
  //echo '<br>A: '.$schriftart;
  
  imagettftext($image, $groesse, $winkel, $mx+($i*$abstand), $y, -$decolor, $schriftart , $zahleins[$i]);
@@ -260,7 +261,8 @@ $zahleins = $zahl[$zahleins-1];
 
  $decolor = ImageColorAllocate($image, 200, 200, 200);
 
- $schriftart='fonts/font'.$schriftart.'.ttf';
+ #$schriftart='fonts/font'.$schriftart.'.ttf';
+ $schriftart='fonts/example_font.ttf';
  imagettftext($image, $groesse, $winkel, $mx+($i*$abstand), $y, $decolor, $schriftart , $zahleins[$i]);
  imagettftext($image, $groesse, $winkel, $mx+($i*$abstand), $y+$iy, $demulticolor, $schriftart , $zahleins[$i]);
 

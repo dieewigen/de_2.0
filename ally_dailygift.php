@@ -1,12 +1,12 @@
 <?php
 $GLOBALS['deactivate_old_design']=true;
 
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.dailygift.lang.php'; 
-include "inc/userartefact.inc.php";
-include "lib/religion.lib.php";
-include "lib/transaction.lib.php";
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.dailygift.lang.php'); 
+include('inc/userartefact.inc.php');
+include('lib/religion.lib.php');
+include('lib/transaction.lib.php');
+include_once('functions.php');
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
 $pd=loadPlayerData($_SESSION['ums_user_id']);
@@ -76,7 +76,7 @@ $allydailygift_lang['bonusdescription'][6]='<br>+ 1 Kriegsartefakt
 <html>
 <head>
 <title><?php echo $allydailygift_lang['title']?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 <script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 </head>
 <body>
@@ -542,13 +542,13 @@ if($ally_id>0 && $allystatus==1){
 
 
 }else{
-  include "resline.php";
-  echo '<div class="info_box"><span class="text2">'.$allydailygift_lang[keineally].'</span></div><br>';
+  include('resline.php');
+  echo '<div class="info_box"><span class="text2">'.$allydailygift_lang['keineally'].'</span></div><br>';
 }
 
 ?>
 <br>
 </div>
-<?php include "fooban.php"; ?>
+<?php include('fooban.php'); ?>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <?php
-$rangnamen=array("The Raised One", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
+$rangnamen=array('The Raised One', 'Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Theta','Iota','Kappa','Lambda','My','Ny','Xi','Omikron','Pi','Rho','Sigma','Tau','Ypsilon','Phi','Chi','Psi','Omega');
 
 $wt_lang['accounts']='Accounts';
 $wt_lang['agentenanzahl']='Amount agents';
@@ -33,7 +33,7 @@ $wt_lang['handelspunkte']='Trading points';
 $wt_lang['hyperfunkanzahl']='Hyperfunk amount';
 $wt_lang['inaktiv']='inactive';
 $wt_lang['inaktivenmailbetreff']='Die Ewigen - Account deletion - Server: ';
-$wt_lang['inaktivenmailbody']="Hello,\n\nyour account at Die Ewigen will be moved to sector 1 by the inactivity script in 24 hours if you do not log into your account for until then.\n\nMit freundlichen Gr&uuml;&szlig;en\nDein BGAM.ES-Team";
+$wt_lang['inaktivenmailbody']='Hello,\n\nyour account at Die Ewigen will be moved to sector 1 by the inactivity script in 24 hours if you do not log into your account for until then.\n\nMit freundlichen Grü&szlig;en\nDein BGAM.ES-Team';
 $wt_lang['inaktivenloeschung']='Inactivity deletion';
 $wt_lang['kollektoren']='Collectors';
 $wt_lang['kollektorspiegelcalderan']='You receive a collector through the Mirror of Calderan.';
@@ -42,7 +42,7 @@ $wt_lang['kollies']='Collectors';
 $wt_lang['kriege']='Wars';
 $wt_lang['level']='Level';
 $wt_lang['loeschmailbetreff']='Die Ewigen - Account deletion - Server: ';
-$wt_lang['loeschmailbody']="Hello,\n\nyour account in Die Ewigen has been deleted because you did not log in for a too long time. You can always register a new account.\n\nWith kind regards\nThe DET";
+$wt_lang['loeschmailbody']='Hello,\n\nyour account in Die Ewigen has been deleted because you did not log in for a too long time. You can always register a new account.\n\nWith kind regards\nThe DET';
 $wt_lang['nachrichtenanzahl']='Amount messages';
 $wt_lang['name']='Name';
 $wt_lang['minuten']='minutes';

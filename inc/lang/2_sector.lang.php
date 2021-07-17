@@ -1,6 +1,6 @@
 <?php
-$rangnamen1=array("The Raised One", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
-$rangnamen2=array("X000", "X001","X002","X003","X00A","X00B","X00C","X010","X011","X012","X013","X01A","X01B","X01C","X020","X021","X022","X023","X02A","X02B","X02C","X030","X031","X032","X033");
+$rangnamen1=array('The Raised One', 'Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Theta','Iota','Kappa','Lambda','My','Ny','Xi','Omikron','Pi','Rho','Sigma','Tau','Ypsilon','Phi','Chi','Psi','Omega');
+$rangnamen2=array('X000', 'X001','X002','X003','X00A','X00B','X00C','X010','X011','X012','X013','X01A','X01B','X01C','X020','X021','X022','X023','X02A','X02B','X02C','X030','X031','X032','X033');
 
 $sec_lang['religionraenge']=array('Unbeliever', 'Novice', 'Vestiar', 'Sakristan', 'Adept', 'Infirmar', 'Prior', 'Mystic', 'Enlightend', 'Martyr', 'Saint');
 $sec_lang['religioeserrang']='Religious Rank';

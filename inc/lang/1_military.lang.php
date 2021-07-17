@@ -4,9 +4,9 @@ $military_lang['aktion']='Aktion';
 $military_lang['aktion2']='alle Schiffe';
 $military_lang['alle']='Alle';
 $military_lang['allgfehler']='Allgemeiner Fehler.';
-$military_lang['allgfehler2']='Nur die Aufstellung von Flotten, die sich im Heimatsystem befinden, k&ouml;nnen ge&auml;ndert werden. &Uuml;berpr&uuml;fen Sie bitte noch einmal Ihre Befehle.';
+$military_lang['allgfehler2']='Nur die Aufstellung von Flotten, die sich im Heimatsystem befinden, können geändert werden. überprüfen Sie bitte noch einmal Ihre Befehle.';
 $military_lang['angriffsforma']='Angriffsformation';
-$military_lang['attunwuerdig']='Diese geplante Kampfhandlung ist unehrenhaft und somit Deiner nicht w&uuml;rdig!';
+$military_lang['attunwuerdig']='Diese geplante Kampfhandlung ist unehrenhaft und somit Deiner nicht würdig!';
 $military_lang['basisschiffe']='Basisschiffe';
 $military_lang['befehl']='Befehl';
 $military_lang['befehl1']='Aktuelle Befehle beibehalten';
@@ -22,28 +22,28 @@ $military_lang['besonderheittransmitterschiff']='Besonderheit: Diese Einheit ist
 //besonderheit Jagdboote
 switch($_SESSION['ums_rasse']){
 	case 1:
-		$military_lang['besonderheitjagdboot']='Besonderheit: Ben&ouml;tigt Unterst&uuml;tzung durch Kreuzer/Schlachtschiffe/Tr&auml;ger, sonst ist die Einheit geschw&auml;cht.
-		<br>1 Kreuzer unterst&uuml;tzt 10 Jagdboote.
-		<br>1 Schlachtschiff unterst&uuml;tzt 22 Jagdboote.
-		<br>1 Tr&auml;ger unterst&uuml;tzt 34 Jagdboote.';
+		$military_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
+		<br>1 Kreuzer unterstützt 10 Jagdboote.
+		<br>1 Schlachtschiff unterstützt 22 Jagdboote.
+		<br>1 Träger unterstützt 34 Jagdboote.';
 		break;
 	case 2:
-		$military_lang['besonderheitjagdboot']='Besonderheit: Ben&ouml;tigt Unterst&uuml;tzung durch Kreuzer/Schlachtschiffe/Tr&auml;ger, sonst ist die Einheit geschw&auml;cht.
-		<br>1 Kreuzer unterst&uuml;tzt 12 Jagdboote.
-		<br>1 Schlachtschiff unterst&uuml;tzt 28 Jagdboote.
-		<br>1 Tr&auml;ger unterst&uuml;tzt 43 Jagdboote.';
+		$military_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
+		<br>1 Kreuzer unterstützt 12 Jagdboote.
+		<br>1 Schlachtschiff unterstützt 28 Jagdboote.
+		<br>1 Träger unterstützt 43 Jagdboote.';
 		break;	
 	case 3:
-		$military_lang['besonderheitjagdboot']='Besonderheit: Ben&ouml;tigt Unterst&uuml;tzung durch Kreuzer/Schlachtschiffe/Tr&auml;ger, sonst ist die Einheit geschw&auml;cht.
-		<br>1 Kreuzer unterst&uuml;tzt 6 Jagdboote.
-		<br>1 Schlachtschiff unterst&uuml;tzt 14 Jagdboote.
-		<br>1 Tr&auml;ger unterst&uuml;tzt 26 Jagdboote.';
+		$military_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
+		<br>1 Kreuzer unterstützt 6 Jagdboote.
+		<br>1 Schlachtschiff unterstützt 14 Jagdboote.
+		<br>1 Träger unterstützt 26 Jagdboote.';
 		break;		
 	case 4:
-		$military_lang['besonderheitjagdboot']='Besonderheit: Ben&ouml;tigt Unterst&uuml;tzung durch Kreuzer/Schlachtschiffe/Tr&auml;ger, sonst ist die Einheit geschw&auml;cht.
-		<br>1 Kreuzer unterst&uuml;tzt 12 Jagdboote.
-		<br>1 Schlachtschiff unterst&uuml;tzt 29 Jagdboote.
-		<br>1 Tr&auml;ger unterst&uuml;tzt 48 Jagdboote.';
+		$military_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
+		<br>1 Kreuzer unterstützt 12 Jagdboote.
+		<br>1 Schlachtschiff unterstützt 29 Jagdboote.
+		<br>1 Träger unterstützt 48 Jagdboote.';
 		break;		
 }
 
@@ -51,32 +51,32 @@ switch($_SESSION['ums_rasse']){
 //besonderheit Kreuzer
 switch($_SESSION['ums_rasse']){
 	case 1:
-		$military_lang['besonderheitkreuzer']='Besonderheit: Ben&ouml;tigt pro Einheit Geleitschutz durch 8 J&auml;ger, sonst ist die Einheit geschw&auml;cht.';
+		$military_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit Geleitschutz durch 8 Jäger, sonst ist die Einheit geschwächt.';
 		break;
 	case 2:
-		$military_lang['besonderheitkreuzer']='Besonderheit: Ben&ouml;tigt pro Einheit  Geleitschutz durch 8 J&auml;ger, sonst ist die Einheit geschw&auml;cht.';
+		$military_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit  Geleitschutz durch 8 Jäger, sonst ist die Einheit geschwächt.';
 		break;	
 	case 3:
-		$military_lang['besonderheitkreuzer']='Besonderheit: Ben&ouml;tigt pro Einheit  Geleitschutz durch 7 J&auml;ger, sonst ist die Einheit geschw&auml;cht.';
+		$military_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit  Geleitschutz durch 7 Jäger, sonst ist die Einheit geschwächt.';
 		break;		
 	case 4:
-		$military_lang['besonderheitkreuzer']='Besonderheit: Ben&ouml;tigt pro Einheit  Geleitschutz durch 12 J&auml;ger, sonst ist die Einheit geschw&auml;cht.';
+		$military_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit  Geleitschutz durch 12 Jäger, sonst ist die Einheit geschwächt.';
 		break;		
 }
 
 //besonderheit Schlachtschiff
 switch($_SESSION['ums_rasse']){
 	case 1:
-		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerst&ouml;rer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Ben&ouml;tigt pro Einheit 18 J&auml;ger als Geleitschutz , sonst ist die Einheit geschw&auml;cht.<br>Recycelt zerst&ouml;rte eigene J&auml;ger, Jagdboote und Bomber.';		
+		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
 		break;
 	case 2:
-		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerst&ouml;rer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Ben&ouml;tigt pro Einheit 18 J&auml;ger als Geleitschutz , sonst ist die Einheit geschw&auml;cht.<br>Recycelt zerst&ouml;rte eigene J&auml;ger, Jagdboote und Bomber.';		
+		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
 		break;	
 	case 3:
-		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerst&ouml;rer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Ben&ouml;tigt pro Einheit 14 J&auml;ger als Geleitschutz , sonst ist die Einheit geschw&auml;cht.<br>Recycelt zerst&ouml;rte eigene J&auml;ger, Jagdboote und Bomber.';		
+		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 14 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
 		break;		
 	case 4:
-		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerst&ouml;rer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Ben&ouml;tigt pro Einheit 30 J&auml;ger als Geleitschutz , sonst ist die Einheit geschw&auml;cht.<br>Recycelt zerst&ouml;rte eigene J&auml;ger, Jagdboote und Bomber.';		
+		$military_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 30 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
 		break;		
 }
 
@@ -84,7 +84,7 @@ switch($_SESSION['ums_rasse']){
 
 $military_lang['dererhabene']='Der Erhabene';
 $military_lang['dobefehl']='Befehle erteilen';
-$military_lang['eineflotteziehtsichzurueck']='Eine Flotte zieht sich zur&uuml;ck.';
+$military_lang['eineflotteziehtsichzurueck']='Eine Flotte zieht sich zurück.';
 $military_lang['error']='Zu einer Mission darf nur das Basisschiff aufbrechen.';
 $military_lang['error10']='Es befinden sich keine Schiffe in der Flotte.';
 $military_lang['error11']='Man kann Flotten nur im Heimatsystem Einsatzbefehle erteilen.';
@@ -95,8 +95,8 @@ $military_lang['feindlich']='feindlich';
 $military_lang['feindliche']='feindliche';
 $military_lang['fleetaufstellung']='Flottenaufstellung';
 $military_lang['fleetrausack']='Das Basisschiff ist zu einer Mission aufgebrochen.';
-$military_lang['fleetrausnack']='Missionen sind nur in Systeme der DX61a23 m&ouml;glich.';
-$military_lang['fleetumgestellt']='Die Flottenumstellung wurde durchgef&uuml;hrt.';
+$military_lang['fleetrausnack']='Missionen sind nur in Systeme der DX61a23 möglich.';
+$military_lang['fleetumgestellt']='Die Flottenumstellung wurde durchgeführt.';
 $military_lang['flotte']='Flotte';
 $military_lang['flotte1']='Flotte I';
 $military_lang['flotte2']='Flotte II';
@@ -105,20 +105,20 @@ $military_lang['flottenbefehle']='Flottenbefehle erteilen';
 $military_lang['flottengesinnung']='Flottengesinnung';
 $military_lang['flottenumstellen']='Flotten umstellen';
 $military_lang['flottenpunktewert']='Flottenpunktewert';
-$military_lang['fehlendesgebaeude']='Fehlendes Geb&auml;ude';
-$military_lang['gebaeudeinfo']='Du ben&ouml;tigst folgendes Geb&auml;ude, welches Du links unter dem Men&uuml;punkt Technologien->Geb&auml;ude bauen kannst';
+$military_lang['fehlendesgebaeude']='Fehlendes Gebäude';
+$military_lang['gebaeudeinfo']='Du benötigst folgendes Gebäude, welches Du links unter dem Menüpunkt Technologien->Gebäude bauen kannst';
 $military_lang['heimatflotte']='Heimatflotte';
 $military_lang['hflotte']='HFlotte';
-$military_lang['kapazitaet']='Transportkapazit&auml;t';
-$military_lang['kapazitaet2']='ben&ouml;tigte Transportkapazit&auml;t';
+$military_lang['kapazitaet']='Transportkapazität';
+$military_lang['kapazitaet2']='benötigte Transportkapazität';
 $military_lang['klasse']='Klasse';
-$military_lang['klassennamen']=array('J&auml;ger','Jagdboot','Zerst&ouml;rer','Kreuzer','Schlachtschiff','Bomber','Transmitterschiff','Tr&auml;ger',
-'Orbitalj&auml;ger-Basis','Flugk&ouml;rper-Plattform','Energiegeschoss-Plattform','Materiegeschoss-Plattform','Hochenergiegeschoss-Plattform');
-$military_lang['klasseziel1']='Prim&auml;rziel';
-$military_lang['klasseziel2']='Sekund&auml;rziel';
+$military_lang['klassennamen']=array('Jäger','Jagdboot','Zerstörer','Kreuzer','Schlachtschiff','Bomber','Transmitterschiff','Träger',
+'Orbitaljäger-Basis','Flugkörper-Plattform','Energiegeschoss-Plattform','Materiegeschoss-Plattform','Hochenergiegeschoss-Plattform');
+$military_lang['klasseziel1']='Primärziel';
+$military_lang['klasseziel2']='Sekundärziel';
 $military_lang['nahesek']='Nahe Sektoren';
 $military_lang['notranseninfo']='Achtung: Der Angriff erfolgt ohne passende Schiffe um Kollektoren zu erbeuten.';
-$military_lang['npcattinfo']='Durch diesen Angriff wird der Nichtangriffspakt mit den DX61a23 verletzt. Diese Aktion erfolgt auf eigene Gefahr, denn es werden mehr Arch&auml;ologen zur Erforschung der Missionen ben&ouml;tigt.';
+$military_lang['npcattinfo']='Durch diesen Angriff wird der Nichtangriffspakt mit den DX61a23 verletzt. Diese Aktion erfolgt auf eigene Gefahr, denn es werden mehr Archäologen zur Erforschung der Missionen benötigt.';
 $military_lang['punkte']='Punkte';
 $military_lang['reisezeit']='Reisezeit';
 $military_lang['releaselock']='Datensatz Nr. ';
@@ -134,14 +134,14 @@ $military_lang['sendmsg3']='entdeckt. Ursprung';
 $military_lang['status']='Systemverteidigung';
 $military_lang['status2']='Angriff';
 $military_lang['status3']='Verteidigung';
-$military_lang['status4']='R&uuml;ckflug';
+$military_lang['status4']='Rückflug';
 $military_lang['status5']='Mission';
 $military_lang['status6']='Verteidige';
 $military_lang['sysreisezeit']='Systemreisezeit';
-$military_lang['traegerkapa']='Tr&auml;gerkapazit&auml;t';
+$military_lang['traegerkapa']='Trägerkapazität';
 $military_lang['ursprung']='Ursprung';
-$military_lang['verbuendet']='verb&uuml;ndet';
-$military_lang['verbuendete']='verb&uuml;ndete';
+$military_lang['verbuendet']='verbündet';
+$military_lang['verbuendete']='verbündete';
 $military_lang['verteidiforma']='Verteidigungsformation';
 $military_lang['waffengattung1']='Konventionelle Waffen';
 $military_lang['waffengattung2']='EMP-Waffen';

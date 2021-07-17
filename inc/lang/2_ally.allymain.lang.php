@@ -27,7 +27,7 @@ $allyallymain_lang['allyoverview']='Alliance overview';
 $allyallymain_lang['ja']='Yes';
 
 $allyallymain_lang['msg_1']='The memberlimit has been increased by one. The costs of 10 tronic have been booked from the alliance depot.';
-$allyallymain_lang['msg_2']='Unforunately your alliance has not enough tronic f&uuml;r this action.';
+$allyallymain_lang['msg_2']='Unforunately your alliance has not enough tronic für this action.';
 $allyallymain_lang['msg_3']='You are not allowed to execute this command.';
 $allyallymain_lang['msg_4']='Welcome to the C.A.R.S. - overview';
 ?>

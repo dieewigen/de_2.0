@@ -21,7 +21,7 @@ $archeology_lang['forschungspotenz']='Available research potential: ';
 $archeology_lang['minenlager']='Mining stock';
 $archeology_lang['missionskoords']='Coordinates for the achaeological mission: ';
 $archeology_lang['paket_1_1']='Data unit 1 - The golden collector';
-$archeology_lang['paket_1_2']='According to the provisional analyses the data unit describes an age-old artefact named "The golden collector".';
+$archeology_lang['paket_1_2']='According to the provisional analyses the data unit describes an age-old artefact named 'The golden collector'.';
 $archeology_lang['paket_1_3']='Allegedly the energy output of the golden collector is as high as hundreds or thousands of usual collectors would produce. According to the data unit';
 $archeology_lang['paket_1_4']=' it seems as when the energy output permanently increases so that the golden collector becomes
 	more efficient the longer it is used.<br><br>';

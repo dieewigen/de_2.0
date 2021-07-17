@@ -1,6 +1,6 @@
 <?php
 $secforumvt_lang['title']='Sektorforum';
-$secforumvt_lang['zurueck']='zur&uuml;ck';
+$secforumvt_lang['zurueck']='zurück';
 $secforumvt_lang['tolastpost']='Zum letzten Post der Seite springen';
 $secforumvt_lang['thema']='THEMA';
 $secforumvt_lang['re']='Re';
@@ -12,13 +12,13 @@ $secforumvt_lang['erstellen']='erstellen';
 $secforumvt_lang['vorschau']='Vorschau';
 $secforumvt_lang['titel']='Titel';
 $secforumvt_lang['nachricht']='Nachricht';
-$secforumvt_lang['aenderungspeichern']='&Auml;nderung speichern';
+$secforumvt_lang['aenderungspeichern']='änderung speichern';
 $secforumvt_lang['antworten']='Antworten';
 $secforumvt_lang['ontopaktivieren']='OnTop aktivieren';
 $secforumvt_lang['ontopdeaktivieren']='OnTop deaktivieren';
 $secforumvt_lang['threadschliessen']='Thread schlie&szlig;en';
-$secforumvt_lang['threadloeschen']='Thread l&ouml;schen';
-$secforumvt_lang['threadoeffnen']='Thread &ouml;ffnen';
+$secforumvt_lang['threadloeschen']='Thread löschen';
+$secforumvt_lang['threadoeffnen']='Thread öffnen';
 
 $secforumvt_lang['msg_1']='Leider haben Sie keinen Zugriff auf dieses Dokument.  ';
 $secforumvt_lang['msg_2']='Sie sind nicht berechtigt, dieses Dokument zu editieren.';
@@ -33,5 +33,5 @@ $secforumvt_lang['msg_8_3']='Uhr';
 $secforumvt_lang['msg_8_4']='\u\m';
 $secforumvt_lang['msg_9_1']='Dieser Beitrag wurde';
 $secforumvt_lang['msg_9_2']='mal editiert, das letzte Mal am';
-$secforumvt_lang['msg_10']='M&ouml;chten Sie diesen Thread wirklich l&ouml;schen?';
+$secforumvt_lang['msg_10']='Möchten Sie diesen Thread wirklich löschen?';
 ?>

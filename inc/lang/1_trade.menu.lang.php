@@ -1,5 +1,5 @@
 <?php
-$trademenu_lang['uebersicht']='&Uuml;bersicht';
+$trademenu_lang['uebersicht']='übersicht';
 $trademenu_lang['traderess']='Ressourcen';
 $trademenu_lang['tradefleet']='Flotte handeln';
 $trademenu_lang['tronicauktion']='Tronicauktion';

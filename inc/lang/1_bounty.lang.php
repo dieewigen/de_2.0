@@ -4,7 +4,7 @@ $bounty_lang['m']='M';
 $bounty_lang['d']='D';
 $bounty_lang['i']='I';
 $bounty_lang['e']='E';
-$bounty_lang['welcome']='Willkommen im B&uuml;ro der Kopfgeldgilde';
+$bounty_lang['welcome']='Willkommen im Büro der Kopfgeldgilde';
 $bounty_lang['spielername']='Spielername';
 $bounty_lang['koordinaten']='Koordinaten';
 $bounty_lang['aktuellerkopfgeldstand']='Aktueller Kopfgeldstand';
@@ -25,5 +25,5 @@ $bounty_lang['msg_6']='Dir durch diesen Angreifer gestohlende Kollektoren';
 $bounty_lang['msg_7']='Durch dich ausgesetztes Kopfgeld';
 $bounty_lang['msg_8']='Maximal durch dich aussetzbares Kopfgeld';
 $bounty_lang['msg_9']='Wert der Rohstoffe: M=1, D=2, I=3, E=4';
-$bounty_lang['msg_10']='&Uuml;ber dieses System liegen uns keine Informationen vor';
+$bounty_lang['msg_10']='über dieses System liegen uns keine Informationen vor';
 ?>

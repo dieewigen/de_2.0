@@ -12,27 +12,27 @@
 //                                                          Coleader. Per Klick auf die Namen kann dem Leader und
 //                                                          den Co-Leadern eine Nachricht gesendet werden.
 //  --------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php'; 
-include "lib/religion.lib.php";
-include "lib/basefunctions.lib.php";
-include "inc/allyjobs.inc.php";
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php');
+include('lib/religion.lib.php');
+include('lib/basefunctions.lib.php');
+include('inc/allyjobs.inc.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $dailyallygift=$row['dailyallygift'];
 
-if ($row["status"]==1) $ownally = $row["allytag"];else $ownally='';
+if ($row['status']==1) $ownally = $row['allytag'];else $ownally='';
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <title><?php echo $allyallymain_lang['title'];?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
@@ -107,8 +107,8 @@ function formatString($string){
 	return $result;
 }
 
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 
 // Abfrage auf $iscoleader hinzugef&uuml;gt von Ascendant (01.09.2002)
 if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.inc.php"));
@@ -342,7 +342,7 @@ while($rowx = mysql_fetch_array($result)){
   $uid=$rowx['user_id'];
   $db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$uid'",$db);
   $row = mysql_fetch_array($db_daten);
-  $owner_id=intval($row["owner_id"]);
+  $owner_id=intval($row['owner_id']);
   //$relrang=get_religion_level($owner_id);
   //$allyrelcounter+=$relrang;
   $allyrelcounter+=getAnzahlGeworbeneSpielerByOwnerid($owner_id);
@@ -382,155 +382,155 @@ if(!empty(trim($metairc))){
 	$discord_meta_link='<a href="https://discord.gg/'.$metairc.'" target="_blank">zu Discord</a>';
 }
 
-print("<tr class=cl>
-			<td height=21>$allyallymain_lang[regierungsform]:</td>
-			<td height=21><b>$regierungsform</b></td>
-			<td height=21>$allyallymain_lang[ausrichtung]:</td>
-			<td height=21><b>$ausrichtung</b></td>
+echo '<tr class="cl">
+			<td height="21">'.$allyallymain_lang['regierungsform'].':</td>
+			<td height="21"><b>'.$regierungsform.'</b></td>
+			<td height="21">'.$allyallymain_lang['ausrichtung'].':</td>
+			<td height="21"><b>'.$ausrichtung.'</b></td>
 
 		</tr>
-		<tr class=cl>
-			<td height=21>$allyallymain_lang[irc]:</td>
-			<td height=21>".$discord_open_link."</td>
-			<td height=21>$allyallymain_lang[intirc]:</td>
-			<td height=21>".$discord_intern_link."</td>
+		<tr class="cl">
+			<td height="21">'.$allyallymain_lang['irc'].':</td>
+			<td height="21">'.$discord_open_link.'</td>
+			<td height="21">'.$allyallymain_lang['intirc'].':</td>
+			<td height="21">'.$discord_intern_link.'</td>
 			
 		</tr>
 		<tr class=cl>
-			<td height=21>Allianz-Rundensiegartefakte:</td>
-			<td height=21><b>$rundensiegartefatke</b></td>
-			<td height=21>$allyallymain_lang[metairc]:</td>
-			<td height=21>".$discord_meta_link."</td>
+			<td height="21">Allianz-Rundensiegartefakte:</td>
+			<td height="21"><b>'.$rundensiegartefatke.'</b></td>
+			<td height="21">'.$allyallymain_lang['metairc'].':</td>
+			<td height="21">'.$discord_meta_link.'</td>
 		</tr>
 		<tr class=cl>
-			<td height=21>Partnerallianz:</td>
-			<td height=21 colspan=\"3\"><b>".utf8_encode($partnerallianz)."</b></td>			
+			<td height="21">Partnerallianz:</td>
+			<td height="21" colspan="3"><b>'.utf8_encode($partnerallianz).'</b></td>			
 		</tr>
 		<tr class=cl>
-			<td height=21>$allyallymain_lang[homepage]:</td>
-			<td height=21 colspan=\"3\"><b><a href=\"$homepageurl\" target=_blank>$homepageurl</a></b></td>
+			<td height="21">'.$allyallymain_lang['homepage'].':</td>
+			<td height="21" colspan="3"><b><a href="'.$homepageurl.'" target=_blank>'.$homepageurl.'</a></b></td>
 		</tr>
 		
 		</table>
-		<table width=\"100%\">
+		<table width="100%">
 		<tr>
-			<td height=21 colspan=2><hr></td>
+			<td height="21" colspan="2"><hr></td>
 		</tr>
 		<tr>
-			<td height=21 colspan=2 class=\"cl\"><h3>$allyallymain_lang[allianzposten]:</h3></td>
+			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzposten'].':</h3></td>
 		</tr>
-		<tr class=cl>
-			<td height=21>$leadername: </td>
-			<td height=21><b>$leaderlink</b></td>
+		<tr class="cl">
+			<td height=21>'.$leadername.': </td>
+			<td height=21><b>'.$leaderlink.'</b></td>
 		</tr>
-");
+';
  	 
  	 
 if ($coleaderid1 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$coleadername1: </td>
-      			<td height=21><b>$coleader1link</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$coleadername1.': </td>
+      			<td height="21"><b>'.$coleader1link.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($coleaderid2 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$coleadername2: </td>
-      			<td height=21><b>$coleader2link</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$coleadername2.': </td>
+      			<td height="21"><b>'.$coleader2link.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($coleaderid3 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$coleadername3: </td>
-      			<td height=21><b>$coleader3link</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$coleadername3.': </td>
+      			<td height="21"><b>'.$coleader3link.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($fcid1 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$fcname1: </td>
-      			<td height=21><b>$fclink1</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$fcname1.': </td>
+      			<td height="21"><b>'.$fclink1.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($fcid2 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$fcname2: </td>
-      			<td height=21><b>$fclink2</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$fcname2.': </td>
+      			<td height="21"><b>'.$fclink2.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($toid1 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$toname1: </td>
-      			<td height=21><b>$tolink1</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$toname1.': </td>
+      			<td height="21"><b>'.$tolink1.'</b></td>
     		</tr>
-	");
+	';
 }
 
 if ($toid2 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$toname2: </td>
-      			<td height=21><b>$tolink2</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$toname2.': </td>
+      			<td height="21"><b>'.$tolink2.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($moid1 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$moname1: </td>
-      			<td height=21><b>$molink1</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$moname1.': </td>
+      			<td height="21"><b>'.$molink1.'</b></td>
     		</tr>
-	");
+	';
 }
 if ($moid2 > -1)
 {
-	print("
-			<tr class=cl>
-      			<td height=21>$moname2: </td>
-      			<td height=21><b>$molink2</b></td>
+	echo '
+			<tr class="cl">
+      			<td height="21">'.$moname2.': </td>
+      			<td height="21"><b>'.$molink2.'</b></td>
     		</tr>
-	");
+	';
 }
 
-print("
+echo '
 			<tr>
-      			<td height=21 colspan=2><hr></td>
+      			<td height="21" colspan="2"><hr></td>
     		</tr>
     		<tr>
-      			<td height=21 colspan=2 class=\"cl\"><h3>$allyallymain_lang[allianzbiografie]:</h3></td>
+      			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzbiografie'].':</h3></td>
     		</tr>
     		<tr>
-      			<td class=cl height=21 colspan=2>".utf8_encode($bio)."</td>
+      			<td class="cl" height="21" colspan="2">'.utf8_encode($bio).'</td>
     		</tr>
-");
+';
 
 if ($isleader || $iscoleader)
 {
-	print("
+	echo '
 			<tr>
-      			<td height=21 colspan=2><hr></td>
+      			<td height="21" colspan="2"><hr></td>
     		</tr>
     		<tr>
-      			<td height=21 colspan=2 class=\"cl\"><h3>$allyallymain_lang[changedaten]:</h3></td>
+      			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['changedaten'].':</h3></td>
     		</tr>
-			<form method=\"POST\" action=\"ally_settings.php\">");
+			<form method="POST" action="ally_settings.php">';
 			
 			/*
     		<tr>
@@ -539,59 +539,59 @@ if ($isleader || $iscoleader)
     			</td>
 			</tr>
 			*/
-	print("
+	echo '
 			<tr>
-				<td colspan=2>$allyallymain_lang[homepage]:<br>
-      			<input type=\"text\" name=\"hpurl\" size=\"50\" maxlength=\"50\" value=\"$homepageurl\"></td>
+				<td colspan="2">'.$allyallymain_lang['homepage'].':<br>
+      			<input type="text" name="hpurl" size="50" maxlength="50" value="'.$homepageurl.'"></td>
     		</tr>
     		<tr>
-				<td colspan=2>
-					$allyallymain_lang[pubirc]:<br>
-					https://discord.gg/<input type=text name=openirc size=\"30\" maxlength=\"50\" value=\"$openirc\">
+				<td colspan="2">
+					'.$allyallymain_lang['pubirc'].':<br>
+					https://discord.gg/<input type="text" name="openirc" size="30" maxlength="50" value="'.$openirc.'">
 				</td>
     		</tr>
     		<tr>
-				<td colspan=2>
-					$allyallymain_lang[intirc]:<br>
-					https://discord.gg/<input type=text name=internirc size=\"30\" maxlength=\"50\" value=\"$internirc\">
+				<td colspan="2">
+					'.$allyallymain_lang['intirc'].':<br>
+					https://discord.gg/<input type="text" name="internirc" size="30" maxlength="50" value="'.$internirc.'">
 				</td>
     		</tr>
     		<tr>
-				<td colspan=2>
-					$allyallymain_lang[metairc]:<br>
-					https://discord.gg/<input type=text name=metairc size=\"30\" maxlength=\"50\" value=\"$metairc\">
+				<td colspan="2">
+					'.$allyallymain_lang['metairc'].':<br>
+					https://discord.gg/<input type="text" name="metairc" size="30" maxlength="50" value="'.$metairc.'">
 				</td>
 			</tr>
     		<tr>
-				<td colspan=2>
+				<td colspan="2">
 					Discord-Bot:<br>
-					https://discordapp.com/api/webhooks/<input type=text name=discord_bot size=\"50\" maxlength=\"100\" value=\"$discord_bot\">
+					https://discordapp.com/api/webhooks/<input type="text" name="discord_bot" size="50" maxlength="100" value="'.$discord_bot.'">
 				</td>
     		</tr>			
     		<tr>
-				<td colspan=2>
-					$allyallymain_lang[keywords]:<br>
-					<input type=text name=keywords size=\"50\" maxlength=\"255\" value=\"$keywords\">
+				<td colspan="2">
+					'.$allyallymain_lang['keywords'].':<br>
+					<input type=text name=keywords size="50" maxlength="255" value="'.$keywords.'">
 				</td>
     		</tr>
     		<tr>
-    			<td colspan=2>$allyallymain_lang[allianzbiografie]:<br>
-      			<textarea rows=\"22\" name=\"bio\" cols=\"71\">".utf8_encode($bio)."</textarea></td>
+    			<td colspan="2">'.$allyallymain_lang['allianzbiografie'].':<br>
+      			<textarea rows="22" name="bio" cols="71">'.utf8_encode($bio).'</textarea></td>
     		</tr>
     		<tr>
-    			<td colspan=2>$allyallymain_lang[msgtoleader]:<br>
-      			<textarea rows=\"10\" name=\"leadermessage\" cols=\"71\">".utf8_encode($leadermessage)."</textarea></td>
+    			<td colspan="2">'.$allyallymain_lang['msgtoleader'].':<br>
+      			<textarea rows="10" name="leadermessage" cols="71">'.utf8_encode($leadermessage).'</textarea></td>
     		</tr>
     		<tr>
-    			<td colspan=2>$allyallymain_lang[bewerberinfo]:<br>
-      			<textarea rows=\"10\" name=\"bewerberinfo\" cols=\"71\">".utf8_encode($bewerberinfo)."</textarea></td>
+    			<td colspan="2">'.$allyallymain_lang['bewerberinfo'].':<br>
+      			<textarea rows="10" name="bewerberinfo" cols="71">'.utf8_encode($bewerberinfo).'</textarea></td>
     		</tr>
     		<tr><td><br><br></td></tr>
     		<tr>
-    			<td colspan=2><input type=\"submit\" value=\"$allyallymain_lang[abschicken]\" name=\"B1\"><input type=\"reset\" value=\"$allyallymain_lang[zurueck]\" name=\"B2\"></td>
+    			<td colspan="2"><input type="submit" value="'.$allyallymain_lang['abschicken'].'" name="B1"><input type="reset" value="'.$allyallymain_lang['zurueck'].'" name="B2"></td>
     		</tr>
 			</form>
-	");
+	';
 }
 
 /*
@@ -601,11 +601,11 @@ if ($isleader || $iscoleader)
     		</tr>
 */
 
-print("</table></td></tr></table></div></div>");
+echo '</table></td></tr></table></div></div>';
 
 ?>
 <br>
-<?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
+<?php include('ally/ally.footer.inc.php'); ?>
+<?php include ('fooban.php'); ?>
 </body>
 </html>

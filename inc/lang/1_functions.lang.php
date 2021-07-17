@@ -1,5 +1,5 @@
 <?php
-$functions['ausgelastet']='Kapazit&auml;ten ausgelastet';
+$functions['ausgelastet']='Kapazitäten ausgelastet';
 $functions['bauen']='Bauen';
 $functions['erforscht']='Erforscht';
 $functions['forschen']='Forschen';
