@@ -1,0 +1,83 @@
+@CHARSET "UTF-8";
+@import url("jq.ui/ui.all.css");
+
+@import url("jq.tablesorter/style.css");
+@import url("jq.tablesorter.override.css");
+
+@import url("jq.jTPS/jTPS.css");
+@import url("jq.jTPS.override.css");
+
+@import url("layout/layout.css");
+@import url("menu/menu.css");
+@import url("overlay/overlay.css");
+
+
+@import url("jq.ui.all.override.css");
+
+
+    
+
+/************************************************************
+* Seiten Layout 
+*/
+
+/***********************************************************************************
+* Container für Listenanzeigen
+*/
+
+div.detailContainer{
+
+    margin:10px;
+    width:440px;
+    border: 1px solid lightgrey;
+    float:left;
+    background-color:#FFF;
+}
+div.detailContainer > h3.header{
+    text-align:left;
+    background-color:#f0dfbe;
+    //background: #f0f2f5 url(images/f0f2f5grad.gif) bottom repeat-x;
+    margin:0px;
+    padding: 2px;
+    border-bottom: 1px solid lightgrey;
+}
+div.detailContainer > div.content{
+    width:100%;
+}
+div.detailContainer input:disabled{
+    border:1px dotted;
+    background:white;
+}
+
+
+
+div.detailContainer > div.footer{
+}
+
+div.iconBar{
+    margin:10px;
+
+    height:40px;
+    border: 1px solid lightgrey;
+    float:right;
+    background-color:#FFF;
+}
+
+div.iconBar img.icon { background:url(images/icons.png) no-repeat; margin:4px; width:32px; height:32px; }
+div.iconBar img.disabledIcon { background:url(images/icons.png) no-repeat; margin:4px; width:32px; height:32px; }
+div.iconBar img.icon:active { margin:6px 2px 2px 6px; width:32px; height:32px; }
+div.iconBar img.add    { background-position:0 0; }
+div.iconBar img.del    { background-position:-32px 0; }
+div.iconBar img.back   { background-position:-64px 0; }
+div.iconBar img.edit   { background-position:-96px 0; }
+div.iconBar img.search { background-position:-128px 0; }
+div.iconBar img.save   { background-position:-160px 0; }
+div.iconBar img.last   { background-position:-192px 0; }
+div.iconBar img.next   { background-position:-224px 0; }
+div.iconBar img.prev   { background-position:-256px 0; }
+div.iconBar img.first  { background-position:-288px 0; }
+div.iconBar img.info   { background-position:-320px 0; }
+div.iconBar img.time   { background-position:-352px 0; }
+
+
+

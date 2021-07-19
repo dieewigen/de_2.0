@@ -1,0 +1,112 @@
+/* 
+    Document   : layout.css
+    Created on : 09.03.2009, 16:12:05
+    Author     : Rainer Zerbe
+    Description:
+        Purpose of the stylesheet follows.
+*/
+body{
+    margin:0px;
+    padding:0px;
+    background-color:#DDD;
+    font-family: verdana, geneva, arial, helvetica, sans-serif;
+    font-size: 12px;
+}
+
+div{
+    margin:0px;
+    padding:0px;
+}
+img{
+    margin:0px;
+    padding:0px;
+    border:0 none;
+}
+input{
+    font-family:arial;
+    font-size: 8pt;
+}
+li{
+    list-style-image: none;
+    list-style-type: none;
+    list-style-position: outside;
+
+}
+.textlabel{
+    font-size: 8pt;
+    font-weight:bold;
+    float: left;
+    width:200px;
+    overflow:hidden;
+}
+.textlable {
+    font-size: 8pt;
+    font-weight:bold;
+    float: left;
+    width:200px;
+    overflow:hidden;
+    }
+a:link		{ color: blue; text-decoration: none; }
+a:hover		{ color: blue; text-decoration: none; }
+a:visited	{ color: blue; text-decoration: none; }
+
+
+#einloggen{
+    border:1px solid black;
+    padding:20px;
+}	
+
+div#main {
+    background-color:#ffffff;
+    padding:0px;
+    margin:0px 10px;
+    border:0px solid black;
+    width:960px;
+}
+div#header {
+    overflow:hidden;
+    height:69px;
+    width:100%;
+    background-color:#EEE;
+}
+div#menu
+{
+    background-color:#ffffff;
+    color:#EEE;
+    background-attachment:scroll;
+    background-image:url(images/menu_bg_dropdown_g.png);
+    background-repeat:repeat-x;
+    background-position:top;
+    height:41px;
+    width:100%;
+    vertical-align:bottom;
+    z-index:100;
+}
+div#cc{
+    padding:1em;
+}
+div#content {
+    overflow:auto;
+    /* width:100%; */
+    background-color:#EEE;
+    padding:10px;
+
+}
+
+div#lc{
+    margin-left:5.5em;
+}
+div#footer{
+    color:#EEE;
+    font-family:Arial,Helvetica;
+    font-size:11px;
+    background-image:url(images/footer_g.png);
+    background-repeat:repeat-x;
+    background-position:bottom;
+    height:32px;
+    width:100%;
+
+}
+
+
+

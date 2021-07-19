@@ -1,0 +1,49 @@
+/* 
+    Document   : f
+    Created on : 22.03.2009, 13:21:44
+    Author     : Rainer Zerbe
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+body {scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333; scrollbar-3dlight-color: #8CA0B4;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;
+ scrollbar-arrow-color: #8CA0B4;background-image:url(g/bg_blue.gif); background-repeat:repeat;
+ background-attachment:fixed; padding:0px; color: #3399FF; margin-left:0px; margin-top:0px; margin-right:0px; margin-bottom:0px;
+ font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}
+A:hover {
+	color:#C0C0C0; text-decoration:none
+}
+A:link {
+	color:#33CCCC; text-decoration:none
+}
+A {
+	color:#33CCCC; text-decoration:none
+}
+A.menue {
+	color:#FFFFFF; text-decoration:none
+}
+h1,h2,h3,h4,body,br,ul,ol,li,tr,td,th,address,blockquote,nobr,b,em,i,span {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC;
+}
+td.menue,p.menue {
+	font-family:Tahoma, Verdana, Arial; font-size:14px; color:#FFFFFF; font-weight:bold;
+}
+td.cat,p.cat {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC; font-weight:bold;
+}
+td.space,p.space {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC; padding-left:8;
+}
+td.footer,p.footer {
+	font-family:Tahoma, Verdana, Arial; font-size:10px; color:#CCCCCC;
+}
+input,textarea {
+	background-color:#12285A; font-family:Tahoma, Verdana, Arial; font-size:12px; color:#CCCCCC; border-color:#000000; border-style:solid; border-width:1px; padding-left:2px; padding-right:2px;
+}
+td {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt;border-color:#bbbb20; border-style:solid;border-width:1px}
+

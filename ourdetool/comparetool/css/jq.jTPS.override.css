@@ -1,0 +1,22 @@
+/* 
+    Document   : js.jTPS.override
+    Created on : 09.03.2009, 19:02:19
+    Author     : Rainer Zerbe
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.jTPS tr.filterTR {
+    display:none;
+}
+
+.jTPS tbody td {
+   white-space:nowrap;/**/
+   overflow:hidden;
+   height:14px;
+}

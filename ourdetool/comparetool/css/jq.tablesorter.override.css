@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+table.tablesorter thead tr .header {
+	padding-right: 20px;
+}
+table.tablesorter thead tr .noHeadIcon {
+	background-image:url();
+	}

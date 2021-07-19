@@ -1,0 +1,5 @@
+AuthName "Admin Area"
+AuthType Basic
+AuthUserFile "d:/htdocs/de/.htpasswd" 
+require valid-user
+

@@ -6,7 +6,6 @@ cache/toplist/*.tmp
 cache/overview/*.tmp
 fonts/
 npcx/
-ourdetool/
 ranglisten/
 sekretariat/
 soudata/source/sou_showdata.php

@@ -1,0 +1,39 @@
+body {background-image:url(g/bg1.png); background-repeat:repeat;
+ background-attachment:fixed; padding:0px; color: #FFFFFF; margin-left:0px; margin-top:0px; margin-right:0px; margin-bottom:0px;
+ font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}  
+A:hover {
+	color:#ff7e15; text-decoration:none
+}
+A:link {
+	color:#ff7e15; text-decoration:none
+}
+A {
+	color:#ff7e15; text-decoration:none
+}
+A.menue {
+	color:#ff7e15; text-decoration:none
+}
+h1,h2,h3,h4,body,br,ul,ol,li,tr,td,th,address,blockquote,nobr,b,em,i,span {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC;
+}
+td.menue,p.menue {
+	font-family:Tahoma, Verdana, Arial; font-size:14px; color:#FFFFFF; font-weight:bold;
+}
+td.cat,p.cat {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC; font-weight:bold;
+}
+td.space,p.space {
+	font-family:Tahoma, Verdana, Arial; font-size:11px; color:#CCCCCC;;
+}
+td.footer,p.footer {
+	font-family:Tahoma, Verdana, Arial; font-size:10px; color:#CCCCCC;
+}
+input,textarea {
+	background-color:#12285A; font-family:Tahoma, Verdana, Arial; font-size:12px; color:#CCCCCC; border-color:#000000; border-style:solid; border-width:1px; padding-left:2px; padding-right:2px;
+}
+
+td {font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; border: 1px solid #AAAAAA; border-collapse:collapse; color: #FFFFFF; background-color: #000000;} 
+
+
+.cell1{background-color: #444444;}
+.cell2{background-color: #888888;}
