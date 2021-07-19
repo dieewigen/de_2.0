@@ -1,22 +1,22 @@
 <?php
-//beschriftungen f&uuml;r die &uuml;bersichtsfelder
-$ovbes[']='inactive';
-$ovbes[']='DET News / Crystal palace';
-$ovbes[']='Eternal message service';
-$ovbes[']='Random question from the FAQ';
-$ovbes[']='Information from sector commander';
-$ovbes[']='System overview';
-$ovbes[']='Ship units';
-$ovbes[']='Defense units';
+//beschriftungen für die übersichtsfelder
+$ovbes[]='inactive';
+$ovbes[]='DET News / Crystal palace';
+$ovbes[]='Eternal message service';
+$ovbes[]='Random question from the FAQ';
+$ovbes[]='Information from sector commander';
+$ovbes[]='System overview';
+$ovbes[]='Ship units';
+$ovbes[]='Defense units';
 
-$secanzeige[']='Show top';
-$secanzeige[']='Do not show';
-$secanzeige[']='Shot bottom';
+$secanzeige[]='Show top';
+$secanzeige[]='Do not show';
+$secanzeige[]='Shot bottom';
 
 $options_lang['accountdetails']='Account details';
 $options_lang['accountid']='Account-ID';
 $options_lang['accountloeschen']='Delete account';
-$options_lang['accountloescheninfo1']='To delete your account please enter the password, confirm both checkboxes and confirm with "Delete Account".';
+$options_lang['accountloescheninfo1']='To delete your account please enter the password, confirm both checkboxes and confirm with "Delete Account"';
 $options_lang['accountloescheninfo2']='Account deletion leads to loss of your premium account status.';
 $options_lang['allgemeineeinstellungen']='General settings';
 $options_lang['angabeinminuten']='Declaration in minutes';
@@ -29,7 +29,7 @@ $options_lang['einstellungenuebernehmen']='Accept settings';
 $options_lang['einstellungennaechsterunde']='Settings for the next round';
 $options_lang['einteilunguebersicht']='Arrangement of the overview';
 
-$options_lang['emailgeloeschtbody']="Hello,\n\nyour account has been marked for deletion and will be deleted during the next 24 hours from the inactivity script.\nThis has been triggered from the account deletion function ingame.\nIf you do not agree simply log in during the next 24 hours to stop the account deletion.\nIf you did not start the deletion of your account please log in immediately and change your password.\n\nWith kind regards\nThe DET";
+$options_lang['emailgeloeschtbody']='Hello,\n\nyour account has been marked for deletion and will be deleted during the next 24 hours from the inactivity script.\nThis has been triggered from the account deletion function ingame.\nIf you do not agree simply log in during the next 24 hours to stop the account deletion.\nIf you did not start the deletion of your account please log in immediately and change your password.\n\nWith kind regards\nThe DET';
 $options_lang['emailgeloeschtbetreff']='Die Ewigen - Account deletion';
 $options_lang['fehler1']='Data error.';
 $options_lang['fehler2']='No player name.';
@@ -68,12 +68,12 @@ $options_lang['userdetails']='User details';
 $options_lang['sektorbilder']='Sector images';
 $options_lang['smreminder']='Blackmarket reminder<br>(The lowest value is 15, at 0 the reminder is deactivated)';
 $options_lang['sounddeaktivieren']='Deactivate sound';
-$options_lang['umodeinfo1']='To enter the vacation mode simply enter the amount of vacation days (min. 1, max. 21), enter your password and confirm with "Activate vacation mode".';
+$options_lang['umodeinfo1']='To enter the vacation mode simply enter the amount of vacation days (min. 1, max. 21), enter your password and confirm with "Activate vacation mode"';
 $options_lang['umodeinfo2']='(Vacation mode shorter than 3 days costs 150 credits. The credits will be booked immediately. It is impossible to stop the vacation mode once it has startet without spending credits before starting the vacation mode. After 3 days ending the vacation mode is free.)';
 $options_lang['urlaubstage']='Vacation days';
 $options_lang['urlaubsmodusaktivieren']='Activate vacation mode';
 $options_lang['transparenz']='Transparency';
-$options_lang['emailgeloeschtbody']="Hello,\n\nYour account has been marked for deletion and set into vacation mode. In three days your account will be removed from the server database.\nThis has been triggered with the delete function under options from your ingame account.\nIf you do not agree, please log into your account during the next three days to stop this procedure and to set the account into normal vacation mode. After three days normal vacation mode you can log into your account again.\nIf you did not start the deletion process, please log in immediately and change your password.\n\nWith kind regards\nThe Die Ewigen Team";
+$options_lang['emailgeloeschtbody']='Hello,\n\nYour account has been marked for deletion and set into vacation mode. In three days your account will be removed from the server database.\nThis has been triggered with the delete function under options from your ingame account.\nIf you do not agree, please log into your account during the next three days to stop this procedure and to set the account into normal vacation mode. After three days normal vacation mode you can log into your account again.\nIf you did not start the deletion process, please log in immediately and change your password.\n\nWith kind regards\nThe Die Ewigen Team';
 $options_lang['accountloescheninfo3']='This account will be excluded from the possibility to win the game as the raisen one for the following period of time (economy ticks):'; 
 $options_lang['umodefehler3']='You are under attack. Please confirm that you want to enter the vacation mode. After confirmation it is not possible that new fleets access your home system (attacker and defender). Fleets already in transit will still reach your home system.'; 
 $options_lang['umodefehler3desc']='Confirmation at attacks';

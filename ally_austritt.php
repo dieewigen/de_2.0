@@ -1,8 +1,8 @@
 <?php
 //	Funktion der Seite:		Austreten aus einer Allianz
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.austritt.lang.php'; 
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.austritt.lang.php'); 
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
@@ -16,15 +16,15 @@ $leave_fee = 25;
 <html>
 <head>
 <title><?php echo $allyaustritt_lang['title']?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
 <?php
 
-include "resline.php";
-include ("ally/ally.menu.inc.php");
-include ("lib/basefunctions.lib.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
+include('lib/basefunctions.lib.php');
 
 if($a == 1)
 {
@@ -39,7 +39,7 @@ if($a == 1)
 	//Falls ein aktiver Leader die Allianz verlassen will, wird ein Fehler ausgegeben
 	if ($leaderid == $ums_user_id)
 	{
-		print($allyaustritt_lang[msg_1]);
+		print($allyaustritt_lang['msg_1']);
 	}
 	else
 	{
@@ -59,31 +59,31 @@ if($a == 1)
 			{
 				$result_updateally = mysql_query("UPDATE de_allys SET coleaderid3=-1 WHERE allytag='$clantag'");
 			}
-			notifyUser($leaderid, "$allyaustritt_lang[msg_2_1] <b>$username</b> $allyaustritt_lang[msg_2_2]", 6);
-			notifyUser($coleaderid1, "$allyaustritt_lang[msg_2_1] <b>$username</b> $allyaustritt_lang[msg_2_2]", 6);
-			notifyUser($coleaderid2, "$allyaustritt_lang[msg_2_1] <b>$username</b> $allyaustritt_lang[msg_2_2]", 6);
-			notifyUser($coleaderid3, "$allyaustritt_lang[msg_2_1] <b>$username</b> $allyaustritt_lang[msg_2_2]", 6);
+			notifyUser($leaderid, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			notifyUser($coleaderid1, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			notifyUser($coleaderid2, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			notifyUser($coleaderid3, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
 			
 			echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-			echo "$allyaustritt_lang[msg_3_1] $leave_fee $allyaustritt_lang[msg_3_2]";
+			echo $allyaustritt_lang['msg_3_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_3_2'];
 			echo '<div>';
 			
-			include("ally/allyfunctions.inc.php");
-			writeHistory($clantag, "$allyaustritt_lang[msg_4_1] <i>$username</i> $allyaustritt_lang[msg_4_2]",true);
+			include('ally/allyfunctions.inc.php');
+			writeHistory($clantag, $allyaustritt_lang['msg_4_1'].' <i>'.$username.'</i> '.$allyaustritt_lang['msg_4_2'],true);
 
 		}else{
 			echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-			print(str_replace('{VALUE}', $leave_fee, $allyaustritt_lang[msg_5]));
+			print(str_replace('{VALUE}', $leave_fee, $allyaustritt_lang['msg_5']));
 			echo '<div>';
 		}
 	}
 }else{
 	echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-	echo "$allyaustritt_lang[msg_6_1] $leave_fee $allyaustritt_lang[msg_6_2]<BR><BR>";
-	echo "<a href=\"ally_austritt.php?a=1\"><font style=\"font-size:14pt;\"><b>$allyaustritt_lang[msg_7]</a><BR>";
+	echo $allyaustritt_lang['msg_6_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_6_2'].'<br /><br />';
+	echo '<a href="ally_austritt.php?a=1"><font style="font-size:14pt;"><b>'.$allyaustritt_lang['msg_7'].'</a><br />';
 	echo '<div>';
 }
 
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
+<?php include('ally/ally.footer.inc.php'); ?>

@@ -14,9 +14,9 @@ $allymembers_lang['entlassen']='entlassen';
 $allymembers_lang['toleader']='zum Leader';
 
 $allymembers_lang['msg_1_1']='Sind Sie sicher, das Sie das Mitglied ';
-$allymembers_lang['msg_1_2']='aus Ihrer Allianz entlassen m&ouml;chten?';
+$allymembers_lang['msg_1_2']='aus Ihrer Allianz entlassen möchten?';
 $allymembers_lang['msg_2_1']='Sind Sie sicher, das Sie das Mitglied';
 $allymembers_lang['msg_2_2']='zum Leader Ihrer Allianz bestimmen wollen? Sie verlieren alle Allianzrechte!';
 
-$allymembers_lang['religionraenge']=array('Ungl&auml;ubiger', 'Novize', 'Vestiar', 'Sakristan', 'Adept', 'Infirmar', 'Prior', 'Mystiker', 'Erleuchteter', 'M&auml;rtyrer', 'Heiliger');
+$allymembers_lang['religionraenge']=array('Ungläubiger', 'Novize', 'Vestiar', 'Sakristan', 'Adept', 'Infirmar', 'Prior', 'Mystiker', 'Erleuchteter', 'Märtyrer', 'Heiliger');
 ?>

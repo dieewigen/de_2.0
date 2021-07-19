@@ -6,7 +6,7 @@ $resline_lang['nachricht']='Message';
 $resline_lang['payserver']='This is a pay server that is only accessable with a valid premium account. 
 If you are not interested to play on a pay server you can play on one of our free servers. 
 In the server overview you cann see if a server is free or not<br><br>
-A premium account can be purchased in the central account management (menu item "Premium").';
+A premium account can be purchased in the central account management (menu item 'Premium').';
 
 $resline_lang['restipres01']='Multiplex';
 $resline_lang['restipres02']='Dyharra';

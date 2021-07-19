@@ -9,9 +9,9 @@
 //	05.02.2002 (Ascendant)	- Seite erstellt.
 //
 //  --------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.coleader.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.coleader.lang.php');
+include_once('functions.php');
 
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, ally_id, allytag, status, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
@@ -21,12 +21,12 @@ $restyp02=$row[1];
 $restyp03=$row[2];
 $restyp04=$row[3];
 $restyp05=$row[4];
-$punkte=$row["score"];
-$newtrans=$row["newtrans"];
-$newnews=$row["newnews"];
-$sector=$row["sector"];
-$system=$row["system"];
-$spielername=$row["spielername"];
+$punkte=$row['score'];
+$newtrans=$row['newtrans'];
+$newnews=$row['newnews'];
+$sector=$row['sector'];
+$system=$row['system'];
+$spielername=$row['spielername'];
 
 $ally_id=-1;
 if($row['ally_id'] > 0 && $row['status'] == 1){
@@ -38,7 +38,7 @@ if($row['ally_id'] > 0 && $row['status'] == 1){
 <html>
 <head>
 <title><?php echo $allycoleader_lang['title'];?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
@@ -67,7 +67,7 @@ function getSelect($leaderid, $select_name, $co, $ally){
 
 	$coleader=false;
 	//Erzeugen des öffnenden <select> - Tags
-	$select = "<select name=$select_name id=\"$select_name\" style=\"width:150px;height:18;font-size:8pt;font-family:Tahoma\">\n";
+	$select = '<select name="'.$select_name.'" id="'.$select_name.'" style="width:150px;height:18;font-size:8pt;font-family:Tahoma">';
 	//Ermitteln aller Mitglieder der Allianz $ally
 	//$result_member = mysql_query("SELECT user_id, spielername FROM de_user_data WHERE allytag='$ally' AND status='1'");
 	$result_member = mysql_query("SELECT user_id, spielername FROM de_user_data WHERE ally_id='$ally' AND status='1'");
@@ -80,25 +80,25 @@ function getSelect($leaderid, $select_name, $co, $ally){
 			//Auslesen des aktuellen Datensatzes aus dem Resultset
 			$ally_members[$i] = mysql_fetch_array($result_member);
 			//Ermitteln der user_id
-			$uid = $ally_members[$i]["user_id"];
+			$uid = $ally_members[$i]['user_id'];
 			//Ermitteln des Spielernamens
-			$uname = $ally_members[$i]["spielername"];
+			$uname = $ally_members[$i]['spielername'];
 			//Prüfen, ob der aktuelle Spieler der übergebene Coleader $co ist
 			if ($uid == $co){
 				//Der Spieler ist der aktuelle Coleader. Generieren der Vorbelegung der Auswahlbox
-				$select = $select."<option value=$uid selected>$uname</option>\n";
+				$select = $select.'<option value="'.$uid.'" selected>'.$uname.'</option>';
 				//Flag setzen, das die Position des Coleaders besetzt ist.
 				$coleader = TRUE;
 			}else{//Der aktuelle Spieler ist kein Coleader
 				//Generieren des normalen <option> - Tags
-				$select = $select."<option value=$uid>$uname</option>\n";
+				$select = $select.'<option value="'.$uid.'">'.$uname.'</option>';
 			}
 		}
 	}
 	//Der Datenbankserver hat kein gültiges Resultset zurückgegeben. Ausgabe einer Fehlermeldung.
 	else
 	{
-		print("$allycoleader_lang[msg_2]");
+		echo $allycoleader_lang['msg_2'];
 	}
 	//abschliessende Prüfung, ob ein vorselektierter Eintrag generiert wurde (also ob schon ein Co-Leader
 	//eingetragen ist).
@@ -106,23 +106,23 @@ function getSelect($leaderid, $select_name, $co, $ally){
 	{
 		//Falls kein Co-Leader im Datensatz der Allianz vorhanden ist, wird die Auswahloption
 		//"Nicht belegt" vorselektiert
-		$select = $select."<option value=-1 selected>$allycoleader_lang[msg_1]</option>\n";
+		$select = $select.'<option value="-1" selected>'.$allycoleader_lang['msg_1'].'</option>';
 	}
 	else
 	{
 		//Ansonsten wird die Auswahloption als nicht vorselektiert angefügt
-		$select = $select."<option value=-1>$allycoleader_lang[msg_1]</option>\n";
+		$select = $select.'<option value="-1">'.$allycoleader_lang['msg_1'].'</option>';
 	}
 	//Erzeugen des schliessenden Tags
-	$select = $select."</select>\n";
+	$select = $select.'</select>';
 	//Rückgabe der fertigen Auswahlbox
 	return $select;
 }
 
 //Einbinden der Ressourcenanzeige
-include "resline.php";
+include('resline.php');
 //Einbinden des Allianzmen�s
-include ("ally/ally.menu.inc.php");
+include('ally/ally.menu.inc.php');
 
 //Prüfen, ob der aktuelle User Leaderbefugnisse hat
 if ($isleader && $ally_id > 0 ){
@@ -132,9 +132,9 @@ if ($isleader && $ally_id > 0 ){
 	
 	if (isset($coleader1) && isset($coleader2)){
 		if (($coleader1 == $coleader2) && (($coleader1 != -1) && ($coleader2 != -1))){
-			print("$allycoleader_lang[msg_3]");
+			echo $allycoleader_lang['msg_3'];
 		}elseif (($ums_user_id == $coleader1) || ($ums_user_id == $coleader2) || ($ums_user_id == $coleader3)){
-			print("$allycoleader_lang[msg_4]");
+			echo $allycoleader_lang['msg_4'];
 		}else{
 			$leadername=$_POST['leadername'];
 
@@ -160,13 +160,12 @@ if ($isleader && $ally_id > 0 ){
 			$membername1=$_POST['membername1'];
 			$membername2=$_POST['membername2'];
 
-			$result_update = mysql_query("UPDATE de_allys SET coleaderid1='$coleader1', coleaderid2='$coleader2', coleaderid3='$coleader3', fleetcommander1='$fc1', fleetcommander2='$fc2', tacticalofficer1='$tactic1', tacticalofficer2='$tactic2', memberofficer1='$member1', memberofficer2='$member2', leadername='$leadername', coleadername1='$coleadername1', coleadername2='$coleadername2', coleadername3='$coleadername3', fcname1='$fcname1', fcname2='$fcname2', toname1='$tacticname1', toname2='$tacticname2', moname1='$membername1', moname2='$membername2' WHERE leaderid='$ums_user_id'", $db);
+			$query = "UPDATE de_allys SET coleaderid1='$coleader1', coleaderid2='$coleader2', coleaderid3='$coleader3', fleetcommander1='$fc1', fleetcommander2='$fc2', tacticalofficer1='$tactic1', tacticalofficer2='$tactic2', memberofficer1='$member1', memberofficer2='$member2', leadername='$leadername', coleadername1='$coleadername1', coleadername2='$coleadername2', coleadername3='$coleadername3', fcname1='$fcname1', fcname2='$fcname2', toname1='$tacticname1', toname2='$tacticname2', moname1='$membername1', moname2='$membername2' WHERE leaderid='$ums_user_id'";
+			$result_update = mysql_query($query, $db);
 			if ($result_update){
-				echo '<br><div class="info_box text3">';
-				print("$allycoleader_lang[msg_5]");
-				echo '</div>';
+				echo '<br><div class="info_box text3">'.$allycoleader_lang['msg_5'].'</div>';
 			}else{
-				print("$allycoleader_lang[msg_6]");
+				echo $allycoleader_lang['msg_6'];
 			}
 		}
 	}
@@ -211,39 +210,42 @@ if ($isleader && $ally_id > 0 ){
 
 	//Ausgabe des Formulars
 
-	print("<form action=ally_coleader.php name=coleader id=coleader method=post>");
-	echo '<div align=center class="cell" style="width: 600px"><table width="100%">';
-	print("<tr><td><h2>$allycoleader_lang[msg_7], $spielername:</h2></td></tr>");
-	print("<tr><td><hr></td></tr>");
-	print("<tr><td>");
-	print("<table width=600>");
-	print("<tr><td width=100 align=center bgcolor=#1c1c1c><strong>$allycoleader_lang[funktion]</strong></td><td width=200 align=center bgcolor=#1c1c1c><strong>$allycoleader_lang[besondererechte]</strong></td><td width=150 align=center bgcolor=#1c1c1c><strong>$allycoleader_lang[postenbezeichnung]</strong></td><td width=150 align=center bgcolor=#1c1c1c><strong>$allycoleader_lang[vergebenanmitglied]</strong></td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[allianzleader]</td><td align=center bgcolor=#222222>Leader</td><td align=center bgcolor=#222222><input type=text name=leadername value=\"$leadername\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$spielername</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[coleader]</td><td align=center bgcolor=#222222>Co-Leader</td><td align=center bgcolor=#222222><input type=text name=coleadername1 value=\"$coleadername1\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_coleader1</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[coleader]</td><td align=center bgcolor=#222222>Co-Leader</td><td align=center bgcolor=#222222><input type=text name=coleadername2 value=\"$coleadername2\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_coleader2</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[coleader]</td><td align=center bgcolor=#222222>Co-Leader</td><td align=center bgcolor=#222222><input type=text name=coleadername3 value=\"$coleadername3\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_coleader3</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[fleetcommander]</td><td align=center bgcolor=#222222>Fleetcommander</td><td align=center bgcolor=#222222><input type=text name=fcname1 value=\"$fcname1\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_fc1</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[fleetcommander]</td><td align=center bgcolor=#222222>Fleetcommander</td><td align=center bgcolor=#222222><input type=text name=fcname2 value=\"$fcname2\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_fc2</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[tofficer]</td><td align=center bgcolor=#222222>Tactical Officer</td><td align=center bgcolor=#222222><input type=text name=tacticname1 value=\"$tacticname1\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_tactic1</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[tofficer]</td><td align=center bgcolor=#222222>Tactical Officer</td><td align=center bgcolor=#222222><input type=text name=tacticname2 value=\"$tacticname2\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_tactic2</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[mofficer]</td><td align=center bgcolor=#222222>Member Officer</td><td align=center bgcolor=#222222><input type=text name=membername1 value=\"$membername1\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_member1</td></tr>");
-	print("<tr><td align=center bgcolor=#222222>$allycoleader_lang[mofficer]</td><td align=center bgcolor=#222222>Member Officer</td><td align=center bgcolor=#222222><input type=text name=membername2 value=\"$membername2\" style=\"width:150px;height:20px\"></td><td align=center bgcolor=#222222>$select_member2</td></tr>");
-
-	print("</table>");
-	print("</td></tr>");
-	print("<tr><td align=right><input type=submit name=submit value=\"$allycoleader_lang[saveedit]\"></td></tr>");
-	print("</table>");
-	print("</form>");
+	echo '
+		<form action="ally_coleader.php" name="coleader" id="coleader" method="post">
+			<div align="center" class="cell" style="width: 600px"><table width="100%">
+				<tr><td><h2>'.$allycoleader_lang['msg_7'].', '.$spielername.':</h2></td></tr>
+				<tr><td><hr></td></tr>
+				<tr><td>
+					<table width="600">
+						<tr><td width="100" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['funktion'].'</strong></td><td width="200" align="center" bgcolor=#1c1c1c"><strong>'.$allycoleader_lang['besondererechte'].'</strong></td><td width="150" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['postenbezeichnung'].'</strong></td><td width="150" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['vergebenanmitglied'].'</strong></td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['allianzleader'].'</td><td align="center" bgcolor="#222222">Leader</td><td align="center" bgcolor="#222222"><input type="text" name="leadername" value="'.$leadername.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$spielername.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername1" value="'.$coleadername1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername2" value="'.$coleadername2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername3" value="'.$coleadername3.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader3.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname1" value="'.$fcname1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname2" value="'.$fcname2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname1" value="'.$tacticname1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname2" value="'.$tacticname2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername1" value="'.$membername1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername2" value="'.$membername2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member2.'</td></tr>
+					</table>
+				</td></tr>
+				<tr><td align="right"><input type="submit" name="submit" value="'.$allycoleader_lang['saveedit'].'"></td></tr>
+			</table>
+		</form>
+	';
 
 }
 else
 {
 	//Ausgabe einer Fehlermeldung, falls der aktuelle User keine Leaderbefugnis hat
-	print("$allycoleader_lang[msg_8]");
+	echo $allycoleader_lang['msg_8'];
 }
 
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
-</body></html>
+<?php include('ally/ally.footer.inc.php'); ?>
+<?php include('fooban.php'); ?>
+
+</body>
+</html>

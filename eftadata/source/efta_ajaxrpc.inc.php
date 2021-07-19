@@ -477,7 +477,7 @@ if($exp>=$nextlevelexp AND $level<=$maxplayerlevel)
 // optionsseite laden, wenn efta alleine steht
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-if($_REQUEST[action]=='optionspage' AND $sv_efta_in_de==0)
+if($_REQUEST['action']=='optionspage' AND $sv_efta_in_de==0)
 {
   include "eftadata/source/efta_options.php";
 }
@@ -487,7 +487,7 @@ if($_REQUEST[action]=='optionspage' AND $sv_efta_in_de==0)
 // übersichtskarte zeigen
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-if($_REQUEST[action]=='showmappage')
+if($_REQUEST['action']=='showmappage')
 {
   include "eftadata/source/efta_map.php";
 }

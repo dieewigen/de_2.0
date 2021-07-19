@@ -1,29 +1,30 @@
 <?php
 $eftachatbotdefensedisable=1;
-include "inc/header.inc.php";
-include "functions.php";
-include 'inc/lang/'.$sv_server_lang.'_sou_start.lang.php';
+include('inc/header.inc.php');
+include('functions.php');
+include('inc/lang/'.$sv_server_lang.'_sou_start.lang.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Site</title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <div align="center">
 <?php
 $btip1 = $soustart_lang['start4a'].'&'.$soustart_lang['start4b'];
 
-//ea aktivieren
-if(isset($_POST["eftaactivate"])){
+//efta aktivieren
+if(isset($_POST['eftaactivate']))
+{
   mysql_query("UPDATE de_user_data SET useefta=1 WHERE user_id = '$ums_user_id'",$db);
-  $_SESSION["ums_useefta"]=1;
+  $_SESSION['ums_useefta']=1;
 }
 
 echo '<form action="eftastart.php" method="POST">';
 
-//echo '<h1>'.$soustart_lang[willkommen].'</h1>';
+//echo '<h1>'.$soustart_lang['willkommen'].'</h1>';
 
 //quicklink-string zusammenbauen
 if($_SESSION["ums_chatoff"]) $qlstr="top.document.getElementById('gf').cols = '205, *, 0, 0';top.document.getElementById('gf').rows = '*';";

@@ -6,11 +6,11 @@ $naviarray_lang['eintrag_4']='Sektorpolitik';
 
 $buttonpanel_lang['eintrag_1']='Rot';
 $buttonpanel_lang['eintrag_2']='Gelb';
-$buttonpanel_lang['eintrag_3']='Gr&uuml;n';
+$buttonpanel_lang['eintrag_3']='Grün';
 $buttonpanel_lang['eintrag_4']='Wei&szlig;';
 $buttonpanel_lang['eintrag_5']='Blau';
 $buttonpanel_lang['eintrag_6']='Farbe';
-$buttonpanel_lang['eintrag_7']='Gr&ouml;&szlig;e';
+$buttonpanel_lang['eintrag_7']='Grö&szlig;e';
 $buttonpanel_lang['eintrag_8']='Bild';
 $buttonpanel_lang['eintrag_9']='leeren';
 ?>

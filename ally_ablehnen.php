@@ -9,9 +9,9 @@
 //	05.02.2002 (Ascendant)	- Erweiterung der �nderungsbefugnis
 //							  auf Coleader
 //  -------------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.ablehnen.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.ablehnen.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
@@ -21,24 +21,24 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?=$allyablehnen_lang[title]?></title>
-<?php include "cssinclude.php"; ?>
+<title><?php echo $allyablehnen_lang['title']; ?></title>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
 <font face="tahoma" style="font-size:8pt;">
 
-<?
-include "resline.php";
-include ("ally/ally.menu.inc.php");
-include ("lib/basefunctions.lib.php");
+<?php
+include('resline.php');
+include('ally/ally.menu.inc.php');
+include('lib/basefunctions.lib.php');
 //Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
 $allys=mysql_query("SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'");
 
 
 if(mysql_num_rows($allys)<1)
 {
-	echo $allyablehnen_lang[msg_1];
+	echo $allyablehnen_lang['msg_1'];
 }
 else
 {
@@ -72,12 +72,12 @@ else
 					$transaction_result = mysql_query("UPDATE de_transactions SET amount='0' WHERE user_id='$userid' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
 				}
 			}
-			notifyUser($userid, $allyablehnen_lang[msg_2_1].' '.$clantag.' '.$allyablehnen_lang[msg_2_2].' '.$sum.' '.$allyablehnen_lang[msg_2_3], 6);
-			echo $allyablehnen_lang[msg_3];
+			notifyUser($userid, $allyablehnen_lang['msg_2_1'].' '.$clantag.' '.$allyablehnen_lang['msg_2_2'].' '.$sum.' '.$allyablehnen_lang['msg_2_3'], 6);
+			echo $allyablehnen_lang['msg_3'];
 		}
 		else
 		{
-			echo $allyablehnen_lang[msg_4];
+			echo $allyablehnen_lang['msg_4'];
 		}
 	}
 	elseif($allyid)
@@ -87,11 +87,11 @@ else
 		$antragexists = 0;
 		$antragexists = mysql_result($result,0,0);
 		if ($antragexists == 0)
-			die($allyablehnen_lang[msg_5]);
+			die($allyablehnen_lang['msg_5]');
 
 		$query = "delete from de_ally_buendniss_antrag where ally_id_antragsteller=$allyid and ally_id_partner=$clanid";
 		$result = mysql_query($query);
-		echo $allyablehnen_lang[msg_6];
+		echo $allyablehnen_lang['msg_6'];
 	}
 
 }
@@ -99,4 +99,4 @@ else
 
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
+<?php include('ally/ally.footer.inc.php'); ?>

@@ -34,7 +34,7 @@ $tradetick_lang['msg_10_2']='at a price of';
 $tradetick_lang['msg_11_1']='The system found offers cheaper than your maximum price. You get a refund of';
 $tradetick_lang['msg_11_2']='.';
 $tradetick_lang['msg_12_1']='The guild has startet the delivery of your ships. The delivery time is';
-$tradetick_lang['msg_12_2']='economy ticks. The delivery state can be controlled in the <a href=\"trade.php?viewmode=view_own\">tracking system</a>. <br><br>Many thanks for using our services.';
+$tradetick_lang['msg_12_2']='economy ticks. The delivery state can be controlled in the <a href=\'trade.php?viewmode=view_own\'>tracking system</a>. <br><br>Many thanks for using our services.';
 $tradetick_lang['msg_13_1']='You sold';
 $tradetick_lang['msg_13_2']='from one of your offers. The value of this trade is';
 $tradetick_lang['msg_13_3']='The profit for this trade without tax is';

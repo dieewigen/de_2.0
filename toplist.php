@@ -20,74 +20,9 @@ if ($row["status"]==1) $ownally = $row["allytag"];
 <?php //stelle die ressourcenleiste dar
 include "resline.php";
 
-
-//Die Gewinner der alten Runden ansehen
-if(isset($_GET['show_history']) && $_GET['show_history']==1){
-
-	echo '<a href="toplist.php" class="btn">zur&uuml;ck</a><br><br>';
-
-	
-	rahmen_oben('Gewinner der vergangen Runden');
-	echo '<div class="cell" style="width: 570px;">';
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_server_round_toplist ORDER BY round_id DESC");
-	while($row = mysqli_fetch_array($db_daten)){
-		echo '<div style="text-align: center; font-weight: bold;">Runde '.$row['round_id'].'</div>';
-		echo '<div>ERHABENE/ERHABENER: '.$row['player_spielername'].'</div>';
-		echo '<div>Koordinaten: '.$row['player_sector'].':'.$row['player_system'].'</div>';
-
-		switch($row['player_rasse']){
-			case 1:
-				$rasse='Die Ewigen';
-			break;
-
-			case 2:
-				$rasse='Ishtar';
-			break;
-			
-			case 3:
-				$rasse='K&#180;Tharr';
-			break;
-			
-			case 4:
-				$rasse='Z&#180;tah-ara';
-			break;			
-
-			default:
-				$rasse='N/A';
-			break;
-		}
-
-		echo '<div>Punkte: '.number_format($row['player_score'], 0,"",".").'</div>';
-		echo '<div>Rasse: '.$rasse.'</div>';
-		echo '<div>Wirtschaftsticks: '.number_format($row['round_wt'], 0,"",".").'</div>';
-
-		echo '<div style="height: 20px;"></div>';
-
-		echo '<div>Sektor: '.$row['sector_id'].'</div>';
-		echo '<div>Sektorname: '.$row['sector_name'].'</div>';
-		echo '<div>Sektorpunkte: '.number_format($row['sector_score'], 0,"",".").'</div>';
-
-		if(!empty($row['ally_tag'])){
-			echo '<div style="height: 20px;"></div>';
-
-			echo '<div>Allianz: '.$row['ally_tag'].'</div>';
-			echo '<div>Allianzrundensiegartefakte: '.number_format($row['ally_roundpoints'], 0,"",".").'</div>';		
-		}
-
-		echo '<div style="height: 40px;"></div>';
-	}
-
-	rahmen_unten();
-
-	echo '</div>';
-
-	die('<body></html>');
-}
-
-
 function showmenu($menuid, $menupos){
 	global $toplist_lang, $sv_ewige_runde, $sv_oscar, $sv_hardcore;
-	//menüs definieren
+	//men�s definieren
 
 	/////////////////////////////
 	//spieler
@@ -349,7 +284,7 @@ if(!isset($s)){
 	if($sv_ewige_runde==1 || $sv_hardcore==1){
 		rahmen_oben('Creditgewinne');
 	}else{	
-		rahmen_oben($toplist_lang[creditrundengewinne]);
+		rahmen_oben($toplist_lang['creditrundengewinne']);
 	}
 
 	echo '<table border="0" cellpadding="0" cellspacing="1" width="580">';
@@ -364,7 +299,7 @@ if(!isset($s)){
 				</td>
 			</tr>';
 	}else{	
-		echo '<tr class="cell" align="center"><td><b>'.$toplist_lang[ziel].'</b></td><td><b>1. '.$toplist_lang[platz].'</b></td><td><b>2. '.$toplist_lang[platz].'</b></td><td><b>3. '.$toplist_lang[platz].'</b></td></tr>';
+		echo '<tr class="cell" align="center"><td><b>'.$toplist_lang['ziel'].'</b></td><td><b>1. '.$toplist_lang['platz'].'</b></td><td><b>2. '.$toplist_lang['platz'].'</b></td><td><b>3. '.$toplist_lang['platz'].'</b></td></tr>';
 
 		echo '<tr class="cell1" align="center">
 		  <td align="left">'.$toplist_lang['spieler'].' -> '.$toplist_lang['punkte'].' -> '.$toplist_lang['punkte'].'</td>
@@ -398,23 +333,20 @@ if(!isset($s)){
 		</tr>';
 		*/
 
-		echo '<tr class="cell1" align="center"><td><b>'.$toplist_lang[ziel].'</b></td><td colspan="3"><b>1. '.$toplist_lang[platz].'</b></td></tr>';  
+		echo '<tr class="cell1" align="center"><td><b>'.$toplist_lang['ziel'].'</b></td><td colspan="3"><b>1. '.$toplist_lang['platz'].'</b></td></tr>';  
 		echo '<tr class="cell" align="center">
-		  <td align="left">'.$toplist_lang[spieler].' -> '.$toplist_lang[erhabenenpunkte].' -> '.$toplist_lang[ehpunkte].'</td>
+		  <td align="left">'.$toplist_lang['spieler'].' -> '.$toplist_lang['erhabenenpunkte'].' -> '.$toplist_lang['ehpunkte'].'</td>
 		  <td colspan="3">'.number_format($sv_credit_win[4][0], 0,"",".").'</td>
 		</tr>';
 
 		echo '<tr class="cell1" align="center">
-		  <td colspan="5">'.$toplist_lang[creditgewinnhinweis].'</td>
+		  <td colspan="5">'.$toplist_lang['creditgewinnhinweis'].'</td>
 		</tr>';
 	}  
 
 	echo '</table>';
 
 	rahmen_unten();
-
-
-	echo '<a href="toplist.php?show_history=1" class="btn">Rundengewinner</a>';
 }
 
 

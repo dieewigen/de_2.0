@@ -1,19 +1,19 @@
 <?php
 $thisissou=1;
 $soucss=1;
-include "soudata/lib/sou_functions.inc.php";
-include "inc/header.inc.php";
-include "inc/sv.inc.php";
-include "soudata/defs/startpositionen.inc.php";
-include "soudata/lib/transaction.lib.php";
-include "soudata/defs/colors.inc.php";
-include "soudata/lib/sou_dbconnect.php";
+include('soudata/lib/sou_functions.inc.php');
+include('inc/header.inc.php');
+include('inc/sv.inc.php');
+include('soudata/defs/startpositionen.inc.php');
+include('soudata/lib/transaction.lib.php');
+include('soudata/defs/colors.inc.php');
+include('soudata/lib/sou_dbconnect.php');
 
 //grafikpfad optimieren
 $gpfad=$sv_image_server_list[0].'s/';
 
 //code um zu de zur�ckkehren zu k�nnen
-if($_SESSION["ums_chatoff"]) $qlstr="top.document.getElementById('gf').cols = '209, *, 0, 0';top.document.getElementById('gf').rows = '*';";
+if($_SESSION['ums_chatoff']) $qlstr="top.document.getElementById('gf').cols = '209, *, 0, 0';top.document.getElementById('gf').rows = '*';";
 else $qlstr="top.document.getElementById('gf').cols = '209, 620, *, 0, 0';top.document.getElementById('gf').rows = '*';";
 
 if($sv_sou_in_de==1 AND $_SESSION['ums_mobi']==1)
@@ -44,7 +44,7 @@ echo '<script language="javascript">';
 include 'soudata/source/sou_js_functions.inc.php';
 include 'soudata/source/sou_js_main.inc.php';
 
-if($_REQUEST['action']!='showdatapage')
+if(isset($_REQUEST['action']) != 'showdatapage')
 echo '
 $(document).ready(function () {
 $("div,span,img,a,tr,td").tooltip({ 
@@ -79,11 +79,12 @@ if($sv_sou_in_de==1)echo 'function btde(){'.$qlstr.'}';
 echo '</SCRIPT>';
 
 //wenn bekannt ist, dass der account existiert, dann die daten laden
-if($_SESSION["sou_user_id"]>0)
+if($_SESSION['sou_user_id']>0)
 {
   $db_daten=mysql_query("SELECT * FROM sou_user_data WHERE user_id='$_SESSION[sou_user_id]'",$soudb);  	
   $row = mysql_fetch_array($db_daten);
   $player_user_id=$_SESSION['sou_user_id'];
+<<<<<<< HEAD
   $_SESSION["sou_spielername"]=$row["spielername"].' {'.$row["sn_ext1"].'}';
   $player_name=$row["spielername"];
   $player_age=$row['playerage'];
@@ -97,23 +98,38 @@ if($_SESSION["sou_user_id"]>0)
   $player_rhy=$row["rhy"];
   $player_rhuse=$row["rhuse"];
   $player_money=$row["money"];
+=======
+  $_SESSION['sou_spielername']=$row['spielername'].' {'.$row['sn_ext1'].'}';
+  $player_name=$row['spielername'];
+  $player_age=$row['playerage'];
+  $_SESSION['sou_fraction']=$row['fraction'];
+  $player_fraction=$row['fraction'];
+  $_SESSION['sou_shipname']=$row['shipname'];
+  $player_ship_name=$row['shipname'];
+  $player_x=$row['x'];
+  $player_y=$row['y'];
+  $player_rhx=$row['rhx'];
+  $player_rhy=$row['rhy'];
+  $player_rhuse=$row['rhuse'];
+  $player_money=$row['money'];
+>>>>>>> 8a01cf88bc255e5ca728eeb6b7f1ff160062a08f
   $player_darkmatter=$row['darkmatter'];
   $player_baosin=$row['baosin'];
-  $player_destroy=$row["destroy"];
-  $player_destroyed=$row["destroyed"];
-  $player_ship_diameter=$row["shipdiameter"];
-  $player_ship_material=$row["shipmaterial"];
-  $player_shipnotready=$row["shipnotready"];
-  $player_donate=$row["donate"];
-  $player_donatelastday=$row["donatelastday"];
-  $player_lastclick=$row["lastclick"];
-  $player_in_hb=$row["inhb"];
-  $player_atimer1typ=$row["atimer1typ"];//laufende aktion
-  $player_atimer1time=$row["atimer1time"];
-  $player_atimer2typ=$row["atimer2typ"];//laufende forschung
-  $player_atimer2flag=$row["atimer2flag"];
-  $player_atimer2time=$row["atimer2time"];
-  $player_atimer3time=$row["atimer3time"];
+  $player_destroy=$row['destroy'];
+  $player_destroyed=$row['destroyed'];
+  $player_ship_diameter=$row['shipdiameter'];
+  $player_ship_material=$row['shipmaterial'];
+  $player_shipnotready=$row['shipnotready'];
+  $player_donate=$row['donate'];
+  $player_donatelastday=$row['donatelastday'];
+  $player_lastclick=$row['lastclick'];
+  $player_in_hb=$row['inhb'];
+  $player_atimer1typ=$row['atimer1typ'];//laufende aktion
+  $player_atimer1time=$row['atimer1time'];
+  $player_atimer2typ=$row['atimer2typ'];//laufende forschung
+  $player_atimer2flag=$row['atimer2flag'];
+  $player_atimer2time=$row['atimer2time'];
+  $player_atimer3time=$row['atimer3time'];
   
   $player_specialres[1]=$row['specialres1'];
   $player_specialres[2]=$row['specialres2'];
@@ -158,18 +174,18 @@ if($player_lastclick+300 < time())
 }
 
 //schauen ob alle daten im account richtig angelegt, sind, bzw. erst noch ein account angelegt werden muss
-include "soudata/source/sou_create_account.php";
+include('soudata/source/sou_create_account.php');
 
 //das alter des spielers �berpr�fen und bei bedarf das klonen starten
 if($player_age>120)
 {
-  include 'soudata/source/sou_clone.php';
+  include('soudata/source/sou_clone.php');
 }
 
 //men� darstellen
 //rahmen0_oben();
 /*
-if($_REQUEST["action"]!="stratmappage")
+if($_REQUEST['action']!="stratmappage")
 {
 ?>
 <div class="menurahmen">
@@ -192,7 +208,7 @@ if($_REQUEST["action"]!="stratmappage")
 }
 */
 
-if($_REQUEST["action"]!="sectorpage")
+if($_REQUEST['action']!="sectorpage")
 {
   echo '<div id="infobar1" style="position:absolute; overflow:hidden; background-image: url('.$gpfad.'bgpic7.png);left: 0px; top: 0px; width: 100%; height: 24px; z-index:3;"></div>';
   $zeit=$player_atimer1time-time();
@@ -249,13 +265,13 @@ if(isset($show_activetime_msg) && $show_activetime_msg==1)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 /*
-if($_REQUEST["cboost"])
+if($_REQUEST['cboost'])
 {
   //�berpr�fen ob etwas l�uft
   if($player_atimer1time>time())
   {
   	//transaktionsbeginn
-    if (setLock($_SESSION["sou_user_id"]))
+    if (setLock($_SESSION['sou_user_id']))
     {
  	  //�berpr�fen ob es der richtige typ ist. geht nur bei folgenden typen
       if($player_atimer1typ==1 OR $player_atimer1typ==5)
@@ -279,7 +295,7 @@ if($_REQUEST["cboost"])
   		  change_credits($ums_user_id, $needcredits*(-1), 'EA-Aktionsbeschleunigung');
   		
 		  //den kauf im logfile hinterlegen
-      	  //@mail($GLOBALS['env_admin_email'], 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION["sou_spielername"].' - Fraktion '.$player_fraction, '');
+      	  //@mail($GLOBALS['env_admin_email'], 'EA Beschleunigung: '.$needcredits.' - '.$_SESSION['sou_spielername'].' - Fraktion '.$player_fraction, '');
       	  if($ums_user_id>1)
       	  {
   		    $datum=date("Y-m-d H:i:s",time());
@@ -292,14 +308,14 @@ if($_REQUEST["cboost"])
 	    else $msg='Es sind nicht genug Credits vorhanden.';
   	  }
       //lock wieder entfernen
-      $erg = releaseLock($_SESSION["sou_user_id"]); //L�sen des Locks und Ergebnisabfrage
+      $erg = releaseLock($_SESSION['sou_user_id']); //L�sen des Locks und Ergebnisabfrage
       if ($erg)
       {
         //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
       }
       else
       {
-        print("Datensatz Nr. ".$_SESSION["sou_user_id"]." konnte nicht entsperrt werden!<br><br><br>");
+        print("Datensatz Nr. ".$_SESSION['sou_user_id']." konnte nicht entsperrt werden!<br><br><br>");
       }
     }//lock ende
     else $msg='<font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font>';
@@ -327,27 +343,31 @@ include "bannerunterbrechung.php";
 //men� ende
 
 //wenn nichts gew�hlt wurde die startseite nehmen
+<<<<<<< HEAD
 if(!isset($_REQUEST["action"]))$_REQUEST["action"]="systempage";
+=======
+if($_REQUEST['action']=="")$_REQUEST['action']="systempage";
+>>>>>>> 8a01cf88bc255e5ca728eeb6b7f1ff160062a08f
 
 //auf die einzelnen unterseiten verzweigen
-if($_REQUEST["action"]=="optionspage")
+if($_REQUEST['action']=="optionspage")
 {
   include "soudata/source/sou_options.php";
 }
 
-if($_REQUEST["action"]=="toplistpage")
+if($_REQUEST['action']=="toplistpage")
 {
   running_action(1);	
   include "soudata/source/sou_toplist.php";
 }
 
-if($_REQUEST["action"]=="statisticspage")
+if($_REQUEST['action']=="statisticspage")
 {
   running_action(1);	
   include "soudata/source/sou_statistics.php";
 }
 
-if($_REQUEST["action"]=="sectorpage")
+if($_REQUEST['action']=="sectorpage")
 {
   //running_action(0);
   //shipnotready();
@@ -355,19 +375,19 @@ if($_REQUEST["action"]=="sectorpage")
   include "soudata/source/sou_sector.php";
 }
 
-if($_REQUEST["action"]=="systempage")
+if($_REQUEST['action']=="systempage")
 {
   running_action(1);
   include "soudata/source/sou_system.php";
 }
 
-if($_REQUEST["action"]=="stratmappage")
+if($_REQUEST['action']=="stratmappage")
 {
   //running_action(1);
   include "soudata/source/sou_stratmap.php";
 }
 
-if($_REQUEST["action"]=="buildingpage")
+if($_REQUEST['action']=="buildingpage")
 {
   running_action(0);
   //shipnotready();
@@ -376,7 +396,7 @@ if($_REQUEST["action"]=="buildingpage")
   include "soudata/source/sou_building.php";
 }
 
-if($_REQUEST["action"]=="researchpage")
+if($_REQUEST['action']=="researchpage")
 {
   running_action(0);
   //shipnotready();
@@ -384,13 +404,13 @@ if($_REQUEST["action"]=="researchpage")
   include "soudata/source/sou_research.php";
 }
 
-if($_REQUEST["action"]=="shipyardpage")
+if($_REQUEST['action']=="shipyardpage")
 {
   running_action(0);
   include "soudata/source/sou_shipyard.php";
 }
 
-if($_REQUEST["action"]=="tradepage")
+if($_REQUEST['action']=="tradepage")
 {
   running_action(0);	
   //shipnotready();
@@ -398,7 +418,7 @@ if($_REQUEST["action"]=="tradepage")
   include "soudata/source/sou_trade.php";
 }
 
-if($_REQUEST["action"]=="auctionpage")
+if($_REQUEST['action']=="auctionpage")
 {
   running_action(1);	
   //shipnotready();
@@ -406,33 +426,33 @@ if($_REQUEST["action"]=="auctionpage")
   include "soudata/source/sou_auction.php";
 }
 
-if($_REQUEST["action"]=="upgradeomodulpage")
+if($_REQUEST['action']=="upgradeomodulpage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_upgradeomodul.php";
 }
 
-if($_REQUEST["action"]=="systemholdpage")
+if($_REQUEST['action']=="systemholdpage")
 {
   running_action(0);
   ship_in_hb();	
   include "soudata/source/sou_system_hold.php";
 }
 
-if($_REQUEST["action"]=="shipoverpage")
+if($_REQUEST['action']=="shipoverpage")
 {
   running_action(1);
   include "soudata/source/sou_ship_overview.php";
 }
 
-if($_REQUEST["action"]=="dailygiftpage")
+if($_REQUEST['action']=="dailygiftpage")
 {
   running_action(1);
   include "soudata/source/sou_dailygift.php";
 }
 
-if($_REQUEST["action"]=="findpage")
+if($_REQUEST['action']=="findpage")
 {
   running_action(0);
   ship_in_hb();
@@ -440,35 +460,35 @@ if($_REQUEST["action"]=="findpage")
 }
 
 
-if($_REQUEST["action"]=="shipresearchpage")
+if($_REQUEST['action']=="shipresearchpage")
 {
   running_action(1);
   //shipnotready();
   include "soudata/source/sou_ship_research.php";
 }
 
-if($_REQUEST["action"]=="modulholdpage")
+if($_REQUEST['action']=="modulholdpage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_system_modulhold.php";
 }
 
-if($_REQUEST["action"]=="factorypage")
+if($_REQUEST['action']=="factorypage")
 {
   running_action(1);
   ship_in_hb();
   include "soudata/source/sou_factory.php";
 }
 
-if($_REQUEST["action"]=="baonadastationpage")
+if($_REQUEST['action']=="baonadastationpage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_baonadastation.php";
 }
 
-if($_REQUEST["action"]=="hyperbubblepage")
+if($_REQUEST['action']=="hyperbubblepage")
 {
   running_action(0);
   //shipnotready();
@@ -476,59 +496,59 @@ if($_REQUEST["action"]=="hyperbubblepage")
   include "soudata/source/sou_hyperbubble.php";
 }
 
-if($_REQUEST["action"]=="createcolonypage")
+if($_REQUEST['action']=="createcolonypage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_create_colony.php";
 }
 
-if($_REQUEST["action"]=="systemprestigepage")
+if($_REQUEST['action']=="systemprestigepage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_system_prestige.php";
 }
 
-if($_REQUEST["action"]=="creatorbridgepage")
+if($_REQUEST['action']=="creatorbridgepage")
 {
   running_action(0);
   ship_in_hb();
   include "soudata/source/sou_creatorbridge.php";
 }
 
-if($_REQUEST["action"]=="hyperfunk")
+if($_REQUEST['action']=="hyperfunk")
 {
   running_action(1);
   include "soudata/source/sou_hyperfunk.php";
 }
 
-if($_REQUEST["action"]=="squad")
+if($_REQUEST['action']=="squad")
 {
   running_action(1);
   include "soudata/source/sou_squad.php";
 }
 
 /*
-if($_REQUEST["action"]=="politics")
+if($_REQUEST['action']=="politics")
 {
   running_action(1);
   include "soudata/source/sou_politics.php";
 }
 
-if($_REQUEST["action"]=="politicscolonypage")
+if($_REQUEST['action']=="politicscolonypage")
 {
   running_action(1);
   include "soudata/source/sou_politics_colony.php";
 }
 */
 
-if($_REQUEST["action"]=="fracforumpage")
+if($_REQUEST['action']=="fracforumpage")
 {
   running_action(1);
   include "soudata/source/sou_fracforum.php";
 }
-if($_REQUEST["action"]=="showdatapage")
+if($_REQUEST['action']=="showdatapage")
 {
   running_action(1);
   include "soudata/source/sou_showdata.php";

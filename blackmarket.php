@@ -1,34 +1,34 @@
 <?php
-include "inc/header.inc.php";
-include "lib/transaction.lib.php";
-include "functions.php";
-include 'inc/lang/'.$sv_server_lang.'_userartefact.inc.lang.php';
-include "inc/userartefact.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_trade.blackmarketinc.lang.php';
-include_once "lib/religion.lib.php";
+include('inc/header.inc.php');
+include('lib/transaction.lib.php');
+include('functions.php');
+include('inc/lang/'.$sv_server_lang.'_userartefact.inc.lang.php');
+include('inc/userartefact.inc.php');
+include('inc/lang/'.$sv_server_lang.'_trade.blackmarketinc.lang.php');
+include_once('lib/religion.lib.php');
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
 $pd=loadPlayerData($_SESSION['ums_user_id']);
 $row=$pd;
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
-$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
-$sector=$row["sector"];$system=$row["system"];
+$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
+$sector=$row['sector'];$system=$row['system'];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 
-$credits    = $row["credits"];
-$tick       = $row["tick"];
-$sm_rboost  = $row["sm_rboost"];
-$sm_col     = $row["sm_col"];
-$sm_kartefakt = $row["sm_kartefakt"];
-$sm_tronic  = $row["sm_tronic"];
-$palaufzeit = $row["patime"];
-$col        = $row["col"];
+$credits    = $row['credits'];
+$tick       = $row['tick'];
+$sm_rboost  = $row['sm_rboost'];
+$sm_col     = $row['sm_col'];
+$sm_kartefakt = $row['sm_kartefakt'];
+$sm_tronic  = $row['sm_tronic'];
+$palaufzeit = $row['patime'];
+$col        = $row['col'];
 
 //den maximalen tick auslesen
 $result=mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
 //$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
 $row = mysql_fetch_array($result);
-$maxtick=$row["tick"];
+$maxtick=$row['tick'];
 
 
 if($sv_ewige_runde==1 || $sv_hardcore==1){
@@ -40,7 +40,7 @@ $rtick=$maxtick;
 //owner id auslesen
 $db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$owner_id=intval($row["owner_id"]);
+$owner_id=intval($row['owner_id']);
 
 //preise für die spielerartefakte
 $artefaktpreis=array(50, 25, 25, 25, 50, 50, 50, 25, 25, 25, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50);
@@ -166,7 +166,7 @@ $remsubmit104 OR $remsubmit105 OR $remsubmit106 OR $remsubmit107 OR $remsubmit10
     $artid++;
     $result = mysql_query("SELECT sm_art".$artid."rem FROM de_user_data WHERE user_id='$ums_user_id'", $db);
     $row = mysql_fetch_array($result);
-    if($row["sm_art".$artid."rem"]==1)$flag=0;else $flag=1;
+    if($row['sm_art".$artid."rem']==1)$flag=0;else $flag=1;
     //db updaten
     mysql_query("UPDATE de_user_data SET sm_art".$artid."rem='$flag' WHERE user_id = '$ums_user_id'",$db);
   }
@@ -176,7 +176,7 @@ $remsubmit104 OR $remsubmit105 OR $remsubmit106 OR $remsubmit107 OR $remsubmit10
     //schauen wie der status ist und dann �ndern
     $result = mysql_query("SELECT sm_rboost_rem FROM de_user_data WHERE user_id='$ums_user_id'", $db);
     $row = mysql_fetch_array($result);
-    if($row["sm_rboost_rem"]==1)$flag=0;else $flag=1;
+    if($row['sm_rboost_rem']==1)$flag=0;else $flag=1;
     //db updaten
     mysql_query("UPDATE de_user_data SET sm_rboost_rem='$flag' WHERE user_id = '$ums_user_id'",$db);
   }
@@ -186,7 +186,7 @@ $remsubmit104 OR $remsubmit105 OR $remsubmit106 OR $remsubmit107 OR $remsubmit10
     //schauen wie der status ist und dann �ndern
     $result = mysql_query("SELECT sm_tronic_rem FROM de_user_data WHERE user_id='$ums_user_id'", $db);
     $row = mysql_fetch_array($result);
-    if($row["sm_tronic_rem"]==1)$flag=0;else $flag=1;
+    if($row['sm_tronic_rem']==1)$flag=0;else $flag=1;
     //db updaten
     mysql_query("UPDATE de_user_data SET sm_tronic_rem='$flag' WHERE user_id = '$ums_user_id'",$db);
   }
@@ -196,7 +196,7 @@ $remsubmit104 OR $remsubmit105 OR $remsubmit106 OR $remsubmit107 OR $remsubmit10
     //schauen wie der status ist und dann �ndern
     $result = mysql_query("SELECT sm_kartefakt_rem FROM de_user_data WHERE user_id='$ums_user_id'", $db);
     $row = mysql_fetch_array($result);
-    if($row["sm_kartefakt_rem"]==1)$flag=0;else $flag=1;
+    if($row['sm_kartefakt_rem']==1)$flag=0;else $flag=1;
     //db updaten
     mysql_query("UPDATE de_user_data SET sm_kartefakt_rem='$flag' WHERE user_id = '$ums_user_id'",$db);
   }
@@ -207,7 +207,7 @@ $remsubmit104 OR $remsubmit105 OR $remsubmit106 OR $remsubmit107 OR $remsubmit10
     //schauen wie der status ist und dann �ndern
     $result = mysql_query("SELECT sm_col_rem FROM de_user_data WHERE user_id='$ums_user_id'", $db);
     $row = mysql_fetch_array($result);
-    if($row["sm_col_rem"]==1)$flag=0;else $flag=1;
+    if($row['sm_col_rem']==1)$flag=0;else $flag=1;
     //db updaten
     mysql_query("UPDATE de_user_data SET sm_col_rem='$flag' WHERE user_id = '$ums_user_id'",$db);
   }
@@ -272,20 +272,20 @@ if($submit2)//kartefakt
     {
       if($credits>=$sv_sm_preisliste[1])
       {
-        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang[msg_1].'</font>';
+        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang['msg_1'].'</font>';
         //kriegsartefakt gutschreiben und credits abziehen
         mysql_query("UPDATE de_user_data SET credits=credits-$sv_sm_preisliste[1], kartefakt=kartefakt+1, sm_kartefakt=sm_kartefakt+1 WHERE user_id = '$ums_user_id'",$db);
         $sm_kartefakt++;
         $credits=$credits-$sv_sm_preisliste[1];
         refererbonus($sv_sm_preisliste[1]);
         
-        writetocreditlog($tradeblackmarketinc_lang[kartigutschrift]);
+        writetocreditlog($tradeblackmarketinc_lang['kartigutschrift']);
         updatesmstat(2, $sv_sm_preisliste[1]);
       }
       else
-      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_2].'</font>';
+      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_2'].'</font>';
     }
-    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_3].'</font>';
+    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_3'].'</font>';
 
     //transaktionsende
     $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
@@ -295,10 +295,10 @@ if($submit2)//kartefakt
     }
     else
     {
-      print("$tradeblackmarketinc_lang[msg_4_1] ".$ums_user_id." $tradeblackmarketinc_lang[msg_4_2]!<br><br><br>");
+      print($tradeblackmarketinc_lang['msg_4_1'].' '.$ums_user_id.' '.$tradeblackmarketinc_lang['msg_4_2'].'!<br><br><br>');
     }
   }// if setlock-ende
-  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang[msg_5].'</font><br><br>';
+  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang['msg_5'].'</font><br><br>';
 }//ende submit2
 
 
@@ -316,7 +316,7 @@ if($submit3){
     {
       if($credits>=$sv_sm_preisliste[2])
       {
-        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang[msg_1].'</font>';
+        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang['msg_1'].'</font>';
         //rohstoffe gutschreiben und credits abziehen
 
         $res[0]=$rtick*500;$res[1]=$rtick*250;$res[2]=$rtick*60;$res[3]=$rtick*37;
@@ -326,13 +326,13 @@ if($submit3){
         $credits=$credits-$sv_sm_preisliste[2];
         refererbonus($sv_sm_preisliste[2]);
         $sm_rboost=$tick;
-        writetocreditlog($tradeblackmarketinc_lang[rohstoffgutschrift]);
+        writetocreditlog($tradeblackmarketinc_lang['rohstoffgutschrift']);
         updatesmstat(3, $sv_sm_preisliste[2]);
       }
       else
-      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_2].'</font>';
+      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_2'].'</font>';
     }
-    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_3].'</font>';
+    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_3'].'</font>';
 
     //transaktionsende
     $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
@@ -342,10 +342,10 @@ if($submit3){
     }
     else
     {
-      print("$tradeblackmarketinc_lang[msg_4_1] ".$ums_user_id." $tradeblackmarketinc_lang[msg_4_2]!<br><br><br>");
+      print($tradeblackmarketinc_lang['msg_4_1'].' '.$ums_user_id.' '.$tradeblackmarketinc_lang['msg_4_2'].'!<br><br><br>');
     }
   }// if setlock-ende
-  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang[msg_5].'</font><br><br>';
+  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang['msg_5'].'</font><br><br>';
 }//ende submit3
 
 /*
@@ -357,8 +357,8 @@ if($submit5 && $GLOBALS['sv_ang']!=1)//dartefakt
     //schauen ob er genug credits hat
     $db_daten=mysql_query("SELECT dartefakt, credits FROM de_user_data WHERE user_id='$ums_user_id'",$db);
     $row = mysql_fetch_array($db_daten);
-    $dartefakt=$row["dartefakt"];
-    $credits=$row["credits"];
+    $dartefakt=$row['dartefakt'];
+    $credits=$row['credits'];
 
     if($credits>=$sv_sm_preisliste[4])
     {
@@ -402,8 +402,8 @@ if($submit6)//palenium
     //schauen ob er genug credits hat
     $db_daten=mysql_query("SELECT palenium, credits FROM de_user_data WHERE user_id='$ums_user_id'",$db);
     $row = mysql_fetch_array($db_daten);
-    $palenium=$row["palenium"];
-    $credits=$row["credits"];
+    $palenium=$row['palenium'];
+    $credits=$row['credits'];
 
     //schaue ob er den palenium-verst�rker hat
     if($techs[27]==1)
@@ -458,19 +458,19 @@ if($submit7)//tronic
     {
       if($credits>=$sv_sm_preisliste[6])
       {
-        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang[msg_1].'</font>';
+        $errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang['msg_1'].'</font>';
         //kollektor gutschreiben und credits abziehen
         mysql_query("UPDATE de_user_data SET credits=credits-$sv_sm_preisliste[6], restyp05=restyp05+25, sm_tronic=sm_tronic+1 WHERE user_id = '$ums_user_id'",$db);
         $sm_tronic++;
         $credits=$credits-$sv_sm_preisliste[6];
         refererbonus($sv_sm_preisliste[6]);
-        writetocreditlog($tradeblackmarketinc_lang[tronicgutschrift]);
+        writetocreditlog($tradeblackmarketinc_lang['tronicgutschrift']);
         updatesmstat(7, $sv_sm_preisliste[6]);
       }
       else
-      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_2].'</font>';
+      $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_2'].'</font>';
     }
-    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang[msg_3].'</font>';
+    else $errmsg.='<font color="#FF0000">'.$tradeblackmarketinc_lang['msg_3'].'</font>';
 
     //transaktionsende
     $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
@@ -480,10 +480,10 @@ if($submit7)//tronic
     }
     else
     {
-      print("$tradeblackmarketinc_lang[msg_4_1] ".$ums_user_id." $tradeblackmarketinc_lang[msg_4_2]!<br><br><br>");
+      print($tradeblackmarketinc_lang['msg_4_1'].' '.$ums_user_id.' '.$tradeblackmarketinc_lang['msg_4_2'].'!<br><br><br>');
     }
   }// if setlock-ende
-  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang[msg_5].'</font><br><br>';
+  else echo '<br><font color="#FF0000">'.$tradeblackmarketinc_lang['msg_5'].'</font><br><br>';
 }//ende submit7
 
 //////////////////////////////////////////////
@@ -522,7 +522,7 @@ if($submit100 OR $submit104 OR $submit105 OR $submit106){
 		$credits=$row['credits'];
 
 		$ai=$artid+1;
-		if($row["sm_art$ai"] < floor($maxtick / $artefaktlz[$artid])){
+		if($row['sm_art$ai'] < floor($maxtick / $artefaktlz[$artid])){
 			if($credits>=$artefaktpreis[$artid]){
 				//schauen ob man das artefaktgeb�ude hat
 				if (hasTech($pt, 28)){
@@ -534,7 +534,7 @@ if($submit100 OR $submit104 OR $submit105 OR $submit106){
 						//echo "UPDATE de_user_data SET credits=credits-'$artefaktpreis[$artid]', sm_art$ai=tick WHERE user_id = '$ums_user_id'";
 						$credits=$credits-$artefaktpreis[$artid];
 						refererbonus($artefaktpreis[$artid]);
-						$row["sm_art$ai"]++;
+						$row['sm_art$ai']++;
 						writetocreditlog("$ua_name[$artid]-".$tradeblackmarketinc_lang[artefaktgutschrift]);
 						updatesmstat($artid+100, $artefaktpreis[$artid]);
 						$errmsg.='<font color="#00FF00">'.$tradeblackmarketinc_lang[msg_9].'<br><br></font>';
@@ -567,11 +567,11 @@ if($submit100 OR $submit104 OR $submit105 OR $submit106){
 if($tick>$sm_rboost+1000)
 {
   //es ist lieferbar
-  $lzp1='<i><font color="#00FF00">'.$tradeblackmarketinc_lang[msg_12].'</font></i>';
+  $lzp1='<i><font color="#00FF00">'.$tradeblackmarketinc_lang['msg_12'].'</font></i>';
 }
 else
 {
-  $lzp1='<i><font color="orange">'.$tradeblackmarketinc_lang[msg_13_1].' '.(($tick-$sm_rboost-1000)*(-1)+1).' '.$tradeblackmarketinc_lang[msg_13_2].'.</font></i>';
+  $lzp1='<i><font color="orange">'.$tradeblackmarketinc_lang['msg_13_1'].' '.(($tick-$sm_rboost-1000)*(-1)+1).' '.$tradeblackmarketinc_lang['msg_13_2'].'.</font></i>';
 }
 
 //berechnen bis wann der pa l�uft
@@ -579,12 +579,12 @@ if ($palaufzeit>time())
 {
   //pa ist noch aktiv
   $palz=date("d.m.Y - G:i", $palaufzeit);
-  $palz=$tradeblackmarketinc_lang[paruntime].': '.$palz;
+  $palz=$tradeblackmarketinc_lang['paruntime'].': '.$palz;
 }
 else
 {
   //pa ist nicht aktiv
-  $palz=$tradeblackmarketinc_lang[pana];
+  $palz=$tradeblackmarketinc_lang['pana'];
 }
 
 include "resline.php";
@@ -624,11 +624,10 @@ echo '<form action="blackmarket.php" method="POST">';
 ///////////////////////////////////////////////////////////
 
 //rahmen oben
-rahmen_oben($tradeblackmarketinc_lang[angebote]);
+rahmen_oben($tradeblackmarketinc_lang['angebote']);
 
 echo '<table width="566px">';
-echo '<tr class="cell1" align="center"><td colspan="2"><b>'.$tradeblackmarketinc_lang[artikel].'</td><td><b>'.
-$tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['preis'].'</td></tr>';
+echo '<tr class="cell1" align="center"><td colspan="2"><b>'.$tradeblackmarketinc_lang['artikel'].'</td><td><b>'.$tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['preis'].'</td></tr>';
   
   ///////////////////////////////////////////////////////////
   //rohstofflieferung
@@ -636,26 +635,26 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
   //reminder button
   $db_daten = mysql_query("SELECT sm_rboost_rem FROM de_user_data WHERE user_id='$ums_user_id'",$db);
   $row = mysql_fetch_array($db_daten);
-  if($row["sm_rboost_rem"]==1) $rembutton='<a href="blackmarket.php?remsubmit1=1"><img id="rem1" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
+  if($row['sm_rboost_rem']==1) $rembutton='<a href="blackmarket.php?remsubmit1=1"><img id="rem1" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
   else $rembutton='<a href="blackmarket.php?remsubmit1=1"><img id="rem1" src="'.$ums_gpfad.'g/symbol7.png" title="&'.$tradeblackmarketinc_lang['acreminder'].'"></a>';
   
   echo '<tr class="cell" align="center">
   <td width="50px">
     <div style="background-color: #000000; width: 50px; height: 50px;">
-      <img id="g3" src="'.$ums_gpfad.'g/symbol9.png" border="0" title="'.$tradeblackmarketinc_lang[msg_15_1].'">
+      <img id="g3" src="'.$ums_gpfad.'g/symbol9.png" border="0" title="'.$tradeblackmarketinc_lang['msg_15_1'].'">
     </div>
   </td>
-  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang[msg_15_2a].
-  '<br>'.$tradeblackmarketinc_lang[msg_15_2b].' ('.$rtick.' '.$tradeblackmarketinc_lang[wochen].') '.$tradeblackmarketinc_lang[msg_15_2c].'<b>
-  <br>'.number_format($rtick*500, 0,"",".").' '.$tradeblackmarketinc_lang[m].'
-  <br>'.number_format($rtick*250, 0,"",".").' '.$tradeblackmarketinc_lang[d].'
-  <br>'.number_format($rtick*60, 0,"",".").' '.$tradeblackmarketinc_lang[i].'
-  <br>'.number_format($rtick*37, 0,"",".").' '.$tradeblackmarketinc_lang[e].'</b>
+  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang['msg_15_2a'].
+  '<br>'.$tradeblackmarketinc_lang['msg_15_2b'].' ('.$rtick.' '.$tradeblackmarketinc_lang['wochen'].') '.$tradeblackmarketinc_lang['msg_15_2c'].'<b>
+  <br>'.number_format($rtick*500, 0,"",".").' '.$tradeblackmarketinc_lang['m'].'
+  <br>'.number_format($rtick*250, 0,"",".").' '.$tradeblackmarketinc_lang['d'].'
+  <br>'.number_format($rtick*60, 0,"",".").' '.$tradeblackmarketinc_lang['i'].'
+  <br>'.number_format($rtick*37, 0,"",".").' '.$tradeblackmarketinc_lang['e'].'</b>
   <br><font color="#00FF00">'.$lzp1.'</font>
   <br><center></td>
   <td>&nbsp;</td>
   <td>'.$sv_sm_preisliste[2].' <img src="'.$ums_gpfad.'g/credits.gif" title="Credits">
-  <input type="submit" name="submit3" value="'.$tradeblackmarketinc_lang[kaufen].'"></td></tr>';
+  <input type="submit" name="submit3" value="'.$tradeblackmarketinc_lang['kaufen'].'"></td></tr>';
   
   ///////////////////////////////////////////////////////////
   //palenium
@@ -670,7 +669,7 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
   //reminder button
   $db_daten = mysql_query("SELECT sm_tronic_rem FROM de_user_data WHERE user_id='$ums_user_id'",$db);
   $row = mysql_fetch_array($db_daten);
-  if($row["sm_tronic_rem"]==1) $rembutton='<a href="blackmarket.php?remsubmit2=1"><img id="rem2" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
+  if($row['sm_tronic_rem']==1) $rembutton='<a href="blackmarket.php?remsubmit2=1"><img id="rem2" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
   else $rembutton='<a href="blackmarket.php?remsubmit2=1"><img id="rem2" src="'.$ums_gpfad.'g/symbol7.png" title="&'.$tradeblackmarketinc_lang['acreminder'].'"></a>';
   
   //beschreibung und m�gliche kaufanzahl
@@ -684,9 +683,9 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
       <img id="g7" src="'.$ums_gpfad.'g/symbol8.png" border="0" title="Tronic">
     </div>
   </td>
-  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang[msg_17_1].'.<br><i>'.
-  $tradeblackmarketinc_lang[msg_17_2].'</i></td><td>'.$lzp4.
-  '<td>'.$sv_sm_preisliste[6].' <img src="'.$ums_gpfad.'g/credits.gif" title="Credits"><input type="submit" name="submit7" value="'.$tradeblackmarketinc_lang[kaufen].'"></td></tr>';
+  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang['msg_17_1'].'.<br><i>'.
+  $tradeblackmarketinc_lang['msg_17_2'].'</i></td><td>'.$lzp4.
+  '<td>'.$sv_sm_preisliste[6].' <img src="'.$ums_gpfad.'g/credits.gif" title="Credits"><input type="submit" name="submit7" value="'.$tradeblackmarketinc_lang['kaufen'].'"></td></tr>';
 
   ///////////////////////////////////////////////////////////
   //kriegsartefakt
@@ -695,7 +694,7 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
   $db_daten = mysql_query("SELECT sm_kartefakt_rem FROM de_user_data WHERE user_id='$ums_user_id'",$db);
   $row = mysql_fetch_array($db_daten);
   
-  if($row["sm_kartefakt_rem"]==1) $rembutton='<a href="blackmarket.php?remsubmit3=1"><img id="rem3" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
+  if($row['sm_kartefakt_rem']==1) $rembutton='<a href="blackmarket.php?remsubmit3=1"><img id="rem3" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
   else $rembutton='<a href="blackmarket.php?remsubmit3=1"><img id="rem3" src="'.$ums_gpfad.'g/symbol7.png" title="&'.$tradeblackmarketinc_lang['acreminder'].'"></a>';
 
   //beschreibung und m�gliche kaufanzahl
@@ -709,10 +708,10 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
       <img id="g3" src="'.$ums_gpfad.'g/symbol10.png" border="0" title="'.$tradeblackmarketinc_lang['kriegsartefakt'].'">
     </div>
   </td>
-  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang[msg_18_1].'
+  <td align="left">'.$rembutton.' '.$tradeblackmarketinc_lang['msg_18_1'].'
   </td>
   <td>'.$lzp3.'</td>
-  <td>'.$sv_sm_preisliste[1].' <img src="'.$ums_gpfad.'g/credits.gif" title="Credits"><input type="submit" name="submit2" value="'.$tradeblackmarketinc_lang[kaufen].'"></td></tr>';
+  <td>'.$sv_sm_preisliste[1].' <img src="'.$ums_gpfad.'g/credits.gif" title="Credits"><input type="submit" name="submit2" value="'.$tradeblackmarketinc_lang['kaufen'].'"></td></tr>';
   
 
   /*  
@@ -723,7 +722,7 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
   $db_daten = mysql_query("SELECT sm_col_rem FROM de_user_data WHERE user_id='$ums_user_id'",$db);
   $row = mysql_fetch_array($db_daten);
 
-  if($row["sm_col_rem"]==1) $rembutton='<a href="blackmarket.php?remsubmit4=1"><img id="rem4" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
+  if($row['sm_col_rem']==1) $rembutton='<a href="blackmarket.php?remsubmit4=1"><img id="rem4" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
   else $rembutton='<a href="blackmarket.php?remsubmit4=1"><img id="rem4" src="'.$ums_gpfad.'g/symbol7.png" title="&'.$tradeblackmarketinc_lang['acreminder'].'"></a>';
   
   //beschreibung und m�gliche kaufanzahl
@@ -748,7 +747,7 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
 	//beschreibung und m�gliche kaufanzahl
 	$db_daten=mysql_query("SELECT dartefakt FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 	$row = mysql_fetch_array($db_daten);
-	$dartefakt=$row["dartefakt"];
+	$dartefakt=$row['dartefakt'];
 
 	if($dartefakt < $sv_max_dartefakt){$str1='<font color="#00FF00">';$str2='</font>';}else{$str1='';$str2='';}
 	$lzpdartefakt=$str1.number_format($dartefakt, 0,"",".").'/'.number_format($sv_max_dartefakt, 0,"",".").$str2;  
@@ -781,12 +780,12 @@ $tradeblackmarketinc_lang['genutzt'].'</td><td><b>'.$tradeblackmarketinc_lang['p
 		if(in_array($submit,$artefaktangebot)){
 			if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
 			//beschreibung und m�gliche kaufanzahl
-			if($row["sm_art$ai"] < floor($maxtick/$artefaktlz[$i])){$str1='<font color="#00FF00">';$str2='</font>';}else{$str1='';$str2='';}
-			$lzart=$str1.number_format($row["sm_art$ai"], 0,"",".").'/'.number_format(floor($maxtick/$artefaktlz[$i]), 0,"",".").$str2;
+			if($row['sm_art$ai'] < floor($maxtick/$artefaktlz[$i])){$str1='<font color="#00FF00">';$str2='</font>';}else{$str1='';$str2='';}
+			$lzart=$str1.number_format($row['sm_art$ai'], 0,"",".").'/'.number_format(floor($maxtick/$artefaktlz[$i]), 0,"",".").$str2;
 
 
 			//reminder button
-			if($row["sm_art".$ai."rem"]==1) $rembutton='<a href="blackmarket.php?remsubmit'.$submit.'=1"><img id="rem'.$submit.'" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
+			if($row['sm_art".$ai."rem']==1) $rembutton='<a href="blackmarket.php?remsubmit'.$submit.'=1"><img id="rem'.$submit.'" src="'.$ums_gpfad.'g/symbol6.png" title="&'.$tradeblackmarketinc_lang['deacreminder'].'"></a>';
 			else $rembutton='<a href="blackmarket.php?remsubmit'.$submit.'=1"><img id="rem'.$submit.'" src="'.$ums_gpfad.'g/symbol7.png" title="&'.$tradeblackmarketinc_lang['acreminder'].'"></a>';
 
 			//bonuswert

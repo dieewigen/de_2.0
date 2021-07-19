@@ -17,9 +17,9 @@ $skforum_lang['message']='Message';
 $skforum_lang['threaderstellen']='Create thread';
 
 $skforum_lang['msg_1_1']='Rules for the SK board';
-$skforum_lang['msg_1_2']='Sector alliance requests go into the thread "Sec alliance assemblage thread"! All requests outside this thread will be deleted!';
+$skforum_lang['msg_1_2']='Sector alliance requests go into the thread 'Sec alliance assemblage thread'! All requests outside this thread will be deleted!';
 $skforum_lang['msg_1_3']='It is not allowed to outlaw someone.';
-$skforum_lang['msg_1_4']='"I am SK" - threads will be deleted.';
+$skforum_lang['msg_1_4']='I am SK' - threads will be deleted.';
 $skforum_lang['msg_1_5']='Advertisement of all kind is forbidden!';
 $skforum_lang['msg_2']='No message entered.<br>';
 $skforum_lang['msg_3']='An error has occured['No subject'].<br>';

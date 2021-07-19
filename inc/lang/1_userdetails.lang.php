@@ -4,13 +4,13 @@ $userdetails_lang['userdetailsvon']='Userdetails von ';
 $userdetails_lang['sek']='Sek';
 $userdetails_lang['alli']='Alli';
 $userdetails_lang['alle']='Alle';
-$userdetails_lang['detailsaendern']='Details &auml;ndern';
+$userdetails_lang['detailsaendern']='Details ändern';
 $userdetails_lang['geburtsdatum']='Geburtsdatum';
 $userdetails_lang['tag']='Tag';
 $userdetails_lang['monat']='Monat';
 $userdetails_lang['jahr']='Jahr';
 $userdetails_lang['geschlecht']='Geschlecht';
-$userdetails_lang['maennlich']='M&auml;nnlich';
+$userdetails_lang['maennlich']='Männlich';
 $userdetails_lang['weiblich']='Weiblich';
 $userdetails_lang['wohnort']='Wohnort';
 $userdetails_lang['mail']='E-M@il-Adresse';
@@ -32,7 +32,7 @@ $userdetails_lang['msg_2']='Dieses Bild existiert nicht.';
 $userdetails_lang['msg_3']='Details erfolgreich gespeichert';
 $userdetails_lang['msg_4']='Die Eingaben waren fehlerhaft.';
 $userdetails_lang['msg_5']='Regeln:<br>
-- kein copyrightgesch&uuml;tztes Material<br>
+- kein copyrightgeschütztes Material<br>
 - kein HTML-Code oder irgendwelche Skripte<br>
 - keine rassistischen/pornografischen/geschmacklosen Inhalte<br><br>';
 ?>

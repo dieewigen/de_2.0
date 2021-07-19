@@ -1,14 +1,14 @@
 <?php
-include "inc/header.inc.php";
-include "lib/basefunctions.lib.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.join.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('lib/basefunctions.lib.php');
+include('inc/lang/'.$sv_server_lang.'_ally.join.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, col FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$col_count=$row["col"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
+$col_count=$row['col'];
 
 $ally_id=intval($_REQUEST['ally_id']);
 $ally_data=getAllyByID($ally_id);
@@ -33,7 +33,7 @@ $transaction_result = mysql_query("SELECT * FROM de_transactions WHERE user_id='
 if ($transaction_result){
 	if (mysql_num_rows($transaction_result)==1){
 		$data = mysql_fetch_array($transaction_result);
-		$sum = $data["amount"];
+		$sum = $data['amount'];
 	}
 }
 ?>
@@ -41,33 +41,33 @@ if ($transaction_result){
 <html>
 <head>
 <title><?php echo $allyjoin_lang['title']?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 
 
 echo '<div align=center><div style="width: 592px" class="cell">';
 //print("<tr><td><h2>$allyjoin_lang[msg_1], $ums_spielername</h2></td></tr>");
 //print("<tr><td><hr></td></tr>");
 if($ally_id<1){
-	print("<tr><td><strong>$allyjoin_lang[msg_2_1] $t_tojoin $allyjoin_lang[msg_2_2].</strong></td></tr>");
+	print('<tr><td><strong>'.$allyjoin_lang['msg_2_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_2_2'].'</strong></td></tr>');
 	if ($sum > 0){
-		$msg=str_replace('{VALUE1}', $sum, $allyjoin_lang[msg_3]);
-		print("<tr><td><strong>$msg.</strong></td></tr>");
+		$msg=str_replace('{VALUE1}', $sum, $allyjoin_lang['msg_3']);
+		print('<tr><td><strong>'.$msg.'</strong></td></tr>');
 	}
 }
 
 if (($restyp05 + $sum) < $t_tojoin){
 	$t_missing = $t_tojoin - $restyp05 + $sum;
-	print("<tr><td><font color=red><strong>$allyjoin_lang[msg_5_1] $t_missing $allyjoin_lang[msg_5_2].</strong></font></tr></td>");
+	print('<tr><td><font color="red"><strong>'.$allyjoin_lang['msg_5_1'].' '.$t_missing.' '.$allyjoin_lang['msg_5_2'].'</strong></font></tr></td>');
 	$quit_script = true;
 }
 
 if ($quit_script){
-	die(include("ally/ally.footer.inc.php"));
+	die(include('ally/ally.footer.inc.php'));
 }
 
 $ok=$_POST['ok'];
@@ -79,7 +79,7 @@ if($ok || $warnung){
 		$row = mysql_fetch_array($result);
 
 		$user_ally_id = $row['ally_id'];
-		$status = $row["status"];
+		$status = $row['status'];
 
 		if(mysql_num_rows(mysql_query("SELECT id FROM de_allys WHERE leaderid='$ums_user_id'")))
 		{
@@ -93,9 +93,10 @@ if($ok || $warnung){
 	}
 
 	if($error){
-		echo "<form name=\"register\" method=\"POST\" action=\"ally_join.php\">$allyjoin_lang[msg_6]
-		<input type=\"hidden\" name=\"ally_id\" value=\"$ally_id\">
-		<input type=\"submit\" value=\"$allyjoin_lang[fertig]\" name=\"warnung\"></form>";
+		echo '
+			<form name="register" method="POST\" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
+				<input type="hidden" name="ally_id" value="'.$ally_id.'">
+				<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung"></form>';
 	}else{
 		if($ally_id<1){
 			echo $allyjoin_lang['msg_7'];
@@ -117,12 +118,12 @@ if($ok || $warnung){
 			if($nb>0){
 				$row     = mysql_fetch_array($result);
 
-				$clanid = $row["id"];
-				$allytag = $row["allytag"];
-				$leaderid = $row["leaderid"];
-				$coleaderid1 = $row["coleaderid1"];
-				$coleaderid2 = $row["coleaderid2"];
-				$coleaderid3 = $row["coleaderid3"];
+				$clanid = $row['id'];
+				$allytag = $row['allytag'];
+				$leaderid = $row['leaderid'];
+				$coleaderid1 = $row['coleaderid1'];
+				$coleaderid2 = $row['coleaderid2'];
+				$coleaderid3 = $row['coleaderid3'];
 
 				$sqlquery = "UPDATE de_user_data SET ally_id='$ally_id', allytag='$allytag', status=0 WHERE (user_id = '$ums_user_id')";
 				$result = mysql_query($sqlquery);
@@ -143,21 +144,21 @@ if($ok || $warnung){
 				if ($transaction_result){
 					if (mysql_num_rows($transaction_result)==1){
 						$data = mysql_fetch_array($transaction_result);
-						$sum = $data["amount"];
+						$sum = $data['amount'];
 						mysql_query("UPDATE de_user_data SET restyp05=restyp05+$sum WHERE user_id='$ums_user_id'");
 						$transaction_result = mysql_query("UPDATE de_transactions SET amount='$t_tojoin' WHERE user_id='$ums_user_id' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
 						mysql_query("UPDATE de_user_data SET restyp05=restyp05-$t_tojoin WHERE user_id='$ums_user_id'");
-						print("<strong>$allyjoin_lang[msg_9_1] $sum $allyjoin_lang[msg_9_2]</strong><br>");
+						print('<strong>'.$allyjoin_lang['msg_9_1'].' '.$sum.' '.$allyjoin_lang['msg_9_2'].'</strong><br />');
 					}else{
 						mysql_query("INSERT INTO de_transactions (user_id, type, identifier, name, amount) VALUES($ums_user_id, 'C.A.R.S.', 'reg_fee', 'Tronic', '$t_tojoin')");
 						mysql_query("UPDATE de_user_data SET restyp05=restyp05-$t_tojoin WHERE user_id='$ums_user_id'");
 					}
 				}
-				echo "<strong>$allyjoin_lang[msg_10_1] $t_tojoin $allyjoin_lang[msg_10_2]</strong>";
+				echo '<strong>'.$allyjoin_lang['msg_10_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_10_2'].'</strong>';
 			}
 			else
 			{
-				echo "$allyjoin_lang[msg_11] !";
+				echo $allyjoin_lang['msg_11'].' !';
 			} // else $nb>0
 		}  // else $clan
 
@@ -175,44 +176,44 @@ if($ok || $warnung){
 
 	if ($antrag_allyname == "")
 	{
-		$active_a_request = "$allyjoin_lang[msg_12].";
+		$active_a_request = $allyjoin_lang['msg_12'];
 	}
 	else
 	{
-		$active_a_request = "$allyjoin_lang[msg_13_1] <strong>$antrag_allyname</strong> $allyjoin_lang[msg_13_2]:<br><br>$antrag_antrag";
+		$active_a_request = $allyjoin_lang['msg_13_1'].' <strong>'.$antrag_allyname.'</strong> '.$allyjoin_lang['msg_13_2'].':<br /><br />'.$antrag_antrag;
 	}
 
-	print("<table width=\"600px\" class=\"cell\">
+	print('<table width="600" class="cell">
 				<tr>
-					<td><h3>$allyjoin_lang[aktivebewerbung]: </h3></td>
+					<td><h3>'.$allyjoin_lang['aktivebewerbung'].': </h3></td>
 				</tr>
 				<tr>
 					<td>
-						$active_a_request
+						'.$active_a_request.'
 					</td>
 				</tr>
 				<tr>
 					<td><hr></td>
 				</tr>
 			</table>
-	");
+	');
 
-	print("
-			<table width=\"600px\" class=\"cell\">
+	print('
+			<table width="600" class="cell">
 				<tr>
-					<td><h3>$allyjoin_lang[neuebewerbung]: </h3></td>
+					<td><h3>'.$allyjoin_lang['neuebewerbung'].': </h3></td>
 				</tr>
 				<tr>
 					<td>
-						<form name=\"register\" method=\"POST\" action=\"ally_join.php\">
-						<input type=\"hidden\" name=\"ally_id\" value=\"$ally_id\">
-						$allyjoin_lang[msg_14_1] <strong>$a_name</strong> $allyjoin_lang[msg_14_2]:<br>
-						<textarea name=\"antrag\" cols=\"70\" rows=\"7\" wrap=\"virtual\"></textarea>
-						<br><br><input type=\"submit\" value=\"$allyjoin_lang[bewerbungsenden]\" name=\"ok\">
+						<form name="register" method="POST" action="ally_join.php">
+						<input type="hidden" name="ally_id" value="'.$ally_id.'">
+						'.$allyjoin_lang['msg_14_1'].' <strong>'.$a_name.'</strong> '.$allyjoin_lang['msg_14_2'].':<br>
+						<textarea name="antrag" cols="70" rows="7" wrap="virtual"></textarea>
+						<br><br><input type="submit" value="'.$allyjoin_lang['bewerbungsenden'].'" name="ok">
 					</td>
 				</tr>
 			</table>
-	");
+	');
 
 
 	/*
@@ -248,7 +249,7 @@ if($ok || $warnung){
 		*/
 }
 
-print("</div><br><br>");
+print('</div><br /><br />');
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
+<?php include('ally/ally.footer.inc.php'); ?>

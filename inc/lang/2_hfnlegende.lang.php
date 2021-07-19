@@ -28,6 +28,6 @@ $legende_lang['eintrag_24']='legend for the buttons';
 $legende_lang['eintrag_25']='empty';
 $legende_lang['eintrag_26']='clear message box';
 $legende_lang['eintrag_27']='<b>Note: </b>The colour codes for the ['color'] attribute habe to be set as hexadecimal code (#XXXXXX).<br>
- This code can be generated using special <a href="http://www.google.com/search?hl=de&q=colour palette">colour palettes</a>.';
+ This code can be generated using special <a href='http://www.google.com/search?hl=de&q=colour palette'>colour palettes</a>.';
 
 ?>

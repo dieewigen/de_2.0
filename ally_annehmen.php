@@ -2,9 +2,9 @@
 //	--------------------------------- ally_annehmen.php ---------------------------------
 //	Funktion der Seite:		Annehmen eines Beitrittgesuchs oder eines Bündnisses
 //  -------------------------------------------------------------------------------------
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.annehmen.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.annehmen.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
@@ -16,21 +16,21 @@ $allytag=$row["allytag"];
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?=$allyablehnen_lang[title]?></title>
-<?php include "cssinclude.php"; ?>
+<title><?=$allyablehnen_lang['title']?></title>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
-include "resline.php";
-include ("ally/ally.menu.inc.php");
-include ("lib/basefunctions.lib.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
+include('lib/basefunctions.lib.php');
 //Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
 $allys=mysql_query("SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'");
 
 
 if(mysql_num_rows($allys)<1)
 {
-	echo $allyablehnen_lang[msg_1];
+	echo $allyablehnen_lang['msg_1'];
 }
 else
 {
@@ -77,18 +77,18 @@ else
 				}
 				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Ihrem Antrag zugestimmt und Sie aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachten Sie, das Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
 
-				echo '<div class="info_box text3">'.$allyablehnen_lang[msg_2_1].' '.$sum.' '.$allyablehnen_lang[msg_2_2].'.</div>';
-				include("ally/allyfunctions.inc.php");
-				writeHistory($clantag, $allyablehnen_lang[msg_3].' <i>'.$u_name.'</i>',true);
+				echo '<div class="info_box text3">'.$allyablehnen_lang['msg_2_1'].' '.$sum.' '.$allyablehnen_lang['msg_2_2'].'.</div>';
+				include('ally/allyfunctions.inc.php');
+				writeHistory($clantag, $allyablehnen_lang['msg_3'].' <i>'.$u_name.'</i>',true);
 			}
 			else
 			{
-				echo '<div class="info_box text3">'.$allyablehnen_lang[msg_4].'</div>';
+				echo '<div class="info_box text3">'.$allyablehnen_lang['msg_4'].'</div>';
 			}
 		}
 		else
 		{
-			print('<div class="info_box text3">'.$allyablehnen_lang[msg_5].'</div>');
+			print('<div class="info_box text3">'.$allyablehnen_lang['msg_5'].'</div>');
 		}
 	}
 	elseif($allyid)
@@ -97,7 +97,7 @@ else
 		$result = mysql_query($query);
 		$alreadyinXallys = mysql_result($result,0,0);
 		if ($alreadyinXallys >= 2)
-			die ($allyablehnen_lang[msg_6_1].' '.$alreadyinXallys.' '.$allyablehnen_lang[msg_6_2].' '.$alreadyinXallys.''.$allyablehnen_lang[msg_6_3]);
+			die ($allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3']);
 
 
 		$query = "select count(*) from de_ally_buendniss_antrag where ally_id_antragsteller='$allyid'";
@@ -105,7 +105,7 @@ else
 		$antragexists = 0;
 		$antragexists = mysql_result($result,0,0);
 		if ($antragexists == 0)
-			die($allyablehnen_lang[msg_7]);
+			die($allyablehnen_lang['msg_7']);
 			
 		//überprüfen ob man mit dem gewünschten bündnispartner evtl. im krieg ist
 		$query = "SELECT * FROM de_ally_war WHERE (ally_id_angreifer = '$allyid' AND ally_id_angegriffener = '$allyid_partner') OR (ally_id_angreifer = '$allyid_partner' AND ally_id_angegriffener = '$allyid')";
@@ -141,11 +141,11 @@ else
 		$delallyid1_tag = getAllyTag($clanid);
 		$delallyid2_tag = getAllyTag($allyid);
 
-		writeHistory($delallyid1_tag, $allyablehnen_lang[msg_9_1].' <i>'.$delallyid2_tag.'</i> '.$allyablehnen_lang[msg_9_2], true);
-		writeHistory($delallyid2_tag, $allyablehnen_lang[msg_9_1].' <i>'.$delallyid1_tag.'</i> '.$allyablehnen_lang[msg_9_2], true);
+		writeHistory($delallyid1_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid2_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
+		writeHistory($delallyid2_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid1_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
 
 	}
 }
 
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
+<?php include('ally/ally.footer.inc.php'); ?>

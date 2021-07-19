@@ -1,29 +1,29 @@
 <?php
-include "inc/header.inc.php";
-include_once 'functions.php';
-include "lib/transaction.lib.php";
-include 'ally/allyfunctions.inc.php';
+include('inc/header.inc.php');
+include_once('functions.php');
+include('lib/transaction.lib.php');
+include('ally/allyfunctions.inc.php');
 
 //include 'inc/lang/'.$sv_server_lang.'_community.lang.php';
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row["restyp05"];
-$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
-$sector=$row["sector"];$system=$row["system"];
-if ($row["status"]==1) $ownally = $row["allytag"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row['restyp05'];
+$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
+$sector=$row['sector'];$system=$row['system'];
+if ($row['status']==1) $ownally = $row['allytag'];
 
 ?>
 <!DOCTYPE HTML>
 <head>
 <title>Allianzprojekte</title>
-<?php include "cssinclude.php";?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <div style="text-align: center;">
 <?php
 //stelle die ressourcenleiste dar
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 
 //allydaten laden
 $db_daten=mysql_query("SELECT * FROM de_allys WHERE allytag='$ownally'", $db);
@@ -377,6 +377,6 @@ besondere spielerartefakte
 ?>
 </div>
 <br>
-<?php include "fooban.php"; ?>
+<?php include('fooban.php'); ?>
 </body>
 </html>

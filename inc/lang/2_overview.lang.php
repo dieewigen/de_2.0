@@ -1,5 +1,5 @@
 <?php
-$rangnamen=array("The Raised One", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
+$rangnamen=array('The Raised One', 'Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Theta','Iota','Kappa','Lambda','My','Ny','Xi','Omikron','Pi','Rho','Sigma','Tau','Ypsilon','Phi','Chi','Psi','Omega');
 
 $ov_lang['accountid']='Account-ID';
 $ov_lang['ac_ziel1_1']='Build collectors';
