@@ -1,24 +1,24 @@
 <?php
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.register.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.register.lang.php');
+include_once('functions.php');
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$allytag=$row['allytag'];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];$allytag=$row['allytag'];
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title><?php echo $allyregister_lang['title']?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
 <?php
-include "resline.php";
-include ("ally/ally.menu.inc.php");
+include('resline.php');
+include('ally/ally.menu.inc.php');
 
 //�berpr�fen ob man bereits in einer allianz ist, bzw. eine bewerbung offen ist
  
@@ -109,5 +109,5 @@ if($allytag==''){
 		echo '<div class="info_box text2">Du kannst keine Allianz gr&uuml;nden, da Du Dich bereits in einer Allianz befindest bzw. beworben hast.</div>';
 		
 	}
-	include("ally/ally.footer.inc.php");
+	include('ally/ally.footer.inc.php');
 ?>

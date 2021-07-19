@@ -8,12 +8,12 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 
-include "inc/sv.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_index.lang.php';
-include 'inc/'.$sv_server_lang.'_links.inc.php';
-include 'functions.php';
+include('inc/sv.inc.php');
+include('inc/lang/'.$sv_server_lang.'_index.lang.php');
+include('inc/'.$sv_server_lang.'_links.inc.php');
+include('functions.php');
 
-require_once 'lib/mobiledetect/Mobile_Detect.php';
+require_once('lib/mobiledetect/Mobile_Detect.php');
 $detect = new Mobile_Detect;
 
 //cookie als loginhilfe setzen
@@ -50,7 +50,7 @@ if(isset($_REQUEST['logout'])){
   session_start();
 
   if($sv_efta_in_de==1 AND $sv_sou_in_de==1){
-    include 'inc/session.inc.php';
+    include('inc/session.inc.php');
   }else{
     header("Location: index.php");
   }
@@ -87,24 +87,21 @@ if ($sv_image_server=='')$sv_image_server=$sv_image_server_list[0];
 
 //wenn pass und loginname gepostet werden, dann versuchen den account einzuloggen
 //login ist jetzt auch über den loginkey möglich, dieser ist jedoch nur 5 minuten gültig
-if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic']!='' AND $_POST['pass']!='') OR (isset($_REQUEST["loginkey"]) && $_REQUEST["loginkey"]!='')){
+if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic'] !='' AND $_POST['pass'] !='') OR (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!='')){
 	//db connect herstellen
-	include "inccon.php";
+	include('inccon.php');
 	
-	$_POST['nic']=SecureValue($_POST['nic']);
-	$_POST['pass']=SecureValue($_POST['pass']);
+	if(isset($_POST['nic'])) { $nic = SecureValue($_POST['nic']); }else $nic = '';
+	if(isset($_POST['pass'])) { $pass = SecureValue($_POST['pass']); }else $pass = '';
 
 	if(isset($_REQUEST['loginkey'])){
-		$_REQUEST['loginkey']=SecureValue($_REQUEST['loginkey']);
+		$_REQUEST['loginkey'] = SecureValue($_REQUEST['loginkey']);
 	}else{
-		$_REQUEST['loginkey']='';
+		$_REQUEST['loginkey'] = '';
 	}
 		
-	$sql = "SELECT * FROM de_login WHERE 
-	 
-	 nic = '".$_POST['nic']."' AND (pass = MD5('".$_POST['pass']."') OR newpass = MD5('".$_POST['pass']."'))
-	 
-	 OR loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
+	$sql = "SELECT * FROM de_login WHERE nic = '".$nic."' AND (pass = MD5('".$pass."') OR newpass = MD5('".$pass."')) OR loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
+	echo $sql;
 
 	/*
 ALTER TABLE `de_login` ADD INDEX(`pass`); 
@@ -507,21 +504,21 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  else $fehlermsg=$index_lang[falschezahl];
 		}*/
 	  }
-	  elseif($ums_status==0) $fehlermsg=$index_lang[accnochnichtaktiv];
+	  elseif($ums_status==0) $fehlermsg=$index_lang['accnochnichtaktiv'];
 	  elseif($ums_status==2)
 	  {
 		$sel_supporter = mysql_query("SELECT supporter FROM de_login WHERE user_id='$row[user_id]'");
 		$row_supporter = mysql_fetch_array($sel_supporter);
 
-		if($row_supporter[supporter]=="")
-			$row_supporter[supporter]="Support@Die-Ewigen.com";
+		if($row_supporter['supporter']=="")
+			$row_supporter['supporter']="Support@Die-Ewigen.com";
 			//$fehlermsg=$fehlermsg.$index_lang[accountistgesperrt].' <a href="mailto:'.$row_supporter[supporter].'"><font color="#FF0000">'.$row_supporter[supporter].'</font></a>';
 			$fehlermsg=$fehlermsg.'Der Account ist gesperrt. Wende Dich bitte per Ticketsystem (Accountverwaltung -> Support) an den Support.';
 	  }
-	  elseif($ums_status==4) $fehlermsg=$index_lang[accumzug];
-	  elseif($ums_status==5) $fehlermsg=$index_lang[falscheip];
+	  elseif($ums_status==4) $fehlermsg = $index_lang['accumzug'];
+	  elseif($ums_status==5) $fehlermsg = $index_lang['falscheip'];
 	}else{
-		$fehlermsg=$index_lang[falschezugangsdaten];
+		$fehlermsg = $index_lang['falschezugangsdaten'];
 	}
 }
 ?>

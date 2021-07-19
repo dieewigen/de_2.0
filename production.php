@@ -1,15 +1,15 @@
 <?php
-include "inc/header.inc.php";
-include "lib/transactioni.lib.php";
-include "inc/userartefact.inc.php";
-include "inc/schiffsdaten.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_production.lang.php';
-include 'inc/lang/'.$sv_server_lang.'_defense.lang.php';
-include 'inc/'.$sv_server_lang.'_links.inc.php';
-include 'inc/sabotage.inc.php';
-include "functions.php";
-include "tickler/kt_einheitendaten.php";
-include 'lib/map_system_defs.inc.php';
+include('inc/header.inc.php');
+include('lib/transactioni.lib.php');
+include('inc/userartefact.inc.php');
+include('inc/schiffsdaten.inc.php');
+include('inc/lang/'.$sv_server_lang.'_production.lang.php');
+include('inc/lang/'.$sv_server_lang.'_defense.lang.php');
+include('inc/'.$sv_server_lang.'_links.inc.php');
+include('inc/sabotage.inc.php');
+include('functions.php');
+include('tickler/kt_einheitendaten.php');
+include('lib/map_system_defs.inc.php');
 
 $production_lang['klassennamen']=array('J&auml;ger','Jagdboot','Zerst&ouml;rer','Kreuzer','Schlachtschiff','Bomber','Transmitterschiff','Tr&auml;ger',
 'Frachter','Titan','Orbitalj&auml;ger-Basis','Flugk&ouml;rper-Plattform','Energiegeschoss-Plattform','Materiegeschoss-Plattform','Hochenergiegeschoss-Plattform');
@@ -35,9 +35,9 @@ $design=0;
 //maximalen tick auslesen
 $result  = mysqli_query($GLOBALS['dbi'],"SELECT wt AS tick FROM de_system LIMIT 1");
 $row     = mysqli_fetch_array($result);
-$maxtick = $row["tick"];
+$maxtick = $row['tick'];
 
-//spezialisierung tr�gerkapazit�t
+//spezialisierung trägerkapazität
 if($spec3==2){
 	for($i=0;$i<count($sv_schiffsdaten[$ums_rasse]);$i++){
 		$sv_schiffsdaten[$ums_rasse-1][$i][1]= floor($sv_schiffsdaten[$ums_rasse-1][$i][1] * 1.2);
@@ -50,7 +50,7 @@ if($spec3==2){
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=1 AND user_id='$ums_user_id'");
 $artbonus_fleet=0;
 while($row = mysqli_fetch_array($db_daten)){
-  $artbonus_fleet=$artbonus_fleet+$ua_werte[$row["id"]-1][$row["level"]-1][0];
+  $artbonus_fleet=$artbonus_fleet+$ua_werte[$row['id']-1][$row['level']-1][0];
 }
 
 if($artbonus_fleet>5){
@@ -60,9 +60,9 @@ if($artbonus_fleet>5){
 $db_daten=mysql_query("SELECT id, level FROM de_user_artefact WHERE (id=2 OR id=8 OR id=9) AND user_id='$ums_user_id'",$db);
 $artbonus_def=0;$artbonus2=0;$artbonus3=0;
 while($row = mysql_fetch_array($db_daten)){
-  if($row["id"]==2)$artbonus_def=$artbonus_def+$ua_werte[$row["id"]-1][$row["level"]-1][0];
-  elseif($row["id"]==8)$artbonus2=$artbonus2+$ua_werte[$row["id"]-1][$row["level"]-1][0];
-  elseif($row["id"]==9)$artbonus3=$artbonus3+$ua_werte[$row["id"]-1][$row["level"]-1][0];
+  if($row['id']==2)$artbonus_def=$artbonus_def+$ua_werte[$row['id']-1][$row['level']-1][0];
+  elseif($row['id']==8)$artbonus2=$artbonus2+$ua_werte[$row['id']-1][$row['level']-1][0];
+  elseif($row['id']==9)$artbonus3=$artbonus3+$ua_werte[$row['id']-1][$row['level']-1][0];
 }
 if($artbonus_def>5)$artbonus_def=5;
 
@@ -80,23 +80,23 @@ if($spec1==1)$defense_bonus_buildtime+=50;
 //namen des planetaren schildes aus der db auslesen
 $db_daten=mysql_query("SELECT * FROM de_tech_data$ums_rasse WHERE tech_id=24",$db);
 $row = mysql_fetch_array($db_daten);
-$ps_name=$row[tech_name];
+$ps_name=$row['tech_name'];
 
 //spezialisierung schildst�rke
 if($spec3==1)$defense_bonus_ps+=10;
 
-$infostring=$defense_lang[kostenreduz].$ua_name[1].$defense_lang[artefakte].number_format($artbonus_def, 2,",",".").'% (max. 5,00%)<br>'.
-$ua_name[7].'-'.$defense_lang[artefakt].'-'.$defense_lang[angriffskraftbonus].': '.number_format($artbonus2, 2,",",".").'%<br>'.
-$ua_name[8].'-'.$defense_lang[artefakt].'-'.$defense_lang[laehmkraftbonus].': '.number_format($artbonus3, 2,",",".").'%<br>'.
-$defense_lang[erfahrungspunkte].': '.number_format($defenseexp, 0,",",".").' ('.$rangnamen[getfleetlevel($defenseexp)].')<br>- '.
-$ps_name.'-'.$defense_lang[bonus].': '.$defense_bonus_ps.'%<br>- '.
-$defense_lang[bauzeitreduzierung].': '.$defense_bonus_buildtime.'%<br>'.
-$defense_lang[bauzeitreduzierung1].'<br>- '.		
-$defense_lang[erfahrungspunkte].'-'.$defense_lang[angriffskraftbonus].'/'.$defense_lang[laehmkraftbonus].': '.
-number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").'%<br><font color=#00FF00>'.$defense_lang[spezialfaehigkeiten].':</font><br>';
+$infostring = $defense_lang['kostenreduz'].$ua_name[1].$defense_lang['artefakte'].number_format($artbonus_def, 2,",",".").'% (max. 5,00%)<br>'.
+$ua_name[7].'-'.$defense_lang['artefakt'].'-'.$defense_lang['angriffskraftbonus'].': '.number_format($artbonus2, 2,",",".").'%<br>'.
+$ua_name[8].'-'.$defense_lang['artefakt'].'-'.$defense_lang['laehmkraftbonus'].': '.number_format($artbonus3, 2,",",".").'%<br>'.
+$defense_lang['erfahrungspunkte'].': '.number_format($defenseexp, 0,",",".").' ('.$rangnamen[getfleetlevel($defenseexp)].')<br>- '.
+$ps_name.'-'.$defense_lang['bonus'].': '.$defense_bonus_ps.'%<br>- '.
+$defense_lang['bauzeitreduzierung'].': '.$defense_bonus_buildtime.'%<br>'.
+$defense_lang['bauzeitreduzierung1'].'<br>- '.		
+$defense_lang['erfahrungspunkte'].'-'.$defense_lang['angriffskraftbonus'].'/'.$defense_lang['laehmkraftbonus'].': '.
+number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").'%<br><font color=#00FF00>'.$defense_lang['spezialfaehigkeiten'].':</font><br>';
 
 //angriffskraft
-if($defense_bonus_feuerkraft[0]>0)$infostring.='- '.$defense_lang[angriffskraftbonus].': '.$defense_bonus_feuerkraft[0].'% '.$defense_lang[wahrscheinlichkeit].': '.$defense_bonus_feuerkraft[1].'%';
+if($defense_bonus_feuerkraft[0]>0)$infostring.='- '.$defense_lang['angriffskraftbonus'].': '.$defense_bonus_feuerkraft[0].'% '.$defense_lang['wahrscheinlichkeit'].': '.$defense_bonus_feuerkraft[1].'%';
 
 $defstatus = $defense_lang['statusinformationen'].'&'.$infostring;
 
@@ -116,7 +116,7 @@ if($_REQUEST["setdesign"]){
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?=$production_lang[produktion]?></title>
+<title><?=$production_lang['produktion']?></title>
 <meta charset="utf-8"/>
 <?php include "cssinclude.php";
 echo '<script language="javascript">';
@@ -138,56 +138,56 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	}
 	
 	//klasse
-	$zstr='<font color=#D265FF>'.$production_lang[klasse].': '.$production_lang[klassennamen][$unit_index].'</font>';
+	$zstr='<font color=#D265FF>'.$production_lang['klasse'].': '.$production_lang['klassennamen'][$unit_index].'</font>';
 	//punkte
-	$zstr.='<br><font color=#FFFA65>'.$production_lang[punkte].': '.number_format($unit[$_SESSION['ums_rasse']-1][$unit_index][4], 0,"",".").'</font>';
+	$zstr.='<br><font color=#FFFA65>'.$production_lang['punkte'].': '.number_format($unit[$_SESSION['ums_rasse']-1][$unit_index][4], 0,"",".").'</font>';
 
 	
 	if($i<100){
 		//reisezeit
-		$zstr.='<br><br>'.$production_lang[reisezeit].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][0];
+		$zstr.='<br><br>'.$production_lang['reisezeit'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][0];
 		//transportkapazität
-		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][1]>0)$zstr.='<br>'.$production_lang[kapazitaet1].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][1];
+		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][1]>0)$zstr.='<br>'.$production_lang['kapazitaet1'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][1];
 		//ben. transportkapazität
-		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang[kapazitaet2].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][2];
+		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang['kapazitaet2'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][2];
 		//frachtkapazität
 		if ($unit[$ums_rasse-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$ums_rasse-1][$unit_index]['fk'];
 	}
 
 	//waffenarten
 	//konventionell
-	if($unit[$ums_rasse-1][$unit_index][2]>0)$wv='<font color=#2DFF11>'.$production_lang[waffenvorhandenja].'</font>';
-	 else $wv='<font color=#ED0909>'.$production_lang[waffenvorhandennein].'</font>';
-	$zstr.='<br><br><font color=#9D4B15>'.$production_lang[waffengattung1].':</font> '.$wv;
+	if($unit[$ums_rasse-1][$unit_index][2]>0)$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
+	 else $wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
+	$zstr.='<br><br><font color=#9D4B15>'.$production_lang['waffengattung1'].':</font> '.$wv;
 
 	//klassenziel
 	if($unit[$ums_rasse-1][$unit_index][2]>0){
-	  $zstr.='<br><font color=#ED9409>-'.$production_lang[klasseziel1].': '.$production_lang[klassennamen][$kampfmatrix[$unit_index][0]].'</font>';
-	  $zstr.='<br><font color=#F0BA66>-'.$production_lang[klasseziel2].': '.$production_lang[klassennamen][$kampfmatrix[$unit_index][2]].'</font>';
+	  $zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][0]].'</font>';
+	  $zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][2]].'</font>';
 	}
 
 	//emp
 	if($unit[$ums_rasse-1][$unit_index][3]>0){
-		$wv='<font color=#2DFF11>'.$production_lang[waffenvorhandenja].'</font>';
+		$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
 	}else{
-		$wv='<font color=#ED0909>'.$production_lang[waffenvorhandennein].'</font>';
+		$wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
 	}
-	$zstr.='<br><br><font color=#15629D>'.$production_lang[waffengattung2].':</font> '.$wv;
+	$zstr.='<br><br><font color=#15629D>'.$production_lang['waffengattung2'].':</font> '.$wv;
 
 	//klassenziel
 	if($unit[$ums_rasse-1][$unit_index][3]>0){
-		$zstr.='<br><font color=#ED9409>-'.$production_lang[klasseziel1].': '.$production_lang[klassennamen][$blockmatrix[$unit_index][0]].'</font>';
-		$zstr.='<br><font color=#F0BA66>-'.$production_lang[klasseziel2].': '.$production_lang[klassennamen][$blockmatrix[$unit_index][2]].'</font>';
+		$zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][0]].'</font>';
+		$zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][2]].'</font>';
 	}
 
 	//besonderheiten
-	if($unit_index==1)$zstr.='<br><br><font color=#2DFF11>'.$production_lang[besonderheitjagdboot].'</font>';
-	if($unit_index==3)$zstr.='<br><br><font color=#2DFF11>'.$production_lang[besonderheitkreuzer].'</font>';
-	if($unit_index==4)$zstr.='<br><br><font color=#2DFF11>'.$production_lang[besonderheitschlachtschiff].'</font>';
-	if($unit_index==6)$zstr.='<br><br><font color=#2DFF11>'.$production_lang[besonderheittransmitterschiff].'</font>';
+	if($unit_index==1)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitjagdboot'].'</font>';
+	if($unit_index==3)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitkreuzer'].'</font>';
+	if($unit_index==4)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitschlachtschiff'].'</font>';
+	if($unit_index==6)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheittransmitterschiff'].'</font>';
 
 
-	$tooltips[$c1]=getTechNameByRasse($row["tech_name"],$_SESSION['ums_rasse']).'&'.$zstr;
+	$tooltips[$c1]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.$zstr;
 	$c1++;
 
     //$i++;
@@ -244,7 +244,7 @@ if($_POST['submit'] AND $sabotage==0){//ja, es wurde ein button gedrueckt
 					$fehlermsg='';
 				}else{
 					$h=0;
-					$fehlermsg='<font color="FF0000">'.$production_lang[vorbedingung];
+					$fehlermsg='<font color="FF0000">'.$production_lang['vorbedingung'];
 				}
 				
 				//festellen wieviele schiffe man bauen kann
@@ -332,10 +332,10 @@ if($_POST['submit'] AND $sabotage==0){//ja, es wurde ein button gedrueckt
 		if ($erg){
 			  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{
-			print($production_lang[releaselock].$ums_user_id.$production_lang[releaselock2]."<br><br><br>");
+			print($production_lang['releaselock'].$ums_user_id.$production_lang['releaselock2']."<br><br><br>");
 		}
 	}// if setlock-ende
-	else echo '<br><font color="#FF0000">'.$production_lang[releaselock3].'</font><br><br>';
+	else echo '<br><font color="#FF0000">'.$production_lang['releaselock3'].'</font><br><br>';
 
 }//submit ende
 
@@ -357,7 +357,7 @@ echo'
 //feststellen ob eine sabotage vorliegt und dann abbrechen
 if($sabotage==1){
   $emsg.='<table width="600px"><tr><td class="ccr">';
-  $emsg.=$production_lang[sabotage_aktiv];
+  $emsg.=$production_lang['sabotage_aktiv'];
   $emsg.='</td></tr></table>';
   echo $emsg;
   
@@ -421,7 +421,7 @@ echo '<div align="center">';
 //info mit artefaktbonus ausgeben
 /////////////////////////////////////////////////////////////////////////////
 echo '<tr valign="middle" align="center" height="25"><td class="cell1" height="25" colspan="9" align="left"><b>&nbsp;Flotteneinheiten: '.
-	$production_lang[baukostenreduz].$ua_name[0].$production_lang[artefakte].number_format($artbonus_fleet, 2,",",".").'% (max. 5,00%)</b></td></tr>';
+	$production_lang['baukostenreduz'].$ua_name[0].$production_lang['artefakte'].number_format($artbonus_fleet, 2,",",".").'% (max. 5,00%)</b></td></tr>';
 
 /////////////////////////////////////////////////////////////////////////////
 //Einheiten z�hlen
@@ -481,7 +481,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	//zwischen Flotte und Verteidigung eine Zeile einf�gen
 	if($row['tech_id']==100){
 		echo '<tr valign="middle" align="center" height="25"><td class="'.$bg.'" height="25" colspan="9" align="left"><b>
-		&nbsp;Verteidigungseinheiten: '.$defense_lang[statusinformationen].' <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$defstatus.'">
+		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$defstatus.'">
 		&nbsp;-&nbsp;Baukostenreduzierung: '.number_format($artbonus_def, 2,",",".").'% (max. 5,00%)</b></td></tr>';
 		if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
 	}
@@ -499,7 +499,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 		$item_kosten='';
 	}
 
-	showeinheit_ang(getTechNameByRasse($row["tech_name"],$_SESSION['ums_rasse']), $row["tech_id"], $ben_restyp01-round($ben_restyp01*$artbonus/100),
+	showeinheit_ang(getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']), $row['tech_id'], $ben_restyp01-round($ben_restyp01*$artbonus/100),
 	$ben_restyp02-round($ben_restyp02*$artbonus/100), $ben_restyp03-round($ben_restyp03*$artbonus/100),
 	$ben_restyp04-round($ben_restyp04*$artbonus/100), $ben_restyp05-round($ben_restyp05*$artbonus/100), $tech_ticks, $ec[$row['tech_id']], $bg,$z, $has_tech, $item_kosten);
 
@@ -543,11 +543,11 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 <td width="76" class="cell">I</td>
 <td width="76" class="cell">E</td>
 <td width="43" class="cell">T</td>
-<td width="71" class="cell"><?=$production_lang[kapazitaet]?></td>
-<td width="75" class="cell"><?=$production_lang[punkte]?></td>
+<td width="71" class="cell"><?=$production_lang['kapazitaet']?></td>
+<td width="75" class="cell"><?=$production_lang['punkte']?></td>
 </tr>
 <tr height="20" align="center">
-<td class="cell1" align="left">&nbsp;<?=$production_lang[summe]?>:</td>
+<td class="cell1" align="left">&nbsp;<?=$production_lang['summe']?>:</td>
 <td class="cell1" id="m">0</td>
 <td class="cell1" id="d">0</td>
 <td class="cell1" id="i">0</td>
@@ -557,7 +557,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 <td class="cell1" id="p">0</td>
 </tr>
 <tr height="20">
-<td class="cell" colspan="8" align="center"><input type="Submit" name="submit" value="<?=$production_lang[bauen]?>"></td>
+<td class="cell" colspan="8" align="center"><input type="Submit" name="submit" value="<?=$production_lang['bauen']?>"></td>
 </tr>
 </table>
 <?php
@@ -597,19 +597,19 @@ if ($num>0){
 
 	echo '<table border="0" cellpadding="0" cellspacing="1">';
 	echo '<tr align="center">';
-	echo '<td class="cell" width="300"><b>'.$production_lang[einheit].'</b></td>';
-	echo '<td class="cell" width="88"><b>'.$production_lang[stueck].'</b></td>';
-	echo '<td class="cell" width="105"><b>'.$production_lang[punkte].'</b></td>';
-	echo '<td class="cell" width="78"><b>'.$production_lang[wochen].'</b></td>';
+	echo '<td class="cell" width="300"><b>'.$production_lang['einheit'].'</b></td>';
+	echo '<td class="cell" width="88"><b>'.$production_lang['stueck'].'</b></td>';
+	echo '<td class="cell" width="105"><b>'.$production_lang['punkte'].'</b></td>';
+	echo '<td class="cell" width="78"><b>'.$production_lang['wochen'].'</b></td>';
 	echo '</tr>';
 
 
 	while($row = mysqli_fetch_array($result)){ //jeder gefundene datensatz wird geprueft
 	    echo '<tr align="center">';
-	    echo '<td class="cell">'.$technames[$row["tech_id"]].'</td>';
-	    echo '<td class="cell">'.number_format($row["anzahl"], 0,"",".").'</td>';
-	    echo '<td class="cell">'.number_format($row["score"], 0,"",".").'</td>';
-	    echo '<td class="cell">'.$row["verbzeit"].'</td>';
+	    echo '<td class="cell">'.$technames[$row['tech_id']].'</td>';
+	    echo '<td class="cell">'.number_format($row['anzahl'], 0,"",".").'</td>';
+	    echo '<td class="cell">'.number_format($row['score'], 0,"",".").'</td>';
+	    echo '<td class="cell">'.$row['verbzeit'].'</td>';
 	    echo '</tr>';
 	}
   

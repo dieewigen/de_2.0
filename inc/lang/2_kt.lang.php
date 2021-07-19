@@ -1,6 +1,6 @@
 <?php
 $kt_lang['angreifer']='Attacker';
-$kt_lang['archeology1']='Your archaeologists succeeded to save the age-old artefact "The golden collector".';
+$kt_lang['archeology1']='Your archaeologists succeeded to save the age-old artefact 'The golden collector'.';
 $kt_lang['archeology2']='Your archaeologists succeeded to save 50 probes.';
 $kt_lang['archeology3']='Your archaeologists succeeded to save 25 collectors.';
 $kt_lang['archeologysuccess']='Your archaeologists could successfully complete the mission and found the following';

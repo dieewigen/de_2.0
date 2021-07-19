@@ -1,11 +1,11 @@
 <?php
-include "inc/header.inc.php";
-include "lib/transactioni.lib.php";
-include "outputlib.php";
-require_once 'lib/phpmailer/class.phpmailer.php';
-require_once 'lib/phpmailer/class.smtp.php';
-include "functions.php";
-include 'inc/lang/'.$sv_server_lang.'_options.lang.php';
+include('inc/header.inc.php');
+include('lib/transactioni.lib.php');
+include('outputlib.php');
+require_once('lib/phpmailer/class.phpmailer.php');
+require_once('lib/phpmailer/class.smtp.php');
+include('functions.php');
+include('inc/lang/'.$sv_server_lang.'_options.lang.php');
 
 if(isset($_REQUEST['set_use_mobile_version'])){
   $value=intval($_REQUEST['set_use_mobile_version']);
@@ -33,32 +33,32 @@ $ehlockfaktor=4;
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$allytag=$row["allytag"];$newnews=$row["newnews"];$hidepic=$row["hide_secpics"];
-$sector=$row["sector"];$system=$row["system"];$nrrasse=$row["nrrasse"];$nrspielername=$row["nrspielername"];
-$tick=$row["tick"];$ovopt=$row["ovopt"];$soundoff=$row["soundoff"];
-$credits=$row["credits"];$chatoff=$row["chatoff"];$chatoffallg=$row["chatoffallg"];$chatoffglobal=$row["chatoffglobal"];$helperon=$row['helper'];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$allytag=$row['allytag'];$newnews=$row['newnews'];$hidepic=$row['hide_secpics'];
+$sector=$row['sector'];$system=$row['system'];$nrrasse=$row['nrrasse'];$nrspielername=$row['nrspielername'];
+$tick=$row['tick'];$ovopt=$row['ovopt'];$soundoff=$row['soundoff'];
+$credits=$row['credits'];$chatoff=$row['chatoff'];$chatoffallg=$row['chatoffallg'];$chatoffglobal=$row['chatoffglobal'];$helperon=$row['helper'];
 $patime=$row['patime'];$trade_reminder=$row['trade_reminder'];
 
 
 //irc-benutzername auslesen
 $db_daten=mysql_query("SELECT ircname, gpfad, transparency FROM de_user_info WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$db_ircname=$row["ircname"];
-$gpfaddb=$row["gpfad"];
+$db_ircname=$row['ircname'];
+$gpfaddb=$row['gpfad'];
 
-//$transparency=$row["transparency"];
+//$transparency=$row['transparency'];
 
 //owner id auslesen
 $db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$owner_id=intval($row["owner_id"]);
+$owner_id=intval($row['owner_id']);
 
 //maximalen tick auslesen
 //$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
 $result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
 $row     = mysql_fetch_array($result);
-$maxtick = $row["tick"];
+$maxtick = $row['tick'];
 
 ////////////////////////////////////////////////////////
 // Premiumaccount buchen
@@ -76,13 +76,9 @@ if($getpa>0){
 
 			//alle Server durchgehen und die PA-Zeit verlängern
 			$server_liste=array(
-				'abl_server_abl1',
-				'de_server_cde',
-				'de_server_dde',
-				'de_server_ede',
-				'de_server_rde',
-				'de_server_sde',
-				'de_server_xde'
+				'sde',
+				'xde',
+				'rde'
 			);
 
 			for($i=0;$i<count($server_liste);$i++){
@@ -96,12 +92,12 @@ if($getpa>0){
 					//echo 'A';
 					//falls ja user id auslesen und die pa-zeit gutschreiben
 					$row = mysqli_fetch_array($db_daten);
-					$user_id=$row["user_id"];
+					$user_id=$row['user_id'];
 					
 					//aktuelle laufzeit auslesen
 					$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT patime FROM ".$db_table.".de_user_data WHERE user_id='$user_id'");
 					$row = mysqli_fetch_array($db_daten);
-					$palaufzeit=$row["patime"];
+					$palaufzeit=$row['patime'];
 					
 					if ($palaufzeit<time()){
 						//echo 'B';
@@ -123,8 +119,8 @@ if($getpa>0){
 
 		//Daten aktualisieren
 		$row=loadPlayerData($_SESSION['ums_user_id']);
-		$row["credits"]=$row["credits"]-$creditkosten;
-		$credits=$row["credits"];
+		$row['credits']=$row['credits']-$creditkosten;
+		$credits=$row['credits'];
 		$patime=$row['patime'];
 
 		}else{
@@ -148,17 +144,17 @@ if($getpa>0){
 $ovoptfelder=split(";",$ovopt);
 
 //einstellungen für die Übersicht speichern
-if ($_POST["dooveinst"])
+if ($_POST['dooveinst'])
 {
 
   //die felder parsen und den string zusammenbauen
-  $ovoptarray[]=$_POST["opt1"];
-  $ovoptarray[]=$_POST["opt2"];
-  $ovoptarray[]=$_POST["opt3"];
-  $ovoptarray[]=$_POST["opt4"];
-  $ovoptarray[]=$_POST["opt5"];
-  $ovoptarray[]=$_POST["opt6"];
-  $ovoptarray[]=$_POST["opt7"];
+  $ovoptarray[]=$_POST['opt1'];
+  $ovoptarray[]=$_POST['opt2'];
+  $ovoptarray[]=$_POST['opt3'];
+  $ovoptarray[]=$_POST['opt4'];
+  $ovoptarray[]=$_POST['opt5'];
+  $ovoptarray[]=$_POST['opt6'];
+  $ovoptarray[]=$_POST['opt7'];
 
   $ovopstr='';
 
@@ -207,7 +203,7 @@ if ($_POST["dooveinst"])
 */
 
 //einstellungen für die nächste runde speichern
-if ($_POST["donr"]){
+if ($_POST['donr']){
   $spielername=$_POST['spielername'];
   $rasse=$_POST['rasse'];
   if($spielername!='')  {
@@ -246,21 +242,21 @@ if ($_POST["donr"]){
   }
 }
 
-if(isset($_POST["graop"])){
+if(isset($_POST['graop'])){
   //<input type="hidden" name="dograop" value="1">
-  $secpic = $_POST["secbild"];
+  $secpic = $_POST['secbild'];
   if($secbild==$secanzeige[0])$secpic=0;
   elseif($secbild==$secanzeige[1])$secpic=1;
   elseif($secbild==$secanzeige[2])$secpic=2;
   else $secpic=0;
   $hidepic=$secpic;
   //ircname
-  if(!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $_POST["ircname"])){
+  if(!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $_POST['ircname'])){
     $errmsg.=$options_lang['fehler4'];
     $ircname='';
   }else{
-    $db_ircname=$_POST["ircname"];
-    $ircname=$_POST["ircname"];
+    $db_ircname=$_POST['ircname'];
+    $ircname=$_POST['ircname'];
   }
 
   //sm_remtime
@@ -272,23 +268,23 @@ if(isset($_POST["graop"])){
   
 
   if($errmsg==''){
-    //$gpfad = $_REQUEST["gpfad"];
+    //$gpfad = $_REQUEST['gpfad'];
     $gpfad='';
-    $sound=(int)$_POST["sound"];
-    $chat=isset($_POST["chat"]) ? intval($_POST["chat"]) : 0;
-    $chatallg=(int)$_POST["chatallg"];
-	  $chatglobal=(int)$_POST["chatglobal"];
-    $helper=(int)$_POST["helper"];
-    $traderem=(int)$_POST["traderem"];
+    $sound=(int)$_POST['sound'];
+    $chat=isset($_POST['chat']) ? intval($_POST['chat']) : 0;
+    $chatallg=(int)$_POST['chatallg'];
+	  $chatglobal=(int)$_POST['chatglobal'];
+    $helper=(int)$_POST['helper'];
+    $traderem=(int)$_POST['traderem'];
     
 
     /*
-    $transparency=intval($_POST["transparenz"]);
+    $transparency=intval($_POST['transparenz']);
     if($transparenz<40)$transparenz=40;
     elseif($transparenz>100)$transparenz=100;
-    $_SESSION["ums_transparency"]=$transparenz;
+    $_SESSION['ums_transparency']=$transparenz;
     */
-    if ($_REQUEST["gpfad"]!=''){$ums_gpfad=$gpfad;$gpfaddb=$gpfad;}
+    if ($_REQUEST['gpfad']!=''){$ums_gpfad=$gpfad;$gpfaddb=$gpfad;}
     else {$ums_gpfad=$sv_image_server_list[0];$gpfaddb='';}
     //$ums_gpfad=$gpfad;$gpfaddb=$gpfad;
     //mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname', transparency='$transparenz' WHERE user_id = '$ums_user_id'",$db);
@@ -299,16 +295,19 @@ if(isset($_POST["graop"])){
     $soundoff=$sound;
     $chatoff=$chat;
     $chatoffallg=$chatallg;
-    $_SESSION["ums_chatoffallg"]=$chatoffallg;
+    $_SESSION['ums_chatoffallg']=$chatoffallg;
     $chatoffglobal=$chatglobal;
-    $_SESSION["ums_chatoffglobal"]=$chatoffglobal;	
+    $_SESSION['ums_chatoffglobal']=$chatoffglobal;	
     $helperon=$helper;
     $trade_reminder=$traderem;
   }
 }
 
 //wurde ein button gedrueckt??
-if ($newpass AND $owner_id==0){
+$oldpass = $_POST['oldpass'];
+$pass1 = $_POST['pass1'];
+$pass2 = $_POST['pass2'];
+if(isset($_POST['newpass']) AND $owner_id==0){
   //echo '<br>'.HTTP_REFERER.'<br>';
   $db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$oldpass')");
   $num = mysql_num_rows($db_daten);
@@ -454,7 +453,7 @@ if ($_POST['delacc']){ //account l�schen
 				//mail an den accountinhaber schicken
 				$db_daten=mysql_query("SELECT reg_mail FROM de_login WHERE user_id='$ums_user_id'",$db);
 				$row = mysql_fetch_array($db_daten);
-				$reg_mail=$row["reg_mail"];
+				$reg_mail=$row['reg_mail'];
 				@mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: noreply@die-ewigen.com');
 			
 				session_destroy();
@@ -488,17 +487,17 @@ $logoutmsg='<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' '.
 <html>
 <head>
 <title><?php echo $options_lang['title'];?></title>
-<?php include "cssinclude.php"; ?>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 <?php
 
 //stelle die ressourcenleiste dar
-include "resline.php";
+include('resline.php');
 
 $urlacc=$_POST['urlacc'];
 if($urlacc){ //account in urlaubsmodus versetzen
-  $urlpass=isset($_POST['urlpass']) ? $_POST['urlpass'] : '';
+	$urlpass=$_POST['urlpass'];
 	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$urlpass')");
 	$num = mysql_num_rows($db_daten);
 	if ($num==1 OR $ums_cooperation!=0){ //oldpass ist korrekt
@@ -511,7 +510,7 @@ if($urlacc){ //account in urlaubsmodus versetzen
 			$errmsg.='<table width=600><tr><td class="ccr">'.$options_lang['umodezuwenigcredits1'].' '.$creditkosten.' '.$options_lang['umodezuwenigcredits2'].'</table>';
 		}
 		//schauen ob der account angegriffen wird
-		if($_POST["attumodecheck"]==1)$gea='&nbsp;';
+		if($_POST['attumodecheck']==1)$gea='&nbsp;';
 		if($gea=='&nbsp;'){
 			//wenn keine fehler vorliegen, dann umode setzen
 			if($errmsg=='')

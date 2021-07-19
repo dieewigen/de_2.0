@@ -8,5 +8,5 @@ $na['5']='You rescue a space princess from the hands of bad pirates. She gives y
 $na['6']='In a pub a strange looking person in black clothes with a mask and heavy breathe (you heard someone call him dad vader or so) forgets his wallet. You take it and find '.$tronic.' tronic.';
 $na['7']='Your security guards catch a spy. In his pockets you find '.$tronic.' tronic.';
 $na['8']='You sell your wife on the blackmarket. You get '.$tronic.' tronic.';
-$na['9']='Say "A tronic is a tronic is a tronic is a tronic". Hey, well done. You get '.$tronic.' tronic.';
+$na['9']='Say 'A tronic is a tronic is a tronic is a tronic'. Hey, well done. You get '.$tronic.' tronic.';
 ?>

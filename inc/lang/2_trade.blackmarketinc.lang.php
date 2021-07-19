@@ -26,7 +26,7 @@ $tradeblackmarketinc_lang['e']='E';
 $tradeblackmarketinc_lang['kaufen']='buy';
 $tradeblackmarketinc_lang['artilvleins']='Artefact (Level 1)';
 $tradeblackmarketinc_lang['wochen']='Weeks';
-$tradeblackmarketinc_lang['creditangebot']='If you need credits quickly, you can buy them in your central account management under the menu item "credits". From there, the credits can be transfered to the several game servers.';
+$tradeblackmarketinc_lang['creditangebot']='If you need credits quickly, you can buy them in your central account management under the menu item 'credits'. From there, the credits can be transfered to the several game servers.';
 
 
 $tradeblackmarketinc_lang['msg_1']='Transaction is finished shortly.';

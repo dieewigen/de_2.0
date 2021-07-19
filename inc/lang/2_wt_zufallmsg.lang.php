@@ -118,41 +118,41 @@ $ressourcenart['3']='Eternium';
 
 
 
-$kolliemsg['0']=' A big company invests in your technology and contributes '.number_format($zufallskollies, 0,"",".").' collectors.';
-$kolliemsg['1']=' A private research center develops an new control system for collectors and sends you for testing purpose '.number_format($zufallskollies, 0,"",".").' collector prototypes for free.';
-$kolliemsg['2']=' A private university developed a better collector cell and sends you '.number_format($zufallskollies, 0,"",".").' prototypes to verify their testing results.';
-$kolliemsg['3']=' A training escort finds between the wreckage of old ships '.number_format($zufallskollies, 0,"",".").' lost collectors.';
-$kolliemsg['4']=' During a heavy hyperspace storm '.number_format($zufallskollies, 0,"",".").' collectors appear in the orbit of your planet.';
-$kolliemsg['5']=' A new self replicating biological collector factory could increase the amount of collectors by '.number_format($zufallskollies, 0,"",".").' without any costs.';
+$kolliemsg['0']=' A big company invests in your technology and contributes '.number_format($zufallskollies, 0,','.').' collectors.';
+$kolliemsg['1']=' A private research center develops an new control system for collectors and sends you for testing purpose '.number_format($zufallskollies, 0,','.').' collector prototypes for free.';
+$kolliemsg['2']=' A private university developed a better collector cell and sends you '.number_format($zufallskollies, 0,','.').' prototypes to verify their testing results.';
+$kolliemsg['3']=' A training escort finds between the wreckage of old ships '.number_format($zufallskollies, 0,','.').' lost collectors.';
+$kolliemsg['4']=' During a heavy hyperspace storm '.number_format($zufallskollies, 0,','.').' collectors appear in the orbit of your planet.';
+$kolliemsg['5']=' A new self replicating biological collector factory could increase the amount of collectors by '.number_format($zufallskollies, 0,','.').' without any costs.';
 
-$schiffmsg['0']=' You win '.number_format($anzahl, 0,"",".").' '.$schiffsname['$zufallsrasse']['$schiffsart'].'.';
+$schiffmsg['0']=' You win '.number_format($anzahl, 0,','.').' '.$schiffsname['$zufallsrasse']['$schiffsart'].'.';
 
-$deffmsg['0']=' You win '.number_format($zufallsturm, 0,"",".").' '.$turm['$zufallsrasse']['$turmart'].' as first price in a singing contest.';
-$deffmsg['1']=' With improvements in their nanobot technologie your engineer could repair '.number_format($zufallsturm, 0,"",".").' broken '.$turm['$zufallsrasse']['$turmart'].'.';
-$deffmsg['2']=' An unknown person sends you '.number_format($zufallsturm, 0,"",".").' '.$turm['$zufallsrasse']['$turmart'].' as a gift.';
-//$deffmsg['3']=' Polizeieinheiten beschlagnahmen '.number_format($zufallsturm, 0,"",".").' funktionsf&auml;hige '.$turm['$zufallsrasse']['$turmart'].' der R&uuml;stungsmafia.';
-//$deffmsg['4']=' Ein namenhafter Konzern hat ihnen einige unzul&auml;ssige Vertragsbedingungen untergejubelt und wurde von einem Gericht zur kostenfreien Lieferung von '.number_format($zufallsturm, 0,"",".").' '.$turm['$zufallsrasse']['$turmart'].' verurteilt.';
-//$deffmsg['5']=' Bei einer Razzia einer illegalen Kriegsger&auml;temesse k&ouml;nnen Polizeieinheiten '.number_format($zufallsturm, 0,"",".").' '.$turm['$zufallsrasse']['$turmart'].' beschlagnahmen.';
-//$deffmsg['6']=' Eine spontane Mutation eines Nanobotstamms repliziert '.number_format($zufallsturm, 0,"",".").' '.$turm['$zufallsrasse']['$turmart'].' bevor er sich wegen unkontrollierter Verbreitung selbst vernichtet.';
+$deffmsg['0']=' You win '.number_format($zufallsturm, 0,','.').' '.$turm['$zufallsrasse']['$turmart'].' as first price in a singing contest.';
+$deffmsg['1']=' With improvements in their nanobot technologie your engineer could repair '.number_format($zufallsturm, 0,','.').' broken '.$turm['$zufallsrasse']['$turmart'].'.';
+$deffmsg['2']=' An unknown person sends you '.number_format($zufallsturm, 0,','.').' '.$turm['$zufallsrasse']['$turmart'].' as a gift.';
+//$deffmsg['3']=' Polizeieinheiten beschlagnahmen '.number_format($zufallsturm, 0,','.').' funktionsfähige '.$turm['$zufallsrasse']['$turmart'].' der Rüstungsmafia.';
+//$deffmsg['4']=' Ein namenhafter Konzern hat ihnen einige unzulässige Vertragsbedingungen untergejubelt und wurde von einem Gericht zur kostenfreien Lieferung von '.number_format($zufallsturm, 0,','.').' '.$turm['$zufallsrasse']['$turmart'].' verurteilt.';
+//$deffmsg['5']=' Bei einer Razzia einer illegalen Kriegsgerätemesse können Polizeieinheiten '.number_format($zufallsturm, 0,','.').' '.$turm['$zufallsrasse']['$turmart'].' beschlagnahmen.';
+//$deffmsg['6']=' Eine spontane Mutation eines Nanobotstamms repliziert '.number_format($zufallsturm, 0,','.').' '.$turm['$zufallsrasse']['$turmart'].' bevor er sich wegen unkontrollierter Verbreitung selbst vernichtet.';
 
-$erfahrungsmsg['0']=' Your pilots fly a maneuver. The commanding officer wins '.number_format($zufallerfahrung, 0,"",".").' experience points.';
-$erfahrungsmsg['1']=' In a maneuver the pilot has an accident. At least he learned something and gets ('.number_format($zufallerfahrung, 0,"",".").' experience points).';
+$erfahrungsmsg['0']=' Your pilots fly a maneuver. The commanding officer wins '.number_format($zufallerfahrung, 0,','.').' experience points.';
+$erfahrungsmsg['1']=' In a maneuver the pilot has an accident. At least he learned something and gets ('.number_format($zufallerfahrung, 0,','.').' experience points).';
 
-$agentenmsg['0']=' Some agents of the enemy change the lines. After an inspection of their integrity '.number_format($zufallsagenten, 0,"",".").' agents can begin their work.';
-$agentenmsg['1']=' After an image campaign many new employees for the secret service are recruited. '.number_format($zufallsagenten, 0,"",".").' new agents can begin their work.';
-//$agentenmsg['2']=' Ihr Nachrichtendienst f&uuml;hrte eine umfangreiche Rekrutierungsaktion bester K&ouml;pfe durch. Von allen neu zugewiesenen Identit&auml;ten wurden '.number_format($zufallsagenten, 0,"",".").' angenommen, um die &uuml;brigen wurde sich gek&uuml;mmert. Die Familien erhielten die &uuml;bliche Zuwendung.';
-//$agentenmsg['3']=' Durch eine Zusammenlegung zweier Abteilungen ihres Geheimdienstes konnten Stellen gespart werden. Es konnten '.number_format($zufallsagenten, 0,"",".").' Agenten f&uuml;r den Au&szlig;endienst mobilisiert werden, die &uuml;brigen erhielten die n&ouml;tige Aufmerksamkeit.';
-//$agentenmsg['4']=' Durch neue, psychische Trainigsmethoden konnten '.number_format($zufallsagenten, 0,"",".").' Agenten die f&uuml;r den Au&szlig;endienst n&ouml;tige Sicherheitsstufe erlangen.';
-//$agentenmsg['5']=' Einige in Haft befindliche Agenten konnten durch chemische Umerziehungsma&szlig;nahmen wieder auf Linie gebracht werden. '.number_format($zufallsagenten, 0,"",".").' Agenten &uuml;berstanden diese.';
-//$agentenmsg['6']=' Eine Befreiungsaktion brachte einige verloren geglaubte Agenten auf. '.number_format($zufallsagenten, 0,"",".").' von ihnen &uuml;berstanden alles ohne bleibende Sch&auml;den, die anderen wurden kosteng&uuml;nstig in den Ruhestand geschickt.';
-//$agentenmsg['7']=' Durch das Klonen ihrer besten Agenten konnte das nachrichtendienstliche Personal um '.number_format($zufallsagenten, 0,"",".").' Agenten aufgestockt werden.';
+$agentenmsg['0']=' Some agents of the enemy change the lines. After an inspection of their integrity '.number_format($zufallsagenten, 0,','.').' agents can begin their work.';
+$agentenmsg['1']=' After an image campaign many new employees for the secret service are recruited. '.number_format($zufallsagenten, 0,','.').' new agents can begin their work.';
+//$agentenmsg['2']=' Ihr Nachrichtendienst führte eine umfangreiche Rekrutierungsaktion bester Köpfe durch. Von allen neu zugewiesenen Identitäten wurden '.number_format($zufallsagenten, 0,','.').' angenommen, um die übrigen wurde sich gekümmert. Die Familien erhielten die übliche Zuwendung.';
+//$agentenmsg['3']=' Durch eine Zusammenlegung zweier Abteilungen ihres Geheimdienstes konnten Stellen gespart werden. Es konnten '.number_format($zufallsagenten, 0,','.').' Agenten für den Au&szlig;endienst mobilisiert werden, die übrigen erhielten die nötige Aufmerksamkeit.';
+//$agentenmsg['4']=' Durch neue, psychische Trainigsmethoden konnten '.number_format($zufallsagenten, 0,','.').' Agenten die für den Au&szlig;endienst nötige Sicherheitsstufe erlangen.';
+//$agentenmsg['5']=' Einige in Haft befindliche Agenten konnten durch chemische Umerziehungsma&szlig;nahmen wieder auf Linie gebracht werden. '.number_format($zufallsagenten, 0,','.').' Agenten überstanden diese.';
+//$agentenmsg['6']=' Eine Befreiungsaktion brachte einige verloren geglaubte Agenten auf. '.number_format($zufallsagenten, 0,','.').' von ihnen überstanden alles ohne bleibende Schäden, die anderen wurden kostengünstig in den Ruhestand geschickt.';
+//$agentenmsg['7']=' Durch das Klonen ihrer besten Agenten konnte das nachrichtendienstliche Personal um '.number_format($zufallsagenten, 0,','.').' Agenten aufgestockt werden.';
 
-$sondenmsg['0']=' In a meteor storm your fleets find. '.number_format($zufallssonden, 0,"",".").' espionage probes.';
-$sondenmsg['1']=' As bonus for a big research order your secret service gets '.number_format($zufallssonden, 0,"",".").' espionage probes.';
-//$sondenmsg['2']=' Beim testen einer selbstreplizierenden Sonde enstanden auf Anhieb '.number_format($zufallssonden, 0,"",".").' funktionsf&auml;hige Sonden, alle weiteren waren allerdings fehlerhaft, weshalb das Projekt erstmal auf Eis gelegt wurde.';
+$sondenmsg['0']=' In a meteor storm your fleets find. '.number_format($zufallssonden, 0,','.').' espionage probes.';
+$sondenmsg['1']=' As bonus for a big research order your secret service gets '.number_format($zufallssonden, 0,','.').' espionage probes.';
+//$sondenmsg['2']=' Beim testen einer selbstreplizierenden Sonde enstanden auf Anhieb '.number_format($zufallssonden, 0,','.').' funktionsfähige Sonden, alle weiteren waren allerdings fehlerhaft, weshalb das Projekt erstmal auf Eis gelegt wurde.';
 
-$ressmsg['0']=' Your fleets discover the wreckage of a big space battle that brings '.number_format($anzahl, 0,"",".").' '.$ressourcenart['$ressart'].' from recycling.';
-$ressmsg['1']=' An error of an engineer makes some of your converters run on 120% for a short period. The result is '.number_format($anzahl, 0,"",".").' '.$ressourcenart['$ressart'].' additional output. Fortunately the converter did not take any damage.';
-//$ressmsg['2']=' Bergarbeiter stie&szlig;en auf einem Asteroiden auf besonders reiche und reine '.$ressourcenart['$ressart'].'vorkommen. '.number_format($anzahl, 0,"",".").' Einheiten davon stehen sofort zur Verf&uuml;gung.';
+$ressmsg['0']=' Your fleets discover the wreckage of a big space battle that brings '.number_format($anzahl, 0,','.').' '.$ressourcenart['$ressart'].' from recycling.';
+$ressmsg['1']=' An error of an engineer makes some of your converters run on 120% for a short period. The result is '.number_format($anzahl, 0,','.').' '.$ressourcenart['$ressart'].' additional output. Fortunately the converter did not take any damage.';
+//$ressmsg['2']=' Bergarbeiter stie&szlig;en auf einem Asteroiden auf besonders reiche und reine '.$ressourcenart['$ressart'].'vorkommen. '.number_format($anzahl, 0,','.').' Einheiten davon stehen sofort zur Verfügung.';
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 $allyforumvt_lang['title']='Allianzforum';
-$allyforumvt_lang['zurueck']='zur&uuml;ck';
+$allyforumvt_lang['zurueck']='zurück';
 $allyforumvt_lang['tolastpost']='Zum letzten Post der Seite springen';
 $allyforumvt_lang['thema']='THEMA';
 $allyforumvt_lang['re']='Re';
@@ -12,13 +12,13 @@ $allyforumvt_lang['antwortauf']='Antwort auf';
 $allyforumvt_lang['erstellen']='erstellen';
 $allyforumvt_lang['titel']='Titel';
 $allyforumvt_lang['nachricht']='Nachricht';
-$allyforumvt_lang['aenderungspeichern']='&Auml;nderung speichern';
+$allyforumvt_lang['aenderungspeichern']='änderung speichern';
 $allyforumvt_lang['antworten']='Antworten';
 $allyforumvt_lang['ontopaktivieren']='OnTop aktivieren';
 $allyforumvt_lang['ontopdeaktivieren']='OnTop deaktivieren';
 $allyforumvt_lang['threadschliessen']='Thread schlie&szlig;en';
-$allyforumvt_lang['threadoeffnen']='Thread &ouml;ffnen';
-$allyforumvt_lang['threadloeschen']='Thread l&ouml;schen';
+$allyforumvt_lang['threadoeffnen']='Thread öffnen';
+$allyforumvt_lang['threadloeschen']='Thread löschen';
 
 $allyforumvt_lang['msg_1']='Leider haben Sie keinen Zugriff auf dieses Dokument.  ';
 $allyforumvt_lang['msg_2']='Sie sind nicht berechtigt, dieses Dokument zu editieren.';
@@ -33,5 +33,5 @@ $allyforumvt_lang['msg_8_3']='Uhr';
 $allyforumvt_lang['msg_8_4']='\u\m';
 $allyforumvt_lang['msg_9_1']='Dieser Beitrag wurde';
 $allyforumvt_lang['msg_9_2']='mal editiert, das letzte Mal am';
-$allyforumvt_lang['msg_10']='M&ouml;chten Sie diesen Thread wirklich l&ouml;schen?';
+$allyforumvt_lang['msg_10']='Möchten Sie diesen Thread wirklich löschen?';
 ?>

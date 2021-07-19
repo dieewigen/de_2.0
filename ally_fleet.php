@@ -10,31 +10,31 @@
 //                                                          auf Co-Leader
 //  --------------------------------------------------------------------------------
 
-include "inc/header.inc.php";
-include 'inc/lang/'.$sv_server_lang.'_ally.fleet.lang.php';
-include_once 'functions.php';
+include('inc/header.inc.php');
+include('inc/lang/'.$sv_server_lang.'_ally.fleet.lang.php');
+include_once('functions.php');
 
 checkMissionEnd();
 
 $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];
-$sector=$row["sector"];$system=$row["system"];
-$allytag=$row["allytag"];
+$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$newtrans=$row['newtrans'];$newnews=$row['newnews'];
+$sector=$row['sector'];$system=$row['system'];
+$allytag=$row['allytag'];
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?php echo $allyfleet_lang[title]?></title>
-<?php include "cssinclude.php"; ?>
+<title><?php echo $allyfleet_lang['title']?></title>
+<?php include('cssinclude.php'); ?>
 </head>
 <body>
 
 <?php
-include "resline.php";
+include('resline.php');
 
-include ("ally/ally.menu.inc.php");
+include('ally/ally.menu.inc.php');
 
 $full_access = false;
 if (has_position("leaderid", $allytag, $ums_user_id) || has_position("coleaderid1", $allytag, $ums_user_id) || has_position("coleaderid2", $allytag, $ums_user_id) || has_position("coleaderid3", $allytag, $ums_user_id) || has_position("fleetcommander1", $allytag, $ums_user_id) || has_position("fleetcommander2", $allytag, $ums_user_id)){
@@ -47,7 +47,7 @@ echo '
 <table width="600" border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td width="*" align="center" class="ro">'.$allyfleet_lang[allianzflottenstatus].'</td>
+<td width="*" align="center" class="ro">'.$allyfleet_lang['allianzflottenstatus'].'</td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
 <tr><td width="13" class="rl">&nbsp;</td><td>
@@ -55,13 +55,13 @@ echo '
 
 if ($full_access){
 	echo '<tr>'.
-	        '<td class="tc">'.$allyfleet_lang[rassename].'</td>'.
-	        '<td class="tc">'.$allyfleet_lang[koords].'</td>'.
-	        '<td class="tc">'.$allyfleet_lang[heimatflotte].'</td>'.
-	        '<td class="tc">'.$allyfleet_lang[flotte].' I</td>'.
-	        '<td class="tc">'.$allyfleet_lang[flotte].' II</td>';
-	echo    '<td class="tc">'.$allyfleet_lang[flotte].' III</td>';
-	echo    '<td class="tc">'.$allyfleet_lang[gesamt].'</td>';
+	        '<td class="tc">'.$allyfleet_lang['rassename'].'</td>'.
+	        '<td class="tc">'.$allyfleet_lang['koords'].'</td>'.
+	        '<td class="tc">'.$allyfleet_lang['heimatflotte'].'</td>'.
+	        '<td class="tc">'.$allyfleet_lang['flotte'].' I</td>'.
+	        '<td class="tc">'.$allyfleet_lang['flotte'].' II</td>';
+	echo    '<td class="tc">'.$allyfleet_lang['flotte'].' III</td>';
+	echo    '<td class="tc">'.$allyfleet_lang['gesamt'].'</td>';
 	echo '</tr>';
 }
 
@@ -78,11 +78,11 @@ $numrows = mysql_num_rows($result);
 
 for ($i=0; $i<$numrows;$i++){
 	$values = mysql_fetch_array($result);
-    $userid = $values["user_id"];
-    $spielername = $values["spielername"];
-    $sector = $values["sector"];
-    $system = $values["system"];
-    $m_rasse = $values["rasse"];
+    $userid = $values['user_id'];
+    $spielername = $values['spielername'];
+    $sector = $values['sector'];
+    $system = $values['system'];
+    $m_rasse = $values['rasse'];
     $r_text = "?";
 
     if ($m_rasse == "1")
@@ -105,24 +105,24 @@ for ($i=0; $i<$numrows;$i++){
 
     if ($full_access)
     {
-	    print("<tr>\n");
-	    print("<td class=\"cl\">[$r_text] $spielername</td>\n");
-	    print("<td class=\"cr\">{$sector}:{$system}</td>\n");
+	    print('<tr>');
+	    print('<td class="cl">['.$r_text.'] '.$spielername.'</td>');
+	    print('<td class="cr">'.$sector.':'.$system.'</td>');
 	}
 	
 	for ($fnum = 0; $fnum<=3; $fnum++){
     	$f_result = mysql_query("SELECT aktion, zeit, (e81+e82+e83+e84+e85+e86+e87+e88+e89+e90) as fsize from de_user_fleet where user_id='{$userid}-{$fnum}'");
     	$fleet = mysql_fetch_array($f_result);
-	    $fleet_aktion = $fleet["aktion"];
+	    $fleet_aktion = $fleet['aktion'];
 	    if ($fnum > 0)
 	    {
-    		$fleet_aktzeit = "(".$fleet["zeit"].")";
+    		$fleet_aktzeit = "(".$fleet['zeit'].")";
 	    }
 	    else
 	    {
 	    	$fleet_aktzeit="";
 	    }
-    	$fleet_fsize = $fleet["fsize"];
+    	$fleet_fsize = $fleet['fsize'];
    		$fleet_gesamt = $fleet_gesamt + $fleet_fsize;
 
    		if ($fleet_aktion == "1"){//Angriff
