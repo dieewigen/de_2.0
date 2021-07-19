@@ -84,21 +84,6 @@ if($_SESSION['sou_user_id']>0)
   $db_daten=mysql_query("SELECT * FROM sou_user_data WHERE user_id='$_SESSION[sou_user_id]'",$soudb);  	
   $row = mysql_fetch_array($db_daten);
   $player_user_id=$_SESSION['sou_user_id'];
-<<<<<<< HEAD
-  $_SESSION["sou_spielername"]=$row["spielername"].' {'.$row["sn_ext1"].'}';
-  $player_name=$row["spielername"];
-  $player_age=$row['playerage'];
-  $_SESSION["sou_fraction"]=$row["fraction"];
-  $player_fraction=$row["fraction"];
-  $_SESSION["sou_shipname"]=$row["shipname"];
-  $player_ship_name=$row["shipname"];
-  $player_x=$row["x"];
-  $player_y=$row["y"];
-  $player_rhx=$row["rhx"];
-  $player_rhy=$row["rhy"];
-  $player_rhuse=$row["rhuse"];
-  $player_money=$row["money"];
-=======
   $_SESSION['sou_spielername']=$row['spielername'].' {'.$row['sn_ext1'].'}';
   $player_name=$row['spielername'];
   $player_age=$row['playerage'];
@@ -112,7 +97,6 @@ if($_SESSION['sou_user_id']>0)
   $player_rhy=$row['rhy'];
   $player_rhuse=$row['rhuse'];
   $player_money=$row['money'];
->>>>>>> 8a01cf88bc255e5ca728eeb6b7f1ff160062a08f
   $player_darkmatter=$row['darkmatter'];
   $player_baosin=$row['baosin'];
   $player_destroy=$row['destroy'];
