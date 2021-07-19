@@ -49,7 +49,7 @@ include('lib/basefunctions.lib.php');
 //Erweiterung des Querys auf Abfrage von Coleadern von Ascendant (05.09.2002)
 $query = "SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
 $allys = mysqli_query($db, $query);
-if(mysql_num_rows($allys) < "1")
+if(mysqli_num_rows($allys) < "1")
 {
 	echo $allykick_lang['msg_1'];
 }

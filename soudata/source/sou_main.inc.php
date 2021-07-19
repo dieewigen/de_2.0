@@ -327,11 +327,7 @@ include "bannerunterbrechung.php";
 //men� ende
 
 //wenn nichts gew�hlt wurde die startseite nehmen
-<<<<<<< HEAD
-if(!isset($_REQUEST["action"]))$_REQUEST["action"]="systempage";
-=======
 if($_REQUEST['action']=="")$_REQUEST['action']="systempage";
->>>>>>> 8a01cf88bc255e5ca728eeb6b7f1ff160062a08f
 
 //auf die einzelnen unterseiten verzweigen
 if($_REQUEST['action']=="optionspage")
