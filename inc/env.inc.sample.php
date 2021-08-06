@@ -16,6 +16,11 @@ $GLOBALS['env_db_loginsystem_user']='';
 $GLOBALS['env_db_loginsystem_password']='';
 $GLOBALS['env_db_loginsystem_database']='';
 
+$GLOBALS['env_db_logging_host']='';
+$GLOBALS['env_db_logging_user']='';
+$GLOBALS['env_db_logging_password']='';
+$GLOBALS['env_db_logging_database']='';
+
 //DE
 $GLOBALS['env_db_dieewigen_host']='';
 $GLOBALS['env_db_dieewigen_user']='';
