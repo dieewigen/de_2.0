@@ -13,10 +13,10 @@ if(!isset($_REQUEST["authcode"]) || $_REQUEST["authcode"]!=$GLOBALS['env_rpc_aut
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-//daten f�r die rangliste der accountverwaltung zur�ckliefern
+//daten für die rangliste der accountverwaltung zurückliefern
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["gettlscore"]==1){
+if(isset($_REQUEST["gettlscore"]) && $_REQUEST["gettlscore"]==1){
 	//zuerst die anzahl der aktiven spieler feststellen
 	//bei non-bezahlservern alle spieler werten, auf bezahlservern nur die pa-user
 	if($sv_payserver==0){
@@ -37,7 +37,7 @@ if($_REQUEST["gettlscore"]==1){
 //feststellen wieviele user es auf dem server gibt
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["getaccountanz"]==1){
+if(isset($_REQUEST["getaccountanz"]) && $_REQUEST["getaccountanz"]==1){
 	//$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector>1 AND npc=0",$db);
 	$db_daten=mysql_query("SELECT de_login.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1",$db);
 
@@ -46,7 +46,7 @@ if($_REQUEST["getaccountanz"]==1){
 }
 
 //feststellen ob es einen account mit der owner_id gibt
-if($_REQUEST["isaccount"]==1){
+if(isset($_REQUEST["isaccount"]) && $_REQUEST["isaccount"]==1){
 	$id=intval($_REQUEST["id"]);
 	if($id==0)$id='-1';
 	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
@@ -64,7 +64,7 @@ if($_REQUEST["isaccount"]==1){
 //feststellen ob es einen account mit der user_id gibt
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["isaccount_user_id"]==1)
+if(isset($_REQUEST["isaccount_user_id"]) && $_REQUEST["isaccount_user_id"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
@@ -81,7 +81,7 @@ if($_REQUEST["isaccount_user_id"]==1)
 //accountdaten abfragen
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["getaccountdata"]==1)
+if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
@@ -166,7 +166,7 @@ if($_REQUEST["getaccountdata"]==1)
 //einen loginkey setzen
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["setloginkey"]==1)
+if(isset($_REQUEST["setloginkey"]) && $_REQUEST["setloginkey"]==1)
 {
   $id=intval($_REQUEST["id"]);
   $ip=$_REQUEST["ip"];
@@ -194,36 +194,10 @@ if($_REQUEST["setloginkey"]==1)
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-//einen bestehenden account verkn�pfen
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-if($_REQUEST["linkaccount"]==1)
-{
-  $id=intval($_REQUEST["id"]);
-  $loginname=$_REQUEST["loginname"];
-  $passwort=$_REQUEST["passwort"];
-  if($id==0)$id='-1';
-  //schauen ob es den account gibt
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id=0 AND nic='$loginname' AND pass=MD5('$passwort')",$db);
-  $num = mysql_num_rows($db_daten);
-  if($num==1)
-  {
-    //falls ja user id auslesen und die owner_id setzen
-    $row = mysql_fetch_array($db_daten);
-    $user_id=$row["user_id"];
-    mysql_query("UPDATE de_login SET owner_id='$id' WHERE user_id = '$user_id'",$db);
-    //den key zur�ckgeben
-    echo '1';
-  }
-  else echo '2';
-}
-
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
 //credittransfer
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["credittransfer"]==1){
+if(isset($_REQUEST["credittransfer"]) && $_REQUEST["credittransfer"]==1){
 	$id=intval($_REQUEST["id"]);
 	$credits=intval($_REQUEST["credits"]);
 	if($id==0)$id='-1';
@@ -253,7 +227,7 @@ if($_REQUEST["credittransfer"]==1){
 //credittransfer durchs billingsystem
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["credittransfer_billing"]==1)
+if(isset($_REQUEST["credittransfer_billing"]) && $_REQUEST["credittransfer_billing"]==1)
 {
   $user_id=intval($_REQUEST["id"]);
   $credits=intval($_REQUEST["credits"]);
@@ -276,7 +250,7 @@ if($_REQUEST["credittransfer_billing"]==1)
 //spielzeitbuchung / PA
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["getplaytime"]==1)
+if(isset($_REQUEST["getplaytime"]) && $_REQUEST["getplaytime"]==1)
 {
   $id=intval($_REQUEST["id"]);
   $tage=intval($_REQUEST["tage"]);
@@ -324,7 +298,7 @@ if($_REQUEST["getplaytime"]==1)
 //einen neuen account anlegen
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-if($_REQUEST["createaccount"]==1){
+if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
   $rasse=$_REQUEST["rasse"];
@@ -342,8 +316,7 @@ if($_REQUEST["createaccount"]==1){
   $jahr=$_REQUEST["jahr"];
   $geschl=$_REQUEST["geschlecht"];
   $patime=$_REQUEST["patime"];
-  $cooperation=$_REQUEST["cooperation"];
-  $werberid=$_REQUEST[werberid];
+  $werberid=$_REQUEST['werberid'];
 
 
   //schauen ob der spielername bereits verwendet wird
@@ -367,9 +340,15 @@ if($_REQUEST["createaccount"]==1){
   //wenn soweit alles ok ist den account anlegen
   //de_login
   //wenn efta/sou allein steht, dann ist der account direkt aktiv
-  if($sv_efta_in_de==1 AND $sv_sou_in_de==1)$status=0;else $status=1;
-  mysql_query("INSERT INTO de_login (owner_id, nic, reg_mail, register, last_login, status, cooperation)
-    VALUES ('$id', '$spielername', '$email', NOW(), NOW(), '$status', '$cooperation')", $db);
+  //if($sv_efta_in_de==1 AND $sv_sou_in_de==1)$status=0;else $status=1;
+
+  //der Account ist jetzt immer direkt aktiv
+  $status=1;
+
+  $sql="INSERT INTO de_login (owner_id, nic, reg_mail, register, last_login, status)
+  VALUES ('$id', '$spielername', '$email', NOW(), NOW(), '$status')";
+  mysql_query($sql, $db);
+
   $user_id=mysql_insert_id();
   
   if($patime>time())$premium=1; else $premium=0;
@@ -383,8 +362,8 @@ if($_REQUEST["createaccount"]==1){
   mysql_query("UPDATE de_user_data SET ekey='100;0;0;0' WHERE user_id='$user_id';", $db);
 
   //de_user_info
-  mysql_query("INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht)
-    VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl')", $db);
+  mysql_query("INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
+    VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl', '', '', '', '', '')", $db);
 
   if($sv_efta_in_de==1 AND $sv_sou_in_de==1)
   {
@@ -401,14 +380,12 @@ if($_REQUEST["createaccount"]==1){
     mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
    
     $time=strftime("%Y%m%d%H%M%S");
-    /* Begr��ungs HFN Start*/
-    mysql_query("update de_user_data set newtrans=1 where user_id=$uid");
-    $body=str_replace("{SPIELERNAME}", $spielername , $rpc_lang[begrbody]);
-    
-    $desc=str_replace("{WERT1}", number_format($sv_artefakt[$row["id"]-1][0], 2,",",".") ,$desc);
+    /* Begrüßungs HFN Start*/
+    mysql_query("update de_user_data set newtrans=1 where user_id=$user_id");
+    $body=str_replace("{SPIELERNAME}", $spielername , $rpc_lang['begrbody']);
     mysql_query("INSERT INTO de_user_hyper (empfaenger,absender,fromsec,fromsys,fromnic,time,betreff,text,archiv,sender,gelesen)VALUES ('$user_id', '0', '0', '1', '$rpc_lang[begrabs]', '$time' , '$rpc_lang[begrbetreff]','$body', '0', '0', '0')");
     mysql_query("INSERT INTO de_user_hyper (empfaenger,absender,fromsec,fromsys,fromnic,time,betreff,text,archiv,sender,gelesen)VALUES ('$user_id', '0', '0', '1', '$rpc_lang[begrabs]', '$time' , '$rpc_lang[begrbetreff]','$body', '1', '0', '0')");
-    /* Begr��ungs HFN Ende */
+    /* Begrüßungs HFN Ende */
 
 
     //späteinsteigerhilfe, gilt nicht in der ewigen runde
@@ -427,8 +404,8 @@ if($_REQUEST["createaccount"]==1){
         //rohstoffe gutschreiben und nachrichten auf new setzen
         mysql_query("UPDATE de_user_data SET restyp01 = restyp01 + '$m', restyp02 = restyp02 + '$d', newnews=1 WHERE user_id='$user_id'",$db);
         //nachricht hinterlegen
-        $nachricht=$rpc_lang[spaet1].number_format($maxtick, 0,"",".").$rpc_lang[spaet2].
-        number_format($m, 0,"",".").$rpc_lang[spaet3].number_format($d, 0,"",".").$rpc_lang[spaet4];
+        $nachricht=$rpc_lang['spaet1'].number_format($maxtick, 0,"",".").$rpc_lang['spaet2'].
+        number_format($m, 0,"",".").$rpc_lang['spaet3'].number_format($d, 0,"",".").$rpc_lang['spaet4'];
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$user_id', 3,'$time','$nachricht')",$db);
       }
 	  }

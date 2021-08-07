@@ -8,9 +8,10 @@ if(!empty($_SERVER['HTTPS'])){
 	$ums_gpfad=str_replace('http://','https://',$ums_gpfad);
 }
 
-if($ums_rasse<1)$ums_rasse=1;
+if($_SESSION['ums_rasse']<1){
+	$_SESSION['ums_rasse']=1;
+}
 
-//$ums_rasse=4;
 if(isset($eftacss) && $eftacss==1){
 	echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'e.css">';
 }elseif(isset($soucss) && $soucss==1){
@@ -22,24 +23,24 @@ if(isset($eftacss) && $eftacss==1){
 }else{ //de-css laden
 	//unterscheiden ob spielbereich, chat oder menu und das jeweils mobil/nicht mobil
 	if(isset($loadcssmenu) && $loadcssmenu==1)	{
-		echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'m'.$ums_rasse.'.css"><link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$ums_rasse.'.css">';
+		echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'m'.$_SESSION['ums_rasse'].'.css"><link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$_SESSION['ums_rasse'].'.css">';
 	}
   	elseif(isset($loadcsschat) && $loadcsschat==1)
   	{
   		if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
-			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$ums_rasse.'_m.css">';
+			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$_SESSION['ums_rasse'].'_m.css">';
 			echo '<meta name="viewport" content="width=620">';
 		}else{
-			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$ums_rasse.'.css">';
+			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$_SESSION['ums_rasse'].'.css">';
 		}
   	}
 	else //spielbereich
 	{
   		if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
-			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$ums_rasse.'_m.css">';
+			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$_SESSION['ums_rasse'].'_m.css">';
 			echo '<meta name="viewport" content="width=620">';
 		}else{
-			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$ums_rasse.'.css">';
+			echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$_SESSION['ums_rasse'].'.css">';
 		}
   	}
 	

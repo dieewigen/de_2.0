@@ -176,20 +176,24 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 
 	  }    
 
-	  if($ums_status==1){//alles richtig eingegen, spieler einloggen
+	  if($ums_status==1){//alles richtig, spieler einloggen
 		//logincheck, wie oft wurde bereits die grafikaufgabe falsch eingegeben
 		$summe_fehleingaben = $row["points"]+1;
 		//spielerdaten aus der de_login uns sv.inc.php in die session packen
 		$ums_user_id=$row["user_id"];
-		$ums_nic=$_POST['nic'];
+		$_SESSION['ums_user_id']=$row["user_id"];
+		$ums_nic=$row["nic"];
 		$ums_servid=$sv_servid;
 		$ums_zeitstempel=time();
 		$ums_session_start=$ums_zeitstempel;
 		//$ums_one_way_bot_protection=0;
 
 		//spielerdaten aus de_user_data holen und in die session packen
-		$result = mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'") OR die(mysql_error());
-		$row = mysql_fetch_array($result);
+		$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id='$ums_user_id'") OR die(mysql_error());
+		$row = mysqli_fetch_array($result);
+
+		error_log(print_r($row,true));
+
 		$techs=$row["techs"];
 		//$_SESSION["ums_chatoff"]=$row["chatoff"];
 		$_SESSION["ums_chatoff"]=0;
@@ -211,7 +215,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 			$_SESSION['ums_mobi']=0;
 		}
 
-		$_SESSION['desktop_version']=$_COOKIE["desktop_version"];
+		$_SESSION['desktop_version']=isset($_COOKIE["desktop_version"]) ? intval($_COOKIE["desktop_version"]) : 1;
 
 		//////////////////////////////////////////////////////////////////////
 		//check ob die mobile Version verwendet werden soll

@@ -7,6 +7,9 @@ require_once('lib/phpmailer/class.smtp.php');
 include('functions.php');
 include('inc/lang/'.$sv_server_lang.'_options.lang.php');
 
+$errmsg='';
+$getpamsg='';
+
 if(isset($_REQUEST['set_use_mobile_version'])){
   $value=intval($_REQUEST['set_use_mobile_version']);
   $time=time()+3600*24*365*5;
@@ -409,15 +412,21 @@ if ($selfvoteout)
     header("Location: index.php");
   }
 }*/
-
-if ($_POST['delacc']){ //account l�schen
+$delacc=$_POST['delacc'] ?? false;
+if ($delacc){ //account l�schen
 	$delpass=$_POST['delpass'];
 	$delcheck1=$_POST['delcheck1'];
 	$delcheck2=$_POST['delcheck2'];
 
-	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$delpass')", $db);
-	$num = mysql_num_rows($db_daten);
-	if($num==1){ //oldpass ist korrekt
+	$db_datenx=mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
+	$rowx = mysql_fetch_array($db_datenx);
+
+	$passwordOK=false;
+	if(password_verify(trim($delpass), $rowx['pass'])){
+		$passwordOK=true;
+	}	
+
+	if ($passwordOK){ //oldpass ist korrekt	
 		if ($delcheck1=="1" and $delcheck2=="1"){//l�sche
 			//�berpr�fen ob man evtl. allianzleader ist, da ist es notwendig den posten aufzugeben
 			$db_daten = mysql_query("SELECT * FROM de_allys WHERE leaderid='$ums_user_id';", $db);
@@ -461,7 +470,11 @@ if ($_POST['delacc']){ //account l�schen
 			}else{
 				$errmsg='<div class="info_box text2">Gib bitte zuerst Deinen Posten als Allianzleiter auf. Du kannst den Posten &uuml;bertragen, oder die Allianz l&ouml;schen.</div>';
 			}
+		}else{
+			$errmsg='<div class="info_box text2">Setze bitte beide H&auml;kchen um den Account zu l&ouml;schen.</div>';
 		}
+	} else {
+		$errmsg.= '<font color="FF0000">'.$options_lang['umodefehler2'].'</font>';
 	}
 }
 
@@ -495,12 +508,18 @@ $logoutmsg='<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' '.
 //stelle die ressourcenleiste dar
 include('resline.php');
 
-$urlacc=$_POST['urlacc'];
+$urlacc=$_POST['urlacc'] ?? false;
 if($urlacc){ //account in urlaubsmodus versetzen
 	$urlpass=$_POST['urlpass'];
-	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$urlpass')");
-	$num = mysql_num_rows($db_daten);
-	if ($num==1 OR $ums_cooperation!=0){ //oldpass ist korrekt
+	$db_datenx=mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
+	$rowx = mysql_fetch_array($db_datenx);
+
+	$passwordOK=false;
+	if(password_verify(trim($urlpass), $rowx['pass'])){
+		$passwordOK=true;
+	}	
+
+	if ($passwordOK){ //oldpass ist korrekt
 		$urltage=intval($_POST['urltage']);
 		if ($urltage>=1 AND $urltage<=21){
 		//schauen ob es credits kostet und man genug davon hat
@@ -516,8 +535,7 @@ if($urlacc){ //account in urlaubsmodus versetzen
 			if($errmsg=='')
 			{
 			//schauen ob es credits kostet
-			if($urltage<3)
-			{
+			if($urltage<3){
 				mysql_query("UPDATE de_user_data SET credits=credits-'$creditkosten' WHERE user_id = '$ums_user_id'",$db);
 				writetocreditlog("Urlaubsmodus");
 			}
@@ -1128,7 +1146,7 @@ echo '</td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>';
 
-if($ums_cooperation==0) echo '
+echo '
 <tr align="center">
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>'.$options_lang['passwort'].'</td>

@@ -84,13 +84,14 @@ foreach ($_SESSION as $key => $val){
 */
 
 if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){ 
-	
+	$ip=$_SERVER['REMOTE_ADDR'];
+	$parts=explode(".",$ip);
+	$ip=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
+
+	$ums_user_id=$_SESSION['ums_user_id'];
+
 	//post und get-variablen mitloggen, wenn das Logging aktiviert ist
 	if(isset($GLOBALS['sv_log_player_actions']) && $GLOBALS['sv_log_player_actions']==1){
-		$ip=$_SERVER['REMOTE_ADDR'];
-		$parts=explode(".",$ip);
-		$ip=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
-
 		//noch neueres logging
 		if(!isset($_REQUEST["check4new"]) AND !isset($_REQUEST["managechat"])){
 			$datenstring=''; 
