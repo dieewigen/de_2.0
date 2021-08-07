@@ -21,6 +21,8 @@ $ausbauzeit=$artbldglevel+1;
 $tcost1=5;
 $tcost2=10;
 
+$errmsg='';
+
 //Maximale Tickanzahl auslesen
 $result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
 $row     = mysql_fetch_array($result);
@@ -637,7 +639,7 @@ if(!hasTech($pt,28)){
 	echo '</table>';
 	rahmen_unten();  
 }else{
-	//schauen ob schon ein geb�udeupgrade l�uft
+	//schauen ob schon ein gebäudeupgrade läuft
 	$db_daten = mysql_query("SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id='$ums_user_id'",$db);
 	$gebinbau = mysql_num_rows($db_daten);
 
@@ -696,10 +698,13 @@ if(!hasTech($pt,28)){
 	//<input type="submit" name="bupgrade" value="'.$artefacts_lang[zulevel].($artbldglevel+1).$artefacts_lang[zulevel2].'">'
 	//.$artefacts_lang[kosten].number_format($ausbaukosten, 0,",",".").$artefacts_lang[iradiumdauer].($ausbauzeit).'<br>';
 
-	//artefaktgeb�ude
+	//Artefaktgebäude
 	echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
-	if($showbldglink==1)echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
-	echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/t/1_28.jpg" width="50px" height="50px" border="0" title="'.$ua_name[$row["id"]-1].'" alt="'.$ua_name[$row["id"]-1].'"></span>';
+	if($showbldglink==1){
+		echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
+	}
+
+	echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
 	echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artbldglevel.'/'.$maxlevel.'</span>';
 	if($showbldglink==1)echo '</a>';
 	echo '</div>';
@@ -738,8 +743,8 @@ if(!hasTech($pt,28)){
 		$artefacts[$ac]['id']=$row['id'];
 		$artefacts[$ac]['level']=$row['level'];
 		$artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
-		$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
-		$artefacts[$ac]['bs']=$ua_bs[$row["id"]-1];
+		$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1] ?? 0;
+		$artefacts[$ac]['bs']=$ua_bs[$row["id"]-1] ?? 0;
 		$artefacts[$ac]['select']=0;
 
 		//id-counter erh�hen
@@ -790,34 +795,36 @@ if(!hasTech($pt,28)){
 		for($artplace=1;$artplace<=6;$artplace++){
 			echo '<td style="font-size: 10px;">';
 			//title/tooltip festlegen
-			$title=$ua_name[$row["artid".$artplace]-1].'&'.$ua_desc[$row["artid".$artplace]-1];
-			if($ua_werte[$row["artid".$artplace]-1][$row["artlvl".$artplace]-1][0]>0){
-			  //einleitung
-			  $title.='<br>'.$artefacts_lang['bonusderstufe'];
-			  //die einzelnen bonusstufen
-			  for($i=0;$i<count($ua_werte[$row["artid".$artplace]-1]);$i++)
-			  {
-				if($i==$row['artlvl'.$artplace]-1){$fc[0]='<font color=#00FF00>';$fc[1]='</font>';}else{$fc[0]='';$fc[1]='';}
-				$title.='<br>'.$fc[0].($i+1).': '.number_format($ua_werte[$row["artid".$artplace]-1][$i][0], 2,",",".").'%'.$fc[1];
-			  }
-			  $title.='<br><br>Anklicken um das Artefakt ins Artefaktgeb&auml;ude zu transferieren.';
+			
+			//if($ua_werte[$row["artid".$artplace]-1][$row["artlvl".$artplace]-1][0]>0){
+			if(!empty($ua_name[$row["artid".$artplace]-1])){
+				$title=$ua_name[$row["artid".$artplace]-1].'&'.$ua_desc[$row["artid".$artplace]-1];
+				//einleitung
+				$title.='<br>'.$artefacts_lang['bonusderstufe'];
+				//die einzelnen bonusstufen
+				for($i=0;$i<count($ua_werte[$row["artid".$artplace]-1]);$i++)
+				{
+					if($i==$row['artlvl'.$artplace]-1){$fc[0]='<font color=#00FF00>';$fc[1]='</font>';}else{$fc[0]='';$fc[1]='';}
+					$title.='<br>'.$fc[0].($i+1).': '.number_format($ua_werte[$row["artid".$artplace]-1][$i][0], 2,",",".").'%'.$fc[1];
+				}
+				$title.='<br><br>Anklicken um das Artefakt ins Artefaktgeb&auml;ude zu transferieren.';
 
-			//if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
-			echo '<a href="artefacts.php?a=2&fid='.($flotte+1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
-			echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-			echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace]-1].'"></span>';
-			echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace]-1].'</span>';
-			echo '</div>';
-			echo '</a>';
-			//daten f�r json zusammenfassen
-			/*
-			$artefacts[$ac]['lid']=$row['lid'];
-			$artefacts[$ac]['id']=$row['id'];
-			$artefacts[$ac]['level']=$row['level'];
-			$artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
-			$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
-			$artefacts[$ac]['select']=0;
-			*/
+				//if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
+				echo '<a href="artefacts.php?a=2&fid='.($flotte+1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
+				echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
+				echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace]-1].'"></span>';
+				echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace]-1].'</span>';
+				echo '</div>';
+				echo '</a>';
+				//daten f�r json zusammenfassen
+				/*
+				$artefacts[$ac]['lid']=$row['lid'];
+				$artefacts[$ac]['id']=$row['id'];
+				$artefacts[$ac]['level']=$row['level'];
+				$artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
+				$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
+				$artefacts[$ac]['select']=0;
+				*/
 			}
 			else //nicht erforschter/leerer platz
 			{
