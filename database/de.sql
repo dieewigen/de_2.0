@@ -616,7 +616,7 @@ CREATE TABLE `de_login` (
   `last_ip` varchar(15) NOT NULL DEFAULT '',
   `clicks` int(11) NOT NULL DEFAULT '0',
   `lastpopup` int(11) UNSIGNED DEFAULT NULL,
-  `newpass` varchar(255) DEFAULT NULL,
+  `newpass` varchar(32) DEFAULT NULL,
   `sendmail` tinyint(4) NOT NULL DEFAULT '0',
   `savestatus` tinyint(1) NOT NULL DEFAULT '0',
   `inaktmail` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
@@ -624,12 +624,9 @@ CREATE TABLE `de_login` (
   `activetime` int(11) UNSIGNED NOT NULL DEFAULT '0',
   `loginkey` varchar(16) NOT NULL DEFAULT '',
   `loginkeytime` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `loginkeyip` varchar(15) NOT NULL,
-  `delmode` tinyint(3) UNSIGNED NOT NULL,
-  `cooperation` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
-  `fb_id` text NOT NULL,
-  `fb_access_token` text NOT NULL,
-  `google_id` text NOT NULL
+  `loginkeyip` varchar(15) NOT NULL DEFAULT '',
+  `delmode` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+  `cooperation` smallint(5) UNSIGNED NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
