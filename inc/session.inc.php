@@ -50,7 +50,8 @@ function fehlermsg($msg){
 if (!isset($_SESSION['ums_user_id'])){
 	$usestdtemplate=1; 
 
-	$topban_votebutton='&nbsp;<a href="https://de.mmofacts.com/die-ewigen-das-browsergame-108" target="_blank"><img src="https://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
+	$topban_votebutton='';
+	//$topban_votebutton.='&nbsp;<a href="https://de.mmofacts.com/die-ewigen-das-browsergame-108" target="_blank"><img src="https://grafik-de.bgam.es/b/gn_vote.gif" border=0></a>';
 	//$topban_votebutton.='&nbsp;<a href="http://www.gamingfacts.de/charts.php?was=abstimmen2&spielstimme=75" target="_blank"><img src="http://grafik-de.bgam.es/b/gamingfacts_charts.gif" border="0"></a>';
 	//$topban_votebutton[]='&nbsp;<a href="http://www.browsergames24.de" target="_blank"><img src="http://www.browsergames24.de/bg24._vbgrau.jpg" alt="Vote for us @ BG24" border="0"></a>';
 	//$topban_votebutton[2]='&nbsp;<a href="http://www.rawnews.de/index.php?pg=charts&at=vote&game_id=30" target="_blank"><img src="http://www.rawnews.de/vote.php?img=vote&game_id=30" border="0"></a>';
@@ -72,8 +73,8 @@ if (!isset($_SESSION['ums_user_id'])){
 
 	<tr align="center"><td><br><br>
 	<font size="2" color="FF0000">'.$session_lang['error1'].'<br><br><br><font color="00FF00">'.
-	  $session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a><br><br><br><br><font size="1">'.
-	  $session_lang['error5'].' <a href="index.php">'.$session_lang['error4'].'</a><br><br><br><br>
+	  $session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a><br><br><br><br><font size="1">
+	  <br><br><br><br>
 	</td></tr>
 	<tr align="center"><td><br><br>
 	'.$topban_votebutton.'<br><br><br><br><br>
@@ -84,6 +85,8 @@ if (!isset($_SESSION['ums_user_id'])){
 	</table>');
 	  exit;
 }
+
+//'.$session_lang['error5'].' <a href="index.php">'.$session_lang['error4'].'</a>
 //speziallogging
 /*
 if($ums_user_id==1840 OR $ums_user_id==1){  

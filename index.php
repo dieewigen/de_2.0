@@ -35,17 +35,6 @@ if($sv_sou_in_de==0)$gamename='Ablyon';
 
 //wenn die variable logout gesetzt ist, dann ausloggen und session zerst�ren
 if(isset($_REQUEST['logout'])){
-	/*
-  //logout f�r bigpoint
-  if($ums_cooperation==1)
-  {
-    session_destroy();
-  	echo '<html><head>';
-    echo '<script language="JavaScript">if(top.frames.length > 0)top.location.href="http://de.bigpoint.com/games/dieewigen";</script>';
-    echo '<html></head><body></body></html>';
-    exit;
-  }*/
-  
   session_destroy();
   session_start();
 
@@ -87,12 +76,15 @@ if ($sv_image_server=='')$sv_image_server=$sv_image_server_list[0];
 
 //wenn pass und loginname gepostet werden, dann versuchen den account einzuloggen
 //login ist jetzt auch über den loginkey möglich, dieser ist jedoch nur 5 minuten gültig
-if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic'] !='' AND $_POST['pass'] !='') OR (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!='')){
+//if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic'] !='' AND $_POST['pass'] !='') OR (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!='')){
+if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 	//db connect herstellen
 	include('inccon.php');
 	
+	/*
 	if(isset($_POST['nic'])) { $nic = SecureValue($_POST['nic']); }else $nic = '';
 	if(isset($_POST['pass'])) { $pass = SecureValue($_POST['pass']); }else $pass = '';
+	*/
 
 	if(isset($_REQUEST['loginkey'])){
 		$_REQUEST['loginkey'] = SecureValue($_REQUEST['loginkey']);
@@ -100,8 +92,9 @@ if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic'] !='' AND $_POST['pass
 		$_REQUEST['loginkey'] = '';
 	}
 		
-	$sql = "SELECT * FROM de_login WHERE nic = '".$nic."' AND (pass = MD5('".$pass."') OR newpass = MD5('".$pass."')) OR loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
-	echo $sql;
+	//$sql = "SELECT * FROM de_login WHERE nic = '".$nic."' AND (pass = MD5('".$pass."') OR newpass = MD5('".$pass."')) OR loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
+	$sql = "SELECT * FROM de_login WHERE loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
+	//echo $sql;
 
 	/*
 ALTER TABLE `de_login` ADD INDEX(`pass`); 
@@ -115,7 +108,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 	
 	if($num==1){
 		
-		session_regenerate_id(true);
+	  session_regenerate_id(true);
 	  $row = mysql_fetch_array($result);
 	  $ums_status=$row["status"];
 	  $_SESSION["ums_cooperation"]=$row["cooperation"];
@@ -351,7 +344,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$ip_adresse=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
 		mysql_query("INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp)VALUES('$ums_user_id','$ip_adresse',NOW(), '$_SERVER[HTTP_USER_AGENT]', '$loginhelpstr')");
 
-		//Logout anzeige f�r den title
+		//Logout anzeige für den title
 		$sekundenbiszumlogout=($_SESSION['ums_session_start']+$sv_session_lifetime)-time();
 		$restminuten=floor($sekundenbiszumlogout/60);
 		$restsekunden=$sekundenbiszumlogout-($restminuten*60);
@@ -566,20 +559,25 @@ echo '<br><b><font color="FF0000">'.$fehlermsg.'</font></b>';
 // index-seitenansicht für efta/ea
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
-
-if($sv_efta_in_de==0 OR $sv_sou_in_de==0)
-{
-  echo '<br><center>';
-  echo '<font size="2" color="FF0000"><br>Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.<br><br>';
-  echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.bgam.es/">&ouml;ffnen</a>';
-  die('</body></html>');
+/*
+if($sv_efta_in_de==0 OR $sv_sou_in_de==0){
+	echo '<br><center>';
+	echo '<font size="2" color="FF0000"><br>Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.<br><br>';
+	echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.bgam.es/">&ouml;ffnen</a>';
+	die('</body></html>');
 }
+*/
+
+echo '<br><center>';
+echo '<font size="2" color="FF0000"><br>Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.<br><br>';
+echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.bgam.es/">&ouml;ffnen</a>';
 
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 // index-seitenansicht für de
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
+/*
 echo '<br>
 <center>
 <br>
@@ -590,46 +588,25 @@ echo '<br>
 <tr align="center">
 <td colspan="4" align="center"><br><br></td>
 </tr>
-
-
 ';
 
-/*
-<tr align="center">
-<td colspan="4"><a href="index.php"><img src="imagegenerator.php?dummy=<?echo time();?>" alt="<?=$index_lang[bild]?>" border="0"></a></td>
-</tr>
-<tr align="center">
-<td colspan="4" height="30"><font color="FF2828"><?=$index_lang[botinfo]?></font></td>
-</tr>
-*/
 echo '<tr align="center">
 <td width="100" height="25">'.$index_lang['loginname'].'</td>
 <td><input type="password" name="nic" value="" tabindex="1"></td>
 <td width="100" height="25">'.$index_lang['passwort'].'</td>
 <td><input type="password" name="pass" value="" tabindex="2"></td>';
 
-/*
-<td>'.$index_lang[zahl].'</td>
-<td><input type="Text" name="nummer" value="" tabindex="3" onbeforepaste="noPaste()" onpaste="noPaste()" maxlength="3"></td>
-*/
 echo '
 </tr>
 <tr align="center">
 	<td colspan="4"><br><br><input type="Checkbox" name="grapa" value="off" tabindex="3"> '.$index_lang['grapaaus'].'</td>
 ';
 
-//if($sv_server_lang==1)echo '<input type="Checkbox" name="mobilversion" value="on" tabindex="4"> Version f&uuml;r mobile Ger&auml;te verwenden</td>';
-
 echo '</tr>
 <tr align="center">
 <td colSpan="4"><br><br><input type="Submit" name="login" value="'.$index_lang['login'].'" tabindex="5"><br><br><br><br>
 </tr>';
-/*
-<tr align="center">
-<td colspan="2"><a href="http://login.die-ewigen.com/index.php?command=register"><b>'.$index_lang['newaccount'].'</b></a></td>
-<td colspan="2"><a href="pass_act.php">'.$index_lang[pwvergessen].'></a></td>
-</tr>
-*/
+
 echo '
 <tr>
 <td colspan="4" align="center"><br><a href="'.$sv_link[3].'">'.$index_lang['portal'].'</a> - <a href="sstat.php">'.$index_lang['serverstatistik'].'</a> - <a href="ranglisten/index.php" target="_blank">'.$index_lang['externeranglisten'].'</a></td>
@@ -648,7 +625,7 @@ echo '
 </table>
 </form>';
 
-
+*/
 ?>
 </body>
 </html>
