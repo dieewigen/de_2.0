@@ -563,7 +563,6 @@ while($row = mysql_fetch_array($res)){
     }
 
 }
-
 //artefakt 11-20 Die Gabe der Reichen wird immer in die kleinsten pc-sektor gepackt, aber erst nach x ticks und Anzahl der Sektorraumbasen
 //auf Grund der wenigen Sektor werden jetzt nur noch 16-20 verteilt
 if($maxtick>=2000 AND $srbanzahl>=11){
@@ -573,11 +572,10 @@ if($maxtick>=2000 AND $srbanzahl>=11){
 	//nach kollektoren
 	$result  = mysql_query("SELECT sec_id FROM `de_sector` WHERE npc=0 AND sec_id > 1 AND platz>0 ORDER BY tempcol ASC LIMIT 5",$db);
 	
-	$id=16;
-	while($row = mysql_fetch_array($result)){
-		$zielsec = $row["sec_id"];
+	for($id=16;$id<=20;$id++){
+		$row = mysql_fetch_array($result);
+		$zielsec = $row? $row['sec_id'] : -1;
 		mysql_query("UPDATE de_artefakt set sector='$zielsec' WHERE id='$id'",$db);
-		$id++;
 	}
 }
 
