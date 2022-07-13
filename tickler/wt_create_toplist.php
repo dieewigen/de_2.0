@@ -1305,14 +1305,14 @@ xecho('
 ////////////////////////////////////////////////////////////
 
 //in der de_sector die pl�tze der sektoren eintragen
+mysql_query("UPDATE de_sector set platz=0, tempcol=0",$db);
 $db_daten=mysql_query("SELECT sector, sum(score) as score, sum(col) AS col FROM de_user_data WHERE npc=0 AND sector>1 GROUP BY sector ORDER BY score DESC",$db);
 $platz=1;
-while($row = mysql_fetch_array($db_daten))
-{
-  $sec=$row["sector"];
-  $col=$row["col"];
-  mysql_query("UPDATE de_sector set platz='$platz', tempcol='$col' WHERE sec_id='$sec'",$db);
-  $platz++;
+while($row = mysql_fetch_array($db_daten)){
+    $sec=$row["sector"];
+    $col=$row["col"];
+    mysql_query("UPDATE de_sector set platz='$platz', tempcol='$col' WHERE sec_id='$sec'",$db);
+    $platz++;
 }
 //inzwischen leere sektoren vom platz her auf null setzen
 mysql_query("UPDATE de_sector set platz=0 where platz>='$platz'",$db);

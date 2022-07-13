@@ -131,56 +131,64 @@ if($row["anzahl"]>0)
     echo '<br>';
 }
 
-if($_REQUEST['underpage']==1 OR $_REQUEST['underpage']==3)
-{
+if($_REQUEST['underpage']==1 OR $_REQUEST['underpage']==3){
 
-//charakter�bersicht
-rahmen1_oben('<div align="center"><b>Informationen</b></div>');
-echo '<div align="left">';
+	echo '
+	<div style="width: 466px; border: 1px solid #DDDDDD; font-size: 18px; background-color: #222222; color: #e02e75; padding: 10px;">
+		Fraktion 4 hat das Spiel gewonnen. Preiset sie als Sieger eines Spieles, das nur wenige Wochen dauern sollte und dann über 12 Jahre andauerte.
 
-//spielerboni
-$tooltip='&';
-for($i=0;$i<count($r_def);$i++)
-{
-  $skill=get_skill($i);
-  $tooltip.='Bergbaubonus '.$r_def[$i][0].': '.number_format($skill*100/500000, 4,",",".").'% ('.$skill.')<br>';
-}
-
-echo 'Spielerboni: <img title="'.$tooltip.'" border="0" style="vertical-align: middle;" src="'.$gpfad.'a16.gif">';
-echo ' - Schiffsboni: <img border="0" style="vertical-align: middle;" src="'.$gpfad.'a16.gif" title="Bao-Nada Station&Bonusmodule sind auch in den Bao-Nada Stationen zu finden."><br>';
+	</div>
+	';
 
 
 
-//buffs laden und anzeigen
-$time=time();
-unset($tooltip);
-$tooltip[0]='&';
-$tooltip[1]='&';
-$db_daten=mysql_query("SELECT * FROM `sou_user_buffs` WHERE user_id='$player_user_id' AND time>'$time' ORDER BY typ, value",$soudb);
-while($row = mysql_fetch_array($db_daten))
-{
-  if($row[typ]==1) {$tooltip[0].='+'.$row[value].'% F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
-  elseif($row[typ]==2) {$tooltip[0].='+'.$row[value].' F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
-  //elseif($row[typ]==3) {$tooltip[1].='+'.$row[value].' % Frachtraumkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
-  //elseif($row[typ]==4) {$tooltip[1].='+'.$row[value].' Frachtraumkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
-  elseif($row[typ]==3) {$tooltip[0].='+'.$row[value].'% F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
-}
+	//charakter�bersicht
+	rahmen1_oben('<div align="center"><b>Informationen</b></div>');
+	echo '<div align="left">';
 
-if($tooltip[0]!='&')echo '<img src="'.$gpfad.'sym1.png" width="64px" height="64px" title="'.$tooltip[0].'">';
-if($tooltip[1]!='&')echo '<img src="'.$gpfad.'sym2.png" width="64px" height="64px" title="'.$tooltip[1].'">';
+	//spielerboni
+	$tooltip='&';
+	for($i=0;$i<count($r_def);$i++)
+	{
+	$skill=get_skill($i);
+	$tooltip.='Bergbaubonus '.$r_def[$i][0].': '.number_format($skill*100/500000, 4,",",".").'% ('.$skill.')<br>';
+	}
 
-//test auf maximale schiffsgr��e
-$db_daten=mysql_query("SELECT MAX(shipdiameter) AS shipdiameter FROM `sou_user_data` WHERE fraction='$player_fraction'",$soudb);
-$row = mysql_fetch_array($db_daten);
-if($player_ship_diameter<$row['shipdiameter'])
-{
-	$achtungtooltip='Raumschiffgr&ouml;&szlig;e zu gering&In Deiner Fraktion sind bereits gr&ouml;&szlig;ere Raumschiffe m&ouml;glich. Das Raumschiff kann in der Raumwerft vergr&ouml;&szlig;ert werden.';
-	echo '<img src="'.$gpfad.'sym37.png" width="64px" height="64px" title="'.$achtungtooltip.'">';
-}
+	echo 'Spielerboni: <img title="'.$tooltip.'" border="0" style="vertical-align: middle;" src="'.$gpfad.'a16.gif">';
+	echo ' - Schiffsboni: <img border="0" style="vertical-align: middle;" src="'.$gpfad.'a16.gif" title="Bao-Nada Station&Bonusmodule sind auch in den Bao-Nada Stationen zu finden."><br>';
 
-echo '</div>';
-rahmen1_unten();
-echo '<br>';
+
+
+	//buffs laden und anzeigen
+	$time=time();
+	unset($tooltip);
+	$tooltip[0]='&';
+	$tooltip[1]='&';
+	$db_daten=mysql_query("SELECT * FROM `sou_user_buffs` WHERE user_id='$player_user_id' AND time>'$time' ORDER BY typ, value",$soudb);
+	while($row = mysql_fetch_array($db_daten))
+	{
+	if($row[typ]==1) {$tooltip[0].='+'.$row[value].'% F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
+	elseif($row[typ]==2) {$tooltip[0].='+'.$row[value].' F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
+	//elseif($row[typ]==3) {$tooltip[1].='+'.$row[value].' % Frachtraumkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
+	//elseif($row[typ]==4) {$tooltip[1].='+'.$row[value].' Frachtraumkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
+	elseif($row[typ]==3) {$tooltip[0].='+'.$row[value].'% F&ouml;rderkapazit&auml;t - Aktiv bis: '.date ("d.m.Y H:i", $row[time]).'<br>';}
+	}
+
+	if($tooltip[0]!='&')echo '<img src="'.$gpfad.'sym1.png" width="64px" height="64px" title="'.$tooltip[0].'">';
+	if($tooltip[1]!='&')echo '<img src="'.$gpfad.'sym2.png" width="64px" height="64px" title="'.$tooltip[1].'">';
+
+	//test auf maximale schiffsgr��e
+	$db_daten=mysql_query("SELECT MAX(shipdiameter) AS shipdiameter FROM `sou_user_data` WHERE fraction='$player_fraction'",$soudb);
+	$row = mysql_fetch_array($db_daten);
+	if($player_ship_diameter<$row['shipdiameter'])
+	{
+		$achtungtooltip='Raumschiffgr&ouml;&szlig;e zu gering&In Deiner Fraktion sind bereits gr&ouml;&szlig;ere Raumschiffe m&ouml;glich. Das Raumschiff kann in der Raumwerft vergr&ouml;&szlig;ert werden.';
+		echo '<img src="'.$gpfad.'sym37.png" width="64px" height="64px" title="'.$achtungtooltip.'">';
+	}
+
+	echo '</div>';
+	rahmen1_unten();
+	echo '<br>';
 }
 
 if($_REQUEST['underpage']==3 OR $_REQUEST['underpage']==1)

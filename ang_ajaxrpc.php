@@ -13,7 +13,7 @@ mt_srand((double)microtime()*10000);
 
 $date_format='d.m.Y - H:i';
 
-//überprüfen ob es eine aktive session gibt
+//ï¿½berprï¿½fen ob es eine aktive session gibt
 if($sv_debug!=1 AND $_REQUEST['unityeditor']!=1){
 	if(!isset($_SESSION['ums_user_id']) OR $_SESSION['ums_user_id']<1){
 		$status='-1';
@@ -23,7 +23,7 @@ if($sv_debug!=1 AND $_REQUEST['unityeditor']!=1){
 	}
 }
 
-// wenn man im unity-editor ist, dann erhält man die user_id 1
+// wenn man im unity-editor ist, dann erhï¿½lt man die user_id 1
 if($sv_debug==1 AND $_REQUEST['unityeditor']==1){
 	$_SESSION['ums_user_id']=1;
 	$ums_user_id=$_SESSION['ums_user_id'];
@@ -35,7 +35,7 @@ $playerdata = mysql_fetch_array($db_daten);
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
-//wenn es keinen fehler gab, dann status 0 zurückliefern
+//wenn es keinen fehler gab, dann status 0 zurï¿½ckliefern
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
@@ -81,7 +81,7 @@ if(isset($_REQUEST['getsectordata'])){
 	$player_std_pos[11]=array(3,2);
 
 
-	//kopfgeldprozentsatz kann nicht höher als kollektorklaurate sein
+	//kopfgeldprozentsatz kann nicht hï¿½her als kollektorklaurate sein
 	//if($sv_bounty_rate>$sv_kollie_klaurate)$sv_bounty_rate=$sv_kollie_klaurate;
 
 	if ($row["status"]==1) $ownally = $row["allytag"];
@@ -101,7 +101,7 @@ if(isset($_REQUEST['getsectordata'])){
 	//maximale anzahl von kollektoren auslesen
 	$db_daten=mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0",$db);
 	$row = mysql_fetch_array($db_daten);
-	$maxcol=$row[maxcol];
+	$maxcol=$row['maxcol'];
 
 	//die Anzahl der "bewohnten" Sektoren auslesen
 	$sec_daten=mysql_query("SELECT * FROM de_user_data WHERE sector>1 GROUP BY sector ORDER BY npc DESC, sector ASC",$db);
@@ -163,7 +163,7 @@ if(isset($_REQUEST['getsectordata'])){
 			//$sektorinfo='<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
 			/*
 			if(!empty($sf)){
-				//hinweistext für npc-sektoren
+				//hinweistext fï¿½r npc-sektoren
 				$npchint='<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
 						$sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($ums_user_id).'<br>'.$sec_lang['npsecinfo3'].
 						'<br>'.$sec_lang['npsecinfo4'].
@@ -293,16 +293,16 @@ if(isset($_REQUEST['getsectordata'])){
 			//secmalus berechnen
 			$sec_malus=$sv_sector_attmalus/$num*$secplatzunterschied;
 
-			//secmalus darf nicht größer als maximum sein
+			//secmalus darf nicht grï¿½ï¿½er als maximum sein
 			if($sec_malus>$sv_sector_attmalus)$sec_malus=$sv_sector_attmalus;
 			$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus+$sec_malus;
 
 			//recyclotronbonus berechnen
 			$rec_bonus=$sv_recyclotron_sector_bonus/$num*($secplatz-1);
-			//recyclotronbonus darf nicht größer als das maximum sein
+			//recyclotronbonus darf nicht grï¿½ï¿½er als das maximum sein
 			if($rec_bonus>$sv_recyclotron_sector_bonus)$rec_bonus=$sv_recyclotron_sector_bonus;
 
-			//angriffsgrenze für die kollektoren berechnen
+			//angriffsgrenze fï¿½r die kollektoren berechnen
 			if($maxcol==0)$maxcol=1;
 			$col_angriffsgrenze=$col*100/$maxcol;
 			$col_angriffsgrenze_final=$col_angriffsgrenze/100*$sv_max_col_attgrenze;
@@ -366,12 +366,12 @@ if(isset($_REQUEST['getsectordata'])){
 				$systemstr=$row['system'];
 				$senddata[$sf][$system]['system_status']=1;
 				if ($row["lstatus"]==2) $senddata[$sf][$system]['system_status']=2;//$systemstr='['.$systemstr.']';//gesperrt
-				if ($row["lstatus"]==3 AND $row["delmode"]>0) $senddata[$sf][$system]['system_status']=5;//$systemstr='{'.$systemstr.'}';//löschmode
+				if ($row["lstatus"]==3 AND $row["delmode"]>0) $senddata[$sf][$system]['system_status']=5;//$systemstr='{'.$systemstr.'}';//lï¿½schmode
 				if ($row["lstatus"]==3 AND $row["delmode"]==0) $senddata[$sf][$system]['system_status']=3;//$systemstr='('.$systemstr.')';//umode
 
 				
 				if($sksystem==$row['system']){
-					//überprüfen ob der sk auch bk ist, ist in 1-mann-sektoren möglich
+					//ï¿½berprï¿½fen ob der sk auch bk ist, ist in 1-mann-sektoren mï¿½glich
 					if($row['system']==$sec_data['bk'] AND $anz>1){
 						mysql_query("UPDATE de_sector set bk = 0 WHERE sec_id='$sector'",$db);
 						$sec_data['bk']=0;
@@ -426,8 +426,8 @@ if(isset($_REQUEST['getsectordata'])){
 				$knowrasse=0;
 				$playerstatus=0;
 				$rasse='';
-				//hat man scandaten über die rasse/allianz?
-				unset($allytagscan);
+				//hat man scandaten ï¿½ber die rasse/allianz?
+				$allytagscan='';
 				if (isset($scandaten))
 				{
 					for($i=0;$i<count($scandaten);$i++)
@@ -441,15 +441,15 @@ if(isset($_REQUEST['getsectordata'])){
 					}
 				}
 
-				//im eigenen sektor sieht man alle rassen, außer in sektor 1
+				//im eigenen sektor sieht man alle rassen, auï¿½er in sektor 1
 				if($sector==$ownsector AND $ownsector>1)$knowrasse=1;
 
 
 				if($knowrasse==1){
-					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceK.png" title="K´Tharr" width="16px" height="16px">';
-					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceZ.png" title="Z´tah-ara" width="16px" height="16px">';
+					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceK.png" title="Kï¿½Tharr" width="16px" height="16px">';
+					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceZ.png" title="Zï¿½tah-ara" width="16px" height="16px">';
 					$senddata[$sf][$system]['rasse']=$row['rasse'];
 				}else{
 					$senddata[$sf][$system]['rasse']=-1;
@@ -460,7 +460,7 @@ if(isset($_REQUEST['getsectordata'])){
 
 				////////////////////////////////////////////////////////////////////////
 				////////////////////////////////////////////////////////////////////////
-				//allianz, sichtbarkeit durch ally, allybündnis, scandaten, sektor
+				//allianz, sichtbarkeit durch ally, allybï¿½ndnis, scandaten, sektor
 				////////////////////////////////////////////////////////////////////////
 				////////////////////////////////////////////////////////////////////////
 				if($row['status']==1)$allytag=$row['allytag'];else $allytag='';
@@ -478,7 +478,7 @@ if(isset($_REQUEST['getsectordata'])){
 					$csstag='tc2';
 					$showallytag=$allytag;
 				}
-				//ganze andere ally, nichts anzeigen, außer es gibt scandaten, oder es ist der eigene sektor
+				//ganze andere ally, nichts anzeigen, auï¿½er es gibt scandaten, oder es ist der eigene sektor
 				elseif (($ownally != $allytag) OR ($allytag=='') OR ($ownally=='')){
 					//anzeige im eigenen sektor
 					if($ownsector==$sf AND $ownsector>1)
@@ -688,14 +688,17 @@ if(isset($_REQUEST['getsectordata'])){
 
 				$atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
 
-				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.$ums_gpfad.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
+				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.($ums_gpfad ?? '').'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
 				$c++;
 			}
+		
+			/*
 			if($artstr!=''){
 				$datenstring.= '<div style="position: absolute; width: 98px; height: 120px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;
 					left: 320px;
 					top: 170px;">'.$artstr.'</div>';
 			}
+			*/
 		}
 	}
 
