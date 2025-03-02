@@ -71,7 +71,8 @@ $varcol='';
 $varalterplatz='';
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.platz_last_day,de_user_data.platz, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY score DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
@@ -91,7 +92,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["col"], 0,"",".").'"';
@@ -195,7 +196,8 @@ xecho('
 
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY col DESC LIMIT 200",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -222,7 +224,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["col"], 0,"",".").'"';
@@ -309,7 +311,8 @@ xecho('
 
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.e100+de_user_data.e101+de_user_data.e102+de_user_data.e103+de_user_data.e104 AS tower FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY tower DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -336,7 +339,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["tower"], 0,"",".").'"';
@@ -419,7 +422,8 @@ xecho('
 ');
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.roundpoints FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY roundpoints DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -446,7 +450,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["roundpoints"], 0,"",".").'"';
@@ -532,7 +536,8 @@ $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -561,7 +566,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["kgget"], 0,"",".").'"';
@@ -651,7 +656,8 @@ $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -680,7 +686,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["gesamtenergie"], 0,"",".").'"';
@@ -774,7 +780,8 @@ $result = mysql_query("SELECT de_user_data.spielername, de_user_data.sector, de_
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -811,10 +818,10 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
-  $varcol=$varcol.'"'.number_format($row["wert"], 0,"",".").'"';
+  $varcol=$varcol.'"'.number_format($row["wert"] ?? 0, 0,"",".").'"';
 
   if ($varscore!='')$varscore=$varscore.',';
   $varscore=$varscore.'"'.number_format($row["score"], 0,"",".").'"';
@@ -894,7 +901,8 @@ xecho('
 ');
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY ehscore DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -921,7 +929,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["ehscore"], 0,"",".").'"';
@@ -1004,7 +1012,8 @@ xecho('
 ');
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_counter DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -1031,7 +1040,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["eh_counter"], 0,"",".").'"';
@@ -1114,7 +1123,8 @@ xecho('
 ');
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_siege DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -1141,7 +1151,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["eh_counter"], 0,"",".").'"';
@@ -1224,7 +1234,8 @@ xecho('
 ');
 
 $result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.pve_score, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY pve_score DESC LIMIT 100",$db);
-$platz_i=1;$time=strftime("%Y%m%d%H%M%S");
+$platz_i=1;
+$time=date("YmdHis");
 $varrang='';
 $varsector='';
 $varsystem='';
@@ -1251,7 +1262,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   $varsystem=$varsystem.$row["system"];
 
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varcol!='')$varcol=$varcol.',';
   $varcol=$varcol.'"'.number_format($row["pve_score"], 0,"",".").'"';
@@ -1521,7 +1532,7 @@ while($row = mysql_fetch_array($db_daten))
   $target_url = 'ally_detail.php?allyid='.$row['id'];
   xecho ("<tr>");
   xecho ('<td class="cc">'.$platz.'</td>');
-  xecho ('<td class="cc" nowrap><a href="'.$target_url.'">'.utf8_encode($row["allytag"]).'</a></td>');
+  xecho ('<td class="cc" nowrap><a href="'.$target_url.'">'.utf8_encode_fix($row["allytag"]).'</a></td>');
   xecho ('<td class="cr">'.number_format($row['questpoints'], 0,"",".").'</td>');
   xecho ("</tr>");
   $platz++;
@@ -1687,7 +1698,7 @@ if($sv_ewige_runde==1){
 	  $target_url = 'ally_detail.php?allyid='.$row['id'];
 	  xecho ("<tr>");
 	  xecho ('<td class="cc">'.$platz.'</td>');
-	  xecho ('<td class="cc" nowrap><a href="'.$target_url.'">'.utf8_encode($row["allytag"]).'</a></td>');
+	  xecho ('<td class="cc" nowrap><a href="'.$target_url.'">'.utf8_encode_fix($row["allytag"]).'</a></td>');
 	  xecho ('<td class="cr">'.number_format($row['eh_gestellt_anz'], 0,"",".").'</td>');
 	  xecho ("</tr>");
 	  $platz++;
@@ -1745,7 +1756,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
 
   xecho ('<tr>');
   xecho ('<td class="cc">'.$platz.'</td>');
-  xecho ('<td class="cc"><a href="details.php?se='.$row["sector"].'&sy='.$row["system"].'&a=s">'.utf8_encode($row["spielername"]).'</td>');
+  xecho ('<td class="cc"><a href="details.php?se='.$row["sector"].'&sy='.$row["system"].'&a=s">'.utf8_encode_fix($row["spielername"]).'</td>');
   xecho ('<td class="cc">'.number_format($row["tradesystemtrades"], 0,"",".").'</td>');
   xecho ('<td class="cr">'.number_format($row["tradesystemscore"], 0,"",".").'</td>');
   xecho ('</tr>');
@@ -1809,7 +1820,7 @@ while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprue
   if ($row["sells"]>0)$tschnitt=$row["tradescore"]/$row["sells"];else $tschnitt=0;
   xecho ('<tr>');
   xecho ('<td class="cc">'.$platz.'</td>');
-  xecho ('<td class="cc"><a href="details.php?se='.$row["sector"].'&sy='.$row["system"].'&a=s">'.utf8_encode($row["spielername"]).'</td>');
+  xecho ('<td class="cc"><a href="details.php?se='.$row["sector"].'&sy='.$row["system"].'&a=s">'.utf8_encode_fix($row["spielername"]).'</td>');
   xecho ('<td class="cc">'.number_format($row["sells"], 0,"",".").'</td>');
   xecho ('<td class="cr">'.number_format($row["tradescore"], 0,"",".").'</td>');
   xecho ('<td class="cc">'.number_format($tschnitt, 0,"",".").'</td>');
@@ -1876,7 +1887,7 @@ $result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varlevel!='')$varlevel=$varlevel.',';
   if ($row["level"]!='')
@@ -1976,7 +1987,7 @@ $result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varlevel!='')$varlevel=$varlevel.',';
   if ($row["level"]!='')
@@ -2077,7 +2088,7 @@ $result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
-  $varname=$varname.'"'.utf8_encode($row["spielername"]).'"';
+  $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
 
   if ($varlevel!='')$varlevel=$varlevel.',';
   if ($row["level"]!='')

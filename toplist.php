@@ -244,6 +244,7 @@ if(!isset($_REQUEST["mp"])){
 	$_REQUEST["mp"]=0;
 }
 
+$s = $_REQUEST["s"] ?? 1;
 
 if ($s==1){
 	echo '<script language="JavaScript">

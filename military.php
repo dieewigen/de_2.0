@@ -24,6 +24,8 @@ $ownsystem=$system;
 
 $schiffsdaten=$sv_schiffsdaten;
 
+$errmsg='';
+
 if ($row['status']==1) $ownally = $row['allytag'];
 
 $rangnamen=array($military_lang['dererhabene'], "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
@@ -193,13 +195,13 @@ function quest($fleet_id, $zsec, $zsys){
 //schauen ob er die whg hat und dann die attgrenze anpassen
 if ($techs[4]==0)$sv_attgrenze_whg_bonus=0;
 
-if ($_POST['verlegen']){
+if (isset($_POST['verlegen'])){
 	//transaktionsbeginn
 	if (setLock($ums_user_id)){
-		//zuerst alle �bergebenen felder in nen array packen
+		//zuerst alle übergebenen felder in nen array packen
 		$c=0;
 		for ($i=81; $i<=80+$sv_anz_schiffe; $i++){
-			str_replace(".","",$_POST['m".$i."_1']);
+			str_replace(".","", $_POST['m".$i."_1'] ?? 0);
 
 			if($_POST['m'.$i.'_1']>0)$sa[$c][0]=(int)str_replace(".","",$_POST['m'.$i.'_1']);else $sa[$c][0]=0;
 			if($_POST['m'.$i.'_2']>0)$sa[$c][1]=(int)str_replace(".","",$_POST['m'.$i.'_2']);else $sa[$c][1]=0;
@@ -218,6 +220,7 @@ if ($_POST['verlegen']){
 		}
 
 		//jeden schiffstyp einzeln durchgehen
+		$showerror=array(0,0);
 		for ($i=81; $i<=80+$sv_anz_schiffe; $i++){
 			$fleet[0]=$einheiten_daten[0]['e'.$i];//anzahl der einheiten auslesen
 			$fleet[1]=$einheiten_daten[1]['e'.$i];//anzahl der einheiten auslesen
@@ -269,6 +272,7 @@ if ($_POST['verlegen']){
 			if($error==1)$showerror[0]=1;
 			if($error==2)$showerror[1]=1;
 		}
+
 		//fehlermessage erstellen
 		if($showerror[0]==1)
 		$errmsg.='<table width=600><tr><td class="ccr">'.$military_lang['allgfehler'].'</td></tr></table><br>';
@@ -359,96 +363,96 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
       if ($techs[$einzelb]==1) $z2++;
       if ($einzelb==0) {$z1=0;$z2=0;}
     }*/
-    if ($z1==$z2 || 1==1){ //echo "Vorbedingung erfüllt";
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//js-tooltip-daten generieren
-		//klasse
-		$zstr='<font color=#D265FF>'.$military_lang['klasse'].': '.$military_lang['klassennamen'][$i-81].'</font>';
-		//punkte
-		$zstr.='<br><font color=#FFFA65>'.$military_lang['punkte'].': '.number_format($unit[$_SESSION['ums_rasse']-1][$i-81][4], 0,"",".").'</font>';
 
-		//reiszeit
-		$zstr.='<br><br>'.$military_lang['reisezeit'].': '.$schiffsdaten[$ums_rasse-1][$i-81][0];
-		//transportkapazität
-		if ($schiffsdaten[$ums_rasse-1][$i-81][1]>0)$zstr.='<br>'.$military_lang['kapazitaet'].': '.$schiffsdaten[$ums_rasse-1][$i-81][1];
-		//ben. transportkapazität
-		if ($schiffsdaten[$ums_rasse-1][$i-81][2]>0)$zstr.='<br>'.$military_lang['kapazitaet2'].': '.$schiffsdaten[$ums_rasse-1][$i-81][2];
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//js-tooltip-daten generieren
+	//klasse
+	$zstr='<font color=#D265FF>'.$military_lang['klasse'].': '.$military_lang['klassennamen'][$i-81].'</font>';
+	//punkte
+	$zstr.='<br><font color=#FFFA65>'.$military_lang['punkte'].': '.number_format($unit[$_SESSION['ums_rasse']-1][$i-81][4], 0,"",".").'</font>';
 
-		//frachtkapazität
-		if ($unit[$ums_rasse-1][$i-81]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$_SESSION['ums_rasse']-1][$i-81]['fk'];
+	//reiszeit
+	$zstr.='<br><br>'.$military_lang['reisezeit'].': '.$schiffsdaten[$ums_rasse-1][$i-81][0];
+	//transportkapazität
+	if ($schiffsdaten[$ums_rasse-1][$i-81][1]>0)$zstr.='<br>'.$military_lang['kapazitaet'].': '.$schiffsdaten[$ums_rasse-1][$i-81][1];
+	//ben. transportkapazität
+	if ($schiffsdaten[$ums_rasse-1][$i-81][2]>0)$zstr.='<br>'.$military_lang['kapazitaet2'].': '.$schiffsdaten[$ums_rasse-1][$i-81][2];
 
-		//waffenarten
-		//konventionell
-		if($unit[$ums_rasse-1][$i-81][2]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
-		 else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
-		$zstr.='<br><br><font color=#9D4B15>'.$military_lang['waffengattung1'].':</font> '.$wv;
+	//frachtkapazität
+	if (isset($unit[$ums_rasse-1][$i-81]['fk']) && $unit[$ums_rasse-1][$i-81]['fk'] > 0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$_SESSION['ums_rasse']-1][$i-81]['fk'];
 
-		//klassenziel
-		if($unit[$ums_rasse-1][$i-81][2]>0){
-		  $zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][0]].'</font>';
-		  $zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][2]].'</font>';
-		}
+	//waffenarten
+	//konventionell
+	if($unit[$ums_rasse-1][$i-81][2]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
+		else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
+	$zstr.='<br><br><font color=#9D4B15>'.$military_lang['waffengattung1'].':</font> '.$wv;
 
-		//emp
-		if($unit[$ums_rasse-1][$i-81][3]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
-		 else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
-		$zstr.='<br><br><font color=#15629D>'.$military_lang['waffengattung2'].':</font> '.$wv;
+	//klassenziel
+	if($unit[$ums_rasse-1][$i-81][2]>0){
+		$zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][0]].'</font>';
+		$zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][2]].'</font>';
+	}
 
-		//klassenziel
-		if($unit[$ums_rasse-1][$i-81][3]>0){
-		  $zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][0]].'</font>';
-		  $zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][2]].'</font>';
-		}
+	//emp
+	if($unit[$ums_rasse-1][$i-81][3]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
+		else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
+	$zstr.='<br><br><font color=#15629D>'.$military_lang['waffengattung2'].':</font> '.$wv;
 
-		//besonderheiten
-		if($i-81==1)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitjagdboot'].'</font>';
-		if($i-81==3)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitkreuzer'].'</font>';
-		if($i-81==4)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitschlachtschiff'].'</font>';
-		if($i-81==6)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheittransmitterschiff'].'</font>';
+	//klassenziel
+	if($unit[$ums_rasse-1][$i-81][3]>0){
+		$zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][0]].'</font>';
+		$zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][2]].'</font>';
+	}
+
+	//besonderheiten
+	if($i-81==1)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitjagdboot'].'</font>';
+	if($i-81==3)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitkreuzer'].'</font>';
+	if($i-81==4)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitschlachtschiff'].'</font>';
+	if($i-81==6)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheittransmitterschiff'].'</font>';
 
 
-		$mtip[$c1] = getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.$zstr;
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//anzahl der einheiten auslesen
-		$e0=$einheiten_daten[0]['e'.$i];//anzahl der einheiten auslesen
-		$e1=$einheiten_daten[1]['e'.$i];//anzahl der einheiten auslesen
-		$e2=$einheiten_daten[2]['e'.$i];//anzahl der einheiten auslesen
-		$e3=$einheiten_daten[3]['e'.$i];//anzahl der einheiten auslesen
+	$mtip[$c1] = getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.$zstr;
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//anzahl der einheiten auslesen
+	$e0=$einheiten_daten[0]['e'.$i];//anzahl der einheiten auslesen
+	$e1=$einheiten_daten[1]['e'.$i];//anzahl der einheiten auslesen
+	$e2=$einheiten_daten[2]['e'.$i];//anzahl der einheiten auslesen
+	$e3=$einheiten_daten[3]['e'.$i];//anzahl der einheiten auslesen
 
-		//Schiffe, die nicht bewegbar sind, da die flotte nicht daheim ist
-		$fleet_a[0]=$einheiten_daten[1]['aktion'];
-		$fleet_a[1]=$einheiten_daten[2]['aktion'];
-		$fleet_a[2]=$einheiten_daten[3]['aktion'];
-		if($fleet_a[0]!=0)$e1=0;
-		if($fleet_a[1]!=0)$e2=0;
-		if($fleet_a[2]!=0)$e3=0;
+	//Schiffe, die nicht bewegbar sind, da die flotte nicht daheim ist
+	$fleet_a[0]=$einheiten_daten[1]['aktion'];
+	$fleet_a[1]=$einheiten_daten[2]['aktion'];
+	$fleet_a[2]=$einheiten_daten[3]['aktion'];
+	if($fleet_a[0]!=0)$e1=0;
+	if($fleet_a[1]!=0)$e2=0;
+	if($fleet_a[2]!=0)$e3=0;
 
-		// Gesamte Flotte
-		echo 'gesamtf['.$c1.'] = '.($e0+$e1+$e2+$e3).';';
+	// Gesamte Flotte
+	echo 'gesamtf['.$c1.'] = '.($e0+$e1+$e2+$e3).';';
 
-		// Aktuelle Flottenaufteilung
-		echo 'aktf['.$c1.'] = new Array('.$e1.', '.$e2.', '.$e3.');';
+	// Aktuelle Flottenaufteilung
+	echo 'aktf['.$c1.'] = new Array('.$e1.', '.$e2.', '.$e3.');';
 
-		// Reisezeiten
-		echo 'reisez['.$c1.'] = new Array('.$schiffsdaten[$ums_rasse-1][$i-81][0].', '.($schiffsdaten[$ums_rasse-1][$i-81][0]+1).', '.($schiffsdaten[$ums_rasse-1][$i-81][0]+2).');';
+	// Reisezeiten
+	echo 'reisez['.$c1.'] = new Array('.$schiffsdaten[$ums_rasse-1][$i-81][0].', '.($schiffsdaten[$ums_rasse-1][$i-81][0]+1).', '.($schiffsdaten[$ums_rasse-1][$i-81][0]+2).');';
 
-		//transportdaten �berpr�fen
-		//j�ger
-		if($i==81)$bentid[0]=$c1;
-		//bomber
-		if($i==86)$bentid[1]=$c1;
-		//kreuzer
-		if($i==84)$tid[0]=$c1;
-		//schlachter
-		if($i==85)$tid[1]=$c1;
-		//tr�ger
-		if($i==88)$tid[2]=$c1;
-		//zerst�rer
-		if($i==83)$tid[3]=$c1;
-		$c1++;
-    }
+	//transportdaten �berpr�fen
+	//j�ger
+	if($i==81)$bentid[0]=$c1;
+	//bomber
+	if($i==86)$bentid[1]=$c1;
+	//kreuzer
+	if($i==84)$tid[0]=$c1;
+	//schlachter
+	if($i==85)$tid[1]=$c1;
+	//tr�ger
+	if($i==88)$tid[2]=$c1;
+	//zerst�rer
+	if($i==83)$tid[3]=$c1;
+	$c1++;
+
     $i++;
   }
   if($fleet_a[0]!=0){echo 'fleetna[0] = true;';} else echo 'fleetna[0] = false;';
@@ -457,7 +461,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 ?>
  // Anzahl der aktuell vorhandenen Schiffe (dient als Grundlage für alle Ausführungen)
- var anzs = <?=$sv_anz_schiffe-1?>;
+ var anzs = <?php echo $sv_anz_schiffe-1?>;
 
  var firstrun = true;
  var runagain = false;
@@ -615,7 +619,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 		if ($erg>0) $schiffe=1;
 		$ez[$i-81]=$erg;
 		//fix um die zerstörer der 4. rasse unsichtbar zu machen
-		if($ums_rasse==4 AND $i==83 AND $akttyp==1){$deftarn=$erg; $erg=0;}
+		if($ums_rasse==4 && $i==83 && $akttyp==1){$deftarn=$erg; $erg=0;}
 		$ge=$ge+$erg;
 	}
 
@@ -634,6 +638,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 
 		  if($num==1){//die koordinaten stimmen
 			//zuerstmal die daten vom ziel auslesen
+			$zallytag='';
 			$rowx = mysqli_fetch_array($db_daten);
 			$uid = $rowx['user_id'];
 			$zscore = $rowx['score'];
@@ -657,6 +662,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 			}
 			//npc-accounts sind nicht unbegrenzt angreifbar
 			//if ($akttyp==1 AND $npc==1 AND $col>=$sv_npcatt_col_grenze) $attverbot=1;
+			$attverbot=0;
 
 			if ($akttyp==2) $ok=1;//bei der verteidigung spielt der rang keine rolle
 
@@ -720,7 +726,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 				}
 				//------------
 				if ($akttyp==1){//beim angriff schauen ob es ein verb�ndeter ist
-				   if (($ownally!='') AND (($ownally==$zallytag) OR (in_array($zallytag, $allypartner)))) $ok=0;
+				   if (($ownally!='') && (($ownally==$zallytag) || (in_array($zallytag, $allypartner)))) $ok=0;
 				}
 				elseif ($akttyp==2) //bei der verteidigung schauen ob es ein gegner ist
 				{
@@ -730,12 +736,12 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 				  if($ownsector!=$zsec)
 				  {
 
-					if(($ownally!='') AND (in_array($zallytag, $allyfeinde))) $ok=0;
+					if(($ownally!='') && (in_array($zallytag, $allyfeinde))) $ok=0;
 				  }
 				}
 			}
 
-			if ($ok==1 AND $attverbot==0){
+			if ($ok==1 && $attverbot==0){
 				$rz=get_fleet_ground_speed($ez, $ums_rasse, $ums_user_id);
 
 				//entfernungzuschlag
@@ -812,7 +818,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 			//return $rz;
 		} //else return 0;
 	} //else return 0;
-	if ($rz==0)$errmsg.='<div class="info_box text2">'.$military_lang['befehlefehlerhaft'].'</div>';
+	
+	if (isset($rz) && $rz==0)$errmsg.='<div class="info_box text2">'.$military_lang['befehlefehlerhaft'].'</div>';
 }
 
 function recall($fleet_id, $sector, $system, $db){
@@ -978,43 +985,43 @@ echo '
       if ($einzelb==0) {$z1=0;$z2=0;}
     }
 	   */
-    if ($z1==$z2 || 1==1){ //echo "Vorbedingung erf�llt";
-		$e0=$einheiten_daten[0]['e'.$i];//anzahl der einheiten auslesen
-		$e1=$einheiten_daten[1]['e'.$i];//anzahl der einheiten auslesen
-		$e2=$einheiten_daten[2]['e'.$i];//anzahl der einheiten auslesen
-		$e3=$einheiten_daten[3]['e'.$i];//anzahl der einheiten auslesen
 
-		//daten für die befehlsanzeige auslesen
-		if($c1==1){
-		  $fleet_a[1]=$einheiten_daten[1]['aktion'];
-		  $fleet_a[2]=$einheiten_daten[2]['aktion'];
-		  $fleet_a[3]=$einheiten_daten[3]['aktion'];
+	$e0=$einheiten_daten[0]['e'.$i];//anzahl der einheiten auslesen
+	$e1=$einheiten_daten[1]['e'.$i];//anzahl der einheiten auslesen
+	$e2=$einheiten_daten[2]['e'.$i];//anzahl der einheiten auslesen
+	$e3=$einheiten_daten[3]['e'.$i];//anzahl der einheiten auslesen
 
-		  $fleet_mission_time[1]=$einheiten_daten[1]['mission_time'];
-		  $fleet_mission_time[2]=$einheiten_daten[2]['mission_time'];
-		  $fleet_mission_time[3]=$einheiten_daten[3]['mission_time'];
-		}
+	//daten für die befehlsanzeige auslesen
+	if($c1==1){
+		$fleet_a[1]=$einheiten_daten[1]['aktion'];
+		$fleet_a[2]=$einheiten_daten[2]['aktion'];
+		$fleet_a[3]=$einheiten_daten[3]['aktion'];
 
-		$ez1[$i-81]=$e1;//sammele die flottenanzahl fuer die rz-berechnung
-		$ez2[$i-81]=$e2;
-		$ez3[$i-81]=$e3;
+		$fleet_mission_time[1]=$einheiten_daten[1]['mission_time'];
+		$fleet_mission_time[2]=$einheiten_daten[2]['mission_time'];
+		$fleet_mission_time[3]=$einheiten_daten[3]['mission_time'];
+	}
 
-		echo '<tr>';
-		//heimatflotte
-		echo '<td class="cl">&nbsp;<img src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$mtip[$c1-1].'">&nbsp;'.getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'</td>';
-		echo '<td class="cc" id="m'.$c1.'_0">'.number_format($e0, 0,"",".").'</td>';
-		//flotte 1
-		if($fleet_a[1]!=0){$h1=number_format($e1, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_1">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_1" name="m'.$i.'_1" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
-		//flotte 2
-		if($fleet_a[2]!=0){$h1=number_format($e2, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_2">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_2" name="m'.$i.'_2" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
-		//flotte 3
-		if($fleet_a[3]!=0){$h1=number_format($e3, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
-		echo '<td class="cc" id="mn'.$c1.'_3">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_3" name="m'.$i.'_3" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
-		echo '</tr>';
-		$c1++;
-    }
+	$ez1[$i-81]=$e1;//sammele die flottenanzahl fuer die rz-berechnung
+	$ez2[$i-81]=$e2;
+	$ez3[$i-81]=$e3;
+
+	echo '<tr>';
+	//heimatflotte
+	echo '<td class="cl">&nbsp;<img src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$mtip[$c1-1].'">&nbsp;'.getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'</td>';
+	echo '<td class="cc" id="m'.$c1.'_0">'.number_format($e0, 0,"",".").'</td>';
+	//flotte 1
+	if($fleet_a[1]!=0){$h1=number_format($e1, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
+	echo '<td class="cc" id="mn'.$c1.'_1">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_1" name="m'.$i.'_1" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+	//flotte 2
+	if($fleet_a[2]!=0){$h1=number_format($e2, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
+	echo '<td class="cc" id="mn'.$c1.'_2">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_2" name="m'.$i.'_2" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+	//flotte 3
+	if($fleet_a[3]!=0){$h1=number_format($e3, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}
+	echo '<td class="cc" id="mn'.$c1.'_3">'.$h1.'<input class="mil1" type="text" id="m'.$c1.'_3" name="m'.$i.'_3" value="0" size="4" maxlength="10" onKeyup="SetMil(this)" onFocus="vt=this.value=delPkt(this.value); this.className=\'mil2\'" onBlur="SetMil(this); this.className=\'mil1\'; vt=this.value=addPkt(this.value)" '.$h2.'></td>';
+	echo '</tr>';
+	$c1++;
+
     $i++;
   }
 
@@ -1157,6 +1164,7 @@ echo '
   if ($a3[0]==$military_lang['status3'][0] && $t3==0) $a3=$military_lang['status6'].' ('.$hs1.$zsec3.':'.$zsys3.$hs2.') '.$military_lang['zeit'].': '.$at3;
 
   //reisezeiten ausgeben
+  $rz1='';$rz2='';$rz3='';
   if ($a1==$military_lang['status']) // Hier stand Systemverteidigung vorher statt lang-variable
   {
     $rz1=get_fleet_ground_speed($ez1, $ums_rasse, $ums_user_id);
@@ -1286,7 +1294,7 @@ echo '
 		else $hs='<option value=0>'.$military_lang['befehl3'].'</option><option value=2>'.$military_lang['befehl4'].'</option><option value=3>'.$military_lang['befehl5'].'</option><option value=4>'.$military_lang['befehl6'].'</option><option value=5>'.$military_lang['befehl7'].'</option>';
 		echo '<td class="c"><select name="af1" size=0>'.$hs.'</select></td>';
 		if($showfleettarget[0]==1)$checked='checked';else $checked='';
-		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet1" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf1" value="'.$zsecf1.'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf1" value="'.$zsysf1.'" size="3" maxlength="3"></td>';
+		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet1" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf1" value="'.($zsecf1 ?? '').'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf1" value="'.($zsysf1 ?? '').'" size="3" maxlength="3"></td>';
 	}
 	echo "</tr>";
 	//////////////////////////////////////////////////////////
@@ -1302,7 +1310,7 @@ echo '
 		else $hs='<option value=0>'.$military_lang['befehl3'].'</option><option value=2>'.$military_lang['befehl4'].'</option><option value=3>'.$military_lang['befehl5'].'</option><option value=4>'.$military_lang['befehl6'].'</option><option value=5>'.$military_lang['befehl7'].'</option>';
 		echo '<td class="c"><select name="af2" size=0>'.$hs.'</select></td>';
 		if($showfleettarget[1]==1)$checked='checked';else $checked='';
-		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet2" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf2" value="'.$zsecf2.'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf2" value="'.$zsysf2.'" size="3" maxlength="5"></td>';
+		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet2" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf2" value="'.($zsecf2 ?? '').'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf2" value="'.($zsysf2 ?? '').'" size="3" maxlength="5"></td>';
 	}
 	echo "</tr>";
 
@@ -1322,7 +1330,7 @@ echo '
 		}
 		echo '<td class="c"><select name="af3" size=0>'.$hs.'</select></td>';
 		if($showfleettarget[2]==1)$checked='checked';else $checked='';
-		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet3" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf3" value="'.$zsecf3.'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf3" value="'.$zsysf3.'" size="3" maxlength="5"></td>';
+		echo '<td class="c"><input '.$checked.' type="checkbox" name="showfleet3" value="1" title="Die Zielkoordinaten k&ouml;nnen im Sektorstatus von anderen Spielern im Sektor gesehen werden.">&nbsp;<input type="text" name="zsecf3" value="'.($zsecf3 ?? '').'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsysf3" value="'.($zsysf3 ?? '').'" size="3" maxlength="5"></td>';
 	}
 	echo "</tr>";
 	//echo "</table>";

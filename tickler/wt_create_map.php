@@ -170,7 +170,7 @@ if($row['create_map_objects']==1){
 					$pos_y=$y+$basedata_knoten[$sec_id][$i]['pos_y']/$knoten_teiler;
 
 					
-					//System erstellen				
+					//System erstellen
 					$name=$namensliste[$id-1];
 
 					/////////////////////////////////////////////////
@@ -192,11 +192,11 @@ if($row['create_map_objects']==1){
 					/////////////////////////////////////////////////
 					//Klasse erzeugen und mit Daten befüllen
 					/////////////////////////////////////////////////
-					$new_system = NEW map_system;
+					$new_system = new map_system;
 					$new_system->setSystemName($name);
 					$new_system->setSystemLevel($level);
 					$new_system->setSystemPosX($pos_x);
-					$new_system->setSystemPosY($pos_y);		
+					$new_system->setSystemPosY($pos_y);
 					$system_typ=mt_rand(0,7);
 					$system_typ=1;
 					$new_system->setSystemTyp($system_typ);
@@ -219,10 +219,8 @@ if($row['create_map_objects']==1){
 					}
 
 					$new_system->setSystemSubTyp($system_subtyp);
-					//die einzelnen Geländefelder generieren
+					//die einzelnen Geländefelder samt Loot generieren
 					$new_system->generateFields();
-					//Loot generieren							
-					//$new_system->generateLoot();
 
 					if($special_system>0){
 						$new_system->special_system=$special_system;
@@ -390,12 +388,12 @@ if($row['create_map_objects']==1){
 	$koord_min[0]=1;
 	$koord_max[0]=1;
 	$koord_min[1]=2;
-	$koord_max[1]=2;				
+	$koord_max[1]=2;
 	$koord_min[2]=3;
 	$koord_max[2]=3;
 	/*				
 	$koord_min[3]=6;
-	$koord_max[3]=6;				
+	$koord_max[3]=6;
 	$koord_min[4]=7;
 	$koord_max[4]=7;
 	*/
@@ -416,7 +414,7 @@ if($row['create_map_objects']==1){
 		$cluster_y=mt_rand($koord_min[$i],$koord_max[$i]);
 		if(mt_rand(1,100)>50){
 			$cluster_y=$cluster_y*-1;
-		}					
+		}
 
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND cluster_x='$cluster_x' AND cluster_y='$cluster_y' ORDER BY RAND() LIMIT 1;";
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 ORDER BY RAND() LIMIT 1;";
@@ -464,15 +462,15 @@ if($row['create_map_objects']==1){
 	$koord_max[4]=3;
 	
 	$koord_min[5]=3;
-	$koord_max[5]=3;	
+	$koord_max[5]=3;
 
 	/*				
 	$koord_min[1]=2;
-	$koord_max[1]=2;				
+	$koord_max[1]=2;
 	$koord_min[2]=3;
 	$koord_max[2]=3;
 	$koord_min[3]=6;
-	$koord_max[3]=6;				
+	$koord_max[3]=6;
 	$koord_min[4]=7;
 	$koord_max[4]=7;
 	*/

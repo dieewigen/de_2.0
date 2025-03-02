@@ -27,7 +27,12 @@ if(mysql_num_rows($allys)>=1)
 
 
 <?php
+$message='';
 
+$searchterm=$_POST['searchterm'] ?? '';
+if(empty($searchterm)){
+	$searchterm='*';
+}
 
 include('resline.php');
 include('ally/ally.menu.inc.php');
@@ -51,10 +56,6 @@ print('
 	</td></tr>
 ');
 
-$searchterm=$_POST['searchterm'];
-if(empty($searchterm)){
-	$searchterm='*';
-}
 if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 	if ($searchterm == "*")	{
 		$query = "SELECT * FROM de_allys WHERE 1";
@@ -116,9 +117,9 @@ if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 				}
 
 				$detaillink = '<a href="ally_detail.php?allyid='.$a_id.'">'.$allysearch_lang['detailsbewerben'].'</a>';
-				print("<tr><td align=center bgcolor=#222222>".utf8_encode($a_tag)."</td>
-					<td align=center bgcolor=#222222>".utf8_encode($a_name)."</td>
-					<td align=center bgcolor=#222222>".utf8_encode($a_form)."</td>
+				print("<tr><td align=center bgcolor=#222222>".utf8_encode_fix($a_tag)."</td>
+					<td align=center bgcolor=#222222>".utf8_encode_fix($a_name)."</td>
+					<td align=center bgcolor=#222222>".utf8_encode_fix($a_form)."</td>
 					<td align=center bgcolor=#222222>".$a_memberlimit."</td>
 					<td align=center bgcolor=#222222>".$detaillink."</td></tr>");
 			}

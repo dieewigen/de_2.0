@@ -35,8 +35,10 @@ if(mysql_num_rows($allys2)>=1)
 <?php
 include('lib/basefunctions.lib.php');
 
-$transfer=intval($_POST['transfer']);
-$t_transfer=intval($_POST['t_transfer']);
+$message='';
+
+$transfer=intval($_POST['transfer'] ?? 0);
+$t_transfer=intval($_POST['t_transfer'] ?? 0);
 
 if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 	mysql_query("UPDATE de_user_data SET ally_tronic=ally_tronic+$t_transfer, restyp05=restyp05-$t_transfer WHERE user_id='$ums_user_id'");

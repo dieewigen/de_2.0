@@ -1,5 +1,4 @@
 <?php
-
 ////////////////////////////////////////////////////////////
 //Rohstoffertrag der Gebäude, nur für aktive Spieler
 ////////////////////////////////////////////////////////////
@@ -73,9 +72,6 @@ while($row = mysqli_fetch_array($result)){
 					[$bldg_data[$row['user_id']][$i][1]-1]
 					*$prozentwert;
 			}
-
-
-
 			//echo '<br>R: '.$GLOBALS['map_buildings'][$bldg_data[$row['user_id']][$i][0]]['production_amount'][$bldg_data[$row['user_id']][$i][1]];
 
 			//Gebäudepunkte aufsummieren: Level ins Quadrant
@@ -139,7 +135,7 @@ mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET pve_score=tradesystemscore
 /////////////////////////////////////////////////////
 // VS automatisches Erkunden
 /////////////////////////////////////////////////////
-$time=strftime("%Y%m%d%H%M%S");
+$time=date("YmdHis");
 //$kosten_zeit=15*60*$GLOBALS['tech_build_time_faktor']-5;
 $kosten_zeit=15*60*$GLOBALS['tech_build_time_faktor']*2;
 $result = mysqli_query($GLOBALS['dbi'],"SELECT de_user_data.user_id, de_user_data.sonde FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.vs_auto_explore=1");
@@ -204,12 +200,11 @@ while($row = mysqli_fetch_array($result)){
 							$sichtbare_systeme[]=$kanten[$k][0];
 							//echo 'gefunden 2a';
 						}
-					}		
+					}
 				}
 			}
 
 			//Systeme laden
-			//$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects LEFT JOIN de_user_map ON(de_map_objects.id=de_user_map.map_id);");
 			$esysteme=array();
 			$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects");
 			while($row = mysqli_fetch_array($db_daten)){
@@ -221,13 +216,12 @@ while($row = mysqli_fetch_array($result)){
 
 			//print_r($esysteme);
 
-			if(count($esysteme)>0){
+			if(!empty($esysteme)){
 				//per Zufall eine id auslesen
 				$map_id=$esysteme[mt_rand(0, count($esysteme)-1)];
 
 				//erkundetes System hinterlegen
 				$sql="INSERT INTO de_user_map SET user_id='".$user_id."', map_id='".$map_id."', known_since='".(time()+$kosten_zeit)."';";
-				//echo $sql;				
 				mysqli_query($GLOBALS['dbi'],$sql);
 
 				//sonden abziehen
@@ -252,6 +246,4 @@ while($row = mysqli_fetch_array($result)){
 			mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($user_id, 60,'$time','$newstext')");
 		}
 	}
-
 }
-?>

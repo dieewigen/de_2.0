@@ -414,7 +414,7 @@ if($sec_data['npc']==1){
 		//spielername, geworben, details, im sektor online
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
-    	$playername=utf8_encode(umlaut($row['spielername']));
+    	$playername=utf8_encode_fix(umlaut($row['spielername']));
     	if(strtotime($row["last_click"])+1800 > time() AND $row["lstatus"]==1) $os=' *';else $os='';
     	if ($ownsector==$sf AND $secstatdisable==0) $osown=$os;else $osown='';
     	$csstag='tc1';
@@ -605,20 +605,20 @@ if($sec_data['npc']==1){
 	//rahmen_unten();
 	
 	////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////	
+	////////////////////////////////////////////////////////////////////////
 	// alter bereich
 	////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////	
+	////////////////////////////////////////////////////////////////////////
 
 	//bild von der sternenbasis anzeigen
   $bed=$sec_data['techs'][1].$sec_data['techs'][2].$sec_data['techs'][3];
-  $std=strftime("%H");
+  $std=date("H");
   //1=sternenbasis 2=begrenzer 3=werft
 
-  if ($bed=='100') {if ($std>6 AND $std<20 )$bn='sbtag.gif'; else $bn='sbnacht.gif';}
-  elseif ($bed=='110') {if ($std>6 AND $std<20 )$bn='sbtagsfb.gif'; else $bn='sbnachtsfb.gif';}
-  elseif ($bed=='101') {if ($std>6 AND $std<20 )$bn='sbtagw.gif'; else $bn='sbnachtw.gif';}
-  elseif ($bed=='111') {if ($std>6 AND $std<20 )$bn='sbtagsfbw.gif'; else $bn='sbnachtsfbw.gif';}
+  if ($bed=='100') {if ($std>6 && $std<20 )$bn='sbtag.gif'; else $bn='sbnacht.gif';}
+  elseif ($bed=='110') {if ($std>6 && $std<20 )$bn='sbtagsfb.gif'; else $bn='sbnachtsfb.gif';}
+  elseif ($bed=='101') {if ($std>6 && $std<20 )$bn='sbtagw.gif'; else $bn='sbnachtw.gif';}
+  elseif ($bed=='111') {if ($std>6 && $std<20 )$bn='sbtagsfbw.gif'; else $bn='sbnachtsfbw.gif';}
   //artefakte anzeigen
 
   //schauen ob es artefakte gibt
@@ -639,7 +639,7 @@ if($sec_data['npc']==1){
   while($row = mysql_fetch_array($res))
   {
       //artefakttooltip bauen
-	$desc=utf8_encode($row["artdesc"]);
+	$desc=utf8_encode_fix($row["artdesc"]);
 	$desc=str_replace("{WERT1}", number_format($sv_artefakt[$row["id"]-1][0], 2,",",".") ,$desc);
 	$desc=str_replace("{WERT2}", number_format($sv_artefakt[$row["id"]-1][1], 0,"",".") ,$desc);
 	$desc=str_replace("{WERT3}", number_format($sv_artefakt[$row["id"]-1][2], 0,"",".") ,$desc);

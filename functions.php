@@ -245,6 +245,8 @@ function createAuction($uid){
 
 function formatTime($seconds){
 
+	$seconds=round($seconds);
+
 	$days=floor($seconds / 60 / 60 / 24);
 	$hours=floor($seconds / 60 / 60) % 24;
 	$minutes=floor($seconds / 60) % 60;
@@ -381,45 +383,47 @@ function generateMissionReward($reward, $percent=100){
 	}
 	$percent=$percent/100;
 	$content='';
-	for($i=0;$i<count($reward);$i++){
+	if(is_array($reward)){
+		for($i=0;$i<count($reward);$i++){
 
-		switch($reward[$i][0]){
-			//Artefakt
-			case 'A':
-				if($reward[$i][1]=='?'){
-					$content.='zuf&auml;lliges Artefakt';
-				}else{
-					$content.='Folgendes Artefakt:'.$reward[$i][1];
-				}
+			switch($reward[$i][0]){
+				//Artefakt
+				case 'A':
+					if($reward[$i][1]=='?'){
+						$content.='zuf&auml;lliges Artefakt';
+					}else{
+						$content.='Folgendes Artefakt:'.$reward[$i][1];
+					}
 
-			break;
+				break;
 
-			//Standardrohstoffe
-			case 'R':
-				$restyp=$reward[$i][1];
-				$amount=number_format(floor($reward[$i][2]*$percent), 0,"",".");
-				$resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
-				$resimages=array('icon1.png', 'icon2.png', 'icon3.png', 'icon4.png', 'icon5.png');
+				//Standardrohstoffe
+				case 'R':
+					$restyp=$reward[$i][1];
+					$amount=number_format(floor($reward[$i][2]*$percent), 0,"",".");
+					$resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
+					$resimages=array('icon1.png', 'icon2.png', 'icon3.png', 'icon4.png', 'icon5.png');
 
-				//Erfolgs-Nachricht
-				//$content.=$amount.' '.$resnamen[$restyp-1].'<br>';
-				$content.='<img src="g/'.$resimages[$restyp-1].'" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$resnamen[$restyp-1].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
+					//Erfolgs-Nachricht
+					//$content.=$amount.' '.$resnamen[$restyp-1].'<br>';
+					$content.='<img src="g/'.$resimages[$restyp-1].'" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$resnamen[$restyp-1].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
 
-			break;
-			//Items
-			case 'I':
-				$item_id=$reward[$i][1];
-				$amount=number_format(floor($reward[$i][2]*$percent), 0,"",".");
+				break;
+				//Items
+				case 'I':
+					$item_id=$reward[$i][1];
+					$amount=number_format(floor($reward[$i][2]*$percent), 0,"",".");
 
-				//Erfolgs-Nachricht, Design je nach Existenz einer passenden Bilddatei
-				if(file_exists('g/item'.$item_id.'.png')){
-					$content.='<img src="g/item'.$item_id.'.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$GLOBALS['ps'][$item_id]['item_name'].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
-				}else{
-					$content.=$amount.' '.$GLOBALS['ps'][$item_id]['item_name'].'<br>';
-				}
+					//Erfolgs-Nachricht, Design je nach Existenz einer passenden Bilddatei
+					if(file_exists('g/item'.$item_id.'.png')){
+						$content.='<img src="g/item'.$item_id.'.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$GLOBALS['ps'][$item_id]['item_name'].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
+					}else{
+						$content.=$amount.' '.$GLOBALS['ps'][$item_id]['item_name'].'<br>';
+					}
 
-				
-			break;
+					
+				break;
+			}
 		}
 	}
 
@@ -1061,11 +1065,9 @@ function showeinheit_ang($techname, $tech_id ,$rt01, $rt02, $rt03, $rt04, $rt05,
 	echo '</tr>';
 }
 
-function getTechNameByRasse($names,$rasse){
+function getTechNameByRasse($names, $rasse){
 	$tech_names=explode(";",$names);
-	$tech_name=$tech_names[$rasse-1];
-
-	return $tech_name;
+	return $tech_names[$rasse-1];
 }
 
 
@@ -1284,7 +1286,7 @@ function get_free_artefact_places($user_id){
 		$db_daten=mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
 		$row = mysql_fetch_array($db_daten);
 		$ally_geb_bonus=$row['bldg5'];
-	}	
+	}
 
 	//wenn das Geb�ude nicht vorhanden ist, dann ist der Wert generell 0
 	if (!hasTech($pt,28)){
@@ -1376,7 +1378,7 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message){
 
 	$spielername=htmlspecialchars($spielername);
 
-	$owner_id=$_SESSION["ums_owner_id"];
+	$owner_id=$_SESSION["ums_owner_id"] ?? 0;
 	if(empty($owner_id)){
 		$owner_id=0;
 	}
@@ -1472,6 +1474,7 @@ function insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_messag
 }
 
 function validDigit($digit) {
+		/*
 		$isavalid = 1;
 		for ($i=0; $i<strlen($digit); $i++)
 		{
@@ -1481,8 +1484,9 @@ function validDigit($digit) {
 				break;
 			}
 		}
-		//echo $isavalid;
 		return($isavalid);
+		*/
+		return is_int($digit);
 }
 
 function getfleetlevel($exp)
@@ -1710,27 +1714,28 @@ function get_fleet_ground_speed($ez, $rasse, $uid){
 		$ums_rasse=$rasse;
 		for($i=0;$i<count($schiffsdaten[$ums_rasse]);$i++)		{
 			$schiffsdaten[$ums_rasse-1][$i][1]= floor($schiffsdaten[$ums_rasse-1][$i][1] * 1.2);
-		}	
+		}
 	}
 
 	//reisezeitberechnung grundreisezeit
-	//0=j�ger
-	if ($ez[1]>0 AND $rz1<$schiffsdaten[$rasse-1][1][0]) $rz1=$schiffsdaten[$rasse-1][1][0];
-	if ($ez[2]>0 AND $rz1<$schiffsdaten[$rasse-1][2][0]) $rz1=$schiffsdaten[$rasse-1][2][0];
-	if ($ez[3]>0 AND $rz1<$schiffsdaten[$rasse-1][3][0]) $rz1=$schiffsdaten[$rasse-1][3][0];
+	$rz1=0;
+	//0=jäger
+	if ($ez[1]>0 && $rz1<$schiffsdaten[$rasse-1][1][0]) $rz1=$schiffsdaten[$rasse-1][1][0];
+	if ($ez[2]>0 && $rz1<$schiffsdaten[$rasse-1][2][0]) $rz1=$schiffsdaten[$rasse-1][2][0];
+	if ($ez[3]>0 && $rz1<$schiffsdaten[$rasse-1][3][0]) $rz1=$schiffsdaten[$rasse-1][3][0];
 
 	//schlachterbeschleunigung durch kreuzer und zerst�rer
 	$bs_speedup=0;if ($ez[2]>=$ez[4]*$sv_bs_speedup[$rasse-1][0] AND $ez[3]>=$ez[4]*$sv_bs_speedup[$rasse-1][1])$bs_speedup=1;
-	if ($ez[4]>0 AND $rz1<$schiffsdaten[$rasse-1][4][0]-$bs_speedup) $rz1=$schiffsdaten[$rasse-1][4][0]-$bs_speedup;
+	if ($ez[4]>0 && $rz1<$schiffsdaten[$rasse-1][4][0]-$bs_speedup) $rz1=$schiffsdaten[$rasse-1][4][0]-$bs_speedup;
 
 	//5=bomber
-	if ($ez[6]>0 AND $rz1<$schiffsdaten[$rasse-1][6][0]) $rz1=$schiffsdaten[$rasse-1][6][0];
-	if ($ez[7]>0 AND $rz1<$schiffsdaten[$rasse-1][7][0]) $rz1=$schiffsdaten[$rasse-1][7][0];
-	if ($ez[8]>0 AND $rz1<$schiffsdaten[$rasse-1][8][0]) $rz1=$schiffsdaten[$rasse-1][8][0];
-	if ($ez[9]>0 AND $rz1<$schiffsdaten[$rasse-1][9][0]) $rz1=$schiffsdaten[$rasse-1][9][0];
+	if ($ez[6]>0 && $rz1<$schiffsdaten[$rasse-1][6][0]) $rz1=$schiffsdaten[$rasse-1][6][0];
+	if ($ez[7]>0 && $rz1<$schiffsdaten[$rasse-1][7][0]) $rz1=$schiffsdaten[$rasse-1][7][0];
+	if ($ez[8]>0 && $rz1<$schiffsdaten[$rasse-1][8][0]) $rz1=$schiffsdaten[$rasse-1][8][0];
+	if ($ez[9]>0 && $rz1<$schiffsdaten[$rasse-1][9][0]) $rz1=$schiffsdaten[$rasse-1][9][0];
 	
 	
-	//tr�gerschifffe einbeziehen
+	//trägerschifffe einbeziehen
 	$schiffe_btk[0][0] = $ez[0]*$schiffsdaten[$rasse-1][0][2];//ben�tigte transportkapazit�t
 	$schiffe_btk[0][1] = $ez[5]*$schiffsdaten[$rasse-1][5][2];//ben�tigte transportkapazit�t
 
@@ -2035,5 +2040,12 @@ function mail_smtp($empfaenger, $subject, $body, $absender='noreply@die-ewigen.c
 	 
 	$mail->send(); 
 }
+function utf8_encode_fix($string)
+{
+    return mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1');
+}
 
-?>
+function utf8_decode_fix($string)
+{
+    return mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');
+}

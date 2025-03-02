@@ -5,9 +5,6 @@ mb_internal_encoding("iso-8859-1");
 include "inc/header.inc.php";
 include "soudata/lib/sou_dbconnect.php";
 include 'functions.php';
-mt_srand((double)microtime()*10000);
-
-//sleep(20);
 
 $chat_sectorcolor='#FFFFFF';
 $chat_allycolor='#00FF00';
@@ -347,7 +344,7 @@ function format_chat_output($row){
 
 	$output='';
 	
-	$row["message"]=utf8_decode($row["message"]);
+	$row["message"]=utf8_decode_fix($row["message"]);
 
 	$row["message"]=umlaut($row["message"]);
 
@@ -361,12 +358,12 @@ function format_chat_output($row){
 		$value = ((eval("return 0x$first;") & 0x3ff) << 10) | (eval("return 0x$second;") & 0x3ff);
 		$value += 0x10000;
 		return "&#$value;";
-	}, $row["message"]);	
+	}, $row["message"]);
 
-	$zeit=strftime ("%H:%M", $row["timestamp"]);
-	$datum=strftime ("%d.%m.%Y", $row["timestamp"]);
+	$zeit=date("H:m", $row["timestamp"]);
+	$datum=date("d.m.Y", $row["timestamp"]);
 
-	$row["spielername"]=utf8_encode($row["spielername"]);
+	$row["spielername"]=utf8_encode_fix($row["spielername"]);
 
 	//schauen ob es einen nachricht vom herold ist
 	if($row["spielername"]=='^Der Herold^'){

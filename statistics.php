@@ -20,7 +20,10 @@ $sector=$row['sector'];$system=$row['system'];$hasally=$row['status'];
 <?php
 //stelle die ressourcenleiste dar
 include "resline.php";
-if($_REQUEST['mp']=='')$_REQUEST['mp']=1;
+if(!isset($_REQUEST['mp'])){
+  $_REQUEST['mp']=1;
+}
+
 if($_REQUEST['mp']==1)
 {
   echo '<table width="600"><tr>
@@ -88,7 +91,7 @@ if($_REQUEST['mp']==1)
   echo '<tr align="center" class="cell"><td>Zeitpunkt</td><td>Kollektoren</td><td>Spielername</td></tr>';
   $db_daten=mysql_query("SELECT * FROM de_user_getcol WHERE zuser_id='$ums_user_id'",$db);
   while($row = mysql_fetch_array($db_daten)){
-    $time=strftime("%Y-%m-%d %H:%M:%S", $row['time']);
+    $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['user_id'];
   	$result=mysql_query("SELECT spielername, sector, system FROM de_user_data WHERE user_id='$duid'",$db);
@@ -115,7 +118,7 @@ if($_REQUEST['mp']==1)
   $db_daten=mysql_query("SELECT * FROM de_user_getcol WHERE user_id='$ums_user_id'",$db);
   while($row = mysql_fetch_array($db_daten))
   {
-    $time=strftime("%Y-%m-%d %H:%M:%S", $row['time']);
+    $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['zuser_id'];
   	$result=mysql_query("SELECT spielername, sector, system FROM de_user_data WHERE user_id='$duid'",$db);

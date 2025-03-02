@@ -22,7 +22,7 @@ mysql_select_db($GLOBALS['env_db_dieewigen_database'], $db);
 
 $GLOBALS['dbi'] = mysqli_connect($GLOBALS['env_db_dieewigen_host'], $GLOBALS['env_db_dieewigen_user'], $GLOBALS['env_db_dieewigen_password'], $GLOBALS['env_db_dieewigen_database']) or die("B: Keine Verbindung zur Datenbank möglich.");
 
-$GLOBALS['dbi']->set_charset("iso-8859-1");
+$GLOBALS['dbi']->set_charset("utf8mb4");
 
 array_walk_recursive($_GET, function(&$leaf) {
   if (is_string($leaf)){
@@ -208,8 +208,8 @@ if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){
 		if($_SESSION["aktivitaet_time"]+300<time())
 		{
 		mysql_query("UPDATE de_login SET last_click=NOW(), last_ip='$ip' WHERE user_id='$ums_user_id' AND status=1",$db);
-		$time=(int)strftime("%H");
-		$zeit=strftime("%Y-%m-%d");
+		$time=(int)date("H");
+		$zeit=date("Y-m-d");
 		mysql_query("UPDATE de_user_stat SET h$time='2' WHERE user_id='$ums_user_id' AND datum='$zeit' AND h$time<'2'",$db);
 		$_SESSION["aktivitaet_time"]=time();
 		}
@@ -224,14 +224,14 @@ if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){
 
 		if($_SESSION["aktivitaet_chat_time"]+300<time())
 		{
-		$time=(int)strftime("%H");
-		$zeit=strftime("%Y-%m-%d");
+		$time=intval(date("H"));
+		$zeit=date("Y-m-d");
 		mysql_query("UPDATE de_user_stat SET h$time='1' WHERE user_id='$ums_user_id' AND datum='$zeit' AND h$time<'1'",$db);
 		$_SESSION["aktivitaet_chat_time"]=time();
-		}  	
+		}
 	}
 
-	if ($ums_zeitstempel+300<time() AND $eftachatbotdefensedisable!=1) //nur alle 5 minuten aktualisieren
+	if ($ums_zeitstempel+300<time() && $eftachatbotdefensedisable!=1) //nur alle 5 minuten aktualisieren
 	{
 		mysql_query("UPDATE de_login SET last_login=NOW() WHERE user_id='$ums_user_id'  AND status=1",$db);
 		$ums_zeitstempel=time();

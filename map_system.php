@@ -89,7 +89,7 @@ if(!hasTech($pt,25)){
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 	</tr>';
 	echo '</table>';
-	rahmen_unten();  
+	rahmen_unten();
 }else{
 	//welche ID will man sich ansehen?
 	$id=intval($_REQUEST['id']);
@@ -139,7 +139,7 @@ if(!hasTech($pt,25)){
 		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
 		//$num = mysqli_num_rows($db_daten);
 		$user_map_data = mysqli_fetch_array($db_daten);
-		if($user_map_data['known_since']>0 && $user_map_data['known_since']<time()){//man hat schon Infos
+		if(isset($user_map_data['known_since']) && $user_map_data['known_since'] > 0 && $user_map_data['known_since']<time()){//man hat schon Infos
 			echo $data->showSystem($ps);
 		}else{//man hat noch keine Infos, Sonden starten um diese zu bekommen
 			
@@ -220,7 +220,7 @@ if(!hasTech($pt,25)){
 					
 				}else{
 					$explore_starting=false;
-					if($_REQUEST['explore']==1 && $vs_auto_explore==0){
+					if(isset($_REQUEST['explore']) && $_REQUEST['explore']==1 && $vs_auto_explore==0){
 						//checken ob man genug Sonden hat
 						if($pd['sonde']>=$kosten_sonden){
 							//Datensatz hinzufügen

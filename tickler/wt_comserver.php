@@ -1,8 +1,6 @@
 <?php
-if((strftime("%M"))==0 AND (strftime("%H"))==19 OR $erhabenenstop==1)
+if(intval(date("i"))==0 && intval(date("H"))==19 || $erhabenenstop==1)
 {
-
-
   //anzahl der stimmen auslesen
   $time=time()-(3600*24*3);
   $db_daten = mysql_query("SELECT user_id FROM de_login WHERE status=1 AND last_click > '$time'",$db);

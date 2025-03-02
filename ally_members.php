@@ -196,7 +196,7 @@ while ($row < $nb){
     echo '
 		<form name="f'.$sector.'x'.$system.'" action="sector.php?sf='.$sectorjump.'" method="POST">
 			<tr>
-				<td class="cl"><a href="details.php?a=s&se='.$sector.'&sy='.$system.'">'.utf8_encode($name).'</a></td>
+				<td class="cl"><a href="details.php?a=s&se='.$sector.'&sy='.$system.'">'.utf8_encode_fix($name).'</a></td>
 				<td class="cr">'.$kollies.'</td>
 				<td class="cr">'.number_format($score, 0,'','.').'</td>
 				<td class="cc"><a href="javascript:document.f'.$sector.'x'.$system.'.submit()">['.$sector.':'.$system.']</a></font></a></td>

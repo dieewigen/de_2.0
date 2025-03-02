@@ -31,7 +31,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return mysqli|null
 	 */
-	function getLinkIdentifier(mysqli $mysqli = null)
+	function getLinkIdentifier(?mysqli $mysqli = null)
 	{
 		if (!$mysqli) {
 			global $link;
@@ -81,7 +81,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool|mysqli_result
 	 */
-	function mysql_query($query, mysqli $mysqli = null)
+	function mysql_query($query, ?mysqli $mysqli = null)
 	{
 		return getLinkIdentifier($mysqli)->query($query);
 	}
@@ -90,7 +90,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return string
 	 */
-	function mysql_real_escape_string($string, mysqli $mysqli = null)
+	function mysql_real_escape_string($string, ?mysqli $mysqli = null)
 	{
 		return getLinkIdentifier($mysqli)->escape_string($string);
 	}
@@ -146,14 +146,14 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return int
 	 */
-	function mysql_affected_rows(mysqli $mysqli = null)
+	function mysql_affected_rows(?mysqli $mysqli = null)
 	{
 		return mysqli_affected_rows(getLinkIdentifier($mysqli));
 	}
 	/**
 	 * @return void
 	 */
-	function mysql_client_encoding(mysqli $mysqli = null)
+	function mysql_client_encoding(?mysqli $mysqli = null)
 	{
 		return mysqli_character_set_name(getLinkIdentifier($mysqli));
 	}
@@ -161,14 +161,14 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool
 	 */
-	function mysql_close(mysqli $mysqli = null)
+	function mysql_close(?mysqli $mysqli = null)
 	{
 		return mysqli_close(getLinkIdentifier($mysqli));
 	}
 	/**
 	 * @return bool
 	 */
-	function mysql_create_db($database_name, mysqli $mysqli = null)
+	function mysql_create_db($database_name, ?mysqli $mysqli = null)
 	{
 		trigger_error('This function was deprecated in PHP 4.3.0 and is therefor not supported', E_USER_DEPRECATED);
 		return false;
@@ -177,7 +177,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return int
 	 */
-	function mysql_errno(mysqli $mysqli = null)
+	function mysql_errno(?mysqli $mysqli = null)
 	{
 		return mysqli_errno(getLinkIdentifier($mysqli));
 	}
@@ -197,7 +197,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return string
 	 */
-	function mysql_error(mysqli $mysqli = null)
+	function mysql_error(?mysqli $mysqli = null)
 	{
 		return mysqli_error(getLinkIdentifier($mysqli));
 	}
@@ -214,7 +214,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool
 	 */
-	function mysql_ping(mysqli $mysqli = null)
+	function mysql_ping(?mysqli $mysqli = null)
 	{
 		return mysqli_ping(getLinkIdentifier($mysqli));
 	}
@@ -222,7 +222,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param $query
 	 * @param mysqli $mysqli
 	 */
-	function mysql_unbuffered_query($query, mysqli $mysqli = null)
+	function mysql_unbuffered_query($query, ?mysqli $mysqli = null)
 	{
 		return mysqli_query(getLinkIdentifier($mysqli), $query, MYSQLI_USE_RESULT);
 	}
@@ -245,7 +245,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool|mysqli_result
 	 */
-	function mysql_list_dbs(mysqli $mysqli = null)
+	function mysql_list_dbs(?mysqli $mysqli = null)
 	{
 		trigger_error('This function is deprecated. It is preferable to use mysql_query() to issue an SQL Query: SHOW DATABASES statement instead.', E_USER_DEPRECATED);
 		return mysqli_query(getLinkIdentifier($mysqli), 'SHOW DATABASES');
@@ -256,7 +256,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|mysqli_result
 	 */
-	function mysql_list_fields($database_name, $table_name, mysqli $mysqli = null)
+	function mysql_list_fields($database_name, $table_name, ?mysqli $mysqli = null)
 	{
 		trigger_error('This function is deprecated. It is preferable to use mysql_query() to issue an SQL SHOW COLUMNS FROM table [LIKE \'name\'] statement instead.', E_USER_DEPRECATED);
 		$mysqli = getLinkIdentifier($mysqli);
@@ -268,7 +268,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool|mysqli_result
 	 */
-	function mysql_list_processes(mysqli $mysqli = null)
+	function mysql_list_processes(?mysqli $mysqli = null)
 	{
 		return mysqli_query(getLinkIdentifier($mysqli), 'SHOW PROCESSLIST');
 	}
@@ -277,7 +277,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool
 	 */
-	function mysql_set_charset($charset, mysqli $mysqli = null)
+	function mysql_set_charset($charset, ?mysqli $mysqli = null)
 	{
 		return mysqli_set_charset(getLinkIdentifier($mysqli), $charset);
 	}
@@ -285,7 +285,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_info(mysqli $mysqli = null)
+	function mysql_info(?mysqli $mysqli = null)
 	{
 		$result = mysqli_info(getLinkIdentifier($mysqli));
 		if ($result === NULL) {
@@ -299,7 +299,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_stat(mysqli $mysqli = null)
+	function mysql_stat(?mysqli $mysqli = null)
 	{
 		return mysqli_stat(getLinkIdentifier($mysqli));
 	}
@@ -309,7 +309,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_thread_id(mysqli $mysqli = null)
+	function mysql_thread_id(?mysqli $mysqli = null)
 	{
 		return mysqli_thread_id(getLinkIdentifier($mysqli));
 	}
@@ -319,7 +319,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_get_host_info(mysqli $mysqli = null)
+	function mysql_get_host_info(?mysqli $mysqli = null)
 	{
 		return mysqli_get_host_info(getLinkIdentifier($mysqli));
 	}
@@ -329,7 +329,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_get_proto_info(mysqli $mysqli = null)
+	function mysql_get_proto_info(?mysqli $mysqli = null)
 	{
 		return mysqli_get_proto_info(getLinkIdentifier($mysqli));
 	}
@@ -339,7 +339,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_get_server_info(mysqli $mysqli = null)
+	function mysql_get_server_info(?mysqli $mysqli = null)
 	{
 		return mysqli_get_server_info(getLinkIdentifier($mysqli));
 	}
@@ -361,7 +361,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return int|string
 	 */
-	function mysql_insert_id(mysqli $mysqli = null)
+	function mysql_insert_id(?mysqli $mysqli = null)
 	{
 		return mysqli_insert_id(getLinkIdentifier($mysqli));
 	}
@@ -398,7 +398,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param null $mysqli
 	 * @return bool|string
 	 */
-	function mysql_list_tables($database_name, mysqli $mysqli = null)
+	function mysql_list_tables($database_name, ?mysqli $mysqli = null)
 	{
 		trigger_error('This function is deprecated. It is preferable to use mysql_query() to issue an SQL SHOW TABLES [FROM db_name] [LIKE \'pattern\'] statement instead.', E_USER_DEPRECATED);
 		$mysqli = getLinkIdentifier($mysqli);
@@ -582,7 +582,7 @@ if (!extension_loaded('mysql') && !function_exists('mysql_connect')) {
 	 * @param mysqli $mysqli
 	 * @return bool
 	 */
-	function mysql_db_query($database, $query, mysqli $mysqli = null)
+	function mysql_db_query($database, $query, ?mysqli $mysqli = null)
 	{
 		trigger_error('This function is deprecated since PHP 5.3.0 and therefore not implemented', E_USER_DEPRECATED);
 		return false;

@@ -446,14 +446,14 @@ if(!hasTech($pt,29)){
 						
 						//benötigten Frachtraum berechnen
 						$has_storage=0;
-						$fleet_id=intval($_REQUEST['fleet_id']);
+						$fleet_id=intval($_REQUEST['fleet_id'] ?? -1);
 						if($fleet_id<1 || $fleet_id>3){
 							$fleet_id=1;
 						}
 						
 						if($md[$m]['typ']==1 || $md[$m]['typ']==2){
 							//Flotten-Daten laden
-							$fleet_data=getFleetData($_SESSION['ums_user_id']);						
+							$fleet_data=getFleetData($_SESSION['ums_user_id']);
 
 							//Flotten-Frachtkapazität laden
 							$fleet_fk=getFleetFK($_SESSION['ums_user_id']);
@@ -494,8 +494,8 @@ if(!hasTech($pt,29)){
 										$storage_is_ok=false;
 										//echo 'hna';
 									}
-								}else{							
-									$storage_is_ok=false;	
+								}else{
+									$storage_is_ok=false;
 								}
 							}
 
@@ -505,7 +505,7 @@ if(!hasTech($pt,29)){
 						if($storage_is_ok){
 
 							//läuft die Mission bereits?
-							if($um[$m]['end_time']<time() && ($um[$m]['get_reward']==1 || $um[$m]['get_reward']=='')){
+							if( (isset($um[$m]['end_time']) && $um[$m]['end_time']<time()) && ( (isset($um[$m]['get_reward']) && $um[$m]['get_reward']==1) || (isset($um[$m]['get_reward']) && $um[$m]['get_reward']==''))){
 
 								//Agenten abziehen
 								$sql="UPDATE de_user_data SET agent=agent-".$md[$m]['need_agents']." WHERE user_id=".$_SESSION['ums_user_id'].";";
@@ -518,7 +518,7 @@ if(!hasTech($pt,29)){
 								}
 
 								//infocenter zum schnelleren Reload vormerken
-								$_SESSION['ic_last_refresh']=0;								
+								$_SESSION['ic_last_refresh']=0;
 
 								//Mission-Datensatz generieren
 								$end_time=round(time()+$md[$m]['time']*$GLOBALS['tech_build_time_faktor']);

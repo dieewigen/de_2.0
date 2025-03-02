@@ -229,7 +229,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	echo '<div id="restyp5" rel="tooltip" title="'.$resline_lang['restipres05'].'<br>'.$resline_lang['restipres05desc'].'">'.number_format(floor($restyp05), 0,"",".").'</div>';
 
 	//uhr
-	echo '<div id="resclock1" rel="tooltip" title="'.$resline_lang['restipservertime'].'<br>'.$resline_lang['restipservertimedesc'].'">'.strftime("%H:%M").'</div>';
+	echo '<div id="resclock1" rel="tooltip" title="'.$resline_lang['restipservertime'].'<br>'.$resline_lang['restipservertimedesc'].'">'.date("H:m").'</div>';
 	echo '<div id="resclock2" rel="tooltip" title="'.$resline_lang['restipserveretick'].'<br>'.$resline_lang['restipserveretickdesc'].'">'.$lasttick.'</div>';
 	echo '<div id="resclock3" rel="tooltip" title="'.$resline_lang['restipservermtick'].'<br>'.$resline_lang['restipservermtickdesc'].'">'.$lastmtick.'</div>';
 

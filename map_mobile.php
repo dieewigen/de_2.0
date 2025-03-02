@@ -14,7 +14,7 @@ $row=$pd;
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 $punkte=$row["score"];$techs=$row["techs"];$defenseexp=$row["defenseexp"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$design=$row["design"];$mysc2=$row["sc2"];
+$mysc2=$row["sc2"];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 $spec1=$row['spec1'];$spec3=$row['spec3'];
 ?>
@@ -34,7 +34,7 @@ include "cssinclude.php";
 
 <?php
 
-if($sv_deactivate_vsystems==1){
+if(isset($sv_deactivate_vsystems) && $sv_deactivate_vsystems==1){
 	include "resline.php";
 	echo '<br><div class="info_box text2">Auf diesem Server sind die Vergessenen Systeme deaktiviert.</div>';
 
@@ -313,11 +313,11 @@ if(!hasTech($pt,25)){
 
 		//die Filterklassen zusammenbauen
 		$filter_class=' f_system'.$filter_class_unsy;
-		if($data->special_system<1 && in_array($row['id'], $erforschte_systeme) && !in_array($row['id'],$immer_sichtbare_systeme)){
+		if($data->special_system < 1 && in_array($row['id'], $erforschte_systeme) && !in_array($row['id'],$immer_sichtbare_systeme)){
 			for($i=0;$i<count($data->fields);$i++){
 				if(!in_array($row['id'],$immer_sichtbare_systeme)){
 					//$filter_class.=' f_lvl_'.$bldg[$row['id']][$i]['bldg_level'];
-					$stufe=$bldg[$row['id']][$i]['bldg_level'];
+					$stufe=$bldg[$row['id']][$i]['bldg_level'] ?? 0;
 								
 					if($i>0){
 						if($GLOBALS['map_field_typ'][$data->fields[$i][0]]['name']!='-'){
@@ -335,7 +335,7 @@ if(!hasTech($pt,25)){
 
 						}else{
 							//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
-							if(isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id']) && $stufe>0){
+							if(isset($bldg[$row['id']][$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id']) && $stufe > 0){
 								//$filter_class.=' '.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['bldg_filter_tag'];
 								$filter_class.=' '.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['bldg_filter_tag'].'_'.$stufe;
 							}else{
@@ -345,7 +345,7 @@ if(!hasTech($pt,25)){
 						}
 					}else{
 						//Außenposten
-						if($bldg[$row['id']][$i]['bldg_level']>0){
+						if(isset($bldg[$row['id']][$i]['bldg_level']) && $bldg[$row['id']][$i]['bldg_level'] > 0){
 							//$filter_class.=' '.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['bldg_filter_tag'];
 							$filter_class.=' '.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['bldg_filter_tag'].'_'.$stufe;
 						}else{
@@ -418,15 +418,18 @@ if(!hasTech($pt,25)){
 				//Feld-Ressource anzeigen
 				///////////////////////////////////////////
 				$stufeninfo='';
-				if(!in_array($row['id'],$immer_sichtbare_systeme)){
-					//if($bldg[$row['id']][$i]>0){
+				if(!in_array($row['id'], $immer_sichtbare_systeme)){
+					if(isset($bldg[$row['id']]) && isset($bldg[$row['id']][$i]['bldg_level'])){
 						$stufeninfo='<br>'.$bldg[$row['id']][$i]['bldg_level'];
-						//testen ob es gerade im Bau ist, dann die Farbe ändern
-						if($bldg[$row['id']][$i]['bldg_time']>time()){
-							$stufeninfo='<span style="color: yellow;">'.$stufeninfo.'</span>';
-						}
-					//}
-				}						
+					}else{
+						$stufeninfo='<br>0';
+					}
+					
+					//testen ob es gerade im Bau ist, dann die Farbe ändern
+					if(isset($bldg[$row['id']]) && isset($bldg[$row['id']][$i]['bldg_time']) && $bldg[$row['id']][$i]['bldg_time'] > time()){
+						$stufeninfo='<span style="color: yellow;">'.$stufeninfo.'</span>';
+					}
+				}
 
 				if($i>0){
 					if($GLOBALS['map_field_typ'][$data->fields[$i][0]]['name']!='-'){
@@ -439,7 +442,7 @@ if(!hasTech($pt,25)){
 						$output.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="'.$ums_gpfad.'g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
 					}else{
 						//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
-						if(isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'])){
+						if(isset($bldg[$row['id']][$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'])){
 
 							//$GLOBALS['greek_chars']
 							/*

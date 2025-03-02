@@ -23,8 +23,7 @@ $row=$pd;
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 $punkte=$row["score"];$techs=$row["techs"];$defenseexp=$row["defenseexp"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$design=$row["design"];$mysc2=$row["sc2"];
-$gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
+$mysc2=$row["sc2"];$gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 $spec1=$row['spec1'];$spec3=$row['spec3'];
 
 
@@ -202,7 +201,7 @@ echo '<script src="produktion'.$ums_rasse.'.js?'.filemtime($_SERVER['DOCUMENT_RO
 </head>
 <body>
 <?php
-if($_POST['submit'] AND $sabotage==0){//ja, es wurde ein button gedrueckt
+if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 	//transaktionsbeginn
 	if (setLock($ums_user_id)){
 		//$need_storage_res=array();
@@ -210,7 +209,7 @@ if($_POST['submit'] AND $sabotage==0){//ja, es wurde ein button gedrueckt
 		$row=loadPlayerData($_SESSION['ums_user_id']);
 		$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];		
 		for ($i=81; $i<=109; $i++){
-			$h=intval($_POST['b'.$i]);
+			$h=intval($_POST['b'.$i] ?? 0);
 			if ($h>=1){ //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags
 				if($i<100){
 					$unit_index=$i-81;
@@ -347,7 +346,7 @@ echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$rest
 echo '
 <a href="production.php" title="Einheitenproduktion"><img src="'.$ums_gpfad.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
 <a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$ums_gpfad.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
-if($sv_deactivate_vsystems!=1){
+if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems != 1){
 	echo '<a href="specialship.php" title="Basisstern"><img src="'.$ums_gpfad.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
 }
 echo'
@@ -424,13 +423,16 @@ echo '<tr valign="middle" align="center" height="25"><td class="cell1" height="2
 	$production_lang['baukostenreduz'].$ua_name[0].$production_lang['artefakte'].number_format($artbonus_fleet, 2,",",".").'% (max. 5,00%)</b></td></tr>';
 
 /////////////////////////////////////////////////////////////////////////////
-//Einheiten z�hlen
+//Einheiten zählen
 /////////////////////////////////////////////////////////////////////////////
 $ec=array();
 $fid0=$ums_user_id.'-0';$fid1=$ums_user_id.'-1';$fid2=$ums_user_id.'-2';$fid3=$ums_user_id.'-3';
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
 while($row = mysqli_fetch_array($db_daten)){
 	for ($i=81;$i<=90;$i++){
+		if(!isset($ec[$i])){
+			$ec[$i]=0;
+		}
 		$ec[$i]+=$row['e'.$i];
 	}
 }
@@ -446,7 +448,7 @@ $c1=0;$c2=0;$z=0;
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT  * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id");
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	$has_tech=false;
-	if((isset($pt[$row['tech_id']]) && $pt[$row['tech_id']]['time_finished']<=time()) || $sv_comserver_roundtyp==1){
+	if((isset($pt[$row['tech_id']]) && $pt[$row['tech_id']]['time_finished']<=time()) || (isset($sv_comserver_roundtyp) && $sv_comserver_roundtyp==1) ){
 		$has_tech=true;
 	}
 
@@ -652,7 +654,7 @@ echo '</form>';
 /////////////////////////////////////////////////
 // Waren/Handelsgüter/Itemproduktion
 /////////////////////////////////////////////////
-if($sv_deactivate_vsystems!=1){
+if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 	$factory_max_capacity=array();
 	for($g=0;$g<count($GLOBALS['map_buildings']);$g++){
 		if(isset($GLOBALS['map_buildings'][$g]['factory_id'])){

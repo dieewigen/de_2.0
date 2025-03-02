@@ -325,7 +325,7 @@ echo '<tr><td>
     		</tr>
     		<tr class=cl>
       			<td height=21>Allianzname /-tag:</td>
-      			<td height=21 colspan="3"><b>'.utf8_encode($clanname).' / '.utf8_encode($clankuerzel).'</b></td>
+      			<td height=21 colspan="3"><b>'.utf8_encode_fix($clanname).' / '.utf8_encode_fix($clankuerzel).'</b></td>
     		</tr>
     		<tr class=cl>
     		</tr>
@@ -404,7 +404,7 @@ echo '<tr class="cl">
 		</tr>
 		<tr class=cl>
 			<td height="21">Partnerallianz:</td>
-			<td height="21" colspan="3"><b>'.utf8_encode($partnerallianz).'</b></td>			
+			<td height="21" colspan="3"><b>'.utf8_encode_fix($partnerallianz).'</b></td>
 		</tr>
 		<tr class=cl>
 			<td height="21">'.$allyallymain_lang['homepage'].':</td>
@@ -517,7 +517,7 @@ echo '
       			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzbiografie'].':</h3></td>
     		</tr>
     		<tr>
-      			<td class="cl" height="21" colspan="2">'.utf8_encode($bio).'</td>
+      			<td class="cl" height="21" colspan="2">'.utf8_encode_fix($bio).'</td>
     		</tr>
 ';
 
@@ -576,15 +576,15 @@ if ($isleader || $iscoleader)
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['allianzbiografie'].':<br>
-      			<textarea rows="22" name="bio" cols="71">'.utf8_encode($bio).'</textarea></td>
+      			<textarea rows="22" name="bio" cols="71">'.utf8_encode_fix($bio).'</textarea></td>
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['msgtoleader'].':<br>
-      			<textarea rows="10" name="leadermessage" cols="71">'.utf8_encode($leadermessage).'</textarea></td>
+      			<textarea rows="10" name="leadermessage" cols="71">'.utf8_encode_fix($leadermessage).'</textarea></td>
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['bewerberinfo'].':<br>
-      			<textarea rows="10" name="bewerberinfo" cols="71">'.utf8_encode($bewerberinfo).'</textarea></td>
+      			<textarea rows="10" name="bewerberinfo" cols="71">'.utf8_encode_fix($bewerberinfo).'</textarea></td>
     		</tr>
     		<tr><td><br><br></td></tr>
     		<tr>

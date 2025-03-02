@@ -86,7 +86,7 @@ $row = mysql_fetch_array($result);
 $domtick=$row["domtick"];
 if ($domtick==1){
 echo '<br>Starte Tick';
-print strftime("%d/%m/%Y - %H:%M:%S");
+echo date("d/m/Y - H:i:s");
 echo '<br><br>';
 
 //Kampfticks mitzählen
@@ -269,9 +269,9 @@ for ($i=0; $i<$num; $i++)
 include 'kt_manage_bg.php';
 
 //lege in der datenbank die zeit des letzten ticks ab
-$time=strftime("%Y%m%d%H%M%S");
+$time=date("YmdHis");
 mysql_query("update de_system set lastmtick = '$time'",$db);
-print '<br><br>Letzter Tick: '.strftime("%d/%m/%Y - %H:%M:%S");
+print '<br><br>Letzter Tick: '.date("d/m/Y - H:i:s");
 
 function xecho($str){
 	global $cachefile;
@@ -284,14 +284,16 @@ $filename = "../cache/lastmtick.tmp";
 
 $cachefile = fopen ($filename, 'w');
 
-$zeit=strftime("%H:%M");
+$zeit=date("H:i");
 echo $zeit;
 xecho('<?php $lastmtick="'.$zeit.'";');
 
 xecho('?>');
 
 
-} else echo 'Ticks deaktiviert.'; //doetick
+} else {
+	echo 'Ticks deaktiviert.'; //doetick
+}
 ?>
 
 </body>

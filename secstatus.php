@@ -383,7 +383,7 @@ for ($i=0; $i<$fa; $i++){
 	echo '<td class="cc"><b>'.$sss.'</b></td>';
 	echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
 	echo '<td class="'.$cl.'">'.$rasse.'</td>';
-	echo '<td class="'.$cl.'">'.utf8_encode($allytagscan).'</td>';
+	echo '<td class="'.$cl.'">'.utf8_encode_fix($allytagscan).'</td>';
 	echo '<td class="'.$cl.'">'.$a1.'</td>';
 	echo '<td class="'.$cl.'">'.$t1.'</td>';
 	echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';
@@ -532,7 +532,7 @@ if(count($sc) > 0){
 					}else{
 						//aktivierungslink anzeigen
 						echo '&nbsp;<a href="secstatus.php?sassys='.$sc[$i][1][0].'" 
-							title="Die Allianz '.utf8_encode($allytag).' f&uuml;r die Dauer eines KT &uuml;ber den Status ihres Mitgliedes informieren.">AI</a>';
+							title="Die Allianz '.utf8_encode_fix($allytag).' f&uuml;r die Dauer eines KT &uuml;ber den Status ihres Mitgliedes informieren.">AI</a>';
 					}
 				}
 			}
@@ -1209,7 +1209,7 @@ for($s=81;$s<=90;$s++){
   echo '<td class="cc"><b>'.$sss.'</b></td>';
   echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
   echo '<td class="'.$cl.'">'.$rasse.'</td>';
-  echo '<td class="'.$cl.'">'.utf8_encode($allytagscan).'</td>';
+  echo '<td class="'.$cl.'">'.utf8_encode_fix($allytagscan).'</td>';
   echo '<td class="'.$cl.'">'.$a1.'</td>';
   echo '<td class="'.$cl.'">'.$t1.'</td>';
   echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';

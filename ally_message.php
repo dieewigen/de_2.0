@@ -73,6 +73,8 @@ include('resline.php');
 $leaderpage = true;
 include('ally/ally.menu.inc.php');
 
+$action=$_REQUEST['action'] ?? '';
+
 if($action=="del"){//nachricht l&ouml;schen
 	$se=(int)$se;
 	$sy=(int)$sy;
@@ -83,8 +85,8 @@ if($action=="del"){//nachricht l&ouml;schen
 	echo insertmessage($allymessage_lang['msg_1'],"g");
 }
 
-$ak=$_POST['ak'];
-$deak=$_POST['deak'];
+$ak=$_POST['ak'] ?? false;
+$deak=$_POST['deak'] ?? false;
 
 if ($ak || $deak){//HFNs direkt weiterleiten?
 	if($ak)mysql_query("update de_allys set hfn_forwarding = 1 where allytag='$allytag'");
@@ -123,7 +125,7 @@ if($action=="fw"){
 
 }
 
-$send=$_POST['send'];
+$send=$_POST['send'] ?? false;
 if($send){
 	$text=nl2br($_POST['text']);
 	$betreff=$_POST['betreff'];
@@ -194,7 +196,7 @@ if($send){
 $hfnforward=mysql_query("SELECT hfn_forwarding FROM de_allys WHERE allytag='$allytag'");
 $rowhfnforward=mysql_fetch_array($hfnforward);
 
-if($rowhfnforward[hfn_forwarding]=="1")
+if($rowhfnforward['hfn_forwarding']=="1")
 {
 echo '<input type=submit style="background-color:#000000;border:1;border-color:#FF0000;border-style:solid;color:#FF0000" name="deak" value="'.$allymessage_lang['msg_7'].'">';
 }
@@ -242,7 +244,7 @@ echo '<input type=submit  style="background-color:#000000;border:1;border-color:
 		<tr><td class="cell1">&nbsp;<b><?php echo $allymessage_lang['datum']; ?></b></td><td class="cell">&nbsp;<?php echo $time; ?></td></tr>
 		<tr><td class="cell">&nbsp;<b><?php echo $allymessage_lang['betreff']; ?></b></td><td class="cell1">&nbsp;<?php echo $hfnrow['betreff']; ?></td></tr>
 		<tr><td valign="top"  class="cell1">&nbsp;<b><?php echo $allymessage_lang['nachricht']; ?></b></td><td class="cell">&nbsp;<?php echo $hfnrow['text']; ?></td></tr>
-		<?php echo '<tr><td colspan="2" align="center" class="cell" nowrap><a href="ally_message.php?action=fw&se='.$hfnrow['fromsec'].'&sy='.$hfnrow['fromsys'].'&t='.$hfnrow['time'].'"><b><font color="#00FF00">'.$allymessage_lang['msg_11'].'</font></b></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="ally_message.php?action=del&se='.$hfnrow['fromsec'].'&sy='.$hfnrow['fromsys'].'&t='.$hfnrow['time'].'"><b><font color="#FF0000">'.$allymessage_lang['loeschen'].'</font></b></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="details.php?se='.$hfnrow[fromsec].'&sy='.$hfnrow[fromsys].'><b>'.$hfnrow[fromnic].' '.$allymessage_lang[antworten].'"</b></a></td></tr>'; ?>
+		<?php echo '<tr><td colspan="2" align="center" class="cell" nowrap><a href="ally_message.php?action=fw&se='.$hfnrow['fromsec'].'&sy='.$hfnrow['fromsys'].'&t='.$hfnrow['time'].'"><b><font color="#00FF00">'.$allymessage_lang['msg_11'].'</font></b></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="ally_message.php?action=del&se='.$hfnrow['fromsec'].'&sy='.$hfnrow['fromsys'].'&t='.$hfnrow['time'].'"><b><font color="#FF0000">'.$allymessage_lang['loeschen'].'</font></b></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="details.php?se='.$hfnrow['fromsec'].'&sy='.$hfnrow['fromsys'].'><b>'.$hfnrow['fromnic'].' '.$allymessage_lang['antworten'].'"</b></a></td></tr>'; ?>
 		<tr><td colspan="2">&nbsp;</td></tr>
       <?php
       }

@@ -18,7 +18,7 @@ $mbelohnung=30000000*$ac_prozent;
 for($index=0;$index<$stufen;$index++){
 	$rewards1[$index][0]=($index+1)*20; //zu erreichender wert
 	@$rewards1[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
-	$max_achievement_points++;  
+	$max_achievement_points++;
 }
 
 

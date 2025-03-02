@@ -181,15 +181,13 @@ $smatrix[] = array ( 7, 18 );
 
 //vorbelegung der einheitendaten
 //$unit[rasse 0-3][schiffname aus db][hp][aw]
-
-//ewigen
-$res = mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_tech_data where tech_id>80 and tech_id<110 order by tech_id");
-while($row = mysqli_fetch_array($res)){//f�r jede flotte die daten auslesen
+$schiffsname=array();
+$res = mysqli_query($GLOBALS['dbi'],"SELECT tech_name FROM de_tech_data where tech_id>80 and tech_id<110 order by tech_id");
+while($row = mysqli_fetch_array($res)){//für die Rassen die Schiffsnamen auslesen
     $schiffsname[]   = $row["tech_name"];
-    //$schiffspunkte[] = $row["score"];
-    //$restypen[] = array ($row["restyp01"], $row["restyp02"], $row["restyp03"], $row["restyp04"], $row["restyp05"]);
 }
 
+//ewigen
 $unit[0][0][0]=getTechNameByRasse($schiffsname[0],1);//j�ger
 $unit[0][0][1]=15; //hitpoints
 $unit[0][0][2]=4;  //angriffswert

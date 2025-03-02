@@ -209,10 +209,10 @@ if($an and ($isleader || $iscoleader)){
 
 		while ($row = @mysql_fetch_array($result))
 		{
-			if ($row[ally_id_angegriffener] == $allyid)
-				$showallyid = $row[ally_id_angreifer];
+			if ($row['ally_id_angegriffener'] == $allyid)
+				$showallyid = $row['ally_id_angreifer'];
 			else
-				$showallyid = $row[ally_id_angegriffener];
+				$showallyid = $row['ally_id_angegriffener'];
 			$query = "SELECT allytag FROM de_allys where id=$showallyid";
 			$result2 = mysql_query($query);
 			$angegriffener = @mysql_result($result2,0,"allytag");
@@ -222,10 +222,10 @@ if($an and ($isleader || $iscoleader)){
 								<td>'.$angegriffener.'</td>
 			';
 			
-			if($isleader || $iscoleader) { 
+			if($isleader || $iscoleader) {
 			
 				echo '
-								<td><a href="'.$_SERVER['PHP_SELF'].'?SID='.$SID.'&peaceto='.urlencode($angegriffener).'">'.$allywar_lang['declarepeace'].'</a></td>
+								<td><a href="'.$_SERVER['PHP_SELF'].'?peaceto='.urlencode($angegriffener).'">'.$allywar_lang['declarepeace'].'</a></td>
 				';
 			
 			}

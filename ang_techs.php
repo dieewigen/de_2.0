@@ -33,7 +33,7 @@ if(!isset($sv_deactivate_vsystems)){
 }
 
 //transaktionsbeginn
-if(setLock($ums_user_id)){
+if(setLock($_SESSION['ums_user_id'])){
 	$pd=loadPlayerData($_SESSION['ums_user_id']);
 	$pt=loadPlayerTechs($_SESSION['ums_user_id']);
 	

@@ -28,7 +28,9 @@ $nic=$row["nic"];*/
 include('resline.php');
 $leaderpage = true;
 include('ally/ally.menu.inc.php');
-$text=$_POST['text'];
+$text=$_POST['text'] ?? '';
+$select=$_POST['select'] ?? '';
+
 if($text) {
 	$text=nl2br($text);
 	$betreff=$_POST['betreff'];

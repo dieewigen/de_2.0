@@ -7,138 +7,158 @@ require_once('lib/phpmailer/class.smtp.php');
 include('functions.php');
 include('inc/lang/'.$sv_server_lang.'_options.lang.php');
 
-$errmsg='';
-$getpamsg='';
+$errmsg = '';
+$getpamsg = '';
 
-if(isset($_REQUEST['set_use_mobile_version'])){
-  $value=intval($_REQUEST['set_use_mobile_version']);
-  $time=time()+3600*24*365*5;
-  setcookie("use_mobile_version", $value , $time);
-  $_COOKIE['use_mobile_version']=$value;
+if (isset($_REQUEST['set_use_mobile_version'])) {
+    $value = intval($_REQUEST['set_use_mobile_version']);
+    $time = time() + 3600 * 24 * 365 * 5;
+    setcookie("use_mobile_version", $value, $time);
+    $_COOKIE['use_mobile_version'] = $value;
 }
 
-if(isset($_REQUEST['set_deactivate_swipe'])){
-  $value=intval($_REQUEST['set_deactivate_swipe']);
-  $time=time()+3600*24*365*5;
-  setcookie("deactivate_swipe", $value , $time);
-  $_COOKIE['deactivate_swipe']=$value;
+if (isset($_REQUEST['set_deactivate_swipe'])) {
+    $value = intval($_REQUEST['set_deactivate_swipe']);
+    $time = time() + 3600 * 24 * 365 * 5;
+    setcookie("deactivate_swipe", $value, $time);
+    $_COOKIE['deactivate_swipe'] = $value;
 }
 
-if(isset($_REQUEST['desktop_version'])){
-  $value=intval($_REQUEST['desktop_version']);
-  $time=time()+3600*24*365*5;
-  setcookie("desktop_version", $value , $time);
-  $_COOKIE['desktop_version']=$value;
+if (isset($_REQUEST['desktop_version'])) {
+    $value = intval($_REQUEST['desktop_version']);
+    $time = time() + 3600 * 24 * 365 * 5;
+    setcookie("desktop_version", $value, $time);
+    $_COOKIE['desktop_version'] = $value;
 }
-$desktop_version=intval($_COOKIE['desktop_version']);
+$desktop_version = intval($_COOKIE['desktop_version'] ?? 0);
 
-$ehlockfaktor=4;
+$ehlockfaktor = 4;
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
-$newtrans=$row['newtrans'];$allytag=$row['allytag'];$newnews=$row['newnews'];$hidepic=$row['hide_secpics'];
-$sector=$row['sector'];$system=$row['system'];$nrrasse=$row['nrrasse'];$nrspielername=$row['nrspielername'];
-$tick=$row['tick'];$ovopt=$row['ovopt'];$soundoff=$row['soundoff'];
-$credits=$row['credits'];$chatoff=$row['chatoff'];$chatoffallg=$row['chatoffallg'];$chatoffglobal=$row['chatoffglobal'];$helperon=$row['helper'];
-$patime=$row['patime'];$trade_reminder=$row['trade_reminder'];
+$restyp01 = $row[0];
+$restyp02 = $row[1];
+$restyp03 = $row[2];
+$restyp04 = $row[3];
+$restyp05 = $row[4];
+$punkte = $row['score'];
+$newtrans = $row['newtrans'];
+$allytag = $row['allytag'];
+$newnews = $row['newnews'];
+$hidepic = $row['hide_secpics'];
+$sector = $row['sector'];
+$system = $row['system'];
+$nrrasse = $row['nrrasse'];
+$nrspielername = $row['nrspielername'];
+$tick = $row['tick'];
+$ovopt = $row['ovopt'];
+$soundoff = $row['soundoff'];
+$credits = $row['credits'];
+$chatoff = $row['chatoff'];
+$chatoffallg = $row['chatoffallg'];
+$chatoffglobal = $row['chatoffglobal'];
+$helperon = $row['helper'];
+$patime = $row['patime'];
+$trade_reminder = $row['trade_reminder'];
 
 
 //irc-benutzername auslesen
-$db_daten=mysql_query("SELECT ircname, gpfad, transparency FROM de_user_info WHERE user_id='$ums_user_id'",$db);
+$db_daten = mysql_query("SELECT ircname, gpfad, transparency FROM de_user_info WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
-$db_ircname=$row['ircname'];
-$gpfaddb=$row['gpfad'];
+$db_ircname = $row['ircname'];
+$gpfaddb = $row['gpfad'];
 
 //$transparency=$row['transparency'];
 
 //owner id auslesen
-$db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'",$db);
+$db_daten = mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
-$owner_id=intval($row['owner_id']);
+$owner_id = intval($row['owner_id']);
 
 //maximalen tick auslesen
 //$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
+$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1", $db);
 $row     = mysql_fetch_array($result);
 $maxtick = $row['tick'];
 
 ////////////////////////////////////////////////////////
 // Premiumaccount buchen
 ////////////////////////////////////////////////////////
-$getpa=intval($_REQUEST['getpa']);
-if($getpa>0){
-	//transaktionsbeginn
-	if (setLock($ums_user_id)){
-		//nochmal die vorandenen Spielerdaten laden
-		$row=loadPlayerData($_SESSION['ums_user_id']);
+$getpa = intval($_REQUEST['getpa'] ?? 0);
+if ($getpa > 0) {
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        //nochmal die vorandenen Spielerdaten laden
+        $row = loadPlayerData($_SESSION['ums_user_id']);
 
-		$creditkosten=$getpa*5;
-		if($creditkosten<=$credits){
-			$getpamsg='<br><font color="#00FF00">Der Premiumaccount wurde verl&auml;ngert.</font>';
+        $creditkosten = $getpa * 5;
+        if ($creditkosten <= $credits) {
+            $getpamsg = '<br><font color="#00FF00">Der Premiumaccount wurde verl&auml;ngert.</font>';
 
-			//alle Server durchgehen und die PA-Zeit verlängern
-			$server_liste=array(
-				'sde',
-				'xde',
-				'rde'
-			);
+            //alle Server durchgehen und die PA-Zeit verlängern
+            $server_liste = array(
+                'sde',
+                'xde',
+                'rde'
+            );
 
-			for($i=0;$i<count($server_liste);$i++){
-				$db_table=$server_liste[$i];
+            for ($i = 0;$i < count($server_liste);$i++) {
+                $db_table = $server_liste[$i];
 
-				//schauen ob es den account gibt
-				$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'");
-				//echo "<br>SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'";
-				$num = mysqli_num_rows($db_daten);
-				if($num==1){
-					//echo 'A';
-					//falls ja user id auslesen und die pa-zeit gutschreiben
-					$row = mysqli_fetch_array($db_daten);
-					$user_id=$row['user_id'];
-					
-					//aktuelle laufzeit auslesen
-					$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT patime FROM ".$db_table.".de_user_data WHERE user_id='$user_id'");
-					$row = mysqli_fetch_array($db_daten);
-					$palaufzeit=$row['patime'];
-					
-					if ($palaufzeit<time()){
-						//echo 'B';
-						//er hat aktuell keinen pa, also neue gesamtlaufzeit setzen
-						$patime=time()+(3600*24*$getpa);
-						mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET premium=1, patime='$patime' WHERE user_id = '$user_id'");
-					}else{
-						//echo 'C';
-						//er hat einen pa, also zeit dazuaddieren
-						$patime=(3600*24*$getpa);
-						mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'");
-						//echo "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'<br><br>";
-						//echo mysqli_error($GLOBALS['dbi']);
-					}
-				}
-			}
+                //schauen ob es den account gibt
+                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'");
+                //echo "<br>SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'";
+                $num = mysqli_num_rows($db_daten);
+                if ($num == 1) {
+                    //echo 'A';
+                    //falls ja user id auslesen und die pa-zeit gutschreiben
+                    $row = mysqli_fetch_array($db_daten);
+                    $user_id = $row['user_id'];
 
-			changeCredits($_SESSION['ums_user_id'], $creditkosten*-1, 'PA-Buchung: '.$getpa.' Tage');
+                    //aktuelle laufzeit auslesen
+                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT patime FROM ".$db_table.".de_user_data WHERE user_id='$user_id'");
+                    $row = mysqli_fetch_array($db_daten);
+                    $palaufzeit = $row['patime'];
 
-		//Daten aktualisieren
-		$row=loadPlayerData($_SESSION['ums_user_id']);
-		$row['credits']=$row['credits']-$creditkosten;
-		$credits=$row['credits'];
-		$patime=$row['patime'];
+                    if ($palaufzeit < time()) {
+                        //echo 'B';
+                        //er hat aktuell keinen pa, also neue gesamtlaufzeit setzen
+                        $patime = time() + (3600 * 24 * $getpa);
+                        mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET premium=1, patime='$patime' WHERE user_id = '$user_id'");
+                    } else {
+                        //echo 'C';
+                        //er hat einen pa, also zeit dazuaddieren
+                        $patime = (3600 * 24 * $getpa);
+                        mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'");
+                        //echo "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'<br><br>";
+                        //echo mysqli_error($GLOBALS['dbi']);
+                    }
+                }
+            }
 
-		}else{
-			$getpamsg='<br><font color="#FF0000">Es sind nicht genug Credits vorhanden.</font>';
-		}
+            changeCredits($_SESSION['ums_user_id'], $creditkosten * -1, 'PA-Buchung: '.$getpa.' Tage');
 
-		//transaktionsende
-		$erg = releaseLock($ums_user_id); //Lösen des Locks und Ergebnisabfrage
-		if ($erg){
-			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-		}else{
-			print("Transaktionsfehler AX.<br><br><br>");
-		}
-	}// if setlock-ende
-	else echo '<br><font color="#FF0000">Transaktionsfehler BX.</font><br><br>';
+            //Daten aktualisieren
+            $row = loadPlayerData($_SESSION['ums_user_id']);
+            $row['credits'] = $row['credits'] - $creditkosten;
+            $credits = $row['credits'];
+            $patime = $row['patime'];
+
+        } else {
+            $getpamsg = '<br><font color="#FF0000">Es sind nicht genug Credits vorhanden.</font>';
+        }
+
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //Lösen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print("Transaktionsfehler AX.<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">Transaktionsfehler BX.</font><br><br>';
+    }
 }
 
 
@@ -206,130 +226,148 @@ if ($_POST['dooveinst'])
 */
 
 //einstellungen für die nächste runde speichern
-if ($_POST['donr']){
-  $spielername=$_POST['spielername'];
-  $rasse=$_POST['rasse'];
-  if($spielername!='')  {
-    if(!preg_match ("/^[[:alpha:]0-9äöü_=-]*$/i", $spielername))$errmsg.='Im Spielernamen d&uuml;rfen keine Sonderzeichen sein (Ausnahmen sind nur: _-=).';
-    else
-    {
-      $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE (spielername='$spielername' OR nrspielername='$spielername') AND spielername!='$ums_spielername'",$db);
-      $vorhanden = mysql_num_rows($db_daten);
-      if ($vorhanden>0)$errmsg.='<br>'.$options_lang['fehler5'];
+if (isset($_POST['donr'])) {
+    $spielername = $_POST['spielername'];
+    $rasse = $_POST['rasse'];
+    if ($spielername != '') {
+        if (!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $spielername)) {
+            $errmsg .= 'Im Spielernamen d&uuml;rfen keine Sonderzeichen sein (Ausnahmen sind nur: _-=).';
+        } else {
+            $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE (spielername='$spielername' OR nrspielername='$spielername') AND spielername!='$ums_spielername'", $db);
+            $vorhanden = mysql_num_rows($db_daten);
+            if ($vorhanden > 0) {
+                $errmsg .= '<br>'.$options_lang['fehler5'];
+            }
+        }
+    } else {
+        $errmsg = $options_lang['fehler2'];
     }
-  }else $errmsg=$options_lang['fehler2'];
 
-  switch($rasse){
-    case 1:
-      $gewrasse=1;
-      break;
-    case 2:
-      $gewrasse=2;
-      break;
-    case 3:
-      $gewrasse=3;
-      break;
-    case 4:
-      $gewrasse=4;
-      break;
-    default:
-      $errmsg.='<br>'.$options_lang['fehler3'];
-      break;
-  }
+    switch ($rasse) {
+        case 1:
+            $gewrasse = 1;
+            break;
+        case 2:
+            $gewrasse = 2;
+            break;
+        case 3:
+            $gewrasse = 3;
+            break;
+        case 4:
+            $gewrasse = 4;
+            break;
+        default:
+            $errmsg .= '<br>'.$options_lang['fehler3'];
+            break;
+    }
 
-  //wenn alles ok ist, daten in der db ablegen
-  if ($errmsg=='')  {
-    mysql_query("UPDATE de_user_data SET nrspielername='$spielername', nrrasse='$gewrasse' WHERE user_id = '$ums_user_id'",$db);
-    $nrrasse=$gewrasse;
-    $nrspielername=$spielername;
-  }
+    //wenn alles ok ist, daten in der db ablegen
+    if ($errmsg == '') {
+        mysql_query("UPDATE de_user_data SET nrspielername='$spielername', nrrasse='$gewrasse' WHERE user_id = '$ums_user_id'", $db);
+        $nrrasse = $gewrasse;
+        $nrspielername = $spielername;
+    }
 }
 
-if(isset($_POST['graop'])){
-  //<input type="hidden" name="dograop" value="1">
-  $secpic = $_POST['secbild'];
-  if($secbild==$secanzeige[0])$secpic=0;
-  elseif($secbild==$secanzeige[1])$secpic=1;
-  elseif($secbild==$secanzeige[2])$secpic=2;
-  else $secpic=0;
-  $hidepic=$secpic;
-  //ircname
-  if(!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $_POST['ircname'])){
-    $errmsg.=$options_lang['fehler4'];
-    $ircname='';
-  }else{
-    $db_ircname=$_POST['ircname'];
-    $ircname=$_POST['ircname'];
-  }
+if (isset($_POST['graop'])) {
+    //<input type="hidden" name="dograop" value="1">
+    $secpic = $_POST['secbild'];
+    if ($secbild == $secanzeige[0]) {
+        $secpic = 0;
+    } elseif ($secbild == $secanzeige[1]) {
+        $secpic = 1;
+    } elseif ($secbild == $secanzeige[2]) {
+        $secpic = 2;
+    } else {
+        $secpic = 0;
+    }
+    $hidepic = $secpic;
+    //ircname
+    if (!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $_POST['ircname'])) {
+        $errmsg .= $options_lang['fehler4'];
+        $ircname = '';
+    } else {
+        $db_ircname = $_POST['ircname'];
+        $ircname = $_POST['ircname'];
+    }
 
-  //sm_remtime
-  $smremtime=intval($_REQUEST['smremtime']);
-  if($smremtime<15)$smremtime=0;
-  if($smremtime>1440)$smremtime=1440;
-  $ums_sm_remtime=$smremtime;
-  $_SESSION['ums_sm_remtime']=$smremtime;
-  
+    //sm_remtime
+    $smremtime = intval($_REQUEST['smremtime']);
+    if ($smremtime < 15) {
+        $smremtime = 0;
+    }
+    if ($smremtime > 1440) {
+        $smremtime = 1440;
+    }
+    $ums_sm_remtime = $smremtime;
+    $_SESSION['ums_sm_remtime'] = $smremtime;
 
-  if($errmsg==''){
-    //$gpfad = $_REQUEST['gpfad'];
-    $gpfad='';
-    $sound=(int)$_POST['sound'];
-    $chat=isset($_POST['chat']) ? intval($_POST['chat']) : 0;
-    $chatallg=(int)$_POST['chatallg'];
-	  $chatglobal=(int)$_POST['chatglobal'];
-    $helper=(int)$_POST['helper'];
-    $traderem=(int)$_POST['traderem'];
-    
 
-    /*
-    $transparency=intval($_POST['transparenz']);
-    if($transparenz<40)$transparenz=40;
-    elseif($transparenz>100)$transparenz=100;
-    $_SESSION['ums_transparency']=$transparenz;
-    */
-    if ($_REQUEST['gpfad']!=''){$ums_gpfad=$gpfad;$gpfaddb=$gpfad;}
-    else {$ums_gpfad=$sv_image_server_list[0];$gpfaddb='';}
-    //$ums_gpfad=$gpfad;$gpfaddb=$gpfad;
-    //mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname', transparency='$transparenz' WHERE user_id = '$ums_user_id'",$db);
-    mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname' WHERE user_id = '$ums_user_id'",$db);
-    mysql_query("update de_user_data set hide_secpics = '$secpic', soundoff='$sound', sm_remtime='$ums_sm_remtime', chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'",$db);
-    $hidepic=$secpic;
-    $errmsg.=$options_lang['uebernommen'];
-    $soundoff=$sound;
-    $chatoff=$chat;
-    $chatoffallg=$chatallg;
-    $_SESSION['ums_chatoffallg']=$chatoffallg;
-    $chatoffglobal=$chatglobal;
-    $_SESSION['ums_chatoffglobal']=$chatoffglobal;	
-    $helperon=$helper;
-    $trade_reminder=$traderem;
-  }
+    if ($errmsg == '') {
+        //$gpfad = $_REQUEST['gpfad'];
+        $gpfad = '';
+        $sound = (int)$_POST['sound'];
+        $chat = isset($_POST['chat']) ? intval($_POST['chat']) : 0;
+        $chatallg = (int)$_POST['chatallg'];
+        $chatglobal = (int)$_POST['chatglobal'];
+        $helper = (int)$_POST['helper'];
+        $traderem = (int)$_POST['traderem'];
+
+
+        /*
+        $transparency=intval($_POST['transparenz']);
+        if($transparenz<40)$transparenz=40;
+        elseif($transparenz>100)$transparenz=100;
+        $_SESSION['ums_transparency']=$transparenz;
+        */
+        if ($_REQUEST['gpfad'] != '') {
+            $ums_gpfad = $gpfad;
+            $gpfaddb = $gpfad;
+        } else {
+            $ums_gpfad = $sv_image_server_list[0];
+            $gpfaddb = '';
+        }
+        //$ums_gpfad=$gpfad;$gpfaddb=$gpfad;
+        //mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname', transparency='$transparenz' WHERE user_id = '$ums_user_id'",$db);
+        mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname' WHERE user_id = '$ums_user_id'", $db);
+        mysql_query("update de_user_data set hide_secpics = '$secpic', soundoff='$sound', sm_remtime='$ums_sm_remtime', chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
+        $hidepic = $secpic;
+        $errmsg .= $options_lang['uebernommen'];
+        $soundoff = $sound;
+        $chatoff = $chat;
+        $chatoffallg = $chatallg;
+        $_SESSION['ums_chatoffallg'] = $chatoffallg;
+        $chatoffglobal = $chatglobal;
+        $_SESSION['ums_chatoffglobal'] = $chatoffglobal;
+        $helperon = $helper;
+        $trade_reminder = $traderem;
+    }
 }
 
 //wurde ein button gedrueckt??
-$oldpass = $_POST['oldpass'];
-$pass1 = $_POST['pass1'];
-$pass2 = $_POST['pass2'];
-if(isset($_POST['newpass']) AND $owner_id==0){
-  //echo '<br>'.HTTP_REFERER.'<br>';
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$oldpass')");
-  $num = mysql_num_rows($db_daten);
-  if ($num==1) //oldpass ist korrekt
-  {
-    $pass1=trim($pass1);
-    $pass2=trim($pass2);
-    if ($pass1==$pass2)
-    {
-      if (strlen($pass1)>3)
-      {
-        mysql_query("update de_login set pass = MD5('$pass1'), newpass='' WHERE user_id = '$ums_user_id'",$db);
-        $errmsg.=$options_lang['pwnew'];
-      }
-      else $errmsg.='<font color="FF0000">'.$options_lang['pw2short'].'</font>';
+$oldpass = $_POST['oldpass'] ?? '';
+$pass1 = $_POST['pass1'] ?? '';
+$pass2 = $_POST['pass2'] ?? '';
+if (isset($_POST['newpass']) && $owner_id == 0) {
+    //echo '<br>'.HTTP_REFERER.'<br>';
+    $db_daten = mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$oldpass')");
+    $num = mysql_num_rows($db_daten);
+    if ($num == 1) { //oldpass ist korrekt
+        $pass1 = trim($pass1);
+        $pass2 = trim($pass2);
+        if ($pass1 == $pass2) {
+            if (strlen($pass1) > 3) {
+                mysql_query("update de_login set pass = MD5('$pass1'), newpass='' WHERE user_id = '$ums_user_id'", $db);
+                $errmsg .= $options_lang['pwnew'];
+            } else {
+                $errmsg .= '<font color="FF0000">'.$options_lang['pw2short'].'</font>';
+            }
+        } else {
+            $errmsg .= '<font color="FF0000">'.$options_lang['pwdifferent'].'</font>';
+        }
+    } else {
+        $errmsg .= '<font color="FF0000">'.$options_lang['pwfalsch'].'</font>';
     }
-    else $errmsg.='<font color="FF0000">'.$options_lang['pwdifferent'].'</font>';
-  }
-  else $errmsg.='<font color="FF0000">'.$options_lang['pwfalsch'].'</font>';
 }
 
 
@@ -412,89 +450,92 @@ if ($selfvoteout)
     header("Location: index.php");
   }
 }*/
-$delacc=$_POST['delacc'] ?? false;
-if ($delacc){ //account l�schen
-	$delpass=$_POST['delpass'];
-	$delcheck1=$_POST['delcheck1'];
-	$delcheck2=$_POST['delcheck2'];
+$delacc = $_POST['delacc'] ?? false;
+if ($delacc) { //account l�schen
+    $delpass = $_POST['delpass'];
+    $delcheck1 = $_POST['delcheck1'];
+    $delcheck2 = $_POST['delcheck2'];
 
-	$db_datenx=mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
-	$rowx = mysql_fetch_array($db_datenx);
+    $db_datenx = mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
+    $rowx = mysql_fetch_array($db_datenx);
 
-	$passwordOK=false;
-	if(password_verify(trim($delpass), $rowx['pass'])){
-		$passwordOK=true;
-	}	
+    $passwordOK = false;
+    if (password_verify(trim($delpass), $rowx['pass'])) {
+        $passwordOK = true;
+    }
 
-	if ($passwordOK){ //oldpass ist korrekt	
-		if ($delcheck1=="1" and $delcheck2=="1"){//l�sche
-			//�berpr�fen ob man evtl. allianzleader ist, da ist es notwendig den posten aufzugeben
-			$db_daten = mysql_query("SELECT * FROM de_allys WHERE leaderid='$ums_user_id';", $db);
-			$num = mysql_num_rows($db_daten);
-			if($num==0){//man ist kein leader
-				$uid=$ums_user_id;
-				
-				//3 tage umode und dann killen, wenn er sich nicht mehr einloggt
-				$urltage=3;
-				$tis=time()+86400*$urltage;
-				$datum=date("Y-m-d H:i:s",$tis);
-			
-				mysql_query("UPDATE de_login SET last_login='$datum', status=3, inaktmail=1, delmode=1 WHERE user_id=$uid",$db);
-			
-				//zeit des letztens logins setzen um dem account noch 24 stunden zu geben
-				/*
-				$deltage=$sv_inactiv_deldays-1;
-				$uid=$ums_user_id;
-				$tis=time()-86400*$deltage;
-				$datum=date("Y-m-d H:i:s",$tis);
-				mysql_query("UPDATE de_login SET last_login='$datum', inaktmail = 1, delmode = 1 WHERE user_id=$uid",$db);
-				*/
-			
-				//premium-account-status entfernen
-				//mysql_query("UPDATE de_user_data SET premium=0, patime=0 WHERE user_id=$uid",$db);
-				mysql_query("UPDATE de_user_data SET premium=0 WHERE user_id=$uid",$db);
-				
-				//ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
-				$newtick=$maxtick+($sv_benticks*$ehlockfaktor);
-				mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid",$db);
-			
-				
-				//mail an den accountinhaber schicken
-				$db_daten=mysql_query("SELECT reg_mail FROM de_login WHERE user_id='$ums_user_id'",$db);
-				$row = mysql_fetch_array($db_daten);
-				$reg_mail=$row['reg_mail'];
-				@mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: noreply@die-ewigen.com');
-			
-				session_destroy();
-				header("Location: geloescht.php");
-			}else{
-				$errmsg='<div class="info_box text2">Gib bitte zuerst Deinen Posten als Allianzleiter auf. Du kannst den Posten &uuml;bertragen, oder die Allianz l&ouml;schen.</div>';
-			}
-		}else{
-			$errmsg='<div class="info_box text2">Setze bitte beide H&auml;kchen um den Account zu l&ouml;schen.</div>';
-		}
-	} else {
-		$errmsg.= '<font color="FF0000">'.$options_lang['umodefehler2'].'</font>';
-	}
+    if ($passwordOK) { //oldpass ist korrekt
+        if ($delcheck1 == "1" and $delcheck2 == "1") {//l�sche
+            //�berpr�fen ob man evtl. allianzleader ist, da ist es notwendig den posten aufzugeben
+            $db_daten = mysql_query("SELECT * FROM de_allys WHERE leaderid='$ums_user_id';", $db);
+            $num = mysql_num_rows($db_daten);
+            if ($num == 0) {//man ist kein leader
+                $uid = $ums_user_id;
+
+                //3 tage umode und dann killen, wenn er sich nicht mehr einloggt
+                $urltage = 3;
+                $tis = time() + 86400 * $urltage;
+                $datum = date("Y-m-d H:i:s", $tis);
+
+                mysql_query("UPDATE de_login SET last_login='$datum', status=3, inaktmail=1, delmode=1 WHERE user_id=$uid", $db);
+
+                //zeit des letztens logins setzen um dem account noch 24 stunden zu geben
+                /*
+                $deltage=$sv_inactiv_deldays-1;
+                $uid=$ums_user_id;
+                $tis=time()-86400*$deltage;
+                $datum=date("Y-m-d H:i:s",$tis);
+                mysql_query("UPDATE de_login SET last_login='$datum', inaktmail = 1, delmode = 1 WHERE user_id=$uid",$db);
+                */
+
+                //premium-account-status entfernen
+                //mysql_query("UPDATE de_user_data SET premium=0, patime=0 WHERE user_id=$uid",$db);
+                mysql_query("UPDATE de_user_data SET premium=0 WHERE user_id=$uid", $db);
+
+                //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
+                $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
+                mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid", $db);
+
+
+                //mail an den accountinhaber schicken
+                $db_daten = mysql_query("SELECT reg_mail FROM de_login WHERE user_id='$ums_user_id'", $db);
+                $row = mysql_fetch_array($db_daten);
+                $reg_mail = $row['reg_mail'];
+                @mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: noreply@die-ewigen.com');
+
+                session_destroy();
+                header("Location: geloescht.php");
+            } else {
+                $errmsg = '<div class="info_box text2">Gib bitte zuerst Deinen Posten als Allianzleiter auf. Du kannst den Posten &uuml;bertragen, oder die Allianz l&ouml;schen.</div>';
+            }
+        } else {
+            $errmsg = '<div class="info_box text2">Setze bitte beide H&auml;kchen um den Account zu l&ouml;schen.</div>';
+        }
+    } else {
+        $errmsg .= '<font color="FF0000">'.$options_lang['umodefehler2'].'</font>';
+    }
 }
 
 function writetocreditlog($clog)
 {
-  global $ums_user_id;
-  $datum=date("Y-m-d H:i:s",time());
-  $ip=getenv("REMOTE_ADDR");
-  $clog="Zeit: $datum\nIP: $ip\n".$clog."\n--------------------------------------\n";
-  $fp=fopen("cache/creditlogs/$ums_user_id.txt", "a");
-  fputs($fp, $clog);
-  fclose($fp);
+    global $ums_user_id;
+    $datum = date("Y-m-d H:i:s", time());
+    $ip = getenv("REMOTE_ADDR");
+    $clog = "Zeit: $datum\nIP: $ip\n".$clog."\n--------------------------------------\n";
+    $fp = fopen("cache/creditlogs/$ums_user_id.txt", "a");
+    fputs($fp, $clog);
+    fclose($fp);
 }
 
 //Logout anzeige
-$sekundenbiszumlogout=($ums_session_start+$sv_session_lifetime)-time();
-$restminuten=floor($sekundenbiszumlogout/60);
-$restsekunden=$sekundenbiszumlogout-($restminuten*60);
-if($restminuten<5)$color='color="#FF0000" size="4"';
-$logoutmsg='<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' '.$restsekunden.' '.$options_lang['logoutsec'].'</font>';
+$sekundenbiszumlogout = ($ums_session_start + $sv_session_lifetime) - time();
+$restminuten = floor($sekundenbiszumlogout / 60);
+$restsekunden = $sekundenbiszumlogout - ($restminuten * 60);
+$color='';
+if ($restminuten < 5) {
+    $color = 'color="#FF0000" size="4"';
+}
+$logoutmsg = '<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' '.$restsekunden.' '.$options_lang['logoutsec'].'</font>';
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -508,56 +549,66 @@ $logoutmsg='<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' '.
 //stelle die ressourcenleiste dar
 include('resline.php');
 
-$urlacc=$_POST['urlacc'] ?? false;
-if($urlacc){ //account in urlaubsmodus versetzen
-	$urlpass=$_POST['urlpass'];
-	$db_datenx=mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
-	$rowx = mysql_fetch_array($db_datenx);
+$urlacc = $_POST['urlacc'] ?? false;
+if ($urlacc) { //account in urlaubsmodus versetzen
+    $urlpass = $_POST['urlpass'];
+    $db_datenx = mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
+    $rowx = mysql_fetch_array($db_datenx);
 
-	$passwordOK=false;
-	if(password_verify(trim($urlpass), $rowx['pass'])){
-		$passwordOK=true;
-	}	
+    $passwordOK = false;
+    if (password_verify(trim($urlpass), $rowx['pass'])) {
+        $passwordOK = true;
+    }
 
-	if ($passwordOK){ //oldpass ist korrekt
-		$urltage=intval($_POST['urltage']);
-		if ($urltage>=1 AND $urltage<=21){
-		//schauen ob es credits kostet und man genug davon hat
-		$creditkosten=150;
-		if($credits<$creditkosten AND $urltage<3){
-			//zu wenig credits für umode
-			$errmsg.='<table width=600><tr><td class="ccr">'.$options_lang['umodezuwenigcredits1'].' '.$creditkosten.' '.$options_lang['umodezuwenigcredits2'].'</table>';
-		}
-		//schauen ob der account angegriffen wird
-		if($_POST['attumodecheck']==1)$gea='&nbsp;';
-		if($gea=='&nbsp;'){
-			//wenn keine fehler vorliegen, dann umode setzen
-			if($errmsg=='')
-			{
-			//schauen ob es credits kostet
-			if($urltage<3){
-				mysql_query("UPDATE de_user_data SET credits=credits-'$creditkosten' WHERE user_id = '$ums_user_id'",$db);
-				writetocreditlog("Urlaubsmodus");
-			}
-			$uid=$ums_user_id;
-			$tis=time()+86400*$urltage;
-			$datum=date("Y-m-d H:i:s",$tis);
+    if ($passwordOK) { //oldpass ist korrekt
+        $urltage = intval($_POST['urltage']);
+        if ($urltage >= 1 and $urltage <= 21) {
+            //schauen ob es credits kostet und man genug davon hat
+            $creditkosten = 150;
+            if ($credits < $creditkosten and $urltage < 3) {
+                //zu wenig credits für umode
+                $errmsg .= '<table width=600><tr><td class="ccr">'.$options_lang['umodezuwenigcredits1'].' '.$creditkosten.' '.$options_lang['umodezuwenigcredits2'].'</table>';
+            }
+            //schauen ob der account angegriffen wird
+            if ($_POST['attumodecheck'] == 1) {
+                $gea = '&nbsp;';
+            }
+            if ($gea == '&nbsp;') {
+                //wenn keine fehler vorliegen, dann umode setzen
+                if ($errmsg == '') {
+                    //schauen ob es credits kostet
+                    if ($urltage < 3) {
+                        mysql_query("UPDATE de_user_data SET credits=credits-'$creditkosten' WHERE user_id = '$ums_user_id'", $db);
+                        writetocreditlog("Urlaubsmodus");
+                    }
+                    $uid = $ums_user_id;
+                    $tis = time() + 86400 * $urltage;
+                    $datum = date("Y-m-d H:i:s", $tis);
 
-			mysql_query("UPDATE de_login SET last_login='$datum', status=3 WHERE user_id=$uid",$db);
-			
-			//ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
-			$newtick=$maxtick+($sv_benticks*$ehlockfaktor);
-			mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid",$db);
-			
-			session_destroy();
-			header("Location: urlaub.php");
-			}
-		} else {$errmsg.= '<font color="FF0000">'.$options_lang['umodefehler3'].'</font>';$showattumode=1;}
-		} else $errmsg.= '<font color="FF0000">'.$options_lang['umodefehler1'].'</font>';
-	} else $errmsg.= '<font color="FF0000">'.$options_lang['umodefehler2'].'</font>';
+                    mysql_query("UPDATE de_login SET last_login='$datum', status=3 WHERE user_id=$uid", $db);
+
+                    //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
+                    $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
+                    mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid", $db);
+
+                    session_destroy();
+                    header("Location: urlaub.php");
+                }
+            } else {
+                $errmsg .= '<font color="FF0000">'.$options_lang['umodefehler3'].'</font>';
+                $showattumode = 1;
+            }
+        } else {
+            $errmsg .= '<font color="FF0000">'.$options_lang['umodefehler1'].'</font>';
+        }
+    } else {
+        $errmsg .= '<font color="FF0000">'.$options_lang['umodefehler2'].'</font>';
+    }
 }
 
-if ($errmsg!='') echo '<table width=600><tr><td class="cc">'.$errmsg.'</td></tr></table>';
+if ($errmsg != '') {
+    echo '<table width=600><tr><td class="cc">'.$errmsg.'</td></tr></table>';
+}
 
 //strings der Übersichtsoptionen vorbelegen
 /*
@@ -580,10 +631,10 @@ $ovselected[]='<option selected>'.$ovbes[$ovoptfelder[5]].'</option>';
 $ovselected[]='<option selected>'.$ovbes[$ovoptfelder[6]].'</option>';
 */
 
-if($patime>time()){
-	$palaufzeit=date("H:i:s d.m.Y", $patime);
-}else{
-	$palaufzeit='-';
+if ($patime > time()) {
+    $palaufzeit = date("H:i:s d.m.Y", $patime);
+} else {
+    $palaufzeit = '-';
 }
 
 echo '
@@ -645,21 +696,21 @@ echo '
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td colspan="2">';
 
-if($_COOKIE['use_mobile_version']==0){
-  echo '<br><a href="options.php?set_use_mobile_version=1" class="btn">Desktopversion</a><br>';
-}else{
-  echo '<br><a href="options.php?set_use_mobile_version=0" class="btn">mobile Version</a><br>';
+if ($_COOKIE['use_mobile_version'] == 0) {
+    echo '<br><a href="options.php?set_use_mobile_version=1" class="btn">Desktopversion</a><br>';
+} else {
+    echo '<br><a href="options.php?set_use_mobile_version=0" class="btn">mobile Version</a><br>';
 }
 
 
 echo '<div>Wird erst nach dem n&auml;chsten Login wirksam.</div>';
 
 
-  if($_COOKIE['deactivate_swipe']==0){
+if ($_COOKIE['deactivate_swipe'] == 0) {
     echo '<br>Die Wischgesten sind <a href="options.php?set_deactivate_swipe=1" class="btn">an</a><br>';
-  }else{
+} else {
     echo '<br>Die Wischgesten sind <a href="options.php?set_deactivate_swipe=0" class="btn">aus</a><br>';
-  }  
+}
 
 echo'
 </td>
@@ -714,15 +765,15 @@ echo'
   <td>
     <select name="desktop_version">
       <option value="0"';
-      if($desktop_version==0){
-        echo ' selected';
-      }
-      echo '>Standard</option>
+if ($desktop_version == 0) {
+    echo ' selected';
+}
+echo '>Standard</option>
       <option value="1"';
-      if($desktop_version==1){
-        echo ' selected';
-      }      
-      echo '>Classic</option>
+if ($desktop_version == 1) {
+    echo ' selected';
+}
+echo '>Classic</option>
   </td>
   <td width="13" class="rr">&nbsp;</td>
 </tr>';
@@ -741,7 +792,7 @@ echo'
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>'.$options_lang['chatdeaktivieren'].'</td>
 <td><input type="Checkbox" name="chat"';
-if($chatoff=="1") echo "checked "; 
+if($chatoff=="1") echo "checked ";
 echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
@@ -752,7 +803,9 @@ echo '
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>Server-Chat-Channel deaktivieren</td>
 <td><input type="Checkbox" name="chatallg"';
-if($chatoffallg==1) echo "checked "; 
+if ($chatoffallg == 1) {
+    echo "checked ";
+}
 echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
@@ -761,7 +814,9 @@ echo 'value="1"></td>
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>globaler Chat-Channel deaktivieren</td>
 <td><input type="Checkbox" name="chatglobal"';
-if($chatoffglobal==1) echo "checked "; 
+if ($chatoffglobal == 1) {
+    echo "checked ";
+}
 echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
@@ -770,7 +825,9 @@ echo 'value="1"></td>
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>'.$options_lang['helferaktivieren'].'</td>
 <td><input type="Checkbox" name="helper"';
-if($helperon==1) echo "checked "; 
+if ($helperon == 1) {
+    echo "checked ";
+}
 echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
@@ -780,7 +837,9 @@ echo 'value="1"></td>
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>Missionshilfe aktivieren</td>
 <td><input type="Checkbox" name="traderem"';
-if($trade_reminder==1) echo "checked "; 
+if ($trade_reminder == 1) {
+    echo "checked ";
+}
 echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
@@ -937,10 +996,15 @@ echo '
 <td width="280">
 <select name="rasse">';
 
-if ($nrrasse==1) $rasse='Ewiger';
-elseif ($nrrasse==2) $rasse='Ishtar';
-elseif ($nrrasse==3) $rasse='K&#180;Tharr';
-elseif ($nrrasse==4) $rasse='Z&#180;tah-ara';
+if ($nrrasse == 1) {
+    $rasse = 'Ewiger';
+} elseif ($nrrasse == 2) {
+    $rasse = 'Ishtar';
+} elseif ($nrrasse == 3) {
+    $rasse = 'K&#180;Tharr';
+} elseif ($nrrasse == 4) {
+    $rasse = 'Z&#180;tah-ara';
+}
 
 echo '<option selected value="'.$nrrasse.'">'.$rasse.'</option>';
 
@@ -968,9 +1032,8 @@ echo '
 </form>
 </table>';
 
-if ($owner_id==0)
-{
-echo '
+if ($owner_id == 0) {
+    echo '
 <table border="0" cellpadding="0" cellspacing="0">
 <form action="options.php" method="POST">
 <tr align="center">
@@ -1070,7 +1133,7 @@ echo '
 <td width="560">'.$options_lang['accountloescheninfo1'];
 
 //if ($ums_premium>0)echo '<br><font color="#FFFF00">'.$options_lang[accountloescheninfo2].'</font>';
-echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks*$ehlockfaktor, 0,"",".").'</font>';
+echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks * $ehlockfaktor, 0, "", ".").'</font>';
 
 echo '
 </td>
@@ -1124,10 +1187,10 @@ echo '
 <td width="13" height="37" class="rl">&nbsp;</td>
 <td width="560">'.$options_lang['umodeinfo1'].'
 <font color="00FF00"><br>'.$options_lang['umodeinfo2'].'</font>';
-echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks*$ehlockfaktor, 0,"",".").'</font>';
+echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks * $ehlockfaktor, 0, "", ".").'</font>';
 //�berpr�fen ob man angegriffen wird
-if($showattumode==1){
-	echo '<br><font color="FF0000"><input name="attumodecheck" type="checkbox" value="1"> '.$options_lang['umodefehler3desc'].'</font>';
+if ($showattumode == 1) {
+    echo '<br><font color="FF0000"><input name="attumodecheck" type="checkbox" value="1"> '.$options_lang['umodefehler3desc'].'</font>';
 }
 echo '</td>
 <td width="13" class="rr">&nbsp;</td>
@@ -1176,7 +1239,7 @@ echo'
 </table>
 </form>';
 
-include "fooban.php"; 
+include "fooban.php";
 
 ?>
 </body>

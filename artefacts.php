@@ -190,9 +190,9 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 		  //id auslesen
 		  $row = mysql_fetch_array($db_daten);
 
-		  //ist jetzt immer zerst�rbar
-		  if($ua_useable[$row["id"]-1]!=1 || 1==1){
-			//artefakt l�schen
+		  //ist jetzt immer zerstörbar
+		  //if($ua_useable[$row["id"]-1]!=1){
+			//artefakt löschen
 			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
 
 			//palenium gutschreiben
@@ -200,7 +200,7 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler8'];
-		  }
+		  //}
 		}
 		else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
 

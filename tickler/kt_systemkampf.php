@@ -1,13 +1,13 @@
 <?php
 include "kt_einheitendaten.php";
 
-mt_srand((double)microtime()*10000);
-
 //anzahl der maximalen kollektoren eines spielers
 $db_daten=mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0",$db);
 $row = mysql_fetch_array($db_daten);
 $maxcol=$row['maxcol'];
-if($maxcol==0)$maxcol=1;
+if($maxcol==0){
+	$maxcol=1;
+}
 
 //maximale tickzeit auslesen
 $db_daten=mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);

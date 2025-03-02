@@ -1,4 +1,5 @@
 <?php
+#[\AllowDynamicProperties]
 class map_system{
 	private $system_name;
 	private $system_level;
@@ -6,6 +7,8 @@ class map_system{
 	private $pos_y;
 	private $system_typ;
 	private $system_subtyp;
+
+	public $special_system;
 
 	private $system_biohazard_level;
 	private $system_radiation_level;
@@ -18,7 +21,7 @@ class map_system{
 
 	public function setSystemName($value){
 		$this->system_name=$value;
-	}	
+	}
 
 	public function getSystemLevel(){
 		return $this->system_level;
@@ -26,7 +29,7 @@ class map_system{
 
 	public function setSystemLevel($value){
 		$this->system_level=$value;
-	}	
+	}
 
 	public function getSystemPosX(){
 		return $this->pos_x;
@@ -107,7 +110,7 @@ class map_system{
 					$blocker_amount=mt_rand(1,10)*1000;
 
 					$fields[$i][1][0]=$blocker_typ;//Typ
-					$fields[$i][1][1]=$blocker_amount;//Menge					
+					$fields[$i][1][1]=$blocker_amount;//Menge
 				}else{
 					//kein Blocker
 					$GLOBALS['anzahl_felder']++;
@@ -118,7 +121,7 @@ class map_system{
 
 				///////////////////////////////////////////////////
 				// Loot bestimmen und ab welchen Gebäudeleveln:
-				// Titanen-Energiekerne/Palenium/Bodenschätze, 
+				// Titanen-Energiekerne/Palenium/Bodenschätze,
 				// Tronic, Artefakte, Credits
 				///////////////////////////////////////////////////
 				$loot_typ=0;
@@ -160,7 +163,7 @@ class map_system{
 							if(in_array($loot_subtyp, $not_allowed)){
 								$loot_subtyp=-1;
 							}
-						}						
+						}
 						
 					}else{//Credits
 						$loot_typ=4;
@@ -1207,7 +1210,7 @@ class map_system{
 		//Typ 1: Loot aus de_item_data
 		//Subtypen siehe DB
 		//Typ 2: Tronic
-		//Typ 3: Spielerartefakt 
+		//Typ 3: Spielerartefakt
 		//Typ 4: Credits
 
 		/*
@@ -1246,7 +1249,7 @@ class map_system{
 						if($num>0){
 							$ally_know_it=true;
 						}
-					}				
+					}
 				}
 
 				//$content.='<br>A: '.$inlevel.'/'.$bldg_level;
