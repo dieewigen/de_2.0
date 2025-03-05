@@ -33,10 +33,10 @@ if($row['create_map_objects']==1){
 	}
 	*/
 
-	$anzahl_systeme=2000;
+	$anzahl_systeme=1000;
 
 	//eine Liste mit einmaligen Namen generieren
-	$namensliste=array();	
+	$namensliste=array();
 	while(count($namensliste)<$anzahl_systeme){
 		$neuer_name=generierename();
 		if(!in_array($neuer_name, $namensliste)){
@@ -127,8 +127,8 @@ if($row['create_map_objects']==1){
 	$kanten=array();
 	$anzahl_systeme=0;
 
-	$x_max=6;//geht von -x bis +x
-	$y_max=6;//geht von -y bis +y
+	$x_max=3;//geht von -x bis +x
+	$y_max=3;//geht von -y bis +y
 	
 
 	$count_sector=0;
@@ -326,7 +326,7 @@ if($row['create_map_objects']==1){
 					//echo $sql;
 					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
 					$row = mysqli_fetch_array($db_daten);
-					$knoten_id2=$row['id'];
+					$knoten_id2=$row['id'] ?? -1;
 
 					//wir haben beide knoten, können also eine kante einfügen
 					if($knoten_id1>0 && $knoten_id2>0){
@@ -362,7 +362,7 @@ if($row['create_map_objects']==1){
 					//echo $sql;
 					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
 					$row = mysqli_fetch_array($db_daten);
-					$knoten_id2=$row['id'];
+					$knoten_id2=$row['id'] ?? -1;
 
 					//wir haben ggf. beide knoten, können also eine kante einfügen
 					if($knoten_id1>0 && $knoten_id2>0){
@@ -371,7 +371,7 @@ if($row['create_map_objects']==1){
 						echo '<br>('.$x.'/'.$y.')';
 						mysqli_query($GLOBALS['dbi'],$sql);
 					}
-				}				
+				}
 
 			}
 		}

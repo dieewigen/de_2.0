@@ -395,9 +395,9 @@ if($sv_deactivate_vsystems==1){
 }else{
 	$stufen=round($sv_winscore/1440);
 }
-$mbelohnung=6000000*$ac_prozent;
+$mbelohnung=1000000*$ac_prozent;
 for($index=0;$index<$stufen;$index++){
-	$rewards17[$index][0]=500/$stufen*($index+1); //zu erreichender wert
+	$rewards17[$index][0]=100/$stufen*($index+1); //zu erreichender wert
 	@$rewards17[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
 	$max_achievement_points++;
 }
@@ -409,9 +409,9 @@ if($sv_deactivate_vsystems==1){
 }else{
 	$stufen=round($sv_winscore/1440);
 }
-$mbelohnung=50000000*$ac_prozent;
+$mbelohnung=20000000*$ac_prozent;
 for($index=0;$index<$stufen;$index++){
-	$rewards18[$index][0]=2500/$stufen*($index+1); //zu erreichender wert
+	$rewards18[$index][0]=1000/$stufen*($index+1); //zu erreichender wert
 	@$rewards18[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
 	$max_achievement_points++;
 }
@@ -423,9 +423,9 @@ if($sv_deactivate_vsystems==1){
 }else{
 	$stufen=round($sv_winscore/1440);
 }
-$mbelohnung=100000000*$ac_prozent;
+$mbelohnung=40000000*$ac_prozent;
 for($index=0;$index<$stufen;$index++){
-	$rewards19[$index][0]=1250/$stufen*($index+1); //zu erreichender wert
+	$rewards19[$index][0]=500/$stufen*($index+1); //zu erreichender wert
 	@$rewards19[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
 	$max_achievement_points++;
 }

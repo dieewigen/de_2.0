@@ -122,7 +122,7 @@ elseif (isset($_GET["a"]) && $_GET["a"]==2)
 	if($_GET["fid"]==7)$flotte=6;
 
     $id=(int)$_GET["id"];
-    if($id<1 OR $id>6)$id=1;
+    if($id < 1 || $id > 6)$id=1;
 
     //flottendaten laden
     $fleetid=$ums_user_id.'-'.$flotte;

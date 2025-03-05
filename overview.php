@@ -201,7 +201,7 @@ while($rew=mysql_fetch_array($sel_news)){
 	//$time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
 	$time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
 
-	$det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode($rew['betreff']).'</span></a><br>';
+	$det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew['betreff']).'</span></a><br>';
 }
 
 $b_news=mysql_query("SELECT * FROM de_news_overview where typ=2 order by id desc Limit 0,5");
@@ -209,7 +209,7 @@ while($rew_b=mysql_fetch_array($b_news)){
 	$t=$rew_b[time];
 	//$time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
 	$time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
-	$bnews .= '<a href="newspaper.php?id='.$rew_b['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode($rew_b['betreff']).'</span></a><br>';
+	$bnews .= '<a href="newspaper.php?id='.$rew_b['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew_b['betreff']).'</span></a><br>';
 }
 
 /*  
@@ -664,7 +664,7 @@ for ($j=0;$j<=6;$j++){
 				if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
 				xecho('
 				<tr>
-					<td class="'.$bg.'" style="text-align: left;"><a href="http://forum.bgam.es/thread.php?threadid='.$row['threadid'].'" target="_blank">'.utf8_encode($row['topic']).'</a></td>
+					<td class="'.$bg.'" style="text-align: left;"><a href="http://forum.bgam.es/thread.php?threadid='.$row['threadid'].'" target="_blank">'.utf8_encode_fix($row['topic']).'</a></td>
 					<td class="'.$bg.'" style="text-align: center;">'.$row['replycount'].'</td>
 					<td class="'.$bg.'" style="text-align: right;">'.date("d.m.Y - H:i",$row['lastposttime']).'</td>
 				</tr>');
@@ -930,7 +930,7 @@ for ($j=0;$j<=6;$j++){
            {
              xecho ('<tr align="center" height="25">');
              xecho ('<td width="13" class="rl">&nbsp;</td>');
-             xecho ('<td width="280">'.utf8_encode($row["tech_name"])."</td>");
+             xecho ('<td width="280">'.utf8_encode_fix($row["tech_name"])."</td>");
              xecho ('<td width="280">'.number_format($ec, 0,"",".")."</td>");
              xecho ('<td width="13" class="rr">&nbsp;</td>');
              xecho ('</tr>');
@@ -940,7 +940,7 @@ for ($j=0;$j<=6;$j++){
            {
              xecho ('<tr align="center"  height="25">');
              xecho ('<td class="rl">&nbsp;</td>');
-             xecho ('<td>'.utf8_encode($row["tech_name"])."</td>");
+             xecho ('<td>'.utf8_encode_fix($row["tech_name"])."</td>");
              xecho ('<td>'.number_format($ec, 0,"",".")."</td>");
              xecho ('<td class="rr">&nbsp;</td>');
              xecho ('</tr>');
@@ -1010,7 +1010,7 @@ for ($j=0;$j<=6;$j++){
           {
             xecho ('<tr align="center" height="25">');
             xecho ('<td width="13" class="rl">&nbsp;</td>');
-            xecho ('<td width="280">'.utf8_encode($row["tech_name"])."</td>");
+            xecho ('<td width="280">'.utf8_encode_fix($row["tech_name"])."</td>");
             xecho ('<td width="280">'.number_format($ec, 0,"",".")."</td>");
             xecho ('<td width="13" class="rr">&nbsp;</td>');
             xecho ('</tr>');
@@ -1020,7 +1020,7 @@ for ($j=0;$j<=6;$j++){
           {
             xecho ('<tr align="center"  height="25">');
             xecho ('<td class="rl">&nbsp;</td>');
-            xecho ('<td>'.utf8_encode($row["tech_name"])."</td>");
+            xecho ('<td>'.utf8_encode_fix($row["tech_name"])."</td>");
             xecho ('<td>'.number_format($ec, 0,"",".")."</td>");
             xecho ('<td class="rr">&nbsp;</td>');
             xecho ('</tr>');
@@ -1080,7 +1080,7 @@ for ($j=0;$j<=6;$j++){
 		$ik=0;
 		$db_daten=mysql_query("SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id",$db);
 		while($row = mysql_fetch_array($db_daten)){
-			$schiffe[$ik][0]=utf8_encode(getTechNameByRasse($row["tech_name"],$ums_rasse));
+			$schiffe[$ik][0]=utf8_encode_fix(getTechNameByRasse($row["tech_name"],$ums_rasse));
 			$schiffe[$ik][1]=number_format($ec[$row["tech_id"]], 0,"",".");
 			$ik++;
 		}
@@ -1103,7 +1103,7 @@ for ($j=0;$j<=6;$j++){
 		$ik=0;
 		$db_daten=mysql_query("SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id",$db);
 		while($row = mysql_fetch_array($db_daten)){
-			$defense[$ik][0]=utf8_encode(getTechNameByRasse($row["tech_name"],$ums_rasse));
+			$defense[$ik][0]=utf8_encode_fix(getTechNameByRasse($row["tech_name"],$ums_rasse));
 			$defense[$ik][1]=number_format($ec[$row["tech_id"]], 0,"",".");
 			$ik++;
 		}

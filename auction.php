@@ -121,6 +121,18 @@ if (!hasTech($pt, 4)) {
             $bid = intval($_REQUEST['bid'] ?? -1);
             $bid_has_all = false;
 
+            //Ertrag der Auktion
+            $reward = unserialize($row['reward']);
+            $is_artefact = false;
+            if($reward[0] == 'A'){
+                $is_artefact = true;
+            }
+
+            //überprüfen ob es Platz im Artefaktgebäude gibt, wenn nötig und dann ggf. den Kauf verhindern
+            if ($is_artefact && $free_artefact_places < 1) {
+                $bid = -1;
+            }
+
             //hat man sie selbst erstellt?
             if ($row['creator'] == $_SESSION['ums_user_id']) {
                 $creator = true;
@@ -247,9 +259,7 @@ if (!hasTech($pt, 4)) {
             //Belohnung
             ////////////////////////////////////////////////////////////////
             $artikel = '';
-            $reward = unserialize($row['reward']);
             $amount = $reward[2] ?? 0;
-            $is_artefact = false;
             switch ($reward[0]) {
                 case 'A': //Artefakt
                     $artid = $reward[1];
@@ -268,8 +278,6 @@ if (!hasTech($pt, 4)) {
                     $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.$ums_gpfad.'g/arte'.$artid.'.gif"></div>';
                     $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.$ua_name[$reward[1] - 1].$tradesystemscore_str.'</div>';
                     $artikel .= '</div>';
-                    $is_artefact = true;
-
                     break;
                 case 'R': //Standard-Rohstoffe
                     //bietet man dafür?
