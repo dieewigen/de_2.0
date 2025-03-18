@@ -1195,8 +1195,8 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
 //Insert f&uuml;r die Buddyliste
 if(isset($_POST['friendbtn'])) {
 
-    $sector = intval($freundsector);
-    $system = intval($freundsystem);
+    $sector = intval($_REQUEST['freundsector']);
+    $system = intval($_REQUEST['freundsystem']);
 
     $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND system='$system'", $db);
     $numcheck = mysql_num_rows($db_check);
@@ -1217,9 +1217,6 @@ if(isset($_POST['friendbtn'])) {
         }
 
         if ($num <= ($pbuddies - 1)) {
-            $sector = (int)$sector;
-            $system = (int)$system;
-
             $buddyname = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND system='$system'");
             $rowbuddy = mysql_fetch_array($buddyname);
 
@@ -1236,9 +1233,9 @@ if(isset($_POST['friendbtn'])) {
     $action = "optionen";
 }
 //Insert f&uuml;r die Ignoreliste
-if (isset($_POST['$ignorebtn'])) {
-    $sector = intval($feindsector);
-    $system = intval($feindsystem);
+if (isset($_POST['ignorebtn'])) {
+    $sector = intval($_REQUEST['feindsector'] ?? -1);
+    $system = intval($_REQUEST['feindsystem'] ?? -1);
 
     $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND system='$system'", $db);
     $numcheck = mysql_num_rows($db_check);
@@ -1262,8 +1259,8 @@ if (isset($_POST['$ignorebtn'])) {
         }
 
         if ($num <= ($pigno - 1)) {
-            $sector = (int)$feindsector;
-            $system = (int)$feindsystem;
+            //$sector = (int)$feindsector;
+            //$system = (int)$feindsystem;
 
             $ignorename = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND system='$system'");
             $rowignore = mysql_fetch_array($ignorename);

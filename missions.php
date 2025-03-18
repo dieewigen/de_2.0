@@ -288,7 +288,7 @@ $md[$md_index]['time']=27000*$duration_factor;
 $md[$md_index]['need_agents']=0;
 $md[$md_index]['storage_capacity']=$res_bezahlen*10;
 
-//Handel - ARES man zahlt Palenium und erhält Tronic
+//Handel - 	 man zahlt Palenium und erhält Tronic
 $md_index++;
 $md[$md_index]['typ']=2;
 $md[$md_index]['subtyp']=1;//Ares
