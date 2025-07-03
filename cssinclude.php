@@ -58,5 +58,5 @@ if(isset($eftacss) && $eftacss==1){
 		';
 	}
 }
-//echo '<meta name="referrer" content="always">';
+echo '<meta charset="UTF-8">';
 ?>

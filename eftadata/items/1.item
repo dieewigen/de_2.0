@@ -1,6 +1,0 @@
-<?php
-$item_typ='20';
-$item_stack='16777215';
-$item_worth='1';
-$item_bind='1';
-?>

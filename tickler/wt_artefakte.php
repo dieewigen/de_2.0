@@ -590,7 +590,7 @@ while ($row = mysql_fetch_array($res)) {
 
         //echo $artsec.' -> '.$zielsec.'<br>';
         //user_id vom bk des neuen sektors rausfinden
-        $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsec' and system='$zielbk'", $db);
+        $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsec' and `system`='$zielbk'", $db);
         $numbk = mysql_num_rows($db_daten);
         if ($numbk == 1) {//nachricht an bk schicken
             $rowx = mysql_fetch_array($db_daten);
@@ -616,7 +616,7 @@ while ($row = mysql_fetch_array($res)) {
                 //$herkbk = $rowx["bk"];
 
                 //user_id vom sk rausfinden
-                $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$artsec' and system='$herbk'", $db);
+                $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$artsec' and `system`='$herbk'", $db);
                 $numbk = mysql_num_rows($db_daten);
                 echo '<br>$numbk: '.$numbk;
 

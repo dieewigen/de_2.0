@@ -60,7 +60,7 @@ WHERE user_id='$ums_user_id' AND tick<1000000;",$db);
 //logincounter zurücksetzen
 mysql_query("UPDATE de_login SET points = 0 WHERE user_id='$ums_user_id'", $db);
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, system, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];$ehpunkte=$row["ehscore"];
 $own_tick=$row["tick"];$techs=$row["techs"];$newtrans=$row["newtrans"];$tradescore=$row["tradesystemscore"];
@@ -206,7 +206,7 @@ while($rew=mysql_fetch_array($sel_news)){
 
 $b_news=mysql_query("SELECT * FROM de_news_overview where typ=2 order by id desc Limit 0,5");
 while($rew_b=mysql_fetch_array($b_news)){
-	$t=$rew_b[time];
+	$t=$rew_b['time'];
 	//$time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
 	$time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
 	$bnews .= '<a href="newspaper.php?id='.$rew_b['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew_b['betreff']).'</span></a><br>';
@@ -636,12 +636,17 @@ for ($j=0;$j<=6;$j++){
 
 		 <b style="font-size:14px;">'.$ov_lang['nachrichtendienst'].' [<a href="newspaper.php?action=archiv&typ=2">'.$ov_lang['archiv'].'</a>]</b>
 		 <div align="left"><table border="0"><tr><td width="30">&nbsp;</td><td>'.umlaut($bnews).'</td></tr></table></div>
-		<div style="width: 100%; border-top: 1px solid #00FF00; color: #00FF00; margin-top: 3px; padding-top: 3px;">
+		
+    ');
+
+    /*
+    <div style="width: 100%; border-top: 1px solid #00FF00; color: #00FF00; margin-top: 3px; padding-top: 3px;">
 		Vorschl&auml;ge werden im <a style="color: #00FF00; text-decoration: underline; font-size: 8pt;" href="http://forum.bgam.es/board.php?boardid=8" target="_blank">Forum</a> gemacht/diskutiert, denn dort ist ein geordneter Ablauf und das Nachschlagen alter Beitr&auml;ge m&ouml;glich.
 		Es ist nat&uuml;rlich keine Pflicht dort mitzuwirken, aber wer darauf verzichtet, muss damit rechnen, dass seine Meinung nicht beachtet wird und sp&auml;tere Beschwerden u.U. auch nichts mehr bringen.
-		</div>');
+		</div>
+    */
 	  
-
+    /*
 	  xecho('
 		<table style="width: 100%">
 		<tr>
@@ -671,7 +676,8 @@ for ($j=0;$j<=6;$j++){
 			}
 		}
 	  
-		xecho('</table>');	  
+		xecho('</table>');
+    */
 	
 	  xecho('
 	   </td>

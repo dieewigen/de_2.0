@@ -35,6 +35,6 @@ include "cache/loginstat.tmp"
 <td width="13" class="rur">&nbsp;</td>
 </tr>
 </table>
-<br><a href="index.php"><?=$sstat_lang[zurueck]?></a>
+<br><a href="index.php"><?=$sstat_lang['zurueck']?></a>
 </body>
 </html>

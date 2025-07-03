@@ -1,9 +1,9 @@
 <?php
 $sn_lang['nachrichten']='Nachrichten ';
 $sn_lang['geloescht']='Alle Nachrichten wurden gelöscht.';
-$sn_lang['mailhallo']='Hallo $ums_spielername,\n\nmit dieser Mail bekommst du deine Angeforderten Systemnachrichten vom Server: $sv_server_name\n\n\n\n';
-$sn_lang['mailende']='Hinweis: Diese E-Mail wurde automatisch generiert, eine Antwort an die Absenderadresse ist nicht möglich, da sie nicht existiert.';
-$sn_lang['mailbetreff']='Die Ewigen - Nachrichten Server $sv_server_name';
+$sn_lang['mailhallo']='Hallo,<br><br>mit dieser Mail bekommst du deine Angeforderten Systemnachrichten.<br><br>';
+$sn_lang['mailende']='Hinweis: Diese E-Mail wurde automatisch generiert, eine Antwort an diese Absenderadresse werden nicht beantwortet.';
+$sn_lang['mailbetreff']='Die Ewigen - Nachrichten';
 $sn_lang['mailfehler']='Fehler beim Versenden';
 $sn_lang['neue']='Neue';
 $sn_lang['alle']='Alle';

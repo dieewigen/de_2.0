@@ -5,7 +5,7 @@ include "croninfo.inc.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// das script soll für etwas rp bei der ki sorgen und den spielern zufällige
+// das script soll fï¿½r etwas rp bei der ki sorgen und den spielern zufï¿½llige
 // meldungen schicken
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,23 +29,23 @@ if ($doetick==1)
   $rassen_id=5;
   //zuerstmal ne liste der spieler und der der npc laden
   //spielerdaten
-  $spielerdaten = mysql_query("select de_user_data.user_id, de_user_data.sector, de_user_data.system FROM de_user_data where npc=0",$db);
+  $spielerdaten = mysql_query("select de_user_data.user_id, de_user_data.sector, de_user_data.`system` FROM de_user_data where npc=0",$db);
   $spieleranzahl = mysql_num_rows($spielerdaten);
   //npc-daten
-  $npcdaten = mysql_query("select de_user_data.user_id, de_user_data.spielername, de_user_data.sector, de_user_data.system FROM de_user_data where npc=1",$db);
+  $npcdaten = mysql_query("select de_user_data.user_id, de_user_data.spielername, de_user_data.sector, de_user_data.`system` FROM de_user_data where npc=1",$db);
   $npcanzahl = mysql_num_rows($npcdaten);
 
   //schauen ob es spieler gibt
   if($spieleranzahl==0 OR $npcanzahl==0) die('Zuwenig Spieler oder NPCs.');
 
   //anzahl der spieler bestimmen, die eine message bekommen sollen
-  //sagen wir mal 0,01% pro scriptaufruf bei 5 minuten-aufrufen, das wären ca. 115 spieler pro tag bei 4000 spielern
+  //sagen wir mal 0,01% pro scriptaufruf bei 5 minuten-aufrufen, das wï¿½ren ca. 115 spieler pro tag bei 4000 spielern
   $anz=ceil($spieleranzahl/2000);
   
   for($i=0; $i<$anz; $i++) //$anz-spielern ne message schicken
   {
     $time=strftime("%Y%m%d%H%M%S");
-    //den typ der meldung auswählen
+    //den typ der meldung auswï¿½hlen
     $typ=rand(1,2);
     
     //ziel bestimmen

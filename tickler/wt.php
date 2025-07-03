@@ -4,36 +4,36 @@ set_time_limit(240);
 //$directory=str_replace("/tickler/wt.php","/",$directory);
 //if ($directory=='')$directory='../';
 $directory = '../';
-include $directory."inc/sv.inc.php";
-include $directory."inc/env.inc.php";
+include_once $directory."inc/sv.inc.php";
+include_once $directory."inc/env.inc.php";
 //überprüfen ob es Zeit für den Tick ist
 if ($sv_debug == 0 && $sv_comserver == 0) {
     if (!in_array(intval(date("i")), $GLOBALS['wts'][date("G")])) {
-        die('NO TICK TIME');
+        die('<br>WT: NO TICK TIME<br>');
     }
 }
 
-include $directory."inccon.php";
-include $directory."inc/db_ls_connect.inc.php";
-include $directory."eftadata/lib/efta_dbconnect.php";
-include $directory."soudata/lib/sou_dbconnect.php";
+include_once $directory."inccon.php";
+include_once $directory."inc/db_ls_connect.inc.php";
+//include_once $directory."eftadata/lib/efta_dbconnect.php";
+include_once $directory."soudata/lib/sou_dbconnect.php";
 if ($sv_comserver == 1) {
-    include $directory.'inc/svcomserver.inc.php';
+    include_once $directory.'inc/svcomserver.inc.php';
 }
 
-require_once $directory.'lib/phpmailer/class.phpmailer.php';
-require_once $directory.'lib/phpmailer/class.smtp.php';
+include_once $directory.'lib/phpmailer/class.phpmailer.php';
+include_once $directory.'lib/phpmailer/class.smtp.php';
 
-include $directory."inc/artefakt.inc.php";
-include $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
-include $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
-include $directory."inc/sabotage.inc.php";
-include $directory."inc/allyjobs.inc.php";
-include $directory."lib/map_system_defs.inc.php";
-include $directory."lib/map_system.class.php";
-include $directory."functions.php";
-include $directory."issectork.php";
-include "kt_einheitendaten.php";
+include_once $directory."inc/artefakt.inc.php";
+include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
+include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
+include_once $directory."inc/sabotage.inc.php";
+include_once $directory."inc/allyjobs.inc.php";
+include_once $directory."lib/map_system_defs.inc.php";
+include_once $directory."lib/map_system.class.php";
+include_once $directory."functions.php";
+include_once $directory."issectork.php";
+include_once "kt_einheitendaten.php";
 
 //include $directory."cache/anz_user.tmp"; //$gesamtuser=anzahl, die in der datei steht
 ?>
@@ -126,12 +126,9 @@ if ($doetick == 1) {
     $time = time();
     mysql_query("UPDATE de_login SET status = 1 WHERE status = 3 AND $time>UNIX_TIMESTAMP(last_login) AND delmode=0", $db);
 
-    //pa abgelaufen?
-    mysql_query("UPDATE de_user_data SET premium = 0 WHERE patime<$time AND premium=1", $db);
-
     //spieler umziehen, die zu gro� f�r den startsektor sind, au�er die funktion ist deaktiviert
     if ($sv_deactivate_sec1moveout == 0) {
-        $db_daten = mysql_query("SELECT de_user_data.user_id, de_user_data.sector, de_user_data.system FROM de_login left join de_user_data 
+        $db_daten = mysql_query("SELECT de_user_data.user_id, de_user_data.sector, de_user_data.`system` FROM de_login left join de_user_data 
 		on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND delmode=0 AND sector=1 AND (col>=10 OR score>=5000000)", $db);
 
         $num = mysql_num_rows($db_daten);
@@ -144,7 +141,7 @@ if ($doetick == 1) {
             //account in den umzugsmodus versetzen
             mysql_query("UPDATE de_login set status = 4, savestatus=1 WHERE user_id = '$uid'", $db);
             //umzug hinterlegen
-            mysql_query("INSERT INTO de_sector_umzug set user_id='$uid', typ=0, sector='$sector', system='$system'", $db);
+            mysql_query("INSERT INTO de_sector_umzug set user_id='$uid', typ=0, sector='$sector', `system`='$system'", $db);
         }
     }
 
@@ -181,37 +178,6 @@ if ($doetick == 1) {
     }
     //}
 
-    // Handelstick durchf�hren
-    /*
-    include $directory."trade/trade.tick.inc.php";
-    doTradeTick();
-    */
-    /*
-    //Auktionen buchen
-    $result = mysql_query("SELECT id,seller,amount,bidder,ticks, maxbid FROM de_tauction WHERE ticks=1");
-    while(list($id,$seller,$amount,$bidder,$ticks,$maxbid) = mysql_fetch_row($result))
-    {
-        $time=strftime("%Y%m%d%H%M%S");
-        //verk�ufer
-        mysql_query("UPDATE de_user_data SET restyp04=restyp04+'".$maxbid."' WHERE user_id=".$seller);
-        $nachricht=$wt_lang[auktiongeteternium1].$maxbid.$wt_lang[auktiongeteternium2].$amount.$wt_lang[auktiongeteternium3];
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($seller, 11,'$time','$nachricht')",$db);
-        mysql_query("update de_user_data set newnews = 1 where user_id = $seller",$db);
-
-        //k�ufer
-        mysql_query("UPDATE de_user_data SET restyp05=restyp05+'".$amount."' WHERE user_id=".$bidder);
-        $nachricht=$wt_lang[auktiongettronic1].$amount.$wt_lang[auktiongettronic2].$maxbid.$wt_lang[auktiongettronic3];
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($bidder, 10,'$time','$nachricht')",$db);
-        mysql_query("update de_user_data set newnews = 1 where user_id = $bidder",$db);
-
-        //auktion l�schen
-        mysql_query("DELETE FROM de_tauction WHERE id=".$id,$db);
-
-    }
-    //alle angebote einen tick verringern
-    mysql_query("UPDATE de_tauction SET ticks=ticks-1 WHERE bidder>0",$db);
-    */
-
     //votetimer für den sektor um 1 verringern
     mysql_query("UPDATE de_sector SET votetimer=votetimer-1 WHERE votetimer>0", $db);
     mysql_query("UPDATE de_sector SET votecounter=votecounter-1 WHERE votecounter>0", $db);
@@ -220,33 +186,7 @@ if ($doetick == 1) {
     //include "wt_archeology.php";
 
     //manage map data
-    include "wt_manage_map.php";
-
-    //Gebaeude bauen
-    /*
-    $res = mysql_query("SELECT user_id, techs, buildgnr, rasse from de_user_data WHERE buildgtime <= 1 AND buildgnr > 0",$db);
-    $num = mysql_num_rows($res);
-    echo "<br>$num Geb�ude-Datens�tze gefunden<br>";
-    mysql_query("UPDATE de_user_data SET buildgtime = buildgtime - 1 WHERE buildgtime > 0",$db);
-    for ($i=0; $i<$num; $i++){
-        $uid   = mysql_result($res, $i, "user_id");
-        $techs = mysql_result($res, $i, "techs");
-        $bnr   = mysql_result($res, $i, "buildgnr");
-        $rasse = mysql_result($res, $i, "rasse");
-
-        $techs[$bnr]=1;
-        $techtable='de_tech_data'.$rasse;
-        $db_daten=mysql_query("SELECT tech_name, score FROM $techtable WHERE tech_id=$bnr",$db);
-        $row = mysql_fetch_array($db_daten);
-        $techname=$wt_lang[gebaeudefertig].$row["tech_name"];
-        $bnr=0;$score=$row["score"];
-        mysql_query("UPDATE de_user_data SET techs = '$techs', buildgnr = $bnr, fixscore = fixscore + $score, newnews=1 where user_id = $uid",$db);
-        //nachricht an den account schicken
-        $time=strftime("%Y%m%d%H%M%S");
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 1,'$time','$techname')",$db);
-        //mysql_query("UPDATE de_user_data SET newnews = 1 WHERE user_id = $uid",$db);
-    }*/
-
+    include_once "wt_manage_map.php";
 
     //sektorgebauede bauen
     $res = mysql_query("select sec_id, techs, buildgnr, buildgtime from de_sector where buildgtime <= 1  AND buildgnr > 0", $db);
@@ -266,34 +206,6 @@ if ($doetick == 1) {
 
     echo '<br>Gebäude fertig ';
     echo date("d/m/Y - H:i:s");
-
-    //Forschung entwickeln
-    /*
-    $res = mysql_query("SELECT user_id, techs, resnr, rasse FROM de_user_data WHERE restime <= 1  AND resnr > 0",$db);
-    $num = mysql_num_rows($res);
-    mysql_query("UPDATE de_user_data SET restime = restime - 1 where restime > 0",$db);
-    echo "<br>$num Forschungs-Datens�tze gefunden<br>";
-    for ($i=0; $i<$num; $i++){
-        $uid   = mysql_result($res, $i, "user_id");
-        $techs = mysql_result($res, $i, "techs");
-        $bnr   = mysql_result($res, $i, "resnr");
-        $rasse = mysql_result($res, $i, "rasse");
-        $techs[$bnr]=1;
-
-        $techtable='de_tech_data'.$rasse;
-        $db_daten=mysql_query("SELECT tech_name, score FROM $techtable WHERE tech_id=$bnr",$db);
-        $row = mysql_fetch_array($db_daten);
-        $techname=$wt_lang[forschungfertig].$row["tech_name"];
-        $bnr=0;$score=$row["score"];
-        mysql_query("update de_user_data set techs = '$techs', resnr = $bnr, fixscore = fixscore + $score where user_id = $uid",$db);
-        //nachricht an den account schicken
-        $time=strftime("%Y%m%d%H%M%S");
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 2,'$time','$techname')",$db);
-        mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
-    }
-    echo '<br>Forschungen fertig ';
-    print strftime("%d/%m/%Y - %H:%M:%S");
-    */
 
     //Sektor-Einheiten bauen
     $tech_id = 1;
@@ -368,7 +280,8 @@ if ($doetick == 1) {
             $tech_name = getTechNameByRasse($row["tech_name"], $player_rasse);
             $msg = $wt_lang['gebaeudeausbau'].': '.$tech_name.'<br>'.$wt_lang['gebaeudelevel'].': '.$artbldglevel;
 
-            $time = strftime("%Y%m%d%H%M%S");
+            //$time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 2,'$time','$msg')", $db);
 
             //levelupgrade und fixpunkte in der db vermerken
@@ -493,7 +406,7 @@ if ($doetick == 1) {
     for ($rasse = 1; $rasse <= $sv_anz_rassen; $rasse++) {
         echo '<br>Rasse: '.$rasse;
 
-        $res = mysql_query("SELECT de_user_data.user_id, de_user_data.col, de_user_data.sector, de_user_data.agent, de_user_data.agent_lost, de_user_data.techs, de_user_data.ekey, de_user_data.e100, de_user_data.e101, de_user_data.e102, de_user_data.e103, de_user_data.e104, de_user_data.premium, de_user_data.tcount, de_user_data.zcount, de_user_data.eartefakt, de_user_data.kartefakt, de_user_data.dartefakt, de_user_data.tick , de_user_data.palenium, de_user_data.archi, de_user_data.npc, de_user_data.useefta, de_user_data.sc1, de_user_data.vs_auto_explore FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.rasse=$rasse", $db);
+        $res = mysql_query("SELECT de_user_data.user_id, de_user_data.col, de_user_data.sector, de_user_data.agent, de_user_data.agent_lost, de_user_data.techs, de_user_data.ekey, de_user_data.e100, de_user_data.e101, de_user_data.e102, de_user_data.e103, de_user_data.e104,  de_user_data.tcount, de_user_data.zcount, de_user_data.eartefakt, de_user_data.kartefakt, de_user_data.dartefakt, de_user_data.tick , de_user_data.palenium, de_user_data.archi, de_user_data.npc, de_user_data.useefta, de_user_data.sc1, de_user_data.vs_auto_explore FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.rasse=$rasse", $db);
         $num = mysql_num_rows($res);
 
         //tronic-meldungen einbinden, damit man weiß wieviele man verwenden kann
@@ -516,7 +429,6 @@ if ($doetick == 1) {
             $e102    = $irow["e102"];
             $e103    = $irow["e103"];
             $e104    = $irow["e104"];
-            $premium = $irow["premium"];
             $tcount  = $irow["tcount"];
             $zcount  = $irow["zcount"];
             $eartefakt  = $irow["eartefakt"];
@@ -548,16 +460,6 @@ if ($doetick == 1) {
             if ($maxtick < $mysc1 + $sv_sabotage[7][0] and $mysc1 > $sv_sabotage[7][0]) {
                 $sabotagemalus += $sv_sabotage[7][2];
             }
-
-            //gesamtenergie pro tick, energieausbeute
-            /*
-            if($premium==0){
-                $ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
-            }else{
-                $ea=$col*($sv_kollieertrag_pa-$malus-$sabotagemalus);
-            }*/
-
-            //$ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
 
             //überprüfen ob eine Erkundung läuft
             if ($vs_auto_explore == 1) {
@@ -595,20 +497,9 @@ if ($doetick == 1) {
             $paleniumenergie = floor($ea / 10000 * $palenium);
 
             //ade-rassenbonus
-            //$adebonus=$maxtick/100*$adeprozente[$rasse-1];
             $adebonus = 0;
 
-            //$ea=$ea+$eartefaktenergie+$kartefaktenergie+$dartefaktenergie+$paleniumenergie+$adebonus;
-
-            $pa_energie = $maxcol * $sv_kollieertrag * 0.05;
-
-            if ($premium == 1) {
-                $ea = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $paleniumenergie + $adebonus + $pa_energie;
-            } else {
-                $ea = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $paleniumenergie + $adebonus;
-            }
-
-
+            $ea = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $paleniumenergie + $adebonus;
 
             //energieinput pro rohstoff
             $em = floor($ea / 100 * $keym);
@@ -702,7 +593,11 @@ if ($doetick == 1) {
             //Tronicator
             $tronicertrag = 0;
             if (hasTech($pt, 160) && $rundenalter_wt % 20 == 0) {
+                //ein Tronic bekommt man immer
                 $tronicertrag++;
+
+                //pro Troniccelerator-Artefakt bekommt man zusätzlich ein Tronic
+                $tronicertrag+=intval(getArtefactAmountByUserId($uid, 21));
             }
 
             //tronicverteilung
@@ -1234,7 +1129,7 @@ if ($doetick == 1) {
 
     //questsystem einbinden
     echo '<hr>Serverquests:<br>';
-    include "wt_quest.php";
+    include_once "wt_quest.php";
     echo '<br><hr>';
 
     //sektorartefaktaktionen durchführen
@@ -1242,11 +1137,11 @@ if ($doetick == 1) {
         $sv_deactivate_sectorartefacts = 0;
     }
     if ($sv_deactivate_sectorartefacts != 1) {
-        include "wt_artefakte.php";
+        include_once "wt_artefakte.php";
     }
 
     //spielerartefaktaktionen durchf�hren
-    include "wt_userartefacts.php";
+    include_once "wt_userartefacts.php";
 
     //Tick hochzählen
     mysql_query("UPDATE de_user_data SET tick = tick + 1", $db);
@@ -1270,7 +1165,7 @@ if ($doetick == 1) {
 
     $tis = time() - (86400 * ($sv_inactiv_deldays - 1));
     $datum = date("Y-m-d H:i:s", $tis);
-    $db_daten = mysql_query("SELECT de_login.user_id, de_login.reg_mail FROM de_login, de_user_data WHERE de_login.last_login < '$datum' AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND de_user_data.premium=0 AND inaktmail = 0 AND de_login.status=1", $db);
+    $db_daten = mysql_query("SELECT de_login.user_id, de_login.reg_mail FROM de_login, de_user_data WHERE de_login.last_login < '$datum' AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND inaktmail = 0 AND de_login.status=1", $db);
     while ($row = mysql_fetch_array($db_daten)) {
         $uid = $row["user_id"];
         $reg_mail = $row["reg_mail"];
@@ -1298,8 +1193,8 @@ if ($doetick == 1) {
         $tis = time() - (86400 * $sv_inactiv_deldays);
         $datum = date("Y-m-d H:i:s", $tis);
         $time = strftime("%Y%m%d%H%M%S");
-        //$db_daten=mysql_query("SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.sou_user_id, de_user_data.efta_user_id FROM de_login, de_user_data WHERE de_login.last_login < '$datum' AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id AND de_user_data.premium=0",$db);
-        $db_daten = mysql_query("SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.premium, de_user_data.sou_user_id, de_user_data.efta_user_id FROM de_login, de_user_data WHERE de_login.last_login < '$datum' AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", $db);
+
+        $db_daten = mysql_query("SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.sou_user_id, de_user_data.efta_user_id FROM de_login, de_user_data WHERE de_login.last_login < '$datum' AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", $db);
         while ($row = mysql_fetch_array($db_daten)) {
             $uid = $row["user_id"];
             $sector = $row["sector"];
@@ -1310,7 +1205,6 @@ if ($doetick == 1) {
             $status = $row["status"];
             $spielername = $row["spielername"];
             $col = $row["col"];
-            $premium = $row['premium'];
 
             //votetimer/votecounter f�r den sektor setzen
             mt_srand((float)microtime() * 10000);
@@ -1342,7 +1236,7 @@ if ($doetick == 1) {
 
                 //wenn er BK war, den Posten zur�cksetzen
                 mysql_query("UPDATE de_sector SET bk=0 WHERE sec_id='$sector' AND bk='$system'", $db);
-            } elseif ($premium != 1) { //spieler l�schen
+            } else { //spieler löschen
                 //mail an den spieler
                 $betreff = $wt_lang['loeschmailbetreff'].$sv_server_tag.' - '.$sv_server_name;
                 $emailtext = $wt_lang['loeschmailbody'];
@@ -1413,8 +1307,8 @@ if ($doetick == 1) {
                 mysql_query("DELETE FROM de_login WHERE user_id=$uid", $db);
                 mysql_query("DELETE FROM de_user_data WHERE user_id=$uid", $db);
                 mysql_query("DELETE FROM de_user_info WHERE user_id=$uid", $db);
-                mysql_query("DELETE FROM `de_hfn_buddy_ignore` WHERE user_id=$userid or (sector=$sector and system=$system)", $db);
-
+                mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id=$uid or (sector=$sector and `system`=$system)", $db);
+                mysql_query("DELETE FROM de_user_hyper WHERE empfaenger = $uid", $db);
 
                 $fleet_id = $uid.'-0';
                 mysql_query("DELETE FROM de_user_fleet WHERE user_id='$fleet_id'", $db);
@@ -1427,23 +1321,24 @@ if ($doetick == 1) {
 
                 mysql_query("DELETE FROM de_user_build WHERE user_id=$uid", $db);
                 mysql_query("DELETE FROM de_user_comserver WHERE user_id=$uid", $db);
-                mysql_query("DELETE FROM de_user_hf WHERE user_id=$uid", $db);
                 mysql_query("DELETE FROM de_user_news WHERE user_id=$uid", $db);
                 mysql_query("DELETE FROM de_user_scan WHERE user_id=$uid", $db);
 
                 //falls er SK war werden die votes entfernt
                 mysql_query("UPDATE de_user_data SET votefor=0 WHERE sector='$sector' AND votefor='$system'", $db);
                 //buddy liste anpassen
-                mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id='$uid' or (sector='$sector' and system='$system')", $db);
+                mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id='$uid' or (sector='$sector' and `system`='$system')", $db);
                 //statistik leeren
                 mysql_query("DELETE FROM de_user_stat WHERE user_id='$uid'", $db);
                 //cyborg entfernen
+                /*
                 mysql_query("DELETE FROM de_cyborg_data WHERE user_id='$efta_user_id'", $eftadb);
                 mysql_query("DELETE FROM de_cyborg_enm WHERE user_id='$efta_user_id'", $eftadb);
                 mysql_query("DELETE FROM de_cyborg_flags WHERE user_id='$efta_user_id'", $eftadb);
                 mysql_query("DELETE FROM de_cyborg_ht WHERE user_id='$efta_user_id'", $eftadb);
                 mysql_query("DELETE FROM de_cyborg_item WHERE user_id='$efta_user_id'", $eftadb);
                 mysql_query("DELETE FROM de_cyborg_quest WHERE user_id='$efta_user_id'", $eftadb);
+                */
 
                 //dem sektor die kollektoren gutschreiben
                 if ($col > 75) {
@@ -1474,8 +1369,6 @@ if ($doetick == 1) {
 
                     mysql_select_db($sv_database_de, $db);
                 }
-            } else {
-                @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Versuche PA-Spieler zu löschen. user_id: '.$uid.' - Spielername: '.$spielername, ' ');
             }
         }
 
@@ -1500,7 +1393,7 @@ if ($doetick == 1) {
             mysql_query("DELETE FROM de_user_fleet WHERE user_id='$fleet_id'", $db);
 
             mysql_query("DELETE FROM de_user_build WHERE user_id=$uid", $db);
-            mysql_query("DELETE FROM de_user_hf WHERE user_id=$uid", $db);
+            //mysql_query("DELETE FROM de_user_hf WHERE user_id=$uid", $db);
             mysql_query("DELETE FROM de_user_news WHERE user_id=$uid", $db);
         }
     }
@@ -1649,7 +1542,7 @@ if ($doetick == 1) {
 				npcartefact=0, specreset=0, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0, tradesystemscore=0, tradesystemtrades=0, tradesystem_mb_uid=0, 
 				tradesystem_mb_tick=0, lastpcatt=0, fleetscore=0,bgscore0=0, bgscore1=1, bgscore2=0, bgscore3=0, bgscore4=0 WHERE user_id='".$user_id."';";
 
-                $sql[] = "UPDATE de_user_data SET sector=0, system=0, eh_siege=eh_siege+1, eh_counter=0 WHERE user_id='".$user_id."'";
+                $sql[] = "UPDATE de_user_data SET sector=0, `system`=0, eh_siege=eh_siege+1, eh_counter=0 WHERE user_id='".$user_id."'";
                 $sql[] = "UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
 				e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0, e90=0, artid1=0, artlvl1=0, artid2=0, artlvl2=0, artid3=0, artlvl3=0, artid4=0, artlvl4=0 , artid5=0, artlvl5=0 , artid6=0, artlvl6=0  
 				WHERE user_id LIKE'".$user_id."-%';";
@@ -1674,12 +1567,14 @@ if ($doetick == 1) {
                     mysql_query($sql[$i], $db);
                 }
 
-                //info in die sektorhistorie packen - spieler verl��t den sektor
+                //info in die sektorhistorie packen - spieler verläßt den sektor
                 mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '3', '$sector', '$spielername');", $db);
 
+                /*
                 echo '<hr>Erhabenercreditgewinn:<br>';
                 wt_change_credits($user_id, 50, 'Creditgewinn Erhabener');
                 echo '<br>'.$user_id;
+                */
 
                 //mail bzgl. EH
                 @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Ewige Runde: Neuer EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
@@ -1770,9 +1665,11 @@ if ($doetick == 1) {
                     mysql_query("UPDATE de_system SET domtick=0, doetick=0", $db);
                     $erhabenenstop = 1;
                     //dem erhabenen die credits geben
+                    /*
                     echo '<hr>Erhabenercreditgewinn:<br>';
                     wt_change_credits($user_id, 1000, 'Creditgewinn Erhabener');
                     echo '<br>'.$user_id;
+                    */
 
 
                     //mail an den detverteiler, wenn es ein bezahlserver ist
@@ -1812,7 +1709,7 @@ if ($doetick == 1) {
 					npcartefact=0, specreset=0, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0, tradesystemscore=0, tradesystemtrades=0, tradesystem_mb_uid=0, 
 					tradesystem_mb_tick=0, lastpcatt=0, fleetscore=0 WHERE user_id='".$user_id."';";
 
-                    $sql[] = "UPDATE de_user_data SET sector=0, system=0, eh_siege=eh_siege+1, eh_counter=0 WHERE user_id='".$user_id."'";
+                    $sql[] = "UPDATE de_user_data SET sector=0, `system`=0, eh_siege=eh_siege+1, eh_counter=0 WHERE user_id='".$user_id."'";
                     $sql[] = "UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
 					e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0, e90=0 WHERE user_id LIKE'".$user_id."-%';";
 
@@ -1831,9 +1728,11 @@ if ($doetick == 1) {
                     //info in die sektorhistorie packen - spieler verläßt den sektor
                     mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '3', '$sector', '$spielername');", $db);
 
+                    /*
                     echo '<hr>Erhabenercreditgewinn:<br>';
                     wt_change_credits($user_id, 100, 'Creditgewinn Erhabenen-Teilsieg');
                     echo '<br>'.$user_id;
+                    */
 
                     //mail bzgl. EH
                     @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Hardcore: Neuer Teil-EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
@@ -1889,6 +1788,7 @@ if ($doetick == 1) {
                 //die alphas bekommen zus�tzlich einen
                 mysql_query("UPDATE de_user_data SET roundpoints=roundpoints+1 WHERE rang=1 AND npc=0", $db);
 
+                /*
                 //creditgewinne
                 //spieler mit den meisten punkten
                 echo '<hr>Punktecreditgewinne:<br>';
@@ -1913,7 +1813,7 @@ if ($doetick == 1) {
                         $platz++;
                     }
                 }
-
+                */
                 /*
                 //erfolgreichster kopfgeldj�nger
                 echo '<br><br>Kopfgeldj�gercreditgewinne:<br>';
@@ -1964,11 +1864,13 @@ if ($doetick == 1) {
                         //er hat gewonnen, server anhalten
                         mysql_query("UPDATE de_system SET domtick=0, doetick=0", $db);
                         $erhabenenstop = 1;
+
+                        /*
                         //dem erhabenen die credits geben
                         echo '<hr>Erhabenercreditgewinn:<br>';
                         wt_change_credits($uid, $sv_credit_win[4][0], 'Creditgewinn Erhabener');
                         echo '<br>'.$uid;
-
+                        */
 
                         //mail an den detverteiler, wenn es ein bezahlserver ist
                         //da pde-server wegfallen immer eine e-mail schicken
@@ -2006,7 +1908,7 @@ if ($doetick == 1) {
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
 
-    include "wt_create_toplist.php";
+    include_once "wt_create_toplist.php";
 
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -2014,7 +1916,7 @@ if ($doetick == 1) {
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
 
-    include "wt_allyjobs.inc.php";
+    include_once "wt_allyjobs.inc.php";
 
 
     //////////////////////////////////////////////////////////////////////
@@ -2077,21 +1979,21 @@ if ($doetick == 1) {
     //erstelle die loginseiten-statistik
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
-    include "wt_create_status.php";
+    include_once "wt_create_status.php";
 
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
     //efta
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
-    //include "wt_efta.php";
+    //include_once "wt_efta.php";
 
     //rausvoten
     mysql_query("UPDATE de_sector_voteout SET ticks = ticks - 1", $db);
     mysql_query("DELETE FROM de_sector_voteout WHERE ticks<=0", $db);
 
     //cron - sachen die zu einem bestimmten zeitpunkt bearbeitet werden m�ssen
-    include "wt_cron.php";
+    include_once "wt_cron.php";
 
 
     //tick wieder aktivieren nachdem alles abgearbeitet worden ist, au�er es gibt nen erhabenen
@@ -2213,7 +2115,7 @@ if ($doetick == 1) {
 
         //überprüfen ob es einen automatischen reset geben soll
         if ($sv_auto_reset == 1) {
-            include "wt_auto_reset.php";
+            include_once "wt_auto_reset.php";
             //ticks wieder starten
             mysql_query("UPDATE de_system SET doetick=1, domtick=1", $db);
         }
@@ -2221,22 +2123,21 @@ if ($doetick == 1) {
 
     //beim communityserver ggf. das dazugeh�rige script einbinden
     if ($sv_comserver == 1) {
-        include 'wt_comserver.php';
+        include_once 'wt_comserver.php';
     }
 
     //soll die Karte neu generiert werden?
-    include 'wt_create_map.php';
+    include_once 'wt_create_map.php';
 
     print '<br><br>Letzter Tick: '.date("d/m/Y - H:i:s");
 
 } else {
-    echo 'Ticks deaktiviert.';
+    echo '<br>Wirtschaftsticks deaktiviert.<br>';
 } //doetick
-
-mysql_close($db);
 
 function wt_change_credits($uid, $amount, $reason)
 {
+    /*
     global $db;
 
     //zuerst auslesen wieviel man hat
@@ -2256,6 +2157,7 @@ function wt_change_credits($uid, $amount, $reason)
     $fp = fopen("../cache/creditlogs/$uid.txt", "a");
     fputs($fp, $clog);
     fclose($fp);
+    */
 }
 
 ?>

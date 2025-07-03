@@ -17,7 +17,7 @@ mysql_query("UPDATE de_login set logins=2, clicks=0;",$db);
 mysql_query("UPDATE de_login set status=1 WHERE (status > 2 AND delmode=0);",$db);
 
 if(isset($GLOBALS['sv_autostart_move_player_to_sector_1']) && $GLOBALS['sv_autostart_move_player_to_sector_1']==1){
-	mysql_query("UPDATE de_user_data SET sector=0, system=0 WHERE npc=0;",$db);
+	mysql_query("UPDATE de_user_data SET sector=0, `system`=0 WHERE npc=0;",$db);
 }else{
 	mysql_query("UPDATE de_system SET reshuffle=1;",$db);
 }

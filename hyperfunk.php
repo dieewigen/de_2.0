@@ -4,7 +4,7 @@ include('inc/lang/'.$sv_server_lang.'_hyperfunk.lang.php');
 require_once('lib/phpmailer/class.phpmailer.php');
 require_once('lib/phpmailer/class.smtp.php');
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, system FROM de_user_data WHERE user_id='$ums_user_id'", $db);
+$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, `system` FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -62,7 +62,7 @@ function insertmessage($message, $color, $lang_systemnachricht)
 
 function insertemp($spieler)
 {
-    $empfa = mysql_query("SELECT sector, system, spielername FROM de_user_data WHERE user_id=$spieler");
+    $empfa = mysql_query("SELECT sector, `system`, spielername FROM de_user_data WHERE user_id=$spieler");
     $rowemp = mysql_fetch_array($empfa);
 
     $namekoords = $rowemp[sector].':'.$rowemp['system'].' ('.$rowemp['spielername'].')';
@@ -74,7 +74,6 @@ function insertemp($spieler)
 <html>
 <head>
 <title><?php echo $hyperfunk_lang['headtitle']?></title>
-<meta charset="iso-8859-15">
 <?php include "cssinclude.php";
 
 //ein bisschen CSS f&uuml;r die Buttons
@@ -444,12 +443,12 @@ if (isset($_POST['antbut'])) {
     } elseif ($nachricht == "") {
         echo insertmessage($hyperfunk_lang['msg_1'], "r", $hyperfunk_lang['systemnachricht']);
     } elseif (validdigit($zielsek) && validdigit($zielsys)) {
-        $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsek' AND system='$zielsys'", $db);
+        $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsek' AND `system`='$zielsys'", $db);
         @$num = mysql_num_rows($db_daten);
 
         @$uid = mysql_result($db_daten, 0, "user_id");
 
-        $db_ignore = mysql_query("SELECT sector, system FROM de_hfn_buddy_ignore WHERE user_id='$uid' and system='$asys' and sector='$asec' and status=2", $db);
+        $db_ignore = mysql_query("SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id='$uid' and `system`='$asys' and sector='$asec' and status=2", $db);
         $numignore = mysql_num_rows($db_ignore);
 
 
@@ -530,7 +529,7 @@ if ($sekmsg && $asec != 1) {
         $igmsg = 0;
         while ($row = mysql_fetch_array($sekhfn)) {
 
-            $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$row[user_id]' and system='$asys' and sector='$asec' and status=2", $db);
+            $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$row[user_id]' and `system`='$asys' and sector='$asec' and status=2", $db);
             $numignore = mysql_num_rows($db_ignore);
 
             if ($numignore == 0) {
@@ -597,7 +596,7 @@ if(isset($_POST['allimsg'])) {
             $igmsg = 0;
             while ($rowa = mysql_fetch_array($resource)) {
 
-                $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$rowa[user_id]' and system='$asys' and sector='$asec' and status=2", $db);
+                $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$rowa[user_id]' and `system`='$asys' and sector='$asec' and status=2", $db);
                 $numignore = mysql_num_rows($db_ignore);
 
                 if ($numignore == 0) {
@@ -639,7 +638,7 @@ if(isset($_POST['allimsg'])) {
 }
 // Insert fuer die Freunde
 if (isset($_POST['freundemsg'])) {
-    $db_freunde = mysql_query("SELECT sector, system FROM de_hfn_buddy_ignore WHERE user_id='$ums_user_id' AND status=1");
+    $db_freunde = mysql_query("SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id='$ums_user_id' AND status=1");
 
     $time = date("YmdHis");
 
@@ -679,10 +678,10 @@ if (isset($_POST['freundemsg'])) {
             if ($oldfriend != "") {
                 $oldfriendcoords = explode(":", $oldfriend);
 
-                $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$oldfriendcoords[0]' AND system='$oldfriendcoords[1]' ", $db);
+                $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$oldfriendcoords[0]' AND `system`='$oldfriendcoords[1]' ", $db);
                 $uid = mysql_result($db_daten, 0, "user_id");
 
-                $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$uid' and system='$asys' and sector='$asec' and status=2", $db);
+                $db_ignore = mysql_query("SELECT * FROM de_hfn_buddy_ignore WHERE user_id='$uid' and `system`='$asys' and sector='$asec' and status=2", $db);
                 $numignore = mysql_num_rows($db_ignore);
 
                 if ($numignore == 0) {
@@ -903,7 +902,7 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
           }?></td><td><table border="0" width="100%" cellspacing="0" cellpadding="0"><tr><td class="cell" style="text-align: left;"><font face="Tahoma" size="2">
           <?php
           if ($action == "ausgang") {
-              $empfa = mysql_query("SELECT sector, system, spielername FROM de_user_data WHERE user_id=$row[empfaenger]");
+              $empfa = mysql_query("SELECT sector, `system`, spielername FROM de_user_data WHERE user_id=$row[empfaenger]");
               $rowemp = mysql_fetch_array($empfa);
 
               $empfaenger = $rowemp['spielername'];
@@ -1003,7 +1002,7 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
     $id = intval($_REQUEST['id'] ?? -1);
 
     if ($action == "freunde") {
-        $db_friends = mysql_query("SELECT sector, system, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
+        $db_friends = mysql_query("SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
         $num = mysql_num_rows($db_friends);
         if ($num == "0") {
             $check = 0;
@@ -1198,16 +1197,16 @@ if(isset($_POST['friendbtn'])) {
     $sector = intval($_REQUEST['freundsector'] ?? -1);
     $system = intval($_REQUEST['freundsystem'] ?? -1);
 
-    $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND system='$system'", $db);
+    $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND `system`='$system'", $db);
     $numcheck = mysql_num_rows($db_check);
 
-    $db_buddy_exist_check = mysql_query("SELECT user_id FROM de_hfn_buddy_ignore WHERE sector='$sector' AND system='$system' and status=1 and user_id='$ums_user_id'", $db);
+    $db_buddy_exist_check = mysql_query("SELECT user_id FROM de_hfn_buddy_ignore WHERE sector='$sector' AND `system`='$system' and status=1 and user_id='$ums_user_id'", $db);
     $buddy_exist_check = mysql_num_rows($db_buddy_exist_check);
 
     if ($buddy_exist_check >= 1) {
         echo insertmessage($hyperfunk_lang['msg_22'], "r", $hyperfunk_lang['systemnachricht']);
     } elseif ($numcheck == 1) {
-        $db_buddy = mysql_query("SELECT sector, system FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
+        $db_buddy = mysql_query("SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
         $num = mysql_num_rows($db_buddy);
 
         if ($ums_premium == 1) {
@@ -1217,10 +1216,10 @@ if(isset($_POST['friendbtn'])) {
         }
 
         if ($num <= ($pbuddies - 1)) {
-            $buddyname = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND system='$system'");
+            $buddyname = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND `system`='$system'");
             $rowbuddy = mysql_fetch_array($buddyname);
 
-            mysql_query("INSERT INTO de_hfn_buddy_ignore (user_id, sector, system, name, status) VALUES ('$ums_user_id', '$sector', '$system','$rowbuddy[spielername]',1)", $db);
+            mysql_query("INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES ('$ums_user_id', '$sector', '$system','$rowbuddy[spielername]',1)", $db);
 
             echo insertmessage($hyperfunk_lang['msg_23'], "g", $hyperfunk_lang['systemnachricht']);
         } else {
@@ -1237,10 +1236,10 @@ if (isset($_POST['ignorebtn'])) {
     $sector = intval($_REQUEST['feindsector'] ?? -1);
     $system = intval($_REQUEST['feindsystem'] ?? -1);
 
-    $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND system='$system'", $db);
+    $db_check = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND `system`='$system'", $db);
     $numcheck = mysql_num_rows($db_check);
 
-    $db_buddy_exist_check = mysql_query("SELECT user_id FROM de_hfn_buddy_ignore WHERE sector='$sector' AND system='$system' and status=2 and user_id='$ums_user_id'", $db);
+    $db_buddy_exist_check = mysql_query("SELECT user_id FROM de_hfn_buddy_ignore WHERE sector='$sector' AND `system`='$system' and status=2 and user_id='$ums_user_id'", $db);
     $buddy_exist_check = mysql_num_rows($db_buddy_exist_check);
 
     if ($buddy_exist_check >= 1) {
@@ -1248,7 +1247,7 @@ if (isset($_POST['ignorebtn'])) {
     } elseif ($numcheck == 1) {
 
 
-        $db_enem = mysql_query("SELECT sector, system FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=2", $db);
+        $db_enem = mysql_query("SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=2", $db);
         $num = mysql_num_rows($db_enem);
 
 
@@ -1259,10 +1258,10 @@ if (isset($_POST['ignorebtn'])) {
         }
 
         if ($num <= ($pigno - 1)) {
-            $ignorename = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND system='$system'");
+            $ignorename = mysql_query("SELECT spielername FROM de_user_data WHERE sector='$sector' AND `system`='$system'");
             $rowignore = mysql_fetch_array($ignorename);
 
-            mysql_query("INSERT INTO de_hfn_buddy_ignore (user_id, sector, system, name, status) VALUES ('$ums_user_id', '$sector', '$system','$rowignore[spielername]',2)", $db);
+            mysql_query("INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES ('$ums_user_id', '$sector', '$system','$rowignore[spielername]',2)", $db);
 
             echo insertmessage($hyperfunk_lang['msg_26'], "g", $hyperfunk_lang['systemnachricht']);
         } else {
@@ -1279,7 +1278,7 @@ if ($action == "delbuddy") {
     $sector = (int)$se;
     $system = (int)$sy;
 
-    mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and sector=$sector and system=$system and status=1", $db);
+    mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and sector=$sector and `system`=$system and status=1", $db);
 
     echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
 
@@ -1290,7 +1289,7 @@ if ($action == "delene") {
     $sector = (int)$se;
     $system = (int)$sy;
 
-    mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and sector=$sector and system=$system and status=2", $db);
+    mysql_query("DELETE FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and sector=$sector and `system`=$system and status=2", $db);
 
     echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
 
@@ -1431,7 +1430,7 @@ if ($action == "optionen") {
 
 
     <?php
-        $db_friends = mysql_query("SELECT sector, system, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
+        $db_friends = mysql_query("SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=1", $db);
 
     $num = mysql_num_rows($db_friends);
 
@@ -1481,7 +1480,7 @@ if ($action == "optionen") {
 </tr>
 
     <?php
-    $db_enemy = mysql_query("SELECT sector, system, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=2", $db);
+    $db_enemy = mysql_query("SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=$ums_user_id and status=2", $db);
 
     $nume = mysql_num_rows($db_enemy);
 

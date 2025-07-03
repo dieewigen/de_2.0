@@ -20,7 +20,7 @@ echo '
 <!doctype html>
 <html>
 <head>
-<title><?=$sinfo_lang[title]?></title>
+<title><?=$sinfo_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
 <body>
@@ -28,23 +28,23 @@ echo '
 <table width="580" border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td width="500" align="center" class="ro"><?php echo $sinfo_lang[detmeldungen]?>
+<td width="500" align="center" class="ro"><?php echo $sinfo_lang['detmeldungen']?>
 </td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
 <tr>
 <td class="rl">&nbsp;</td>
-<td><div class="cell"><?php echo utf8_encode($detmsg); ?></div></td>
+<td><div class="cell"><?php echo utf8_encode_fix($detmsg); ?></div></td>
 <td class="rr">&nbsp;</td>
 </tr>
 <tr align="center">
 <td height="37" class="rml">&nbsp;</td>
-<td align="center" class="ro"><?php echo $sinfo_lang[informationenausdemkristallpalast]?></td>
+<td align="center" class="ro"><?php echo $sinfo_lang['informationenausdemkristallpalast']?></td>
 <td class="rmr">&nbsp;</td>
 </tr>
 <tr>
 <td class="rl">&nbsp;</td>
-<td align="center"><div class="cell"><?php echo utf8_encode($kpmsg); ?></div></td>
+<td align="center"><div class="cell"><?php echo utf8_encode_fix($kpmsg); ?></div></td>
 <td class="rr">&nbsp;</td>
 </tr>
 <tr>

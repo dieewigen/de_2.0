@@ -3,7 +3,7 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.finance.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -44,7 +44,7 @@ if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 	mysql_query("UPDATE de_user_data SET ally_tronic=ally_tronic+$t_transfer, restyp05=restyp05-$t_transfer WHERE user_id='$ums_user_id'");
 	mysql_query("UPDATE de_allys SET t_depot=t_depot+$t_transfer WHERE allytag='$allytag'");
 	$message = "$allyfinance_lang[msg_1_1] $t_transfer $allyfinance_lang[msg_1_2]";
-	$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+	$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 	$row = mysql_fetch_array($db_daten);
 	$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 	$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -99,7 +99,7 @@ if (isset($memberid) && $memberid > 0)
 			{
 				$m_data = mysql_fetch_array($m_result);
 				$gemahnt_name = $m_data["spielername"];
-				notifyUser($memberid, $allyfinance_lang[msg_7], 6);
+				notifyUser($memberid, $allyfinance_lang['msg_7'], 6);
 				$message = "$allyfinance_lang[msg_8_1] $gemahnt_name $allyfinance_lang[msg_8_2]";
 				notifyUser($ums_user_id, "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
 				$db_daten=mysql_query("SELECT newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'",$db);
@@ -218,7 +218,7 @@ if ($isleader || $iscoleader)
 				</tr>
 
 	');
-	$member_result = mysql_query("SELECT user_id, spielername, col, sector, system, ally_tronic FROM de_user_data WHERE allytag='$allytag' AND status='1' ORDER BY ally_tronic, sector, system ASC");
+	$member_result = mysql_query("SELECT user_id, spielername, col, sector, `system`, ally_tronic FROM de_user_data WHERE allytag='$allytag' AND status='1' ORDER BY ally_tronic, sector, `system` ASC");
 	if ($member_result)
 	{
 		$member_numrows = mysql_num_rows($member_result);

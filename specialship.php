@@ -29,10 +29,8 @@ $max_kt = $row["kt"];
 <html>
 <head>
 <title>Basisstern</title>
-<meta charset="utf-8"/>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <?php 
-//$newcss=1;
 include "cssinclude.php";
 ?>
 <link rel="stylesheet" href="g/style.css?<?php echo filemtime('g/style.css');?>">

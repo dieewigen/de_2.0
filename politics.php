@@ -6,7 +6,7 @@ include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include_once "functions.php";
 include "issectork.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, system, score, newtrans, newnews, secmoves, secatt FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves, secatt FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
@@ -267,7 +267,7 @@ if(isset($_REQUEST["do"]) && $_REQUEST["do"]==2 AND $system==issectorcommander()
 	
   $sys=intval($_REQUEST["sys"]);
   //daten des spielers auslesen
-  $db_daten=mysql_query("SELECT spielername, secstatdisable FROM de_user_data WHERE sector='$sector' AND system='$sys'",$db);
+  $db_daten=mysql_query("SELECT spielername, secstatdisable FROM de_user_data WHERE sector='$sector' AND `system`='$sys'",$db);
   if(mysql_num_rows($db_daten)==1)
   {
     $row = mysql_fetch_array($db_daten);
@@ -275,7 +275,7 @@ if(isset($_REQUEST["do"]) && $_REQUEST["do"]==2 AND $system==issectorcommander()
     $secstatdisable=$row["secstatdisable"];
     if($secstatdisable==0)$secstatdisable=1;
     elseif($secstatdisable==1)$secstatdisable=0;
-    mysql_query("UPDATE de_user_data SET secstatdisable='$secstatdisable' WHERE sector='$sector' AND system='$sys'",$db);
+    mysql_query("UPDATE de_user_data SET secstatdisable='$secstatdisable' WHERE sector='$sector' AND `system`='$sys'",$db);
     //info in die sektorhistorie packen - komplette spielerlöschung
     if($secstatdisable==0)mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '5', '$sector', '$spielername');",$db);
     if($secstatdisable==1)mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '6', '$sector', '$spielername');",$db);
@@ -325,7 +325,7 @@ if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 				if (mysql_num_rows($result1)==0 AND mysql_num_rows($result2)==0) $ok=1;
 			}
 			//eintrag in der db machen, dass er umzieht
-			mysql_query("INSERT de_sector_umzug set user_id='$ums_user_id', typ=1, sector=0, system=0,pass='$newpass', ticks=192",$db);
+			mysql_query("INSERT de_sector_umzug set user_id='$ums_user_id', typ=1, sector=0, `system`=0,pass='$newpass', ticks=192",$db);
 		}
 	}
 	else echo '<br><font color="#FF0000"><b>'.$politics_lang["msg_4"].'<br><br></b></font>';
@@ -436,12 +436,12 @@ if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl
     for ($i=1; $i<=($sv_maxsystem+5); $i++)if ($vvotes[$i]=='1')$jastimmen++;
     //anzahl der aktiven spieler im sektor bestimmen
     //$result1 = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-    $result1 = mysql_query("SELECT de_user_data.system FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
+    $result1 = mysql_query("SELECT de_user_data.`system` FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
     WHERE de_user_data.sector='$sector' AND de_login.status=1",$db);
     $anz1 = mysql_num_rows($result1);
     $prozentwert=($jastimmen*100)/$anz1;
     if ($prozentwert>=$sv_voteoutgrenze){
-      $result1 = mysql_query("SELECT system FROM de_user_data WHERE user_id='$vuser_id'",$db);
+      $result1 = mysql_query("SELECT `system` FROM de_user_data WHERE user_id='$vuser_id'",$db);
       $row1=mysql_fetch_array($result1);
       $vsystem=$row1["system"];
       $time=strftime("%Y%m%d%H%M%S");
@@ -457,7 +457,7 @@ if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl
 		mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$vuser_id', 3,'$time','".$politics_lang["msg_25"]."')",$db);
 		
 		//auf 0:0 verschieben damit er in sektor 1 landet und einstellungen updaten
-		mysql_query("UPDATE de_user_data SET sector=0, system=0, newnews=1, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, votefor=0, secstatdisable=0 WHERE user_id = '$vuser_id'",$db);
+		mysql_query("UPDATE de_user_data SET sector=0, `system`=0, newnews=1, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, votefor=0, secstatdisable=0 WHERE user_id = '$vuser_id'",$db);
 		
 		//voteumfrage aus der db l�schen
 		mysql_query("DELETE FROM de_sector_voteout WHERE sector_id='$sector'",$db);
@@ -486,7 +486,7 @@ if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl
         mysql_query("UPDATE de_login set status = 4 where user_id = '$vuser_id'",$db);
         mysql_query("UPDATE de_user_data SET spend01=0, spend02=0, spend03=0, spend04=0, spend05=0 WHERE user_id = '$vuser_id'",$db);
         //eintrag in der db machen, dass er umzieht
-        mysql_query("INSERT de_sector_umzug set user_id='$vuser_id', typ=0, sector='$sector', system='$vsystem'",$db);
+        mysql_query("INSERT de_sector_umzug set user_id='$vuser_id', typ=0, sector='$sector', `system`='$vsystem'",$db);
         //nachricht an den account schicken
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$vuser_id', 3,'$time','".$politics_lang["msg_25"]."')",$db);
         mysql_query("update de_user_data set newnews = 1 where user_id = '$vuser_id'",$db);
@@ -887,7 +887,7 @@ if ($s==2){
 	if ($anz1==0){
 		//schauen ob man zu dem zeitpunkt voten kann
 		if($votecounter==0 OR 1==1){
-			$result = mysql_query("SELECT de_user_data.spielername FROM de_user_data WHERE de_user_data.sector=$sector ORDER BY system ASC",$db);
+			$result = mysql_query("SELECT de_user_data.spielername FROM de_user_data WHERE de_user_data.sector=$sector ORDER BY `system` ASC",$db);
 			$anz = mysql_num_rows($result);
 			echo '<br><br><select size="1" name="voteoutlist">';
 			while($row=mysql_fetch_array($result))
@@ -960,17 +960,17 @@ echo '<td class="'.$bg.'">';
 echo '<br><font size=2 face=arial>'.$politics_lang["actualsk"].': ';
 echo '<input type="hidden" name="s" value="1">';
 //alle user des sektors auslesen
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.votefor, de_user_data.system FROM de_user_data WHERE de_user_data.sector='$sector' ORDER BY system ASC",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_user_data.votefor, de_user_data.`system` FROM de_user_data WHERE de_user_data.sector='$sector' ORDER BY `system` ASC",$db);
 $anz = mysql_num_rows($result);
 while($row=mysql_fetch_array($result)){
 	//�berpr�fen, ob es den Account f�r den man votet noch gibt
 	if($row["votefor"]!=0){
-		$db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND system='".$row["votefor"]."' ORDER BY system ASC",$db);
+		$db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND `system`='".$row["votefor"]."' ORDER BY `system` ASC",$db);
 		$anzv = mysql_num_rows($db_daten);
 		if($anzv!=1){
 			//wenn es den Spieler im Sektor nicht gibt, dann den Vote entfernen
 			//echo $row["votefor"];
-			mysql_query("UPDATE de_user_data SET votefor=0 WHERE sector='$sector' AND votefor='".$row["votefor"]."' ORDER BY system ASC",$db);
+			mysql_query("UPDATE de_user_data SET votefor=0 WHERE sector='$sector' AND votefor='".$row["votefor"]."'",$db);
 		}
 	}
 	
@@ -1156,7 +1156,7 @@ echo '</table>';
 <td width="550">
 <?php
 $c1="";
-$result = mysql_query("SELECT spielername, spend01, spend02, spend03, spend04, spend05 FROM de_user_data WHERE sector = '$sector' ORDER BY system",$db);
+$result = mysql_query("SELECT spielername, spend01, spend02, spend03, spend04, spend05 FROM de_user_data WHERE sector = '$sector' ORDER BY `system`",$db);
 $num = mysql_num_rows($result);
 if ($num>0)
 {
@@ -1222,7 +1222,7 @@ if ($num>0)
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td width="550">
 <?php
-$result = mysql_query("SELECT de_user_data.spielername, de_login.last_login,  de_login.last_click, de_user_data.system, de_user_data.chatoff, de_user_data.secstatdisable FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_user_data.sector='$sector' ORDER BY system ASC LIMIT 200",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_login.last_login,  de_login.last_click, de_user_data.`system`, de_user_data.chatoff, de_user_data.secstatdisable FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_user_data.sector='$sector' ORDER BY `system` ASC LIMIT 200",$db);
 $num = mysql_num_rows($result);
 if ($num>0)
 {
@@ -1371,7 +1371,7 @@ else
   $result = mysql_query("SELECT user_id FROM de_sector_umzug WHERE pass='".$row1["pass"]."'",$db);
   while($row=mysql_fetch_array($result))
   {
-    $result1 = mysql_query("SELECT spielername, sector, system FROM de_user_data WHERE user_id='".$row["user_id"]."'",$db);
+    $result1 = mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='".$row["user_id"]."'",$db);
     $row1=mysql_fetch_array($result1);
     echo $row1["spielername"].' ['.$row1["sector"].':'.$row1["system"].']<br>';
     $useranz++;
@@ -1432,9 +1432,9 @@ if($showexilvote==1){
 <?php
 //alle user des sektors auslesen die aktiv sind
 echo '<b>'.$politics_lang["msg_21_1"].' '.$vspielername.' '.$politics_lang["msg_21_2"].'?</b><br>';
-//$result = mysql_query("SELECT spielername, system FROM de_user_data WHERE sector='$sector' ORDER BY system ASC",$db);
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.system FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
-  WHERE de_user_data.sector='$sector' AND de_login.status=1 ORDER BY system ASC ",$db);
+//$result = mysql_query("SELECT spielername, `system` FROM de_user_data WHERE sector='$sector' ORDER BY `system` ASC",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_user_data.`system` FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
+  WHERE de_user_data.sector='$sector' AND de_login.status=1 ORDER BY `system` ASC ",$db);
 
 $anz = mysql_num_rows($result);
 while($row=mysql_fetch_array($result))

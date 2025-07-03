@@ -4,7 +4,7 @@ include('lib/basefunctions.lib.php');
 include('inc/lang/'.$sv_server_lang.'_ally.join.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, col FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, col FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
@@ -94,7 +94,7 @@ if($ok || $warnung){
 
 	if($error){
 		echo '
-			<form name="register" method="POST\" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
+			<form name="register" method="POST" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
 				<input type="hidden" name="ally_id" value="'.$ally_id.'">
 				<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung"></form>';
 	}else{
@@ -166,12 +166,14 @@ if($ok || $warnung){
 	} // $ok check
 }else{ // else $ok
 	$query = "SELECT allyname, antrag FROM de_ally_antrag antrag, de_allys allys where allys.id=antrag.ally_id and user_id = $ums_user_id";
-	$result = @mysql_query($query);
-	$antrag_allyname = @mysql_result($result,$row,"allyname");
-	$antrag_antrag 	 = @mysql_result($result,$row,"antrag");
+	$result = mysql_query($query, $db);
+	$row = mysql_fetch_array($result);
+
+	$antrag_allyname = $row["allyname"];
+	$antrag_antrag 	 = $row["antrag"];
 
 	$query = "SELECT * FROM de_allys ORDER BY allyname ASC";
-	$result = mysql_query($query);
+	$result = mysql_query($query, $db);
 	$nb = mysql_num_rows($result);
 
 	if ($antrag_allyname == "")

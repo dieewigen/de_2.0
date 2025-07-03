@@ -10,31 +10,10 @@ include('inc/lang/'.$sv_server_lang.'_options.lang.php');
 $errmsg = '';
 $getpamsg = '';
 
-if (isset($_REQUEST['set_use_mobile_version'])) {
-    $value = intval($_REQUEST['set_use_mobile_version']);
-    $time = time() + 3600 * 24 * 365 * 5;
-    setcookie("use_mobile_version", $value, $time);
-    $_COOKIE['use_mobile_version'] = $value;
-}
-
-if (isset($_REQUEST['set_deactivate_swipe'])) {
-    $value = intval($_REQUEST['set_deactivate_swipe']);
-    $time = time() + 3600 * 24 * 365 * 5;
-    setcookie("deactivate_swipe", $value, $time);
-    $_COOKIE['deactivate_swipe'] = $value;
-}
-
-if (isset($_REQUEST['desktop_version'])) {
-    $value = intval($_REQUEST['desktop_version']);
-    $time = time() + 3600 * 24 * 365 * 5;
-    setcookie("desktop_version", $value, $time);
-    $_COOKIE['desktop_version'] = $value;
-}
-$desktop_version = intval($_COOKIE['desktop_version'] ?? 0);
 
 $ehlockfaktor = 4;
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
+$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -80,150 +59,6 @@ $owner_id = intval($row['owner_id']);
 $result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1", $db);
 $row     = mysql_fetch_array($result);
 $maxtick = $row['tick'];
-
-////////////////////////////////////////////////////////
-// Premiumaccount buchen
-////////////////////////////////////////////////////////
-$getpa = intval($_REQUEST['getpa'] ?? 0);
-if ($getpa > 0) {
-    //transaktionsbeginn
-    if (setLock($ums_user_id)) {
-        //nochmal die vorandenen Spielerdaten laden
-        $row = loadPlayerData($_SESSION['ums_user_id']);
-
-        $creditkosten = $getpa * 5;
-        if ($creditkosten <= $credits) {
-            $getpamsg = '<br><font color="#00FF00">Der Premiumaccount wurde verl&auml;ngert.</font>';
-
-            //alle Server durchgehen und die PA-Zeit verlängern
-            $server_liste = array(
-                'sde',
-                'xde',
-                'rde'
-            );
-
-            for ($i = 0;$i < count($server_liste);$i++) {
-                $db_table = $server_liste[$i];
-
-                //schauen ob es den account gibt
-                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'");
-                //echo "<br>SELECT user_id FROM ".$db_table.".de_login WHERE owner_id='$owner_id'";
-                $num = mysqli_num_rows($db_daten);
-                if ($num == 1) {
-                    //echo 'A';
-                    //falls ja user id auslesen und die pa-zeit gutschreiben
-                    $row = mysqli_fetch_array($db_daten);
-                    $user_id = $row['user_id'];
-
-                    //aktuelle laufzeit auslesen
-                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT patime FROM ".$db_table.".de_user_data WHERE user_id='$user_id'");
-                    $row = mysqli_fetch_array($db_daten);
-                    $palaufzeit = $row['patime'];
-
-                    if ($palaufzeit < time()) {
-                        //echo 'B';
-                        //er hat aktuell keinen pa, also neue gesamtlaufzeit setzen
-                        $patime = time() + (3600 * 24 * $getpa);
-                        mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET premium=1, patime='$patime' WHERE user_id = '$user_id'");
-                    } else {
-                        //echo 'C';
-                        //er hat einen pa, also zeit dazuaddieren
-                        $patime = (3600 * 24 * $getpa);
-                        mysqli_query($GLOBALS['dbi'], "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'");
-                        //echo "UPDATE ".$db_table.".de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'<br><br>";
-                        //echo mysqli_error($GLOBALS['dbi']);
-                    }
-                }
-            }
-
-            changeCredits($_SESSION['ums_user_id'], $creditkosten * -1, 'PA-Buchung: '.$getpa.' Tage');
-
-            //Daten aktualisieren
-            $row = loadPlayerData($_SESSION['ums_user_id']);
-            $row['credits'] = $row['credits'] - $creditkosten;
-            $credits = $row['credits'];
-            $patime = $row['patime'];
-
-        } else {
-            $getpamsg = '<br><font color="#FF0000">Es sind nicht genug Credits vorhanden.</font>';
-        }
-
-        //transaktionsende
-        $erg = releaseLock($ums_user_id); //Lösen des Locks und Ergebnisabfrage
-        if ($erg) {
-            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-        } else {
-            print("Transaktionsfehler AX.<br><br><br>");
-        }
-    }// if setlock-ende
-    else {
-        echo '<br><font color="#FF0000">Transaktionsfehler BX.</font><br><br>';
-    }
-}
-
-
-
-/*
-$ovoptfelder=split(";",$ovopt);
-
-//einstellungen für die Übersicht speichern
-if ($_POST['dooveinst'])
-{
-
-  //die felder parsen und den string zusammenbauen
-  $ovoptarray[]=$_POST['opt1'];
-  $ovoptarray[]=$_POST['opt2'];
-  $ovoptarray[]=$_POST['opt3'];
-  $ovoptarray[]=$_POST['opt4'];
-  $ovoptarray[]=$_POST['opt5'];
-  $ovoptarray[]=$_POST['opt6'];
-  $ovoptarray[]=$_POST['opt7'];
-
-  $ovopstr='';
-
-  for($i=0;$i<=6;$i++)
-  switch($ovoptarray[$i]){
-    case $ovbes[0]:
-      $ovopstr.='0;';
-      break;
-    case $ovbes[1]:
-      $ovopstr.='1;';
-      break;
-    case $ovbes[2]:
-      $ovopstr.='2;';
-      break;
-    case $ovbes[3]:
-      $ovopstr.='3;';
-      break;
-    case $ovbes[4]:
-      $ovopstr.='4;';
-      break;
-    case $ovbes[5]:
-      $ovopstr.='5;';
-      break;
-    case $ovbes[6]:
-      $ovopstr.='6;';
-      break;
-    case $ovbes[7]:
-      $ovopstr.='7;';
-      break;
-    default:
-      $errmsg.='<br>'.$options_lang[fehler1];
-      break;
-  }
-
-  //einstellungen f�r die darstellung updaten
-  $ovoptfelder=split(";",$ovopstr);
-
-  //db updaten
-  mysql_query("UPDATE de_user_data SET ovopt='$ovopstr' WHERE user_id = '$ums_user_id'",$db);
-
-  //�bersicht-cachefile l�schen
-  $filename = 'cache/overview/overview-'.$ums_user_id.'.tmp';
-  if (file_exists($filename))unlink($filename);
-
-}
-*/
 
 //einstellungen für die nächste runde speichern
 if (isset($_POST['donr'])) {
@@ -291,18 +126,6 @@ if (isset($_POST['graop'])) {
         $ircname = $_POST['ircname'];
     }
 
-    //sm_remtime
-    $smremtime = intval($_REQUEST['smremtime']);
-    if ($smremtime < 15) {
-        $smremtime = 0;
-    }
-    if ($smremtime > 1440) {
-        $smremtime = 1440;
-    }
-    $ums_sm_remtime = $smremtime;
-    $_SESSION['ums_sm_remtime'] = $smremtime;
-
-
     if ($errmsg == '') {
         //$gpfad = $_REQUEST['gpfad'];
         $gpfad = '';
@@ -330,7 +153,7 @@ if (isset($_POST['graop'])) {
         //$ums_gpfad=$gpfad;$gpfaddb=$gpfad;
         //mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname', transparency='$transparenz' WHERE user_id = '$ums_user_id'",$db);
         mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname' WHERE user_id = '$ums_user_id'", $db);
-        mysql_query("update de_user_data set hide_secpics = '$secpic', soundoff='$sound', sm_remtime='$ums_sm_remtime', chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
+        mysql_query("update de_user_data set hide_secpics = '$secpic', soundoff='$sound', chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
         $hidepic = $secpic;
         $errmsg .= $options_lang['uebernommen'];
         $soundoff = $sound;
@@ -370,86 +193,6 @@ if (isset($_POST['newpass']) && $owner_id == 0) {
     }
 }
 
-
-//sich selbst aus dem sektor voten, mit verlust aller techs und dem rest, incl. Änderung spielername, rasse
-/*
-if ($selfvoteout)
-{
-  //schauen ob man inc hat
-  $flotten=mysql_query("SELECT aktion, fleetsize FROM de_user_fleet WHERE zielsec = $sector AND zielsys = $system AND aktion = 1 AND entdeckt > 0",$db);
-  $fa = mysql_num_rows($flotten);
-
-  if ($fa>0 AND $errmsg=='')$errmsg.='<font color="#FF0000">Diese Funktion ist nicht nutzbar, wenn man angegriffen wird.</font>';
-  if ($tick<=5 AND $errmsg=='')$errmsg.='<font color="#FF0000">Diese Funktion ist erst ab einem Accountalter von 5 Wochen (Wirtschaftsticks) m&ouml;glich.</font>';
-  //schauen ob man sachen im handel hat
-  $db_daten=mysql_query("SELECT * FROM de_trade_resrequest WHERE user_id = '$ums_user_id'");
-  $num = mysql_num_rows($db_daten);
-  if($num>0) $errmsg.='<font color="#FF0000">Diese Funktion ist nicht nutzbar, wenn noch Handelsangebote offen sind.</font>';
-  $db_daten=mysql_query("SELECT * FROM de_trade_resoffer WHERE user_id = '$ums_user_id'");
-  $num = mysql_num_rows($db_daten);
-  if($num>0) $errmsg.='<font color="#FF0000">Diese Funktion ist nicht nutzbar, wenn noch Handelsangebote offen sind.</font>';
-
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$umzpass')");
-  $num = mysql_num_rows($db_daten);
-  if ($num==1) //passwort ist korrekt
-  if ($umzcheck1=="1" and $umzcheck2=="1" AND $errmsg=='')//wenn beides angehakt dann umziehen
-  {
-    $time=strftime("%Y%m%d%H%M%S");
-    //accountstatus sichern und account sperren
-
-    $vuser_id=$ums_user_id;
-    mysql_query("UPDATE de_login set status = 4, savestatus=1 where user_id = '$vuser_id'",$db);
-
-    //eintrag in der db machen, dass er umzieht
-    //mysql_query("INSERT de_sector_umzug set user_id='$vuser_id', typ=0, sector='$sector', system='$system'",$db);
-    //nachricht an den account schicken
-    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$vuser_id', 3,'$time','Dein System ist umgezogen.')",$db);
-
-    //account resetten
-    mysql_query("update de_user_data set newnews = 1, tick=1, fixscore=0, score=0,
-     restyp01=10000, restyp02=5000, restyp03=0, restyp04=0, restyp05=0, col=0, sonde=0, agent=0,
-     buildgnr=0, buildgtime=0, resnr=0, restime=0, ekey='100;0;0;0', newtrans=0,
-     e100=0, e101=0, e102=0, e103=0, e104=0, tradescore=0, sells=0,
-     techs='s0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
-     secmoves=0, votefor=0, secmoves=0, tcount=0, zcount=0, eartefakt=0, kartefakt=0,
-     scanhistory='',platz_last_day=1, trade_sell_sum=0, trade_buy_sum=0, trade_forbidden=0,
-     spielername=nrspielername, rasse=nrrasse, sm_rboost=0, sector=0, system=0, artbldglevel=0,
-     spend01=0, spend02=0, spend03=0, spend04=0, spend05=0
-     WHERE user_id = '$vuser_id'",$db);
-
-    //tronicauktionen l�schen, auf die noch nicht geboten wurde
-    mysql_query("DELETE FROM de_tauktion WHERE seller='$ums_user_id' AND bids=0;");
-
-    //flotte l�schen
-    $fleet_id=$vuser_id.'-0';
-    mysql_query("UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
-     e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0 WHERE user_id = '$fleet_id'",$db);
-    $fleet_id=$vuser_id.'-1';
-    mysql_query("UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
-     e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0 WHERE user_id = '$fleet_id'",$db);
-    $fleet_id=$vuser_id.'-2';
-    mysql_query("UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
-     e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0 WHERE user_id = '$fleet_id'",$db);
-    $fleet_id=$vuser_id.'-3';
-    mysql_query("UPDATE de_user_fleet set komatt=0, komdef=0, zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0,
-     e81=0, e82=0, e83=0, e84=0, e85=0, e86=0, e87=0, e88=0, e89=0 WHERE user_id = '$fleet_id'",$db);
-
-    //build-liste leeren
-    mysql_query("DELETE FROM de_user_build WHERE user_id = '$vuser_id'",$db);
-
-    //nachricht an alle im sektor schicken
-    $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-    while($row = mysql_fetch_array($db_daten))
-    {
-      mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($row[user_id], 3,'$time','$ums_spielername ist aus dem Sektor weggezogen.')",$db);
-      mysql_query("update de_user_data set newnews = 1 where user_id = $row[user_id]",$db);
-    }
-
-    //session killen und spieler ausloggen
-    session_destroy();
-    header("Location: index.php");
-  }
-}*/
 $delacc = $_POST['delacc'] ?? false;
 if ($delacc) { //account l�schen
     $delpass = $_POST['delpass'];
@@ -478,19 +221,6 @@ if ($delacc) { //account l�schen
                 $datum = date("Y-m-d H:i:s", $tis);
 
                 mysql_query("UPDATE de_login SET last_login='$datum', status=3, inaktmail=1, delmode=1 WHERE user_id=$uid", $db);
-
-                //zeit des letztens logins setzen um dem account noch 24 stunden zu geben
-                /*
-                $deltage=$sv_inactiv_deldays-1;
-                $uid=$ums_user_id;
-                $tis=time()-86400*$deltage;
-                $datum=date("Y-m-d H:i:s",$tis);
-                mysql_query("UPDATE de_login SET last_login='$datum', inaktmail = 1, delmode = 1 WHERE user_id=$uid",$db);
-                */
-
-                //premium-account-status entfernen
-                //mysql_query("UPDATE de_user_data SET premium=0, patime=0 WHERE user_id=$uid",$db);
-                mysql_query("UPDATE de_user_data SET premium=0 WHERE user_id=$uid", $db);
 
                 //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
                 $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
@@ -549,7 +279,44 @@ $logoutmsg = '<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' 
 //stelle die ressourcenleiste dar
 include('resline.php');
 
+if (isset($_REQUEST['set_use_mobile_version'])) {
+    $value = intval($_REQUEST['set_use_mobile_version']);
+    echo'
+<script>
+let expires = new Date();
+expires.setTime(expires.getTime() + (3600 * 24 * 360 * 1000));
+document.cookie = "use_mobile_version='.$value.'; expires=" + expires.toUTCString() + "; path=/";
+</script>';    
+    $_COOKIE['use_mobile_version'] = $value;
+}
+
+if (isset($_REQUEST['set_deactivate_swipe'])) {
+    $value = intval($_REQUEST['set_deactivate_swipe']);
+    echo'
+<script>
+let expires = new Date();
+expires.setTime(expires.getTime() + (3600 * 24 * 360 * 1000));
+document.cookie = "deactivate_swipe='.$value.'; expires=" + expires.toUTCString() + "; path=/";
+</script>';    
+
+    $_COOKIE['deactivate_swipe'] = $value;
+}
+
+if (isset($_REQUEST['desktop_version'])) {
+    $value = intval($_REQUEST['desktop_version']);
+    echo'
+<script>
+let expires = new Date();
+expires.setTime(expires.getTime() + (3600 * 24 * 360 * 1000));
+document.cookie = "desktop_version='.$value.'; expires=" + expires.toUTCString() + "; path=/";
+</script>';
+
+    $_COOKIE['desktop_version'] = $value;
+}
+$desktop_version = intval($_COOKIE['desktop_version'] ?? 0);
+
 $urlacc = $_POST['urlacc'] ?? false;
+$showattumode=0;
 if ($urlacc) { //account in urlaubsmodus versetzen
     $urlpass = $_POST['urlpass'];
     $db_datenx = mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
@@ -642,45 +409,10 @@ echo '
 <table border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td colspan="2" width="560" align="center" class="ro">'.$options_lang['informationen'].' / Premiumaccount buchen</td>
+<td colspan="2" width="560" align="center" class="ro">'.$options_lang['userdetails'].'</td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="280">'.$options_lang['autologout'].'</td>
-<td width="280">'.$logoutmsg.'</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang['palaufzeit'].'</td>
-<td>'.$palaufzeit.'</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>';
 
-//Premium-Account verlängern
-echo '
-<tr align="center">
-	<td width="13" height="25" class="rl">&nbsp;</td>
-	<td colspan="2">
-	Premiumaccount f&uuml;r 5 Credits pro Tag buchen (gilt f&uuml;r alle DE/EA-Server):'.$getpamsg.'<br>
-	<a href="options.php?getpa=1" class="btn">1 Tag</a>
-	<a href="options.php?getpa=7" class="btn">7 Tage</a>
-	<a href="options.php?getpa=14" class="btn">14 Tage</a>
-	<a href="options.php?getpa=30" class="btn">30 Tage</a>
-
-
-	</td>
-	<td width="13" class="rr">&nbsp;</td>
-</tr>';
-
-
-echo '
-<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td align="center" colspan="2" class="ro">'.$options_lang['userdetails'].'</td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
 <tr align="center">
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td colspan="2"><a href="userdetails.php" target="h" class="btn">'.$options_lang['userdetails'].'</a></td>
@@ -696,16 +428,20 @@ echo '
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td colspan="2">';
 
-if ($_COOKIE['use_mobile_version'] == 0) {
-    echo '<br><a href="options.php?set_use_mobile_version=1" class="btn">Desktopversion</a><br>';
-} else {
-    echo '<br><a href="options.php?set_use_mobile_version=0" class="btn">mobile Version</a><br>';
+if(!isset($_COOKIE['use_mobile_version'])){
+    $_COOKIE['use_mobile_version'] = 0;
 }
-
+if ($_COOKIE['use_mobile_version'] == 0) {
+    echo '<br><a href="options.php?set_use_mobile_version=1" class="btn">zu Mobil</a><br>';
+} else {
+    echo '<br><a href="options.php?set_use_mobile_version=0" class="btn">zu Desktop</a><br>';
+}
 
 echo '<div>Wird erst nach dem n&auml;chsten Login wirksam.</div>';
 
-
+if(!isset($_COOKIE['deactivate_swipe'])){
+    $_COOKIE['deactivate_swipe'] = 0;
+}
 if ($_COOKIE['deactivate_swipe'] == 0) {
     echo '<br>Die Wischgesten sind <a href="options.php?set_deactivate_swipe=1" class="btn">an</a><br>';
 } else {
@@ -726,42 +462,11 @@ echo'
 </table>
 <table border="0" cellpadding="0" cellspacing="0">';
 
-/*
-echo '
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="280">'.$options_lang['grafikpackpfad'].'</td>
-<td width="280"><input type="Text" name="gpfad" value="'.$gpfaddb.'" maxlength="255"></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>';
-*/
-/*
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang[transparenz].' (40-100)</td>
-<td><input type="Text" name="transparenz" value="'.$transparency.'" maxlength="3"></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-';
-*/
-
-//markiertes feld der sektorbilderansicht festlegen
-/*
-$secanzeige_checked='<option selected>'.$secanzeige[$hidepic].'</option>';
-echo'
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang['sektorbilder'].'</td>
-<td><select name="secbild">'.$secanzeige_checked.'<option>'.$secanzeige[0].'</option><option>'.$secanzeige[1].'</option><option>'.$secanzeige[2].'</option></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>';
-*/
-
 //welche Desktop-Version
 echo'
 <tr align="center">
   <td width="13" height="25" class="rl">&nbsp;</td>
-  <td>Desktopversion<br>(Die Standardversion wird f&uuml;r Systeme ab einer horizontale Auflösung von 1280px aufw&auml;rts empfohlen. Die &Auml;nderung wird erst nach dem n&auml;chsten Login wirksam.)<br><br></td>
+  <td width="477px">Desktopversion<br>(Die Standardversion wird f&uuml;r Systeme ab einer horizontale Auflösung von 1280px aufw&auml;rts empfohlen. Die &Auml;nderung wird erst nach dem n&auml;chsten Login wirksam.)<br><br></td>
   <td>
     <select name="desktop_version">
       <option value="0"';
@@ -844,15 +549,6 @@ echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
 
-
-
-<tr align="center">
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="280">'.$options_lang['smreminder'].'</td>
-<td width="280"><input type="Text" name="smremtime" value="'.$ums_sm_remtime.'" maxlength="8"><br>('.$options_lang['angabeinminuten'].')</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
 <tr align="center">
 <td width="13" height="37" class="rl">&nbsp;</td>
 <td colspan="2"><input type="Submit" name="graop" value="'.$options_lang['einstellungenspeichern'].'"></td>

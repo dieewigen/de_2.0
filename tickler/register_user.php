@@ -53,7 +53,7 @@ if($dortick==1){
 	$maxsecindb=$sec_id;
 
 	//zuerstmal alle belegten positionen auslesen
-	$db_daten=mysql_query("SELECT sector, system FROM de_user_data WHERE sector > 0",$db);
+	$db_daten=mysql_query("SELECT sector, `system` FROM de_user_data WHERE sector > 0",$db);
 	while($row = mysql_fetch_array($db_daten))
 	{
 	  $systeme[$row["sector"]][$row["system"]]=1;
@@ -83,7 +83,7 @@ if($dortick==1){
 	//Koordinaten 0:0, Spieler werden in Sektor 1 gepackt
 	//////////////////////////////////////////////////////////////////////////////
 
-	$result = mysql_query("SELECT user_id, spielername, npc FROM de_user_data WHERE sector=0 AND system=0",$db);
+	$result = mysql_query("SELECT user_id, spielername, npc FROM de_user_data WHERE sector=0 AND `system`=0",$db);
 	$num = mysql_num_rows($result);
 	while($res = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 	{
@@ -128,7 +128,7 @@ if($dortick==1){
 	  }
 	  else //keine freien sektoren mehr vorhanden, also nen sektor so suchen, am besten einen wo wenig drin sind
 	  {
-		$sql="SELECT sector, count( system )  AS systeme FROM `de_user_data` WHERE npc='$npc' AND sector > $sv_free_startsectors AND sector <= $maxsector GROUP BY sector ORDER BY systeme ASC LIMIT 1";
+		$sql="SELECT sector, count( `system` )  AS systeme FROM `de_user_data` WHERE npc='$npc' AND sector > $sv_free_startsectors AND sector <= $maxsector GROUP BY sector ORDER BY systeme ASC LIMIT 1";
 		$rx=mysql_query($sql,$db);
 		$rowx = mysql_fetch_array($rx);
 		$sec=$rowx["sector"];
@@ -164,7 +164,7 @@ if($dortick==1){
 	  $uid=$res["user_id"];
 	  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$uid' AND status=0",$db);//status aktiv
 	  //heimatsystem festlegen
-	  mysql_query("UPDATE de_user_data SET sector='$secz', system='$sysz' WHERE user_id='$uid'",$db);
+	  mysql_query("UPDATE de_user_data SET sector='$secz', `system`='$sysz' WHERE user_id='$uid'",$db);
 	  //flottenkoordinaten updaten
 	  $fleet_id=$uid.'-0';
 	  mysql_query("UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
@@ -192,7 +192,7 @@ if($dortick==1){
 	//spieler die per vote rausgevotet worden sind/geresettet haben/aus sektor 1 rausziehen
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
-	$result = mysql_query("SELECT user_id, sector, system FROM de_sector_umzug WHERE typ=0",$db);
+	$result = mysql_query("SELECT user_id, sector, `system` FROM de_sector_umzug WHERE typ=0",$db);
 	$num = mysql_num_rows($result);
 	while($res = mysql_fetch_array($result)){ //jeder gefundene datensatz wird geprueft
 		$uid=$res["user_id"];
@@ -248,7 +248,7 @@ if($dortick==1){
 		{
 			echo '<br>freesector==0';
 			//nur sektoren betrachten, die nicht zu den alien-sektoren geh�ren
-			$sql="SELECT de_user_data.sector, count( de_user_data.system ) AS systeme FROM de_user_data, de_sector WHERE
+			$sql="SELECT de_user_data.sector, count( de_user_data.`system` ) AS systeme FROM de_user_data, de_sector WHERE
 			de_user_data.sector > $sv_free_startsectors AND de_user_data.sector <= $maxsector AND de_user_data.sector=de_sector.sec_id 
 			AND de_user_data.sector<> '$last_sector' 
 			AND de_sector.votetimer=0 AND de_sector.npc=0
@@ -290,7 +290,7 @@ if($dortick==1){
 
 		mysql_query("UPDATE de_login SET status=savestatus WHERE user_id='$uid'",$db);//status aktiv
 		//heimatsystem festlegen
-		mysql_query("UPDATE de_user_data SET sector=$secz, system=$sysz, votefor=0, last_sector='$secz' WHERE user_id='$uid'",$db);
+		mysql_query("UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, last_sector='$secz' WHERE user_id='$uid'",$db);
 		//info in der sektorhistorie hinterlegen
 		mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '2', '$secz', '$spielername');",$db);
 
@@ -338,7 +338,7 @@ if($dortick==1){
 	  $zielsec=$res["sector"];
 
 	  //herkunftssektor und -system
-	  $result1 = mysql_query("SELECT sector, system, techs FROM de_user_data WHERE user_id='$uid'",$db);
+	  $result1 = mysql_query("SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'",$db);
 	  $res1 = mysql_fetch_array($result1);
 
 	  $herksec=$res1["sector"];
@@ -372,7 +372,7 @@ if($dortick==1){
 
 	  //freie position ermitteln - ende
 	  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$uid'",$db);//status aktiv
-	  mysql_query("UPDATE de_user_data SET sector=$secz, system=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'",$db);//heimatsystem festlegen
+	  mysql_query("UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'",$db);//heimatsystem festlegen
 	  //flottenkoordinaten updaten
 	  $fleet_id=$uid.'-0';
 	  mysql_query("UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
@@ -428,7 +428,7 @@ if($dortick==1){
 
 		$uid=$res["user_id"];
 		//herkunftssektor und -system
-		$result2 = mysql_query("SELECT sector, system, techs FROM de_user_data WHERE user_id='$uid'",$db);
+		$result2 = mysql_query("SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'",$db);
 		$res2 = mysql_fetch_array($result2);
 
 		$herksec=$res2["sector"];
@@ -467,7 +467,7 @@ if($dortick==1){
 		//freie position ermitteln - ende
 
 		mysql_query("UPDATE de_login SET status=1 WHERE user_id='$uid'",$db);//status aktiv
-		mysql_query("UPDATE de_user_data SET sector=$secz, system=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'",$db);//heimatsystem festlegen
+		mysql_query("UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'",$db);//heimatsystem festlegen
 		//flottenkoordinaten updaten
 	  $fleet_id=$uid.'-0';
 	  mysql_query("UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
@@ -501,7 +501,7 @@ if($dortick==1){
 
 	//npc-accounts
 	/*
-	$result = mysql_query("SELECT user_id FROM de_user_data WHERE sector=0 AND system=2",$db);
+	$result = mysql_query("SELECT user_id FROM de_user_data WHERE sector=0 AND `system`=2",$db);
 	$num = mysql_num_rows($result);
 	while($res = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 	{
@@ -534,7 +534,7 @@ if($dortick==1){
 
 	  $uid=$res["user_id"];
 	  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$uid'",$db);//status aktiv
-	  mysql_query("UPDATE de_user_data SET sector=$secz, system=$sysz WHERE user_id='$uid'",$db);//heimatsystem festlegen
+	  mysql_query("UPDATE de_user_data SET sector=$secz, `system`=$sysz WHERE user_id='$uid'",$db);//heimatsystem festlegen
 	  //flottenkoordinaten updaten
 
 	  $fleet_id=$uid.'-0';
@@ -695,7 +695,7 @@ function reshuffle(){
 		$uid=$user['uid'];
 		$secz=$user['sector'];
 		$sysz=$user['system'];
-		echo("<br>UPDATE de_user_data SET sector='$secz', system='$sysz' WHERE user_id='$uid'");
+		echo("<br>UPDATE de_user_data SET sector='$secz', `system`='$sysz' WHERE user_id='$uid'");
 		//flottenkoordinaten updaten
 		$fleet_id=$uid.'-0';
 		echo("<br>UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'");
@@ -716,7 +716,7 @@ function reshuffle(){
 			WHERE user_id='$uid' AND (status=1 OR status=3)",$db);//status aktiv
 
 		//heimatsystem festlegen
-		mysql_query("UPDATE de_user_data SET sector='$secz', system='$sysz' WHERE user_id='$uid'",$db);
+		mysql_query("UPDATE de_user_data SET sector='$secz', `system`='$sysz' WHERE user_id='$uid'",$db);
 		//flottenkoordinaten updaten
 		$fleet_id=$uid.'-0';
 		mysql_query("UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);

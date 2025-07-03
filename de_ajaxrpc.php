@@ -360,7 +360,7 @@ function format_chat_output($row){
 		return "&#$value;";
 	}, $row["message"]);
 
-	$zeit=date("H:m", $row["timestamp"]);
+	$zeit=date("H:i", $row["timestamp"]);
 	$datum=date("d.m.Y", $row["timestamp"]);
 
 	$row["spielername"]=utf8_encode_fix($row["spielername"]);

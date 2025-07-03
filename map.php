@@ -10,7 +10,7 @@ include 'lib/map_system_defs.inc.php';
 include "lib/map_system.class.php";
 
 
-//$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, system, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id='$ums_user_id'");
+//$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, `system`, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id='$ums_user_id'");
 //$row = mysqli_fetch_array($db_daten);
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 $pd = loadPlayerData($_SESSION['ums_user_id']);
@@ -82,7 +82,7 @@ if($_REQUEST["sso"]){
 */
 
 //spieler sortiert auslesen
-$orderby = 'system';
+$orderby = '`system`';
 if ($secsort == '1') {
     $orderby = 'col';
 } elseif ($secsort == '2') {
@@ -470,7 +470,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
 
         //alles anzeigen
         $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
-		de_login.last_login, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.system, de_user_data.rasse, de_user_data.allytag, 
+		de_login.last_login, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector='$sf' ORDER BY $orderby ASC");
@@ -795,7 +795,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             $sektorinfo .= ' <span title="Sektornummer">S:'.$sf.'</span> <span title="Platz in der Sektorwertung">P:'.$sec_data['platz'].'</span>';
             $sektorinfo .= ' <span title="Sektorpunkte">SP:'.number_format($gesamtpunkte, 0, ",", ".");
             if ($sec_data['name'] != '') {
-                $sektorinfo .= ' - '.utf8_decode($sec_data['name']);
+                $sektorinfo .= ' - '.utf8_decode_fix($sec_data['name']);
             }
             $sektorinfo .= '</span>';
         } else {
@@ -817,7 +817,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             //bild von der sternenbasis anzeigen
 
             $bed = $sec_data['techs'][1].$sec_data['techs'][2].$sec_data['techs'][3];
-            $std = strftime("%H");
+            $std = date("H");
             //1=sternenbasis 2=begrenzer 3=werft
 
             if ($bed == '100') {

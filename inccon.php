@@ -1,7 +1,7 @@
 <?php
+ob_start();
 include_once "inc/env.inc.php";
 ignore_user_abort(true);
-
 //if($disablegzip!=1)ob_start("ob_gzhandler");
 
 /*
@@ -19,9 +19,9 @@ include_once('lib/mysql_wrapper.inc.php');
 
 $db = @mysql_connect($GLOBALS['env_db_dieewigen_host'], $GLOBALS['env_db_dieewigen_user'], $GLOBALS['env_db_dieewigen_password'], true) or die("A: Keine Verbindung zur Datenbank möglich.");
 mysql_select_db($GLOBALS['env_db_dieewigen_database'], $db);
+mysql_set_charset("utf8mb4", $db);
 
 $GLOBALS['dbi'] = mysqli_connect($GLOBALS['env_db_dieewigen_host'], $GLOBALS['env_db_dieewigen_user'], $GLOBALS['env_db_dieewigen_password'], $GLOBALS['env_db_dieewigen_database']) or die("B: Keine Verbindung zur Datenbank möglich.");
-
 $GLOBALS['dbi']->set_charset("utf8mb4");
 
 array_walk_recursive($_GET, function(&$leaf) {
@@ -86,7 +86,7 @@ foreach ($_SESSION as $key => $val){
 if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){ 
 	$ip=$_SERVER['REMOTE_ADDR'];
 	$parts=explode(".",$ip);
-	$ip=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
+	$ip=$parts[0].'.x.'.($parts[2] ?? '?').'.'.($parts[3] ?? '?'); //IP anonymisieren, damit nicht jeder die IP sieht
 
 	$ums_user_id=$_SESSION['ums_user_id'];
 

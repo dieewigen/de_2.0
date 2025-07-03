@@ -85,7 +85,7 @@ if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
-  $db_daten=mysql_query("SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime, de_user_data.efta_user_id, de_user_data.sou_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id='$id'",$db);
+  $db_daten=mysql_query("SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime, de_user_data.efta_user_id, de_user_data.sou_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id='$id'",$db);
   $num = mysql_num_rows($db_daten);
   if($num==1){
     $row = mysql_fetch_array($db_daten);
@@ -354,16 +354,18 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   if($patime>time())$premium=1; else $premium=0;
   
   //de_user_data
-  mysql_query("INSERT INTO de_user_data (user_id, spielername, tick, restyp01, restyp02, techs,
-    sector, system, rasse, nrspielername, nrrasse, ovopt, hide_secpics, premium, patime, werberid)
+  $sql="INSERT INTO de_user_data (user_id, spielername, tick, restyp01, restyp02, techs,
+    sector, `system`, rasse, nrspielername, nrrasse, ovopt, hide_secpics, premium, patime, werberid)
     VALUES ($user_id , '$spielername' , 1, 100000, 50000, 's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
-    0, 0, '$rasse', '$spielername', '$rasse', '1;2;3;4;5;6;7','0', '$premium', '$patime', '$werberid')", $db);
+    0, 0, '$rasse', '$spielername', '$rasse', '1;2;3;4;5;6;7','0', '$premium', '$patime', '$werberid')";
+    
+  mysql_query($sql, $db);
   //de_user_data fix f�r ekey in der dedv-version
   mysql_query("UPDATE de_user_data SET ekey='100;0;0;0' WHERE user_id='$user_id';", $db);
 
   //de_user_info
   mysql_query("INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
-    VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl', '', '', '', '', '')", $db);
+    VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl', '', '', '', '')", $db);
 
   if($sv_efta_in_de==1 AND $sv_sou_in_de==1)
   {

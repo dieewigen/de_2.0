@@ -34,7 +34,7 @@ $userartefact_lang[16]='Dieses Artefakt erh&ouml;ht die Artefaktgeb&auml;udestuf
 $userartefact_lang[17]='Dieses Artefakt erzeugt 1-3 Kriegsartefakte. Nach Aktivierung des Artefaktes verliert es f&uuml;r immer seine Wirkung.';
 $userartefact_lang[18]='Dieses Artefakt erzeugt 6-8 Kollektoren, sollte man mehr als 5 Artefakte dieser Art haben, so erzeugt das Artefakt 200 Palenium. Nach Aktivierung des Artefaktes verliert es f&uuml;r immer seine Wirkung.';
 $userartefact_lang[19]='Dieses Artefakt erzeugt 1-2 Sektorkollektoren. Nach Aktivierung des Artefaktes verliert es f&uuml;r immer seine Wirkung.';
-$userartefact_lang[20]='Dieses Artefakt erzeugt einen gigantischen Hyperraumr&uuml;ssel, der dem gro&szlig;en Ishtarus 3-5 Credits aus seinem Geheimlager wegr&uuml;sselt.';
+$userartefact_lang[20]='Dieses Artefakt verstärkt den Output des Tronicators um jeweils ein Tronic.';
 $userartefact_lang[21]='Dieses Artefakt verringert die Auktionspreise. Maximal 50% f&uuml;r alle Artefakte zusammen. Bei eigenen Auktionen kann man somit auf maximal 75% Preisnachlass kommen.';
 
 //flottenbaukosten
@@ -294,10 +294,10 @@ $ua_werte[$ua_index][0]= array(-1, 1000);
 //anderem spieler einen kollektor nehmen und daraus f�r sich selbst ein kriegsartefakt machen
 $ua_index=20;
 //artefaktname
-$ua_name[$ua_index]='Creditr&uuml;ssel';
+$ua_name[$ua_index]='Troniccelerator';
 $ua_desc[$ua_index]=$userartefact_lang[$ua_index];
 $ua_maxlvl[$ua_index]=1;
-$ua_useable[$ua_index]=1;
+$ua_useable[$ua_index]=0;
 //2. index ist der level des artefakts (1. wert ist der multiplikator, 2. wert ist der grundpreis)
 $ua_werte[$ua_index][0]= array(-1, 1000);
 

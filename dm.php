@@ -3,8 +3,6 @@ include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_menu.lang.php';
 include 'inc/'.$sv_server_lang.'_links.inc.php';
 include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
-//<meta charset="utf-8">
-//<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 unset($_SESSION["de_frameset"]);
 
@@ -17,6 +15,7 @@ $_SESSION['ic_last_refresh']=0;
   <head>
     
     <title><?php echo $sv_server_tag;?> Die Ewigen - Desktopversion</title>
+	<meta charset="utf-8">
 	<link rel="shortcut icon" href="favicon.ico" />
 	
 	<script type="text/javascript" src="js/jquery.min.js"></script>
@@ -61,21 +60,9 @@ $_SESSION['ic_last_refresh']=0;
 		echo '
 		<div class="dropdown">
 			<img src="g/derassenlogo'.$_SESSION['ums_rasse'].'.png" style="position: absolute; left: -31px; top: 0px; width: auto; height: 71px; cursor: pointer;" onclick="switch_iframe_main_container(\'overview.php\')">
-			<div class="dropdown-content" style="z-index: 200;">';
-		//echo '<span onclick="switch_iframe_main_container(\'overview.php\')" class="btn">'.$menu_lang['eintrag_1'].'</span>';
-		//echo '<br><span onclick="switch_iframe_main_container(\'hyperfunk.php\')" class="btn">'.$menu_lang['eintrag_2'].'</span>';
-		//echo '<br><span onclick="switch_iframe_main_container(\'sysnews.php\')" class="btn">'.$menu_lang['eintrag_3'].'</span>';
-
-		//echo '<br><span onclick="switch_iframe_main_container(\'resource.php\')" class="btn">'.$menu_lang['eintrag_6'].'</span>';
-		
-		//echo '<br><span onclick="switch_iframe_main_container(\'secstatus.php\')" class="btn">'.$menu_lang['eintrag_13'].'</span>';
-		//echo '<span onclick="switch_iframe_main_container(\'politics.php\')" class="btn">'.$menu_lang['eintrag_15'].'</span>';
-		
-		//echo '<br><span onclick="switch_iframe_main_container(\'blackmarket.php\')" class="btn">'.$menu_lang['eintrag_35'].'</span>';
-	
-		//echo '<br><span onclick="switch_iframe_main_container(\'community.php\')" class="btn">'.$menu_lang['eintrag_27'].'</span>';
-
-		echo '<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>';
+			<div class="dropdown-content" style="z-index: 200;">
+			
+				<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>';
 
 		if(!isset($sv_deactivate_efta) || $sv_deactivate_efta==0){
 			echo '<br><a href="eftaindex.php" target="_blank" class="btn">EFTA</a>';
@@ -128,10 +115,6 @@ $_SESSION['ic_last_refresh']=0;
 		//Punkte
 		echo '<img onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score_img" src="g/icon8.png" style="cursor: pointer;position: absolute; left: 240px; top: 36px; width: 24px; height: auto;" rel="tooltip">';
 		echo '<div onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 266px;" rel="tooltip"></div>';
-
-		//Credits		
-		echo '<img onclick="switch_iframe_main_container(\'blackmarket.php\')" id="tb_credits_img" src="g/credits.gif" style="cursor: pointer; position: absolute; left: 340px; top: 38px; width: 24px; height: auto;" title="'.$resline_lang['restipcreditsdesc'].'" rel="tooltip">';
-		echo '<div onclick="switch_iframe_main_container(\'blackmarket.php\')" id="tb_credits" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 366px;" rel="tooltip"></div>';
 
 		//Hyperfunk
 		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php\')" src="g/hyper.png" style="cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Hyperfunknachrichten vor." rel="tooltip">';

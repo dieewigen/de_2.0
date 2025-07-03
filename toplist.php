@@ -3,7 +3,7 @@ include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_toplist.lang.php';
 include "functions.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row["restyp05"];
 $punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -278,78 +278,6 @@ if ($s==4){
 	$filename = "cache/toplist/top4a.tmp";
 	include $filename;
 }
-
-
-//beim ersten aufruf, wenn nichts ausgew�hlt ist die m�glichen gewinne anzeigen.
-if(!isset($s)){
-	if($sv_ewige_runde==1 || $sv_hardcore==1){
-		rahmen_oben('Creditgewinne');
-	}else{	
-		rahmen_oben($toplist_lang['creditrundengewinne']);
-	}
-
-	echo '<table border="0" cellpadding="0" cellspacing="1" width="580">';
-	if($sv_ewige_runde==1){
-		echo '<tr class="cell" align="center"><td>Der Erhabene erh&auml;lt als Preis 50 Credits.</td></tr>';
-	}elseif($sv_hardcore==1){
-		echo '
-			<tr class="cell" align="center">
-				<td>
-					Der ERHABENE erh&auml;lt als Preis 1000 Credits.<br>
-					Jeder ERHABENEN-Teilsieg bringt 100 Credits als Belohnung.
-				</td>
-			</tr>';
-	}else{	
-		echo '<tr class="cell" align="center"><td><b>'.$toplist_lang['ziel'].'</b></td><td><b>1. '.$toplist_lang['platz'].'</b></td><td><b>2. '.$toplist_lang['platz'].'</b></td><td><b>3. '.$toplist_lang['platz'].'</b></td></tr>';
-
-		echo '<tr class="cell1" align="center">
-		  <td align="left">'.$toplist_lang['spieler'].' -> '.$toplist_lang['punkte'].' -> '.$toplist_lang['punkte'].'</td>
-		  <td>'.number_format($sv_credit_win[0][0], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[0][1], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[0][2], 0,"",".").'</td>
-		</tr>';
-
-		if($sv_deactivate_trade==0)
-		echo '<tr class="cell" align="center">
-		  <td align="left">'.$toplist_lang['spieler'].' -> '.$toplist_lang['punkte'].' -> Executorpunkte</td>
-		  <td>'.number_format($sv_credit_win[1][0], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[1][1], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[1][2], 0,"",".").'</td>
-		</tr>';
-
-		/*
-		echo '<tr class="cell1" align="center">
-		  <td align="left">'.$toplist_lang[spieler].' -> '.$toplist_lang[kopfgeldjaeger].' -> '.$toplist_lang[gesamtwert].'</td>
-		  <td>'.number_format($sv_credit_win[2][0], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[2][1], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[2][2], 0,"",".").'</td>
-		</tr>';
-		*/
-		/*
-		echo '<tr class="cell" align="center">
-		  <td align="left">'.$toplist_lang[cyborg].' -> '.$toplist_lang[punkte].'</td>
-		  <td>'.number_format($sv_credit_win[3][0], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[3][1], 0,"",".").'</td>
-		  <td>'.number_format($sv_credit_win[3][2], 0,"",".").'</td>
-		</tr>';
-		*/
-
-		echo '<tr class="cell1" align="center"><td><b>'.$toplist_lang['ziel'].'</b></td><td colspan="3"><b>1. '.$toplist_lang['platz'].'</b></td></tr>';  
-		echo '<tr class="cell" align="center">
-		  <td align="left">'.$toplist_lang['spieler'].' -> '.$toplist_lang['erhabenenpunkte'].' -> '.$toplist_lang['ehpunkte'].'</td>
-		  <td colspan="3">'.number_format($sv_credit_win[4][0], 0,"",".").'</td>
-		</tr>';
-
-		echo '<tr class="cell1" align="center">
-		  <td colspan="5">'.$toplist_lang['creditgewinnhinweis'].'</td>
-		</tr>';
-	}  
-
-	echo '</table>';
-
-	rahmen_unten();
-}
-
 
 ?>
 </div>

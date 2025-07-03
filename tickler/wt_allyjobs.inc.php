@@ -126,7 +126,7 @@ if($maxtick % $trigger_intervall == 0){
 
 		echo '$score_gesamt: '.$score_gesamt.'<br>';
 
-		//Gewinn bestimmen, richtet sich nach dem Wert der Rohstofflieferung
+		//Gewinn bestimmen, erhöht sich mit Voranschreiten der Runde (WT)
 		$maxres[0]=$maxtick*500;$maxres[1]=$maxtick*250;$maxres[2]=$maxtick*60;$maxres[3]=$maxtick*37;
 
 		//alle Teilnehmen Allianzen durchgehen und ihren Prozentanteil berechnen
@@ -151,6 +151,7 @@ if($maxtick % $trigger_intervall == 0){
 				$uid=$rowx['user_id'];
 				$sql="UPDATE de_user_data SET restyp01=restyp01+$user_res[0], restyp02=restyp02+$user_res[1], restyp03=restyp03+$user_res[2], restyp04=restyp04+$user_res[3] WHERE user_id = '$uid'";
 				echo $sql.'<br>';
+				error_log($sql, 0);
 				mysql_query($sql,$db);
 			}
 

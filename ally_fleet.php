@@ -16,7 +16,7 @@ include_once('functions.php');
 
 checkMissionEnd();
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];
@@ -65,7 +65,7 @@ if ($full_access){
 	echo '</tr>';
 }
 
-$query = "SELECT user_id, spielername, sector, system, rasse  FROM de_user_data WHERE status='1' AND allytag='$allytag' ORDER BY sector, system";
+$query = "SELECT user_id, spielername, sector, `system`, rasse  FROM de_user_data WHERE status='1' AND allytag='$allytag' ORDER BY sector, `system`";
 //echo $query;
 $result = mysql_query($query);
 $numrows = mysql_num_rows($result);

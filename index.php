@@ -146,7 +146,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  $et=strtotime($et);
 		  $et=date("d.m.Y - G:i", $et);
 
-		  $fehlermsg=$index_lang[umode1].$et;
+		  $fehlermsg=$index_lang['umode1'].$et;
 		  if($et>$fat)$fehlermsg.='<br>'.$index_lang[umode2].$fat;
 		  $zstatus='(x Tage sind noch nicht um, kein Login m&oouml;glich)';
 		}
@@ -185,8 +185,6 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id='$ums_user_id'") OR die(mysql_error());
 		$row = mysqli_fetch_array($result);
 
-		error_log(print_r($row,true));
-
 		$techs=$row["techs"];
 		//$_SESSION["ums_chatoff"]=$row["chatoff"];
 		$_SESSION["ums_chatoff"]=0;
@@ -208,7 +206,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 			$_SESSION['ums_mobi']=0;
 		}
 
-		$_SESSION['desktop_version']=isset($_COOKIE["desktop_version"]) ? intval($_COOKIE["desktop_version"]) : 1;
+		$_SESSION['desktop_version']=isset($_COOKIE["desktop_version"]) ? intval($_COOKIE["desktop_version"]) : 0;
 
 		//////////////////////////////////////////////////////////////////////
 		//check ob die mobile Version verwendet werden soll
@@ -248,7 +246,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$gevotetevotes = array();
 		while($rew = mysql_fetch_array($schonabgestimmt))
 		{
-		  $gevotetevotes[$i]=$rew[vote_id];
+		  $gevotetevotes[$i]=$rew['vote_id'];
 		  $i++;
 		}
 		$i=0;
@@ -258,7 +256,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		while($row = mysql_fetch_array($db_umfrage)){
 			$i=0;
 			while($i<=count($gevotetevotes)+1){
-				if($gevotetevotes[$i]==$row[id]){
+				if($gevotetevotes[$i]==$row['id']){
 					$schongestimmt=1;
 				}
 				$i++;
@@ -293,7 +291,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;
 
 		//testen ob er das alternativ-pw verwendet hat
-		$sql = "SELECT user_id FROM de_login WHERE user_id='$ums_user_id' AND newpass = MD5('".$_POST['pass']."');";
+		$sql = "SELECT user_id FROM de_login WHERE user_id='$ums_user_id' AND newpass = MD5('".($_POST['pass'] ?? '')."');";
 		$result = mysql_query($sql) OR die(mysql_error());
 		$num = mysql_num_rows($result);
 
@@ -313,7 +311,8 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  $loginsystemlogin=1;
 		  $_SESSION["ums_session_start"]=0;
 
-		  $botfilename='../div_server_data/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
+		  //$botfilename='../div_server_data/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
+		  $botfilename='cache/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
 		  //botschutzzeit aktualisieren
 		  if(file_exists($botfilename)) 
 		  {
@@ -432,17 +431,6 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		}
 		elseif($GLOBALS['sv_ang']==1){
 			//neue DE-Version, hier zwischen Standard und Classic-Dektopsicht unterscheiden
-			/*
-			<br><br>Hier kann zwischen dem alten und dem neuen Desktop-Design gewechselt werden (der Wert wird aktuell nicht gespeichert, da es nur eine vorl&auml;ufige L&ouml;sung ist): 
-			<br>
-			<div style="display: flex; width: 100%; margin-top: 10px;">
-				<div style="flex-grow: 2; text-align: center;"></div>
-				<div style="flex-grow: 1; text-align: center;"><a href="de_frameset.php" class="btn" target="_top">Classic</a></div>
-				<div style="flex-grow: 1; text-align: center;"><a href="dm.php" class="btn" target="_top">Standard</a></div>
-				<div style="flex-grow: 1; text-align: center;"></div>
-			</div>			
-			*/
-
 			if($_SESSION['desktop_version']==0){
 				//Standard
 				header('Location: dm.php');
@@ -473,7 +461,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 
 	echo '<noframes>
 	<body>
-	<p>'.$index_lang[framemsg].'</p>
+	<p>'.$index_lang['framemsg'].'</p>
 	</body>
 	</noframes>
 	</html>';
@@ -533,10 +521,10 @@ $save_ums_gpfad=$ums_gpfad;
 $ums_rasse=1;
 $ums_gpfad=$sv_image_server;
 //include "cssinclude.php";
-echo '<link href="https://grafik-de.bgam.es/die-ewigen.com/default.css" rel="stylesheet" type="text/css">
+echo '<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type="text/css">
 <style type="text/css">
 <!--
-	@import url("https://grafik-de.bgam.es/die-ewigen.com/layout.css");
+	@import url("https://www.die-ewigen.com/layout.css");
 -->
 </style>';
 
@@ -554,78 +542,10 @@ if($fehlermsg!=''){
 echo '<br><b><font color="FF0000">'.$fehlermsg.'</font></b>';
 }
 
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-// index-seitenansicht für efta/ea
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-/*
-if($sv_efta_in_de==0 OR $sv_sou_in_de==0){
-	echo '<br><center>';
-	echo '<font size="2" color="FF0000"><br>Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.<br><br>';
-	echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.bgam.es/">&ouml;ffnen</a>';
-	die('</body></html>');
-}
-*/
-
 echo '<br><center>';
 echo '<font size="2" color="FF0000"><br>Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.<br><br>';
-echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.bgam.es/">&ouml;ffnen</a>';
+echo '<font size="2" color="00FF00">Du kannst das Fenster/Tab jetzt schlie&szlig;en, oder die zentrale Accountverwaltung <a href="http://login.die-ewigen.com/">&ouml;ffnen</a>';
 
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-// index-seitenansicht für de
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-/*
-echo '<br>
-<center>
-<br>
-<table border="0" cellpadding="0" cellspacing="0" width="600">
-<tr align="center">
-<td colspan="4" align="center"><h1 id="title5">Login</h1></td></tr>
-
-<tr align="center">
-<td colspan="4" align="center"><br><br></td>
-</tr>
-';
-
-echo '<tr align="center">
-<td width="100" height="25">'.$index_lang['loginname'].'</td>
-<td><input type="password" name="nic" value="" tabindex="1"></td>
-<td width="100" height="25">'.$index_lang['passwort'].'</td>
-<td><input type="password" name="pass" value="" tabindex="2"></td>';
-
-echo '
-</tr>
-<tr align="center">
-	<td colspan="4"><br><br><input type="Checkbox" name="grapa" value="off" tabindex="3"> '.$index_lang['grapaaus'].'</td>
-';
-
-echo '</tr>
-<tr align="center">
-<td colSpan="4"><br><br><input type="Submit" name="login" value="'.$index_lang['login'].'" tabindex="5"><br><br><br><br>
-</tr>';
-
-echo '
-<tr>
-<td colspan="4" align="center"><br><a href="'.$sv_link[3].'">'.$index_lang['portal'].'</a> - <a href="sstat.php">'.$index_lang['serverstatistik'].'</a> - <a href="ranglisten/index.php" target="_blank">'.$index_lang['externeranglisten'].'</a></td>
-</tr>
-<tr>
-<td colspan="4" align="center"><br><br>';
-
-//include 'indexad.php';
-
-echo '
-</td>
-</tr>
-<tr>
-<td colspan="4"><div class="hr1"><div><hr></div></div></td>
-</tr>
-</table>
-</form>';
-
-*/
 ?>
 </body>
 </html>

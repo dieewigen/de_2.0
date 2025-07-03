@@ -198,7 +198,6 @@ $angreifer_verlust_win_max[$index] = 2;
 <html>
 <head>
 <title><?php echo $secret_lang['geheimdienst'];?></title>
-<meta charset="utf-8"/>
 <?php include "cssinclude.php";
 echo '<script type="text/javascript">var ab='.$artbonusbuild.';</script>';
 echo '<script src="produktion'.$ums_rasse.'.js" type="text/javascript"></script>';
@@ -617,77 +616,72 @@ if (!hasTech($pt, 9)) {
 
             //die daten ausgeben
             echo '<table width=570 border="0" cellpadding="0" cellspacing="0">';
-            if ($ums_premium == 1) {
-                //spalte 1
-                echo '<tr><td width="50%" valign="top">';
-                echo '<table border="0" cellpadding="0">';
-                //rasse
-                echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['rasse'].':</b> '.$rasse.'</td></tr>';
-                //schiffs�bersicht
-                echo '<tr class="cell"><td width="25%"><b>'.$secret_lang['schiffsuebersicht'].'</b></td><td align="center" width="25%">'.$ftime.'</td>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][0].'</td><td align="center">'.$e81.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][1].'</td><td align="center">'.$e82.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][2].'</td><td align="center">'.$e83.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][3].'</td><td align="center">'.$e84.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][4].'</td><td align="center">'.$e85.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][5].'</td><td align="center">'.$e86.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][6].'</td><td align="center">'.$e87.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][7].'</td><td align="center">'.$e88.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][8].'</td><td align="center">'.$e89.'</td></tr>';
-                echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][9].'</td><td align="center">'.$e90.'</td></tr>';
-                //turm�bersicht
-                echo '<tr class="cell"><td><b>'.$secret_lang['turmuebersicht'].'</b></td><td align="center">'.$dtime.'</td></tr>';
-                echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][0].'</td><td align="center">'.$e100.'</td></tr>';
-                echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][1].'</td><td align="center">'.$e101.'</td></tr>';
-                echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][2].'</td><td align="center">'.$e102.'</td></tr>';
-                echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][3].'</td><td align="center">'.$e103.'</td></tr>';
-                echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][4].'</td><td align="center">'.$e104.'</td></tr>';
-                echo '</table>';
-                //spalte 2
-                echo '</td><td width="50%" valign="top">';
-                echo '<table border="0" cellpadding="0">';
-                //allianz
-                echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['allytag'].':</b> '.$allianz.'</td></tr>';
-                //sondenbericht
-                echo '<tr class="cell1"><td width="25%"><b>Sondenbericht</b></td><td align="center" width="25%">'.$stime.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['punkte'].'</td><td align="center">'.$score.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['schiffseinheiten'].'</td><td align="center">'.$fleet.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['verteidigungsanlagen'].'</td><td align="center">'.$defense.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['einheitenimbau'].'</td><td align="center">'.$build.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['kollektoren'].'</td><td align="center">'.$col.'</td></tr>';
-                //echo '<tr class="cell1"><td>'.$secret_lang[gebaeude].'</td><td align="center">'.$buildings.'</td></tr>';
-                echo '<tr class="cell1"><td><b>'.$secret_lang['rohstoffe'].'</b></td><td>&nbsp;</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['multiplex'].'</td><td align="center">'.$restyp01.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['dyharra'].'</td><td align="center">'.$restyp02.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['iradium'].'</td><td align="center">'.$restyp03.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['eternium'].'</td><td align="center">'.$restyp04.'</td></tr>';
-                echo '<tr class="cell1"><td>'.$secret_lang['tronic'].'</td><td align="center">'.$restyp05.'</td></tr>';
-                echo '</table>';
-                echo '</td></tr>';
+            //spalte 1
+            echo '<tr><td width="50%" valign="top">';
+            echo '<table border="0" cellpadding="0">';
+            //rasse
+            echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['rasse'].':</b> '.$rasse.'</td></tr>';
+            //schiffs�bersicht
+            echo '<tr class="cell"><td width="25%"><b>'.$secret_lang['schiffsuebersicht'].'</b></td><td align="center" width="25%">'.$ftime.'</td>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][0].'</td><td align="center">'.$e81.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][1].'</td><td align="center">'.$e82.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][2].'</td><td align="center">'.$e83.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][3].'</td><td align="center">'.$e84.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][4].'</td><td align="center">'.$e85.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][5].'</td><td align="center">'.$e86.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][6].'</td><td align="center">'.$e87.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][7].'</td><td align="center">'.$e88.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][8].'</td><td align="center">'.$e89.'</td></tr>';
+            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][9].'</td><td align="center">'.$e90.'</td></tr>';
+            //turm�bersicht
+            echo '<tr class="cell"><td><b>'.$secret_lang['turmuebersicht'].'</b></td><td align="center">'.$dtime.'</td></tr>';
+            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][0].'</td><td align="center">'.$e100.'</td></tr>';
+            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][1].'</td><td align="center">'.$e101.'</td></tr>';
+            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][2].'</td><td align="center">'.$e102.'</td></tr>';
+            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][3].'</td><td align="center">'.$e103.'</td></tr>';
+            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][4].'</td><td align="center">'.$e104.'</td></tr>';
+            echo '</table>';
+            //spalte 2
+            echo '</td><td width="50%" valign="top">';
+            echo '<table border="0" cellpadding="0">';
+            //allianz
+            echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['allytag'].':</b> '.$allianz.'</td></tr>';
+            //sondenbericht
+            echo '<tr class="cell1"><td width="25%"><b>Sondenbericht</b></td><td align="center" width="25%">'.$stime.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['punkte'].'</td><td align="center">'.$score.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['schiffseinheiten'].'</td><td align="center">'.$fleet.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['verteidigungsanlagen'].'</td><td align="center">'.$defense.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['einheitenimbau'].'</td><td align="center">'.$build.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['kollektoren'].'</td><td align="center">'.$col.'</td></tr>';
+            //echo '<tr class="cell1"><td>'.$secret_lang[gebaeude].'</td><td align="center">'.$buildings.'</td></tr>';
+            echo '<tr class="cell1"><td><b>'.$secret_lang['rohstoffe'].'</b></td><td>&nbsp;</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['multiplex'].'</td><td align="center">'.$restyp01.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['dyharra'].'</td><td align="center">'.$restyp02.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['iradium'].'</td><td align="center">'.$restyp03.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['eternium'].'</td><td align="center">'.$restyp04.'</td></tr>';
+            echo '<tr class="cell1"><td>'.$secret_lang['tronic'].'</td><td align="center">'.$restyp05.'</td></tr>';
+            echo '</table>';
+            echo '</td></tr>';
 
-                //playerstatus anzeigen und �nderbar machen
-                $ps_checked = '<option selected>'.$secret_lang["ps$ps"].'</option>';
+            //playerstatus anzeigen und �nderbar machen
+            $ps_checked = '<option selected>'.$secret_lang["ps$ps"].'</option>';
 
-                $hidden = '<input type="hidden" name="zsec1" value="'.$zsec1.'"><input type="hidden" name="zsys1" value="'.$zsys1.'">';
+            $hidden = '<input type="hidden" name="zsec1" value="'.$zsec1.'"><input type="hidden" name="zsys1" value="'.$zsys1.'">';
 
-                $button = '<input type="submit" name="pschange" value="'.$secret_lang['pschange'].'">';
+            $button = '<input type="submit" name="pschange" value="'.$secret_lang['pschange'].'">';
 
-                echo '<tr class="cell" align="center"><td colspan="2">'.$hidden.'Spielerstatus: <select name="ps">'.$ps_checked.'<option>'.$secret_lang['ps0'].'</option>
-			<option>'.$secret_lang['ps1'].'</option><option>'.$secret_lang['ps2'].'</option></select> '.$button.'</td></tr>';
+            echo '<tr class="cell" align="center"><td colspan="2">'.$hidden.'Spielerstatus: <select name="ps">'.$ps_checked.'<option>'.$secret_lang['ps0'].'</option>
+        <option>'.$secret_lang['ps1'].'</option><option>'.$secret_lang['ps2'].'</option></select> '.$button.'</td></tr>';
 
-                //weiter-zu-links
-                echo '<tr class="cell" align="center"><td colspan="2">';
-                echo '</form>';
-                echo '<form name="f'.$zsec1.'" action="sector.php?sf='.$zsec1.'" method="POST">';
-                echo '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'">'.$secret_lang['zummilitaer'].'</a> - ';
-                echo '<a href="javascript:document.f'.$zsec1.'.submit()">'.$secret_lang['zursektoransicht'].'</a> - ';
-                echo '<a href="secstatus.php">'.$secret_lang['zumsektorstatus'].'</a>';
-                echo '</form></td></tr>';
+            //weiter-zu-links
+            echo '<tr class="cell" align="center"><td colspan="2">';
+            echo '</form>';
+            echo '<form name="f'.$zsec1.'" action="sector.php?sf='.$zsec1.'" method="POST">';
+            echo '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'">'.$secret_lang['zummilitaer'].'</a> - ';
+            echo '<a href="javascript:document.f'.$zsec1.'.submit()">'.$secret_lang['zursektoransicht'].'</a> - ';
+            echo '<a href="secstatus.php">'.$secret_lang['zumsektorstatus'].'</a>';
+            echo '</form></td></tr>';
 
-            } else {
-                //info dass man keinen pa hat
-                echo '<tr class="cell"><td><a href="http://login.bgam.es/index.php?command=premium" target="_blank">'.$secret_lang['geheimdienstnopa'].'</a></td></tr>';
-            }
             echo '</table>';
 
             //rahmen unten
@@ -1185,12 +1179,8 @@ if (!hasTech($pt, 9)) {
                     }
                 }
 
-                //$w=$w+$bomalus;
-
-                mt_srand((float)microtime() * 10000);
                 $r = mt_rand(1, 100);
                 //echo '<br>W: '.$w.' R: '.$r.' AZ: '.$az.' ZAGENT: '.$bomalus.'<br>';
-                //if ($w>=$r || $_REQUEST['etyp']==11){ //der einsatz klappt
                 if ($w >= $r) { //der einsatz klappt
                     //die rasse immer in de_user_scan hinterlegen
                     $savelist = array();

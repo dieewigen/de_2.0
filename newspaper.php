@@ -2,7 +2,7 @@
 include "inc/header.inc.php";
 include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, system, score, newtrans, newnews, secmoves FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
@@ -30,12 +30,12 @@ if($action!="archiv"){
 	mysql_query("UPDATE de_news_overview set klicks=klicks+1,time=time WHERE id='$id'");
 
 
-	$nachricht = utf8_encode(nl2br(umlaut($row[nachricht])));
+	$nachricht = utf8_encode(nl2br(umlaut($row['nachricht'])));
 	echo '<br>
 	<table border="0" cellspacing="0" cellpadding="0" width="600px">
 	<tr>
 	<td width="13" height="25" class="rol"></td>
-	<td align="center" height="35" class="ro"><div class="cellu">'.utf8_encode(umlaut($row[betreff])).' (<a href="newspaper.php?action=archiv&typ='.utf8_encode($row[typ]).'">Archiv</a>)</td>
+	<td align="center" height="35" class="ro"><div class="cellu">'.utf8_encode(umlaut($row['betreff'])).' (<a href="newspaper.php?action=archiv&typ='.utf8_encode($row['typ']).'">Archiv</a>)</td>
 	<td width="13" height="25" class="ror"></td>
 	</tr>
 	<tr>
@@ -124,9 +124,9 @@ else  //archiv
 
      while($rew=mysql_fetch_array($sel_news))
      {
-       $t=$rew[time];
+       $t=$rew['time'];
        $time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];
-  echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew[id].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode(umlaut($rew[betreff])).'</a><br><br>';
+  echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew['id'].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode(umlaut($rew['betreff'])).'</a><br><br>';
      }
      ?>
      </div></td>

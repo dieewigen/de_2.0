@@ -10,15 +10,10 @@ top.location.href=self.location;
 </script>
 <head>
 <title><?php echo $gel_lang['title'];?></title>
-<?php
-//$ums_rasse=1;
-//$ums_gpfad=$sv_image_server_list[0];
-//include "cssinclude.php";
-?>
-<link href="https://grafik-de.bgam.es/die-ewigen.com/default.css" rel="stylesheet" type="text/css">
+<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type="text/css">
 <style type="text/css">
 <!--
-	@import url("https://grafik-de.bgam.es/die-ewigen.com/layout.css");
+	@import url("https://www.die-ewigen.com/layout.css");
 -->
 </style>
 </head>

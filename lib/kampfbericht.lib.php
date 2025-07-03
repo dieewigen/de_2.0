@@ -112,21 +112,21 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
 	include 'inc/lang/'.$sv_server_lang.'_kampfbericht.lib.lang.php';
 
 	//meldung f�r kollies zusammenbauen
-	if ($kkollies==-1)$kolliesatz=$kbl_lang[abgewehrt];
+	if ($kkollies==-1)$kolliesatz=$kbl_lang['abgewehrt'];
 	else
 	{
-	  if ($kkollies==1)$kolliesatz=$kbl_lang[deffercollosts]; else $kolliesatz=$kbl_lang[deffercollostp];
+	  if ($kkollies==1)$kolliesatz=$kbl_lang['deffercollosts']; else $kolliesatz=$kbl_lang['deffercollostp'];
 
 	  if ($kollieserbeutet>0)
 	  {
-		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwins]); 
-		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinp]);
+		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwins']); 
+		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinp']);
 	  }
 	  elseif($kollieserbeutet<0)
 	  {
 		$kollieserbeutet=$kollieserbeutet*(-1);
-		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinsdestroy]); 
-		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinpdestroy]);
+		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinsdestroy']); 
+		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinpdestroy']);
 	  }
 	  //$kolliesatz=$kbl_lang[deffercollost];
 	  //$kolliesatz.=$kbl_lang[attercolwin];
@@ -137,39 +137,39 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
 		ALT<br>
   <table cellSpacing=0 cellPadding=2 width=555 border=1>
   <tr align="center">
-  <td class="k1" width="15%"><b>'.$kbl_lang[angreifer].':</b></td>
+  <td class="k1" width="15%"><b>'.$kbl_lang['angreifer'].':</b></td>
   <td class="k1" width="85%">'.$atterliste.'</td>
   </tr>
   <tr align="center">
-  <td class="k1""><b>'.$kbl_lang[verteidiger].':</b></td>
+  <td class="k1""><b>'.$kbl_lang['verteidiger'].':</b></td>
   <td class="k1"">'.$defferliste.'</td>
   </tr>
   <tr align="center">
   <td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
-  "<br>$kbl_lang[admiralexp]<br>".
-  "$kbl_lang[erhaltenekartefakt]: $kartefakte<br>".
-  $rassennamen[$rasse-1][4]."-$kbl_lang[recycling]: ".number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b></td>
+  '<br>'.$kbl_lang['admiralexp'].'<br>'.
+  $kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
+  $rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b></td>
   </tr>
   </table>
   <br>
   <TABLE cellSpacing=0 cellPadding=2 width=555 border=1>
   <tr align="center">
   <td class="k1" width="14%"><b>'.$ksec.':'.$ksys.'</font></b></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang[angreifer].'</u></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang[verteidiger].'</u></td>
-  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang[eigene].'</u></td>
+  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['angreifer'].'</u></td>
+  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['verteidiger'].'</u></td>
+  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang['eigene'].'</u></td>
   </tr>
   <tr align="center" width="14%">
-  <td class="k2">'.$kbl_lang[einheit].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
+  <td class="k2">'.$kbl_lang['einheit'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
   </tr>';
 
   $geseinheiten_atter_anz=0;
@@ -268,7 +268,7 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   {
   $kbstring.='
   <TR align="center">
-  <TD class="k1" colSpan=10><u>'.$kbl_lang[tuerme].'</u></TD>
+  <TD class="k1" colSpan=10><u>'.$kbl_lang['tuerme'].'</u></TD>
   </TR>
   ';
 	$aktrasse=$kturmrasse;
@@ -319,12 +319,12 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   //////////////////////////////////////////////////////
   $kbstring.='
   <br><table cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang[statistik].'</b></td></tr>
+  <tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang['statistik'].'</b></td></tr>
   <tr align="center">
-  <td  class="k2"><b>'.$kbl_lang[typ].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang[angreifer].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang[verteidiger].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang[verhaeltnis].'</b></td>
+  <td  class="k2"><b>'.$kbl_lang['typ'].'</b></td>
+  <td  class="k2"><b>'.$kbl_lang['angreifer'].'</b></td>
+  <td  class="k2"><b>'.$kbl_lang['verteidiger'].'</b></td>
+  <td  class="k2"><b>'.$kbl_lang['verhaeltnis'].'</b></td>
   </tr>';
 
   if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
@@ -334,7 +334,7 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   else $verhaeltnis=0;
   $kbstring.='
   <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang[einheitenanzahl].'</td>
+  <td  class="'.$bg.'">'.$kbl_lang['einheitenanzahl'].'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz, 0,"",".").'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz, 0,"",".").'</td>
   <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -351,7 +351,7 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   else $prozent_deffer=0;
   $kbstring.='
   <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang[verloreneeinheiten].'</td>
+  <td  class="'.$bg.'">'.$kbl_lang['verloreneeinheiten'].'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz_verloren, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz_verloren, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
   <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -363,7 +363,7 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   else $verhaeltnis=0;
   $kbstring.='
   <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang[einheitenpunktewert].'</td>
+  <td  class="'.$bg.'">'.$kbl_lang['einheitenpunktewert'].'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_atter_score, 0,"",".").'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score, 0,"",".").'</td>
   <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -380,7 +380,7 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
   else $prozent_deffer=0;
   $kbstring.='
   <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang[verlorenepunkte].'</td>
+  <td  class="'.$bg.'">'.$kbl_lang['verlorenepunkte'].'</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_atter_score_lost, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
   <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score_lost, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
   <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -448,20 +448,20 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 
 	//meldung f�r kollies zusammenbauen
 	if ($kkollies==-1){
-		$kolliesatz=$kbl_lang[abgewehrt];
+		$kolliesatz=$kbl_lang['abgewehrt'];
 	}else{
-		if ($kkollies==1)$kolliesatz=$kbl_lang[deffercollosts]; else $kolliesatz=$kbl_lang[deffercollostp];
+		if ($kkollies==1)$kolliesatz=$kbl_lang['deffercollosts']; else $kolliesatz=$kbl_lang['deffercollostp'];
 
 		if ($kollieserbeutet>0)
 		{
-		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwins]); 
-		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinp]);
+		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwins']); 
+		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinp']);
 		}
 		elseif($kollieserbeutet<0)
 		{
 		  $kollieserbeutet=$kollieserbeutet*(-1);
-		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinsdestroy]); 
-		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang[attercolwinpdestroy]);
+		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinsdestroy']); 
+		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinpdestroy']);
 		}
 		//$kolliesatz=$kbl_lang[deffercollost];
 		//$kolliesatz.=$kbl_lang[attercolwin];
@@ -485,17 +485,17 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
   <table cellSpacing=0 cellPadding=2 width=555 border=1>
   <tr align="center">
   <td class="k1" width="15%"><b>'.$kbl_lang['angreifer'].':</b></td>
-  <td class="k1" width="85%">'.utf8_encode($atterliste).'</td>
+  <td class="k1" width="85%">'.utf8_encode_fix($atterliste).'</td>
   </tr>
   <tr align="center">
   <td class="k1"><b>'.$kbl_lang['verteidiger'].':</b></td>
-  <td class="k1">'.utf8_encode($defferliste).'</td>
+  <td class="k1">'.utf8_encode_fix($defferliste).'</td>
   </tr>
   <tr align="center">
 	<td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
-	"<br>$kbl_lang[admiralexp]<br>".
-	"$kbl_lang[erhaltenekartefakt]: $kartefakte<br>".
-	$rassennamen[$rasse-1][4]."-$kbl_lang[recycling]: ".number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b>
+	'<br>'.$kbl_lang['admiralexp'].'<br>'.
+	$kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
+	$rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b>
 	'.$kg_set_hinweis.'  
 	  </td>
   </tr>
@@ -504,21 +504,21 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
   <TABLE cellSpacing=0 cellPadding=2 width=555 border=1>
   <tr align="center">
   <td class="k1" width="14%"><b>'.$ksec.':'.$ksys.'</font></b></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang[angreifer].'</u></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang[verteidiger].'</u></td>
-  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang[eigene].'</u></td>
+  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['angreifer'].'</u></td>
+  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['verteidiger'].'</u></td>
+  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang['eigene'].'</u></td>
   </tr>
   <tr align="center" width="14%">
-  <td class="k2">'.$kbl_lang[einheit].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
-  <td class="k2">'.$kbl_lang[eingesetzt].'</td>
-  <td class="k2">'.$kbl_lang[geblockt].'</td>
-  <td class="k2">'.$kbl_lang[ueberlebt].'</td>
+  <td class="k2">'.$kbl_lang['einheit'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
+  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
+  <td class="k2">'.$kbl_lang['geblockt'].'</td>
+  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
   </tr>';
 
   $geseinheiten_atter_anz=0;
@@ -599,7 +599,7 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	if(($kbd['tuerme'][0][0]+$kbd['tuerme'][0][1]+$kbd['tuerme'][0][2]+$kbd['tuerme'][0][3]+$kbd['tuerme'][0][4])>0){
 		$kbstring.='
 		<TR align="center">
-		<TD class="k1" colSpan=10><u>'.$kbl_lang[tuerme].'</u></TD>
+		<TD class="k1" colSpan=10><u>'.$kbl_lang['tuerme'].'</u></TD>
 		</TR>
 		';
 		  $aktrasse=$kturmrasse;
@@ -646,12 +646,12 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	//////////////////////////////////////////////////////
 	$kbstring.='
 	<br><table cellSpacing=0 cellPadding=2 width=555 border=1>
-	<tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang[statistik].'</b></td></tr>
+	<tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang['statistik'].'</b></td></tr>
 	<tr align="center">
-	<td  class="k2"><b>'.$kbl_lang[typ].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang[angreifer].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang[verteidiger].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang[verhaeltnis].'</b></td>
+	<td  class="k2"><b>'.$kbl_lang['typ'].'</b></td>
+	<td  class="k2"><b>'.$kbl_lang['angreifer'].'</b></td>
+	<td  class="k2"><b>'.$kbl_lang['verteidiger'].'</b></td>
+	<td  class="k2"><b>'.$kbl_lang['verhaeltnis'].'</b></td>
 	</tr>';
 
 	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
@@ -661,7 +661,7 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	else $verhaeltnis=0;
 	$kbstring.='
 	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang[einheitenanzahl].'</td>
+	<td  class="'.$bg.'">'.$kbl_lang['einheitenanzahl'].'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz, 0,"",".").'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz, 0,"",".").'</td>
 	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -678,7 +678,7 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	else $prozent_deffer=0;
 	$kbstring.='
 	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang[verloreneeinheiten].'</td>
+	<td  class="'.$bg.'">'.$kbl_lang['verloreneeinheiten'].'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz_verloren, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz_verloren, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
 	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -690,7 +690,7 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	else $verhaeltnis=0;
 	$kbstring.='
 	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang[einheitenpunktewert].'</td>
+	<td  class="'.$bg.'">'.$kbl_lang['einheitenpunktewert'].'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_score, 0,"",".").'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score, 0,"",".").'</td>
 	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -707,7 +707,7 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	else $prozent_deffer=0;
 	$kbstring.='
 	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang[verlorenepunkte].'</td>
+	<td  class="'.$bg.'">'.$kbl_lang['verlorenepunkte'].'</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_score_lost, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
 	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score_lost, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
 	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
@@ -739,6 +739,14 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 		$win_explain='deffer';
 	}
 	*/
+
+	if($atter_allhp == 0){
+		$atter_allhp=1;
+	}
+
+	if($deffer_allhp == 0){
+		$deffer_allhp=1;
+	}
 
 	$win_explain='Es gewinnt derjenige, der weniger Hitpoints im Verh&auml;ltnis zur Gesamthitpointzahl verloren hat. In den Hitpoints sind alle Boni eingerechnet.';	
 	$win_explain.='<br>Verluste Angreifer: '.number_format($vernichtete_atter*100/$atter_allhp, 2,",",".").'%';

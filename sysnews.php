@@ -5,7 +5,7 @@ include 'inc/lang/'.$sv_server_lang.'_sysnews.lang.php';
 include "functions.php";
 include "tickler/kt_einheitendaten.php";
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'", $db);
+$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -97,7 +97,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 
 
     $query = mysql_query("SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' ORDER BY time DESC");
-
+    $hrstr='';
     while ($row = mysql_fetch_array($query)) {
         $t = $row["time"];
         $n = $row["typ"];
@@ -183,21 +183,10 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 
     //jetzt die e-mail versenden
 
-    sendmail_att($rowmail[reg_mail], 'noreply@die-ewigen.com', $sn_lang["mailbetreff"], $mailbody, $filename, $allenachrichten);
+    sendmail_att($rowmail['reg_mail'], 'noreply@die-ewigen.com', $sn_lang["mailbetreff"], $mailbody, $filename, $allenachrichten);
 
-    //die nachrichten nach dem versand l�schen
+    //die nachrichten nach dem versand löschen
     mysql_query("DELETE FROM de_user_news WHERE user_id='$ums_user_id' AND seen=1", $db);
-
-    /*
-    if(@mail($rowmail[reg_mail],$sn_lang["mailbetreff"],$allenachrichten,$header))
-    {
-      //mysql_query("DELETE FROM de_user_news WHERE user_id='$ums_user_id'",$db);
-    }
-    else
-    {
-    echo "<h1>".$sn_lang["mailfehler"]."</h1>";
-    }
-    */
 
 }//mailnews ende
 
@@ -489,82 +478,20 @@ function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
 
     $email_subject = $betreff; // The Subject of the email
 
-    /*
-    $headers = "From: ".$from;
-
-
-    $semi_rand = md5(time());
-    $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-
-    $headers .= "\nMIME-Version: 1.0\n" .
-                "Content-Type: multipart/mixed;\n" .
-                " boundary=\"{$mime_boundary}\"";
-
-    $email_message .=  "This is a multi-part message in MIME format.\n\n" .
-                        "--{$mime_boundary}\n" .
-                        "Content-Type:text/plain; charset=\"iso-8859-1\"\n" .
-                       "Content-Transfer-Encoding: 7bit\n\n" .
-    $text . "\n\n";
-
-    $fileatt = $datei; // Path to the file
-    $fileatt_type = "text/html"; // File Type
-
-    if ($dateiname) {
-           $fileatt_name = $dateiname; // Filename that will be used for the file as the attachment
-    }else{
-        $fileatt_name = basename($datei);
-    }
-
-
-    $data = $att_content;
-
-
-    $data = chunk_split(base64_encode($data));
-
-    $email_message .= "--{$mime_boundary}\n" .
-                      "Content-Type: {$fileatt_type};\n" .
-                      " name=\"{$fileatt_name}\"\n" .
-                      //"Content-Disposition: attachment;\n" .
-                      //" filename=\"{$fileatt_name}\"\n" .
-                      "Content-Transfer-Encoding: base64\n\n" .
-                     $data . "\n\n" .
-                      "--{$mime_boundary}--\n";
-    */
-
-    //$ok = @mail($an, $email_subject, $email_message, $headers);
-
     require_once 'lib/phpmailer/class.phpmailer.php';
     require_once 'lib/phpmailer/class.smtp.php';
 
-    //Create a new PHPMailer instance
     $mail = new PHPMailer();
-    //Tell PHPMailer to use SMTP
+
+    $mail->IsHTML(true);
     $mail->isSMTP();
-    $mail->smtpConnect([
-      'ssl' => [
-        'verify_peer' => false,
-        'verify_peer_name' => false,
-        'allow_self_signed' => true
-      ]
-    ]);
-    //Enable SMTP debugging
-    // 0 = off (for production use)
-    // 1 = client messages
-    // 2 = client and server messages
-    $mail->SMTPDebug = 0;
-    //Ask for HTML-friendly debug output
-    $mail->Debugoutput = 'html';
-    //Set the hostname of the mail server
     $mail->Host = $GLOBALS['env_mail_server'];
-    //Set the SMTP port number - likely to be 25, 465 or 587
-    $mail->Port = 587;
-    //Whether to use SMTP authentication
     $mail->SMTPAuth = true;
-    //Username to use for SMTP authentication
     $mail->Username = $GLOBALS['env_mail_user'];
-    //Password to use for SMTP authentication
     $mail->Password = $GLOBALS['env_mail_password'];
-    //Set who the message is to be sent from
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
     $mail->setFrom('noreply@die-ewigen.com', 'Die Ewigen');
     //Set an alternative reply-to address
     $mail->addReplyTo('noreply@die-ewigen.com', 'Die Ewigen');
@@ -572,21 +499,11 @@ function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
     $mail->addAddress($an, '');
     //Set the subject line
     $mail->Subject = $email_subject;
-    //Read an HTML message body from an external file, convert referenced images to embedded,
-    //convert HTML into a basic plain-text alternative body
-    //$mail->msgHTML($text);
-    //Replace the plain text body with one created manually
-    //$mail->AltBody = 'This is a plain-text message body';
-    //Attach an image file
-    //$mail->addAttachment('images/phpmailer_mini.png');
     $mail->Body = $text;
 
     $mail->AddStringAttachment($att_content, $dateiname, 'base64', 'text/html');
 
 
     $mail->send();
-
-    //echo "OK: $ok";
-    return($ok);
 }
 ?>

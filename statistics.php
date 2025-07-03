@@ -3,7 +3,7 @@ include "inc/header.inc.php";
 include "inc/lang/".$sv_server_lang."_statistics.lang.php";
 include "functions.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
 $restyp05=$row[4];$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
@@ -94,7 +94,7 @@ if($_REQUEST['mp']==1)
     $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['user_id'];
-  	$result=mysql_query("SELECT spielername, sector, system FROM de_user_data WHERE user_id='$duid'",$db);
+  	$result=mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='$duid'",$db);
   	$num = mysql_num_rows($result);
   	if($num==1)
   	{
@@ -121,7 +121,7 @@ if($_REQUEST['mp']==1)
     $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['zuser_id'];
-  	$result=mysql_query("SELECT spielername, sector, system FROM de_user_data WHERE user_id='$duid'",$db);
+  	$result=mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='$duid'",$db);
   	$num = mysql_num_rows($result);
   	if($num==1)
   	{

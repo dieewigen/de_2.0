@@ -42,7 +42,7 @@ function create_bknachricht(){
 	//echo '<br>Sektorkampf-SK: '.$bk.'/'.$sec_id.'/'.$sv_maxsystem;
   
 	if ($bk>0){ //bk vorhanden, dann dessen daten raussuchen und nachricht einfügen
-	  	$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sec_id' and system='$bk'",$db);
+	  	$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sec_id' and `system`='$bk'",$db);
     	$anz = mysql_num_rows($db_daten);
 	  	if ($anz>0){//bk-system ist auch besetzt
 			$uid=mysql_result($db_daten, 0,0);

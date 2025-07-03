@@ -122,7 +122,7 @@ class map_system{
 				///////////////////////////////////////////////////
 				// Loot bestimmen und ab welchen Gebäudeleveln:
 				// Titanen-Energiekerne/Palenium/Bodenschätze,
-				// Tronic, Artefakte, Credits
+				// Tronic, Artefakte
 				///////////////////////////////////////////////////
 				$loot_typ=0;
 				//gibt es Loot?
@@ -131,8 +131,8 @@ class map_system{
 					//auf welchem Feldlevel gibt es Loot?
 					$loot_level=mt_rand(2,10);
 
-					//Chance auf Item aus itemdata
-					if(mt_rand(0,100)>30){
+					//Chance auf Item aus der de_item_data Tabelle
+					if(mt_rand(0,100)>25){
 						$loot_typ=1;
 						//welches Item?
 						$loot_subtyp=mt_rand(1,12);
@@ -146,12 +146,12 @@ class map_system{
 							$loot_amount=mt_rand(100,300)*$loot_level;
 						}
 
-					}elseif(mt_rand(0,100)>70){//Tronic
+					}elseif(mt_rand(0,100)>60){//Tronic
 						$loot_typ=2;
 						$loot_subtyp=0;
 						$loot_amount=$loot_level;
 
-					}elseif(mt_rand(0,100)>30){//Artefakte
+					}else{//Artefakte
 						$loot_typ=3;
 						$loot_amount=1;
 						$loot_subtyp=-1;
@@ -165,10 +165,6 @@ class map_system{
 							}
 						}
 						
-					}else{//Credits
-						$loot_typ=4;
-						$loot_subtyp=0;
-						$loot_amount=mt_rand(2,6);
 					}
 
 					$fields[$i][2][0]=$loot_typ;//Typ

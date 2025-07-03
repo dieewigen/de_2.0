@@ -296,7 +296,6 @@ if (isset($_POST['verlegen'])){
 <html>
 <head>
 <title>Flotten</title>
-<meta charset="utf-8"/>
 <?php include "cssinclude.php"; ?>
 <?php
 

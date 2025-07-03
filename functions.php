@@ -164,7 +164,7 @@ function createAuction($uid)
 
     // Liste der möglichen Auktionen
     // was kann man bekommen: Artefakt, Titanen-Energiekerne, Palenium, Tronic
-    // womit kann man bezahlen: Restyp1-4, neue Rohstoffe (1,3-12), Credits
+    // womit kann man bezahlen: Restyp1-4, neue Rohstoffe (1,3-12)
 
     //Belohnung
     $get = mt_rand(1, 100);
@@ -225,6 +225,8 @@ function createAuction($uid)
         }
     }
 
+
+    /*
     //Credits
     $amount = $restyp_x['credits'] / 10;
     if ($amount < 1000) {
@@ -236,6 +238,7 @@ function createAuction($uid)
     }
 
     $cost_list[] = array('C', 0, $amount);
+    */
 
     //print_r($cost_list);
     //eine Wählen
@@ -1303,7 +1306,7 @@ function checkForNPCbyKoord($sector, $system)
 
     //ist an den Koordinaten ein NPC?
     $npc = false;
-    $db_daten = mysql_query("SELECT npc FROM de_user_data WHERE sector='$sector' AND system='$system'", $db);
+    $db_daten = mysql_query("SELECT npc FROM de_user_data WHERE sector='$sector' AND `system`='$system'", $db);
     $num = mysql_num_rows($db_daten);
     if ($num > 0) {
         $row = mysql_fetch_array($db_daten);
@@ -1368,22 +1371,29 @@ function get_free_artefact_places($user_id)
     return($freeartefactplaces);
 }
 
+function getArtefactAmountByUserId($user_id, $artefact_id)
+{
+    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS amount FROM de_user_artefact WHERE user_id='$user_id' AND id='$artefact_id'");
+    $row = mysqli_fetch_array($db_daten);
+    return($row['amount']);
+}
+
 function get_col_amount($user_id)
 {
     global $db;
 
     $db_daten = mysql_query("SELECT col FROM de_user_data WHERE user_id='$user_id'", $db);
     $row = mysql_fetch_array($db_daten);
-    return($row[col]);
+    return($row['col']);
 }
 
 function get_user_id_from_coord($zsec, $zsys)
 {
     global $db;
 
-    $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' AND system='$zsys'", $db);
+    $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' AND `system`='$zsys'", $db);
     $row = mysql_fetch_array($db_daten);
-    return($row[user_id]);
+    return($row['user_id']);
 }
 
 function get_player_allyid($user_id)

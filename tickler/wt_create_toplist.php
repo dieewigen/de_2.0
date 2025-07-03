@@ -70,7 +70,7 @@ $varrang='';
 $varcol='';
 $varalterplatz='';
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.platz_last_day,de_user_data.platz, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY score DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.platz_last_day,de_user_data.platz, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY score DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
@@ -195,7 +195,7 @@ xecho('
 ');
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY col DESC LIMIT 200",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY col DESC LIMIT 200",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -310,7 +310,7 @@ xecho('
 <?php
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.e100+de_user_data.e101+de_user_data.e102+de_user_data.e103+de_user_data.e104 AS tower FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY tower DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.e100+de_user_data.e101+de_user_data.e102+de_user_data.e103+de_user_data.e104 AS tower FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY tower DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -421,7 +421,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.roundpoints FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY roundpoints DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.roundpoints FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY roundpoints DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -532,7 +532,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.rang, de_user_data.kgget FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY kgget DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.kgget FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY kgget DESC LIMIT 100",$db);
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
@@ -652,7 +652,7 @@ xecho('
 <?php
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.system, de_user_data.rang, (de_user_data.kg01+de_user_data.kg02*2+de_user_data.kg03*3+de_user_data.kg04*4) AS gesamtenergie FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY gesamtenergie DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, (de_user_data.kg01+de_user_data.kg02*2+de_user_data.kg03*3+de_user_data.kg04*4) AS gesamtenergie FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY gesamtenergie DESC LIMIT 100",$db);
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
@@ -776,7 +776,7 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.sector, de_user_data.system, de_user_data.rang, de_user_data.score, de_user_data.platz, (de_user_achievement.ac1+de_user_achievement.ac2+de_user_achievement.ac3+de_user_achievement.ac4+de_user_achievement.ac5+de_user_achievement.ac6+de_user_achievement.ac7+de_user_achievement.ac8+de_user_achievement.ac9+de_user_achievement.ac10+de_user_achievement.ac11+de_user_achievement.ac12+de_user_achievement.ac13+de_user_achievement.ac14+de_user_achievement.ac15+de_user_achievement.ac16+de_user_achievement.ac17+de_user_achievement.ac18+de_user_achievement.ac19+de_user_achievement.ac20+de_user_achievement.ac21+de_user_achievement.ac22+de_user_achievement.ac23+de_user_achievement.ac24+de_user_achievement.ac25+de_user_achievement.ac999) AS wert FROM de_user_data LEFT JOIN de_user_achievement on(de_user_data.user_id = de_user_achievement.user_id) ORDER BY wert DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.score, de_user_data.platz, (de_user_achievement.ac1+de_user_achievement.ac2+de_user_achievement.ac3+de_user_achievement.ac4+de_user_achievement.ac5+de_user_achievement.ac6+de_user_achievement.ac7+de_user_achievement.ac8+de_user_achievement.ac9+de_user_achievement.ac10+de_user_achievement.ac11+de_user_achievement.ac12+de_user_achievement.ac13+de_user_achievement.ac14+de_user_achievement.ac15+de_user_achievement.ac16+de_user_achievement.ac17+de_user_achievement.ac18+de_user_achievement.ac19+de_user_achievement.ac20+de_user_achievement.ac21+de_user_achievement.ac22+de_user_achievement.ac23+de_user_achievement.ac24+de_user_achievement.ac25+de_user_achievement.ac999) AS wert FROM de_user_data LEFT JOIN de_user_achievement on(de_user_data.user_id = de_user_achievement.user_id) ORDER BY wert DESC LIMIT 100",$db);
 $gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
 $gesamtuser = mysql_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
@@ -900,7 +900,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY ehscore DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY ehscore DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1011,7 +1011,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_counter DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_counter DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1122,7 +1122,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_siege DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_siege DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1233,7 +1233,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.pve_score, de_user_data.sector, de_user_data.system, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY pve_score DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.pve_score, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY pve_score DESC LIMIT 100",$db);
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1749,7 +1749,7 @@ xecho('<table border="0" cellpadding="0" cellspacing="0">
 <col width="160">
 <col width="160">
 </colgroup>');
-$result = mysql_query("SELECT spielername, sector, system, tradesystemscore, tradesystemtrades FROM de_user_data ORDER BY tradesystemscore DESC LIMIT 100 ",$db);
+$result = mysql_query("SELECT spielername, sector, `system`, tradesystemscore, tradesystemtrades FROM de_user_data ORDER BY tradesystemscore DESC LIMIT 100 ",$db);
 $platz=1;
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
@@ -1809,7 +1809,7 @@ xecho('<table border="0" cellpadding="0" cellspacing="0">
 <col width="100">
 <col width="100">
 </colgroup>');
-$result = mysql_query("SELECT spielername, sells, tradescore, sector, system FROM de_user_data ORDER BY tradescore DESC LIMIT 100 ",$db);
+$result = mysql_query("SELECT spielername, sells, tradescore, sector, `system` FROM de_user_data ORDER BY tradescore DESC LIMIT 100 ",$db);
 $platz=1;
 //$tschnitt=$row["tradescore"]/$row["sells"];
 //$tschnitt=round($schnitt);
@@ -1883,7 +1883,7 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.system FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY exp DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY exp DESC LIMIT 100",$db);
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
@@ -1983,7 +1983,7 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.system FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY questpoints DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY questpoints DESC LIMIT 100",$db);
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
@@ -2084,7 +2084,7 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.system FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY fame DESC LIMIT 100",$db);
+$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY fame DESC LIMIT 100",$db);
 while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';

@@ -1,6 +1,4 @@
 <?php
-include "topban.php";
-
 include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
 
 //transparenz setzen, wenn sie von 100 abweicht
@@ -101,11 +99,9 @@ if(!$flag_ang_big_iframe){
 $db_datenresline=mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $rowresline = mysql_fetch_array($db_datenresline);
 
-$credits=$rowresline["credits"];
 $ehscore=$rowresline["ehscore"];
 $tradescore=$rowresline["tradesystemscore"];
 $pve_score=$rowresline["pve_score"];
-$player_credittransfer=$rowresline['credittransfer'];
 $show_helper=$rowresline['helper'];
 $helper_progress=$rowresline['helperprogress'];
 //$helper_techs=$rowresline['techs'];
@@ -113,42 +109,26 @@ $helper_col=$rowresline['col'];
 $resline_dailyallygift=$rowresline['dailyallygift'];
 $show_trade_reminder=$rowresline['trade_reminder'];
 
-//altes mouseoversystem
-/*
-echo '<SCRIPT language="JavaScript1.2" src="efta_ttip.js" type="text/javascript""></SCRIPT>';
-echo '<DIV id="tiplayer" style="visibility:hidden;position:absolute;z-index:1000;top:-100px;"></DIV>';
-echo '<SCRIPT language="JavaScript1.2">';
-echo 'Style[0]=["","","","","",,"#FFFFFF","#222222","","","",,400,,2,"#111111",2,24,0.5,0,2,"gray",,2,,13];';
-// these are global settings
-echo 'var TipId="tiplayer";'; // should be the same as <div> tag's id
-echo 'var FiltersEnabled = 0;'; // should be the set as to 1 if your going to use visual effects if not set to 0
-echo 'mig_clay();';
-echo '</SCRIPT>';
-*/
-
-//$_SESSION['ums_mobi']=0;
-
-/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 // menübutton für die mobile version
 /////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
+$deactivate_touch_menu=0;
 if($_SESSION['ums_mobi']==1){
-	if($_COOKIE['deactivate_swipe']==1){
+	if(isset($_COOKIE['deactivate_swipe']) && $_COOKIE['deactivate_swipe']==1){
 		echo '<a href="menu.php"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Men&uuml;</div></a>';
 	}else{
 		echo '<a href="menu.php"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Men&uuml;: links -> rechts wischen, oder ber&uuml;hren. Chat: rechts -> links wischen</div></a>';
 	}
 	
 
-	if($_COOKIE['deactivate_swipe']==1){
+	if(isset($_COOKIE['deactivate_swipe']) && $_COOKIE['deactivate_swipe']==1){
 		$deactivate_touch_menu=1;
 	}
 
 	//test ob Touch-Gesten generell deaktiviert sind
 	if($deactivate_touch_menu!=1){
 ?>
-<script type="text/javascript">
+<script>
 function swipedetect(el, callback){
   
     var touchsurface = el,
@@ -229,7 +209,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	echo '<div id="restyp5" rel="tooltip" title="'.$resline_lang['restipres05'].'<br>'.$resline_lang['restipres05desc'].'">'.number_format(floor($restyp05), 0,"",".").'</div>';
 
 	//uhr
-	echo '<div id="resclock1" rel="tooltip" title="'.$resline_lang['restipservertime'].'<br>'.$resline_lang['restipservertimedesc'].'">'.date("H:m").'</div>';
+	echo '<div id="resclock1" rel="tooltip" title="'.$resline_lang['restipservertime'].'<br>'.$resline_lang['restipservertimedesc'].'">'.date("H:i").'</div>';
 	echo '<div id="resclock2" rel="tooltip" title="'.$resline_lang['restipserveretick'].'<br>'.$resline_lang['restipserveretickdesc'].'">'.$lasttick.'</div>';
 	echo '<div id="resclock3" rel="tooltip" title="'.$resline_lang['restipservermtick'].'<br>'.$resline_lang['restipservermtickdesc'].'">'.$lastmtick.'</div>';
 
@@ -254,9 +234,6 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 
 	//punkte
 	echo '<div id="resscore" rel="tooltip" title="'.$resline_lang['restipscore'].'<br>'.$resline_lang['restipscoredesc'].'<br>'.$resline_lang['restipehscore'].': '.number_format($ehscore, 0,"",".").'<br>Executor-Punkte: '.number_format($pve_score, 0,"",".").'">'.number_format($punkte, 0,"",".").'</div>';
-
-	//credits
-	echo '<div id="rescredits" rel="tooltip" title="'.$resline_lang['restipcredits'].'<br>'.$resline_lang['restipcreditsdesc'].'">'.number_format($credits, 0,"",".").'</div>';
 
 	//hyperfunk
 	//$newtrans=1;
@@ -294,16 +271,6 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	echo '$("#tb_res4", parent.document).attr("title", "'.number_format(floor($restyp04), 0,"",".").'");';
 	echo '$("#tb_res5", parent.document).attr("title", "'.number_format(floor($restyp05), 0,"",".").'");';
 
-
-	
-	/*
-	echo '$("#tb_res1", parent.document).html("'.number_format(floor($restyp01), 0,"",".").'");';
-	echo '$("#tb_res2", parent.document).html("'.number_format(floor($restyp02), 0,"",".").'");';
-	echo '$("#tb_res3", parent.document).html("'.number_format(floor($restyp03), 0,"",".").'");';
-	echo '$("#tb_res4", parent.document).html("'.number_format(floor($restyp04), 0,"",".").'");';
-	echo '$("#tb_res5", parent.document).html("'.number_format(floor($restyp05), 0,"",".").'");';
-	*/
-
 	//atter/deffer
 	if ($gevflag>0){//es gibt deffer
 		echo '$("#tb_deffer_img", parent.document).css("display","");';
@@ -340,10 +307,6 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	echo '$("#tb_score", parent.document).html("'.formatMasseinheit($punkte).'");';
 	echo '$("#tb_score", parent.document).attr("title", "'.number_format(floor($punkte), 0,"",".").'");';
 
-	//Credits
-	echo '$("#tb_credits", parent.document).html("'.formatMasseinheit($credits).'");';	
-	echo '$("#tb_credits", parent.document).attr("title", "'.number_format(floor($credits), 0,"",".").'");';
-	
 	//hyperfunk
 	//$newtrans=1;
 	if ($newtrans==1){
@@ -369,17 +332,9 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	
 	
 	//serverzeiten
-	echo '$("#tb_time1", parent.document).html("'.strftime("%H:%M").'");';
+	echo '$("#tb_time1", parent.document).html("'.date("H:i").'");';
 	echo '$("#tb_time2", parent.document).html("'.$lasttick.'");';
 	echo '$("#tb_time3", parent.document).html("'.$lastmtick.'");';
-	
-	/*
-	echo '$("#tb_res1", parent.document).attr("title","'.number_format(floor($restyp01)).'");';	
-	echo '$("#tb_res2", parent.document).attr("title","'.number_format(floor($restyp02)).'");';	
-	echo '$("#tb_res3", parent.document).attr("title","'.number_format(floor($restyp03)).'");';	
-	echo '$("#tb_res4", parent.document).attr("title","'.number_format(floor($restyp04)).'");';	
-	echo '$("#tb_res5", parent.document).attr("title","'.number_format(floor($restyp05)).'");';	
-	*/
 	
 	echo '</script>';
 }
@@ -409,216 +364,33 @@ if(!$flag_ang_big_iframe){
 }
 
 /////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// check für ungelesene sektorforumthreads
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-/*
-$likestr='s__________';
-$likestr[$system]=0;
-$db_daten=mysql_query("SELECT id FROM de_sectorforum_threads WHERE sector='$sector' AND gelesen LIKE '$likestr'");
-$num = mysql_num_rows($db_daten);
-if($num>0)
-{
-	echo '<div class="info_box text1" style="margin-bottom: 5px; font-size: 14px;">Es liegen ungelesene Beitr�ge im <a href="secforum.php">Sektorforum</a> vor.</div>';
-}
-*/
-
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
 // helper
-/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 if($show_helper==1){
 	include 'lib/helper.inc.php';
 }
 
 /////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// info über schwarzmarktcredit
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-if(isset($show_activetime_msg) && $show_activetime_msg==1){
-  $nexttime=time()+$sv_activetime;
-  echo '<div class="info_box"><span class="text3">'.$resline_lang['getcredit'].'';
-  echo  ' '.$resline_lang['getnextcredit'].date("G:i:s d.m.Y", $nexttime);
-  
-  echo '</span></div><br>';
-}
-
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// schwarzmarktreminder
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-
-include "inc/sm_reminder.inc.php";
-
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
 // Mission-Reminder
-/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 if($show_trade_reminder==1 && !$flag_ang_big_iframe){
 	include "lib/trade_reminder.inc.php";
 }
-
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// bannerunterbrechung
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-
-include "bannerunterbrechung.php";
-
-/*
-if($ums_one_way_bot_protection==1)
-echo '<script language="JavaScript">
-<!--
-alert(unescape"'.$resline_lang[botlogout].'"));
-//-->
-</script>';
-*/
-
-//temporärer hinweis, dass man seinen account, mit dem hauptaccount verknüpfen soll
-/*
-$db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id=0 AND user_id='$ums_user_id'",$db);
-if(mysql_num_rows($db_daten)>0)
-echo '<table width=590><tr><td class="ccg">
-Der Account ist noch nicht mit der zentralen Accountverwaltung unter <a href="http://login.die-ewigen.com" target="_blank">http://login.die-ewigen.com
-</a> verbunden. Siehe auch die Information im <a href="http://forum.die-ewigen.com/thread.php?threadid=17325" target="_blank">Forum</a>. Ben�tigt wird 
-nur ein Hauptaccount<br><br><br><br>Wenn bis zum 15.06.2007 der Account nicht mit der zentralen Accountverwaltung verbunden ist, kann nicht garantiert werden,
-dass der Zugriff auf den Account weiterhin m�glich sein wird.
-</td></tr></table><br><br><br><br>';*/
-
-//seite deaktivieren, wenn es ein payserver ist und man keinen pa hat
-if($sv_payserver==1)
-{
-  $posps = strpos($PHP_SELF, "options.php");
-  if($posps === false)
-  {
-    //laufzeit auslesen
-    $db_datenps=mysql_query("SELECT patime FROM de_user_data WHERE user_id='$ums_user_id'",$db);	
-    $rowps = mysql_fetch_array($db_datenps);
-    if($rowps["patime"]<time())
-    {
-      echo '<table width="590px"><tr><td class="ccg">'.$resline_lang['payserver'].'</td></tr></table>';
-      die('</body></html>');
-    }
-  }
-}
-
-//echo '<br><div class="info_box text2">Executor Karlath hat den DX61a23 den Krieg erkl&auml;rt.</div><br>';
 
 //Seite schließen/Seitenname ANG
 if($GLOBALS['sv_ang']==1 && $_SESSION['ums_mobi']!=1 && $_SESSION['de_frameset']!=1){
 	if(!$flag_ang_big_iframe){
 
 		echo '<div style="height: 10px;"></div>';
-
-		/*
-		echo '
-		<div id="page_topbar" style="position: relative; width: 590px; margin-top: 6px; font-size: 16px; margin-bottom: 8px; border-radius: 10px; height: 20px; border: 1px solid #CCCCCC; color: #FFFFFF;" class="cell">
-			<span id="page_topbar_text">Seitentitel</span>
-			<img onclick="closeIframeMain();" src="g/close_icon.png" style="position: absolute; right: 1px; height: 26px; margin-top: -3px; width: auto;">
-		</div>';
-	
-		echo '
-		<script type="text/javascript">
-		function closeIframeMain(){
-			$("#iframe_main_container", parent.document).css("display", "none");
-		}
-
-		$( document ).ready(function() {
-			$("#iframe_main_container", parent.document).css("display", "");
-			$("#page_topbar_text").html(document.title);
-		});
-
-		</script>
-		';
-
-		*/
 	}
 }
 
-////////////////////////////////////////////////////////////////////////
-// User-Counter
-////////////////////////////////////////////////////////////////////////
-//if($_SESSION['ums_user_id']==1){
-/*
-	echo '
-	<div style="width: 500px; background-color: #333333; color: #EEEEEE; padding: 5px; border: 1px solid #999999; font-size: 20px; margin-top: 10px; margin-bottom: 10px;">
-		<div style="display: flex">
-			<div style="flex-grow: 1;">135,57 von 145 Euro (2021)</div>
-			<div style="flex-grow: 1;"><a style="font-size: 20px;" href="https://paypal.me/pools/c/8vL9wuicz9" target="_blank">Spendenseite</a></div>
-			<div style="flex-grow: 1; cursor: pointer;" onclick="$(\'#sf_desc\').show();">?</div>
-		</div>
-		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:'.$GLOBALS['env_admin_email'].'">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
-		<div id="sf_desc" style="display: none; margin-top: 20px; font-size: 16px;">
-			Die Ewigen kostet ca. 145 Euro pro Jahr f&uuml;r Domains/Hosting/Server. Eine Beteiligung der Spieler an den Kosten w&auml;re begr&uuml;&szlig;enswert. Aktuell wird f&uuml;r das Jahr 2021 gesammelt.
-		</div>
-	</div>';
-*/
+/////////////////////////////////////////////////////////////
+// temporärer Hinweis
+/////////////////////////////////////////////////////////////
+echo '
+<div class="info_box text3" style="margin-bottom: 5px; font-size: 14px;">
+Die nächste xDE/SDE-Runde startet am 04.07.2025 um ca. 19:00 Uhr.<br><br>
 
-	/*
-	$db_daten_uc=mysqli_query($GLOBALS['dbi'], "SELECT anzahl FROM loginsystem.ls_user_count ORDER BY datum DESC LIMIT 1;");
-	$row_uc = mysqli_fetch_array($db_daten_uc);
-	$anzahl_uc=$row_uc["anzahl"];
-	$anzahl_db=$anzahl_uc;
-	//01.12.2019: 1547251200
-
-	if($anzahl_uc<100){
-		$anzahl_uc=100;
-	}
-
-	$target_time=1575158400+(86400*3*($anzahl_uc-100));
-
-	$db_daten_forum=mysqli_query($GLOBALS['dbi'], "SELECT * FROM deforum_de.bb1_posts WHERE threadid=23437 ORDER BY postid DESC LIMIT 1;");
-	$row_forum = mysqli_fetch_array($db_daten_forum);
-	$forum_output='<div><a href="https://forum.bgam.es/thread.php?goto=lastpost&threadid=23437" target="_blank">Diskussion dazu im Forum - letzter Beitrag: '.date("d.m.Y H:i:s", $row_forum['posttime']).': '.$row_forum['username'].'</a></div>';
-
-	echo '
-	<div style="width: 500px; background-color: #333333; color: #EEEEEE; padding: 5px; border: 1px solid #999999; font-size: 20px; margin-top: 10px; margin-bottom: 10px;">
-		<div style="display: flex">
-			<div style="flex-grow: 1;">Spieler: '.$anzahl_db.'</div>
-			<div style="flex-grow: 1;">'.date('d.m.Y', $target_time).'</div>
-			<div style="width: 230px;" id="sfj12"></div>
-			<div style="flex-grow: 1; cursor: pointer;" onclick="$(\'#sf_desc\').show();">?</div>
-		</div>
-		'.$forum_output.'
-		<div style="font-size: 10pt;">Du meinst Du kannst DE helfen? Melde Dich einfach per <a href="mailto:'.$GLOBALS['env_admin_email'].'">E-Mail</a> oder im <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>
-		<div id="sf_desc" style="display: none; margin-top: 20px; font-size: 16px;">
-			Der Counter l&auml;uft mindestens bis zum 01.12.2019. Für jeden Spieler über 100 verl&auml;ngert sich der Counter um 3 Tage. Sollten die Spielerzahlen stark steigen, kann der Counter wieder entfernt werden.
-		</div>
-	</div>
-
-	<script>';
-
-	echo '
-	var countDownDate = new Date("'.date('c', $target_time) .'").getTime();
-	
-	var x = setInterval(function() {
-	
-	  var now = new Date().getTime();
-		
-	  var distance = countDownDate - now;
-		
-	  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-		
-	  document.getElementById("sfj12").innerHTML = days + "T " + hours + "Std "
-	  + minutes + "Min " + seconds + "Sek ";
-		
-	  if (distance < 0) {
-		clearInterval(x);
-		document.getElementById("sfj12").innerHTML = "ENDE";
-	  }
-	}, 1000);
-	</script>	
-
-	';
-	*/
-//}
-?>
+Da es zwischenzeitlich die Info gab, dass DE eingestellt worden ist, bitte ich jeden von euch die Rundenstartinfo möglichst an jeden weiterzuleiten.
+</div>';

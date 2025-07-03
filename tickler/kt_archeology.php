@@ -7,22 +7,22 @@ $ticks=$row["tick"];
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-//datenpaket 1 - der güldene kollektor
+//datenpaket 1 - der gï¿½ldene kollektor
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-//schauen ob flotten in dem sytem mit dem güldenen kollektor sind
+//schauen ob flotten in dem sytem mit dem gï¿½ldenen kollektor sind
 //userid des besitzers laden
 $result = mysql_query("SELECT a1userid, a1npc FROM de_system",$db);
 $row = mysql_fetch_array($result);
 $a1userid=$row["a1userid"];
 $a1npc=$row["a1npc"];
-//nur durchführen, wenn der güldene bei einem npc ist
+//nur durchfï¿½hren, wenn der gï¿½ldene bei einem npc ist
 if($a1npc==1)
 {
   //koordinaten auslesen
-  $result = mysql_query("SELECT sector, system FROM de_user_data WHERE user_id='$a1userid'",$db);
+  $result = mysql_query("SELECT sector, `system` FROM de_user_data WHERE user_id='$a1userid'",$db);
   $row = mysql_fetch_array($result);
   $sector=$row["sector"];
   $system=$row["system"];
@@ -34,7 +34,7 @@ if($a1npc==1)
     //user_id extrahieren
     $hv=explode("-",$row["user_id"]);
     $uid=$hv[0];
-    //schauen ob man die voraussetzungen erfüllt
+    //schauen ob man die voraussetzungen erfï¿½llt
     $db_data = mysql_query("SELECT user_id FROM de_user_quest WHERE user_id='$uid' AND pid=1 AND flag1=0",$db);
     $num = mysql_num_rows($db_data);
     if($num==1)$bewerber[]=$uid;
@@ -44,10 +44,10 @@ if($a1npc==1)
   {
     $zufall=mt_rand(0,count($bewerber)-1);
     $uid=$bewerber[$zufall];
-    //den güldenen transferieren
+    //den gï¿½ldenen transferieren
     mysql_query("UPDATE de_system SET a1userid='$uid', a1npc=0, a1tick=0",$db);
 
-    //flag setzten, damit man es nicht öfters bekommen kann
+    //flag setzten, damit man es nicht ï¿½fters bekommen kann
     mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid=1",$db);
 
     //dem spieler eine info schicken
@@ -79,7 +79,7 @@ $row = mysql_fetch_array($result);
 $userid=$row["a2userid"];
 
 //koordinaten auslesen
-$result = mysql_query("SELECT sector, system FROM de_user_data WHERE user_id='$userid'",$db);
+$result = mysql_query("SELECT sector, `system` FROM de_user_data WHERE user_id='$userid'",$db);
 $row = mysql_fetch_array($result);
 $sector=$row["sector"];
 $system=$row["system"];
@@ -91,7 +91,7 @@ while ($row = mysql_fetch_array($db_daten))
   //user_id extrahieren
   $hv=explode("-",$row["user_id"]);
   $uid=$hv[0];
-  //schauen ob man die voraussetzungen erfüllt
+  //schauen ob man die voraussetzungen erfï¿½llt
   $db_data = mysql_query("SELECT user_id FROM de_user_quest WHERE user_id='$uid' AND pid='$pid' AND flag1=0",$db);
   $num = mysql_num_rows($db_data);
   if($num==1)$bewerber[]=$uid;
@@ -102,7 +102,7 @@ if(count($bewerber)>0)
 {
   $zufall=mt_rand(0,count($bewerber)-1);
   $uid=$bewerber[$zufall];
-  //flag setzten, damit man es nicht öfters bekommen kann
+  //flag setzten, damit man es nicht ï¿½fters bekommen kann
   mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
 
   //dem spieler eine info schicken und sonden updaten
@@ -112,8 +112,8 @@ if(count($bewerber)>0)
   mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
   mysql_query("UPDATE de_user_data SET newnews = 1, sonde=sonde+50 WHERE user_id = $uid",$db);
 
-  //neues npc-system wählen
-  $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 AND sector<>'$sector' AND system<>'$system'",$db);
+  //neues npc-system wï¿½hlen
+  $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 AND sector<>'$sector' AND `system`<>'$system'",$db);
   $anz = mysql_num_rows($result);
   $zufall=mt_rand(0,$anz-1);
   $uid=mysql_result($result, $zufall,0);
@@ -140,7 +140,7 @@ $row = mysql_fetch_array($result);
 $userid=$row["a3userid"];
 
 //koordinaten auslesen
-$result = mysql_query("SELECT sector, system FROM de_user_data WHERE user_id='$userid'",$db);
+$result = mysql_query("SELECT sector, `system` FROM de_user_data WHERE user_id='$userid'",$db);
 $row = mysql_fetch_array($result);
 $sector=$row["sector"];
 $system=$row["system"];
@@ -152,7 +152,7 @@ while ($row = mysql_fetch_array($db_daten))
   //user_id extrahieren
   $hv=explode("-",$row["user_id"]);
   $uid=$hv[0];
-  //schauen ob man die voraussetzungen erfüllt
+  //schauen ob man die voraussetzungen erfï¿½llt
   $db_data = mysql_query("SELECT user_id FROM de_user_quest WHERE user_id='$uid' AND pid='$pid' AND flag1=0",$db);
   $num = mysql_num_rows($db_data);
   if($num==1)$bewerber[]=$uid;
@@ -163,7 +163,7 @@ if(count($bewerber)>0)
 {
   $zufall=mt_rand(0,count($bewerber)-1);
   $uid=$bewerber[$zufall];
-  //flag setzten, damit man es nicht öfters bekommen kann
+  //flag setzten, damit man es nicht ï¿½fters bekommen kann
   mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
 
   //dem spieler eine info schicken und sonden updaten
@@ -173,8 +173,8 @@ if(count($bewerber)>0)
   mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
   mysql_query("UPDATE de_user_data SET newnews = 1, col=col+25 WHERE user_id = $uid",$db);
 
-  //neues npc-system wählen
-  $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 AND sector<>'$sector' AND system<>'$system'",$db);
+  //neues npc-system wï¿½hlen
+  $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 AND sector<>'$sector' AND `system`<>'$system'",$db);
   $anz = mysql_num_rows($result);
   $zufall=mt_rand(0,$anz-1);
   $uid=mysql_result($result, $zufall,0);
@@ -206,7 +206,7 @@ for ($pid=4;$pid<=11;$pid++)
   $userid=$row["userid"];
 
   //koordinaten auslesen
-  $result = mysql_query("SELECT sector, system FROM de_user_data WHERE user_id='$userid'",$db);
+  $result = mysql_query("SELECT sector, `system` FROM de_user_data WHERE user_id='$userid'",$db);
   $row = mysql_fetch_array($result);
   $sector=$row["sector"];
   $system=$row["system"];
@@ -218,7 +218,7 @@ for ($pid=4;$pid<=11;$pid++)
     //user_id extrahieren
     $hv=explode("-",$row["user_id"]);
     $uid=$hv[0];
-    //schauen ob man die voraussetzungen erfüllt
+    //schauen ob man die voraussetzungen erfï¿½llt
     $db_data = mysql_query("SELECT user_id FROM de_user_quest WHERE user_id='$uid' AND pid='$pid' AND flag1=0",$db);
     $num = mysql_num_rows($db_data);
     if($num==1)$bewerber[]=$uid;
@@ -241,7 +241,7 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_1].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
   		$allyid=get_player_allyid($uid);
   		if($allyid>0)mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id = $allyid",$db);
@@ -252,7 +252,7 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_2].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
   		$allyid=get_player_allyid($uid);
   		if($allyid>0)mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id = $allyid",$db);
@@ -263,7 +263,7 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_3].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
   		$allyid=get_player_allyid($uid);
   		if($allyid>0)mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id = $allyid",$db);
@@ -274,7 +274,7 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_4].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
   		$allyid=get_player_allyid($uid);
   		if($allyid>0)mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id = $allyid",$db);
@@ -285,7 +285,7 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_5].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
   		$allyid=get_player_allyid($uid);
   		if($allyid>0)mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id = $allyid",$db);
@@ -296,13 +296,13 @@ for ($pid=4;$pid<=11;$pid++)
         $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$kt_lang[archeologyfound_6].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
         mysql_query("UPDATE de_user_data SET newnews = 1, $restyp=$restyp+'$energie' WHERE user_id = $uid",$db);      
-        //flag setzten, damit man es nicht öfters bekommen kann
+        //flag setzten, damit man es nicht ï¿½fters bekommen kann
         mysql_query("UPDATE de_user_quest SET flag1=1 WHERE user_id='$uid' AND pid='$pid'",$db);
       break;
 
       case 10: //spielerartefakt
-        //feststellen ob platz im artefaktgebäude ist
-        //schauen ob man das artefaktgebäude hat
+        //feststellen ob platz im artefaktgebï¿½ude ist
+        //schauen ob man das artefaktgebï¿½ude hat
 		$db_techs=mysql_query("SELECT techs, tick, eftagetlastartefact FROM de_user_data WHERE user_id='$uid'",$db);
 		$row = mysql_fetch_array($db_techs);
 		$techs=$row["techs"];
@@ -312,7 +312,7 @@ for ($pid=4;$pid<=11;$pid++)
         if ($techs[28]==1)
         {
           echo 'BBBBBBBBBBBBBBBBBB';
-          //schauen ob man noch platz im artefaktgebäude hat
+          //schauen ob man noch platz im artefaktgebï¿½ude hat
           if(get_free_artefact_places($uid)>0)
           {
         	echo 'CCCCCCCCCCCCC';
@@ -322,7 +322,7 @@ for ($pid=4;$pid<=11;$pid++)
           	  //artefakt per zufall aussuchen
         	  $ai=mt_rand(1,$ua_index+1);
         	  $energie=1;
-        	  //artefakt dem spieler im gebäude hinterlegen
+        	  //artefakt dem spieler im gebï¿½ude hinterlegen
         	  mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$uid', '$ai', '1')",$db);
         	  $text=$kt_lang[archeologysuccess].': '.number_format($energie, 0,"",".").' '.$ua_name[$ai-1].'-'.$kt_lang[archeologyfound_7].'<br>'.$kt_lang[koordinaten].': '.$sector.':'.$system;
         	  mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
@@ -337,7 +337,7 @@ for ($pid=4;$pid<=11;$pid++)
       break;      
       
       case 11: //paleniumvortex
-        //schauen ob man den paleniumverstärker hat
+        //schauen ob man den paleniumverstï¿½rker hat
 		$db_techs=mysql_query("SELECT techs, palenium FROM de_user_data WHERE user_id='$uid'",$db);
 		$row = mysql_fetch_array($db_techs);
 		$techs=$row["techs"];
@@ -363,7 +363,7 @@ for ($pid=4;$pid<=11;$pid++)
       break;
     }
 
-    //neues npc-system wählen
+    //neues npc-system wï¿½hlen
     $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 ORDER BY RAND() LIMIT 0,1",$db);
     $row = mysql_fetch_array($result);
     $uid=$row["user_id"];

@@ -9,10 +9,6 @@ include "../inccon.php";
 <body>
 <?php
 
-
-
-mt_srand((double)microtime()*10000);
-
 function generierespielername(){
 	//namen zusammenbauen
 	//struktur: 1-4 silben bindestrich 1-5 silben
@@ -43,10 +39,12 @@ function generierespielername(){
 	return $name;
 }
 
-if ($_REQUEST["anzahl"] AND $_REQUEST["create"])
+$anzahl=intval($_REQUEST["anzahl"] ?? 0);
+
+if ($anzahl > 0)
 {
-  //accounts in die db einfügen
-  for ($j=0; $j<=$_REQUEST["anzahl"]-1; $j++)
+  //accounts in die db einfÃ¼gen
+  for ($j=0; $j < $anzahl; $j++)
   {
 
     //spielername erzeugen und schauen ob er schon vergeben ist
@@ -81,7 +79,7 @@ if ($_REQUEST["anzahl"] AND $_REQUEST["create"])
       echo $reg_mail.'<br>';
     }
 
-    //account einfügen
+    //account einfï¿½gen
     //de_login
     mysql_query("INSERT INTO de_login (nic, reg_mail, pass, register, last_login, status, last_ip)
       VALUES ('$loginname', '$reg_mail', PASSWORD('$reg_mail'), NOW(), NOW(), 1, '127.0.0.1')", $db);
@@ -89,7 +87,7 @@ if ($_REQUEST["anzahl"] AND $_REQUEST["create"])
 
     //de_user_data
     mysql_query("INSERT INTO de_user_data (user_id, spielername, restyp01, restyp02, techs,
-      ekey, sector, system, rasse, npc, nrrasse, nrspielername)
+      ekey, sector, `system`, rasse, npc, nrrasse, nrspielername)
       VALUES ($user_id , '$spielername' ,10000, 5000,
       's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
       '100;0;0;0', 0, 0, 5, 1, 5, '$spielername')", $db);
@@ -107,12 +105,12 @@ if ($_REQUEST["anzahl"] AND $_REQUEST["create"])
     mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
 
     //de_user_info
-    mysql_query("INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht)
-      VALUES ('$user_id', '$vorname', '$nachname', '$strasse', $plz, '$ort', '$land', '$telefon', $tag, $monat, $jahr, $geschl)", $db);
-
-    
+    $sql="INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht)
+      VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl')";
+    mysql_query($sql, $db);
+   
   }
-  echo("Done. Es wurden ".$_REQUEST["anzahl"]." Accounts erstellt.<br><br>");
+  echo("Done. Es wurden ".$anzahl." Accounts erstellt.<br><br>");
 }
 echo '<form method="post">';
 echo 'Wieviel neue Accounts anlegen? ';

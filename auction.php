@@ -64,7 +64,6 @@ $tradescore = 10000;
 <html>
 <head>
 <title>Auktion</title>
-<meta charset="utf-8"/>
 <?php
 include "cssinclude.php";
 ?>

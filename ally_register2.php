@@ -4,7 +4,7 @@ include 'inc/lang/'.$sv_server_lang.'_ally.registerzwei.lang.php';
 include_once 'functions.php';
 include('outputlib.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
@@ -50,6 +50,12 @@ if($clankuerzel==""){
 if( strlen($clankuerzel) > 8 ){
 	$eintragung=0;
 	$errormessage.=$allyregisterzwei_lang['msg_3']."<br>";
+}
+
+if (preg_match("/[^0-9a-zA-Z]/", $clankuerzel))
+{
+    $eintragung=0;
+    $errormessage.="Kürzel darf keine Sonderzeichen enthalten!<br>";
 }
 
 $query="SELECT * FROM de_allys WHERE allytag='$clankuerzel'";

@@ -13,7 +13,7 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.antrag.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -43,7 +43,7 @@ $result = mysql_query($query);
 
 $clankuerzel = @mysql_result($result,0,"allytag");
 
-$query = "SELECT user_id, sector, system FROM de_user_data WHERE status='0' AND allytag='$clankuerzel'";
+$query = "SELECT user_id, sector, `system` FROM de_user_data WHERE status='0' AND allytag='$clankuerzel'";
 
 $result = @mysql_query($query);
 
@@ -59,7 +59,7 @@ while ($row < $nb){
         $se                 = @mysql_result($result,$row,"sector");
         $sy                 = @mysql_result($result,$row,"system");
 
-        $query = "SELECT spielername, tick, col, score, sector, system, rasse, actpoints, tick FROM de_user_data where user_id='$userid'";
+        $query = "SELECT spielername, tick, col, score, sector, `system`, rasse, actpoints, tick FROM de_user_data where user_id='$userid'";
         $result2         = @mysql_query($query);
         $name            = @mysql_result($result2,0,"spielername");
         $b_score		 = @mysql_result($result2,0,"score");

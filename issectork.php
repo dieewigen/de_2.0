@@ -6,7 +6,7 @@ function issectorcommander() {
 	//global $system;
 	//alle user des sektors auslesen
 	if($sector>0){
-		$sql="SELECT votefor, system FROM de_user_data WHERE sector=$sector";
+		$sql="SELECT votefor, `system` FROM de_user_data WHERE sector=$sector";
 		//echo $sql;
 		$resultsk = mysqli_query($GLOBALS['dbi'], $sql);
 		$anz = mysqli_num_rows($resultsk);
@@ -63,7 +63,7 @@ function getSKSystemBySecID($sec_id){
 	//global $system;
 	//alle user des sektors auslesen
 	if($sector>0){
-		$sql="SELECT votefor, system FROM de_user_data WHERE sector=$sector";
+		$sql="SELECT votefor, `system` FROM de_user_data WHERE sector=$sector";
 		//echo $sql;
 		$resultsk = mysqli_query($GLOBALS['dbi'], $sql);
 		$anz = mysqli_num_rows($resultsk);

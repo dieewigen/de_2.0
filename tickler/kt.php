@@ -12,21 +12,21 @@ $directory="../";
 include $directory."inc/sv.inc.php";
 if($sv_debug==0 && $sv_comserver==0){
 	if(!in_array(intval(date("i")), $GLOBALS['kts'][date("G")]) && $sv_debug!=1){
-		die('NO TICK TIME');
+		die('<br>KT: NO TICK TIME<br>');
 	}
 }
 
-include $directory."inccon.php";
-include $directory."inc/db_ls_connect.inc.php";
-if($sv_comserver==1)include $directory.'inc/svcomserver.inc.php';
-include $directory."inc/schiffsdaten.inc.php";
-include $directory."inc/userartefact.inc.php";
-include $directory."functions.php";
-include $directory."issectork.php";
-include $directory."inc/lang/".$sv_server_lang."_kt.lang.php";
-include $directory."lib/special_ship.class.php";
-include $directory.'lib/bg_defs.inc.php';
-include $directory.'lib/bg_defs.inc.php';
+include_once $directory."inccon.php";
+include_once $directory."inc/db_ls_connect.inc.php";
+if($sv_comserver==1)include_once $directory.'inc/svcomserver.inc.php';
+include_once $directory."inc/schiffsdaten.inc.php";
+include_once $directory."inc/userartefact.inc.php";
+include_once $directory."functions.php";
+include_once $directory."issectork.php";
+include_once $directory."inc/lang/".$sv_server_lang."_kt.lang.php";
+include_once $directory."lib/special_ship.class.php";
+include_once $directory.'lib/bg_defs.inc.php';
+include_once $directory.'lib/bg_defs.inc.php';
 ?>
 
 <html>
@@ -108,7 +108,7 @@ $max_kt = $row["max_kt"];
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-include "kt_systemkampf.php";
+include_once "kt_systemkampf.php";
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ for ($i=0; $i<$num; $i++){
 			$sector = mysql_result($res, $i, "hsec");
 			$system = mysql_result($res, $i, "hsys");
 			//rasse laden
-			$db_daten=mysql_query("SELECT rasse FROM de_user_data WHERE sector='$sector' AND system='$system'",$db);
+			$db_daten=mysql_query("SELECT rasse FROM de_user_data WHERE sector='$sector' AND `system`='$system'",$db);
 			$db_daten = mysql_fetch_array($db_daten);
 			$rasse=$db_daten["rasse"];
 			echo '<br>Rasse: '.$rasse;
@@ -211,7 +211,7 @@ mysql_query("UPDATE de_user_fleet SET fleetsize = e81+e82+e83+e84+e85+e86+e87+e8
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-include "kt_sectorkampf.php";
+include_once "kt_sectorkampf.php";
 
 //flottenbewegung - sektorflotten
 $res = mysql_query("select sec_id, aktion, zeit, aktzeit, zielsec from de_sector where aktion > 0",$db);
@@ -266,7 +266,7 @@ for ($i=0; $i<$num; $i++)
 // Battlegrounds
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-include 'kt_manage_bg.php';
+include_once 'kt_manage_bg.php';
 
 //lege in der datenbank die zeit des letzten ticks ab
 $time=date("YmdHis");
@@ -292,7 +292,7 @@ xecho('?>');
 
 
 } else {
-	echo 'Ticks deaktiviert.'; //doetick
+	echo '<br>Kampfticks deaktiviert.<br>'; //doetick
 }
 ?>
 

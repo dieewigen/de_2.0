@@ -288,7 +288,7 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['tronic'].': '.$tronic;
 		}
-		//gebäudestufe erhöhen
+		//Artefaktgebäudestufe erhöhen
 		elseif($id==17)
 		{
 			//das artefakt kann nur verwendet werden, wenn aktuell kein ausbau l�uft

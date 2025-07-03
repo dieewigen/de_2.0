@@ -22,7 +22,6 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 <html>
 <head>
 <title>Vergessene Systeme</title>
-<meta charset="utf-8"/>
 <?php 
 //$newcss=1;
 include "cssinclude.php";

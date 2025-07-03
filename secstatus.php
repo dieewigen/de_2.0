@@ -5,7 +5,7 @@ include "inc/lang/".$sv_server_lang."_secstatus.lang.php";
 include "functions.php";
 include "tickler/kt_einheitendaten.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews, secstatdisable, status, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, secstatdisable, status, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$allytag=$row["allytag"];$newnews=$row["newnews"];
@@ -523,7 +523,7 @@ if(count($sc) > 0){
 						//anzeigen bis wann es übermittelt wird
 						echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $show_ally_secstatus).')';
 						//db updaten
-						$db_daten=mysql_query("UPDATE de_user_data SET show_ally_secstatus='$show_ally_secstatus' WHERE sector='".$sector."' AND system='".$sc[$i][1][0]."';",$db);
+						$db_daten=mysql_query("UPDATE de_user_data SET show_ally_secstatus='$show_ally_secstatus' WHERE sector='".$sector."' AND `system`='".$sc[$i][1][0]."';",$db);
 						//eintrag im allianzchat
 						$chattext='<font color="#ff0101">Status&uuml;bermittlung von ('.$sector.':'.$sc[$i][1][0].') durch '.$ums_spielername.'</font>';
 						insert_chat_msg($ally_id, 1, '', $chattext);
@@ -970,7 +970,7 @@ $allypartnertag=isset($allypartner[0])?$allypartner[0]:'';
 $time=time();
 $sql="SELECT *, de_user_fleet.user_id, de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.aktion, de_user_fleet.aktzeit, de_user_fleet.hsec, 
 de_user_fleet.hsys, de_user_fleet.zeit, de_user_fleet.fleetsize, de_user_data.show_ally_secstatus
-FROM de_user_fleet LEFT JOIN de_user_data ON(de_user_data.sector=de_user_fleet.zielsec AND de_user_data.system=de_user_fleet.zielsys) 
+FROM de_user_fleet LEFT JOIN de_user_data ON(de_user_data.sector=de_user_fleet.zielsec AND de_user_data.`system`=de_user_fleet.zielsys) 
 WHERE de_user_fleet.zielsec != '$sector' AND (de_user_fleet.aktion = 1 OR de_user_fleet.aktion = 2) AND de_user_fleet.entdeckt > 0 
 AND de_user_fleet.entdecktsec > 0 AND de_user_data.show_ally_secstatus>'$time' AND de_user_data.status=1 AND de_user_data.allytag<>'' AND 
 (de_user_data.allytag='$ownally'". ($allypartnertag!=''? "OR de_user_data.allytag='$allypartnertag'" : "") .")

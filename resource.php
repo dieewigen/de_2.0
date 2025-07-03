@@ -325,19 +325,16 @@ $btipstr .= '</table>';
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 $fehlermsg = '';
-$e_t1 = $_POST["e_t1"] ?? 0;
-$e_t2 = $_POST["e_t2"] ?? 0;
-$e_t3 = $_POST["e_t3"] ?? 0;
-$e_t4 = $_POST["e_t4"] ?? 0;
+
+$e_t1 = intval($_POST["e_t1"] ?? 0);
+$e_t2 = intval($_POST["e_t2"] ?? 0);
+$e_t3 = intval($_POST["e_t3"] ?? 0);
+$e_t4 = intval($_POST["e_t4"] ?? 0);
 if (!empty($e_t1) || !empty($e_t2) || !empty($e_t3) || !empty($e_t4)) {
     if (validDigit($e_t1) && validDigit($e_t2) && validDigit($e_t3) && validDigit($e_t4)) {
-        $e_t1 = intval($e_t1);
-        $e_t2 = intval($e_t2);
-        $e_t3 = intval($e_t3);
-        $e_t4 = intval($e_t4);
         if (($e_t1 + $e_t2 + $e_t3 + $e_t4) <= 100) {  //key ist ok und wird aktualisiert
             $newkey = $e_t1.";".$e_t2.";".$e_t3.";".$e_t4;
-
+            
             //wenn key kleiner als 100 dann warnung ausgeben
             if (($e_t1 + $e_t2 + $e_t3 + $e_t4) < 100) {
                 $fehlermsg = $resource_lang['reswarnung'];
@@ -418,23 +415,10 @@ $db_daten = mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0
 $row = mysql_fetch_array($db_daten);
 $maxcol = $row['maxcol'];
 
-$pa_energie = $maxcol * $sv_kollieertrag * 0.05;
-
-//adebonus
-/*
-$filename='../div_server_data/ade_debonus/data.txt';
-$fp = fopen ($filename, 'r');
-$data=trim(fgets($fp, 1024));
-$prozente=explode(";", $data);
-$adebonus=$maxtick/100*$prozente[$ums_rasse-1];
-fclose($fp);*/
 $adebonus = 0;
 
-if ($_SESSION['ums_premium'] == 1) {
-    $eages = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $sartefaktenergie + $paleniumenergie + $adebonus + $pa_energie;
-} else {
-    $eages = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $sartefaktenergie + $paleniumenergie + $adebonus;
-}
+
+$eages = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $sartefaktenergie + $paleniumenergie + $adebonus;
 
 //energieinput pro rohstoff
 $em = floor($eages / 100 * $keym);
@@ -780,56 +764,6 @@ echo '<tr valign="middle" align="center" height="25">';
 echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($ea, 0, "", ".").' ('.number_format($col, 0, "", ".").' '.$resource_lang['kollis'].')</td>';
 echo '</tr>';
-
-if ($GLOBALS['sv_ang'] != 1) {
-    //diplomatieertrag
-    if ($c1 == 0) {
-        $c1 = 1;
-        $bg = 'cell1';
-    } else {
-        $c1 = 0;
-        $bg = 'cell';
-    }
-    echo '<tr valign="middle" align="center" height="25">';
-    echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe4'].'"> + '.$resource_lang['diploartibonus'].'</td>';
-    echo '<td class="'.$bg.'" colspan=4>'.number_format($dartefaktenergie, 0, "", ".").' ('.number_format($dartefakt, 2, ",", ".").' %)</td>';
-    echo '</tr>';
-
-    //paleniumverst�rker
-    if ($c1 == 0) {
-        $c1 = 1;
-        $bg = 'cell1';
-    } else {
-        $c1 = 0;
-        $bg = 'cell';
-    }
-    echo '<tr valign="middle" align="center" height="25">';
-    echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe5'].'"> + '.$resource_lang['paleniumverst'].'</td>';
-    echo '<td class="'.$bg.'" colspan=4>'.number_format($paleniumenergie, 0, "", ".").' ('.number_format($palenium / 100, 2, ",", ".").' % von max. '.number_format($sv_max_palenium / 100, 2, ",", ".").' %)</td>';
-    echo '</tr>';
-} else {
-    //premium-account
-    if ($_SESSION['ums_premium'] != 1) {
-        $pa_text_color = 'color:#FF0000;';
-        $pa_energie_msg = 'Dir entgehen '.number_format($pa_energie, 0, "", ".").' Energie.';
-    } else {
-        $pa_text_color = '';
-        $pa_energie_msg = number_format($pa_energie, 0, "", ".");
-    }
-    if ($c1 == 0) {
-        $c1 = 1;
-        $bg = 'cell1';
-    } else {
-        $c1 = 0;
-        $bg = 'cell';
-    }
-    echo '<tr valign="middle" align="center" height="25">';
-    echo '<td class="'.$bg.'" style="text-align: left;'.$pa_text_color.'">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" 
-			title="Premium-Account&Durch diesen erh&auml;lt man einen Bonus der sich wie folgt berechnet:<br>5% der Kollektorenenergie des Spielers mit den meisten Kollektoren"> + Premium-Account</td>';
-
-    echo '<td class="'.$bg.'" style="'.$pa_text_color.'" colspan="4">'.$pa_energie_msg.'</td>';
-    echo '</tr>';
-}
 
 //sektorartefaktenergie
 if ($c1 == 0) {

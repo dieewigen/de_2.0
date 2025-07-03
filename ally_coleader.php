@@ -14,7 +14,7 @@ include('inc/lang/'.$sv_server_lang.'_ally.coleader.lang.php');
 include_once('functions.php');
 
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, ally_id, allytag, status, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, ally_id, allytag, status, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];
 $restyp02=$row[1];

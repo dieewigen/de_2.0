@@ -1,5 +1,5 @@
 <?php
-//mit fügt mit einer chance von x prozent x-y userartefakte in den handel ein, wenn es für die artefakte kein angebot gibt
+//mit fï¿½gt mit einer chance von x prozent x-y userartefakte in den handel ein, wenn es fï¿½r die artefakte kein angebot gibt
 //das ganze passiert jedoch nur dann, wenn mindestens x% der spieler einen cyborg haben
 
 /*
@@ -16,12 +16,12 @@ if($cyborganzahl>=$gesamanzahl/10)
   //alle artefakte durchgehen
   for($i=1;$i<=7;$i++)
   {
-    //wenn w zutrifft, dann schauen ob man einfügen muß
+    //wenn w zutrifft, dann schauen ob man einfï¿½gen muï¿½
     if(mt_rand(1,100)<=1)
     {
       $db_daten=mysql_query("SELECT id FROM de_trade_artefact WHERE id='$i' AND level=1",$db);
       $anz = mysql_num_rows($db_daten);
-      //wenn keine artefakte vorhanden sind x artefakte einfügen
+      //wenn keine artefakte vorhanden sind x artefakte einfï¿½gen
       if($anz==0)
       {
         $anz=mt_rand(1,2);

@@ -321,7 +321,6 @@ $md[$md_index]['ally_mission_counter_id']=2;
 <html>
 <head>
 <title>Missionen</title>
-<meta charset="utf-8"/>
 
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <?php 
@@ -364,7 +363,7 @@ if(!hasTech($pt,29)){
 	//die Missionsdatensätze auslesen
 	///////////////////////////////////////////////////////////
 	$um=array();
-	$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".$_SESSION['ums_user_id'].";");
+	$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".intval($_SESSION['ums_user_id']).";");
 	//alle daten in ein array packen
 	while($row = mysqli_fetch_array($db_daten)){
 		$um[$row['mission_id']]=$row;
@@ -388,7 +387,7 @@ if(!hasTech($pt,29)){
 		if(isset($md[$m]['special_system_phase_need'])){
 			$map_id=getMapIDBySpecialsystemID($md[$m]['special_system_phase_need'][0]);
 			$special_data=getUserSpecialsystemDataByMapID($_SESSION['ums_user_id'], $map_id);
-			if($special_data['phase']>=$md[$m]['special_system_phase_need'][1]){
+			if(isset($special_data['phase']) && $special_data['phase']>=$md[$m]['special_system_phase_need'][1]){
 				//Vorbedingung erfüllt
 			}else{
 				//Vorbedingung nicht erfüllt, also Mission nicht anzeigen
@@ -505,7 +504,8 @@ if(!hasTech($pt,29)){
 						if($storage_is_ok){
 
 							//läuft die Mission bereits?
-							if( (isset($um[$m]['end_time']) && $um[$m]['end_time']<time()) && ( (isset($um[$m]['get_reward']) && $um[$m]['get_reward']==1) || (isset($um[$m]['get_reward']) && $um[$m]['get_reward']==''))){
+							if( (isset($um[$m]['end_time']) && $um[$m]['end_time']<time()) && ( (isset($um[$m]['get_reward']) && $um[$m]['get_reward']==1) || (isset($um[$m]['get_reward']) && $um[$m]['get_reward']=='')) || !isset($um[$m]) ){
+
 
 								//Agenten abziehen
 								$sql="UPDATE de_user_data SET agent=agent-".$md[$m]['need_agents']." WHERE user_id=".$_SESSION['ums_user_id'].";";

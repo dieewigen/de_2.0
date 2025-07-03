@@ -13,7 +13,7 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.ablehnen.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -25,8 +25,6 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 <?php include('cssinclude.php'); ?>
 </head>
 <body>
-
-<font face="tahoma" style="font-size:8pt;">
 
 <?php
 include('resline.php');
@@ -87,7 +85,7 @@ else
 		$antragexists = 0;
 		$antragexists = mysql_result($result,0,0);
 		if ($antragexists == 0)
-			die($allyablehnen_lang['msg_5]');
+			die($allyablehnen_lang['msg_5']);
 
 		$query = "delete from de_ally_buendniss_antrag where ally_id_antragsteller=$allyid and ally_id_partner=$clanid";
 		$result = mysql_query($query);

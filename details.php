@@ -4,7 +4,7 @@ include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_details.lang.php';
 include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, score, sector, system, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -22,7 +22,7 @@ $sy=intval($_REQUEST['sy']);
 if(isset($_REQUEST['sn'])){
 	
 	$sn=$_REQUEST['sn'];
-	$db_daten=mysql_query("SELECT user_id, sector, system FROM de_user_data WHERE spielername='$sn'",$db);
+	$db_daten=mysql_query("SELECT user_id, sector, `system` FROM de_user_data WHERE spielername='$sn'",$db);
 	$num = mysql_num_rows($db_daten);
 	if($num==1){
 		$row = mysql_fetch_array($db_daten);
@@ -41,7 +41,7 @@ if(isset($_REQUEST['sn'])){
 }
 
 //Analysieren der Koordinaten, um userid vom ZIEL herauszubekommen
-$db_da=mysql_query("SELECT user_id,allytag,sector,spielername,status  FROM de_user_data WHERE sector='$se' and  system='$sy'",$db);
+$db_da=mysql_query("SELECT user_id,allytag,sector,spielername,status  FROM de_user_data WHERE sector='$se' and  `system`='$sy'",$db);
 $rew = mysql_fetch_array($db_da);
 if($rew['user_id']>0){
 	$zuser_id=$rew['user_id'];
@@ -61,7 +61,7 @@ if($zuser_id>0 && $zowner_id<1){
 <!doctype html>
 <html>
 <head>
-<title><?php echo $details_lang[title];?></title>
+<title><?php echo $details_lang['title'];?></title>
 <?php include "cssinclude.php"; ?>
 <style type="text/css">
 <!--
@@ -89,8 +89,8 @@ smilies++;
 j++;
 i++;
 }
-if(smilies>20)alert("<?php echo $details_lang[err_zu_viele_smilies];?>");
-if(document.getElementById("nachricht").value.length>10000)alert("<?php echo $details_lang[err_zu_viele_zeichen]?>");
+if(smilies>20)alert("<?php echo $details_lang['err_zu_viele_smilies'];?>");
+if(document.getElementById("nachricht").value.length>10000)alert("<?php echo $details_lang['err_zu_viele_zeichen']?>");
 if(smilies<=20 && document.getElementById("nachricht").value.length<=10000)
 {
 var temp=0;
@@ -99,7 +99,7 @@ if(temp==0)
 {
 if(document.getElementById("zielsek").value==""||document.getElementById("zielsys").value=="")
 {
-alert("<?php echo $details_lang[err_fehlerhaftekoords]?>");
+alert("<?php echo $details_lang['err_fehlerhaftekoords']?>");
 return false;
 }
 else
@@ -130,11 +130,11 @@ i++;
 }
 if(document.getElementById("nachricht").value.length>=10000 || smilies>20)
 {
-alert("<?php echo $details_lang[msg_zeichensmilie]?>");
+alert("<?php echo $details_lang['msg_zeichensmilie']?>");
 }
 else
 {
-alert("<?php echo $details_lang[msg_summezeichensmilie1]?> " + document.getElementById("nachricht").value.length + " <?php echo $details_lang[msg_summezeichensmilie2]?> "+ (10000 - document.getElementById("nachricht").value.length) +" <?php echo $details_lang[msg_summezeichensmilie3]?> " + smilies + " <?php $details_lang[msg_summezeichensmilie4]?> " + (20 - smilies) + " <?php echo $details_lang[msg_summezeichensmilie5]?>");
+alert("<?php echo $details_lang['msg_summezeichensmilie1']?> " + document.getElementById("nachricht").value.length + " <?php echo $details_lang['msg_summezeichensmilie2']?> "+ (10000 - document.getElementById("nachricht").value.length) +" <?php echo $details_lang['msg_summezeichensmilie3']?> " + smilies + " <?php $details_lang['msg_summezeichensmilie4']?> " + (20 - smilies) + " <?php echo $details_lang['msg_summezeichensmilie5']?>");
 }
 }
 
@@ -326,7 +326,7 @@ if($_REQUEST['ruessel']==1)
 		if($num>0)
 		{
 			//�berpr�fen ob das ziel einen kollektor hat
-			$db_daten=mysql_query("SELECT * FROM de_user_data WHERE sector='$se' AND system='$sy'",$db);
+			$db_daten=mysql_query("SELECT * FROM de_user_data WHERE sector='$se' AND `system`='$sy'",$db);
 			$num = mysql_num_rows($db_daten);
 			if($num>0)
 			{
@@ -341,7 +341,7 @@ if($_REQUEST['ruessel']==1)
 					if($ums_user_id!=$zuid)
 					{
 						//dem ziel den kollektor entfernen
-						mysql_query("UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE sector='$se' AND system='$sy'",$db);
+						mysql_query("UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE sector='$se' AND `system`='$sy'",$db);
 	
 						//info an das ziel bzgl. r�sselung
 						mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$zuid', '60','$time','Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')",$db);
@@ -395,12 +395,12 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 <table border="0" width="586" cellspacing="0" cellpadding="0">
 <tr>
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td class="ro" align="center" colspan="2"><?php echo $details_lang[hfnverfassen]?></td>
+<td class="ro" align="center" colspan="2"><?php echo $details_lang['hfnverfassen']?></td>
 <td width="13" height="37" class="ror">&nbsp;</td>
 </tr>
 <tr class="cell">
 <td width="13" height="37" class="rl">&nbsp;</td>
-<td width="100"><?php echo $details_lang[zielkoordinaten]?>:</td>
+<td width="100"><?php echo $details_lang['zielkoordinaten']?>:</td>
 <td>
 <input name="zielsek" tabindex="1" id="zielsek" size="4" style="border-style:solid;height:21;" value="<?php echo $se;?>"><input name="zielsys" tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" value="<?php echo $sy;?>">
 </td>
@@ -408,7 +408,7 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 </tr>
 <tr class="cell">
 <td width="13" height="37" class="rl">&nbsp;</td>
-<td width="100"><?php echo $details_lang[betreff]?>: </td>
+<td width="100"><?php echo $details_lang['betreff']?>: </td>
 <td><input name="betreff" tabindex="3" size="30" style="border-style:solid;height:21;">
 </td>
 <td width="13" height="37" class="rr">&nbsp;</td>
@@ -417,44 +417,44 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 <tr class="cell">
               <td width='13' height='37' class='rl'>&nbsp;</td>
               <td colspan=2 align=center height=50>
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm1.gif" onclick="init('smile1')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm2.gif" onclick="init('smile2')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm3.gif" onclick="init('smile3')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm4.gif" onclick="init('smile4')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm5.gif" onclick="init('smile5')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm6.gif" onclick="init('smile6')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm7.gif" onclick="init('smile7')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm8.gif" onclick="init('smile8')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm9.gif" onclick="init('smile9')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm10.gif" onclick="init('smile10')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm11.gif" onclick="init('smile11')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm12.gif" onclick="init('smile12')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm13.gif" onclick="init('smile13')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm14.gif" onclick="init('smile14')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm15.gif" onclick="init('smile15')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm16.gif" onclick="init('smile16')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm17.gif" onclick="init('smile17')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm18.gif" onclick="init('smile18')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm19.gif" onclick="init('smile19')" alt="<?php echo $details_lang[altsmilie]?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm20.gif" onclick="init('smile20')" alt="<?php echo $details_lang[altsmilie]?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm1.gif" onclick="init('smile1')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm2.gif" onclick="init('smile2')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm3.gif" onclick="init('smile3')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm4.gif" onclick="init('smile4')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm5.gif" onclick="init('smile5')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm6.gif" onclick="init('smile6')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm7.gif" onclick="init('smile7')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm8.gif" onclick="init('smile8')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm9.gif" onclick="init('smile9')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm10.gif" onclick="init('smile10')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm11.gif" onclick="init('smile11')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm12.gif" onclick="init('smile12')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm13.gif" onclick="init('smile13')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm14.gif" onclick="init('smile14')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm15.gif" onclick="init('smile15')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm16.gif" onclick="init('smile16')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm17.gif" onclick="init('smile17')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm18.gif" onclick="init('smile18')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm19.gif" onclick="init('smile19')" alt="<?php echo $details_lang['altsmilie']?>">
+              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm20.gif" onclick="init('smile20')" alt="<?php echo $details_lang['altsmilie']?>">
               <br>
 
               <input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
               <input type="button" value="&nbsp;u&nbsp;"  onclick="init('under')">
               <input type="button" value="&nbsp;i&nbsp;"  onclick="init('kursiv')">
-              <input type="button" value="<?php echo $details_lang[rot]?>"  onclick="init('rot')">
-              <input type="button" value="<?php echo $details_lang[gelb]?>"  onclick="init('gelb')">
-              <input type="button" value="<?php echo $details_lang[gruen]?>"  onclick="init('gruen')">
-              <input type="button" value="<?php echo $details_lang[weiss]?>"  onclick="init('weiss')">
-              <input type="button" value="<?php echo $details_lang[farbe]?>"  onclick="init('farbe')">
+              <input type="button" value="<?php echo $details_lang['rot']?>"  onclick="init('rot')">
+              <input type="button" value="<?php echo $details_lang['gelb']?>"  onclick="init('gelb')">
+              <input type="button" value="<?php echo $details_lang['gruen']?>"  onclick="init('gruen')">
+              <input type="button" value="<?php echo $details_lang['weiss']?>"  onclick="init('weiss')">
+              <input type="button" value="<?php echo $details_lang['farbe']?>"  onclick="init('farbe')">
               
-              <input type="button" value="<?php echo $details_lang[groesse]?>"  onclick="init('size')">
+              <input type="button" value="<?php echo $details_lang['groesse']?>"  onclick="init('size')">
               <input type="button" value="center"  onclick="init('center')">
               <input type="button" value="pre"  onclick="init('pre')">
               <input type="button" value="Link"  onclick="init('www')">
               <input type="button" value="@"  onclick="init('mail')">
               <input type="button" value="&nbsp;?&nbsp;"  onclick="hilfe()">
-              <input type="button" value="<?php echo $details_lang[leeren]?>"  onclick="leeren()">
+              <input type="button" value="<?php echo $details_lang['leeren']?>"  onclick="leeren()">
               </td>
               <td width='13' height='37' class='rr'>&nbsp;</td>
               </tr>
@@ -467,7 +467,7 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 
 <tr>
 <td width="13" height="37" class="rl">&nbsp;</td>
-<td colspan="2" align=center><input type="button" value="<?php echo $details_lang[laengepruefen]?>" onClick="check()"> <input type="submit" tabindex="5" onclick="return zeichenundsmiliecheck()" name="antbut" value="<?php echo $details_lang[hfnabsenden]?>"></td>
+<td colspan="2" align=center><input type="button" value="<?php echo $details_lang['laengepruefen']?>" onClick="check()"> <input type="submit" tabindex="5" onclick="return zeichenundsmiliecheck()" name="antbut" value="<?php echo $details_lang['hfnabsenden']?>"></td>
 <td width="13" height="37" class="rr">&nbsp;</td>
 </tr>
 

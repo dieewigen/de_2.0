@@ -5,7 +5,7 @@ include "lib/religion.lib.php";
 include "functions.php";
 include "issectork.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, system, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, `system`, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
 $restyp05=$row[4];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -44,7 +44,7 @@ if(isset($_REQUEST["sso"])){
 }
 
 //spieler sortiert auslesen    
-$orderby='system';
+$orderby='`system`';
 if($secsort=='1')$orderby='col';
 elseif($secsort=='2')$orderby='score';
 
@@ -75,39 +75,37 @@ echo '<div align="center">';
 //die("<table width=600><br><font size=4>Momentan k�nnen keine Sektordaten aus der Zentraldatenbank des Kristallpalastes bezogen werden. Grund daf�r ist der gleichzeitige Ausfall mehrerer Datenknoten. Die Umst�nde lassen keinen Zweifel daran, dass es sich um Sabotage gehandelt hat und die Techniker haben die DX61a23 in Verdacht, mit bisher noch unbekannten technischen Mitteln die St�rung herbeigef�hrt zu haben. Wir hoffen, dass die St�rung nur von kurzer Dauer sein wird und arbeiten mit Hochdruck an einer L�sung.</body></html>");
 
 function wellenrechner($kol, $maxcol, $npcsec){
-	global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $ums_premium, $sv_kollie_klaurate;
+	global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $sv_kollie_klaurate;
 	$str='Kollektoren-Wellenrechner';
 	$str.="<table width=200px border=0 cellpadding=0 cellspacing=1><tr align=center><td width=15%>&nbsp</td><td width=17%>".$sec_lang['kollektoren']."</td></tr>";
 	$str.="<tr align=center><td>&nbsp;</td><td>".number_format($kol, 0, ',' ,'.')."</td></tr>";
-	if($ums_premium==1){
-		$owncol=$col;
-		if($maxcol==0)$maxcol=1;
-		for($we=0; $we<5; $we++){
-	  		if($owncol>$maxcol)$maxcol=$owncol;
-	  
-			if($npcsec==0){
-	  			$col_angriffsgrenze=$owncol*100/$maxcol;
-	  			$col_angriffsgrenze=$col_angriffsgrenze/100*$sv_max_col_attgrenze;
-	  			if($col_angriffsgrenze>$sv_max_col_attgrenze){
-					$col_angriffsgrenze=$sv_max_col_attgrenze;
-				}
-	  			if($col_angriffsgrenze<$sv_min_col_attgrenze){
-					$col_angriffsgrenze=$sv_min_col_attgrenze;
-				}
-	  		}else{
-	  			$col_angriffsgrenze=$sv_min_col_attgrenze;
-	  		}
-	  		
-	  		if ($kol<$col_angriffsgrenze*$owncol){$colclass="text2";}else{$colclass="text3";}
-	  		
-			$str.="<tr align=center><td nowrap>".($we+1).". ".$sec_lang['welle']."</td><td class=".$colclass.">".
-			number_format(floor($kol*$sv_kollie_klaurate), 0, ',','.')."</td></tr>";
-	  		$owncol=$owncol+floor($kol*$sv_kollie_klaurate);
-	  		$kol=$kol-floor($kol*$sv_kollie_klaurate);
+
+	$owncol=$col;
+	if($maxcol==0)$maxcol=1;
+	for($we=0; $we<5; $we++){
+		if($owncol>$maxcol)$maxcol=$owncol;
+	
+		if($npcsec==0){
+			$col_angriffsgrenze=$owncol*100/$maxcol;
+			$col_angriffsgrenze=$col_angriffsgrenze/100*$sv_max_col_attgrenze;
+			if($col_angriffsgrenze>$sv_max_col_attgrenze){
+				$col_angriffsgrenze=$sv_max_col_attgrenze;
+			}
+			if($col_angriffsgrenze<$sv_min_col_attgrenze){
+				$col_angriffsgrenze=$sv_min_col_attgrenze;
+			}
+		}else{
+			$col_angriffsgrenze=$sv_min_col_attgrenze;
 		}
 		
+		if ($kol<$col_angriffsgrenze*$owncol){$colclass="text2";}else{$colclass="text3";}
+		
+		$str.="<tr align=center><td nowrap>".($we+1).". ".$sec_lang['welle']."</td><td class=".$colclass.">".
+		number_format(floor($kol*$sv_kollie_klaurate), 0, ',','.')."</td></tr>";
+		$owncol=$owncol+floor($kol*$sv_kollie_klaurate);
+		$kol=$kol-floor($kol*$sv_kollie_klaurate);
 	}
-	else $str.="<tr><td colspan=2>".$sec_lang['painfo']."</td></tr>";
+		
 
 	//info bzgl. erobern/zerst�ren von kollektoren
 	$str.="</table><br>Gr&uuml;ner Kollektorenwert: Kollektoren liegen &uuml;ber der Kollektorenangriffsgrenze und werden erobert.<br><br>Roter Kollektorenwert: Kollektoren liegen unter der Kollektorenangriffsgrenze und werden zerst&ouml;rt.";
@@ -351,14 +349,14 @@ if($sec_data['npc']==1){
 	//die spielerdaten laden
 	if($sf==1 && !isset($_REQUEST['showall'])){
 		$db_daten = mysql_query("SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.system, de_user_data.rasse, de_user_data.allytag, 
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector='$sf' ORDER BY $orderby ASC",$db);
 	}else{
 		//alles anzeigen
 		$db_daten = mysql_query("SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.system, de_user_data.rasse, de_user_data.allytag, 
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector='$sf' ORDER BY $orderby ASC",$db);
@@ -622,8 +620,8 @@ if($sec_data['npc']==1){
   //artefakte anzeigen
 
   //schauen ob es artefakte gibt
-  $res = mysql_query("SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector='$sector'",$db);
-  $artnum = mysql_num_rows($res);
+  $res = mysqli_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector='$sector'");
+  $artnum = mysqli_num_rows($res);
   //if ($artnum>0 OR $bed!='000')//artefakt vorhanden, oder raumbasis gebaut
   //{
     
@@ -636,10 +634,10 @@ if($sec_data['npc']==1){
   }
   	
   	
-  while($row = mysql_fetch_array($res))
+  while($row = mysqli_fetch_array($res))
   {
       //artefakttooltip bauen
-	$desc=utf8_encode_fix($row["artdesc"]);
+	$desc=$row["artdesc"];
 	$desc=str_replace("{WERT1}", number_format($sv_artefakt[$row["id"]-1][0], 2,",",".") ,$desc);
 	$desc=str_replace("{WERT2}", number_format($sv_artefakt[$row["id"]-1][1], 0,"",".") ,$desc);
 	$desc=str_replace("{WERT3}", number_format($sv_artefakt[$row["id"]-1][2], 0,"",".") ,$desc);

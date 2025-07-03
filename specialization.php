@@ -5,7 +5,7 @@ include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/achievement.inc.php';
 include "functions.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, buildgnr, buildgtime, newtrans, newnews, design1 AS design, efta_user_id, tick, specreset, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE user_id='$ums_user_id'",$db);
+$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, buildgnr, buildgtime, newtrans, newnews, design1 AS design, efta_user_id, tick, specreset, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE user_id='$ums_user_id'",$db);
 $row = mysql_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];
 $punkte=$row["score"];$techs=$row["techs"];$buildgnr=$row["buildgnr"];

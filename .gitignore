@@ -10,6 +10,7 @@ ranglisten/
 sekretariat/
 soudata/source/sou_showdata.php
 .gitignore
+.user.ini
 dieewigen.code-workspace
 inc/env.inc.php
 inc/sv.inc.php

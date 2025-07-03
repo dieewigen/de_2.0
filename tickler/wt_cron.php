@@ -48,19 +48,23 @@ if ($nachtcron != $time) {
             ////////////////////////////////////////////////////////////
             $zeit = strftime("%Y-%m-%d");
             //daten für die userstatistik speichern
-            $db_daten = mysql_query("SELECT user_id, score, col, efta_user_id FROM de_user_data WHERE npc=0", $db);
+            $db_daten = mysql_query("SELECT user_id, score, col FROM de_user_data WHERE npc=0", $db);
             echo "<br>$num Spieler für die tägliche Statistik geladen.<br>";
             while ($row = mysql_fetch_array($db_daten)) {
                 $uid = $row["user_id"];
                 $score = $row["score"];
                 $col = $row["col"];
-                $efta_user_id = $row["efta_user_id"];
+                //$efta_user_id = $row["efta_user_id"];
 
+                /*
                 //cyborgpunkte laden
                 $db_datenx = mysql_query("SELECT exp FROM de_cyborg_data WHERE user_id='$efta_user_id'", $eftadb);
                 $rowx = mysql_fetch_array($db_datenx);
                 $cybexp = $rowx["exp"];
                 mysql_query("INSERT INTO de_user_stat SET user_id='$uid', datum='$zeit', score='$score', col='$col', cybexp='$cybexp'", $db);
+                */
+
+                mysql_query("INSERT INTO de_user_stat SET user_id='$uid', datum='$zeit', score='$score', col='$col';", $db);
             }
 
             //maximal 1 Jahr speichern
@@ -108,9 +112,11 @@ if ($nachtcron != $time) {
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
             // den sou creditbonus geben
+            /*
             if ($sv_deactivate_sou == 0) {
                 give_ea_creditbonus();
             }
+            */
             // den efta-bonus geben
             //if($sv_deactivate_efta==0)give_efta_bonus();
             ////////////////////////////////////////////////////////////
@@ -120,7 +126,6 @@ if ($nachtcron != $time) {
 
         case 2:
             mysql_query("DELETE FROM  de_user_locks", $db);
-            //include "wt_externe_topliste_alli.php";
             break;
 
         case 3:
@@ -142,7 +147,6 @@ if ($nachtcron != $time) {
         case 6:
             mysql_query("DELETE FROM  de_user_locks", $db);
             remove_sm_rboost_br();
-            //include "wt_externe_topliste_alli.php";
             break;
         case 7:
             mysql_query("DELETE FROM  de_user_locks", $db);
@@ -157,10 +161,6 @@ if ($nachtcron != $time) {
 
         case 10:
             mysql_query("DELETE FROM de_user_locks", $db);
-            //include "wt_externe_topliste_alli.php";
-            //include "wt_externe_topliste_cyborg.php";
-            //include "wt_externe_topliste_sektor.php";
-            //include "wt_externe_topliste_spieler.php";
             break;
 
         case 11:
@@ -175,7 +175,6 @@ if ($nachtcron != $time) {
             break;
         case 14:
             mysql_query("DELETE FROM de_user_locks", $db);
-            //include "wt_externe_topliste_alli.php";
             break;
         case 15:
             mysql_query("DELETE FROM de_user_locks", $db);
@@ -190,7 +189,6 @@ if ($nachtcron != $time) {
         case 18:
             mysql_query("DELETE FROM de_user_locks", $db);
             remove_sm_rboost_br();
-            //include "wt_externe_topliste_alli.php";
 
             //Anzahl der Spieler im globalen Chat anzeigen
             if ($sv_server_tag == 'SDE') {
@@ -220,10 +218,6 @@ if ($nachtcron != $time) {
 
         case 22:
             mysql_query("DELETE FROM de_user_locks", $db);
-            //include "wt_externe_topliste_alli.php";
-            //include "wt_externe_topliste_cyborg.php";
-            //include "wt_externe_topliste_sektor.php";
-            //include "wt_externe_topliste_spieler.php";
             break;
 
         case 23:
@@ -381,6 +375,7 @@ function give_sector_bonus()
     }
 }
 
+/*
 function give_efta_bonus()
 {
     global $db, $eftadb, $wt_lang;
@@ -451,10 +446,11 @@ function give_efta_bonus()
         mysql_query($sqlcommand[$i], $db);
     }
 }
-
+*/
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
+/*
 function give_ea_creditbonus()
 {
     global $db, $sv_database_de, $sv_database_sou, $wt_lang, $soudb;
@@ -531,6 +527,7 @@ function give_ea_creditbonus()
         mysql_query($sqlcommand[$i], $db);
     }
 }
+*/
 
 function remove_sm_rboost_br()
 {
@@ -637,12 +634,3 @@ function create_daily_server_statistic()
     //echo $sql;
     mysql_query($sql, $db);
 }
-
-/*
-die folgenden dateien liegen im Tickordner und m�ssen zu den angezeigten Zeiten ausgef�hrt werden!
-
-wt_externe_topliste_alli.php <==  2 Uhr & 6 Uhr & 10 Uhr & 14 Uhr & 18 Uhr & 22 Uhr
-wt_externe_topliste_cyborg.php <== 10 Uhr & 22 Uhr
-wt_externe_topliste_sektor.php <== 10 Uhr & 22 Uhr
-wt_externe_topliste_spieler.php <== 10 Uhr & 22 Uhr
-*/

@@ -116,7 +116,6 @@ if($_REQUEST["setdesign"]){
 <html>
 <head>
 <title><?=$production_lang['produktion']?></title>
-<meta charset="utf-8"/>
 <?php include "cssinclude.php";
 echo '<script language="javascript">';
 //Trägerbonus
@@ -150,7 +149,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 		//ben. transportkapazität
 		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang['kapazitaet2'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][2];
 		//frachtkapazität
-		if ($unit[$ums_rasse-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$ums_rasse-1][$unit_index]['fk'];
+		if (isset($unit[$ums_rasse-1][$unit_index]['fk']) && $unit[$ums_rasse-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$ums_rasse-1][$unit_index]['fk'];
 	}
 
 	//waffenarten

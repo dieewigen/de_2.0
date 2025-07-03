@@ -31,7 +31,7 @@ $defabzug=0.20;
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-//alle einheitendaten f�r die ausgabe auslesen
+//alle einheitendaten für die ausgabe auslesen
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 unset($technames);
@@ -41,10 +41,8 @@ $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_tech_data WHERE tech_id
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	if($row['tech_id']<100){
 		$unit_index=$row['tech_id']-81;
-		$artbonus=$artbonus_fleet;
 	}else{
 		$unit_index=$row['tech_id']-90;
-		$artbonus=$artbonus_def;
 	}	
 	
 	$technames[$row['tech_id']]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']);
@@ -249,7 +247,6 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 <html>
 <head>
 <title>Recycling</title>
-<meta charset="utf-8"/>
 <?php include "cssinclude.php";?>
 </head>
 <body>
