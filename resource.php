@@ -216,8 +216,8 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
                 //$steueranteil=$res_cost-($res_cost*100/(100+$handelssteuersatz+$sektorsteuersatz));
 
                 //sektorsteuersatz auslesen
-                $db_daten=mysql_query("SELECT ssteuer FROM de_sector WHERE sec_id='$sector'",$db);
-                $sektorsteuersatz=mysql_result($db_daten, 0,0);
+                $db_daten = mysql_query("SELECT ssteuer FROM de_sector WHERE sec_id='$sector'", $db);
+                $sektorsteuersatz = mysql_result($db_daten, 0, 0);
 
                 $steueranteil = $res_cost / 100 * ($handelssteuersatz + $sektorsteuersatz);
 
@@ -334,7 +334,7 @@ if (!empty($e_t1) || !empty($e_t2) || !empty($e_t3) || !empty($e_t4)) {
     if (validDigit($e_t1) && validDigit($e_t2) && validDigit($e_t3) && validDigit($e_t4)) {
         if (($e_t1 + $e_t2 + $e_t3 + $e_t4) <= 100) {  //key ist ok und wird aktualisiert
             $newkey = $e_t1.";".$e_t2.";".$e_t3.";".$e_t4;
-            
+
             //wenn key kleiner als 100 dann warnung ausgeben
             if (($e_t1 + $e_t2 + $e_t3 + $e_t4) < 100) {
                 $fehlermsg = $resource_lang['reswarnung'];
@@ -556,7 +556,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 // kollektoren bauen
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-if(isset($_POST["b_col"])) {
+if (isset($_POST["b_col"])) {
     $b_col = intval($_POST["b_col"]);
     //transaktionsbeginn
     if (setLock($ums_user_id)) {
@@ -752,14 +752,14 @@ if (!hasTech($pt, 7)) {
 <?php
   //kollektorenergieoutput
   //grundenergie
-  $c1=0;
-  if ($c1 == 0) {
-      $c1 = 1;
-      $bg = 'cell1';
-  } else {
-      $c1 = 0;
-      $bg = 'cell';
-  }
+  $c1 = 0;
+if ($c1 == 0) {
+    $c1 = 1;
+    $bg = 'cell1';
+} else {
+    $c1 = 0;
+    $bg = 'cell';
+}
 echo '<tr valign="middle" align="center" height="25">';
 echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($ea, 0, "", ".").' ('.number_format($col, 0, "", ".").' '.$resource_lang['kollis'].')</td>';
@@ -1257,7 +1257,10 @@ echo '<tr class="'.$bg.'"><td>Eternium</td><td style="text-align: right">'.numbe
 //Tronic
 $tronic_hinweis = '';
 if (hasTech($pt, 160)) {
-    $tronic_hinweis = '<span style="color: #00FF00;">(jeden 20. Wirtschaftstick +1)</span> ';
+    $tronicertrag = 1;
+    $tronicertrag += intval(getArtefactAmountByUserId($_SESSION['ums_user_id'], 21));
+    $tronic_hinweis = '<span style="color: #00FF00;">(jeden 20. Wirtschaftstick +'.$tronicertrag.')</span> ';
+
 }
 
 if ($c1 == 0) {

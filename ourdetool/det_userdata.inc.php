@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 foreach ($_REQUEST as $key => $val){
   $$key = $_REQUEST[$key];
 }
@@ -80,7 +84,7 @@ fclose($fp234);
 //aktivit�t mitloggen
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
+/*
 //db konnekten
 if(!$db)include "../inccon.php";
 //richtige tabelle ausw�hlen
@@ -97,5 +101,6 @@ if($num==0)mysql_query("INSERT INTO de_supporttool.de_user_stat SET username='$d
 //aktivit�t vermerken
 $time=(int)strftime("%H");
 mysql_query("UPDATE de_supporttool.de_user_stat SET h$time=h$time+1 WHERE username='$det_username' AND datum='$zeit'",$db);
+*/
 
 ?>
