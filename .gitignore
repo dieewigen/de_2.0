@@ -4,6 +4,7 @@ cache/*.tmp
 cache/creditlogs/*.txt
 cache/toplist/*.tmp
 cache/overview/*.tmp
+cache/botcheck/*.txt
 fonts/
 npcx/
 ranglisten/
