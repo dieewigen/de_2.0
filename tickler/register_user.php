@@ -603,6 +603,11 @@ function reshuffle(){
 	
 	//die durschnittliche aktivit�t berechnen und diese dann den -1 Spielern zuweisen, da diese neu sind, erhalten sie den Durchschnittswert
 	//dies dient im Endeffet dazu neue Fakeaccounts nicht den ganz guten Sektoren zuzuweisen
+	if($akti_gewertet==0){
+		//keine Aktivität vorhanden, daher Durchschnitt auf 1 setzen
+		$akti_gewertet=1;
+	}
+
 	$akti_durchschnitt=$akti_gesamt/$akti_gewertet;
 	echo '<br>Akti Durchschnitt: '. $akti_durchschnitt;
 	

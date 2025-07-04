@@ -152,7 +152,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		}
 		//2. m�glichkeit: account bereits 3 tage im umode
 		else{
-		  $fehlermsg=$index_lang[umodebeendet];
+		  $fehlermsg=$index_lang['umodebeendet'];
 		  //umode beenden
 		  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$row[user_id]'",$db);
 		  $ums_status=1;

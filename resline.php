@@ -388,9 +388,11 @@ if($GLOBALS['sv_ang']==1 && $_SESSION['ums_mobi']!=1 && $_SESSION['de_frameset']
 /////////////////////////////////////////////////////////////
 // temporärer Hinweis
 /////////////////////////////////////////////////////////////
+/*
 echo '
 <div class="info_box text3" style="margin-bottom: 5px; font-size: 14px;">
 Die nächste xDE/SDE-Runde startet am 04.07.2025 um ca. 19:00 Uhr.<br><br>
 
 Da es zwischenzeitlich die Info gab, dass DE eingestellt worden ist, bitte ich jeden von euch die Rundenstartinfo möglichst an jeden weiterzuleiten.
 </div>';
+*/

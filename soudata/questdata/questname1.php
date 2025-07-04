@@ -1,4 +1,0 @@
-<?php
-$questname='Schiffsfledderei';
-$questinfo='-';
-?>
