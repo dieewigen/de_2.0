@@ -14,9 +14,9 @@
 if (intval(date("i")) == 0) {
     $time = time() - 3600 * 24 * 2;
     mysql_query("DELETE FROM de_chat_msg WHERE timestamp<'$time'", $db);
-    mysql_query("DELETE FROM de_chat_msg WHERE timestamp<'$time'", $soudb);
+    mysqli_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_msg WHERE timestamp<'$time'");
     // Und auch die alten Ignores aufräumen
-    mysql_query("DELETE FROM de_chat_ignore WHERE ignore_until<'".time()."'", $soudb);
+    mysqli_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_ignore WHERE ignore_until<'".time()."'");
 }
 
 //aktuelle stunde ermitteln
@@ -108,20 +108,6 @@ if ($nachtcron != $time) {
 
         case 1:
             mysql_query("DELETE FROM  de_user_locks", $db);
-
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
-            // den sou creditbonus geben
-            /*
-            if ($sv_deactivate_sou == 0) {
-                give_ea_creditbonus();
-            }
-            */
-            // den efta-bonus geben
-            //if($sv_deactivate_efta==0)give_efta_bonus();
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
-
             break;
 
         case 2:
@@ -374,161 +360,6 @@ function give_sector_bonus()
         }
     }
 }
-
-/*
-function give_efta_bonus()
-{
-    global $db, $eftadb, $wt_lang;
-
-    echo '<hr><br>EFTA Bonus gutschreiben:<br>';
-
-    //alle accounts auslesen
-    //$db_daten=mysql_query("SELECT de_user_data.user_id, de_user_data.sou_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0",$db);
-    //$db_daten=mysql_query("SELECT de_cyborg_data.user_id FROM de_login left join de_cyborg_data on(de_login.user_id = de_cyborg_data.user_id) WHERE de_login.status=1",$db);
-    $db_daten = mysql_query("SELECT de_user_data.user_id, de_user_data.efta_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0 AND de_user_data.efta_user_id>0", $db);
-    $index = 0;
-    while ($row = mysql_fetch_array($db_daten)) {
-        $user[$index][0] = $row["user_id"];
-        $user[$index][1] = $row["efta_user_id"];
-
-        $index++;
-    }
-
-    //zuerstmal den durchschnitt berechnen
-    //spenden im vergleich zum "vorjahr"
-    $db_daten = mysql_query("SELECT SUM(exp)-SUM(explastday) AS wert FROM `de_cyborg_data`", $eftadb);
-    $row = mysql_fetch_array($db_daten);
-    $tageswachstum = $row["wert"];
-    //spendendurchschnitt
-    $db_daten = mysql_query("SELECT COUNT(*) AS wert FROM `de_cyborg_data` WHERE exp<>explastday", $eftadb);
-    $row = mysql_fetch_array($db_daten);
-    $durchschnitt = $row["wert"];
-    echo '<br>Durchschnitt: '.$durchschnitt;
-    if ($durchschnitt < 1) {
-        $durchschnitt = 1;
-    }
-    //vom durschnitt mu� man x% haben
-    $p = 20;
-    $durchschnitt = $tageswachstum / $durchschnitt / 100 * $p;
-    echo '<br>Tageswachstum: '.$tageswachstum;
-    echo '<br>Durchschnitt: '.$durchschnitt;
-
-    $eftaartefakte = 5;
-    unset($sqlcommand);
-    $textzuinaktiv = $wt_lang[eftazuinaktiv].'<br>'.$wt_lang[eftazuerreichen].' '.$p.'%';
-    $textaktiv = $wt_lang[eftaaktiv].'<br>'.$wt_lang[eftaartefakte].': '.$eftaartefakte;
-    $time = strftime("%Y%m%d%H%M%S");
-    //jetzt alle efta_user_ids durchgehen und schauen was man bekommt
-    for ($i = 0;$i < count($user);$i++) {
-        $de_uid = $user[$i][0];
-        $efta_uid = $user[$i][1];
-        //efta_user_id = 0 -> man bekommt gar nichts
-        if ($efta_uid == 0) {
-            //nachricht, dass man keinen account hat und somit auch nichts bekommt
-            $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$wt_lang[eftakeinaccount]')";
-        } else { //man hat einen account
-            //auslesen wie aktiv man war
-            $db_daten = mysql_query("SELECT SUM(exp)-SUM(explastday) AS wert FROM `de_cyborg_data` WHERE user_id='$efta_uid'", $eftadb);
-            $row = mysql_fetch_array($db_daten);
-            if ($row["wert"] >= $durchschnitt && $durchschnitt > 0) {//man bekommt einen bonus
-                $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$textaktiv')";
-                $sqlcommand[] = "UPDATE de_user_data SET eartefakt=eartefakt+'$eftaartefakte', geteftabonus=geteftabonus+1 WHERE user_id='$de_uid'";
-            } else { //man ist zu inaktiv und bekommt nur eine info
-                $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$textzuinaktiv')";
-            }
-        }
-        $sqlcommand[] = "UPDATE de_user_data SET newnews = 1 WHERE user_id = '$de_uid'";
-    }
-
-    //alle befehle durchf�hren
-    for ($i = 0;$i < count($sqlcommand);$i++) {
-        echo '<br>'.$sqlcommand[$i];
-        mysql_query($sqlcommand[$i], $db);
-    }
-}
-*/
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
-/*
-function give_ea_creditbonus()
-{
-    global $db, $sv_database_de, $sv_database_sou, $wt_lang, $soudb;
-
-    echo '<hr><br>EA Credits gutschreiben:<br>';
-
-    //alle de-accounts inkl. sou-id auslesen
-    $db_daten = mysql_query("SELECT de_user_data.user_id, de_user_data.sou_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0", $db);
-    $index = 0;
-    while ($row = mysql_fetch_array($db_daten)) {
-        $user[$index][0] = $row["user_id"];
-        $user[$index][1] = $row["sou_user_id"];
-
-        $index++;
-    }
-
-    //sou db w�hlen
-    //mysql_select_db($sv_database_sou,$db);
-
-    //zuerstmal den durchschnitt berechnen
-    //spenden im vergleich zum "vorjahr"
-    $db_daten = mysql_query("SELECT SUM(donate)-SUM(donatelastday) AS wert FROM `sou_user_data`", $soudb);
-    $row = mysql_fetch_array($db_daten);
-    $jahrespenden = $row["wert"];
-    //spendendurchschnitt
-    $db_daten = mysql_query("SELECT COUNT(*) AS wert FROM `sou_user_data` WHERE donate<>donatelastday", $soudb);
-    $row = mysql_fetch_array($db_daten);
-    $durchschnitt = $row["wert"];
-    if ($durchschnitt < 1) {
-        $durchschnitt = 1;
-    }
-    //vom durschnitt mu� man x% haben
-    $p = 50;
-    $durchschnitt = round($jahrespenden / $durchschnitt / 100 * $p);
-
-    $credits = 1;
-    unset($sqlcommand);
-    $textzuinaktiv = $wt_lang[souzuinaktiv].'<br>'.$wt_lang[souzuerreichen].' '.$p.'%';
-    $textaktiv = $wt_lang[souaktiv].'<br>'.$wt_lang[soucredits].': '.$credits;
-    $time = strftime("%Y%m%d%H%M%S");
-    //jetzt alle sou_user_ids durchgehen und schauen was man bekommt
-    for ($i = 0;$i < count($user);$i++) {
-        $de_uid = $user[$i][0];
-        $sou_uid = $user[$i][1];
-        //sou_user_id = 0 -> man bekommt gar nichts
-        if ($sou_uid == 0) {
-            //nachricht, dass man keinen account hat und somit auch nichts bekommt
-            $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$wt_lang[soukeinaccount]')";
-        } else { //man hat einen account
-            //auslesen wie aktiv man war
-            $db_daten = mysql_query("SELECT SUM(donate)-SUM(donatelastday) AS wert FROM `sou_user_data` WHERE user_id='$sou_uid'", $soudb);
-            $row = mysql_fetch_array($db_daten);
-            if ($row['wert'] >= $durchschnitt && $durchschnitt > 0) {//man bekommt einen credit
-                $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$textaktiv')";
-                $sqlcommand[] = "UPDATE de_user_data SET credits=credits+'$credits', geteacredits=geteacredits+'$credits' WHERE user_id='$de_uid'";
-            } else { //man ist zu inaktiv und bekommt nur eine info
-                $msg = $textzuinaktiv.
-                    '<br>Zu erreichender Spendenwert: '.number_format($durchschnitt, 0, ',', '.').
-                    '<br>Erreichter Spendenwert: '.number_format($row['wert'], 0, ',', '.');
-                $sqlcommand[] = "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$de_uid', 60,'$time','$msg')";
-
-            }
-        }
-        $sqlcommand[] = "UPDATE de_user_data SET newnews = 1 WHERE user_id = '$de_uid'";
-    }
-
-
-    //sou db abw�hlen
-    //mysql_select_db($sv_database_de,$db);
-
-    //alle befehle durchf�hren
-    for ($i = 0;$i < count($sqlcommand);$i++) {
-        echo '<br>'.$sqlcommand[$i];
-        mysql_query($sqlcommand[$i], $db);
-    }
-}
-*/
-
 function remove_sm_rboost_br()
 {
     global $db, $sv_ewige_runde, $sv_hardcore;

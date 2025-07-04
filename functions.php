@@ -1456,7 +1456,7 @@ function getAllyBGScore($ally_id, $bg)
 
 function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
 {
-    global $db, $soudb, $sv_server_tag;
+    global $db, $sv_server_tag;
 
     $spielername = htmlspecialchars($spielername);
 
@@ -1468,8 +1468,8 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
     $time = time();
 
     if ($channeltyp == 3) {//gloabler Chat
-        mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$sv_server_tag', '$spielername', '$chat_message', '$time', '$owner_id')", $soudb);
+        mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
+		('$channel', '$channeltyp', '$sv_server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
     } else {
         //die verschiedenen Chats auf dem Server
         mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
@@ -1543,13 +1543,13 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
 
 function insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, $owner_id, $server_tag)
 {
-    global $db, $soudb;
+    global $db;
 
     $time = time();
 
     if ($channeltyp == 3) {//gloabler Chat
-        mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$server_tag', '$spielername', '$chat_message', '$time', '$owner_id')", $soudb);
+        mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
+		('$channel', '$channeltyp', '$server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
     } else {
         mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
 		('$channel', '$channeltyp', '$spielername', '$chat_message', '$time', '$owner_id')", $db);
@@ -1558,18 +1558,6 @@ function insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_messag
 
 function validDigit($digit)
 {
-    /*
-    $isavalid = 1;
-    for ($i=0; $i<strlen($digit); $i++)
-    {
-        if (!preg_match("/^[0-9]*$/i",$digit[$i]))
-        {
-            $isavalid = 0;
-            break;
-        }
-    }
-    return($isavalid);
-    */
     return is_int($digit);
 }
 

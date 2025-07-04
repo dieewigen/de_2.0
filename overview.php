@@ -60,6 +60,7 @@ WHERE user_id='$ums_user_id' AND tick<1000000;", $db);
 //logincounter zurücksetzen
 mysql_query("UPDATE de_login SET points = 0 WHERE user_id='$ums_user_id'", $db);
 
+$pt=loadPlayerTechs($_SESSION['ums_user_id']);
 $db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
 $restyp01 = $row[0];
@@ -111,107 +112,6 @@ $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT SUM(need_agents) AS anzahl FRO
 $row = mysqli_fetch_array($db_daten);
 $agent += $row['anzahl'];
 
-
-//---------------------------------------------------------------------------------------------
-// Overview Caching...
-
-include "cache/lastedbtick.tmp"; //holt die zeit des letzten wirtschaftsticks $t1='';
-
-$lastticktime = @mktime($t1[8].$t1[9], $t1[10].$t1[11], $t1[12].$t1[13], $t1[4].$t1[5], $t1[6].$t1[7], $t1[0].$t1[1].$t1[2].$t1[3]);
-//$filename = $DOCUMENT_ROOT."/desp01/cache/overview/overview-".$ums_user_id.".tmp";
-$filename = "cache/overview/overview-".$ums_user_id.".tmp";
-
-@$filetime = filemtime($filename);
-
-//$lastticktime=$filetime+9999999; //deaktiviert das cachen
-
-if ($lastticktime > $filetime) {//daten werden nicht gecached
-    //if ($lastticktime>$filetime)//daten werden nicht gecached
-    //echo "<!-- Live lastticktime: $lastticktime | filetime: $filetime -->";
-    $cachefile = fopen($filename, 'w');
-} else { //daten werden gecached
-    //echo "<!-- Cached lastticktime: $lastticktime | filetime: $filetime -->";
-    include "resline.php";
-    include $filename;
-    include "fooban.php";
-    echo '</body></html>';
-    exit;
-}
-
-function xecho($str)
-{
-    global $cachefile;
-    echo $str;
-    if ($cachefile) {
-        fwrite($cachefile, $str);
-    }
-}
-
-//---------------------------------------------------------------------------------------------
-
-//aktivit�t ausrechnen
-/*
-//zuerst schauen wer der aktiviste spieler ist
-$db_daten=mysql_query("SELECT MAX(actpoints) AS actpoints FROM de_user_data",$db);
-$row = mysql_fetch_array($db_daten);
-$maxap=$row["actpoints"];
-if ($maxap>0)$aktivitaet=$actpoints * 100 / $maxap; else $aktivitaet=100;*/
-//$aktivitaet=$actpoints/$tick*1000;
-
-/*
-$db_daten=mysql_query("SELECT skmes FROM de_sector WHERE sec_id='$sector'",$db);
-$row = mysql_fetch_array($db_daten);
-$skmes=$row["skmes"];
-
-$skmes = str_replace('\r\n',"\r\n",$skmes);
-$skmes = str_replace(":)","<img src=\"" . $ums_gpfad . "g/smilies/sm1.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":D","<img src=\"" . $ums_gpfad . "g/smilies/sm2.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(";)","<img src=\"" . $ums_gpfad . "g/smilies/sm3.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":x","<img src=\"" . $ums_gpfad . "g/smilies/sm4.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":(","<img src=\"" . $ums_gpfad . "g/smilies/sm5.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace("x(","<img src=\"" . $ums_gpfad . "g/smilies/sm6.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":p","<img src=\"" . $ums_gpfad . "g/smilies/sm7.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace("(?)","<img src=\"" . $ums_gpfad . "g/smilies/sm8.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace("(!)","<img src=\"" . $ums_gpfad . "g/smilies/sm9.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":{","<img src=\"" . $ums_gpfad . "g/smilies/sm10.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":}","<img src=\"" . $ums_gpfad . "g/smilies/sm11.gif\" alt=\"Smilie\">",$skmes);
-$skmes = str_replace(":L","<img src=\"" . $ums_gpfad . "g/smilies/sm12.gif\" alt=\"Smilie\">",$skmes);
-
-$skmes = preg_replace("/\[img\]([^[]*)\[\/img\]/","<img src=\"\\1\" border=0>",$skmes);
-
-$skmes = preg_replace("/\[b\]/i", "<b>",$skmes);
-$skmes = preg_replace("/\[\/b\]/i", "</b>",$skmes);
-
-$skmes = preg_replace("/\[i\]/i", "<i>",$skmes);
-$skmes = preg_replace("/\[\/i]/i", "</i>",$skmes);
-
-$skmes = preg_replace("/\[u]/i", "<u>",$skmes);
-$skmes = preg_replace("/\[\/u]/i", "</u>",$skmes);
-
-$skmes = preg_replace("/\[center\]/i", "<center>",$skmes);
-$skmes = preg_replace("/\[\/center\]/i", "</center>",$skmes);
-
-$skmes = preg_replace("/\[pre]/i", "<pre>",$skmes);
-$skmes = preg_replace("/\[\/pre]/i", "</pre>",$skmes);
-
-$skmes = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$skmes);
-$skmes = str_replace("[CROT]","<font color=\"#F10505\">",$skmes);
-$skmes = str_replace("[CDE]","<font color=\"#3399FF\">",$skmes);
-$skmes = str_replace("[CGELB]","<font color=\"#FDFB59\">",$skmes);
-$skmes = str_replace("[CW]","<font color=\"#FFFFFF\">",$skmes);
-
-
-$skmes = preg_replace("/\[email\]([^[]*)\[\/email\]/","<a href=\"mailto:\\1\">\\1</a>",$skmes);
-$skmes = preg_replace("/\[url\]([^[]*)\[\/url\]/i",'<a href="\\1" target="_blank">\\1</a>',$skmes);
-$skmes = preg_replace("/\[color=#([^[]+)\]([^[]*)\[\/color\]/","<font color=\"#\\1\" >\\2</font>",$skmes);
-$skmes = preg_replace("/\[size=([^[]+)\]([^[]*)\[\/size\]/","<font size=\"\\1\" >\\2</font>",$skmes);
-
-if ($skmes=='') $skmes='&nbsp;';
-
-*/
-
-//include "cache/overview.inc.php"; //nachrichten f&uuml;r det, kp und galname
-
 if ($status == 0) {
     $allytag = ' ';
 }
@@ -230,46 +130,10 @@ $sel_news = mysql_query("SELECT * FROM de_news_overview where typ=1 order by id 
 $det_news = '';
 while ($rew = mysql_fetch_array($sel_news)) {
     $t = $rew['time'];
-    //$time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
     $time = $t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
 
     $det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew['betreff']).'</span></a><br>';
 }
-
-$b_news = mysql_query("SELECT * FROM de_news_overview where typ=2 order by id desc Limit 0,5");
-while ($rew_b = mysql_fetch_array($b_news)) {
-    $t = $rew_b['time'];
-    //$time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
-    $time = $t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
-    $bnews .= '<a href="newspaper.php?id='.$rew_b['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew_b['betreff']).'</span></a><br>';
-}
-
-/*
-if($sv_server_lang==1)
-{
-  $datei = "http://faq.die-ewigen.com/zufallsfrage/export.php";
-  $faqfrage = file($datei);
-  $faqeintrag='<table width="500" cellspacing="0" cellpadding="5" style="border:2;border-color:#1f1f1f;border-style:solid;"><tr> <td bgcolor="#1f1f1f"><b>'.$ov_lang[frage].' '.$faqfrage[0].'</b></td></tr><tr><td>'.$faqfrage[1].'</td></tr></table>';
-}
-*/
-
-
-
-/*
-//siegel 1
-$siegeltext='<tr>
-<td height="37" class="rml">&nbsp;</td>
-<td align="center" class="ro">Quests</td>
-<td class="rmr">&nbsp;</td>
-</tr>
-<tr><td class="rl">&nbsp;</td><td align="center"><br>';
-$db_daten=mysql_query("SELECT siegel1 FROM de_system",$db);
-$row = mysql_fetch_array($db_daten);
-$siegel1=$row["siegel1"];
-$laufzeit=$sv_siegel1[1]-$siegel1;
-if ($siegel1>0)$siegeltext.='<a href="signet1.php">Rassenquest: Das Siegel von Basranur (verleibende Ticks: '.$laufzeit.')</a><br>';
-$siegeltext.='<br></td><td class="rr">&nbsp;</td></tr>';
-*/
 
 //stelle die ressourcenleiste dar
 include "resline.php";
@@ -280,7 +144,7 @@ $db_daten = mysql_query("SELECT com_sperre FROM de_login WHERE user_id='$ums_use
 $row = mysql_fetch_array($db_daten);
 if ($row['com_sperre'] > $akttime) {
     $sperrtime = strtotime($row['com_sperre']);
-    xecho('<div class="info_box text2" style="margin-bottom: 5px; font-size: 14px;">Account: Sperre f&uuml;r ausgehende Kommunikation bis: '.date("d.m.Y - H:i", $sperrtime).'</div>');
+    echo('<div class="info_box text2" style="margin-bottom: 5px; font-size: 14px;">Account: Sperre f&uuml;r ausgehende Kommunikation bis: '.date("d.m.Y - H:i", $sperrtime).'</div>');
 }
 
 
@@ -313,7 +177,7 @@ if ($sector == 1 and $sv_deactivate_sec1moveout == 0) {
 	<td width="13" class="rur">&nbsp;</td>
 	</tr>
 	</table><br><br>';
-    xecho($text);
+    echo($text);
 }
 
 //erstmal schauen ob evtl. alle deaktiviert worden sind, dann werden nur die det-news angezeigt
@@ -487,7 +351,7 @@ for ($j = 0;$j <= 6;$j++) {
                 if ($ticks < 2500000 or $sv_comserver_roundtyp == 1) {
                     if ($sv_comserver_roundtyp == 1) {
                         $ticks -= 2500000;
-                    }//fix f�r community-server in der BR
+                    }//fix für community-server in der BR
                     //wenn die ticks kleiner als die maximale tickzahl sind, dann l�uft die runde noch
                     if ($ticks < $sv_winscore) {
                         //spaltenbreite
@@ -573,13 +437,13 @@ for ($j = 0;$j <= 6;$j++) {
             //die rundencounteranzeige erstellen - ende
             ///////////////////////////////////////////////////////////////
 
-            xecho($ueberschrift.'
+            echo($ueberschrift.'
        <tr>
        <td class="rl">&nbsp;</td>
 	   <td align="center" class="text1 bgpic3">');
 
             //obere Buttons Hilfe/Discord/Umfragen
-            xecho('
+            echo('
 		 <div style="display: flex; width: 100%; margin-bottom: 15px;">
 			  <div style="flex-grow: 1;"><a href="'.$sv_link[2].'" target="_blank" class="btn">Hilfe</a></div>
 			  <div style="flex-grow: 1;"><a href="vote.php?bar=yes" class="btn">Umfragen</a></div>
@@ -600,66 +464,23 @@ for ($j = 0;$j <= 6;$j++) {
                 $hs .= '<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="'.$ums_gpfad.'g/symbol15.png" width="48px" height="48px"></a>';
                 $hs .= '</div><br>';
 
-                xecho($hs);
+                echo($hs);
             }
 
-            xecho($rca.'<br>');
+            echo($rca.'<br>');
             if ($sv_comserver != 1) {
-                xecho('<a href="sinfo.php" target="h"><font color="lightgreen"> > > Informationen &uuml;ber den Server < < </a></font><br><br>');
+                echo('<a href="sinfo.php" target="h"><font color="lightgreen"> > > Informationen &uuml;ber den Server < < </a></font><br><br>');
             }
 
-            if (!isset($bnews)) {
-                $bnews = '';
-            }
-
-            xecho('
+            echo('
 		  <b style="font-size:14px;">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</b>
 		  	<div align="left">
 				<table border="0">
 					<tr><td width="30">&nbsp;</td><td>'.umlaut($det_news).'</td></tr>
 				</table>
 			</div>');
-            /*
-    <div style="width: 100%; border-top: 1px solid #00FF00; color: #00FF00; margin-top: 3px; padding-top: 3px;">
-              Vorschl&auml;ge werden im <a style="color: #00FF00; text-decoration: underline; font-size: 8pt;" href="http://forum.bgam.es/board.php?boardid=8" target="_blank">Forum</a> gemacht/diskutiert, denn dort ist ein geordneter Ablauf und das Nachschlagen alter Beitr&auml;ge m&ouml;glich.
-              Es ist nat&uuml;rlich keine Pflicht dort mitzuwirken, aber wer darauf verzichtet, muss damit rechnen, dass seine Meinung nicht beachtet wird und sp&auml;tere Beschwerden u.U. auch nichts mehr bringen.
-              </div>
-    */
 
-            /*
-              xecho('
-                <table style="width: 100%">
-                <tr>
-                    <td colspan="3" class="cell1" style="font-weight: bold; text-align: center;">Die letzten 10 Vorschl&auml;ge</td>
-                </tr>');
-                $c1=1;
-                if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
-                xecho('
-                  <tr>
-                    <td class="'.$bg.'" style="text-align: left;">Thread</td>
-                    <td class="'.$bg.'" style="text-align: center;">Posts</td>
-                    <td class="'.$bg.'" style="text-align: right;">letzte &Auml;nderung</td>
-                  </tr>');
-
-                //die letzten X Threads aus dem Vorschlagsbereich auslesen und anzeigen
-                if($_SERVER['SERVER_NAME']!='de.test'){
-                    require_once 'inc/db_forum_connect.inc.php';
-                    $db_daten=mysqli_query($dbi_forum, "SELECT * FROM bb1_threads WHERE boardid IN (65, 63, 96, 98, 99, 100, 101, 103, 134, 107, 164, 104, 217) ORDER BY lastposttime DESC LIMIT 10");
-                    while($row = mysqli_fetch_array($db_daten)){
-                        if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
-                        xecho('
-                        <tr>
-                            <td class="'.$bg.'" style="text-align: left;"><a href="http://forum.bgam.es/thread.php?threadid='.$row['threadid'].'" target="_blank">'.utf8_encode_fix($row['topic']).'</a></td>
-                            <td class="'.$bg.'" style="text-align: center;">'.$row['replycount'].'</td>
-                            <td class="'.$bg.'" style="text-align: right;">'.date("d.m.Y - H:i",$row['lastposttime']).'</td>
-                        </tr>');
-                    }
-                }
-
-                xecho('</table>');
-            */
-
-            xecho('
+            echo('
 	   </td>
        <td width="13" class="rr">&nbsp;</td>
        </tr>
@@ -693,7 +514,7 @@ for ($j = 0;$j <= 6;$j++) {
          </tr>
          ';
             }
-            xecho($ueberschrift.'<tr>
+            echo($ueberschrift.'<tr>
        <td width="13" class="rl">&nbsp;</td><td>
        
        <table width="100%" border="0" cellpadding="0" cellspacing="1">
@@ -743,180 +564,14 @@ for ($j = 0;$j <= 6;$j++) {
        
        </table>
        ');
-            xecho('</td><td width="13" class="rr">&nbsp;</td>
+            echo('</td><td width="13" class="rr">&nbsp;</td>
        </tr>
        </table>
        ');
             break;
         case 6://schiffseinheiten
-            if ($ovfirst == 1) {
-                $ovfirst = 0;
-                $ueberschrift = '
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rol">&nbsp;</td>
-         <td width="560" align="center" class="ro" colspan="2"><div class="cellu">'.$ov_lang['schiffseinheiten'].'</div></td>
-         <td width="13" class="ror">&nbsp;</td>
-         </tr>
-         ';
-            } else {
-                $ueberschrift = '
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rml">&nbsp;</td>
-         <td width="560" align="center" class="ro" colspan="2"><div class="cellu">'.$ov_lang['schiffseinheiten'].'</div></td>
-         <td width="13" class="rmr">&nbsp;</td>
-         </tr>
-         ';
-            }
-            xecho($ueberschrift.'');
-            //zaehle alle schiffe, die schon vorhanden sind - anfang
-            $ec81 = 0;
-            $ec82 = 0;
-            $ec83 = 0;
-            $ec84 = 0;
-            $ec85 = 0;
-            $ec86 = 0;
-            $ec87 = 0;
-            $ec88 = 0;
-            $ec89 = 0;
-            $ec90 = 0;
-            $fid0 = $ums_user_id.'-0';
-            $fid1 = $ums_user_id.'-1';
-            $fid2 = $ums_user_id.'-2';
-            $fid3 = $ums_user_id.'-3';
-            $db_daten = mysql_query("SELECT e81, e82, e83, e84, e85, e86, e87,e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC", $db);
-            while ($row = mysql_fetch_array($db_daten)) {
-                $str = '';
-                for ($i = 81;$i <= 99;$i++) {
-                    $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
-                }
-                eval($str); //variablen -> ec81, ec82...
-            }
-            //zaehle alle schiffe, die schon vorhanden sind - ende
-
-            //lade einheitentypen
-            $flag1 = 0;
-            $db_daten = mysql_query("SELECT  tech_id, tech_name, tech_vor FROM de_tech_data$ums_rasse WHERE tech_id>80 AND tech_id<100", $db);
-            while ($row = mysql_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
-                //zerlege vorbedinguns-string
-                $z1 = 0;
-                $z2 = 0;
-                $vorb = explode(";", $row["tech_vor"]);
-                foreach ($vorb as $einzelb) { //jede einzelne bedingung checken
-                    $z1++;
-                    if ($techs[$einzelb] == 1) {
-                        $z2++;
-                    }
-                    if ($einzelb == 0) {
-                        $z1 = 0;
-                        $z2 = 0;
-                    }
-                }
-                if ($z1 == $z2) { //xecho ("Vorbedingung erf&uuml;llt";
-                    $str = '$ec=$ec'.$row["tech_id"].';';
-                    eval($str);
-                    //showeinheit($row["tech_name"], $row["tech_id"], $row["restyp01"], $row["restyp02"], $row["restyp03"], $row["restyp04"], $row["tech_ticks"], $ec);
-                    if ($flag1 == 0) {
-                        xecho('<tr align="center" height="25">');
-                        xecho('<td width="13" class="rl">&nbsp;</td>');
-                        xecho('<td width="280">'.utf8_encode_fix($row["tech_name"])."</td>");
-                        xecho('<td width="280">'.number_format($ec, 0, "", ".")."</td>");
-                        xecho('<td width="13" class="rr">&nbsp;</td>');
-                        xecho('</tr>');
-                        $flag1 = 1;
-                    } else {
-                        xecho('<tr align="center"  height="25">');
-                        xecho('<td class="rl">&nbsp;</td>');
-                        xecho('<td>'.utf8_encode_fix($row["tech_name"])."</td>");
-                        xecho('<td>'.number_format($ec, 0, "", ".")."</td>");
-                        xecho('<td class="rr">&nbsp;</td>');
-                        xecho('</tr>');
-                    }
-                }
-            }
-            xecho('</table>');
-
             break;
         case 7://verteidigungsanlagen
-            if ($ovfirst == 1) {
-                $ovfirst = 0;
-                $ueberschrift = '
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rol">&nbsp;</td>
-         <td width="560" align="center" class="ro" colspan="2"><div class="cellu">'.$ov_lang['verteidigungsanlagen'].'</div></td>
-         <td width="13" class="ror">&nbsp;</td>
-         </tr>
-         ';
-            } else {
-                $ueberschrift = '
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rml">&nbsp;</td>
-         <td width="560" align="center" class="ro" colspan="2"><div class="cellu">'.$ov_lang['verteidigungsanlagen'].'</div></td>
-         <td width="13" class="rmr">&nbsp;</td>
-         </tr>
-         ';
-            }
-            xecho($ueberschrift.'');
-            //zaehle alle verteidigungsanlagen, die schon vorhanden sind - anfang
-            $str = '';
-            for ($i = 100;$i <= 109;$i++) {
-                $str = $str."\$ec$i=0;";
-            }
-            eval($str); //variablen -> ec100, ec101,...
-            $db_daten = mysql_query("SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-            while ($row = mysql_fetch_array($db_daten)) {
-                $str = '';
-                for ($i = 100;$i <= 109;$i++) {
-                    $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
-                }
-                eval($str);
-            }
-            //zaehle alle verteidigungsanlagen, die schon vorhanden sind - ende
-
-            //lade einheitentypen
-            $flag1 = 0;
-            $db_daten = mysql_query("SELECT  tech_id, tech_name, tech_vor FROM de_tech_data$ums_rasse WHERE tech_id>99 AND tech_id<110 ORDER BY tech_ticks", $db);
-            while ($row = mysql_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
-                //zerlege vorbedinguns-string
-                $z1 = 0;
-                $z2 = 0;
-                $vorb = explode(";", $row["tech_vor"]);
-                foreach ($vorb as $einzelb) { //jede einzelne bedingung checken
-                    $z1++;
-                    if ($techs[$einzelb] == 1) {
-                        $z2++;
-                    }
-                    if ($einzelb == 0) {
-                        $z1 = 0;
-                        $z2 = 0;
-                    }
-                }
-                if ($z1 == $z2) { //xecho ("Vorbedingung erf&uuml;llt";
-                    $str = '$ec=$ec'.$row["tech_id"].';';
-                    eval($str);
-                    if ($flag1 == 0) {
-                        xecho('<tr align="center" height="25">');
-                        xecho('<td width="13" class="rl">&nbsp;</td>');
-                        xecho('<td width="280">'.utf8_encode_fix($row["tech_name"])."</td>");
-                        xecho('<td width="280">'.number_format($ec, 0, "", ".")."</td>");
-                        xecho('<td width="13" class="rr">&nbsp;</td>');
-                        xecho('</tr>');
-                        $flag1 = 1;
-                    } else {
-                        xecho('<tr align="center"  height="25">');
-                        xecho('<td class="rl">&nbsp;</td>');
-                        xecho('<td>'.utf8_encode_fix($row["tech_name"])."</td>");
-                        xecho('<td>'.number_format($ec, 0, "", ".")."</td>");
-                        xecho('<td class="rr">&nbsp;</td>');
-                        xecho('</tr>');
-                    }
-                }
-            }
-
-            xecho('</table>');
             break;
         case 8://schiffseinheiten/verteidigungsanlagen
             if ($ovfirst == 1) {
@@ -941,7 +596,7 @@ for ($j = 0;$j <= 6;$j++) {
 		   </tr>
 		   ';
             }
-            xecho($ueberschrift.'');
+            echo($ueberschrift.'');
             //zaehle alle schiffe, die schon vorhanden sind - anfang
             $ec = array();
             $ec[81] = 0;
@@ -976,9 +631,9 @@ for ($j = 0;$j <= 6;$j++) {
             //lade einheitentypen
             $flag1 = 0;
             $ik = 0;
-            $db_daten = mysql_query("SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id", $db);
-            while ($row = mysql_fetch_array($db_daten)) {
-                $schiffe[$ik][0] = utf8_encode_fix(getTechNameByRasse($row["tech_name"], $ums_rasse));
+            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id");
+            while ($row = mysqli_fetch_array($db_daten)) {
+                $schiffe[$ik][0] = getTechNameByRasse($row["tech_name"], $ums_rasse);
                 $schiffe[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
                 $ik++;
             }
@@ -1003,16 +658,16 @@ for ($j = 0;$j <= 6;$j++) {
             //lade einheitentypen
             $flag1 = 0;
             $ik = 0;
-            $db_daten = mysql_query("SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id", $db);
-            while ($row = mysql_fetch_array($db_daten)) {
-                $defense[$ik][0] = utf8_encode_fix(getTechNameByRasse($row["tech_name"], $ums_rasse));
+            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id");
+            while ($row = mysqli_fetch_array($db_daten)) {
+                $defense[$ik][0] = getTechNameByRasse($row["tech_name"], $ums_rasse);
                 $defense[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
                 $ik++;
             }
 
             //jetzt die daten komprimiert ausgeben
-            xecho('<tr align="center" height="25">');
-            xecho('<td width="13" class="rl">&nbsp;</td><td colspan=2>');
+            echo('<tr align="center" height="25">');
+            echo('<td width="13" class="rl">&nbsp;</td><td colspan=2>');
 
             $max = count($schiffe);
             if (count($defense) > $max) {
@@ -1020,8 +675,8 @@ for ($j = 0;$j <= 6;$j++) {
             }
 
             //2 spalten für schiffe/verteidigungsanlagen
-            xecho('<div class="cell"><table width="100%" border="0" cellpadding="0" cellspacing="0">');
-            xecho('<tr><td width="50%"><div class="bgpic1" style="height: 150px;">
+            echo('<div class="cell"><table width="100%" border="0" cellpadding="0" cellspacing="0">');
+            echo('<tr><td width="50%"><div class="bgpic1" style="height: 150px;">
 
 		<table border="0" cellpadding="0" cellspacing="1">');
             for ($jk = 0;$jk < $max;$jk++) {
@@ -1070,16 +725,16 @@ for ($j = 0;$j <= 6;$j++) {
                     $out[3] = '&nbsp;';
                 }
 
-                xecho('<tr>');
-                xecho('<td'.$w1.' class="text1">'.$out[0]."</td>");
-                xecho('<td'.$w2.' class="text1" align="center">'.$out[1]."</td>");
-                xecho('</tr>');
+                echo('<tr>');
+                echo('<td'.$w1.' class="text1">'.$out[0]."</td>");
+                echo('<td'.$w2.' class="text1" align="center">'.$out[1]."</td>");
+                echo('</tr>');
             }
 
             // die 2 spalten folgen hier aufeinander
-            xecho('</table></div></td><td width="50%"><div class="bgpic2">');
+            echo('</table></div></td><td width="50%"><div class="bgpic2">');
 
-            xecho('<table border="0" cellpadding="0" cellspacing="1">');
+            echo('<table border="0" cellpadding="0" cellspacing="1">');
 
             for ($jk = 0;$jk < $max;$jk++) {
                 if ($jk == 0) {
@@ -1127,19 +782,19 @@ for ($j = 0;$j <= 6;$j++) {
                     $out[3] = '&nbsp;';
                 }
 
-                xecho('<tr>');
-                //xecho ('<td'.$w1.' class="cell">'.$out[0]."</td>");
-                //xecho ('<td'.$w2.' class="cell" align="center">'.$out[1]."</td>");
-                xecho('<td'.$w1.' class="text1">'.$out[2]."</td>");
-                xecho('<td'.$w2.' class="text1" align="center">'.$out[3]."</td>");
-                xecho('</tr>');
+                echo('<tr>');
+                //echo ('<td'.$w1.' class="cell">'.$out[0]."</td>");
+                //echo ('<td'.$w2.' class="cell" align="center">'.$out[1]."</td>");
+                echo('<td'.$w1.' class="text1">'.$out[2]."</td>");
+                echo('<td'.$w2.' class="text1" align="center">'.$out[3]."</td>");
+                echo('</tr>');
             }
-            xecho('</table></div></td></tr></table>');
+            echo('</table></div></td></tr></table>');
 
             //tabelle schlie�en
-            xecho('</td><td width="13" class="rr">&nbsp;</td>');
-            xecho('</tr>');
-            xecho('</table>');
+            echo('</td><td width="13" class="rr">&nbsp;</td>');
+            echo('</tr>');
+            echo('</table>');
 
             break;
 
@@ -1164,14 +819,14 @@ for ($j = 0;$j <= 6;$j++) {
          </tr>
          ';
             }
-            xecho($ueberschrift.'');
+            echo($ueberschrift.'');
 
-            xecho('<tr align="center" height="25">');
-            xecho('<td width="13" class="rl">&nbsp;</td><td>');
+            echo('<tr align="center" height="25">');
+            echo('<td width="13" class="rl">&nbsp;</td><td>');
 
-            xecho('<table border="0" cellpadding="0" cellspacing="1">');
+            echo('<table border="0" cellpadding="0" cellspacing="1">');
             //tabellen�berschrift ausgeben
-            xecho('<tr align="center"><td width="50" class="cell">'.$ov_lang['stufe'].'</td><td width="510" class="cell">'.$ov_lang['aufgabe'].'</td></tr>');
+            echo('<tr align="center"><td width="50" class="cell">'.$ov_lang['stufe'].'</td><td width="510" class="cell">'.$ov_lang['aufgabe'].'</td></tr>');
 
             //alle errungenschaften auslesen
             $db_daten = mysql_query("SELECT * FROM de_user_achievement WHERE user_id = '$ums_user_id'", $db);
@@ -1589,16 +1244,16 @@ for ($j = 0;$j <= 6;$j++) {
                 }
 
                 if ($do_calc == 1 and $ac_max > 0) {
-                    xecho('<tr align="center" title="'.$actip[$ac].'">
+                    echo('<tr align="center" title="'.$actip[$ac].'">
           <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.' ('.number_format($zielwert, 0, "", ".").'/'.number_format($rewards[$ac_max - 1][0], 0, "", ".").')'.$rca.'</td>
           </tr>');
                 } else {
                     if ($ac_max > 0) {
-                        xecho('<tr align="center">
+                        echo('<tr align="center">
           <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.' ('.number_format($zielwert, 0, "", ".").'/'.number_format($rewards[$ac_max - 1][0], 0, "", ".").')'.$rca.'</td>
           </tr>');
                     } else {
-                        xecho('<tr align="center">
+                        echo('<tr align="center">
           <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.'</td>
           </tr>');
                     }
@@ -1607,18 +1262,18 @@ for ($j = 0;$j <= 6;$j++) {
             }
 
             //ziele ausgeben
-            xecho($output);
+            echo($output);
 
             //belohnungen mit einem mal in der db gutschreiben
             mysql_query("UPDATE de_user_data SET restyp01 = restyp01 + '$ac_belohnung' WHERE user_id = '$ums_user_id'", $db);
-            //xecho ($ac_belohnung);
+            //echo ($ac_belohnung);
 
-            xecho('</table>');
+            echo('</table>');
 
             //tabelle schlie�en
-            xecho('</td><td width="13" class="rr">&nbsp;</td>');
-            xecho('</tr>');
-            xecho('</table>');
+            echo('</td><td width="13" class="rr">&nbsp;</td>');
+            echo('</tr>');
+            echo('</table>');
 
             break;
 
@@ -1629,7 +1284,7 @@ for ($j = 0;$j <= 6;$j++) {
 }
 
 //fussleiste ausgeben
-xecho('
+echo('
 <table width="586" border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td width="13" class="rul">&nbsp;</td>
@@ -1641,14 +1296,6 @@ xecho('
 function calculate_ac_max($acs)
 {
     global $ticks, $own_tick, $sv_winscore, $sv_ewige_runde, $sv_hardcore;
-
-    /*
-    xecho('<br>$acs '.$acs);
-    xecho('<br>$ticks '.$ticks);
-    xecho('<br>$own_tick '.$own_tick);
-    xecho('<br>$sv_winscore '.$sv_winscore);
-    xecho('<br>$sv_ewige_runde '.$sv_ewige_runde);
-    */
 
     if ($sv_ewige_runde == 1 || $sv_hardcore == 1) {//ewige runde
         $ticksegment = $sv_winscore / ($acs + 1);
@@ -1673,8 +1320,6 @@ function calculate_ac_max($acs)
             $ac_max = $acs;
         }
     }
-
-    //xecho('<br>ac_max: '.$ac_max);
 
     return($ac_max);
 }

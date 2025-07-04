@@ -24,6 +24,10 @@ mysql_set_charset("utf8mb4", $db);
 $GLOBALS['dbi'] = mysqli_connect($GLOBALS['env_db_dieewigen_host'], $GLOBALS['env_db_dieewigen_user'], $GLOBALS['env_db_dieewigen_password'], $GLOBALS['env_db_dieewigen_database']) or die("B: Keine Verbindung zur Datenbank möglich.");
 $GLOBALS['dbi']->set_charset("utf8mb4");
 
+//Accountverwaltung einbinden
+$GLOBALS['dbi_ls'] = mysqli_connect($GLOBALS['env_db_loginsystem_host'], $GLOBALS['env_db_loginsystem_user'], $GLOBALS['env_db_loginsystem_password'], $GLOBALS['env_db_loginsystem_database']);
+$GLOBALS['dbi_ls']->set_charset("utf8mb4");
+
 array_walk_recursive($_GET, function(&$leaf) {
   if (is_string($leaf)){
      $leaf = mysqli_real_escape_string($GLOBALS['dbi'], $leaf);

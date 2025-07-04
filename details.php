@@ -485,13 +485,11 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 ////////////////////////////////////////////////////////
 // Chat-Ignore verwalten
 ////////////////////////////////////////////////////////
-include $directory."soudata/lib/sou_dbconnect.php";
-
 //m�chte man einen Eintrag l�schen
 $del_ignore=intval($_REQUEST['del_ignore']);
 if($del_ignore>0){
 	$sql="DELETE FROM de_chat_ignore WHERE id='$del_ignore' AND owner_id='".$_SESSION['ums_owner_id']."';";
-	$db_daten=mysql_query($sql,$soudb);
+	$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
 }
 
 if($_REQUEST['sn']){
@@ -511,10 +509,10 @@ if($_REQUEST['sn']){
 	if(isset($_REQUEST['ctyp']) && isset($_REQUEST['cid'])){//anderer server
 		//aus dem Chat die dazugeh�rige owner_id holen
 		$sql="SELECT * FROM de_chat_msg WHERE id='".intval($_REQUEST['cid'])."' AND channeltyp='".intval($_REQUEST['ctyp'])."';";
-		$db_daten=mysql_query($sql,$soudb);
-		$num = mysql_num_rows($db_daten);
+		$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		$num = mysqli_num_rows($db_daten);
 		if($num==1){	
-			$row = mysql_fetch_array($db_daten);
+			$row = mysqli_fetch_array($db_daten);
 			$zowner_id=$row['owner_id'];
 			echo '<div class="cell" style="width: 560px; text-align: center;">';
 
@@ -527,17 +525,17 @@ if($_REQUEST['sn']){
 					$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
 						spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
 
-					mysql_query($sql,$soudb);
+					mysqli_query($GLOBALS['dbi_ls'], $sql);
 
 				}		
 
 				//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-				$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';",$soudb);
-				$num = mysql_num_rows($db_daten);
+				$db_daten=mysqli_query($GLOBALS['dbi_ls'], "SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';");
+				$num = mysqli_num_rows($db_daten);
 
 
 				if($num==1){  // er steht schon drin
-					$row = mysql_fetch_array($db_daten);
+					$row = mysqli_fetch_array($db_daten);
 					echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
 				}elseif($zowner_id>0){ //er steht noch nicht drin
 					echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
@@ -592,17 +590,17 @@ if($_REQUEST['sn']){
 				$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
 					spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
 
-				mysql_query($sql,$soudb);
+				mysqli_query($GLOBALS['dbi_ls'], $sql);
 
 			}		
 
 			//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-			$db_daten=mysql_query("SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';",$soudb);
-			$num = mysql_num_rows($db_daten);
+			$db_daten=mysqli_query($GLOBALS['dbi_ls'], "SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';");
+			$num = mysqli_num_rows($db_daten);
 
 
 			if($num==1){  // er steht schon drin
-				$row = mysql_fetch_array($db_daten);
+				$row = mysqli_fetch_array($db_daten);
 				echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
 			}elseif($zowner_id>0){ //er steht noch nicht drin
 				echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
@@ -647,17 +645,17 @@ if($_REQUEST['sn']){
 }
 ////////////////////////////////////////////////////////
 // Eine Liste der im Chat ignorierten Spielern ausgeben 
-// dar�ber soll ebenfalls eine L�schung m�glich sein
+// darüber soll ebenfalls eine LÖschung möglich sein
 ////////////////////////////////////////////////////////
 $sql="SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND ignore_until>'".time()."';";
-$db_daten=mysql_query($sql,$soudb);
-$num = mysql_num_rows($db_daten);
+$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+$num = mysqli_num_rows($db_daten);
 if($num>=1){
 	rahmen_oben('Folgende Spieler sind auf Deiner Chat-Ignore-Liste');
 	echo '<table class="cell" style="width: 560px;">';
 	echo '<tr style="font-weight: bold;"><td>Spielername</td><td>Blockiert bis</td><td>Aktion</td></tr>';
 	//aus dem Chat die dazugeh�rige owner_id holen
-	while($row = mysql_fetch_array($db_daten)){
+	while($row = mysqli_fetch_array($db_daten)){
 		echo '
 		<tr>
 			<td>'.$row['spielername'].'</td>

@@ -85,60 +85,21 @@ if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
-  $db_daten=mysql_query("SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime, de_user_data.efta_user_id, de_user_data.sou_user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id='$id'",$db);
+  $db_daten=mysql_query("SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id='$id'",$db);
   $num = mysql_num_rows($db_daten);
   if($num==1){
     $row = mysql_fetch_array($db_daten);
     $user_id=$row["user_id"];
     $accstatus=$row["astatus"];
     $delmode=$row["delmode"];
-    $efta_user_id=$row['efta_user_id'];
-    $sou_user_id=$row['sou_user_id'];
     $last_login=$row['last_login'];
     $last_login=strtotime($last_login);
     $last_login=date("d.m.Y - G:i", $last_login);
-    
+    $spielername=$row["spielername"];
     
     $supporter=$row['supporter'];
     if($supporter=='')$supporter='support@die-ewigen.com';
             
-    //spielername auslesen, kann nach gametyp variieren
-    if($sv_efta_in_de==1 AND $sv_sou_in_de==1)
-    {
-      $spielername=$row["spielername"];
-    }
-    else 
-    {
-      //efta steht allein
-      if($sv_efta_in_de==0)
-      {
-        //spielername aus der efta-db auslesen
-        include_once "eftadata/lib/efta_dbconnect.php";
-        $db_datenx=mysql_query("SELECT * FROM de_cyborg_data WHERE user_id='$efta_user_id'",$eftadb);
-  	    $num = mysql_num_rows($db_datenx);
-  	    if($num==1)
-  	    {
-  	      $rowx = mysql_fetch_array($db_datenx);
-          $spielername=$rowx['spielername'];
-  	    }
-  	    else $spielername='N/A';
-      }
-      //sou steht allein
-      if($sv_sou_in_de==0)
-      {
-        //spielername aus der efta-db auslesen
-        include "soudata/lib/sou_dbconnect.php";
-        $db_datenx=mysql_query("SELECT * FROM sou_user_data WHERE user_id='$sou_user_id'",$soudb);
-  	    $num = mysql_num_rows($db_datenx);
-  	    if($num==1)
-  	    {
-  	      $rowx = mysql_fetch_array($db_datenx);
-          $spielername=$rowx['spielername'];
-  	    }
-  	    else $spielername='N/A';
-      }
-    }
-    
     if($row["status"]==1 AND $row["allytag"]!='')$allytag=$row["allytag"];else $allytag='-';
     echo $user_id.';'.$accstatus.';'.$spielername.';'.number_format($row["score"], 0,"",".").';'.number_format($row["tick"], 0,"",".").';'.
     $allytag.';'.$row["credits"].';'.$row["patime"];

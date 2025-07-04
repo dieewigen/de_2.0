@@ -17,7 +17,6 @@ if($sv_debug==0 && $sv_comserver==0){
 }
 
 include_once $directory."inccon.php";
-include_once $directory."inc/db_ls_connect.inc.php";
 if($sv_comserver==1)include_once $directory.'inc/svcomserver.inc.php';
 include_once $directory."inc/schiffsdaten.inc.php";
 include_once $directory."inc/userartefact.inc.php";

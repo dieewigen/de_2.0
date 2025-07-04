@@ -14,9 +14,6 @@ if ($sv_debug == 0 && $sv_comserver == 0) {
 }
 
 include_once $directory."inccon.php";
-include_once $directory."inc/db_ls_connect.inc.php";
-//include_once $directory."eftadata/lib/efta_dbconnect.php";
-include_once $directory."soudata/lib/sou_dbconnect.php";
 if ($sv_comserver == 1) {
     include_once $directory.'inc/svcomserver.inc.php';
 }

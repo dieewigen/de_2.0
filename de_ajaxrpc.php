@@ -3,7 +3,6 @@ $eftachatbotdefensedisable=1;
 mb_internal_encoding("iso-8859-1");
 
 include "inc/header.inc.php";
-include "soudata/lib/sou_dbconnect.php";
 include 'functions.php';
 
 $chat_sectorcolor='#FFFFFF';
@@ -201,20 +200,20 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		//server�bergreifend
 		if(isset($_REQUEST['chatidallg'])){
 			$sqlallg="SELECT * FROM de_chat_msg WHERE channeltyp=3 AND id > '".$chatidallg."' AND timestamp > '$cleartime' ORDER BY timestamp ASC";
-			$db_daten=mysql_query($sqlallg,$soudb);
+			$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sqlallg);
 			//ausgeben
 			//$first=1;
-			while ($row = mysql_fetch_array($db_daten)){
+			while ($row = mysqli_fetch_array($db_daten)){
 				$chatdata[]=$row;
 			}
 		}
 	}else{//nur die Meldungen von [SYSTEM] auslesen
 		if(isset($_REQUEST['chatidallg'])){
 			$sqlallg="SELECT * FROM de_chat_msg WHERE owner_id=-1 AND channeltyp=3 AND id > '".$chatidallg."' AND timestamp > '$cleartime' ORDER BY timestamp ASC";
-			$db_daten=mysql_query($sqlallg,$soudb);
+			$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sqlallg);
 			//ausgeben
 			//$first=1;
-			while ($row = mysql_fetch_array($db_daten)){
+			while ($row = mysqli_fetch_array($db_daten)){
 				$chatdata[]=$row;
 			}
 		}
@@ -250,8 +249,8 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	//nur die Ignore-Liste laden, wenn es etwas neues im Chat gibt
 	if(count($sorted)>0 && $_SESSION['ums_owner_id']!=1){
 		$sql="SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND ignore_until>'".time()."';";
-		$db_daten=mysql_query($sql,$soudb);
-		while($row = mysql_fetch_array($db_daten)){
+		$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		while($row = mysqli_fetch_array($db_daten)){
 			//sich selbst kann man nicht ignorieren
 			if($row['owner_id_ignore']!=$_SESSION['ums_owner_id'] && $row['owner_id_ignore']!=1){
 				$ignore_self[]=$row['owner_id_ignore'];
@@ -267,8 +266,8 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	$ignore_global=array();
 	if(count($sorted)>0 && $_SESSION['ums_owner_id']!=1){
 		$sql="SELECT * FROM de_chat_ignore WHERE owner_id=0;";
-		$db_daten=mysql_query($sql,$soudb);
-		while($row = mysql_fetch_array($db_daten)){
+		$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		while($row = mysqli_fetch_array($db_daten)){
 			if($row['owner_id_ignore']!=$_SESSION['ums_owner_id'] && $row['owner_id_ignore']!=1){
 				$ignore_global[]=$row['owner_id_ignore'];
 			}
