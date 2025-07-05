@@ -18,15 +18,11 @@ $hide_secpics=$row["hide_secpics"];
 
 $secrelcounter=0;
 
-//kopfgeldprozentsatz kann nicht h�her als kollektorklaurate sein
-//if($sv_bounty_rate>$sv_kollie_klaurate)$sv_bounty_rate=$sv_kollie_klaurate;
-
 if ($row["status"]==1){
 	$ownally = $row["allytag"];
 }else{
 	$ownally='';
 }
-
 
 //schauen ob er die whg hat und dann die attgrenze anpassen
 if ($techs[4]==0)$sv_attgrenze_whg_bonus=0;
@@ -58,8 +54,19 @@ $maxcol=$row['maxcol'];
 <html>
 <head>
 <title>Sektor</title>
-<?php include "cssinclude.php"; 
-echo '</head>';
+<?php include "cssinclude.php";
+echo '
+<style type="text/css">
+.user_title {
+	display: inline-block;
+	background-color: rgb(250, 184, 233);
+	width: 10px;
+	height: 10px;
+	margin-left: 5px;
+	transform: rotate(45deg);
+}
+</style>.
+</head>';
 if($_SESSION['ums_mobi']==1){
 	echo '<body>';
 }else{
@@ -416,10 +423,19 @@ if($sec_data['npc']==1){
     	if(strtotime($row["last_click"])+1800 > time() AND $row["lstatus"]==1) $os=' *';else $os='';
     	if ($ownsector==$sf AND $secstatdisable==0) $osown=$os;else $osown='';
     	$csstag='tc1';
-	    $playertooltip='';
-		if($row["werberid"]==$owner_id){$csstag='tc3';$playertooltip=$sec_lang['spielergeworben'];}
+		$userTitle='';
+		$sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
+		$db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		if(mysqli_num_rows($db_datenx) > 0){
+			
+			while ($rowx = mysqli_fetch_array($db_datenx)){
+				$userTitle.=$rowx['title'].'<br>';
+			}
+			$userTitle='<div class="user_title" title="'.$userTitle.'"></div>';
+		}
+
 		$output.='<td class="cell tac" style="font-size: 10pt;"><a href="details.php?se='.$sector.'&sy='.$row['system'].'">
-		<span title="'.$playertooltip.'" class="'.$csstag.'">'.$playername.$osown.'</span></a></td>';
+		<span class="'.$csstag.'">'.$playername.$osown.$userTitle.'</span></a></td>';
 		
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
