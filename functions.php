@@ -1472,8 +1472,8 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
 		('$channel', '$channeltyp', '$sv_server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
     } else {
         //die verschiedenen Chats auf dem Server
-        mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$spielername', '$chat_message', '$time', '$owner_id')", $db);
+        mysqli_query($GLOBALS['dbi'], "INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
+		('$channel', '$channeltyp', '$spielername', '$chat_message', '$time', '$owner_id')");
     }
 
     ////////////////////////////////////////////////////////////

@@ -1,58 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>T</title>
+<title>NPC Tool</title>
 <?php include "cssinclude.php";?>
 </head>
 <body>
 <?php
-mb_internal_encoding("iso-8859-1");
-
 include "det_userdata.inc.php";
+include '../inccon.php';
 include '../inc/env.inc.php';
 include '../functions.php';
-include "../soudata/lib/sou_dbconnect.php";
 
-$result = mysql_query("SELECT * FROM de_system",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_system");
+$row = mysqli_fetch_array($result);
 $doetick=$row["doetick"];
 $npc_leader_id=$row['npcleader'];
 
-$result = mysql_query("SELECT * FROM de_user_data WHERE user_id='$npc_leader_id'",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id='$npc_leader_id'");
+$row = mysqli_fetch_array($result);
 $npc_leader_spielername=$row['spielername'];
 
-$aktion=intval($_REQUEST['aktion']);
+echo '<div>NPC-Leader: '.$npc_leader_spielername.'</div>';
 
-if($aktion>0){
+$aktion=intval($_REQUEST['aktion'] ?? 0);
+
+if($aktion > 0){
 	switch($aktion){	
 		case 1://msg
 			//nachricht in der db eintragen
-			$text='/me '.umlaut(utf8_encode(trim($_REQUEST["message"])));
+			$text='/me '.trim($_REQUEST["message"]);
 
-			//insert_chat_msg('', $text, 0, 0);
 			$channel=0;$channeltyp=2;$spielername=$npc_leader_spielername; $chat_message=$text;
 			insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);
-
-			//mysql_query("INSERT INTO sou_chat_msg (spielername, message, timestamp) VALUES ('', '$text', '$time')",$db);
 		break;
 		
 		case 2://der npcleader
-			//nachricht in der db eintragen
-			//$text='<font color="#fc7b3c">'.$_REQUEST["message"].'</font>';
-			$text='<font color="#9f2ebd">'.umlaut(utf8_encode(trim($_REQUEST["message"]))).'</font>';
+			$text='<font color="#9f2ebd">'.trim($_REQUEST["message"]).'</font>';
 			$channel=0;$channeltyp=2;$spielername=$npc_leader_spielername; $chat_message=$text;
 			insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);	  
-			//insert_chat_msg('Der Reporter', '<font color="#00ff00">'.$text.'</font>', 0, 0);
-			//mysql_query("INSERT INTO sou_chat_msg (spielername, message, timestamp) VALUES ('^Der Reporter^', '$text', '$time')",$db);
 		break;
 
 		case 3://SYSTEM: chatnachricht an alle über globalen chat
-			$channel=0;$channeltyp=3;$spielername='[SYSTEM]'; $chat_message='<span style="font-weight: bold; color: #ffff00;">'.umlaut(utf8_encode(trim($_REQUEST["message"]))).'</span>';
-			insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, -1, 'DE');
+			$channel=0;$channeltyp=3;$spielername='[SYSTEM]'; $chat_message='<span style="font-weight: bold; color: #ffff00;">'.trim($_REQUEST["message"]).'</span>';
+			insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, 0, 'DE');
 
-			postToDiscord($_REQUEST['message']);
+			postToDiscord(trim($_REQUEST['message']));
 
 		break;
 	}
@@ -63,7 +55,7 @@ if($aktion>0){
 ///////////////////////////////////////////////////////////////
 echo '<form action="npctool.php" method="post">';
 //aktion im hiddenfeld
-echo 'F&uuml; den NPC-Leader im Chat eine Nachricht hinterlegen:';
+echo '<br>Für den NPC-Leader im Chat eine Nachricht hinterlegen:';
 
 echo '<input type="hidden" name="aktion" value="1">';
 
@@ -87,7 +79,7 @@ echo '</form>';
 ///////////////////////////////////////////////////////////////
 echo '<form action="npctool.php" method="post">';
 //aktion im hiddenfeld
-echo 'F&uuml;r [SYSTEM] im Chat eine Nachricht hinterlegen:';
+echo '<br>Für [SYSTEM] im Chat eine Nachricht hinterlegen:';
 
 echo '<input type="hidden" name="aktion" value="3">';
 

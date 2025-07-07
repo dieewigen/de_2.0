@@ -224,6 +224,6 @@ $sondenmsg[2]='Beim testen einer selbstreplizierenden Sonde enstanden auf Anhieb
 $ressmsg=array();
 $ressmsg[0]='Eine Wartungsflotte stö&szlig;t auf Weltraumschrott, der {VALUE1} {VALUE2} einbringt.';
 $ressmsg[1]='Durch einen Ingenieursfehler lief ein Materiewandler für einige Zeit auf über 120% Auslastung. Das gab {VALUE1} {VALUE2} zusätzlich. Zum Glück wurde der Wandler nicht beschädigt.';
-$ressmsg[2]='Bergarbeiter stie&szlig;en auf einem Asteroiden auf besonders reiche und reine {VALUE2}vorkommen. {VALUE1} Einheiten davon stehen sofort zur Verfügung.';
+$ressmsg[2]='Bergarbeiter stie&szlig;en auf einem Asteroiden auf besonders reiche und reine {VALUE2} vorkommen. {VALUE1} Einheiten davon stehen sofort zur Verfügung.';
 
 ?>

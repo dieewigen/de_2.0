@@ -343,14 +343,6 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
     mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
    
     $time=strftime("%Y%m%d%H%M%S");
-    /* Begrüßungs HFN Start*/
-    mysql_query("update de_user_data set newtrans=1 where user_id=$user_id");
-    $body=str_replace("{SPIELERNAME}", $spielername , $rpc_lang['begrbody']);
-    mysql_query("INSERT INTO de_user_hyper (empfaenger,absender,fromsec,fromsys,fromnic,time,betreff,text,archiv,sender,gelesen)VALUES ('$user_id', '0', '0', '1', '$rpc_lang[begrabs]', '$time' , '$rpc_lang[begrbetreff]','$body', '0', '0', '0')");
-    mysql_query("INSERT INTO de_user_hyper (empfaenger,absender,fromsec,fromsys,fromnic,time,betreff,text,archiv,sender,gelesen)VALUES ('$user_id', '0', '0', '1', '$rpc_lang[begrabs]', '$time' , '$rpc_lang[begrbetreff]','$body', '1', '0', '0')");
-    /* Begrüßungs HFN Ende */
-
-
     //späteinsteigerhilfe, gilt nicht in der ewigen runde
     if($sv_ewige_runde!=1){
       //zuerst schauen wieviel ticks bereits vergangen sind

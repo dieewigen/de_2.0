@@ -20,6 +20,70 @@ if ($row["status"]==1) $ownally = $row["allytag"];
 <?php //stelle die ressourcenleiste dar
 include "resline.php";
 
+
+//Die Gewinner der alten Runden ansehen
+if(isset($_GET['show_history']) && $_GET['show_history']==1){
+
+	echo '<a href="toplist.php" class="btn">zur&uuml;ck</a><br><br>';
+
+	
+	rahmen_oben('Gewinner der vergangen Runden');
+	echo '<div class="cell" style="width: 570px;">';
+	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_server_round_toplist ORDER BY round_id DESC");
+	while($row = mysqli_fetch_array($db_daten)){
+		echo '<div style="text-align: center; font-weight: bold;">Runde '.$row['round_id'].'</div>';
+		echo '<div>ERHABENE/ERHABENER: '.$row['player_spielername'].'</div>';
+		echo '<div>Koordinaten: '.$row['player_sector'].':'.$row['player_system'].'</div>';
+
+		switch($row['player_rasse']){
+			case 1:
+				$rasse='Die Ewigen';
+			break;
+
+			case 2:
+				$rasse='Ishtar';
+			break;
+			
+			case 3:
+				$rasse='K&#180;Tharr';
+			break;
+			
+			case 4:
+				$rasse='Z&#180;tah-ara';
+			break;			
+
+			default:
+				$rasse='N/A';
+			break;
+		}
+
+		echo '<div>Punkte: '.number_format($row['player_score'], 0,"",".").'</div>';
+		echo '<div>Rasse: '.$rasse.'</div>';
+		echo '<div>Wirtschaftsticks: '.number_format($row['round_wt'], 0,"",".").'</div>';
+
+		echo '<div style="height: 20px;"></div>';
+
+		echo '<div>Sektor: '.$row['sector_id'].'</div>';
+		echo '<div>Sektorname: '.$row['sector_name'].'</div>';
+		echo '<div>Sektorpunkte: '.number_format($row['sector_score'], 0,"",".").'</div>';
+
+		if(!empty($row['ally_tag'])){
+			echo '<div style="height: 20px;"></div>';
+
+			echo '<div>Allianz: '.$row['ally_tag'].'</div>';
+			echo '<div>Allianzrundensiegartefakte: '.number_format($row['ally_roundpoints'], 0,"",".").'</div>';		
+		}
+
+		echo '<div style="height: 40px;"></div>';
+	}
+
+	rahmen_unten();
+
+	echo '</div>';
+
+	die('<body></html>');
+}
+
 function showmenu($menuid, $menupos){
 	global $toplist_lang, $sv_ewige_runde, $sv_oscar, $sv_hardcore;
 	//men�s definieren
@@ -280,7 +344,12 @@ if ($s==4){
 }
 
 ?>
+<div class="info_box text3" style="margin-bottom: 5px; font-size: 14px;">
+	<a href="toplist.php?show_history=1">Daten der vergangenen Runden</a>
 </div>
+
+</div>
+
 <br>
 <?php include "fooban.php"; ?>
 </body>

@@ -430,15 +430,4 @@ for($index=0;$index<$stufen;$index++){
 	$max_achievement_points++;
 }
 
-//Spieler geworben
-$achievement_anz++;
-$stufen=10;
-$mbelohnung=60000000*$ac_prozent;
-for($index=0;$index<$stufen;$index++){
-	$rewards20[$index][0]=10/$stufen+$index; //zu erreichender wert
-	@$rewards20[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
-	$max_achievement_points++;
-}
-
-
 ?>

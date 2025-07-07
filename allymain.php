@@ -307,7 +307,7 @@ if($allyidpartner>0){
 }
 
 //platz nach rundensiegpunkten
-$db_datenx=mysql_query("SELECT COUNT(*) AS wert FROM de_allys WHERE questpoints>'$questpoints' ORDER BY id ASC", $db);
+$db_datenx=mysql_query("SELECT COUNT(*) AS wert FROM de_allys WHERE questpoints > '$questpoints' ORDER BY id ASC", $db);
 $rowx = mysql_fetch_array($db_datenx);
 $platz=$rowx['wert']+1;
 $rundensiegartefatke=number_format($questpoints, 0,"",".").' (Platz: '.$platz.')';

@@ -1,6 +1,6 @@
 <?php
 $eftachatbotdefensedisable=1;
-mb_internal_encoding("iso-8859-1");
+mb_internal_encoding("UTF-8");
 session_start();
 include 'inc/sv.inc.php';
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';

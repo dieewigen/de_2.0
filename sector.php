@@ -157,14 +157,6 @@ echo '</form><br>';
 //schauen ob nah oder fern
 $rzadd=0;
 if ($ownsector<>$sf){
-	//schauen wie viele artefakte man hat, die die nahen sektoren vergr��ern
-	//$db_daten=mysql_query("SELECT id FROM de_user_artefact WHERE id=5 AND user_id='$ums_user_id'",$db);
-	/*
-	$wert = 5;// + mysql_num_rows($db_daten);
-
-	if ($ownsector<$sf+$wert and $ownsector>$sf-$wert) $rzadd=1;
-	else $rzadd=2;
-	*/
 	$rzadd=2;
 }
 
@@ -172,17 +164,26 @@ if ($ownsector<>$sf){
 $db_daten=mysql_query("SELECT * FROM de_sector WHERE sec_id='$sf'",$db);
 $sec_data = mysql_fetch_array($db_daten);
 
+//Hinweis in Sektor 666
+if($sf==666){
+    //hinweistext für npc-sektoren
+	echo '
+	<div class="cell" style="display: flex; width: 597px; border: 1px solid #333333; padding: 4px; margin-bottom: 20px;">
+    	<div style="background-color: #000000; width: 50px; height: 50px;">
+			<img src="'.$ums_gpfad.'g/symbol12.png" border="0" title="Info">
+		</div>
+    
+		<div style="flex-grow: 1; padding: 10px;">
+			In Sektor 666 regten sich vor Äonen die größten Übel der Zeit. Heute schlafen sie und man kann nur hoffen, dass sie nie wieder erwachen. 
+		</div>
+    </div>';
+}
+
+
 if($sec_data['npc']==1){
-	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////	
 	//npc anzeigen
 	////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////
-	/*
-	if($sv_oscar==1){
-		$sv_min_col_attgrenze=0.2;
-	}
-	*/
 	
 	//kein malus bei aliens
   	$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus;
@@ -197,9 +198,6 @@ if($sec_data['npc']==1){
 		$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
 	}
 	
-	//if($rzadd==1)$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	//if($rzadd==2)$style='border: 1px solid #444444; background-color: #DD0000; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	//$sektorinfo='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Naher Sektor: Reisezeit +1 Kampftick<br>Ferne Sektoren: Reisezeit +2 Kampfticks" style="'.$style.'">'.$rzadd.'</span>';
 	$sektorinfo='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
 	$sektorinfo.='';
 	//rahmen
@@ -256,10 +254,8 @@ if($sec_data['npc']==1){
     echo '</div><br>';
 	
 }else{
-	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////	
 	//spieler anzeigen
-	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////
 	//sektorkommandant feststellen
 	$sksystem=issectorcommander();
