@@ -5,11 +5,9 @@ cache/creditlogs/*.txt
 cache/toplist/*.tmp
 cache/overview/*.tmp
 cache/botcheck/*.txt
+ourdetool/logs/*.txt
 fonts/
 npcx/
-ranglisten/
-sekretariat/
-soudata/source/sou_showdata.php
 .gitignore
 .user.ini
 dieewigen.code-workspace
