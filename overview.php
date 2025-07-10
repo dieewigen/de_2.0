@@ -126,13 +126,13 @@ if ($ums_rasse == 1) {
     $rasse = 'Z&#180;tah-ara';
 }
 
-$sel_news = mysql_query("SELECT * FROM de_news_overview where typ=1 order by id desc Limit 0,5");
+$sel_news = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_news_overview where typ=1 order by id desc Limit 0,5");
 $det_news = '';
-while ($rew = mysql_fetch_array($sel_news)) {
+while ($rew = mysqli_fetch_array($sel_news)) {
     $t = $rew['time'];
     $time = $t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
 
-    $det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode_fix($rew['betreff']).'</span></a><br>';
+    $det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rew['betreff'].'</span></a><br>';
 }
 
 //stelle die ressourcenleiste dar
@@ -206,32 +206,6 @@ for ($j = 0;$j <= 6;$j++) {
 			<td width="13" class="rmr">&nbsp;</td>
 			</tr>
 			';
-
-            /*
-            if($ovfirst==1){
-                $ovfirst=0;
-                $ueberschrift='
-                <table width="586" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                <td width="13" height="37" class="rol">&nbsp;</td>
-                <td width="560" align="center" class="ro"><div class="cellu">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</div></td>
-                <td width="13" class="ror">&nbsp;</td>
-                </tr>
-                ';
-            }
-            else
-            {
-                $ueberschrift='
-                <table width="586" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                <td width="13" height="37" class="rml">&nbsp;</td>
-                <td width="560" align="center" class="ro"><div class="cellu">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</div></td>
-                <td width="13" class="rmr">&nbsp;</td>
-                </tr>
-                ';
-            }
-            */
-
 
             ///////////////////////////////////////////////////////////////
             //die rundencounteranzeige erstellen - anfang
@@ -476,7 +450,7 @@ for ($j = 0;$j <= 6;$j++) {
 		  <b style="font-size:14px;">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</b>
 		  	<div align="left">
 				<table border="0">
-					<tr><td width="30">&nbsp;</td><td>'.umlaut($det_news).'</td></tr>
+					<tr><td width="30">&nbsp;</td><td>'.$det_news.'</td></tr>
 				</table>
 			</div>');
 
