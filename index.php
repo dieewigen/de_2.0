@@ -233,11 +233,10 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//////////////////////////////////////////////////////////////////////
 		//spielerdaten aus de_user_info holen und in die session packen
 		//////////////////////////////////////////////////////////////////////
-		$result = mysql_query("SELECT submit, gpfad, transparency FROM de_user_info WHERE user_id='$ums_user_id'") OR die(mysql_error());
+		$result = mysql_query("SELECT submit, gpfad FROM de_user_info WHERE user_id='$ums_user_id'") OR die(mysql_error());
 		$row = mysql_fetch_array($result);
 		$ums_submit=$row["submit"];
 		$ums_gpfad=$row["gpfad"];
-		$_SESSION["ums_transparency"]=$row["transparency"];
 		if(($ums_gpfad=='')||($_REQUEST['grapa']=="off"))$ums_gpfad=$sv_image_server;
 
 		//vote

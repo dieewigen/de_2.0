@@ -13,7 +13,7 @@ $getpamsg = '';
 
 $ehlockfaktor = 4;
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
+$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
 $row = mysql_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -31,7 +31,6 @@ $nrrasse = $row['nrrasse'];
 $nrspielername = $row['nrspielername'];
 $tick = $row['tick'];
 $ovopt = $row['ovopt'];
-$soundoff = $row['soundoff'];
 $credits = $row['credits'];
 $chatoff = $row['chatoff'];
 $chatoffallg = $row['chatoffallg'];
@@ -39,15 +38,6 @@ $chatoffglobal = $row['chatoffglobal'];
 $helperon = $row['helper'];
 $patime = $row['patime'];
 $trade_reminder = $row['trade_reminder'];
-
-
-//irc-benutzername auslesen
-$db_daten = mysql_query("SELECT ircname, gpfad, transparency FROM de_user_info WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
-$db_ircname = $row['ircname'];
-$gpfaddb = $row['gpfad'];
-
-//$transparency=$row['transparency'];
 
 //owner id auslesen
 $db_daten = mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'", $db);
@@ -105,58 +95,15 @@ if (isset($_POST['donr'])) {
 }
 
 if (isset($_POST['graop'])) {
-    //<input type="hidden" name="dograop" value="1">
-    $secpic = $_POST['secbild'];
-    if ($secbild == $secanzeige[0]) {
-        $secpic = 0;
-    } elseif ($secbild == $secanzeige[1]) {
-        $secpic = 1;
-    } elseif ($secbild == $secanzeige[2]) {
-        $secpic = 2;
-    } else {
-        $secpic = 0;
-    }
-    $hidepic = $secpic;
-    //ircname
-    if (!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $_POST['ircname'])) {
-        $errmsg .= $options_lang['fehler4'];
-        $ircname = '';
-    } else {
-        $db_ircname = $_POST['ircname'];
-        $ircname = $_POST['ircname'];
-    }
-
     if ($errmsg == '') {
-        //$gpfad = $_REQUEST['gpfad'];
-        $gpfad = '';
-        $sound = (int)$_POST['sound'];
-        $chat = isset($_POST['chat']) ? intval($_POST['chat']) : 0;
-        $chatallg = (int)$_POST['chatallg'];
-        $chatglobal = (int)$_POST['chatglobal'];
-        $helper = (int)$_POST['helper'];
-        $traderem = (int)$_POST['traderem'];
+        $chat = intval($_POST['chat'] ?? 0);
+        $chatallg = intval($_POST['chatallg'] ?? 0);
+        $chatglobal = intval($_POST['chatglobal'] ?? 0);
+        $helper = intval($_POST['helper'] ?? 0);
+        $traderem = intval($_POST['traderem'] ?? 0);
 
-
-        /*
-        $transparency=intval($_POST['transparenz']);
-        if($transparenz<40)$transparenz=40;
-        elseif($transparenz>100)$transparenz=100;
-        $_SESSION['ums_transparency']=$transparenz;
-        */
-        if ($_REQUEST['gpfad'] != '') {
-            $ums_gpfad = $gpfad;
-            $gpfaddb = $gpfad;
-        } else {
-            $ums_gpfad = $sv_image_server_list[0];
-            $gpfaddb = '';
-        }
-        //$ums_gpfad=$gpfad;$gpfaddb=$gpfad;
-        //mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname', transparency='$transparenz' WHERE user_id = '$ums_user_id'",$db);
-        mysql_query("update de_user_info set gpfad = '$gpfad', ircname='$ircname' WHERE user_id = '$ums_user_id'", $db);
-        mysql_query("update de_user_data set hide_secpics = '$secpic', soundoff='$sound', chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
-        $hidepic = $secpic;
+        mysql_query("UPDATE de_user_data SET chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
         $errmsg .= $options_lang['uebernommen'];
-        $soundoff = $sound;
         $chatoff = $chat;
         $chatoffallg = $chatallg;
         $_SESSION['ums_chatoffallg'] = $chatoffallg;
@@ -483,14 +430,6 @@ echo '>Classic</option>
   <td width="13" class="rr">&nbsp;</td>
 </tr>';
 
-
-/*
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[sounddeaktivieren]?></td>
-<td><input type="Checkbox" name="sound" <? if($soundoff=="1") echo "checked"; ?> value="1"></td>
-<td width="13" class="rr">&nbsp;</td>
-*/
 /*
 </tr>
 <tr align="center">

@@ -1,13 +1,6 @@
 <?php
 include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
 
-//transparenz setzen, wenn sie von 100 abweicht
-if($ums_transparency!=100){
-echo '<style type="text/css">
-td,c,cl,cc,ccg,ccr,ccy,cr,tl,tc,tr,cell,cell1{filter:alpha(opacity='.$ums_transparency.');-moz-opacity: 0.'.$ums_transparency.';}
-</style>';
-}
-
 //tickzeiten laden
 include "cache/lasttick.tmp";
 include "cache/lastmtick.tmp";
