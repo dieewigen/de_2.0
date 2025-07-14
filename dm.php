@@ -266,60 +266,19 @@ $(document).ready(function() {
 		resize: function(event, ui) {
 			setCookie('chat_width', $('.ui-dialog').css('width'));
 			setCookie('chat_height', $('.ui-dialog').css('height'));
-			//console.log($('.ui-dialog').css('width'));
-			//console.log($('.ui-dialog').css('height'));
-
 		}
 	});
 	$('#chat_popup').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}});
-	
-	//$(".ui-dialog-content, .ui-dialog").css("padding", "1px");
-	//$(".ui-widget-content").css("background-color", "transparent");	
-	//$(".ui-dialog .ui-dialog-titlebar").css("padding", "1px");
-	
-	//var top_pos=parseInt($('.ui-dialog').css('top'), 10)-18;
-	//$('.ui-dialog').css('top',top_pos);
-	/*
-	$('.ui-dialog').css('position', 'absolute');
-	$('.ui-dialog').css('bottom', 0);
-	$('.ui-dialog').css('right', 0);
-	$('#chat-popup').css('height', '600px');
-	*/
-	
 });
 
 window.setInterval(function(){
 	$("#iframe_menu").contents().find("body").css("background-color", "transparent");
 	$("#iframe_menu").contents().find("body").css("background-image", "none");
 	$("#iframe_main").contents().find("body").css("background-color", "transparent");
-	$("#iframe_main").contents().find("body").css("background-image", "url(https://grafik-de.bgam.es/degp3v2/g/cellblack.png)");
+	$("#iframe_main").contents().find("body").css("background-image", "url(<?php echo $_SESSION['ums_gpfad'] ?>/g/cellblack.png)");
 	$("#iframe_chat").contents().find("body").css("background-color", "transparent");
 	$("#iframe_chat").contents().find("body").css("background-image", "none");
 }, 100);
-
-
 </script>
-
-<?php
-/*
-<script>
-$(document).ready(function () {
-$("div, span, img, a, tr").tooltip({
-	content: function () {
-              return $(this).prop('title');
-          },
-    track: true, 
-    delay: 0, 
-    showURL: false, 
-    showBody: "&",
-    extraClass: "design1", 
-    fixPNG: true,
-    opacity: 1.00,
-    left: 0
-});
-});
-</script>
-*/
-?>
 </body>
 </html>
