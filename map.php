@@ -103,15 +103,10 @@ $maxcol = $row['maxcol'];
 $newcss = 1;
 include "cssinclude.php";
 
-/*
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-*/
 ?>
-<link rel="stylesheet" href="/js/jquery-ui-1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="/js/jquery-ui-1.14.1/jquery-ui.min.css">
 <script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="/js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <script>
 $(function() {
