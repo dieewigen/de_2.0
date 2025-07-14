@@ -82,6 +82,7 @@ if(isset($data['action']) && !empty($data['action'])) {
             $_SESSION['ums_user_id'] = $userId;
             $_SESSION['de_frameset'] = 1; // Setze die Frameset-Variable, um das Layout zu ändern
             $_SESSION['ums_servid']=$sv_servid;
+            $_SESSION['ums_owner_id']=0;
 
             //damit man die Scriptfunktionen ansprechen kann, werden die in requestData übergebenen Parameter in $_REQUEST hinterlegt
             if (isset($data['requestData'])) {
