@@ -140,9 +140,9 @@ if($ums_user_id==1840 OR $ums_user_id==1){
 if ($_SESSION['ums_servid']!=$sv_servid)
 {
   fehlermsg('<br><center>
-  <font size="2" color="FF0000">'.$session_lang[error2].'<br><br><font color="00FF00">'.
-  $session_lang[error3].' <a href="'.$sv_link[1].'">'.$session_lang[error4].'</a><br><br><br><font size="1">'.
-  $session_lang[error5].' <a href="index.php">'.$session_lang[error4].'</a>');
+  <font size="2" color="FF0000">'.$session_lang['error2'].'<br><br><font color="00FF00">'.
+  $session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a><br><br><br><font size="1">'.
+  $session_lang['error5'].' <a href="index.php">'.$session_lang['error4'].'</a>');
   session_destroy();
   exit;
 }
