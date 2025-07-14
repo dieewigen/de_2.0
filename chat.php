@@ -236,7 +236,6 @@ if (window.Worker) {
 	var worker = new Worker('de_chat.js');
 	
 	worker.addEventListener('message', function(e) {
-		console.log(e);
 		if(e.data.output!=''){
 			$('#chatcontent').html($('#chatcontent').html()+e.data.output);
 			
