@@ -7,9 +7,11 @@ define("PROJECT_ROOT_PATH", __DIR__ . "/");
 require PROJECT_ROOT_PATH.'../inccon.php';
 include_once 'vendor/autoload.php';
 
-// Check if the user has API access
-$headers = getallheaders();
-$apiKey=$headers['de_api_key'] ?? '';
+$apiKey = getHeaderValue('X-DE-API-KEY');
+
+if(empty($apiKey)){
+    $apiKey=$_SERVER['X-DE-API-KEY'] ?? '';
+}
 
 if($apiKey != $GLOBALS['env_api_key']) {
     header('HTTP/1.1 401 Unauthorized');
@@ -102,30 +104,30 @@ if(isset($data['action']) && !empty($data['action'])) {
     exit;
 }
 
-/*
-$authenticationService = new AuthenticationService();
-if ($_SESSION['ums_user_id'] < 1) {
-    header('HTTP/1.1 401 Unauthorized');
-    exit();
+
+function getHeaderValue($name) {
+    // 1. Standard: $_SERVER mit HTTP_ Prefix
+    $key = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+    if (isset($_SERVER[$key])) {
+        return $_SERVER[$key];
+    }
+
+    // 2. Manchmal sind Header direkt vorhanden (z. B. 'x-de-api-key')
+    foreach ($_SERVER as $k => $v) {
+        if (strtolower($k) === strtolower($name)) {
+            return $v;
+        }
+    }
+
+    // 3. Als Fallback: getallheaders() falls verfügbar
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        foreach ($headers as $k => $v) {
+            if (strtolower($k) === strtolower($name)) {
+                return $v;
+            }
+        }
+    }
+
+    return null;
 }
-if (!$authenticationService->isAllowedForAPIUsage($_SESSION['ums_user_id'])) {
-    header('HTTP/1.1 403 Forbidden');
-    exit();
-}
-
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = explode( '/', $uri );
-
-
-//API endpoint registration
-if ((isset($uri[3]) && $uri[3] != 'allTechs') || !isset($uri[3])) {
-    header('HTTP/1.1 404 Not Found');
-    exit();
-}
-
-//Tech Building Controller registration
-$objFeedController = new TechBuildingController();
-$strMethodName = $uri[3];
-echo $strMethodName;
-$objFeedController->{$strMethodName}();
-*/

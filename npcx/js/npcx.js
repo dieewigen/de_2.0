@@ -29,7 +29,7 @@ async function getAllNpcUsers() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'de_api_key': env_api_key // API Key
+            'X-DE-API-KEY': env_api_key // API Key
         },
         body: JSON.stringify({ action: 'getAllNpcUsers' })
     });
@@ -42,7 +42,7 @@ async function openPage(user_id, filename, requestData=Array()) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'de_api_key': env_api_key // API Key
+            'X-DE-API-KEY': env_api_key // API Key
         },
         body: JSON.stringify({ action: 'openPage', user_id: user_id, filename: filename, requestData: requestData })
     })
