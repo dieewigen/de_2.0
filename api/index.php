@@ -6,6 +6,7 @@ use DieEwigen\Api\Model\ValidateGameFilename;
 define("PROJECT_ROOT_PATH", __DIR__ . "/");
 require PROJECT_ROOT_PATH.'../inccon.php';
 include_once 'vendor/autoload.php';
+include_once '../inc/sv.inc.php';
 
 $apiKey = getHeaderValue('X-DE-API-KEY');
 
@@ -80,6 +81,7 @@ if(isset($data['action']) && !empty($data['action'])) {
             //SESSSION-Variable setzen
             $_SESSION['ums_user_id'] = $userId;
             $_SESSION['de_frameset'] = 1; // Setze die Frameset-Variable, um das Layout zu ändern
+            $_SESSION['ums_servid']=$sv_servid;
 
             //damit man die Scriptfunktionen ansprechen kann, werden die in requestData übergebenen Parameter in $_REQUEST hinterlegt
             if (isset($data['requestData'])) {
