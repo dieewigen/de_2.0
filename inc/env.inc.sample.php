@@ -58,4 +58,6 @@ $GLOBALS['webhooks']['xDE']=			'';
 //RPC Authcode
 $GLOBALS['env_rpc_authcode']='';
 
+// API Key for external services
+$GLOBALS['env_api_key']='
 ?>

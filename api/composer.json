@@ -1,0 +1,15 @@
+{
+    "name": "dieewigen/api",
+    "autoload": {
+        "psr-4": {
+            "DieEwigen\\Api\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "git",
+            "email": "issomad@die-ewigen.com"
+        }
+    ],
+    "require": {}
+}

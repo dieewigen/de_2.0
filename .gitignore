@@ -7,7 +7,6 @@ cache/overview/*.tmp
 cache/botcheck/*.txt
 ourdetool/logs/*.txt
 fonts/
-npcx/
 .gitignore
 .user.ini
 dieewigen.code-workspace
