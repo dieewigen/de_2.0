@@ -176,8 +176,6 @@ if ($ally_id > 0 && $allystatus == 1) {
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
-
-                            //createAuction($_SESSION['ums_user_id']);
                         }
 
                         //Allianzartefakt
@@ -206,8 +204,6 @@ if ($ally_id > 0 && $allystatus == 1) {
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
-
-                            //createAuction($_SESSION['ums_user_id']);
                         }
 
                         //Allianzartefakt
@@ -236,8 +232,6 @@ if ($ally_id > 0 && $allystatus == 1) {
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
-
-                            //createAuction($_SESSION['ums_user_id']);
                         }
 
                         //Allianzartefakt
@@ -266,8 +260,6 @@ if ($ally_id > 0 && $allystatus == 1) {
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
-
-                            //createAuction($_SESSION['ums_user_id']);
                         }
 
                         //Allianzartefakt
@@ -296,8 +288,6 @@ if ($ally_id > 0 && $allystatus == 1) {
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
-
-                            //createAuction($_SESSION['ums_user_id']);
                         }
 
                         //Allianzartefakt
@@ -355,7 +345,7 @@ if ($ally_id > 0 && $allystatus == 1) {
 
     //die Hintergrundfarbe bestimmen
     $css = array();
-    for ($i = 0;$i <= 6;$i++) {
+    for ($i = 0;$i <= 5;$i++) {
         if ($allyrelverbreitung >= $allyrelverbreitung_need[$i]) {
             if ($allyrelverbreitung >= $allyrelverbreitung_need[$i + 1] && $i < count($allydailygift_lang['bonusname']) - 1) {
                 //grau

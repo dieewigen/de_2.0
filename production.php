@@ -446,10 +446,6 @@ for($i=100;$i<=104;$i++){
 $c1=0;$c2=0;$z=0;
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT  * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id");
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
-	$has_tech=false;
-	if((isset($pt[$row['tech_id']]) && $pt[$row['tech_id']]['time_finished']<=time()) || (isset($sv_comserver_roundtyp) && $sv_comserver_roundtyp==1) ){
-		$has_tech=true;
-	}
 
 	if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
 	
@@ -502,7 +498,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 	showeinheit_ang(getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']), $row['tech_id'], $ben_restyp01-round($ben_restyp01*$artbonus/100),
 	$ben_restyp02-round($ben_restyp02*$artbonus/100), $ben_restyp03-round($ben_restyp03*$artbonus/100),
-	$ben_restyp04-round($ben_restyp04*$artbonus/100), $ben_restyp05-round($ben_restyp05*$artbonus/100), $tech_ticks, $ec[$row['tech_id']], $bg,$z, $has_tech, $item_kosten);
+	$ben_restyp04-round($ben_restyp04*$artbonus/100), $ben_restyp05-round($ben_restyp05*$artbonus/100), $tech_ticks, $ec[$row['tech_id']], $bg,$z, hasTech($pt, $row['tech_id']), $item_kosten);
 
 
 	/*

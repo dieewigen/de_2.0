@@ -5,14 +5,6 @@ include "det_userdata.inc.php";
 
 $uid=$_REQUEST['uid'];
 
-// This code demonstrates how to lookup the country by IP Address
-include("geoip.inc");
-// Uncomment if querying against GeoIP/Lite City.
-include("geoipcity.inc");
-//$gi = geoip_open("../../div_server_data/geoip/GeoIP.dat",GEOIP_STANDARD);
-$gi = geoip_open("../../div_server_data/geoip/GeoLiteCity.dat",GEOIP_STANDARD);
-
-
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -652,7 +644,6 @@ if ($uid>0)
       echo '<tr>';
       echo '<td width="150px" align="center">Kooperation</td>';
       $coop='keine';
-      if($de_login[cooperation]==1)$coop='<font color="#0000FF"><b>BIGPOINT-DE</b></font>';
       echo '<td width="250px" align="center">'.$coop.'</td>';
       echo '<td width="150px" align="center">Status</td>';
       if ($de_login["status"]==0)$status='Inaktiv';
@@ -670,7 +661,7 @@ if ($uid>0)
       echo '</tr>';
       echo '<tr>';
       echo '<td align="center">Hauptaccount ID</td>';
-      echo '<td align="center"><a href="https://login.bgam.es/ourdetool/idinfo.php?UID='.$de_login[owner_id].'" target="_blank">'.$de_login["owner_id"].'</td>';
+      echo '<td align="center"><a href="https://login.bgam.es/ourdetool/idinfo.php?UID='.$de_login['owner_id'].'" target="_blank">'.$de_login["owner_id"].'</td>';
       echo '<td align="center">Logins</td>';
       echo '<td align="center">'.$de_login["logins"].'</td>';      
       echo '</tr>';
@@ -694,18 +685,6 @@ if ($uid>0)
       echo '</tr>';
       echo '<tr>';
       echo '<td align="center">Letzte IP</td>';
-      
-/*
-$record = geoip_record_by_addr($gi,$de_login["last_ip"]);
-$ipinfo='Daten laut maxmind.com: '.
-$record->country_code . " " . $record->country_code3 . " " . $record->country_name . "\n".
-$record->region . " " . $GEOIP_REGION_NAME[$record->country_code][$record->region] . "\n".
-$record->city . " ".
-$record->postal_code . " ".
-$record->metro_code . " ".
-$record->area_code . " ";
-geoip_close($gi);
-*/
       
       echo '<td align="center" wrap><a href="sameip.php?lip='.$de_login["last_ip"].'" target="_blank">'.$de_login["last_ip"].'</a>
             </td>';

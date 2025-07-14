@@ -17,6 +17,10 @@ if ($row["status"]==1){
 	$ownally='';
 }
 
+if(!isset($sv_hide_fp_in_secstatus)){
+	$sv_hide_fp_in_secstatus=0;
+}
+
 //----------- Ally Feinde/Freunde
 $allypartner = array();
 $allyfeinde = array();

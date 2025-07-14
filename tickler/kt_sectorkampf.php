@@ -166,7 +166,7 @@ for ($c=0; $c<$num; $c++){
 		$db_daten_artefakt = mysql_query("SELECT artname FROM de_artefakt WHERE id='$id'",$db);
 		$rowartefakt = mysql_fetch_array($db_daten_artefakt);
 		//meldung über das eroberte artefakt
-		$stolestr=$kt_lang[sektor].' '.$artziel.' '.$kt_lang[konnteartefakterobern].$rowartefakt["artname"].'<br>';
+		$stolestr=$kt_lang['sektor'].' '.$artziel.' '.$kt_lang['konnteartefakterobern'].$rowartefakt["artname"].'<br>';
 		//echo 'AAA'.$artziel.'BBB';
 		
 		//artefaktumzug in der db hinterlegen
@@ -275,7 +275,8 @@ for ($c=0; $c<$num; $c++){
 				$eigenue=$eigeninsg-$deffer[$i][1]-$deffer[$i+1][1];
 				$subeinheiten1=$deffer[$i][1];
 				$subeinheiten2=$deffer[$i+1][1];
-				mysql_query("update de_sector set e1 = e1 - $subeinheiten1, e2 = e2 - $subeinheiten2 where sec_id = $sec_id",$db);
+
+				mysql_query("update de_sector set e1 = e1 - ".intval($subeinheiten1).", e2 = e2 - ".intval($subeinheiten2)." where sec_id = $sec_id",$db);
 				$i++;
 				create_bknachricht();
 			}else{
@@ -284,9 +285,9 @@ for ($c=0; $c<$num; $c++){
 				$subeinheiten=$deffer[$i][1];
 				create_bknachricht();
 				if ($sec_id==$zsec)//kann nur die wachflotte sein, daher auch von dort abziehen
-				mysql_query("update de_sector set e1 = e1 - $subeinheiten where sec_id = $sec_id",$db);
+				mysql_query("update de_sector set e1 = e1 - ".intval($subeinheiten)." where sec_id = $sec_id",$db);
 				else
-				mysql_query("update de_sector set e2 = e2 - $subeinheiten where sec_id = $sec_id",$db);
+				mysql_query("update de_sector set e2 = e2 - ".intval($subeinheiten)." where sec_id = $sec_id",$db);
 
 				if ($eigenue==0 AND $sec_id!=$zsec)//falls keine schiffe überlebt haben direkt flotte nach hause
 				mysql_query("update de_sector set aktion = 0, zeit = 0, aktzeit = 0,

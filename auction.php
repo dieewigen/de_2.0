@@ -333,6 +333,7 @@ if (!hasTech($pt, 4)) {
             if ($bid == $row['id']) {
                 if ($bid_has_all) {
                     $sql = "UPDATE de_auction SET bidder='".$_SESSION['ums_user_id']."' WHERE id='".$row['id']."'";
+                    error_log($sql, 0);
                     mysqli_query($GLOBALS['dbi'], $sql);
 
                 }

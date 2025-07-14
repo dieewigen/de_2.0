@@ -79,7 +79,9 @@ function getInfocenter()
         //wird aktuell etwas erforscht?
         $t_aktiv = 0;
         foreach ($pt as $tech) {
-            if ($tech['time_finished'] > time()) {
+
+
+            if (is_array($tech) && $tech['time_finished'] > time()) {
                 $t_aktiv++;
             }
         }
@@ -251,6 +253,8 @@ function createAuction($uid)
 	cost='".serialize($cost)."',
 	reward='".serialize($reward)."'
 	";
+
+    error_log($sql, 0);
 
     mysqli_query($GLOBALS['dbi'], $sql);
 }
@@ -1033,6 +1037,12 @@ function loadPlayerTechs($uid)
         while ($row = mysqli_fetch_array($db_daten)) {
             $data[$row['tech_id']]['time_finished'] = $row['time_finished'];
         }
+
+        //die Daten um den NPC-Status erweitern
+        $sql = "SELECT npc FROM de_user_data WHERE user_id='$uid';";
+        $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+        $row = mysqli_fetch_array($db_daten);
+        $data['npc'] = $row['npc'];
     }
 
     return $data;
@@ -1043,7 +1053,7 @@ function hasTech($pt, $tech_id)
     global $sv_comserver_roundtyp;
 
     //Test auf Comserver-BR
-    if ($sv_comserver_roundtyp == 1) {
+    if ($sv_comserver_roundtyp == 1 || $pt['npc'] == 2) {
         return true;
     }
 

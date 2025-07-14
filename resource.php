@@ -155,20 +155,23 @@ $handelssteuersatz = 50;
 //Bonus durch Allianzgebäude
 
 $ally_has_notfallkonverter = false;
+
 //allydaten laden
 $db_daten = mysql_query("SELECT * FROM de_allys WHERE allytag='$ownally'", $db);
 $row = mysql_fetch_array($db_daten);
-$allyid = $row['id'];
-$ownallyid = $allyid;
-
-$db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
 $num = mysql_num_rows($db_daten);
 if ($num == 1) {
-    $row = mysql_fetch_array($db_daten);
+    $allyid = $row['id'];
 
-    if ($row['bldg6'] > 0) {
-        $ally_has_notfallkonverter = true;
-        $handelssteuersatz -= $row['bldg6'];
+    $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
+    $num = mysql_num_rows($db_daten);
+    if ($num == 1) {
+        $row = mysql_fetch_array($db_daten);
+
+        if ($row['bldg6'] > 0) {
+            $ally_has_notfallkonverter = true;
+            $handelssteuersatz -= $row['bldg6'];
+        }
     }
 }
 

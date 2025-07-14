@@ -157,12 +157,12 @@ class database {
 	 * @param string The name
 	 * @return string The quoted name
 	 */
-	function NameQuote( $s ) {
+	function NameQuote($s) {
 		$q = $this->_nameQuote;
-		if (strlen( $q ) == 1) {
+		if (strlen($q) == 1) {
 			return $q . $s . $q;
 		} else {
-			return $q{0} . $s . $q{1};
+			return $q[0] . $s . $q[1];
 		}
 	}
 	/**
@@ -248,7 +248,7 @@ class database {
 					break;
 				}
 				$l = $k - 1;
-				while ($l >= 0 && $sql{$l} == '\\') {
+				while ($l >= 0 && $sql[$l] == '\\') {
 					$l--;
 					$escaped = !$escaped;
 				}
