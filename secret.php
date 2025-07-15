@@ -200,7 +200,7 @@ $angreifer_verlust_win_max[$index] = 2;
 <title><?php echo $secret_lang['geheimdienst'];?></title>
 <?php include "cssinclude.php";
 echo '<script type="text/javascript">var ab='.$artbonusbuild.';</script>';
-echo '<script src="produktion'.$ums_rasse.'.js" type="text/javascript"></script>';
+echo '<script src="js/produktion'.$ums_rasse.'.js" type="text/javascript"></script>';
 echo '<script language="javascript">';
 echo 'var eb = new Array();';
 
@@ -216,8 +216,8 @@ echo '</script>';
 
 if ($agent > 0) {
     ?>
-<script language="JavaScript">
-<!--
+<script>
+
 function insertagent(sec,sys)
 {
   if(document.agent.zsec2)
@@ -230,6 +230,7 @@ function insertagent(sec,sys)
       alert("<?php echo $secret_lang['keineagenten'];?>");
   }
 }
+
 function insertsonde(sec,sys)
 {
   if(document.sonde.zsec1)
@@ -242,7 +243,6 @@ function insertsonde(sec,sys)
       alert("<?php echo $secret_lang['keinesonden'];?>");
   }
 }
-//-->
 </script>
 <?php
 }
