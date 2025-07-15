@@ -214,10 +214,8 @@ $bstr = $secret_lang['aggibonus'].$ua_name[2].$secret_lang['artefakte'].number_f
 
 echo '</script>';
 
-if ($agent > 0) {
-    ?>
+?>
 <script>
-
 function insertagent(sec,sys)
 {
   if(document.agent.zsec2)
@@ -233,20 +231,14 @@ function insertagent(sec,sys)
 
 function insertsonde(sec,sys)
 {
-  if(document.sonde.zsec1)
-  {
-      document.getElementById("zsec1").value = sec;
-      document.getElementById("zsys1").value = sys;
-  }
-  else
-  {
-      alert("<?php echo $secret_lang['keinesonden'];?>");
-  }
+    if(document.sonde.zsec1) {
+        document.getElementById("zsec1").value = sec;
+        document.getElementById("zsys1").value = sys;
+    }else{
+        alert("<?php echo $secret_lang['keinesonden'];?>");
+    }
 }
 </script>
-<?php
-}
-?>
 </head>
 <body>
 <?php
@@ -703,7 +695,7 @@ if (!hasTech($pt, 9)) {
     ////////////////////////////////////////////////////////////
     if ((isset($_POST["startsonde"]) || isset($_GET["a"]) && $_GET["a"] == 's') && ($zsec1 != '' && $zsys1 != '') && !isset($_POST["b110"]) && !isset($_POST["b111"])
      && hasTech($pt, 9) && hasTech($pt, 110)) {
-        
+
         if (validDigit($zsec1) && validDigit($zsys1) && $sonde > 0) {
 
             $zk = $zsec1.':'.$zsys1;
@@ -972,9 +964,9 @@ if (!hasTech($pt, 9)) {
     $az = isset($_POST['az']) ? intval($_POST['az']) : '';
 
     if (isset($_POST["zsec2"]) && isset($_POST["zsys2"]) && !isset($_POST["b110"]) && !isset($_POST["b111"]) && hasTech($pt, 111)) {
-        
+
         if (validDigit($zsec2) && validDigit($zsys2) && validDigit($az)) {
-           
+
             if ($az == '') {
                 $az = 0;
             }
