@@ -24,7 +24,7 @@ require_once '../inc/env.inc.php';
 			</div>
 
 			<div class="column">
-				<h2>JSON-Output</h2>
+				<h2>JSON-Output <span style="cursor: pointer;" onclick="getServerData();">&cir;</span></h2>
 				<span id="target_json_output"></span>
 			</div>			
 

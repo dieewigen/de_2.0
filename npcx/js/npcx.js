@@ -69,6 +69,21 @@ async function getSectorStatus(userId) {
     document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
 }
 
+async function getServerData() {
+    const response = await fetch('../api/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-DE-API-KEY': env_api_key // API Key
+        },
+        body: JSON.stringify({ action: 'getServerData'})
+    });
+    
+    const json = await response.json();
+
+    document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
+}
+
 async function openPage(user_id, filename, requestData=Array()) {
     const response = await fetch('../api/', {
         method: 'POST',
