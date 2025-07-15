@@ -444,16 +444,12 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		echo '<frameset ID="gf" framespacing="0" border="0" cols="209,*,0,0" frameborder="0" '.$titlecounter.'>';
 		echo '<frame name="Inhalt" target="h" src="menu.php" noresize marginwidth="0" marginheight="0">';
 		echo '<frame name="h" src="overview.php" noresize target="_blank">';
-		echo '<frame name="ef" src="eftastart.php" noresize target="_blank">';
-		echo '<frame name="sou" src="sou_start.php" noresize target="_blank">';
 		echo '</frameset>';
 		}else{ //mit chat
 		echo '<frameset ID="gf" framespacing="0" border="0" cols="209,620,*,0,0" frameborder="0" '.$titlecounter.'>';
 		echo '<frame name="Inhalt" target="h" src="menu.php" noresize marginwidth="0" marginheight="0">';
 		echo '<frame name="h" src="overview.php" noresize target="_blank">';
 		echo '<frame name="c" src="chat.php?frame=1" noresize target="_blank">';
-		echo '<frame name="ef" src="eftastart.php" noresize target="_blank">';
-		echo '<frame name="sou" src="sou_start.php" noresize target="_blank">';
 		echo '</frameset>';	
 		}
   	}
@@ -529,7 +525,7 @@ echo '<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type=
 
 $ums_rasse=$save_ums_rasse;
 $ums_gpfad=$save_ums_gpfad;
-echo '<script src="'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
+echo '<script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
 ?>
 <meta http-equiv="expires" content="0">
 </head>

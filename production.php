@@ -195,7 +195,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 <?php
 echo '<script type="text/javascript">var abf='.$artbonus_fleet.';var abd='.$artbonus_def.';var ab=0;</script>';
-echo '<script src="produktion'.$ums_rasse.'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/produktion'.$ums_rasse.'.js').'" type="text/javascript"></script>';
+echo '<script src="js/produktion'.$ums_rasse.'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$ums_rasse.'.js').'" type="text/javascript"></script>';
 ?>
 </head>
 <body>

@@ -17,28 +17,18 @@ $_SESSION['ic_last_refresh']=0;
     <title><?php echo $sv_server_tag;?> Die Ewigen - Desktopversion</title>
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="favicon.ico" />
+
+	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
+	<link rel="stylesheet" href="g/style.css?<?php echo filemtime('g/style.css');?>">	
 	
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/jquery-ui.min-1.12.0.js"></script>
+	<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
-	<link rel="stylesheet" href="js/jquery-ui.min-1.12.0.css">
-	<link rel="stylesheet" href="g/style.css?<?php echo filemtime('g/style.css');?>">
 
 
-	<?php
-	//<link rel="stylesheet" href="js/jquery-ui.min-1.12.0.css">
-	?>
   </head>
   <body class="template rasse<?php echo $_SESSION['ums_rasse'];?>">
-	  <?php
-	  /*
-    <div class="template-wrap1 clear1">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="600px" width="960px"></canvas>
-    </div>
-	<!--<div style="position: absolute; right: 0px; bottom:0px;"><img src="g/fullscreen.png" width="38" height="38" alt="Fullscreen" title="Fullscreen" onclick="SetFullscreen(1);" /></div>-->
-	   */
-	  ?>
 	<div style="position: absolute; width: 100%; height: 100%; left: 0px; top:0px;"><iframe src="map.php" id="iframe_map" height="100%" width="100%" frameBorder="0"></iframe></div>
 	<?php
 	//<div style="position: absolute; width: 209px; height: calc(100% - 80px); left: 0px; top:24px;"><iframe src="menu.php" id="iframe_menu" height="100%" width="100%" frameBorder="0"></iframe></div>

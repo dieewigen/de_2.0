@@ -38,8 +38,7 @@ if($_REQUEST['mp']==1)
     <img src="statistics_genpic.php?typ=1" width="600">
     <br><br><div class="cellu" style="width: 600px;">'.$stat_lang['kollektorentwicklung'].'</div>
     <img src="statistics_genpic.php?typ=2" width="600">
-    <br><br><div class="cellu" style="width: 600px;">'.$stat_lang['cybentwexp'].'</div>
-    <img src="statistics_genpic.php?typ=3" width="600"><br><br>';
+    <br><br>';
   //aktivit�t
   rahmen_oben($stat_lang['aktivitaet']);
   //tabellenkopf

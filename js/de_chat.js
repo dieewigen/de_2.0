@@ -17,6 +17,6 @@ self.addEventListener('message', function(e) {
 			self.postMessage(data[0]);
 		}
 	}
-	xmlhttp.open("GET", "de_ajaxrpc.php?managechat=1&chatid="+chatid+"&chatidallg="+chatidallg, true);
+	xmlhttp.open("GET", "/de_ajaxrpc.php?managechat=1&chatid="+chatid+"&chatidallg="+chatidallg, true);
 	xmlhttp.send();
 }, false);

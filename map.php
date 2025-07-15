@@ -99,12 +99,14 @@ $maxcol = $row['maxcol'];
 <?php
 $newcss = 1;
 include "cssinclude.php";
-
 ?>
+
 <link rel="stylesheet" href="/js/jquery-ui-1.14.1/jquery-ui.min.css">
+
 <script src="/js/jquery-3.7.1.min.js"></script>
 <script src="/js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
+
 <script>
 $(function() {
 $(document).tooltip({
@@ -115,17 +117,6 @@ $(document).tooltip({
 });
 </script>
 <?php
-//<script type="text/javascript" src="js/jquery.ui.touch.js"></script>
-//
-//
-//die Anzahl der "bewohnten" Sektoren auslesen
-//$sec_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_data WHERE npc=0 AND sector>1 GROUP BY sector ORDER BY npc, sector ASC");
-//$sec_anzahl=mysqli_num_rows($sec_daten);
-
-//$need_x_y=ceil(sqrt($sec_anzahl));
-
-//$sektoren_x=$need_x_y;
-//$sektoren_y=$need_x_y;
 $sektor_width = 720;
 $sektor_height = 720;
 
@@ -141,10 +132,8 @@ background-image:    url(g/PurpleNebula2048_back.jpg);
 background-size:     cover;
 background-repeat:   no-repeat;
 background-position: center center;
-">';
-//echo '<div id="mapcontent" style="position:absolute; overflow:hidden; left: 0px; top: 0px; width: '.($sektoren_x*$sektor_width).'px; height: '.($sektoren_y*$sektor_height).'px;  z-index:1;">';
-//echo '<div id="mousemove" style="transform-origin: 0 0; position:absolute; overflow:hidden; left: 0px; top: 0px; width: '.$mapcontent_width.'px; height: '.$mapcontent_height.'px;  z-index:20;"></div>';
-echo '<div id="mapcontent" style="transform-origin: 0 0; position:absolute; overflow:hidden; left: 0px; top: 0px; width: '.$mapcontent_width.'px; height: '.$mapcontent_height.'px;  z-index:1;">';
+">
+    <div id="mapcontent" style="transform-origin: 0 0; position:absolute; overflow:hidden; left: 0px; top: 0px; width: '.$mapcontent_width.'px; height: '.$mapcontent_height.'px;  z-index:1;">';
 
 //links oben spielname
 echo '<div id="gamename" style="top:40000px; left:40000px;" data-left="40000" data-top="40000">die ewigen</div>';

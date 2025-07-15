@@ -1,4 +1,6 @@
 <?php
+echo '<meta charset="UTF-8">';
+
 if(isset($_SESSION['ums_gpfad']))$ums_gpfad=$_SESSION['ums_gpfad'];
 if(isset($_SESSION['ums_rasse']))$ums_rasse=$_SESSION['ums_rasse'];
 //behandlung außerhalb der session
@@ -58,5 +60,4 @@ if(isset($eftacss) && $eftacss==1){
 		';
 	}
 }
-echo '<meta charset="UTF-8">';
 ?>

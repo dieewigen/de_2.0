@@ -204,7 +204,7 @@ if ((($_SESSION['ums_session_start']+$sv_session_lifetime)<time()) && ($eftachat
 	
 	if((isset($thisisefta) && $thisisefta==1) || (isset($thisissou) && $thisissou==1)){//bereich im efta/sou-style ausgeben
 
-		echo '<meta http-equiv="expires" content="0"></head><body><script src="'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
+		echo '<meta http-equiv="expires" content="0"></head><body><script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
 		
 		echo '<div align="center">';
 		rahmen0_oben();
@@ -243,7 +243,7 @@ if ((($_SESSION['ums_session_start']+$sv_session_lifetime)<time()) && ($eftachat
 		echo '</body></html>';
 	}else{ //bereich im de-style ausgeben
 		echo '<meta http-equiv="expires" content="0">
-		</head><body><script src="jssammlung.js" type="text/javascript"></script>
+		</head><body><script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>
 		<div align="center">';
 
 		if($GLOBALS['sv_ang']==1){

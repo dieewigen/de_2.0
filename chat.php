@@ -22,8 +22,7 @@ if (!isset($_SESSION["de_chat_inputchannel"])) {
 <!DOCTYPE HTML>
 <html>
 <head>
-<script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 <title>DE Chat</title>
 <meta charset="UTF-8">
 <?php
@@ -233,7 +232,7 @@ var chatid=0;
 var chatcounter=100;
 
 if (window.Worker) {
-	var worker = new Worker('de_chat.js');
+	var worker = new Worker('js/de_chat.js?time=<?php echo time();?>');
 	
 	worker.addEventListener('message', function(e) {
 		if(e.data.output!=''){
