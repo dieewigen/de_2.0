@@ -149,8 +149,7 @@ if ($_SESSION['ums_servid']!=$sv_servid)
 
 //session nach maximal einer zeit X durch den botschutz unterbrechen
 //globale sessiondatei auslesen
-//$botfilename='../div_server_data/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
-$botfilename='cache/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
+$botfilename='../botcheck/'.$_SESSION["ums_owner_id"].'.txt';
 if(file_exists($botfilename)){
 	$botfile = fopen ($botfilename, 'r'); 
 	$bottime=trim(fgets($botfile, 1000));

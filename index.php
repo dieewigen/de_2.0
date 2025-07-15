@@ -310,8 +310,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  $loginsystemlogin=1;
 		  $_SESSION["ums_session_start"]=0;
 
-		  //$botfilename='../div_server_data/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
-		  $botfilename='cache/botcheck/'.$_SESSION["ums_owner_id"].'.txt';
+		  $botfilename='../botcheck/'.$_SESSION["ums_owner_id"].'.txt';
 		  //botschutzzeit aktualisieren
 		  if(file_exists($botfilename)) 
 		  {
