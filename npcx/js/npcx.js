@@ -12,7 +12,8 @@ function updateNpcUI(data) {
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'resource.php', {b_col: 1})">baue einen Kollektor</span>`;
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'sector.php')">Sektor</span>`;
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'military.php')">Militär</span>`;
-        div.innerHTML+= ` - <span onclick="getUserFleet(${item.user_id}, 'military.php')">Flotten</span>`;
+        div.innerHTML+= ` - <span onclick="getUserFleet(${item.user_id})">Flotten</span>`;
+        div.innerHTML+= ` - <span onclick="getSectorStatus(${item.user_id})">Sektorstatus</span>`;
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'missions.php')">Missionen</span>`;
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'production.php')">Produktion</span>`;
         div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'hyperfunk.php')">Hyperfunk</span><br><br>`;
@@ -46,6 +47,21 @@ async function getUserFleet(userId) {
             'X-DE-API-KEY': env_api_key // API Key
         },
         body: JSON.stringify({ action: 'getUserFleet', user_id: userId })
+    });
+    
+    const json = await response.json();
+
+    document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
+}
+
+async function getSectorStatus(userId) {
+    const response = await fetch('../api/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-DE-API-KEY': env_api_key // API Key
+        },
+        body: JSON.stringify({ action: 'getSectorStatus', user_id: userId })
     });
     
     const json = await response.json();

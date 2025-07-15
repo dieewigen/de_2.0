@@ -1,6 +1,7 @@
 <?php
 use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetUserFleet;
+use DieEwigen\Api\Model\GetSectorStatus;
 use DieEwigen\Api\Model\UserService;
 use DieEwigen\Api\Model\ValidateGameFilename;
 
@@ -60,6 +61,20 @@ if(isset($data['action']) && !empty($data['action'])) {
 
             $userModel = new GetUserFleet();
             $fleets = $userModel->getUserFleet($userId);
+            echo json_encode(['status' => 'success', 'data' => $fleets]);
+            break; 
+
+        case 'getSectorStatus':
+            //is user_id valid
+            $userId = intval($data['user_id']);
+            $userService = new UserService();
+            if (!$userService->isAPIUser($userId)) {
+                echo json_encode(['status' => 'error', 'message' => 'Unberechtigter Zugriff']);
+                exit;
+            }
+
+            $userModel = new GetSectorStatus();
+            $fleets = $userModel->getSectorStatus($userId);
             echo json_encode(['status' => 'success', 'data' => $fleets]);
             break;            
 
