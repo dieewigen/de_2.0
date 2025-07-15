@@ -2,6 +2,7 @@
 use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetUserFleet;
 use DieEwigen\Api\Model\GetSectorStatus;
+use DieEwigen\Api\Model\GetServerData;
 use DieEwigen\Api\Model\UserService;
 use DieEwigen\Api\Model\ValidateGameFilename;
 
@@ -76,7 +77,13 @@ if(isset($data['action']) && !empty($data['action'])) {
             $userModel = new GetSectorStatus();
             $fleets = $userModel->getSectorStatus($userId);
             echo json_encode(['status' => 'success', 'data' => $fleets]);
-            break;            
+            break;
+
+        case 'getServerData':
+            $serverModel = new GetServerData();
+            $data = $serverModel->getServerData();
+            echo json_encode(['status' => 'success', 'data' => $data]);
+            break;
 
         case 'openPage':
             //all fields are required
