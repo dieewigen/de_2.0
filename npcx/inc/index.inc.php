@@ -23,10 +23,16 @@ require_once '../inc/env.inc.php';
 				<span id="target_npc_accounts"></span>
 			</div>
 
+			<div class="column">
+				<h2>JSON-Output</h2>
+				<span id="target_json_output"></span>
+			</div>			
+
 			<div class="column tall" style="width: 600px;">
 				<h2>Gameoutput</h2>
 				<iframe id="target_gameoutput" style="width:600px; height:1000px; border:none;"></iframe>
 			</div>
+
 		</div>		
 
     </body>
