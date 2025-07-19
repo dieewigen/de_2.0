@@ -24,20 +24,18 @@ while($row = mysql_fetch_array($db_daten)){
 	
 	//feststellen wie weit die runde vorangeschritten ist
 	$allyjobs_rundenfortschritt=$maxtick/$sv_winscore;
-	if($sv_ewige_runde==1){
-		if($allyjobs_rundenfortschritt>0)$allyjobs_rundenfortschritt=1;
-	}
+	
 	//aufgabe ist fertig, belohnung hinterlegen
 	if($row['questgoal']>0 AND $row['questreach']>0 AND $row['questreach']>=$row['questgoal']){
 		$questpoints=$allyjobs[$row['questtyp']][4]+round($row['questtime']/10);
 		mysql_query("UPDATE de_allys SET questpoints=questpoints+'$questpoints', artefacts=artefacts+1 WHERE id='$allyid'",$db);
 	}
 
-	//n�chster questtyp
+	//nächster questtyp
 	$nexttyp=$row['questtyp']+1;
 	//wenn es die allererste aufgabe ist, dann ist der questyp 0
 	if($row['questgoal']==0)$nexttyp=0;
-	//�berpr�fen ob der questtyp verf�gbar ist, ansonsten typ 0 nehmen
+	//überprüfen ob der questtyp verfügbar ist, ansonsten typ 0 nehmen
 	if($nexttyp>=count($allyjobs))$nexttyp=0;
 
 	//neue aufgabe hinterlegen

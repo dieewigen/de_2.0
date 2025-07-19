@@ -1853,7 +1853,7 @@ if ($doetick == 1) {
 
             //////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////
-            // auf den erhabenen pr�fen
+            // auf den erhabenen prüfen
             //////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////
             if ($score >= $sv_winscore) {
@@ -1998,11 +1998,11 @@ if ($doetick == 1) {
     mysql_query("UPDATE de_sector_voteout SET ticks = ticks - 1", $db);
     mysql_query("DELETE FROM de_sector_voteout WHERE ticks<=0", $db);
 
-    //cron - sachen die zu einem bestimmten zeitpunkt bearbeitet werden m�ssen
+    //cron - sachen die zu einem bestimmten zeitpunkt bearbeitet werden müssen
     include_once "wt_cron.php";
 
 
-    //tick wieder aktivieren nachdem alles abgearbeitet worden ist, au�er es gibt nen erhabenen
+    //tick wieder aktivieren nachdem alles abgearbeitet worden ist, außer es gibt einen Erhabenen
     if ($erhabenenstop != 1) {
         $sql = "UPDATE de_system set doetick=1";
         echo $sql;
@@ -2044,39 +2044,6 @@ if ($doetick == 1) {
         $sector_id = $row['sec_id'];
         $sector_name = $row['name'];
 
-        /*
-        CREATE TABLE `de_server_round_toplist` (
-            `round_id` mediumint(8) UNSIGNED NOT NULL,
-            `player_owner_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
-            `player_spielername` varchar(20) CHARACTER SET utf8mb4 NOT NULL,
-            `player_sector` mediumint(9) NOT NULL,
-            `player_system` smallint(5) UNSIGNED NOT NULL,
-            `player_col` int(10) UNSIGNED NOT NULL,
-            `player_score` bigint(20) UNSIGNED NOT NULL,
-            `player_rasse` smallint(6) NOT NULL,
-            `round_wt` int(11) NOT NULL,
-            `sector_id` mediumint(8) UNSIGNED NOT NULL,
-            `sector_name` int(10) UNSIGNED NOT NULL,
-            `sector_score` bigint(20) UNSIGNED NOT NULL,
-            `ally_id` smallint(5) UNSIGNED NOT NULL,
-            `ally_tag` varchar(7) CHARACTER SET utf8mb4 NOT NULL,
-            `ally_roundpoints` int(10) UNSIGNED NOT NULL
-          ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-          --
-          -- Indizes der exportierten Tabellen
-          --
-
-          --
-          -- Indizes für die Tabelle `de_server_round_toplist`
-          --
-          ALTER TABLE `de_server_round_toplist`
-            ADD PRIMARY KEY (`round_id`);
-
-          --
-
-*/
-
         //Sektorpunkte
         $db_daten = mysql_query("SELECT SUM(score) AS gespunkte FROM de_user_data WHERE sector='$sec_id'", $db);
         $row = mysql_fetch_array($db_daten);
@@ -2100,24 +2067,27 @@ if ($doetick == 1) {
 
         //Ranglistendaten in der DB speichern
         $sql = "INSERT INTO de_server_round_toplist SET 
-	player_owner_id='$player_owner_id', 
-	player_spielername='$player_spielername', 
-	player_sector='$player_sector', 
-	player_system='$player_system', 
-	player_col='$player_col', 
-	player_score='$player_score', 
-	player_rasse='$player_rasse', 
-	round_wt='$round_wt', 
-	sector_id='$sector_id', 
-	sector_name='$sector_name', 
-	sector_score='$sector_score', 
-	ally_id='$ally_id', 
-	ally_tag='$ally_tag',
-	ally_roundpoints='$ally_roundpoints' 
-	";
-        echo $sql;
-
+            player_owner_id='$player_owner_id', 
+            player_spielername='$player_spielername', 
+            player_sector='$player_sector', 
+            player_system='$player_system', 
+            player_col='$player_col', 
+            player_score='$player_score', 
+            player_rasse='$player_rasse', 
+            round_wt='$round_wt', 
+            sector_id='$sector_id', 
+            sector_name='$sector_name', 
+            sector_score='$sector_score', 
+            ally_id='$ally_id', 
+            ally_tag='$ally_tag',
+            ally_roundpoints='$ally_roundpoints' 
+            ";
         mysqli_query($GLOBALS['dbi'], $sql);
+
+        $rundenNummer=mysqli_insert_id($GLOBALS['dbi']);
+
+        //für den Erhabenen einen Titel erzeugen und für seine owner_id im Account hinterlegen
+        createTitleForUser($player_owner_id, '['.$sv_server_tag.'] ERHABENE/R - Runde '.$rundenNummer);
 
         //überprüfen ob es einen automatischen reset geben soll
         if ($sv_auto_reset == 1) {
@@ -2127,7 +2097,7 @@ if ($doetick == 1) {
         }
     }
 
-    //beim communityserver ggf. das dazugeh�rige script einbinden
+    //beim communityserver ggf. das dazugehörige script einbinden
     if ($sv_comserver == 1) {
         include_once 'wt_comserver.php';
     }

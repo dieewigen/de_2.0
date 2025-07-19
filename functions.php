@@ -1,5 +1,20 @@
 <?php
 
+function createTitleForUser($ownerId, $title){
+
+    //Titel in der DB hinterlegen
+    $sql = "INSERT INTO ls_title SET title='$title';";
+    echo $sql;
+    mysqli_query($GLOBALS['dbi_ls'], $sql);
+    $titleId=mysqli_insert_id($GLOBALS['dbi_ls']);
+
+    //den Titel dem Spieler im Hauptaccount zuweisen
+    $sql = "INSERT INTO ls_user_title SET user_id='$ownerId', title_id='$titleId';";
+    echo $sql;
+    mysqli_query($GLOBALS['dbi_ls'], $sql);
+
+}
+
 function write2agentlog($uid, $reason, $change_amount)
 {
     /*

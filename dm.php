@@ -140,13 +140,6 @@ $_SESSION['ic_last_refresh']=0;
 		echo '<span onclick="switch_iframe_main_container(\'auction.php\')" class="btn">Auktion</span>';
 		//Missionen
 		echo '<span onclick="switch_iframe_main_container(\'missions.php\')" class="btn">Missionen</span>';
-		//VS
-		/*
-		if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
-			echo '<span onclick="switch_iframe_main_container(\'map_mobile.php\')" class="btn">V-Systeme</span>'; 
-		}
-		*/
-		
 		//Produktion
 		echo '<span onclick="switch_iframe_main_container(\'production.php\')" class="btn">Produktion</span>';
 
