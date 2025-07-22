@@ -1,5 +1,5 @@
 <?php
-ob_start();
+//ob_start();
 include_once "inc/env.inc.php";
 ignore_user_abort(true);
 //if($disablegzip!=1)ob_start("ob_gzhandler");
@@ -63,8 +63,6 @@ if(isset($_SESSION)){
   	}
   }
 }
-
-$GLOBALS['dbi']->set_charset("utf8");
 
 /*
 foreach ($_REQUEST as $key => $val){
@@ -139,8 +137,6 @@ if(isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id']>0){
 			//Dateiendung entfernen um Platz zu sparen
 			if($scriptname[0]=='/')$scriptname = substr($scriptname,1);
 			$scriptname=str_replace('.php','',$scriptname);
-
-			//mysql_query("INSERT INTO de_user_log (serverid, userid, time, ip, file, getpost) VALUES('$sv_servid','$ums_user_id',NOW(), '$ip', '$scriptname', '$datenstring')",$db);
 
 			$db_log = mysqli_connect($GLOBALS['env_db_logging_host'], $GLOBALS['env_db_logging_user'], $GLOBALS['env_db_logging_password'], $GLOBALS['env_db_logging_database']) or die("C: Keine Verbindung zur Datenbank möglich.");
 			mysqli_query($db_log, "INSERT INTO gameserverlogdata (serverid, userid, time, ip, file, getpost) VALUES('$sv_servid','$ums_user_id',NOW(), '$ip', '$scriptname', '$datenstring')"); 

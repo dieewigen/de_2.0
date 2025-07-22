@@ -142,7 +142,6 @@ include "resline.php";
 echo '<table border="0" cellpadding="0" cellspacing="2" width="600">';
 echo '<tr align="center">';
 echo '<td><a href="politics.php?s=1" class="btn">'.$politics_lang["allgemein"].'</a></td>';
-//echo '<td><a href="secforum.php" class="btn">'.$politics_lang["sektorforum"].'</a></td>';
 
 if($system==issectorcommander()){
 	echo '<td><a href="politics.php?s=2" class="btn">SK-Politik</a></td>';
@@ -334,7 +333,7 @@ if(!empty($befehle)){
   }//switch af1 ende
 }
 
-$verlegen=$_POST['verlegen'];
+$verlegen=$_POST['verlegen'] ?? false;
 if ($verlegen){
 	$einheiten_daten=mysql_query("SELECT aktion, e1, e2 FROM de_sector WHERE sec_id='$sector'",$db);
 	$h=0;
@@ -344,17 +343,7 @@ if ($verlegen){
 	if($b1>0){
 		$h=$b1;
 	}
-
-	/*
-	$str="if (\$b$i<>'') \$h= \$b$i;";
-	eval($str);
-	$str="if (\$b$i<>'') \$from= \$from$i;";
-	eval($str);
-	$str="if (\$b$i<>'') \$to= \$to$i;";
-	eval($str);
-	*/
-	//echo $str;
-	//echo $h.$from.$to.'<br>';
+	
 	if ($h>=1){ //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags
 		//echo 'von'.$from.' nach '.$to;
 		$from=intval($from+1);
@@ -389,8 +378,8 @@ $at1=mysql_result($db_daten, 0,7);
 $zsec1=mysql_result($db_daten, 0,8);
 
 //wurde der produzieren-button gedrückt?
-$prod=$_POST['prod'];
-$prodanz=$_POST['prodanz'];
+$prod=$_POST['prod'] ?? false;
+$prodanz=$_POST['prodanz'] ?? 0;
 if ($prod)//ja, es wurde ein button gedrueckt
 {
   //transaktionsbeginn
@@ -467,6 +456,8 @@ eval($str);
 
 if(isset($_REQUEST['ida'])){
 	$t=intval($_REQUEST['ida']);
+}else{
+  $t=-1;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -535,10 +526,10 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 }
 
 //sektorphalanx
-$sc1=$_POST['sc1'];
-$sc2=$_POST['sc2'];
+$sc1=$_POST['sc1'] ?? false;
+$sc2=$_POST['sc2'] ?? false;
 $scansec=$_POST['scansec'];
-if (($sc1 OR $sc2) AND $scansec){
+if (($sc1 || $sc2) && $scansec){
   $scansec=(int)$scansec;
   $db_daten=mysql_query("SELECT * FROM de_sector WHERE sec_id=$scansec",$db);
 
@@ -564,7 +555,7 @@ if (($sc1 OR $sc2) AND $scansec){
       echo '<table border="0" cellpadding="0" cellspacing="1" width="400">';
       echo '<tr>';
       echo '<td class="cc">'.$bkmenu_lang['sektorkollektoren'].'</td>';
-      echo '<td class="cc">'.number_format($row[col], 0,"",".").'</td>';
+      echo '<td class="cc">'.number_format($row['col'], 0,"",".").'</td>';
       echo '</tr>';
       echo '<tr>';
       echo '<td class="cc" width="40%">Multiplex</td>';
@@ -592,7 +583,7 @@ if (($sc1 OR $sc2) AND $scansec){
       echo '</tr>';
       echo '<tr>';
       echo '<td class="cc">'.$bkmenu_lang['schiffeimbau'].'</td>';
-      echo '<td class="cc">'.number_format($row1["anzahl"], 0,"",".").'</td>';
+      echo '<td class="cc">'.number_format($row1["anzahl"] ?? 0, 0,"",".").'</td>';
       echo '</tr>';
       echo '</table>';
 

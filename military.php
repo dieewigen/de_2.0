@@ -512,7 +512,7 @@ function rangok($zscore, $rang_nr, $sector, $system, $zcol, $kriegsgegner, $coun
 		return(0);
 	}
 	
-	//�berpr�fen ob es evtl. der eigene sektor ist
+	//überprüfen ob es evtl. der eigene sektor ist
 	if($sector==$ownsector){
 		return(0);
 	}

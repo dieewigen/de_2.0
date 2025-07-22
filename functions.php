@@ -1493,12 +1493,15 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
     $time = time();
 
     if ($channeltyp == 3) {//gloabler Chat
-        mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$sv_server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
+        $sql="INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
+		('$channel', '$channeltyp', '$sv_server_tag', ?, ? '$time', '$owner_id')";
+        mysqli_execute_query($GLOBALS['dbi_ls'], $sql, [$spielername, $chat_message]);
     } else {
         //die verschiedenen Chats auf dem Server
-        mysqli_query($GLOBALS['dbi'], "INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$spielername', '$chat_message', '$time', '$owner_id')");
+        $sql="INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
+		('$channel', '$channeltyp', ?, ?, '$time', '$owner_id')";
+
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$spielername, $chat_message]);
     }
 
     ////////////////////////////////////////////////////////////
