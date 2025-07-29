@@ -63,7 +63,7 @@ if ($techs[4] == 0) {
 }
 
 //owner id auslesen
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id=?", [$ums_user_id]);
 $row = mysqli_fetch_array($db_daten);
 $owner_id = intval($row["owner_id"]);
 
@@ -72,7 +72,7 @@ $owner_id = intval($row["owner_id"]);
 if($_REQUEST["sso"]){
   $sso=intval($_REQUEST["sso"]);
   $sso--;
-  mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET secsort='$sso' WHERE user_id='$ums_user_id'");
+  mysqli_execute_query($GLOBALS['dbi'],"UPDATE de_user_data SET secsort=? WHERE user_id=?", [$sso, $ums_user_id]);
   $secsort=$sso;
 }
 */
@@ -86,7 +86,7 @@ if ($secsort == '1') {
 }
 
 //maximale anzahl von kollektoren auslesen
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0");
 $row = mysqli_fetch_array($db_daten);
 $maxcol = $row['maxcol'];
 
@@ -175,7 +175,7 @@ if (!empty($sf)) {
 }
 
 $sf = 2;
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE sector='$sf' ORDER BY score ASC, col ASC");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE sector=? ORDER BY score ASC, col ASC", [$sf]);
 $alien_anz = mysqli_num_rows($db_daten);
 $alien_nr = 0;
 $planet_id = 1;
@@ -271,7 +271,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
     $sf = $player_sector + 3;
 
     //die daten des sektors auslesen
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id='$sf'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id=?", [$sf]);
     $sec_data = mysqli_fetch_array($db_daten);
 
     //Position des Sektors auf der Karte bestimmen
@@ -356,7 +356,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
 
         //die scandaten des spielers auslesen
         unset($scandaten);
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id='$ums_user_id'");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?", [$ums_user_id]);
         $index = 0;
         while ($row = mysqli_fetch_array($db_daten)) {
             $scandaten[$index]['zuser_id'] = $row['zuser_id'];
@@ -369,22 +369,22 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
         //----------- Ally Feine/Freunde
         $allypartner = array();
         $allyfeinde = array();
-        $query = "SELECT id FROM de_allys WHERE allytag='$ownally'";
-        $allyresult = mysqli_query($GLOBALS['dbi'], $query);
+        $query = "SELECT id FROM de_allys WHERE allytag=?";
+        $allyresult = mysqli_execute_query($GLOBALS['dbi'], $query, [$ownally]);
         $at = mysqli_num_rows($allyresult);
         if ($at != 0) {
             //$allyid = mysqli_result($allyresult,0,"id");
             $row = mysqli_fetch_array($allyresult);
             $allyid = $row['id'];
 
-            $allyresult = mysqli_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=$allyid or ally_id_2=$allyid) and (ally_id_1=id or ally_id_2=id)");
+            $allyresult = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=? or ally_id_2=?) and (ally_id_1=id or ally_id_2=id)", [$allyid, $allyid]);
             while ($row = mysqli_fetch_array($allyresult)) {
                 if ($ownally != $row["allytag"]) {
                     $allypartner[] = $row["allytag"];
                 }
             }
 
-            $allyresult = mysqli_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=$allyid or ally_id_angegriffener=$allyid) and (ally_id_angreifer=id or ally_id_angegriffener=id)");
+            $allyresult = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=? or ally_id_angegriffener=?) and (ally_id_angreifer=id or ally_id_angegriffener=id)", [$allyid, $allyid]);
             while ($row = mysqli_fetch_array($allyresult)) {
                 if ($ownally != $row["allytag"]) {
                     $allyfeinde[] = $row["allytag"];
@@ -394,14 +394,14 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
 
         //sektormalus bei der attgrenze berechnen
         //zuerst anzahl der pc-sektoren auslesen
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1");
         $num = mysqli_num_rows($db_daten);
         if ($num < 1) {
             $num = 1;
         }
 
         //eigenen sektorplatz auslesen
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT platz FROM de_sector WHERE sec_id='$ownsector'");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT platz FROM de_sector WHERE sec_id=?", [$ownsector]);
         $row = mysqli_fetch_array($db_daten);
         $ownsectorplatz = $row["platz"];
 
@@ -449,11 +449,11 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
 
 
         //alles anzeigen
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
 		de_login.last_login, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
-		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector='$sf' ORDER BY $orderby ASC");
+		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector=? ORDER BY $orderby ASC", [$sf]);
 
         $anz = mysqli_num_rows($db_daten);
         $gescol = 0;
@@ -491,7 +491,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 //überprüfen ob der sk auch bk ist, ist in 1-mann-sektoren möglich
                 /*
                 if($row['system']==$sec_data['bk'] AND $anz>1){
-                    mysqli_query($GLOBALS['dbi'],"UPDATE de_sector set bk = 0 WHERE sec_id='$sector'");
+                    mysqli_execute_query($GLOBALS['dbi'],"UPDATE de_sector set bk = 0 WHERE sec_id=?", [$sector]);
                     $sec_data['bk']=0;
                 }
                 */
@@ -859,7 +859,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             //Artefakte im Sektor
 
             //schauen ob es artefakte gibt
-            $res = mysqli_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector='$sf'");
+            $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [$sf]);
             $artnum = mysqli_num_rows($res);
             //if ($artnum>0 OR $bed!='000')//artefakt vorhanden, oder raumbasis gebaut
             //{
@@ -909,14 +909,14 @@ $erforschte_systeme_koordinaten = array();
 
 //Kanten laden
 $kanten = array();
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_map_kanten");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_kanten");
 while ($row = mysqli_fetch_array($db_daten)) {
     $kanten[] = array($row['knoten_id1'],$row['knoten_id2']);
 }
 
 //die erforschten Systeme laden
-$sql = "SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>0 AND known_since<'".time()."';";
-$db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+$sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND known_since>0 AND known_since<?;";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], time()]);
 while ($row = mysqli_fetch_array($db_daten)) {
     //sie sind sichtbar und erforscht
     $sichtbare_systeme[] = $row['map_id'];
@@ -925,7 +925,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
 //die sichtbaren Systeme um Systeme ergänzen, die immer sichtbar sind
 $sql = "SELECT id FROM de_map_objects WHERE always_visible=1 OR system_typ=4;";
-$db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql);
 while ($row = mysqli_fetch_array($db_daten)) {
     if (!in_array($row['id'], $sichtbare_systeme)) {
         $sichtbare_systeme[] = $row['id'];
@@ -967,8 +967,8 @@ $kanten_koordinaten = array();
 // allge Gebäude der Karte laden und in ein Array packen
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 $bldg = array();
-$sql = "SELECT * FROM de_user_map_bldg WHERE user_id='".$_SESSION['ums_user_id']."';";
-$db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+$sql = "SELECT * FROM de_user_map_bldg WHERE user_id=?;";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 while ($row = mysqli_fetch_array($db_daten)) {
     $bldg[$row['map_id']][$row['field_id']]['bldg_id'] = $row['bldg_id'];
     $bldg[$row['map_id']][$row['field_id']]['bldg_level'] = $row['bldg_level'];
@@ -978,7 +978,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
 //Systeme laden
 //$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects LEFT JOIN de_user_map ON(de_map_objects.id=de_user_map.map_id);");
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects");
 $alien_anz = mysqli_num_rows($db_daten);
 
 //Position auf der Karte berechnen
