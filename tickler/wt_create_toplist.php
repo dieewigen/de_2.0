@@ -13,13 +13,13 @@ function xecho($str)
 ////////////////////////////////////////////////////////////
 
 //Gesamtpunktezahl aller Spieler
-$result = mysql_query("SELECT SUM(score) AS value FROM  de_user_data WHERE sector > 1 AND npc=0;",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(score) AS value FROM  de_user_data WHERE sector > 1 AND npc=0;", []);
+$row = mysqli_fetch_array($result);
 $server_gesamt_score=$row['value'];
 
 //Gesamtzahl aller Spielerkollektoren
-$result = mysql_query("SELECT SUM(col) AS value FROM  de_user_data WHERE sector > 1 AND npc=0;",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) AS value FROM  de_user_data WHERE sector > 1 AND npc=0;", []);
+$row = mysqli_fetch_array($result);
 $server_gesamt_col=$row['value'];
 
 ////////////////////////////////////////////////////////////
@@ -70,10 +70,10 @@ $varrang='';
 $varcol='';
 $varalterplatz='';
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.platz_last_day,de_user_data.platz, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY score DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.platz_last_day,de_user_data.platz, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY score DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -195,7 +195,7 @@ xecho('
 ');
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY col DESC LIMIT 200",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY col DESC LIMIT 200");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -205,7 +205,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -310,7 +310,7 @@ xecho('
 <?php
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.e100+de_user_data.e101+de_user_data.e102+de_user_data.e103+de_user_data.e104 AS tower FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY tower DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.e100+de_user_data.e101+de_user_data.e102+de_user_data.e103+de_user_data.e104 AS tower FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY tower DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -320,7 +320,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -421,7 +421,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.roundpoints FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY roundpoints DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.roundpoints FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY roundpoints DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -431,7 +431,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -532,9 +532,9 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.kgget FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY kgget DESC LIMIT 100",$db);
-$gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
-$gesamtuser = mysql_num_rows($gesamtuser);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.kgget FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY kgget DESC LIMIT 100");
+$gesamtuser = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data");
+$gesamtuser = mysqli_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
 $platz_i=1;
 $time=date("YmdHis");
@@ -545,7 +545,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   //if ($winid==$row["user_id"])
@@ -652,9 +652,9 @@ xecho('
 <?php
 
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, (de_user_data.kg01+de_user_data.kg02*2+de_user_data.kg03*3+de_user_data.kg04*4) AS gesamtenergie FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY gesamtenergie DESC LIMIT 100",$db);
-$gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
-$gesamtuser = mysql_num_rows($gesamtuser);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.rang, (de_user_data.kg01+de_user_data.kg02*2+de_user_data.kg03*3+de_user_data.kg04*4) AS gesamtenergie FROM de_user_data WHERE sector > 1 AND npc=0 ORDER BY gesamtenergie DESC LIMIT 100");
+$gesamtuser = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data");
+$gesamtuser = mysqli_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
 $platz_i=1;
 $time=date("YmdHis");
@@ -665,7 +665,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   //if ($winid==$row["user_id"])
@@ -776,9 +776,9 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.score, de_user_data.platz, (de_user_achievement.ac1+de_user_achievement.ac2+de_user_achievement.ac3+de_user_achievement.ac4+de_user_achievement.ac5+de_user_achievement.ac6+de_user_achievement.ac7+de_user_achievement.ac8+de_user_achievement.ac9+de_user_achievement.ac10+de_user_achievement.ac11+de_user_achievement.ac12+de_user_achievement.ac13+de_user_achievement.ac14+de_user_achievement.ac15+de_user_achievement.ac16+de_user_achievement.ac17+de_user_achievement.ac18+de_user_achievement.ac19+de_user_achievement.ac20+de_user_achievement.ac21+de_user_achievement.ac22+de_user_achievement.ac23+de_user_achievement.ac24+de_user_achievement.ac25+de_user_achievement.ac999) AS wert FROM de_user_data LEFT JOIN de_user_achievement on(de_user_data.user_id = de_user_achievement.user_id) ORDER BY wert DESC LIMIT 100",$db);
-$gesamtuser = mysql_query("SELECT user_id FROM de_user_data",$db);
-$gesamtuser = mysql_num_rows($gesamtuser);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_user_data.sector, de_user_data.`system`, de_user_data.rang, de_user_data.score, de_user_data.platz, (de_user_achievement.ac1+de_user_achievement.ac2+de_user_achievement.ac3+de_user_achievement.ac4+de_user_achievement.ac5+de_user_achievement.ac6+de_user_achievement.ac7+de_user_achievement.ac8+de_user_achievement.ac9+de_user_achievement.ac10+de_user_achievement.ac11+de_user_achievement.ac12+de_user_achievement.ac13+de_user_achievement.ac14+de_user_achievement.ac15+de_user_achievement.ac16+de_user_achievement.ac17+de_user_achievement.ac18+de_user_achievement.ac19+de_user_achievement.ac20+de_user_achievement.ac21+de_user_achievement.ac22+de_user_achievement.ac23+de_user_achievement.ac24+de_user_achievement.ac25+de_user_achievement.ac999) AS wert FROM de_user_data LEFT JOIN de_user_achievement on(de_user_data.user_id = de_user_achievement.user_id) ORDER BY wert DESC LIMIT 100");
+$gesamtuser = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data");
+$gesamtuser = mysqli_num_rows($gesamtuser);
 $rang_schritt = $gesamtuser*0.042;
 $platz_i=1;
 $time=date("YmdHis");
@@ -789,7 +789,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   /*$rang_nr=1;
   $rang_zaehler=$rang_schritt;
@@ -900,7 +900,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY ehscore DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY ehscore DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -910,7 +910,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -1011,7 +1011,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_counter DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_counter DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1021,7 +1021,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -1122,7 +1122,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_siege DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.ehscore, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang, de_user_data.eh_counter, de_user_data.eh_siege FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY eh_siege DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1132,7 +1132,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -1233,7 +1233,7 @@ xecho('
 <!--
 ');
 
-$result = mysql_query("SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.pve_score, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY pve_score DESC LIMIT 100",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.spielername, de_user_data.score, de_user_data.pve_score, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.rang  FROM de_user_data WHERE sector > 0 AND npc=0 ORDER BY pve_score DESC LIMIT 100");
 $platz_i=1;
 $time=date("YmdHis");
 $varrang='';
@@ -1243,7 +1243,7 @@ $varname='';
 $varcol='';
 $varscore='';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   $rang_nr=$row["rang"];
   if($rang_nr==0)
@@ -1316,17 +1316,17 @@ xecho('
 ////////////////////////////////////////////////////////////
 
 //in der de_sector die pl�tze der sektoren eintragen
-mysql_query("UPDATE de_sector set platz=0, tempcol=0",$db);
-$db_daten=mysql_query("SELECT sector, sum(score) as score, sum(col) AS col FROM de_user_data WHERE npc=0 AND sector>1 GROUP BY sector ORDER BY score DESC",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set platz=0, tempcol=0");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, sum(score) as score, sum(col) AS col FROM de_user_data WHERE npc=0 AND sector>1 GROUP BY sector ORDER BY score DESC");
 $platz=1;
-while($row = mysql_fetch_array($db_daten)){
+while($row = mysqli_fetch_array($db_daten)){
     $sec=$row["sector"];
     $col=$row["col"];
-    mysql_query("UPDATE de_sector set platz='$platz', tempcol='$col' WHERE sec_id='$sec'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set platz='$platz', tempcol='$col' WHERE sec_id='$sec'");
     $platz++;
 }
 //inzwischen leere sektoren vom platz her auf null setzen
-mysql_query("UPDATE de_sector set platz=0 where platz>='$platz'",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set platz=0 where platz>='$platz'");
 
 $filename = $directory."cache/toplist/top2.tmp";
 $cachefile = fopen ($filename, 'w');
@@ -1449,14 +1449,14 @@ while($row = mysqli_fetch_array($db_daten)){
   $newmaxmembercount=$row['am'];
   $newmaxcolcount=$row['col'];
   $newmaxscorecount=$row['score'];
-  mysql_query("UPDATE de_allys SET maxmembercount='$newmaxmembercount' WHERE id='$wt_a_id' AND maxmembercount<'$newmaxmembercount'",$db);
-  mysql_query("UPDATE de_allys SET maxcolcount='$newmaxcolcount' WHERE id='$wt_a_id' AND maxcolcount<'$newmaxcolcount'",$db);
-  mysql_query("UPDATE de_allys SET maxscorecount='$newmaxscorecount' WHERE id='$wt_a_id' AND maxscorecount<'$newmaxscorecount'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET maxmembercount='$newmaxmembercount' WHERE id='$wt_a_id' AND maxmembercount<'$newmaxmembercount'");
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET maxcolcount='$newmaxcolcount' WHERE id='$wt_a_id' AND maxcolcount<'$newmaxcolcount'");
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET maxscorecount='$newmaxscorecount' WHERE id='$wt_a_id' AND maxscorecount<'$newmaxscorecount'");
   
   //bei den aufgaben ggf. die erreiche memberzahl setzen	
-  //mysql_query("UPDATE de_allys SET questreach='$newmaxmembercount' WHERE id='$wt_a_id' AND questtyp=2",$db);
-  mysql_query("UPDATE de_allys SET questreach='$col_erobert' WHERE id='$wt_a_id' AND questtyp=1",$db);
-  mysql_query("UPDATE de_allys SET questreach='$newmaxscorecount' WHERE id='$wt_a_id' AND questtyp=2",$db);
+  //mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach='$newmaxmembercount' WHERE id='$wt_a_id' AND questtyp=2");
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach='$col_erobert' WHERE id='$wt_a_id' AND questtyp=1");
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach='$newmaxscorecount' WHERE id='$wt_a_id' AND questtyp=2");
 
   //die Punkte-Prozentzahl der Allianz
   $p_allianz_score= $server_gesamt_score!=0 ? $row['score']*100/$server_gesamt_score : 0;
@@ -1524,10 +1524,10 @@ xecho('
 </colgroup>
 ');
 
-$db_daten=mysql_query("SELECT id, allytag, questpoints FROM de_allys ORDER BY questpoints DESC, id ASC LIMIT 100",$db);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, allytag, questpoints FROM de_allys ORDER BY questpoints DESC, id ASC LIMIT 100");
 
 $platz=1;
-while($row = mysql_fetch_array($db_daten))
+while($row = mysqli_fetch_array($db_daten))
 {
   $target_url = 'ally_detail.php?allyid='.$row['id'];
   xecho ("<tr>");
@@ -1588,28 +1588,28 @@ xecho('
 //b�ndnisse laden
 $platz=1;
 $allydata=array();
-$db_datenx=mysql_query("SELECT * FROM de_ally_partner",$db);
-while($rowx = mysql_fetch_array($db_datenx)){
+$db_datenx=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_ally_partner");
+while($rowx = mysqli_fetch_array($db_datenx)){
   $allyid1=$rowx['ally_id_1'];
   $allyid2=$rowx['ally_id_2'];
   //allytags laden
-  $db_daten=mysql_query("SELECT allytag FROM de_allys WHERE id='$allyid1'",$db);
-  $row = mysql_fetch_array($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_allys WHERE id='$allyid1'");
+  $row = mysqli_fetch_array($db_daten);
   $allytag1=$row['allytag'];
 
   //ggf. doppelte partnerschaften l�schen
-  mysql_query("DELETE FROM de_ally_partner WHERE ally_id_2='$allyid1'",$db);  
+  mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_ally_partner WHERE ally_id_2='$allyid1'");  
   
-  $db_daten=mysql_query("SELECT allytag FROM de_allys WHERE id='$allyid2'",$db);
-  $row = mysql_fetch_array($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_allys WHERE id='$allyid2'");
+  $row = mysqli_fetch_array($db_daten);
   $allytag2=$row['allytag'];  
   
 
 
-  $db_daten=mysql_query("SELECT SUM(score) AS score, SUM(col) AS col, COUNT(user_id) AS am FROM de_user_data 
-  WHERE (allytag='$allytag1' OR allytag='$allytag2') AND status=1",$db);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(score) AS score, SUM(col) AS col, COUNT(user_id) AS am FROM de_user_data 
+  WHERE (allytag='$allytag1' OR allytag='$allytag2') AND status=1");
   
-  $row = mysql_fetch_array($db_daten);
+  $row = mysqli_fetch_array($db_daten);
   
   $allydata[$platz-1]['allytag']=$allytag1.' & '.$allytag2;
   $allydata[$platz-1]['score']=$row['score'];
@@ -1690,10 +1690,10 @@ if($sv_ewige_runde==1){
 	</colgroup>
 	');
 
-	$db_daten=mysql_query("SELECT id, allytag, eh_gestellt_anz FROM de_allys ORDER BY eh_gestellt_anz DESC, id ASC LIMIT 100",$db);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, allytag, eh_gestellt_anz FROM de_allys ORDER BY eh_gestellt_anz DESC, id ASC LIMIT 100");
 
 	$platz=1;
-	while($row = mysql_fetch_array($db_daten))
+	while($row = mysqli_fetch_array($db_daten))
 	{
 	  $target_url = 'ally_detail.php?allyid='.$row['id'];
 	  xecho ("<tr>");
@@ -1749,9 +1749,9 @@ xecho('<table border="0" cellpadding="0" cellspacing="0">
 <col width="160">
 <col width="160">
 </colgroup>');
-$result = mysql_query("SELECT spielername, sector, `system`, tradesystemscore, tradesystemtrades FROM de_user_data ORDER BY tradesystemscore DESC LIMIT 100 ",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sector, `system`, tradesystemscore, tradesystemtrades FROM de_user_data ORDER BY tradesystemscore DESC LIMIT 100 ");
 $platz=1;
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
 
   xecho ('<tr>');
@@ -1809,12 +1809,12 @@ xecho('<table border="0" cellpadding="0" cellspacing="0">
 <col width="100">
 <col width="100">
 </colgroup>');
-$result = mysql_query("SELECT spielername, sells, tradescore, sector, `system` FROM de_user_data ORDER BY tradescore DESC LIMIT 100 ",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sells, tradescore, sector, `system` FROM de_user_data ORDER BY tradescore DESC LIMIT 100 ");
 $platz=1;
 //$tschnitt=$row["tradescore"]/$row["sells"];
 //$tschnitt=round($schnitt);
 //$time=strftime("%Y%m%d%H%M%S");
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
 
   if ($row["sells"]>0)$tschnitt=$row["tradescore"]/$row["sells"];else $tschnitt=0;
@@ -1883,8 +1883,8 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY exp DESC LIMIT 100",$db);
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY exp DESC LIMIT 100");
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
   $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
@@ -1983,8 +1983,8 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY questpoints DESC LIMIT 100",$db);
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY questpoints DESC LIMIT 100");
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
   $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';
@@ -2084,8 +2084,8 @@ $varscore='';
 $varquestpunkte='';
 $varfame='';
 
-$result = mysql_query("SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY fame DESC LIMIT 100",$db);
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_cyborg_data.level, de_cyborg_data.exp, de_cyborg_data.questpoints, de_cyborg_data.fame, de_user_data.sector, de_user_data.`system` FROM de_user_data left join de_cyborg_data on(de_user_data.user_id = de_cyborg_data.user_id) ORDER BY fame DESC LIMIT 100");
+while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
   if ($varname!='')$varname=$varname.',';
   $varname=$varname.'"'.utf8_encode_fix($row["spielername"]).'"';

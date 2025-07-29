@@ -23,8 +23,8 @@ if($_SESSION['ums_vote']=="1"){
 	exit();
 }
 
-$flotten=mysql_query("SELECT aktion, fleetsize FROM de_user_fleet WHERE zielsec = '$sector' AND zielsys = '$system' AND (aktion = 1 OR aktion = 2) AND entdeckt > 0",$db);
-$fa = mysql_num_rows($flotten);
+$flotten=mysqli_execute_query($GLOBALS['dbi'], "SELECT aktion, fleetsize FROM de_user_fleet WHERE zielsec = ? AND zielsys = ? AND (aktion = 1 OR aktion = 2) AND entdeckt > 0", [$sector, $system]);
+$fa = mysqli_num_rows($flotten);
 $gea=0;
 $gev=0;
 $geaflag=0;
@@ -32,17 +32,20 @@ $gevflag=0;
 
 for ($i=0; $i<$fa; $i++)
 {
-  $akt=mysql_result($flotten, $i, "aktion");
+  // Get the current row data
+  mysqli_data_seek($flotten, $i);
+  $row_data = mysqli_fetch_assoc($flotten);
+  $akt = $row_data["aktion"];
 
   if ($akt==1)//angreifer
   {
-    $erg=mysql_result($flotten, $i, "fleetsize");
+    $erg = $row_data["fleetsize"];
     $gea=$gea+$erg;
     $geaflag=1;
   }
   elseif ($akt==2)//verteidiger
   {
-    $erg=mysql_result($flotten, $i, "fleetsize");
+    $erg = $row_data["fleetsize"];
     $gev=$gev+$erg;
     $gevflag=1;
   }
@@ -89,8 +92,8 @@ if(!$flag_ang_big_iframe){
 ///////////////////////////////////////////////////////
 
 //resline-daten laden
-$db_datenresline=mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$rowresline = mysql_fetch_array($db_datenresline);
+$db_datenresline=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$rowresline = mysqli_fetch_array($db_datenresline);
 
 $ehscore=$rowresline["ehscore"];
 $tradescore=$rowresline["tradesystemscore"];

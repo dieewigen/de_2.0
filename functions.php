@@ -172,8 +172,8 @@ function createAuction($uid)
 {
     global $sv_deactivate_vsystems, $ua_name, $db;
     //Maximale Tickanzahl auslesen
-    $result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1", $db);
-    $row     = mysql_fetch_array($result);
+    $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
+    $row     = mysqli_fetch_array($result);
     $maxtick = $row["tick"];
 
     unset($reward);
@@ -1215,7 +1215,7 @@ function array_orderby()
 function SecureValue($value)
 {
     $value = htmlspecialchars(stripslashes($value), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-    $value = mysql_real_escape_string($value);
+    // mysqli_real_escape_string no longer needed with prepared statements
 
     return ($value);
 }
@@ -1238,15 +1238,13 @@ function median($zahlen_array = array())
 
 function get_allyid_partner($allyid)
 {
-    global $db;
-
     $allyidpartner = 0;
 
-    $db_daten = mysql_query("SELECT * FROM de_ally_partner WHERE ally_id_1=$allyid OR ally_id_2=$allyid", $db);
-    $num = mysql_num_rows($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?", [$allyid, $allyid]);
+    $num = mysqli_num_rows($db_daten);
 
     if ($num == 1) {
-        $row = mysql_fetch_array($db_daten);
+        $row = mysqli_fetch_array($db_daten);
         if ($row['ally_id_1'] == $allyid) {
             $allyidpartner = $row['ally_id_2'];
         } else {
@@ -1259,12 +1257,10 @@ function get_allyid_partner($allyid)
 
 function checkForKriegsgegner($allyid1, $allyid2)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT * FROM de_ally_war WHERE 
-		(ally_id_angreifer='$allyid1' AND ally_id_angegriffener='$allyid2') OR 
-		(ally_id_angegriffener='$allyid1' AND ally_id_angreifer='$allyid2')", $db);
-    $num = mysql_num_rows($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_ally_war WHERE 
+		(ally_id_angreifer=? AND ally_id_angegriffener=?) OR 
+		(ally_id_angegriffener=? AND ally_id_angreifer=?)", [$allyid1, $allyid2, $allyid1, $allyid2]);
+    $num = mysqli_num_rows($db_daten);
 
     if ($num > 0) {
         return true;
@@ -1275,16 +1271,14 @@ function checkForKriegsgegner($allyid1, $allyid2)
 
 function checkForCounter($atter_uid, $target_uid)
 {
-    global $db;
-
     //Counter möglich wenn das Ziel Angriffsflotten draußen hat, gilt nicht bei Angriffen auf Aliens
     $player_att = false;
 
     if ($player_att == false) {
-        $db_daten = mysql_query("SELECT * FROM de_user_fleet WHERE user_id='".$target_uid."-1' AND aktion=1", $db);
-        $num = mysql_num_rows($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? AND aktion=1", [$target_uid."-1"]);
+        $num = mysqli_num_rows($db_daten);
         if ($num > 0) {
-            $row = mysql_fetch_array($db_daten);
+            $row = mysqli_fetch_array($db_daten);
             if ($row['zielsec'] > 0) {
                 if (checkForNPCbyKoord($row['zielsec'], $row['zielsys']) == false) {
                     //echo '<br>'.$row['zielsec'].'/'.$row['zielsys'];
@@ -1295,10 +1289,10 @@ function checkForCounter($atter_uid, $target_uid)
     }
 
     if ($player_att == false) {
-        $db_daten = mysql_query("SELECT * FROM de_user_fleet WHERE user_id='".$target_uid."-2' AND aktion=1", $db);
-        $num = mysql_num_rows($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? AND aktion=1", [$target_uid."-2"]);
+        $num = mysqli_num_rows($db_daten);
         if ($num > 0) {
-            $row = mysql_fetch_array($db_daten);
+            $row = mysqli_fetch_array($db_daten);
             if ($row['zielsec'] > 0) {
                 if (checkForNPCbyKoord($row['zielsec'], $row['zielsys']) == false) {
                     //echo '<br>'.$row['zielsec'].'/'.$row['zielsys'];
@@ -1309,10 +1303,10 @@ function checkForCounter($atter_uid, $target_uid)
     }
 
     if ($player_att == false) {
-        $db_daten = mysql_query("SELECT * FROM de_user_fleet WHERE user_id='".$target_uid."-3' AND aktion=1", $db);
-        $num = mysql_num_rows($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? AND aktion=1", [$target_uid."-3"]);
+        $num = mysqli_num_rows($db_daten);
         if ($num > 0) {
-            $row = mysql_fetch_array($db_daten);
+            $row = mysqli_fetch_array($db_daten);
             if ($row['zielsec'] > 0) {
                 if (checkForNPCbyKoord($row['zielsec'], $row['zielsys']) == false) {
                     //echo '<br>'.$row['zielsec'].'/'.$row['zielsys'];
@@ -1327,14 +1321,12 @@ function checkForCounter($atter_uid, $target_uid)
 
 function checkForNPCbyKoord($sector, $system)
 {
-    global $db;
-
     //ist an den Koordinaten ein NPC?
     $npc = false;
-    $db_daten = mysql_query("SELECT npc FROM de_user_data WHERE sector='$sector' AND `system`='$system'", $db);
-    $num = mysql_num_rows($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT npc FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
+    $num = mysqli_num_rows($db_daten);
     if ($num > 0) {
-        $row = mysql_fetch_array($db_daten);
+        $row = mysqli_fetch_array($db_daten);
         if ($row['npc'] == 1) {
             $npc = true;
         }
@@ -1345,15 +1337,13 @@ function checkForNPCbyKoord($sector, $system)
 
 function get_allybldg($allyid)
 {
-    global $db;
-
     for ($i = 0;$i <= 30;$i++) {
         $bldg[$i] = 0;
     }
 
     if ($allyid > 0) {
-        $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
-        $row = mysql_fetch_array($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
+        $row = mysqli_fetch_array($db_daten);
         for ($i = 0;$i <= 30;$i++) {
             if (isset($row["bldg$i"]) && $row["bldg$i"] != '') {
                 $bldg[$i] = $row["bldg$i"];
@@ -1365,20 +1355,18 @@ function get_allybldg($allyid)
 
 function get_free_artefact_places($user_id)
 {
-    global $db;
-
     //gebäudestufe und test auf geb�ude
     $pt = loadPlayerTechs($user_id);
-    $db_daten = mysql_query("SELECT artbldglevel FROM de_user_data WHERE user_id='$user_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT artbldglevel FROM de_user_data WHERE user_id=?", [$user_id]);
+    $row = mysqli_fetch_assoc($db_daten);
     $artbldglevel = $row["artbldglevel"];
 
     //allianz-bonus
     $allyid = $allyid = get_player_allyid($user_id);
     $ally_geb_bonus = 0;
     if ($allyid > 0) {
-        $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
-        $row = mysql_fetch_array($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
+        $row = mysqli_fetch_array($db_daten);
         $ally_geb_bonus = $row['bldg5'];
     }
 
@@ -1389,8 +1377,8 @@ function get_free_artefact_places($user_id)
     }
 
     //artefakte vorhanden
-    $db_daten = mysql_query("SELECT id FROM de_user_artefact WHERE user_id='$user_id'", $db);
-    $num = mysql_num_rows($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=?", [$user_id]);
+    $num = mysqli_num_rows($db_daten);
     $freeartefactplaces = $artbldglevel + $ally_geb_bonus - $num;
 
     return($freeartefactplaces);
@@ -1405,34 +1393,28 @@ function getArtefactAmountByUserId($user_id, $artefact_id)
 
 function get_col_amount($user_id)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT col FROM de_user_data WHERE user_id='$user_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT col FROM de_user_data WHERE user_id=?", [$user_id]);
+    $row = mysqli_fetch_array($db_daten);
     return($row['col']);
 }
 
 function get_user_id_from_coord($zsec, $zsys)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' AND `system`='$zsys'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND `system`=?", [$zsec, $zsys]);
+    $row = mysqli_fetch_array($db_daten);
     return($row['user_id']);
 }
 
 function get_player_allyid($user_id)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT allytag, status FROM de_user_data WHERE user_id='$user_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, status FROM de_user_data WHERE user_id=?", [$user_id]);
+    $row = mysqli_fetch_array($db_daten);
     $allytag = $row['allytag'];
     $allystatus = $row['status'];
     //�berpr�fen ob man in einer allianz ist
     if ($allytag != '' and $allystatus == 1) {
-        $db_daten = mysql_query("SELECT id FROM de_allys WHERE allytag='$allytag'", $db);
-        $row = mysql_fetch_array($db_daten);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_allys WHERE allytag=?", [$allytag]);
+        $row = mysqli_fetch_array($db_daten);
         $allyid = $row['id'];
         return($allyid);
     }
@@ -1441,29 +1423,23 @@ function get_player_allyid($user_id)
 
 function getAllytagByAllyid($id)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT allytag FROM de_allys WHERE id='$id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_allys WHERE id=?", [$id]);
+    $row = mysqli_fetch_array($db_daten);
 
     return $row['allytag'];
 }
 
 function getAllyByID($ally_id)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$ally_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$ally_id]);
+    $row = mysqli_fetch_array($db_daten);
     return $row;
 }
 
 function getAllyIDByAllytag($allytag)
 {
-    global $db;
-
-    $db_daten = mysql_query("SELECT id FROM de_allys WHERE allytag='$allytag'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_allys WHERE allytag=?", [$allytag]);
+    $row = mysqli_fetch_array($db_daten);
 
     return $row['id'];
 }
@@ -1481,7 +1457,7 @@ function getAllyBGScore($ally_id, $bg)
 
 function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
 {
-    global $db, $sv_server_tag;
+    global $sv_server_tag;
 
     $spielername = htmlspecialchars($spielername);
 
@@ -1571,16 +1547,13 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
 
 function insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, $owner_id, $server_tag)
 {
-    global $db;
-
     $time = time();
 
     if ($channeltyp == 3) {//gloabler Chat
         mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
 		('$channel', '$channeltyp', '$server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
     } else {
-        mysql_query("INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$spielername', '$chat_message', '$time', '$owner_id')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES (?, ?, ?, ?, ?, ?)", [$channel, $channeltyp, $spielername, $chat_message, $time, $owner_id]);
     }
 }
 
@@ -1824,13 +1797,13 @@ function rahmen_unten($echo = true)
 
 function get_fleet_ground_speed($ez, $rasse, $uid)
 {
-    global $db, $sv_schiffsdaten, $sv_anz_schiffe, $sv_bs_speedup;
+    global $sv_schiffsdaten, $sv_anz_schiffe, $sv_bs_speedup;
 
     $schiffsdaten = $sv_schiffsdaten;
 
     //spezialisierung tr�gerkapazit�t
-    $db_daten = mysql_query("SELECT spec3 FROM de_user_data WHERE user_id='$uid'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT spec3 FROM de_user_data WHERE user_id=?", [$uid]);
+    $row = mysqli_fetch_array($db_daten);
     $spec3 = $row['spec3'];
 
     if ($spec3 == 2) {

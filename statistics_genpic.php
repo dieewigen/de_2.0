@@ -1,19 +1,21 @@
 <?php
 include "inc/header.inc.php";
 //daten laden
-$db_daten = mysql_query("SELECT sector, allytag FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
+$sql = "SELECT sector, allytag FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
 $sector = $row["sector"];
 $allytag = $row["allytag"];
 //allyid auslesen
-$db_datenx = mysql_query("SELECT id FROM de_allys WHERE allytag='$allytag'", $db);
-$rowx = mysql_fetch_array($db_datenx);
+$sql = "SELECT id FROM de_allys WHERE allytag=?";
+$db_datenx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allytag]);
+$rowx = mysqli_fetch_assoc($db_datenx);
 $allyid = $rowx["id"];
 
 //rundenstart auslesen
-//allyid auslesen
-$db_datenx = mysql_query("SELECT rundenstart_datum FROM de_system", $db);
-$rowx = mysql_fetch_array($db_datenx);
+$sql = "SELECT rundenstart_datum FROM de_system";
+$db_datenx = mysqli_execute_query($GLOBALS['dbi'], $sql);
+$rowx = mysqli_fetch_assoc($db_datenx);
 $rundenstart_datum = $rowx["rundenstart_datum"];
 
 //hintergund laden
@@ -22,37 +24,47 @@ $im = imagecreatefrompng("smilies/statvorl2.png");
 //statistische daten auslesen
 //spieler
 if ($_GET["typ"] == 1) {
-    $db_daten = mysql_query("SELECT score FROM de_user_stat WHERE user_id='$ums_user_id' AND datum>'$rundenstart_datum' ORDER BY datum ASC", $db);
+    $sql = "SELECT score FROM de_user_stat WHERE user_id=? AND datum>? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $rundenstart_datum]);
 } elseif ($_GET["typ"] == 2) {
-    $db_daten = mysql_query("SELECT col FROM de_user_stat WHERE user_id='$ums_user_id' AND datum>'$rundenstart_datum' ORDER BY datum ASC", $db);
+    $sql = "SELECT col FROM de_user_stat WHERE user_id=? AND datum>? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $rundenstart_datum]);
 }
 
 //sektor
 elseif ($_GET["typ"] == 11) {
-    $db_daten = mysql_query("SELECT score FROM de_sector_stat WHERE sec_id='$sector' ORDER BY datum ASC", $db);
+    $sql = "SELECT score FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 } elseif ($_GET["typ"] == 12) {
-    $db_daten = mysql_query("SELECT col FROM de_sector_stat WHERE sec_id='$sector' ORDER BY datum ASC", $db);
+    $sql = "SELECT col FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 } elseif ($_GET["typ"] == 13) {
-    $db_daten = mysql_query("SELECT platz FROM de_sector_stat WHERE sec_id='$sector' ORDER BY datum ASC", $db);
+    $sql = "SELECT platz FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 }
 //allianz
 elseif ($_GET["typ"] == 21) {
-    $db_daten = mysql_query("SELECT score FROM de_ally_stat WHERE id='$allyid' ORDER BY datum ASC", $db);
+    $sql = "SELECT score FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
 } elseif ($_GET["typ"] == 22) {
-    $db_daten = mysql_query("SELECT col FROM de_ally_stat WHERE id='$allyid' ORDER BY datum ASC", $db);
+    $sql = "SELECT col FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
 } elseif ($_GET["typ"] == 23) {
-    $db_daten = mysql_query("SELECT platz FROM de_ally_stat WHERE id='$allyid' ORDER BY datum ASC", $db);
+    $sql = "SELECT platz FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
 } elseif ($_GET["typ"] == 24) {
-    $db_daten = mysql_query("SELECT member FROM de_ally_stat WHERE id='$allyid' ORDER BY datum ASC", $db);
+    $sql = "SELECT member FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
 }
 
 $i = 0;
 $wert[0] = 0;
 $wert[1] = 0;
 $maxwert = 1;
-while ($row = mysql_fetch_array($db_daten)) {
+while ($row = mysqli_fetch_assoc($db_daten)) {
     $i++;
-    $wert[$i] = $row[0];
+    // Hole den ersten (und einzigen) Wert aus dem assoziativen Array
+    $wert[$i] = reset($row); // reset() gibt den ersten Wert eines Arrays zurück
     if ($wert[$i] > $maxwert) {
         $maxwert = $wert[$i];
     }

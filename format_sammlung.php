@@ -1,108 +1,74 @@
 <?php
-include 'inc/lang/'.$sv_server_lang.'_format_sammlung.lang.php'; 
+
+include 'inc/lang/'.$sv_server_lang.'_format_sammlung.lang.php';
 
 function db_aufbereitung($text)
 {
-    /*$text = str_replace('\"', '&quot;', $text);
-    $text = str_replace('\'', '&acute;', $text); */
     $text = str_replace('script', 'schkript', $text);
     $text = str_replace('Script', 'Schkript', $text);
 
 
-return $text;
+    return $text;
 }
 
-function foren_navi($datei,$ums_user_id,$system)
+function formatierte_anzeige($text, $ums_gpfad)
 {
-  global $naviarray_lang;
-  
-  if(($datei=="secforum.php")||($datei=="secforumvt.php"))
-    $sek='<td><a href="politics.php" class="btn">'.$naviarray_lang[eintrag_4].'</a></td>';
-    
+    $text = str_replace(":)", "<img src=\"" . $ums_gpfad . "g/smilies/sm1.gif\" alt=\"lustiger Smilie\">", $text);
+    $text = str_replace(":D", "<img src=\"" . $ums_gpfad . "g/smilies/sm2.gif\" alt=\"lachernder Smilie\">", $text);
+    $text = str_replace(";)", "<img src=\"" . $ums_gpfad . "g/smilies/sm3.gif\" alt=\"zwinkernder Smilie\">", $text);
+    $text = str_replace(":x", "<img src=\"" . $ums_gpfad . "g/smilies/sm4.gif\" alt=\"flamender Smilie\">", $text);
+    $text = str_replace(":(", "<img src=\"" . $ums_gpfad . "g/smilies/sm5.gif\" alt=\"trauriger Smilie\">", $text);
+    $text = str_replace("x(", "<img src=\"" . $ums_gpfad . "g/smilies/sm6.gif\" alt=\"Smilie\">", $text);
+    $text = str_replace(":p", "<img src=\"" . $ums_gpfad . "g/smilies/sm7.gif\" alt=\"Zunge rausstreck Smilie\">", $text);
+    $text = str_replace("(?)", "<img src=\"" . $ums_gpfad . "g/smilies/sm8.gif\" alt=\"Fragezeichen\">", $text);
+    $text = str_replace("(!)", "<img src=\"" . $ums_gpfad . "g/smilies/sm9.gif\" alt=\"Ausrufezeichen\">", $text);
+    $text = str_replace(":{", "<img src=\"" . $ums_gpfad . "g/smilies/sm10.gif\" alt=\"Smilie\">", $text);
+    $text = str_replace(":}", "<img src=\"" . $ums_gpfad . "g/smilies/sm11.gif\" alt=\"Smilie\">", $text);
+    $text = str_replace(":L", "<img src=\"" . $ums_gpfad . "g/smilies/sm12.gif\" alt=\"rauchender Smilie\">", $text);
+    $text = str_replace(":nene:", "<img src=\"" . $ums_gpfad . "g/smilies/sm13.gif\" alt=\"nene\">", $text);
+    $text = str_replace(":eek:", "<img src=\"" . $ums_gpfad . "g/smilies/sm14.gif\" alt=\"eek\">", $text);
+    $text = str_replace(":applaus:", "<img src=\"" . $ums_gpfad . "g/smilies/sm15.gif\" alt=\"applaus\">", $text);
+    $text = str_replace(":cry:", "<img src=\"" . $ums_gpfad . "g/smilies/sm16.gif\" alt=\"cry\">", $text);
+    $text = str_replace(":sleep:", "<img src=\"" . $ums_gpfad . "g/smilies/sm17.gif\" alt=\"sleep\">", $text);
+    $text = str_replace(":rolleyes:", "<img src=\"" . $ums_gpfad . "g/smilies/sm18.gif\" alt=\"Rolleyes\">", $text);
+    $text = str_replace(":wand:", "<img src=\"" . $ums_gpfad . "g/smilies/sm19.gif\" alt=\"Wand\">", $text);
+    $text = str_replace(":dead:", "<img src=\"" . $ums_gpfad . "g/smilies/sm20.gif\" alt=\"Dead\">", $text);
 
-  $sek.='<td><a href="secforum.php" class="btn">'.$naviarray_lang[eintrag_1].'</a></td>';
-    
-  if($system==issectorcommander())
-  {
-    //if(($datei=="skforum.php")||($datei=="skforumvt.php"))
-      $sk='<td><a href="skforum.php" class="btn">'.$naviarray_lang[eintrag_2].'</a></td>';
-  }
-  else
-  $sk='';
+    $text = preg_replace("/\[b\]/i", "<b>", $text);
+    $text = preg_replace("/\[\/b\]/i", "</b>", $text);
 
-  $allys=mysql_query("SELECT allytag, status FROM de_user_data where user_id='$ums_user_id' and status=1 and allytag!=''");
-  if(mysql_num_rows($allys)>=1)
-  {
-    //if(($datei=="ally_forum.php")||($datei=="ally_forumvt.php"))
-      $ally='<td><a href="ally_forum.php" class="btn">'.$naviarray_lang[eintrag_3].'</a></td>';
-  }
-  else
-  $ally='';
+    $text = preg_replace("/\[i\]/i", "<i>", $text);
+    $text = preg_replace("/\[\/i]/i", "</i>", $text);
 
-  //if(($sk!="")||($ally!=""))
-  $forennavi='<table><tr>'.$sek.$sk.$ally.'</tr></table>';
+    $text = preg_replace("/\[u]/i", "<u>", $text);
+    $text = preg_replace("/\[\/u]/i", "</u>", $text);
 
-  return $forennavi;
-}
+    $text = preg_replace("/\[center\]/i", "<center>", $text);
+    $text = preg_replace("/\[\/center\]/i", "</center>", $text);
 
-function formatierte_anzeige($text,$ums_gpfad)
-{
-    $text = str_replace(":)","<img src=\"" . $ums_gpfad . "g/smilies/sm1.gif\" alt=\"lustiger Smilie\">",$text);
-    $text = str_replace(":D","<img src=\"" . $ums_gpfad . "g/smilies/sm2.gif\" alt=\"lachernder Smilie\">",$text);
-    $text = str_replace(";)","<img src=\"" . $ums_gpfad . "g/smilies/sm3.gif\" alt=\"zwinkernder Smilie\">",$text);
-    $text = str_replace(":x","<img src=\"" . $ums_gpfad . "g/smilies/sm4.gif\" alt=\"flamender Smilie\">",$text);
-    $text = str_replace(":(","<img src=\"" . $ums_gpfad . "g/smilies/sm5.gif\" alt=\"trauriger Smilie\">",$text);
-    $text = str_replace("x(","<img src=\"" . $ums_gpfad . "g/smilies/sm6.gif\" alt=\"Smilie\">",$text);
-    $text = str_replace(":p","<img src=\"" . $ums_gpfad . "g/smilies/sm7.gif\" alt=\"Zunge rausstreck Smilie\">",$text);
-    $text = str_replace("(?)","<img src=\"" . $ums_gpfad . "g/smilies/sm8.gif\" alt=\"Fragezeichen\">",$text);
-    $text = str_replace("(!)","<img src=\"" . $ums_gpfad . "g/smilies/sm9.gif\" alt=\"Ausrufezeichen\">",$text);
-    $text = str_replace(":{","<img src=\"" . $ums_gpfad . "g/smilies/sm10.gif\" alt=\"Smilie\">",$text);
-    $text = str_replace(":}","<img src=\"" . $ums_gpfad . "g/smilies/sm11.gif\" alt=\"Smilie\">",$text);
-    $text = str_replace(":L","<img src=\"" . $ums_gpfad . "g/smilies/sm12.gif\" alt=\"rauchender Smilie\">",$text);
-    $text = str_replace(":nene:","<img src=\"" . $ums_gpfad . "g/smilies/sm13.gif\" alt=\"nene\">",$text);
-    $text = str_replace(":eek:","<img src=\"" . $ums_gpfad . "g/smilies/sm14.gif\" alt=\"eek\">",$text);
-    $text = str_replace(":applaus:","<img src=\"" . $ums_gpfad . "g/smilies/sm15.gif\" alt=\"applaus\">",$text);
-    $text = str_replace(":cry:","<img src=\"" . $ums_gpfad . "g/smilies/sm16.gif\" alt=\"cry\">",$text);
-    $text = str_replace(":sleep:","<img src=\"" . $ums_gpfad . "g/smilies/sm17.gif\" alt=\"sleep\">",$text);
-    $text = str_replace(":rolleyes:","<img src=\"" . $ums_gpfad . "g/smilies/sm18.gif\" alt=\"Rolleyes\">",$text);
-    $text = str_replace(":wand:","<img src=\"" . $ums_gpfad . "g/smilies/sm19.gif\" alt=\"Wand\">",$text);
-    $text = str_replace(":dead:","<img src=\"" . $ums_gpfad . "g/smilies/sm20.gif\" alt=\"Dead\">",$text);
+    $text = preg_replace("/\[pre]/i", "<pre>", $text);
+    $text = preg_replace("/\[\/pre]/i", "</pre>", $text);
 
-    $text = preg_replace("/\[b\]/i", "<b>",$text);
-    $text = preg_replace("/\[\/b\]/i", "</b>",$text);
+    $text = str_replace("[CGRUEN]", "<font color=\"#28FF50\">", $text);
+    $text = str_replace("[CROT]", "<font color=\"#F10505\">", $text);
+    $text = str_replace("[CW]", "<font color=\"#FFFFFF\">", $text);
+    $text = str_replace("[CGELB]", "<font color=\"#FDFB59\">", $text);
+    $text = str_replace("[CDE]", "<font color=\"#3399FF\">", $text);
 
-    $text = preg_replace("/\[i\]/i", "<i>",$text);
-    $text = preg_replace("/\[\/i]/i", "</i>",$text);
+    $text = preg_replace("/\[email\]([^[]*)\[\/email\]/", "<a href=\"mailto:\\1\">\\1</a>", $text);
+    $text = preg_replace("/\[url\]([^[]*)\[\/url\]/i", '<a href="\\1" target="_blank">\\1</a>', $text);
+    $text = preg_replace("/\[color=#([^[]+)\]([^[]*)\[\/color\]/", "<font color=\"#\\1\" >\\2</font>", $text);
+    $text = preg_replace("/\[size=([^[]+)\]([^[]*)\[\/size\]/", "<font size=\"\\1\" >\\2</font>", $text);
 
-    $text = preg_replace("/\[u]/i", "<u>",$text);
-    $text = preg_replace("/\[\/u]/i", "</u>",$text);
-
-    $text = preg_replace("/\[center\]/i", "<center>",$text);
-    $text = preg_replace("/\[\/center\]/i", "</center>",$text);
-
-    $text = preg_replace("/\[pre]/i", "<pre>",$text);
-    $text = preg_replace("/\[\/pre]/i", "</pre>",$text);
-
-    $text = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$text);
-    $text = str_replace("[CROT]","<font color=\"#F10505\">",$text);
-    $text = str_replace("[CW]","<font color=\"#FFFFFF\">",$text);
-    $text = str_replace("[CGELB]","<font color=\"#FDFB59\">",$text);
-    $text = str_replace("[CDE]","<font color=\"#3399FF\">",$text);
-
-    $text = preg_replace("/\[email\]([^[]*)\[\/email\]/","<a href=\"mailto:\\1\">\\1</a>",$text);
-    $text = preg_replace("/\[url\]([^[]*)\[\/url\]/i",'<a href="\\1" target="_blank">\\1</a>',$text);
-    $text = preg_replace("/\[color=#([^[]+)\]([^[]*)\[\/color\]/","<font color=\"#\\1\" >\\2</font>",$text);
-    $text = preg_replace("/\[size=([^[]+)\]([^[]*)\[\/size\]/","<font size=\"\\1\" >\\2</font>",$text);
-
-return $text;
+    return $text;
 }
 
 
 
 function buttonpanel($ums_gpfad)
 {
-	global $buttonpanel_lang;
-echo '
+    global $buttonpanel_lang;
+    echo '
    <tr>
     <td width="13" height="25" class="rl"></td>
               <td colspan="4" align="center" height=50 class="tl"><div align="center">
@@ -151,27 +117,24 @@ echo '
 </tr>';
 }
 
- function nl2br_pre($string) {
+function nl2br_pre($string)
+{
 
-   $string = nl2br($string);
+    $string = nl2br($string);
 
-   $stat = preg_match("/\[pre[^\]]*?\](.|\n)*?\[\/pre\]/", $string, $ret);
-
-
-
-   if ($stat != false) {
-
-     $retr = preg_replace("/<br[^>]*?>/", "", $ret[0]);
-
-     $retr = str_replace($ret[0], $retr, $string);
+    $stat = preg_match("/\[pre[^\]]*?\](.|\n)*?\[\/pre\]/", $string, $ret);
 
 
-     return preg_replace("/\[\/pre\]<br[^>]*?>/", "[/pre]", $retr);
-   }
-   else {
-     return $string;
-   }
- }
+
+    if ($stat != false) {
+
+        $retr = preg_replace("/<br[^>]*?>/", "", $ret[0]);
+
+        $retr = str_replace($ret[0], $retr, $string);
 
 
-?>
+        return preg_replace("/\[\/pre\]<br[^>]*?>/", "[/pre]", $retr);
+    } else {
+        return $string;
+    }
+}

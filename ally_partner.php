@@ -1,11 +1,15 @@
 <?php
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.partner.lang.php';
-include_once 'functions.php';
+include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];
 
@@ -25,9 +29,11 @@ include "resline.php";
 include ("ally/ally.menu.inc.php");
 
 //test auf passendes gebäude
-$ally_result = mysql_query("SELECT * FROM de_allys WHERE allytag='$allytag'", $db);
+$ally_result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_allys WHERE allytag=?",
+    [$allytag]);
 if ($ally_result){
-	$ally_data = mysql_fetch_array($ally_result);
+	$ally_data = mysqli_fetch_assoc($ally_result);
 	//diplomatiezentrum
 	$bldg=$ally_data['bldg1'];
 }
@@ -41,15 +47,19 @@ $delallyid1=isset($_REQUEST['delallyid1']) ? $_REQUEST['delallyid1'] : false;
 $delallyid2=isset($_REQUEST['delallyid2']) ? $_REQUEST['delallyid2'] : false;
 if($delallyid1 && $delallyid2 && ($isleader || $iscoleader)){
 	
-	$query = "select count(*) from de_ally_partner, de_allys where ally_id_1 = $delallyid1 and ally_id_2 = $delallyid2 and ((ally_id_1 = id) or (ally_id_2 = id)) and (leaderid=$ums_user_id OR coleaderid1=$ums_user_id OR coleaderid2=$ums_user_id OR coleaderid3=$ums_user_id)";
-	$result = @mysql_query($query, $db);
-	$alreadyinXallys = 0;
-	$alreadyinXallys = @mysql_result($result,0,0);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT count(*) as count FROM de_ally_partner, de_allys 
+		 WHERE ally_id_1=? AND ally_id_2=? AND ((ally_id_1=id) OR (ally_id_2=id)) 
+		 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+		[$delallyid1, $delallyid2, $ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+	$row = mysqli_fetch_assoc($result);
+	$alreadyinXallys = $row['count'];
 	if ($alreadyinXallys == 0)
 		die ("$allypartner_lang[msg_1]");
 
-	$query="DELETE FROM de_ally_partner WHERE ally_id_1=$delallyid1 and ally_id_2=$delallyid2";
-	$result = mysql_query($query, $db);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"DELETE FROM de_ally_partner WHERE ally_id_1=? AND ally_id_2=?",
+		[$delallyid1, $delallyid2]);
 	echo $allypartner_lang[msg_2];
 	include("ally/allyfunctions.inc.php");
 	$delallyid1_tag = getAllyTag($delallyid1);
@@ -66,42 +76,54 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 	$antrag = htmlentities ($antrag,ENT_QUOTES);
 	$antrag = str_replace("\n","<br>",$antrag);
 
-	$query="SELECT id FROM de_allys WHERE leaderid=$ums_user_id OR coleaderid1=$ums_user_id OR coleaderid2=$ums_user_id OR coleaderid3=$ums_user_id";
-	$result = mysql_query($query, $db);
-	$allyid = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
+		[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+	$row = mysqli_fetch_assoc($result);
+	$allyid = $row['id'];
 
-	$query = "select count(*) from de_ally_partner where ally_id_1=$allyid or ally_id_2=$allyid";
-	$result = mysql_query($query, $db);
-	$alreadyinXallys = mysql_result($result,0,0);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT count(*) as count FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
+		[$allyid, $allyid]);
+	$row = mysqli_fetch_assoc($result);
+	$alreadyinXallys = $row['count'];
 	if ($alreadyinXallys >= $maxbuendnis)
 		die ("$allypartner_lang[msg_4_1] $alreadyinXallys $allypartner_lang[msg_4_2] $alreadyinXallys $allypartner_lang[msg_4_3]");
 	//---------------
 
 	//---------------
-	$query="SELECT id FROM de_allys WHERE allytag='$an'";
-	$result = mysql_query($query, $db);
-	$allyid_partner = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys WHERE allytag=?",
+		[$an]);
+	$row = mysqli_fetch_assoc($result);
+	$allyid_partner = $row['id'];
 
-	$query = "select count(*) from de_ally_partner where ally_id_1='$allyid_partner' or ally_id_2='$allyid_partner'";
-	$result = mysql_query($query, $db);
-	$alreadyinXallys = mysql_result($result,0,0);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT count(*) as count FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
+		[$allyid_partner, $allyid_partner]);
+	$row = mysqli_fetch_assoc($result);
+	$alreadyinXallys = $row['count'];
 	if ($alreadyinXallys >= $maxbuendnis)
 		die ("$allypartner_lang[msg_5_1] $alreadyinXallys $allypartner_lang[msg_5_2]");
 	//---------------
 	
-	//�berpr�fen ob man mit dem gew�nschten b�ndnispartner evtl. im krieg ist
-	$query = "SELECT * FROM de_ally_war WHERE (ally_id_angreifer = '$allyid' AND ally_id_angegriffener = '$allyid_partner') OR (ally_id_angreifer = '$allyid_partner' AND ally_id_angegriffener = '$allyid')";
-	$db_daten = mysql_query($query, $db);
-	$num = mysql_num_rows($db_daten);
+	//überprüfen ob man mit dem gewünschten bündnispartner evtl. im krieg ist
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT * FROM de_ally_war 
+		 WHERE (ally_id_angreifer=? AND ally_id_angegriffener=?) OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
+		[$allyid, $allyid_partner, $allyid_partner, $allyid]);
+	$num = mysqli_num_rows($db_daten);
 	if ($num>0)
 		die ('<div class="info_box text2">Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.</div></body></html>');
 
-	$sqlquery = "INSERT into de_ally_buendniss_antrag (ally_id_antragsteller, ally_id_partner, antrag) VALUES ($allyid, $allyid_partner, '$antrag')";
-	$result = @mysql_query($sqlquery, $db);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"INSERT INTO de_ally_buendniss_antrag (ally_id_antragsteller, ally_id_partner, antrag) VALUES (?, ?, ?)",
+		[$allyid, $allyid_partner, $antrag]);
 
 	if (!$result){
-		$sqlquery = "UPDATE de_ally_buendniss_antrag SET ally_id_partner=$allyid_partner, antrag='$antrag' where ally_id_antragsteller=$allyid";
-		$result = @mysql_query($sqlquery, $db);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_ally_buendniss_antrag SET ally_id_partner=?, antrag=? WHERE ally_id_antragsteller=?",
+			[$allyid_partner, $antrag, $allyid]);
 
 	}
 	echo "<br><div class=\"info_box\">$allypartner_lang[msg_6_1] $an $allypartner_lang[msg_6_2] $an $allypartner_lang[msg_6_3]</div>";
@@ -114,11 +136,17 @@ else {
 	$bestehende_buendnisse=array();
 
   	if ($isleader || $iscoleader)
-  		$query = "SELECT ally_id_1, ally_id_2  FROM de_allys, de_ally_partner where ((ally_id_1=id) or (ally_id_2=id)) and (leaderid=$ums_user_id || coleaderid1=$ums_user_id || coleaderid2=$ums_user_id || coleaderid3=$ums_user_id)";
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT ally_id_1, ally_id_2 FROM de_allys, de_ally_partner 
+			 WHERE ((ally_id_1=id) OR (ally_id_2=id)) 
+			 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+			[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
   	else
-  		$query = "SELECT ally_id_1, ally_id_2  FROM de_allys, de_ally_partner where ((ally_id_1=id) or (ally_id_2=id)) and allytag='$allytag'";
-	$result = @mysql_query($query, $db);
-	if (mysql_num_rows($result)){
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT ally_id_1, ally_id_2 FROM de_allys, de_ally_partner 
+			 WHERE ((ally_id_1=id) OR (ally_id_2=id)) AND allytag=?",
+			[$allytag]);
+	if (mysqli_num_rows($result)){
 		echo 	"<br><table border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\">\n".
 				"<tr align=\"center\">\n".
 					"<td width=\"13\" height=\"37\" class=\"rol\">&nbsp;</td>\n".
@@ -137,14 +165,18 @@ else {
 								echo "<td><b>$allypartner_lang[delbuendnis]</td>";
 						echo "</tr>";
 
-		while ($row = @mysql_fetch_array($result)){
-			$query = "SELECT allytag FROM de_allys where id=".$row['ally_id_1'];
-			$result2 = @mysql_query($query, $db);
-			$antragsteller = @mysql_result($result2,0,"allytag");
+		while ($row = mysqli_fetch_assoc($result)){
+			$result2 = mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT allytag FROM de_allys WHERE id=?",
+				[$row['ally_id_1']]);
+			$row2 = mysqli_fetch_assoc($result2);
+			$antragsteller = $row2['allytag'];
 
-			$query = "SELECT allytag FROM de_allys where id=".$row['ally_id_2'];
-			$result2 = @mysql_query($query, $db);
-			$allypartner = @mysql_result($result2,0,"allytag");
+			$result2 = mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT allytag FROM de_allys WHERE id=?",
+				[$row['ally_id_2']]);
+			$row2 = mysqli_fetch_assoc($result2);
+			$allypartner = $row2['allytag'];
 
 			echo 	"<tr class=\"cl\">".
 					"<td>".$antragsteller."</td><td>".$allypartner."</td>";
@@ -167,11 +199,14 @@ else {
 	}
 
 	if($isleader || $iscoleader){
-		$query = "select antrag, ally_id_partner from de_ally_buendniss_antrag, de_allys where ally_id_antragsteller=id and (leaderid=$ums_user_id OR coleaderid1=$ums_user_id OR coleaderid2=$ums_user_id OR coleaderid3=$ums_user_id)";
-
-		$result = @mysql_query($query, $db);
-		$laufenderantrag = @mysql_result($result,0,"antrag");
-		$selected = @mysql_result($result,0,"ally_id_partner");
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT antrag, ally_id_partner FROM de_ally_buendniss_antrag, de_allys 
+			 WHERE ally_id_antragsteller=id 
+			 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+			[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+		$row = mysqli_fetch_assoc($result);
+		$laufenderantrag = $row['antrag'] ?? '';
+		$selected = $row['ally_id_partner'] ?? '';
 		if ($laufenderantrag){
 			echo "<br><div class=\"info_box\">$allypartner_lang[msg_10]</div><br>";
 		}
@@ -184,9 +219,9 @@ else {
 			      "<td width=\"50%\">".
 			      "<select name=\"an\">\n";
 
-			    $query = "SELECT allytag, id FROM de_allys order by allytag";
-				$result = mysql_query($query, $db);
-				while ($row = mysql_fetch_array($result))
+			    $result = mysqli_execute_query($GLOBALS['dbi'],
+					"SELECT allytag, id FROM de_allys ORDER BY allytag");
+				while ($row = mysqli_fetch_assoc($result))
 				{
 					if (!in_array($row['allytag'],$bestehende_buendnisse) and $allytag != $row['allytag'])
 					{

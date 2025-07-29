@@ -56,9 +56,9 @@ if($artbonus_fleet>5){
 	$artbonus_fleet=5;
 }
 
-$db_daten=mysql_query("SELECT id, level FROM de_user_artefact WHERE (id=2 OR id=8 OR id=9) AND user_id='$ums_user_id'",$db);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE (id=2 OR id=8 OR id=9) AND user_id=?", [$ums_user_id]);
 $artbonus_def=0;$artbonus2=0;$artbonus3=0;
-while($row = mysql_fetch_array($db_daten)){
+while($row = mysqli_fetch_array($db_daten)){
   if($row['id']==2)$artbonus_def=$artbonus_def+$ua_werte[$row['id']-1][$row['level']-1][0];
   elseif($row['id']==8)$artbonus2=$artbonus2+$ua_werte[$row['id']-1][$row['level']-1][0];
   elseif($row['id']==9)$artbonus3=$artbonus3+$ua_werte[$row['id']-1][$row['level']-1][0];
@@ -77,8 +77,8 @@ include 'lib/defenseboni.lib.php';
 if($spec1==1)$defense_bonus_buildtime+=50;
 
 //namen des planetaren schildes aus der db auslesen
-$db_daten=mysql_query("SELECT * FROM de_tech_data$ums_rasse WHERE tech_id=24",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data{$ums_rasse} WHERE tech_id=24", []);
+$row = mysqli_fetch_array($db_daten);
 $ps_name=$row['tech_name'];
 
 //spezialisierung schildst�rke
@@ -107,7 +107,7 @@ if($maxtick<$mysc2+$sv_sabotage[8][0] AND $mysc2>$sv_sabotage[8][0])$sabotage=1;
 /*
 if($_REQUEST["setdesign"]){
   $design=intval($_REQUEST["setdesign"]);
-  mysql_query("UPDATE de_user_data SET design3='$design' WHERE user_id = '$ums_user_id'",$db);	
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET design3=? WHERE user_id = ?", [$design, $ums_user_id]);	
 }*/
 
 
@@ -365,8 +365,8 @@ if($sabotage==1){
 /*
 if ($techs[13]==0){
 	$techcheck="SELECT tech_name FROM de_tech_data".$ums_rasse." WHERE tech_id=13";
-	$db_tech=mysql_query($techcheck,$db);
-	$row_techcheck = mysql_fetch_array($db_tech);
+	$db_tech=mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
+	$row_techcheck = mysqli_fetch_array($db_tech);
 
 	//echo $production_lang[eswirdeine].$row_techcheck[tech_name].$production_lang[benoetigt];
 
@@ -561,12 +561,12 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 
 //zeige aktive bauauftr�ge an
-//$result=mysql_query("SELECT de_user_build.anzahl, de_user_build.verbzeit, de_tech_data$ums_rasse.tech_name, de_tech_data$ums_rasse.score FROM de_user_build left join de_tech_data$ums_rasse on(de_user_build.tech_id = de_tech_data$ums_rasse.tech_id) WHERE user_id=$ums_user_id AND de_user_build.tech_id > 80 AND de_user_build.tech_id < 110 ORDER BY de_user_build.verbzeit ASC",$db);
+//$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_build.anzahl, de_user_build.verbzeit, de_tech_data{$ums_rasse}.tech_name, de_tech_data{$ums_rasse}.score FROM de_user_build LEFT JOIN de_tech_data{$ums_rasse} ON(de_user_build.tech_id = de_tech_data{$ums_rasse}.tech_id) WHERE user_id=? AND de_user_build.tech_id > 80 AND de_user_build.tech_id < 110 ORDER BY de_user_build.verbzeit ASC", [$ums_user_id]);
 /*
 unset($technames);
 $techselect='<option value="0">Bitte w&auml;hlen</option>';
-$db_daten=mysql_query("SELECT * FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id>80 AND tech_id<105 ORDER BY tech_id",$db);
-while($row = mysql_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id>80 AND tech_id<105 ORDER BY tech_id", []);
+while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	$technames[$row['tech_id']]=$row['tech_name'];
 }*/
 

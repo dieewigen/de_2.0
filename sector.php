@@ -1,14 +1,14 @@
 <?php
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
-include "lib/religion.lib.php";
 include "functions.php";
 include "issectork.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, `system`, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
-$restyp05=$row[4];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, `system`, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];
+$restyp05=$row["restyp05"];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 $sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
 $platz=$row["platz"];$erang_nr=$row["rang"];$secsort=$row["secsort"];$secstatdisable=$row["secstatdisable"];
 $col=$row['col'];
@@ -28,14 +28,16 @@ if ($row["status"]==1){
 if ($techs[4]==0)$sv_attgrenze_whg_bonus=0;
 
 //owner id auslesen
-$db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$sql = "SELECT owner_id FROM de_login WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
 $owner_id=intval($row["owner_id"]);
 
 if(isset($_REQUEST["sso"])){
 	$sso=intval($_REQUEST["sso"]);
 	$sso--;
-	mysql_query("UPDATE de_user_data SET secsort='$sso' WHERE user_id='$ums_user_id'",$db);
+	$sql = "UPDATE de_user_data SET secsort=? WHERE user_id=?";
+	mysqli_execute_query($GLOBALS['dbi'], $sql, [$sso, $ums_user_id]);
 	$secsort=$sso;
 }
 
@@ -45,8 +47,9 @@ if($secsort=='1')$orderby='col';
 elseif($secsort=='2')$orderby='score';
 
 //maximale anzahl von kollektoren auslesen
-$db_daten=mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0",$db);
-$row = mysql_fetch_array($db_daten);
+$sql = "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql);
+$row = mysqli_fetch_assoc($db_daten);
 $maxcol=$row['maxcol'];
 
 ?>
@@ -77,9 +80,6 @@ if($_SESSION['ums_mobi']==1){
 include "resline.php";
 
 echo '<div align="center">';
-
-//echo '<div class="info_box">Die Hyperraumbeben sind vorbei und Fraktion 666 ist aus der EA durch ein Hyperraumfenster nach Andromeda vorgesto�en und hat dort einen Allianzsektor gegr&uuml;ndet.</div>';
-//die("<table width=600><br><font size=4>Momentan k�nnen keine Sektordaten aus der Zentraldatenbank des Kristallpalastes bezogen werden. Grund daf�r ist der gleichzeitige Ausfall mehrerer Datenknoten. Die Umst�nde lassen keinen Zweifel daran, dass es sich um Sabotage gehandelt hat und die Techniker haben die DX61a23 in Verdacht, mit bisher noch unbekannten technischen Mitteln die St�rung herbeigef�hrt zu haben. Wir hoffen, dass die St�rung nur von kurzer Dauer sein wird und arbeiten mit Hochdruck an einer L�sung.</body></html>");
 
 function wellenrechner($kol, $maxcol, $npcsec){
 	global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $sv_kollie_klaurate;
@@ -131,10 +131,6 @@ if ($sf>$sv_show_maxsector or $sf<1){
 }
 $sector=$sf;
 
-//Hinweis zu einem bestimmtem Anlass
-//echo '<div class="info_box text3" style="margin-bottom: 10px;">Der Creditverkauf wird zum 31.12.2018 15 Uhr eingestellt. Mehr Informationen gibt es in den News.</div>';
-//echo '<div class="info_box text3" style="margin-bottom: 10px;">Die Umstellung auf PHP 7 / der Serverumzug beginnt am Mittwoch 02.01.2019 ab ca. 14 Uhr. F&uuml;r die Umstellung sind aktuell 24 Stunden eingeplant in denen die Ticks stehen. Sollte es gr&ouml;&szlig;ere Probleme geben, so kann sich die Dauer verl&auml;ngern. W&auml;hrend der Server offline ist, kann man im Discord Kontakt aufnehmen und dort gibt es die aktuellen Infos: <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a></div>';
-
 //den button fürs blättern durch die sektoren darstellen
 echo '<form action="sector.php" name="secform" method="POST">';
 
@@ -161,8 +157,9 @@ if ($ownsector<>$sf){
 }
 
 //die daten des sektors auslesen
-$db_daten=mysql_query("SELECT * FROM de_sector WHERE sec_id='$sf'",$db);
-$sec_data = mysql_fetch_array($db_daten);
+$sql = "SELECT * FROM de_sector WHERE sec_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
+$sec_data = mysqli_fetch_assoc($db_daten);
 
 //Hinweis in Sektor 666
 if($sf==666){
@@ -211,9 +208,10 @@ if($sec_data['npc']==1){
 	<td width="60" class="cell tac"><a href="sector.php?sso=2&sf='.$sf.'"><font size="1">'.$sec_lang['kollektoren'].'</font></a></td>
 	<td width="70" class="cell tac"><font size="1">'.$sec_lang['aktion'].'</font></td>
 	</tr>';
-	$db_daten = mysql_query("SELECT * FROM de_user_data WHERE sector='$sf' ORDER BY $orderby ASC LIMIT 300",$db);
-	$anz = mysql_num_rows($db_daten);
-	while($row = mysql_fetch_array($db_daten)){
+	$sql = "SELECT * FROM de_user_data WHERE sector=? ORDER BY $orderby ASC LIMIT 300";
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
+	$anz = mysqli_num_rows($db_daten);
+	while($row = mysqli_fetch_assoc($db_daten)){
 		echo '<tr>';
 		//system
 		echo '<td class="cell tac" style="font-size: 10pt;">'.$row['system'].'</td>';
@@ -262,9 +260,10 @@ if($sec_data['npc']==1){
 	
 	//die scandaten des spielers auslesen
 	unset($scandaten);
-    $db_daten=mysql_query("SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id='$ums_user_id'",$db);
+    $sql = "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
     $index=0;
-	while($row = mysql_fetch_array($db_daten))
+	while($row = mysqli_fetch_assoc($db_daten))
 	{
 		$scandaten[$index]['zuser_id']=$row['zuser_id'];
 		$scandaten[$index]['rasse']=$row['rasse'];
@@ -276,22 +275,25 @@ if($sec_data['npc']==1){
 	//----------- Ally Feine/Freunde
 	$allypartner = array();
 	$allyfeinde = array();
-	$query = "SELECT id FROM de_allys WHERE allytag='$ownally'";
-	$allyresult = mysql_query($query);
-	$at=mysql_num_rows($allyresult);
+	$sql = "SELECT id FROM de_allys WHERE allytag=?";
+	$allyresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ownally]);
+	$at=mysqli_num_rows($allyresult);
 	if ($at!=0)
 	{
-	  $allyid = mysql_result($allyresult,0,"id");
+	  $allyrow = mysqli_fetch_assoc($allyresult);
+	  $allyid = $allyrow["id"];
 	
-	  $allyresult = mysql_query("SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=$allyid or ally_id_2=$allyid) and (ally_id_1=id or ally_id_2=id)",$db);
-	  while($row = mysql_fetch_array($allyresult))
+	  $sql = "SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=? or ally_id_2=?) and (ally_id_1=id or ally_id_2=id)";
+	  $allyresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid, $allyid]);
+	  while($row = mysqli_fetch_assoc($allyresult))
 	  {
 	        if ($ownally != $row["allytag"])
 	                $allypartner[] = $row["allytag"];
 	  }
 	
-	  $allyresult = mysql_query("SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=$allyid or ally_id_angegriffener=$allyid) and (ally_id_angreifer=id or ally_id_angegriffener=id)",$db);
-	  while($row = mysql_fetch_array($allyresult))
+	  $sql = "SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=? or ally_id_angegriffener=?) and (ally_id_angreifer=id or ally_id_angegriffener=id)";
+	  $allyresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid, $allyid]);
+	  while($row = mysqli_fetch_assoc($allyresult))
 	  {
 	        if ($ownally != $row["allytag"])
 	                $allyfeinde[] = $row["allytag"];
@@ -300,13 +302,15 @@ if($sec_data['npc']==1){
 	
 	//sektormalus bei der attgrenze berechnen
 	//zuerst anzahl der pc-sektoren auslesen
-	$db_daten=mysql_query("SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1",$db);
-	$num = mysql_num_rows($db_daten);
+	$sql = "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1";
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql);
+	$num = mysqli_num_rows($db_daten);
 	if($num<1)$num=1;
 	
 	//eigenen sektorplatz auslesen
-	$db_daten=mysql_query("SELECT platz FROM de_sector WHERE sec_id='$ownsector'",$db);
-	$row = mysql_fetch_array($db_daten);
+	$sql = "SELECT platz FROM de_sector WHERE sec_id=?";
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ownsector]);
+	$row = mysqli_fetch_assoc($db_daten);
 	$ownsectorplatz=$row["platz"];
 	  
 	//sektorplatzunterschied berechnen
@@ -351,23 +355,25 @@ if($sec_data['npc']==1){
 	
 	//die spielerdaten laden
 	if($sf==1 && !isset($_REQUEST['showall'])){
-		$db_daten = mysql_query("SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
+		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
 		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
-		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector='$sf' ORDER BY $orderby ASC",$db);
+		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector=? ORDER BY $orderby ASC";
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 	}else{
 		//alles anzeigen
-		$db_daten = mysql_query("SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
+		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
 		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
-		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector='$sf' ORDER BY $orderby ASC",$db);
+		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector=? ORDER BY $orderby ASC";
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 	}	
 	
-	$anz = mysql_num_rows($db_daten);
+	$anz = mysqli_num_rows($db_daten);
 	$gescol=0;
-	while($row = mysql_fetch_array($db_daten)){
+	while($row = mysqli_fetch_assoc($db_daten)){
 		$gesamtpunkte+=$row['score'];
 		$gescol+=$row['col'];
 		
@@ -383,14 +389,6 @@ if($sec_data['npc']==1){
 	    if ($row["lstatus"]==3 AND $row["delmode"]==0) $systemstr='('.$systemstr.')';//umode
 	    
 	    if($sksystem==$row['system']){
-			//�berpr�fen ob der sk auch bk ist, ist in 1-mann-sektoren m�glich
-			/*
-	      	if($row['system']==$sec_data['bk'] AND $anz>1){
-	      		mysql_query("UPDATE de_sector set bk = 0 WHERE sec_id='$sector'",$db);
-	      		$sec_data['bk']=0;
-			}
-			*/
-			  
 	      	$systemstr='<span class="tc3">^'.$systemstr.'^</span>';
 		}
 		
@@ -424,7 +422,7 @@ if($sec_data['npc']==1){
 		$db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
 		if(mysqli_num_rows($db_datenx) > 0){
 			
-			while ($rowx = mysqli_fetch_array($db_datenx)){
+			while ($rowx = mysqli_fetch_assoc($db_datenx)){
 				$userTitle.=$rowx['title'].'<br>';
 			}
 			$userTitle='<div class="user_title" title="'.$userTitle.'"></div>';
@@ -578,14 +576,7 @@ if($sec_data['npc']==1){
 	
 	$output.='</table>';
 	
-	/*
-	if ($sec_data['url']<>'' AND $hide_secpics == "0")//sektorbild
-  	{
-    	echo '<img src="'.$sec_data['url'].'" name="sekbild"><br><br>';
-	}
-	*/
-	
-	
+
 	//die sektor�berschrift zusammenbauen
 	$sektorinfo='<div style="text-align: left;">';
 	//reisezeit
@@ -594,9 +585,7 @@ if($sec_data['npc']==1){
 	}else{
 		$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
 	}
-	//if($rzadd==1)$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	//if($rzadd==2)$style='border: 1px solid #444444; background-color: #DD0000; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	//$sektorinfo.='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Naher Sektor: Reisezeit +1 Kampftick<br>Ferne Sektoren: Reisezeit +2 Kampfticks" style="'.$style.'">'.$rzadd.'</span>';
+	
 	$sektorinfo.='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
 	$sektorinfo.=' <span title="Platz in der Sektorwertung">Platz: '.$sec_data['platz'].'</span>';
 	$sektorinfo.=' Punkte: '.number_format($gesamtpunkte, 0,",",".");
@@ -615,9 +604,7 @@ if($sec_data['npc']==1){
 	//rahmen_unten();
 	
 	////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////
 	// alter bereich
-	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////
 
 	//bild von der sternenbasis anzeigen
@@ -632,7 +619,8 @@ if($sec_data['npc']==1){
   //artefakte anzeigen
 
   //schauen ob es artefakte gibt
-  $res = mysqli_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector='$sector'");
+  $sql = "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?";
+  $res = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
   $artnum = mysqli_num_rows($res);
   //if ($artnum>0 OR $bed!='000')//artefakt vorhanden, oder raumbasis gebaut
   //{
@@ -646,7 +634,7 @@ if($sec_data['npc']==1){
   }
   	
   	
-  while($row = mysqli_fetch_array($res))
+  while($row = mysqli_fetch_assoc($res))
   {
       //artefakttooltip bauen
 	$desc=$row["artdesc"];
@@ -740,18 +728,7 @@ if($sec_data['npc']==1){
 			echo '<a href="sector.php?sf=1&showall=1" class="btn">alles anzeigen</a><br><br>';
 		}
   }
-  
-  /*
-  if($sv_server_tag=='DDE' || $_SESSION['ums_user_id']==1){
-	echo '<a href="dm.php" class="btn" target="_blank">zur Desktopkarte</a><br><br>';
-  }*/
 
-  	/*
-	if ($sec_data['url']<>'' AND $hide_secpics == "2")//sektorbild
-	{
-			echo '<br><img src="'.$sec_data['url'].'" name="sekbild"><br><br>';
-	}
-	*/
 }
 ?>
 </div>

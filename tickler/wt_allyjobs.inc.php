@@ -6,11 +6,11 @@
 //////////////////////////////////////////////////////////////////////
 echo '<br><hr>Allyaufgaben-START<br>';
 //die zeit eins runterz�hlen
-mysql_query("UPDATE de_allys SET questtime=questtime-1 WHERE questtime>=1",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questtime=questtime-1 WHERE questtime>=1", []);
 
 //noch nicht belegte, erledigte und abgelaufende quests laden 
-$db_daten=mysql_query("SELECT * FROM de_allys WHERE questtime=0 OR questreach>=questgoal",$db);
-while($row = mysql_fetch_array($db_daten)){
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE questtime=0 OR questreach>=questgoal", []);
+while($row = mysqli_fetch_array($db_daten)){
 	
 	$allyid=$row['id'];
 	$allytag=$row['allytag'];
@@ -28,7 +28,7 @@ while($row = mysql_fetch_array($db_daten)){
 	//aufgabe ist fertig, belohnung hinterlegen
 	if($row['questgoal']>0 AND $row['questreach']>0 AND $row['questreach']>=$row['questgoal']){
 		$questpoints=$allyjobs[$row['questtyp']][4]+round($row['questtime']/10);
-		mysql_query("UPDATE de_allys SET questpoints=questpoints+'$questpoints', artefacts=artefacts+1 WHERE id='$allyid'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questpoints=questpoints+?, artefacts=artefacts+1 WHERE id=?", [$questpoints, $allyid]);
 	}
 
 	//nächster questtyp
@@ -87,7 +87,7 @@ while($row = mysql_fetch_array($db_daten)){
 		echo 'ERROR: ALLYJOBS ('.$nexttyp.')';
 	}
 
-	mysql_query("UPDATE de_allys SET questtyp='$nexttyp', questreach='$questreach', questgoal='$questgoal', questtime='$questtime' WHERE id='$allyid'",$db);
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questtyp=?, questreach=?, questgoal=?, questtime=? WHERE id=?", [$nexttyp, $questreach, $questgoal, $questtime, $allyid]);
 	//nachricht an den allianzchat
 	insert_chat_msg($allyid, 1, '', '<font color="#802ec1">Eine neue '.$allytag.'-Allianzaufgabe steht zur Verf&uuml;gung.</font>');
 }
@@ -112,12 +112,12 @@ if($maxtick % $trigger_intervall == 0){
 	echo 'ARES:<br>';
 
 	//alle Alianzen auslesen die an der Mission teilgenommen haben
-	$db_daten=mysql_query("SELECT * FROM de_allys WHERE mission_counter_1 > 0 ORDER BY mission_counter_1 DESC",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE mission_counter_1 > 0 ORDER BY mission_counter_1 DESC", []);
+	$num = mysqli_num_rows($db_daten);
 	if($num>0){
 		$score_gesamt=0;
 		$allys=array();
-		while($row = mysql_fetch_array($db_daten)){
+		while($row = mysqli_fetch_array($db_daten)){
 			$allys[]=$row;
 			$score_gesamt+=$row['mission_counter_1'];
 		}
@@ -144,13 +144,13 @@ if($maxtick % $trigger_intervall == 0){
 			$user_res[3]=$maxres[3]*$p;
 
 			//jeden aktiven Spieler der Allianz laden um ihm die Rohstoffe gutschreiben zu können
-			$result=mysql_query("SELECT * FROM de_user_data WHERE allytag='$allytag' AND status=1",$db);
-			while($rowx = mysql_fetch_array($result)){
+			$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE allytag=? AND status=1", [$allytag]);
+			while($rowx = mysqli_fetch_array($result)){
 				$uid=$rowx['user_id'];
 				$sql="UPDATE de_user_data SET restyp01=restyp01+$user_res[0], restyp02=restyp02+$user_res[1], restyp03=restyp03+$user_res[2], restyp04=restyp04+$user_res[3] WHERE user_id = '$uid'";
 				echo $sql.'<br>';
 				error_log($sql, 0);
-				mysql_query($sql,$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01=restyp01+?, restyp02=restyp02+?, restyp03=restyp03+?, restyp04=restyp04+? WHERE user_id=?", [$user_res[0], $user_res[1], $user_res[2], $user_res[3], $uid]);
 			}
 
 		}
@@ -166,7 +166,7 @@ if($maxtick % $trigger_intervall == 0){
 
 
 	//Mission-Counter zurücksetzen
-	mysql_query("UPDATE de_allys SET mission_counter_1=0;",$db);	
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET mission_counter_1=0", []);	
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -179,10 +179,10 @@ if($maxtick % $trigger_intervall == 0){
 	echo 'HEPHAISTOS:<br>';
 
 	//alle Alianzen auslesen die an der Mission teilgenommen haben
-	$db_daten=mysql_query("SELECT * FROM de_allys WHERE mission_counter_2 > 0 ORDER BY mission_counter_2 DESC LIMIT 1",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE mission_counter_2 > 0 ORDER BY mission_counter_2 DESC LIMIT 1", []);
+	$num = mysqli_num_rows($db_daten);
 	if($num>0){
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_array($db_daten);
 
 		$allytag=$row['allytag'];
 		$allyid=$row['id'];
@@ -190,7 +190,7 @@ if($maxtick % $trigger_intervall == 0){
 		echo $row['allytag'];
 
 		//Gewinn: 1 Allianzartefakt, 1 Quantenglimmer
-		mysql_query("UPDATE de_allys SET artefacts=artefacts+1 WHERE id='$allyid';",$db);	
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+1 WHERE id=?", [$allyid]);	
 		changeAllyStorageAmount($allyid, 13, 1, false);
 
 		//Nachricht an den Server-Chat
@@ -204,7 +204,7 @@ if($maxtick % $trigger_intervall == 0){
 
 
 	//Mission-Counter zurücksetzen
-	mysql_query("UPDATE de_allys SET mission_counter_2=0;",$db);	
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET mission_counter_2=0", []);	
 }
 
 

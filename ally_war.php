@@ -1,32 +1,21 @@
 <?php
-//	--------------------------------- ally_war.php ---------------------------------
-//	Funktion der Seite:		�ndern und Anzeigen von verfeindeten Allianzen
-//	Letzte �nderung:		05.09.2002
-//	Letzte �nderung von:	Ascendant
-//
-//	�nderungshistorie:
-//
-//	05.02.2002 (Ascendant)	- Erweiterung der Änderungsbefugnis der Kriege
-//							  auf Coleader
-//  --------------------------------------------------------------------------------
-
 $bestehende_kriege[] = '';
 $an = '';
 $selected = '';
 
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.war.lang.php');
-include_once('functions.php');
+include('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $allytag=$row['allytag'];
-
-/*$db_daten=mysql_query("SELECT nic FROM de_login WHERE user_id='$ums_user_id'");
-$row = mysql_fetch_array($db_daten);
-$nic=$row['nic'];*/
 
 ?>
 <!DOCTYPE HTML>
@@ -43,32 +32,43 @@ include('ally/ally.menu.inc.php');
 
 if($isleader || $iscoleader)
 {
-	$query = "SELECT id FROM de_allys WHERE leaderid=$ums_user_id  OR coleaderid1=$ums_user_id OR coleaderid2=$ums_user_id OR coleaderid3=$ums_user_id";
-	$result = mysql_query($query);
-	$allyid = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys 
+		 WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
+		[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+	$row = mysqli_fetch_assoc($result);
+	$allyid = $row["id"];
 }
 else
 {
-	$query = "SELECT id FROM de_allys ally, de_user_data user WHERE ally.allytag=user.allytag and user_id=$ums_user_id";
-	$result = mysql_query($query);
-	$allyid = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys ally, de_user_data user 
+		 WHERE ally.allytag=user.allytag AND user_id=?",
+		[$ums_user_id]);
+	$row = mysqli_fetch_assoc($result);
+	$allyid = $row["id"];
 }
 
 if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
 {
-	$query = "SELECT id FROM de_allys WHERE allytag='$peaceto'";
-	$result = mysql_query($query);
-	$peaceto_id = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys WHERE allytag=?",
+		[$peaceto]);
+	$row = mysqli_fetch_assoc($result);
+	$peaceto_id = $row["id"];
 
-	$query = "select friedensangebot, kriegsstart from de_ally_war where (ally_id_angreifer=$allyid and ally_id_angegriffener=$peaceto_id) or (ally_id_angreifer=$peaceto_id and ally_id_angegriffener=$allyid)";
-	$result = @mysql_query($query);
-	$alreadyinXallys = 0;
-	$alreadyinXallys = mysql_num_rows($result);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT friedensangebot, kriegsstart FROM de_ally_war 
+		 WHERE (ally_id_angreifer=? AND ally_id_angegriffener=?) 
+		 OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
+		[$allyid, $peaceto_id, $peaceto_id, $allyid]);
+	$alreadyinXallys = mysqli_num_rows($result);
 	if ($alreadyinXallys == 0)
 		die ("$allywar_lang[msg_1]..");
 
-	$friedensangebot = @mysql_result($result,0,"friedensangebot");
-	$kriegsstart = strtotime(@mysql_result($result,0,"kriegsstart"));
+	$row = mysqli_fetch_assoc($result);
+	$friedensangebot = $row["friedensangebot"];
+	$kriegsstart = strtotime($row["kriegsstart"]);
 
 	$now = time();
 
@@ -91,8 +91,11 @@ if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
 
 	if ($friedensangebot == $peaceto_id)
 	{
-		$query="DELETE FROM de_ally_war WHERE (ally_id_angreifer=$allyid and ally_id_angegriffener=$peaceto_id) or (ally_id_angreifer=$peaceto_id and ally_id_angegriffener=$allyid)";
-		$result = mysql_query($query);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"DELETE FROM de_ally_war 
+			 WHERE (ally_id_angreifer=? AND ally_id_angegriffener=?) 
+			 OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
+			[$allyid, $peaceto_id, $peaceto_id, $allyid]);
 		echo "$allywar_lang[msg_3] $peaceto!";
 		include("ally/allyfunctions.inc.php");
 		writeHistory($allytag, "$allywar_lang[msg_4_1] <i>$peaceto</i> $allywar_lang[msg_4_2]",true);
@@ -101,8 +104,11 @@ if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
 	}
 	elseif ($friedensangebot == 0)
 	{
-		$query="UPDATE de_ally_war set friedensangebot = $allyid where (ally_id_angreifer=$allyid and ally_id_angegriffener=$peaceto_id) or (ally_id_angreifer=$peaceto_id and ally_id_angegriffener=$allyid)";
-		$result = mysql_query($query);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_ally_war SET friedensangebot=? 
+			 WHERE (ally_id_angreifer=? AND ally_id_angegriffener=?) 
+			 OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
+			[$allyid, $allyid, $peaceto_id, $peaceto_id, $allyid]);
 		echo $allywar_lang['msg_5_1'].' '.$peaceto.' '.$allywar_lang['msg_5_2'].' '.$peaceto.' '.$allywar_lang['msg_5_3'];
 		include('ally/allyfunctions.inc.php');
 		writeHistory($allytag, "$allywar_lang[msg_6_1] <i>$peaceto</i> $allywar_lang[msg_6_2]",true);
@@ -121,34 +127,34 @@ if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
 
 $an=isset($_POST['an']) ? $_POST['an'] : false;
 if($an and ($isleader || $iscoleader)){
-	$query = "select count(*) from de_ally_war where ally_id_angreifer = $allyid or ally_id_angegriffener = $allyid";
-	$result = mysql_query($query);
-	$alreadyinXallys = mysql_result($result,0,0);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT COUNT(*) as count FROM de_ally_war 
+		 WHERE ally_id_angreifer=? OR ally_id_angegriffener=?",
+		[$allyid, $allyid]);
+	$row = mysqli_fetch_assoc($result);
+	$alreadyinXallys = $row['count'];
 	if ($alreadyinXallys >= 2)
 		die ("$allywar_lang[msg_9_1] $alreadyinXallys $allywar_lang[msg_9_2] $alreadyinXallys $allywar_lang[msg_9_3]!");
 
-	$query = "SELECT id FROM de_allys WHERE allytag='$an'";
-	$result = mysql_query($query);
-	$angegriffener = mysql_result($result,0,"id");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys WHERE allytag=?",
+		[$an]);
+	$row = mysqli_fetch_assoc($result);
+	$angegriffener = $row["id"];
 
-	/*
-	// Der Angegriffene hat schon zu viele Kriege ?!
-	$query = "select count(*) from de_ally_war where ally_id_angreifer = $angegriffener or ally_id_angegriffener = $angegriffener";
-	$result = mysql_query($query);
-	$alreadyinXallys = mysql_result($result,0,0);
-	if ($alreadyinXallys >= 2)
-		die ("$an ist schon genug in Kämpfe verwickelt...");
-	*/
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT COUNT(user_id) as count, SUM(score) as sum FROM de_user_data WHERE allytag=?",
+		[$an]);
+	$row = mysqli_fetch_assoc($result);
+	$feindmitglieder = $row['count'];
+	$feindpunkte = $row['sum'];
 
-	$query = "select count(user_id), sum(score) from de_user_data where allytag='$an'";
-	$result = mysql_query($query);
-	$feindmitglieder = mysql_result($result,0,0);
-	$feindpunkte = mysql_result($result,0,1);
-
-	$query = "select count(user_id), sum(score) from de_user_data where allytag='$allytag'";
-	$result = mysql_query($query);
-	$selbstmitglieder = mysql_result($result,0,0);
-	$selbstpunkte = mysql_result($result,0,1);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT COUNT(user_id) as count, SUM(score) as sum FROM de_user_data WHERE allytag=?",
+		[$allytag]);
+	$row = mysqli_fetch_assoc($result);
+	$selbstmitglieder = $row['count'];
+	$selbstpunkte = $row['sum'];
 
 	if (($selbstmitglieder/2)>$feindmitglieder)
 		die("$allywar_lang[msg_10]");
@@ -163,14 +169,23 @@ if($an and ($isleader || $iscoleader)){
 	if (($feindpunkte/3)>$selbstpunkte)
 		die("$an $allywar_lang[msg_13]");
 
-	$query = "delete from de_ally_buendniss_antrag where (ally_id_antragsteller=$allyid and ally_id_partner=$angegriffener) or (ally_id_antragsteller=$angegriffener and ally_id_partner=$allyid)";
-	$result = @mysql_query($query);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"DELETE FROM de_ally_buendniss_antrag 
+		 WHERE (ally_id_antragsteller=? AND ally_id_partner=?) 
+		 OR (ally_id_antragsteller=? AND ally_id_partner=?)",
+		[$allyid, $angegriffener, $angegriffener, $allyid]);
 
-	$query = "delete from de_ally_partner where (ally_id_1=$allyid and ally_id_2=$angegriffener) or (ally_id_1=$angegriffener and ally_id_2=$allyid)";
-	$result = @mysql_query($query);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"DELETE FROM de_ally_partner 
+		 WHERE (ally_id_1=? AND ally_id_2=?) 
+		 OR (ally_id_1=? AND ally_id_2=?)",
+		[$allyid, $angegriffener, $angegriffener, $allyid]);
 
-	$sqlquery = "INSERT into de_ally_war (ally_id_angreifer , ally_id_angegriffener , kriegsstart, friedensangebot  ) VALUES ($allyid, $angegriffener, NOW(), 0)";
-	$result = @mysql_query($sqlquery);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"INSERT INTO de_ally_war 
+		 (ally_id_angreifer, ally_id_angegriffener, kriegsstart, friedensangebot) 
+		 VALUES (?, ?, NOW(), 0)",
+		[$allyid, $angegriffener]);
 
 	echo $allywar_lang['msg_14'].' !';
 	include('ally/allyfunctions.inc.php');
@@ -178,9 +193,11 @@ if($an and ($isleader || $iscoleader)){
 	writeHistory($an, "$allywar_lang[msg_16_1] <i>$allytag</i> $allywar_lang[msg_16_2]",true);
 
 }else {
-  	$query = "SELECT ally_id_angegriffener, ally_id_angreifer FROM de_ally_war where ((ally_id_angegriffener=$allyid) or (ally_id_angreifer=$allyid))";
-	$result = mysql_query($query);
-	if (mysql_num_rows($result))	{
+  	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT ally_id_angegriffener, ally_id_angreifer FROM de_ally_war 
+		 WHERE (ally_id_angegriffener=? OR ally_id_angreifer=?)",
+		[$allyid, $allyid]);
+	if (mysqli_num_rows($result))	{
 		echo '
 			<table border="0" width="600" cellspacing="0" cellpadding="0">
 				<tr align="center">
@@ -207,15 +224,18 @@ if($an and ($isleader || $iscoleader)){
 							</tr>
 		';
 
-		while ($row = @mysql_fetch_array($result))
+		while ($row = mysqli_fetch_assoc($result))
 		{
 			if ($row['ally_id_angegriffener'] == $allyid)
 				$showallyid = $row['ally_id_angreifer'];
 			else
 				$showallyid = $row['ally_id_angegriffener'];
-			$query = "SELECT allytag FROM de_allys where id=$showallyid";
-			$result2 = mysql_query($query);
-			$angegriffener = @mysql_result($result2,0,"allytag");
+				
+			$result2 = mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT allytag FROM de_allys WHERE id=?",
+				[$showallyid]);
+			$row2 = mysqli_fetch_assoc($result2);
+			$angegriffener = $row2["allytag"];
 
 			echo '
 							<tr class="cl">
@@ -261,9 +281,9 @@ if($an and ($isleader || $iscoleader)){
 					<select name="an">
 		';
 
-				$query = "SELECT allytag, id FROM de_allys order by allytag";
-				$result = mysql_query($query);
-				while ($row = mysql_fetch_array($result))
+				$result = mysqli_execute_query($GLOBALS['dbi'],
+					"SELECT allytag, id FROM de_allys ORDER BY allytag");
+				while ($row = mysqli_fetch_assoc($result))
 				{
 					if (!in_array($row['allytag'],$bestehende_kriege) and $allytag != $row['allytag'])
 					{

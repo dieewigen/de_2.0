@@ -37,7 +37,8 @@ switch($_SESSION['helperid']){
     $helper_picid=1;
     
     if($helper_progress==0){
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -46,7 +47,8 @@ switch($_SESSION['helperid']){
     $helper_picid=2;
     
     if($helper_progress==1){
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -59,7 +61,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==2)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -70,7 +73,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==3)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -84,7 +88,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==4)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -93,7 +98,8 @@ switch($_SESSION['helperid']){
     $helper_picid=6;
     
     if($helper_progress==5){
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -103,7 +109,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==6)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -120,7 +127,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,1))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -134,7 +142,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==8)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -151,7 +160,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,7))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -167,7 +177,8 @@ switch($_SESSION['helperid']){
     if($helper_progress==10){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,14) AND $helper_col>0){
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -185,7 +196,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,8))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -212,7 +224,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,65) AND hasTech($pt,14))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -231,7 +244,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,3) AND hasTech($pt,2))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -250,7 +264,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,14))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -269,7 +284,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,13))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -281,7 +297,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==16)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -299,7 +316,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,18) AND hasTech($pt,19))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -318,7 +336,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,10) AND hasTech($pt,11) AND hasTech($pt,12))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -342,7 +361,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,9) AND hasTech($pt,66) AND hasTech($pt,62))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -358,7 +378,8 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==20)
     {
-      mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+      $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
       $helper_progress++;
     }
   break;
@@ -378,7 +399,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,6))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
@@ -399,14 +421,15 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,28))
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }
   break;
   
   case 23:
-    $helper_msg='Das waren alle Hinweise die ich f&uuml;r Dich habe, Du kannst das Spiel jetzt auf eigene Faust weiter erforschen.<br><br>Wenn Du meine Dienste nicht mehr ben&ouml;tigst, kannst Du mich links im Men&uuml; unter Optionen bei "Berater aktivieren" entlassen.<br><br><br><br>Bitte macht Vorschl&auml;ge um den Berater zu verbessern.<br><br>Diskussionsthread: <a href="http://forum.bgam.es/thread.php?threadid=21980" target="_blank">Forum</a>';
+    $helper_msg='Das waren alle Hinweise die ich f&uuml;r Dich habe, Du kannst das Spiel jetzt auf eigene Faust weiter erforschen.<br><br>Wenn Du meine Dienste nicht mehr ben&ouml;tigst, kannst Du mich in den Optionen bei "Berater aktivieren" entlassen.<br><br><br><br>Bitte macht Vorschl&auml;ge um den Berater zu verbessern.</a>';
    
     $helper_picid=1;
     
@@ -415,7 +438,8 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,6) AND 1==2)
       {
-        mysql_query("UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id='$ums_user_id';",$db);
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
         $helper_progress++;
       }
     }

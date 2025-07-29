@@ -3,24 +3,28 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.finance.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
+            newtrans, newnews, allytag, ally_tronic 
+     FROM de_user_data WHERE user_id=?", 
+    [$ums_user_id]);
+$row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];
 $t_level = $row["ally_tronic"];
 
-$allys=mysql_query("SELECT * FROM de_allys where leaderid='$ums_user_id'");
-$allys2=mysql_query("SELECT * FROM de_allys where coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'");
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT COUNT(*) as count FROM de_allys WHERE leaderid=?",
+    [$ums_user_id]);
+$count = mysqli_fetch_assoc($result);
+$isleader = ($count['count'] >= 1);
 
-if(mysql_num_rows($allys)>=1)
-{
-	$isleader = true;
-}
-if(mysql_num_rows($allys2)>=1)
-{
-	$iscoleader = true;
-}
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT COUNT(*) as count FROM de_allys WHERE coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
+    [$ums_user_id, $ums_user_id, $ums_user_id]);
+$count = mysqli_fetch_assoc($result);
+$iscoleader = ($count['count'] >= 1);
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -29,8 +33,6 @@ if(mysql_num_rows($allys2)>=1)
 <?php include('cssinclude.php'); ?>
 </head>
 <body>
-
-
 
 <?php
 include('lib/basefunctions.lib.php');
@@ -41,11 +43,19 @@ $transfer=intval($_POST['transfer'] ?? 0);
 $t_transfer=intval($_POST['t_transfer'] ?? 0);
 
 if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
-	mysql_query("UPDATE de_user_data SET ally_tronic=ally_tronic+$t_transfer, restyp05=restyp05-$t_transfer WHERE user_id='$ums_user_id'");
-	mysql_query("UPDATE de_allys SET t_depot=t_depot+$t_transfer WHERE allytag='$allytag'");
+	mysqli_execute_query($GLOBALS['dbi'], 
+	    "UPDATE de_user_data SET ally_tronic=ally_tronic+?, restyp05=restyp05-? WHERE user_id=?",
+	    [$t_transfer, $t_transfer, $ums_user_id]);
+	mysqli_execute_query($GLOBALS['dbi'], 
+	    "UPDATE de_allys SET t_depot=t_depot+? WHERE allytag=?",
+	    [$t_transfer, $allytag]);
 	$message = "$allyfinance_lang[msg_1_1] $t_transfer $allyfinance_lang[msg_1_2]";
-	$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-	$row = mysql_fetch_array($db_daten);
+	$result = mysqli_execute_query($GLOBALS['dbi'], 
+	    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
+	            newtrans, newnews, allytag, ally_tronic 
+	     FROM de_user_data WHERE user_id=?",
+	    [$ums_user_id]);
+	$row = mysqli_fetch_array($result);
 	$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 	$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 	$allytag=$row["allytag"];
@@ -54,56 +64,35 @@ if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 	$message = $allyfinance_lang['msg_2_1'].' ('.$t_transfer.' '.$allyfinance_lang['msg_2_2'].')';
 }
 
-/*
-if ($tax=="1" && $t_tax > 0 && $t_tax <= 200)
-{
-	if ($isleader || $iscoleader)
-	{
-		mysql_query("UPDATE de_user_data SET ally_tronic=ally_tronic-$t_tax WHERE allytag='$allytag' AND status='1'");
-		$message = "$allyfinance_lang[msg_3_1] $t_tax $allyfinance_lang[msg_3_2]";
-		include("ally/allyfunctions.inc.php");
-		writeHistory($allytag, "$allyfinance_lang[msg_4_1] $t_tax $allyfinance_lang[msg_4_2]");
-
-		$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, system, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-		$row = mysql_fetch_array($db_daten);
-		$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-		$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-		$allytag=$row["allytag"];
-		$t_level = $row["ally_tronic"];
-	}
-	else
-	{
-		$message = $allyfinance_lang[msg_5];
-	}
-}
-elseif ($tax == "1")
-{
-	$message = "$allyfinance_lang[msg_6_1] ($t_transfer $allyfinance_lang[msg_6_2]";
-}*/
-
 if(isset($_POST['changetzz']))
 {
 	$tronic_zahlungsziel=intval($_POST['tzz']);
-	mysql_query("UPDATE de_allys SET tronic_zahlungsziel='$tronic_zahlungsziel' WHERE allytag='$allytag'");
+	mysqli_execute_query($GLOBALS['dbi'], 
+	    "UPDATE de_allys SET tronic_zahlungsziel=? WHERE allytag=?",
+	    [$tronic_zahlungsziel, $allytag]);
 }
 
 if (isset($memberid) && $memberid > 0)
 {
 	if ($isleader || $iscoleader)
 	{
-		$m_result = mysql_query("SELECT spielername FROM de_user_data WHERE user_id='$memberid' AND allytag='$allytag'");
-		if ($m_result)
+		$result = mysqli_execute_query($GLOBALS['dbi'], 
+		    "SELECT spielername FROM de_user_data WHERE user_id=? AND allytag=?",
+		    [$memberid, $allytag]);
+		if ($result)
 		{
-			$m_numrows = mysql_num_rows($m_result);
+			$m_numrows = mysqli_num_rows($result);
 			if ($m_numrows == 1)
 			{
-				$m_data = mysql_fetch_array($m_result);
+				$m_data = mysqli_fetch_array($result);
 				$gemahnt_name = $m_data["spielername"];
 				notifyUser($memberid, $allyfinance_lang['msg_7'], 6);
 				$message = "$allyfinance_lang[msg_8_1] $gemahnt_name $allyfinance_lang[msg_8_2]";
 				notifyUser($ums_user_id, "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
-				$db_daten=mysql_query("SELECT newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-				$row = mysql_fetch_array($db_daten);$newtrans=$row["newtrans"];$newnews=$row["newnews"];
+				$result = mysqli_execute_query($GLOBALS['dbi'], 
+				    "SELECT newtrans, newnews FROM de_user_data WHERE user_id=?",
+				    [$ums_user_id]);
+				$row = mysqli_fetch_array($result);$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 			}
 			else
 			{
@@ -135,25 +124,26 @@ if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.in
 
 if($isleader || $iscoleader)
 {
-        $query = "SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
-        $result = mysql_query($query);
+        $result = mysqli_execute_query($GLOBALS['dbi'], 
+            "SELECT * FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
+            [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
 }
 else
 {
-        $query = "SELECT * FROM de_allys ally, de_user_data user where user.allytag=ally.allytag and user.user_id='$ums_user_id'";
-        $result = mysql_query($query);
+        $result = mysqli_execute_query($GLOBALS['dbi'], 
+            "SELECT ally.* FROM de_allys ally, de_user_data user WHERE user.allytag=ally.allytag AND user.user_id=?",
+            [$ums_user_id]);
 }
-$clanid = mysql_result($result,0,"id");
-$clanname = mysql_result($result,0,"allyname");
-$clankuerzel = mysql_result($result,0,"allytag");
-$homepageurl = mysql_result($result,0,"homepage");
-$leaderid = mysql_result($result,0,"leaderid");
-$coleaderid1 = mysql_result($result,0,"coleaderid1");
-$coleaderid2 = mysql_result($result,0,"coleaderid2");
-
-$t_depot = mysql_result($result,0,"t_depot");
-
-$tronic_zahlungsziel = mysql_result($result,0,"tronic_zahlungsziel");
+$row = mysqli_fetch_assoc($result);
+$clanid = $row["id"];
+$clanname = $row["allyname"];
+$clankuerzel = $row["allytag"];
+$homepageurl = $row["homepage"];
+$leaderid = $row["leaderid"];
+$coleaderid1 = $row["coleaderid1"];
+$coleaderid2 = $row["coleaderid2"];
+$t_depot = $row["t_depot"];
+$tronic_zahlungsziel = $row["tronic_zahlungsziel"];
 
 print('<div align="center" class="cell" style="width: 600px;"><table width="100%" class="cell">');
 print('<tr><td><h2>'.$allyfinance_lang['welcome'].', '.$ums_spielername.'</h2></td></tr>');
@@ -176,30 +166,9 @@ print('</form></td></tr>');
 if ($isleader || $iscoleader)
 {
 	print('<tr><td><hr></td></tr>');
-	//print("<tr><td><strong>$allyfinance_lang[msg_14]</strong></td></tr>");
 	print('<tr><td><strong>Tronic Zahlungsziel</strong></td></tr>');
 	print('<tr><td><form action="ally_finance.php" method="post" name="tax">');
-	/*
-	print("$allyfinance_lang[steuersumme]
-		<select name=t_tax>
-			<option value=5>5</option>
-			<option value=10>10</option>
-			<option value=15>15</option>
-			<option value=20>20</option>
-			<option value=25>25</option>
-			<option value=30>30</option>
-			<option value=35>35</option>
-			<option value=40>40</option>
-			<option value=45>45</option>
-			<option value=50>50</option>
-			<option value=75>75</option>
-			<option value=100>100</option>
-			<option value=150>150</option>
-			<option value=200>200</option>
-		</select>
-	<input type=submit name=submit value=\"$allyfinance_lang[bescheidabsenden] \">");
-	print("<input type=hidden name=tax value=1>");
-	*/
+
 	echo 'Zahlungsziel: <input type="text" name="tzz" value="'.$tronic_zahlungsziel.'" size="8" maxlength="8">&nbsp;';
 	echo '<input type=submit name="changetzz" value="Zahlungsziel &auml;ndern">';
 	
@@ -218,13 +187,17 @@ if ($isleader || $iscoleader)
 				</tr>
 
 	');
-	$member_result = mysql_query("SELECT user_id, spielername, col, sector, `system`, ally_tronic FROM de_user_data WHERE allytag='$allytag' AND status='1' ORDER BY ally_tronic, sector, `system` ASC");
+	$member_result = mysqli_execute_query($GLOBALS['dbi'], 
+	    "SELECT user_id, spielername, col, sector, `system`, ally_tronic 
+	     FROM de_user_data WHERE allytag=? AND status='1' 
+	     ORDER BY ally_tronic, sector, `system` ASC",
+	    [$allytag]);
 	if ($member_result)
 	{
-		$member_numrows = mysql_num_rows($member_result);
+		$member_numrows = mysqli_num_rows($member_result);
 		for ($m = 0;$m<$member_numrows; $m++)
 		{
-			$member_data = mysql_fetch_array($member_result);
+			$member_data = mysqli_fetch_array($member_result);
 			$member_id = $member_data["user_id"];
 			$member_spielername = $member_data["spielername"];
 			$member_kollektoren = $member_data["col"];

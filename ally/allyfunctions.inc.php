@@ -4,11 +4,13 @@
 		$entry = html_entity_decode($entry);
 		$timestamp = time();
 		$datum = date("d.m.Y - H:i", $timestamp);
-		$result = mysql_query("SELECT id from de_allys WHERE allytag='$allytag'");
-		$data = mysql_fetch_array($result);
+		$sql = "SELECT id from de_allys WHERE allytag=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allytag]);
+		$data = mysqli_fetch_assoc($result);
 		$ally_id = $data["id"];
 
-		mysql_query("INSERT INTO de_ally_history SET allytag='$allytag', allyid='$ally_id', entry='$entry', timestamp='$timestamp', displaydate='$datum'");
+		$sql = "INSERT INTO de_ally_history SET allytag=?, allyid=?, entry=?, timestamp=?, displaydate=?";
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$allytag, $ally_id, $entry, $timestamp, $datum]);
 
 		if($insert_chat){
 			include_once 'functions.php';
@@ -18,17 +20,18 @@
 	
 	function getAllyId($allytag)
 	{
-		$result = mysql_query("SELECT id from de_allys WHERE allytag='$allytag'");
-		$data = mysql_fetch_array($result);
+		$sql = "SELECT id from de_allys WHERE allytag=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allytag]);
+		$data = mysqli_fetch_assoc($result);
 		$ally_id = $data["id"];
 		return $ally_id;
 	}
 	
 	function getAllyTag($allyid)
 	{
-		$result = mysql_query("SELECT allytag from de_allys WHERE id='$allyid'");
-		$data = mysql_fetch_array($result);
+		$sql = "SELECT allytag from de_allys WHERE id=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
+		$data = mysqli_fetch_assoc($result);
 		$ally_tag = $data["allytag"];
 		return $ally_tag;
 	}
-?>

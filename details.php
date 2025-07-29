@@ -4,9 +4,11 @@ include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_details.lang.php';
 include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id=?",
+  [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];
 $allytag=$row["allytag"];$sector=$row["sector"];$system=$row["system"];
 
@@ -22,37 +24,45 @@ $sy=intval($_REQUEST['sy']);
 if(isset($_REQUEST['sn'])){
 	
 	$sn=$_REQUEST['sn'];
-	$db_daten=mysql_query("SELECT user_id, sector, `system` FROM de_user_data WHERE spielername='$sn'",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+	  "SELECT user_id, sector, `system` FROM de_user_data WHERE spielername=?",
+	  [$sn]);
+	$num = mysqli_num_rows($db_daten);
 	if($num==1){
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_assoc($db_daten);
 		$se=$row['sector'];
 		$sy=$row['system'];
 		$zuser_id=$row['user_id'];
 	}
 	if($zuser_id>0){
-		$db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$zuser_id'",$db);
-		$num = mysql_num_rows($db_daten);
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		  "SELECT owner_id FROM de_login WHERE user_id=?",
+		  [$zuser_id]);
+		$num = mysqli_num_rows($db_daten);
 		if($num==1){
-			$row = mysql_fetch_array($db_daten);		
+			$row = mysqli_fetch_assoc($db_daten);		
 			$zowner_id=$row['owner_id'];
 		}
 	}
 }
 
 //Analysieren der Koordinaten, um userid vom ZIEL herauszubekommen
-$db_da=mysql_query("SELECT user_id,allytag,sector,spielername,status  FROM de_user_data WHERE sector='$se' and  `system`='$sy'",$db);
-$rew = mysql_fetch_array($db_da);
+$db_da = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT user_id,allytag,sector,spielername,status FROM de_user_data WHERE sector=? AND `system`=?",
+  [$se, $sy]);
+$rew = mysqli_fetch_assoc($db_da);
 if($rew['user_id']>0){
 	$zuser_id=$rew['user_id'];
 }
 
 //ggf. noch die owner_id auslesen
 if($zuser_id>0 && $zowner_id<1){
-	$db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$zuser_id'",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+	  "SELECT owner_id FROM de_login WHERE user_id=?",
+	  [$zuser_id]);
+	$num = mysqli_num_rows($db_daten);
 	if($num==1){
-		$row = mysql_fetch_array($db_daten);		
+		$row = mysqli_fetch_assoc($db_daten);		
 		$zowner_id=$row['owner_id'];
 	}
 }
@@ -313,80 +323,6 @@ document.getElementById("nachricht").focus();
 <?php
 include "resline.php";
 
-//test auf kollektorenr�ssel
-/*
-if($_REQUEST['ruessel']==1)
-{
-	//transaktionsbeginn
-	if (setLock($ums_user_id))
-	{
-		//nochmal �berpr�fen ob man ein r�ssel artefakt hat
-		$db_daten=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' AND id=21",$db);
-		$num = mysql_num_rows($db_daten);
-		if($num>0)
-		{
-			//�berpr�fen ob das ziel einen kollektor hat
-			$db_daten=mysql_query("SELECT * FROM de_user_data WHERE sector='$se' AND `system`='$sy'",$db);
-			$num = mysql_num_rows($db_daten);
-			if($num>0)
-			{
-				$row1 = mysql_fetch_array($db_daten);
-				
-				if($row1['col']>0)
-				{
-					$zuid=$row1['user_id'];
-					$time=strftime("%Y%m%d%H%M%S");
-					
-					//man darf sich nicht selbst r�sseln
-					if($ums_user_id!=$zuid)
-					{
-						//dem ziel den kollektor entfernen
-						mysql_query("UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE sector='$se' AND `system`='$sy'",$db);
-	
-						//info an das ziel bzgl. r�sselung
-						mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$zuid', '60','$time','Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')",$db);
-						
-						//dem spieler das kriegsartefakt gutschreiben
-						mysql_query("UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id='$ums_user_id'",$db);
-						
-						//info an den spieler bzgl. kriegsartefakt
-						echo '<div class="info_box text1">Das Ziel hat einen Kollektor verloren und Du hast ein Kriegsartefakt gewonnen.</div>';
-						
-						//artefakt l�schen
-						mysql_query("DELETE FROM de_user_artefact WHERE user_id='$ums_user_id' AND id=21 LIMIT 1",$db);
-					}
-					else echo '<div class="info_box text2">Eine Selbstr&uuml;sselung ist nicht m&ouml;glich.</div>';
-				}
-				else echo '<div class="info_box text2">Das Ziel hat keinen Kollektor.</div>';
-			}
-			else echo '<div class="info_box text2">Das Ziel existiert nicht.</div>';
-		}
-		else echo '<div class="info_box text2">Fehlendes Artefakt.</div>';
-		
-		//transaktionsende
-		$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-		if ($erg)
-		{
-     		//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-		}
-		else
-		{
-       		echo 'Fehler bei der Transaktion.';
-		}
-	}// if setlock-ende
-	else echo 'Fehler bei der Transaktion.';	
-}
-
-//aus der db auslesen ob man ein passendes artefakt hat, id 21
-$db_daten=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' AND id=21",$db);
-$num = mysql_num_rows($db_daten);
-if($num>0)
-{
-	echo '<br>';
-
-	echo '<div class="info_box"><a href="details.php?ruessel=1&se='.$se.'&sy='.$sy.'" style="color: #00FF00;">Dem Ziel einen Kollektor wegr&uuml;sseln.</a></div>';
-}
-*/
 //HF nur anzeigen, wenn es Spieler vom eigenen Server ist
 if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 ?>
@@ -488,8 +424,9 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 //m�chte man einen Eintrag l�schen
 $del_ignore=intval($_REQUEST['del_ignore']);
 if($del_ignore>0){
-	$sql="DELETE FROM de_chat_ignore WHERE id='$del_ignore' AND owner_id='".$_SESSION['ums_owner_id']."';";
-	$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+	mysqli_execute_query($GLOBALS['dbi_ls'],
+	  "DELETE FROM de_chat_ignore WHERE id=? AND owner_id=?",
+	  [$del_ignore, $_SESSION['ums_owner_id']]);
 }
 
 if($_REQUEST['sn']){
@@ -508,11 +445,12 @@ if($_REQUEST['sn']){
 	rahmen_oben('Verwaltung von Spielern die im Chat ignoriert werden');
 	if(isset($_REQUEST['ctyp']) && isset($_REQUEST['cid'])){//anderer server
 		//aus dem Chat die dazugeh�rige owner_id holen
-		$sql="SELECT * FROM de_chat_msg WHERE id='".intval($_REQUEST['cid'])."' AND channeltyp='".intval($_REQUEST['ctyp'])."';";
-		$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
+		  "SELECT * FROM de_chat_msg WHERE id=? AND channeltyp=?",
+		  [intval($_REQUEST['cid']), intval($_REQUEST['ctyp'])]);
 		$num = mysqli_num_rows($db_daten);
 		if($num==1){	
-			$row = mysqli_fetch_array($db_daten);
+			$row = mysqli_fetch_assoc($db_daten);
 			$zowner_id=$row['owner_id'];
 			echo '<div class="cell" style="width: 560px; text-align: center;">';
 
@@ -530,12 +468,14 @@ if($_REQUEST['sn']){
 				}		
 
 				//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-				$db_daten=mysqli_query($GLOBALS['dbi_ls'], "SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';");
+				$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
+				  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
+				  [$_SESSION['ums_owner_id'], $zowner_id, time()]);
 				$num = mysqli_num_rows($db_daten);
 
 
 				if($num==1){  // er steht schon drin
-					$row = mysqli_fetch_array($db_daten);
+					$row = mysqli_fetch_assoc($db_daten);
 					echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
 				}elseif($zowner_id>0){ //er steht noch nicht drin
 					echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
@@ -587,20 +527,21 @@ if($_REQUEST['sn']){
 			//m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
 			if(isset($_REQUEST['ignore_add']) && $zowner_id>0){
 				$ignore_until=time()+(3600*24*intval($_REQUEST['ignore_time']));
-				$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
-					spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
-
-				mysqli_query($GLOBALS['dbi_ls'], $sql);
-
+				$spielername = isset($_REQUEST['ignore_name']) ? $_REQUEST['ignore_name'] : $_REQUEST['sn'];
+				mysqli_execute_query($GLOBALS['dbi_ls'],
+				  "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
+				  [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]);
 			}		
 
 			//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-			$db_daten=mysqli_query($GLOBALS['dbi_ls'], "SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND owner_id_ignore='$zowner_id' AND ignore_until>'".time()."';");
+			$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
+			  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
+			  [$_SESSION['ums_owner_id'], $zowner_id, time()]);
 			$num = mysqli_num_rows($db_daten);
 
 
 			if($num==1){  // er steht schon drin
-				$row = mysqli_fetch_array($db_daten);
+				$row = mysqli_fetch_assoc($db_daten);
 				echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
 			}elseif($zowner_id>0){ //er steht noch nicht drin
 				echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
@@ -647,15 +588,16 @@ if($_REQUEST['sn']){
 // Eine Liste der im Chat ignorierten Spielern ausgeben 
 // darüber soll ebenfalls eine LÖschung möglich sein
 ////////////////////////////////////////////////////////
-$sql="SELECT * FROM de_chat_ignore WHERE owner_id='".$_SESSION['ums_owner_id']."' AND ignore_until>'".time()."';";
-$db_daten=mysqli_query($GLOBALS['dbi_ls'], $sql);
+$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
+  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND ignore_until>?",
+  [$_SESSION['ums_owner_id'], time()]);
 $num = mysqli_num_rows($db_daten);
 if($num>=1){
 	rahmen_oben('Folgende Spieler sind auf Deiner Chat-Ignore-Liste');
 	echo '<table class="cell" style="width: 560px;">';
 	echo '<tr style="font-weight: bold;"><td>Spielername</td><td>Blockiert bis</td><td>Aktion</td></tr>';
 	//aus dem Chat die dazugeh�rige owner_id holen
-	while($row = mysqli_fetch_array($db_daten)){
+	while($row = mysqli_fetch_assoc($db_daten)){
 		echo '
 		<tr>
 			<td>'.$row['spielername'].'</td>
@@ -679,8 +621,10 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spieler
 <table border="0"  cellspacing="0" cellpadding="0" width="400px">
 <?php
 //Anhand der Userid werden hier die Userdetails aus der DB ausgelesen.
-$db_daten=mysql_query("SELECT * FROM de_user_info WHERE user_id='$zuser_id' ",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT * FROM de_user_info WHERE user_id=?",
+  [$zuser_id]);
+$row = mysqli_fetch_assoc($db_daten);
 
 $ud_all=$row['ud_all'];
 if($rew['sector']==$sector && $sector>1){

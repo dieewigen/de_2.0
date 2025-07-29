@@ -1,17 +1,23 @@
 <?php
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.search.lang.php');
-include_once('functions.php');
+include('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $allytag=$row['allytag'];
 $t_level = $row['ally_tronic'];
 
-$allys=mysql_query("SELECT * FROM de_allys where leaderid='$ums_user_id'");
-if(mysql_num_rows($allys)>=1)
+$allys = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT * FROM de_allys WHERE leaderid=?", 
+    [$ums_user_id]);
+if(mysqli_num_rows($allys)>=1)
 {
 	$isleader = true;
 }
@@ -65,39 +71,42 @@ if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 		$fieldnamearray = array("allyname", "allytag", "regierungsform", "besonderheiten", "keywords");
 		$numfields = count($fieldnamearray);
 		$query = "SELECT * FROM de_allys WHERE ";
-		//�ussere Schleife durchl�uft die Suchbegriffe
+		//Äussere Schleife durchläuft die Suchbegriffe
 		for ($i=0;$i<$count_searchwords;$i++)
 		{
 			//Bedingungsblock anlegen
 			$query.="(";
-			//Suchwort f�r Bedingungsblock ermitteln
+			//Suchwort für Bedingungsblock ermitteln
 			$searchword = $searcharray[$i];
-			//Innere Schleife durchl�uft die Tabellenspaltennamen
+			//Innere Schleife durchläuft die Tabellenspaltennamen
 			for ($j=0;$j<$numfields;$j++)
 			{
 				//Bedingung in Query schreiben
-				$query.="`".$fieldnamearray[$j]."` LIKE '%$searchword%'";
-			 	//Pr�fen, ob die Schleife noch nicht am Ende angelangt ist
+				$query.="`".$fieldnamearray[$j]."` LIKE '%".mysqli_real_escape_string($GLOBALS['dbi'], $searchword)."%'";
+			 	//Prüfen, ob die Schleife noch nicht am Ende angelangt ist
 				if ($j+1<$numfields)
 				{
-					//Wenn die Schleife noch nicht am Ende ist, ein OR anf�gen
+					//Wenn die Schleife noch nicht am Ende ist, ein OR anfügen
 					$query.=" OR ";
 				}
 			}
-			//Bedingungsblock f�r das aktuelle Suchwort schliessen
+			//Bedingungsblock für das aktuelle Suchwort schliessen
 			$query.=")";
-			//Pr�fen, ob noch Suchworte folgen
+			//Prüfen, ob noch Suchworte folgen
 			if ($i+1<$count_searchwords)
 			{
-				//Wenn es noch folgende Suchworte gibt, Verkn�pfungsoperator f�r die Suchworte (AND oder OR) anf�gen
+				//Wenn es noch folgende Suchworte gibt, Verknüpfungsoperator für die Suchworte (AND oder OR) anfügen
 				$query.=" AND ";
 			}
 		}
 	}
 	$query.=" ORDER BY allyname";
-	$result = mysql_query($query);
+	
+	// Bei komplexen dynamischen Abfragen wie dieser verwenden wir einen direkten Aufruf
+	// anstelle von Prepared Statements, da die Query dynamisch erstellt wird
+	$result = mysqli_query($GLOBALS['dbi'], $query);
 	if ($result){
-		$datalines = mysql_num_rows($result);
+		$datalines = mysqli_num_rows($result);
 		if ($datalines > 0){
 			print('<tr><td><h3>'.$allysearch_lang['suchergebnisse'].'</h3></td></tr>');
 			print('<tr><td><hr></td></tr>');
@@ -105,7 +114,7 @@ if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 			print('<tr><td align="center" bgcolor="#1c1c1c"><strong>'.$allysearch_lang['allianztag'].'</strong></td><td align="center" bgcolor="#1c1c1c"><strong>'.$allysearch_lang['allianzname'].'</strong><td align="center" bgcolor="#1c1c1c"><strong>'.$allysearch_lang['regierungsform'].'</strong></td><td align="center" bgcolor="#1c1c1c"><strong>'.$allysearch_lang['limit'].'</strong></td></td><td align="center" bgcolor="#1c1c1c">&nbsp;</td></tr>');
 			for ($i=0;$i<$datalines;$i++)
 			{
-				$dataline = mysql_fetch_array($result);
+				$dataline = mysqli_fetch_assoc($result);
 				$a_id = $dataline['id'];
 				$a_tag = $dataline['allytag'];
 				$a_name = html_entity_decode($dataline['allyname']);
@@ -116,7 +125,8 @@ if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 					$a_name = substr($a_name, 0, 27)."...";
 				}
 
-				$detaillink = '<a href="ally_detail.php?allyid='.$a_id.'">'.$allysearch_lang['detailsbewerben'].'</a>';
+				$a_id_safe = htmlspecialchars($a_id, ENT_QUOTES, 'UTF-8');
+				$detaillink = '<a href="ally_detail.php?allyid='.$a_id_safe.'">'.$allysearch_lang['detailsbewerben'].'</a>';
 				print("<tr><td align=center bgcolor=#222222>".utf8_encode_fix($a_tag)."</td>
 					<td align=center bgcolor=#222222>".utf8_encode_fix($a_name)."</td>
 					<td align=center bgcolor=#222222>".utf8_encode_fix($a_form)."</td>

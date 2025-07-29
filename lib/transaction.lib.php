@@ -2,16 +2,16 @@
 
 	function isLocked($id)
 	{
-		global $db;
 		$returnvalue = false;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("SELECT * FROM de_user_locks WHERE id='$id'", $db);
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "SELECT * FROM de_user_locks WHERE id=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 		if ($result)
 		{
-			$lockarray_num=mysql_num_rows($result);
+			$lockarray_num=mysqli_num_rows($result);
 			if ($lockarray_num == 1)
 			{
-				$locks=mysql_fetch_array($result);
+				$locks=mysqli_fetch_assoc($result);
 				$val=$locks["locked"];
 				if ($val == "1")
 				{
@@ -20,30 +20,31 @@
 			}
 			elseif ($lockarray_num > 1)
 			{
-				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:ascendant@bense.com>ascendant@bense.com</a> damit Ihr Problem behoben wird.");
+				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an den Support damit Ihr Problem behoben wird.");
 				$returnvalue = true;
 			}
 		}
-		mysql_query("UNLOCK TABLES", $db);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
 		return $returnvalue;
 	}
 
 	function setLock($id)
 	{	
-		global $db;
 		$returnvalue = false;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("SELECT * FROM de_user_locks WHERE id='$id'", $db);
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "SELECT * FROM de_user_locks WHERE id=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 		if ($result)
 		{
-			$lockarray_num=mysql_num_rows($result);
+			$lockarray_num=mysqli_num_rows($result);
 			if ($lockarray_num == 1)
 			{
-				$locks=mysql_fetch_array($result);
+				$locks=mysqli_fetch_assoc($result);
 				$val=$locks["locked"];
 				if ($val != "1")
 				{
-					$setresult = mysql_query("UPDATE de_user_locks SET locked='1' WHERE id='$id'", $db);
+					$sql = "UPDATE de_user_locks SET locked='1' WHERE id=?";
+					$setresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 					if ($setresult)
 					{
 						$returnvalue = true;
@@ -57,117 +58,51 @@
 			}
 			elseif ($lockarray_num == 0)
 			{
-				$setresult = mysql_query("INSERT into de_user_locks (id, locked) VALUES ($id, '1')", $db);
+				$sql = "INSERT into de_user_locks (id, locked) VALUES (?, '1')";
+				$setresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 				if ($setresult)
 				{
 					$returnvalue = true;
 				}
 			}
 		}
-		mysql_query("UNLOCK TABLES", $db);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
 		return $returnvalue;
 	}
 	
 	function releaseLock($id)
 	{
-		global $db;
-		$returnvalue = false;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("SELECT * FROM de_user_locks WHERE id='$id'", $db);
-		if ($result)
-		{
-			$lockarray_num=mysql_num_rows($result);
-			if ($lockarray_num == 1)
-			{
-				$setresult = mysql_query("UPDATE de_user_locks SET locked='0' WHERE id='$id'", $db);
-				if ($setresult)
-				{
-					$returnvalue = true;
-				}
-			}
-			elseif ($lockarray_num > 1)
-			{
-				print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Bitte wenden Sie sich an <a href=mailto:ascendant@bense.com>ascendant@bense.com</a> damit Ihr Problem behoben wird.");
-				$returnvalue = false;
-			}
-			elseif ($lockarray_num == 0)
-			{
-				$setresult = mysql_query("INSERT into de_user_locks (id, locked) VALUES ($id, '0')", $db);
-				if ($setresult)
-				{
-					$returnvalue = true;
-				}
-			}
-		}
-		mysql_query("UNLOCK TABLES", $db);
-		return $returnvalue;
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "UPDATE de_user_locks SET locked='0' WHERE id=?";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
+		return $result;
 	}
 	
 	function unlockAll()
 	{
-		global $db;
-		$returnvalue = true;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("SELECT * FROM de_user_locks", $db);
-		if ($result)
-		{
-			$lockarray_num=mysql_num_rows($result);
-			if ($lockarray_num > 0)
-			{
-				for($i;$i<$lockarray_num;$i++)
-				{	
-					$locks[i]=mysql_fetch_array($result);
-					$lockid=$locks[i]["id"];
-					$setresult = mysql_query("UPDATE de_user_locks SET locked='0' WHERE id='$lockid'", $db);
-					if (!$setresult)
-					{
-						$returnvalue = false;
-					}
-				}
-			}			
-		}
-		mysql_query("UNLOCK TABLES", $db);
-		return $returnvalue;
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "UPDATE de_user_locks SET locked='0'";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
+		return $result;
 	}
 	
 	function lockAll()
 	{
-		global $db;
-		$returnvalue = true;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("SELECT * FROM de_user_locks", $db);
-		if ($result)
-		{
-			$lockarray_num=mysql_num_rows($result);
-			if ($lockarray_num > 0)
-			{
-				for($i;$i<$lockarray_num;$i++)
-				{	
-					$locks[i]=mysql_fetch_array($result);
-					$lockid=$locks[i]["id"];
-					$setresult = mysql_query("UPDATE de_user_locks SET locked='1' WHERE id='$lockid'", $db);
-					if (!$setresult)
-					{
-						$returnvalue = false;
-					}
-				}
-			}			
-		}
-		mysql_query("UNLOCK TABLES", $db);
-		return $returnvalue;
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "UPDATE de_user_locks SET locked='1'";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
+		return $result;
 	}
 	
 	function deleteAll()
 	{
-		global $db;
-		$returnvalue = false;
-		mysql_query("LOCK TABLES de_user_locks WRITE", $db);
-		$result = mysql_query("DELETE FROM de_user_locks", $db);
-		if ($result)
-		{
-			$returnvalue = true;
-		}
-		mysql_query("UNLOCK TABLES", $db);
-		return $returnvalue;
+		mysqli_execute_query($GLOBALS['dbi'], "LOCK TABLES de_user_locks WRITE");
+		$sql = "DELETE FROM de_user_locks";
+		$result = mysqli_execute_query($GLOBALS['dbi'], $sql);
+		mysqli_execute_query($GLOBALS['dbi'], "UNLOCK TABLES");
+		return $result;
 	}
 ?>

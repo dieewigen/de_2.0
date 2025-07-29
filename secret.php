@@ -1340,7 +1340,7 @@ if (!hasTech($pt, 9)) {
                             $fid3 = $uid.'-3';
                             $result = mysqli_query($GLOBALS['dbi'], "SELECT zielsec, zielsys, aktion, aktzeit, zeit, mission_time FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
                             $ed_id = 0;
-                            while ($row = mysql_fetch_array($result)) {
+                            while ($row = mysqli_fetch_array($result)) {
                                 $einheiten_daten[$ed_id] = $row;
                                 $ed_id++;
                             }
@@ -1443,8 +1443,8 @@ if (!hasTech($pt, 9)) {
                                 $str = $str."\$ec$i=0;";
                             }
                             eval($str); //variablen -> ec100, ec101,...
-                            $db_daten = mysql_query("SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=$uid", $db);
-                            $row = mysql_fetch_array($db_daten);
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$uid]);
+                            $row = mysqli_fetch_array($db_daten);
                             $str = '';
                             for ($i = 100;$i <= 109;$i++) {
                                 $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
@@ -1456,7 +1456,7 @@ if (!hasTech($pt, 9)) {
                             for ($i = 0;$i < count($savelist);$i++) {
                                 $save_uid = $savelist[$i];
 
-                                mysql_query("UPDATE de_user_scan SET dtime=UNIX_TIMESTAMP( ),
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET dtime=UNIX_TIMESTAMP(),
 					e100='$row[e100]', e101='$row[e101]', e102='$row[e102]', e103='$row[e103]', e104='$row[e104]'
 					WHERE user_id='$save_uid' AND zuser_id='$uid'", $db);
                             }
@@ -1469,11 +1469,11 @@ if (!hasTech($pt, 9)) {
                             echo '</table>';
 
                             //lade einheitentypen
-                            $db_daten = mysql_query("SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id", $db);
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id", []);
 
                             echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
                             $gespunkte = 0;
-                            while ($row = mysql_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
+                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
                                 $str = '$ec=$ec'.$row["tech_id"].';';
                                 eval($str);
 
@@ -1498,8 +1498,8 @@ if (!hasTech($pt, 9)) {
                             echo '<td class="tc" width="100%"><b>'.$secret_lang['nachrichtenvon'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
                             echo '</tr>';
 
-                            $db_daten = mysql_query("SELECT time, typ, text FROM de_user_news WHERE user_id='$uid' AND typ <> 60 ORDER BY time DESC", $db);
-                            while ($row = mysql_fetch_array($db_daten)) { //jeder gefundene datensatz wird ausgegeben
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT time, typ, text FROM de_user_news WHERE user_id=? AND typ <> 60 ORDER BY time DESC", [$uid]);
+                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird ausgegeben
                                 $t = $row["time"];
                                 $n = $row["typ"];
                                 $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
@@ -1606,8 +1606,8 @@ if (!hasTech($pt, 9)) {
                             echo '<td class="tc" width="100%">'.$secret_lang['allytagvon'].$zname.' ('.$zsec2.':'.$zsys2.')</td>';
                             echo '</tr>';
                             echo '</table>';
-                            $db_daten = mysql_query("SELECT allytag, status FROM de_user_data WHERE user_id='$uid'", $db);
-                            $row = mysql_fetch_array($db_daten);
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, status FROM de_user_data WHERE user_id=?", [$uid]);
+                            $row = mysqli_fetch_array($db_daten);
 
                             $allytag = $row["allytag"];
 
@@ -1620,7 +1620,7 @@ if (!hasTech($pt, 9)) {
                             for ($i = 0;$i < count($savelist);$i++) {
                                 $save_uid = $savelist[$i];
 
-                                mysql_query("UPDATE de_user_scan SET atime=UNIX_TIMESTAMP( ), allytag='$saveallytag' WHERE user_id='$save_uid' AND zuser_id='$uid'", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET atime=UNIX_TIMESTAMP(), allytag=? WHERE user_id=? AND zuser_id=?", [$saveallytag, $save_uid, $uid]);
                             }
 
                             if ($allytag == '' or $row["status"] != 1) {
@@ -1635,11 +1635,11 @@ if (!hasTech($pt, 9)) {
 
                             break;
                         case 6: //systemstatus
-                            $eta1 = mysql_query("SELECT SUM(fleetsize) AS fleetsize FROM de_user_fleet WHERE zielsec = '$zsec2' AND zielsys = '$zsys2' AND aktion = 1 AND entdeckt > 0 AND zeit = 1", $db);
-                            $eta2 = mysql_query("SELECT SUM(fleetsize) AS fleetsize FROM de_user_fleet WHERE zielsec = '$zsec2' AND zielsys = '$zsys2' AND aktion = 1 AND entdeckt > 0 AND zeit = 2", $db);
-                            $eta1 = mysql_fetch_array($eta1);
+                            $eta1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(fleetsize) AS fleetsize FROM de_user_fleet WHERE zielsec = ? AND zielsys = ? AND aktion = 1 AND entdeckt > 0 AND zeit = 1", [$zsec2, $zsys2]);
+                            $eta2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(fleetsize) AS fleetsize FROM de_user_fleet WHERE zielsec = ? AND zielsys = ? AND aktion = 1 AND entdeckt > 0 AND zeit = 2", [$zsec2, $zsys2]);
+                            $eta1 = mysqli_fetch_array($eta1);
                             $eta1 = $eta1["fleetsize"];
-                            $eta2 = mysql_fetch_array($eta2);
+                            $eta2 = mysqli_fetch_array($eta2);
                             $eta2 = $eta2["fleetsize"];
                             echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
                             echo '<tr>';
@@ -1685,13 +1685,13 @@ if (!hasTech($pt, 9)) {
                                 }else{
                                     $msg='Bei einem feindlichen Agenteneinsatz von '.$ums_spielername.' ('.$sector.':'.$system.') wurde '.number_format($enttarnt, 0,",",".").' Agente enttarnt und arbeitet jetzt als Z&ouml;llner.';
                                 }
-                                mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')",$db);
-                                mysql_query("update de_user_data set newnews = 1, agent = agent - '$enttarnt', agent_lost=agent_lost + '$enttarnt' where user_id = '$uid'",$db);
+                                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$enttarnt, $enttarnt, $uid]);
                             }
 
                             //eigene agenten abziehen
                             if($eigene_verluste>0){
-                                mysql_query("UPDATE de_user_data SET agent = agent - '$eigene_verluste', agent_lost=agent_lost + '$eigene_verluste' WHERE user_id = $ums_user_id",$db);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$eigene_verluste, $eigene_verluste, $ums_user_id]);
                                 $agent=$agent-$eigene_verluste;
                             }
 
@@ -1715,7 +1715,7 @@ if (!hasTech($pt, 9)) {
                                         $aze = $zagent;
                                     }
                                     //eigene agenten abziehen
-                                    mysql_query("UPDATE de_user_data SET agent = agent - '$aze', agent_lost=agent_lost + '$aze' WHERE user_id = $ums_user_id", $db);
+                                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$aze, $aze, $ums_user_id]);
                                     write2agentlog($_SESSION['ums_user_id'], 'saboteage-lost', $aze);
 
                                     $agent = $agent - $aze;
@@ -1728,9 +1728,9 @@ if (!hasTech($pt, 9)) {
                                     //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
                                     $time = strftime("%Y%m%d%H%M%S");
                                     $msg = $secret_lang['erfolgsnachricht_sabotage_kollektoroutput'];
-                                    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')", $db);
+                                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                     //sabotage counter setzen und dass er nen neue info hat
-                                    mysql_query("UPDATE de_user_data SET newnews = 1, sc1 = '$maxroundtick' WHERE user_id = '$uid'", $db);
+                                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc1 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                 } else {
                                     $emsg .= '<table width=600><tr><td class="ccr">';
                                     $emsg .= $secret_lang['sabotage_gehtnochnicht'];
@@ -1767,7 +1767,7 @@ if (!hasTech($pt, 9)) {
                                             $aze = $zagent;
                                         }
                                         //eigene agenten abziehen
-                                        mysql_query("update de_user_data set agent = agent - '$aze', agent_lost=agent_lost + '$aze' where user_id = $ums_user_id", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost = agent_lost + ? WHERE user_id = ?", [$aze, $aze, $ums_user_id]);
                                         write2agentlog($_SESSION['ums_user_id'], 'saboteage-lost', $aze);
                                         $agent = $agent - $aze;
 
@@ -1779,9 +1779,9 @@ if (!hasTech($pt, 9)) {
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
                                         $time = strftime("%Y%m%d%H%M%S");
                                         $msg = $secret_lang['erfolgsnachricht_sabotage_raumwerft'];
-                                        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
-                                        mysql_query("UPDATE de_user_data SET newnews = 1, sc2 = '$maxroundtick' WHERE user_id = '$uid'", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc2 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
                                         $emsg .= '<table width=600><tr><td class="ccr">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
@@ -1823,7 +1823,7 @@ if (!hasTech($pt, 9)) {
                                             $aze = $zagent;
                                         }
                                         //eigene agenten abziehen
-                                        mysql_query("UPDATE de_user_data SET agent = agent - '$aze', agent_lost=agent_lost + '$aze' WHERE user_id = $ums_user_id", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$aze, $aze, $ums_user_id]);
                                         write2agentlog($_SESSION['ums_user_id'], 'saboteage-lost', $aze);
                                         $agent = $agent - $aze;
 
@@ -1835,9 +1835,9 @@ if (!hasTech($pt, 9)) {
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
                                         $time = strftime("%Y%m%d%H%M%S");
                                         $msg = $secret_lang['erfolgsnachricht_sabotage_verteidigungszentrum'];
-                                        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
-                                        mysql_query("UPDATE de_user_data SET newnews = 1, sc3 = '$maxroundtick' WHERE user_id = '$uid'", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc3 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
                                         $emsg .= '<table width=600><tr><td class="ccr">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
@@ -1879,7 +1879,7 @@ if (!hasTech($pt, 9)) {
                                             $aze = $zagent;
                                         }
                                         //eigene agenten abziehen
-                                        mysql_query("update de_user_data set agent = agent - '$aze', agent_lost=agent_lost + '$aze' where user_id = $ums_user_id", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost = agent_lost + ? WHERE user_id = ?", [$aze, $aze, $ums_user_id]);
                                         write2agentlog($_SESSION['ums_user_id'], 'saboteage-lost', $aze);
                                         $agent = $agent - $aze;
 
@@ -1891,9 +1891,9 @@ if (!hasTech($pt, 9)) {
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
                                         $time = strftime("%Y%m%d%H%M%S");
                                         $msg = 'Ein Agenteneinsatz hat f&uuml;r Sch&auml;den am Missionssystem gesorgt. Mehr Informationen sind im Geheimdienst abrufbar.';
-                                        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
-                                        mysql_query("UPDATE de_user_data SET newnews = 1, sc4 = '$maxroundtick' WHERE user_id = '$uid'", $db);
+                                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc4 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
                                         $emsg .= '<table width="600px"><tr><td class="ccr">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
@@ -1948,11 +1948,11 @@ if (!hasTech($pt, 9)) {
                     */
 
                     //info an das ziel und ggf. agenten abziehen
-                    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 5,'$time','$msg')", $db);
-                    mysql_query("update de_user_data set newnews = 1, agent = agent - '$zagentabz', agent_lost=agent_lost + '$zagentabz' where user_id = '$uid'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$zagentabz, $zagentabz, $uid]);
 
                     //eigene agenten abziehen
-                    mysql_query("update de_user_data set agent = agent - '$aze', agent_lost=agent_lost + '$aze' where user_id = $ums_user_id", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET agent = agent - ?, agent_lost=agent_lost + ? WHERE user_id = ?", [$aze, $aze, $ums_user_id]);
                     write2agentlog($_SESSION['ums_user_id'], 'saboteage-lost', $aze);
                     $agent = $agent - $aze;
 
@@ -1970,7 +1970,7 @@ if (!hasTech($pt, 9)) {
                 if ($scanhistory == "") {
                     $entry = $copy_zsec2.':'.$copy_zsys2.':'.$zname.'|';
                     $entry = utf8_decode($entry);
-                    mysql_query("update de_user_data set scanhistory='$entry' where user_id = $ums_user_id", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET scanhistory=? WHERE user_id = ?", [$entry, $ums_user_id]);
                 } else { //Scanhistorie updaten
                     $drin = 0;
                     $i = 0;
@@ -2000,7 +2000,7 @@ if (!hasTech($pt, 9)) {
                             $i++;
                         }
                         $entry = utf8_decode($entry);
-                        mysql_query("update de_user_data set scanhistory='$entry' where user_id = $ums_user_id", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET scanhistory=? WHERE user_id = ?", [$entry, $ums_user_id]);
                     }
                 }
             }
@@ -2238,10 +2238,10 @@ if (!hasTech($pt, 9)) {
 	</colgroup>
 
 	<?php
-      $db_daten = mysql_query("SELECT * FROM de_tech_data WHERE tech_id>=110 AND tech_id<=111 ORDER BY tech_id", $db);
+      $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>=110 AND tech_id<=111 ORDER BY tech_id", []);
 
-    $ergebnis = mysql_query("SELECT  sonde, agent  FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-    $rowe = mysql_fetch_array($ergebnis);
+    $ergebnis = mysqli_execute_query($GLOBALS['dbi'], "SELECT sonde, agent FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+    $rowe = mysqli_fetch_array($ergebnis);
 
     //Check f�r Echtzeitrechner
     $techtrue = 0;
@@ -2250,7 +2250,7 @@ if (!hasTech($pt, 9)) {
     $c2 = 0;
     $z = 0;
     //zerlege vorbedinguns-string
-    while ($row = mysql_fetch_array($db_daten)) {
+    while ($row = mysqli_fetch_array($db_daten)) {
         $tech_id = $row['tech_id'];
         if (hasTech($pt, $tech_id)) { //echo "Vorbedingung erf�llt";
             if ($c1 == 0) {
@@ -2334,12 +2334,11 @@ if (!hasTech($pt, 9)) {
 	</table>
 	';
 
-    //aktive bauauftr�ge
-    //$result=mysql_query("SELECT  de_user_build.anzahl, de_user_build.verbzeit, de_tech_data.tech_name FROM de_tech_data, de_user_build WHERE user_id=$ums_user_id AND de_user_build.tech_id = de_tech_data.tech_id AND de_user_build.tech_id > 109 AND de_user_build.tech_id < 120 ORDER BY de_user_build.verbzeit ASC",$db);
-    $sql = "SELECT SUM(de_user_build.anzahl) AS anzahl, de_user_build.verbzeit, de_tech_data$ums_rasse.tech_name FROM de_user_build LEFT JOIN de_tech_data$ums_rasse on(de_user_build.tech_id = de_tech_data$ums_rasse.tech_id) WHERE user_id=$ums_user_id AND de_user_build.tech_id > 109 AND de_user_build.tech_id < 120 GROUP BY de_user_build.tech_id, de_user_build.verbzeit ORDER BY de_user_build.verbzeit ASC";
+    //aktive Bauaufträge
+    $sql = "SELECT SUM(de_user_build.anzahl) AS anzahl, de_user_build.verbzeit, de_tech_data$ums_rasse.tech_name FROM de_user_build LEFT JOIN de_tech_data$ums_rasse on(de_user_build.tech_id = de_tech_data$ums_rasse.tech_id) WHERE user_id=? AND de_user_build.tech_id > 109 AND de_user_build.tech_id < 120 GROUP BY de_user_build.tech_id, de_user_build.verbzeit ORDER BY de_user_build.verbzeit ASC";
     //echo $sql;
-    $result = mysql_query($sql, $db);
-    $num = mysql_num_rows($result);
+    $result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    $num = mysqli_num_rows($result);
 
     if ($num > 0) {
         echo '</td><td width="13" class="rr">&nbsp;</td></tr></table>
@@ -2360,7 +2359,7 @@ if (!hasTech($pt, 9)) {
         echo '</tr>';
 
 
-        while ($row = mysql_fetch_array($result)) {
+        while ($row = mysqli_fetch_array($result)) {
             echo '<tr align="center">';
             echo '<td class="cell">'.$row["tech_name"].'</td>';
             echo '<td class="cell">'.number_format($row["anzahl"], 0, "", ".").'</td>';
@@ -2466,8 +2465,8 @@ function sabotageallowed($zuid)
     $sabotageallowed = 1;
 
     //daten des ziels auslesen
-    $db_daten = mysql_query("SELECT sector, allytag, status, npc, spec5 FROM de_user_data WHERE user_id='$zuid'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, allytag, status, npc, spec5 FROM de_user_data WHERE user_id=?", [$zuid]);
+    $row = mysqli_fetch_array($db_daten);
     $zsector = $row["sector"];
     $znpc = $row["npc"];
     $zspec5 = $row['spec5'];
@@ -2479,8 +2478,9 @@ function sabotageallowed($zuid)
 
     //�berpr�fen ob es evtl. der eigene sektor ist
     if ($zsector == $ownsector) {
-        if (mysql_result(mysql_query("SELECT count(*) FROM de_user_data WHERE secatt=0 AND sector='$zsector'", $db), 0) >=
-           mysql_result(mysql_query("SELECT count(*) FROM de_user_data WHERE secatt=1 AND sector='$zsector'", $db), 0)) {
+        $defenders = mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], "SELECT count(*) as cnt FROM de_user_data WHERE secatt=0 AND sector=?", [$zsector]));
+        $attackers = mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], "SELECT count(*) as cnt FROM de_user_data WHERE secatt=1 AND sector=?", [$zsector]));
+        if ($defenders['cnt'] >= $attackers['cnt']) {
             $sabotageallowed = 0;
         }
     }
@@ -2489,13 +2489,14 @@ function sabotageallowed($zuid)
     //----------- Ally Feine/Freunde
     $allypartner = array();
     $query = "select id from de_allys where allytag='$ownally'";
-    $allyresult = mysql_query($query);
-    $at = mysql_num_rows($allyresult);
+    $allyresult = mysqli_execute_query($GLOBALS['dbi'], $query, []);
+    $at = mysqli_num_rows($allyresult);
     if ($at != 0) {
-        $allyid = mysql_result($allyresult, 0, "id");
+        $row = mysqli_fetch_array($allyresult);
+        $allyid = $row["id"];
 
-        $allyresult = mysql_query("SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=$allyid or ally_id_2=$allyid) and (ally_id_1=id or ally_id_2=id)", $db);
-        while ($row = mysql_fetch_array($allyresult)) {
+        $allyresult = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_partner, de_allys WHERE (ally_id_1=? OR ally_id_2=?) AND (ally_id_1=id OR ally_id_2=id)", [$allyid, $allyid]);
+        while ($row = mysqli_fetch_array($allyresult)) {
             if ($ownally != $row["allytag"]) {
                 $allypartner[] = $row["allytag"];
             }

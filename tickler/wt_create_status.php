@@ -4,20 +4,26 @@ $filename = $directory."cache/loginstat.tmp";
 $cachefile = fopen ($filename, 'w');
 
 //spieleranzahl pro rasse
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE rasse=1 AND sector > 1",$db);
-$rassenzahl[0] = mysql_result($db_daten,0,0);
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE rasse=2 AND sector > 1",$db);
-$rassenzahl[1] = mysql_result($db_daten,0,0);
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE rasse=3 AND sector > 1",$db);
-$rassenzahl[2] = mysql_result($db_daten,0,0);
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE rasse=4 AND sector > 1",$db);
-$rassenzahl[3] = mysql_result($db_daten,0,0);
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE rasse=5",$db);
-$rassenzahl[4] = mysql_result($db_daten,0,0);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE rasse=? AND sector > 1", [1]);
+$row = mysqli_fetch_array($db_daten);
+$rassenzahl[0] = $row['count'];
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE rasse=? AND sector > 1", [2]);
+$row = mysqli_fetch_array($db_daten);
+$rassenzahl[1] = $row['count'];
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE rasse=? AND sector > 1", [3]);
+$row = mysqli_fetch_array($db_daten);
+$rassenzahl[2] = $row['count'];
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE rasse=? AND sector > 1", [4]);
+$row = mysqli_fetch_array($db_daten);
+$rassenzahl[3] = $row['count'];
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE rasse=?", [5]);
+$row = mysqli_fetch_array($db_daten);
+$rassenzahl[4] = $row['count'];
 
 //spiele die kein npc sind
-$db_daten=mysql_query("SELECT count(user_id) FROM de_user_data WHERE npc=0 AND sector > 1",$db);
-$pcspieler = mysql_result($db_daten,0,0);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_data WHERE npc=0 AND sector > 1", []);
+$row = mysqli_fetch_array($db_daten);
+$pcspieler = $row['count'];
 if($pcspieler==0){
 	$pcspieler=1;
 }
@@ -31,50 +37,57 @@ if ($dodel==1){
 
 //allianzen
 //anzahl der allianzen
-$source=mysql_query("SELECT count(id) FROM de_allys",$db);
-$allianzen[0]=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(id) as count FROM de_allys", []);
+$row = mysqli_fetch_array($source);
+$allianzen[0]=$row['count'];
 //b�ndnisse
-$source=mysql_query("SELECT count(ally_id_1) FROM de_ally_partner",$db);
-$allianzen[1]=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(ally_id_1) as count FROM de_ally_partner", []);
+$row = mysqli_fetch_array($source);
+$allianzen[1]=$row['count'];
 
 //kriege
-$source=mysql_query("SELECT count(ally_id_angreifer ) FROM de_ally_war",$db);
-$allianzen[2]=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(ally_id_angreifer) as count FROM de_ally_war", []);
+$row = mysqli_fetch_array($source);
+$allianzen[2]=$row['count'];
 
 //kollektoren im spiel
-$db_daten=mysql_query("SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=1",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=?", [1]);
+$row = mysqli_fetch_array($db_daten);
 $col1=$row["sumcol"];
-$db_daten=mysql_query("SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=2",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=?", [2]);
+$row = mysqli_fetch_array($db_daten);
 $col2=$row["sumcol"];
-$db_daten=mysql_query("SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=3",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=?", [3]);
+$row = mysqli_fetch_array($db_daten);
 $col3=$row["sumcol"];
-$db_daten=mysql_query("SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=4",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=?", [4]);
+$row = mysqli_fetch_array($db_daten);
 $col4=$row["sumcol"];
-$db_daten=mysql_query("SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=5",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(col) as sumcol FROM de_user_data WHERE rasse=?", [5]);
+$row = mysqli_fetch_array($db_daten);
 $col5=$row["sumcol"];
 $col=$col1+$col2+$col3+$col4+$col5;
 if($col==0)$cold=1; else $cold=$col;
 
 //anzahl nachrichten
-$source=mysql_query("SELECT count(user_id) FROM de_user_news",$db);
-$anznews=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) as count FROM de_user_news", []);
+$row = mysqli_fetch_array($source);
+$anznews=$row['count'];
 
 //annzahl hyperfunknachrichten
-$source=mysql_query("SELECT count(empfaenger) FROM de_user_hyper",$db);
-$anzhyper=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT count(empfaenger) as count FROM de_user_hyper", []);
+$row = mysqli_fetch_array($source);
+$anzhyper=$row['count'];
 
 //agentenanzahl
-$source=mysql_query("SELECT SUM(agent) FROM de_user_data",$db);
-$anzagent=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(agent) as sum FROM de_user_data", []);
+$row = mysqli_fetch_array($source);
+$anzagent=$row['sum'];
 
 //gespielte wochen
-$source=mysql_query("SELECT MAX(tick) FROM de_user_data",$db);
-$anzticks=mysql_result($source,0,0);
+$source=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) as max FROM de_user_data", []);
+$row = mysqli_fetch_array($source);
+$anzticks=$row['max'];
 
 
 xecho ('

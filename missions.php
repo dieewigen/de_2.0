@@ -25,8 +25,9 @@ $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 
 
 //sektorsteuersatz auslesen
-$db_daten=mysql_query("SELECT ssteuer FROM de_sector WHERE sec_id='$sector'",$db);
-$sektorsteuersatz=mysql_result($db_daten, 0,0);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT ssteuer FROM de_sector WHERE sec_id=?", [$sector]);
+$row = mysqli_fetch_array($db_daten);
+$sektorsteuersatz = $row['ssteuer'];
 
 
 //ally_id holen, wird für Allianzmissionen benötigt

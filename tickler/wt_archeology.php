@@ -2,23 +2,23 @@
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-//datenpaket 1 - der güldene kollektor
+//datenpaket 1 - der gï¿½ldene kollektor
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 //zuerst schauen ob ein spieler ihn hat und ggf. rohstoffe gutschreiben
-$result = mysql_query("SELECT a1userid, a1npc, a1tick FROM de_system",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT a1userid, a1npc, a1tick FROM de_system", []);
+$row = mysqli_fetch_array($result);
 $a1userid=$row["a1userid"];
 $a1npc=$row["a1npc"];
 $a1tick=$row["a1tick"];
 
-//wenn den güldenen ein pc hat rohstoffe gutschreiben
+//wenn den gï¿½ldenen ein pc hat rohstoffe gutschreiben
 if($a1userid>0 AND $a1npc==0)
 {
-  $result = mysql_query("SELECT ekey, techs FROM de_user_data WHERE user_id='$a1userid'",$db);
-  $row = mysql_fetch_array($result);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT ekey, techs FROM de_user_data WHERE user_id=?", [$a1userid]);
+  $row = mysqli_fetch_array($result);
   $ekey=$row["ekey"];
   $techs=$row["techs"];
   //ekey aufsplitten
@@ -27,8 +27,8 @@ if($a1userid>0 AND $a1npc==0)
 
   //schauen wieviel output der kollektor hat, grundmenge sind 100 kollektoren
   //zuerst rundendauer auslesen
-  $db_daten=mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-  $row = mysql_fetch_array($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+  $row = mysqli_fetch_array($db_daten);
   $ticks=$row["tick"];
   //menge berechnen
   $ea=floor($sv_kollieertrag*(100+($ticks/4)));
@@ -55,7 +55,7 @@ if($a1userid>0 AND $a1npc==0)
   $ri=intval($ri);
   $re=intval($re);
 
-  //falls es keine materieumwandler gibt, erhält man keine res
+  //falls es keine materieumwandler gibt, erhï¿½lt man keine res
   if ($techs[14]==0)
   {
     $rm=0;
@@ -65,23 +65,25 @@ if($a1userid>0 AND $a1npc==0)
   }
 
   //rohstoffe - ende
-  mysql_query("UPDATE de_user_data SET restyp01 = restyp01 + $rm, restyp02 = restyp02 + $rd,
-    restyp03 = restyp03 + $ri, restyp04 = restyp04 + $re WHERE user_id='$a1userid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ?, restyp02 = restyp02 + ?,
+    restyp03 = restyp03 + ?, restyp04 = restyp04 + ? WHERE user_id=?", [$rm, $rd, $ri, $re, $a1userid]);
 }
 
-//haltedauer um eins erhöhen wenn es ein pc ist
-if ($a1npc==0)mysql_query("UPDATE de_system SET a1tick=a1tick+1",$db);
+//haltedauer um eins erhï¿½hen wenn es ein pc ist
+if ($a1npc==0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET a1tick=a1tick+1", []);
 
-//wenn die haltezeit um ist, oder niemand den güldenen hat ihm einen npc-system zuweisen
+//wenn die haltezeit um ist, oder niemand den gï¿½ldenen hat ihm einen npc-system zuweisen
 if($a1tick>19 OR $a1userid==0)
 {
   //per zufall ein npc-system aussuchen
-  $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1",$db);
-  $anz = mysql_num_rows($result);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=1", []);
+  $anz = mysqli_num_rows($result);
   $zufall=mt_rand(0,$anz-1);
-  $uid=mysql_result($result, $zufall,0);
+  $result->data_seek($zufall);
+  $row = mysqli_fetch_array($result);
+  $uid = $row['user_id'];
   //neue daten in de_system schreiben
-  mysql_query("UPDATE de_system SET a1userid='$uid', a1npc=1, a1tick=0",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET a1userid=?, a1npc=1, a1tick=0", [$uid]);
 }
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -93,18 +95,18 @@ if($a1tick>19 OR $a1userid==0)
 for($i=2;$i<=11;$i++)
 {
   $tblfield='a'.$i.'userid';
-  $result = mysql_query("SELECT $tblfield AS userid FROM de_system",$db);
-  $row = mysql_fetch_array($result);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT $tblfield AS userid FROM de_system", []);
+  $row = mysqli_fetch_array($result);
   $userid=$row["userid"];
-  //wenn kein npc hinterlegt dann einen per  zufall auswählen
+  //wenn kein npc hinterlegt dann einen per  zufall auswï¿½hlen
   if($userid==0)
   {
     //per zufall ein npc-system aussuchen
-    $result = mysql_query("SELECT user_id FROM de_user_data WHERE npc=1 ORDER BY RAND() LIMIT 0,1",$db);
-    $row = mysql_fetch_array($result);
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=1 ORDER BY RAND() LIMIT 0,1", []);
+    $row = mysqli_fetch_array($result);
     $uid=$row["user_id"];
     //neue daten in de_system schreiben
-    mysql_query("UPDATE de_system SET $tblfield='$uid'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET $tblfield=?", [$uid]);
     echo "UPDATE de_system SET $tblfield='$uid'";
   }
 }

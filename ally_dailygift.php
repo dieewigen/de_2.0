@@ -4,7 +4,6 @@ $GLOBALS['deactivate_old_design'] = true;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.dailygift.lang.php');
 include('inc/userartefact.inc.php');
-include('lib/religion.lib.php');
 include('lib/transaction.lib.php');
 include_once('functions.php');
 
@@ -26,61 +25,10 @@ $ally_id = $row['ally_id'];
 $allytag = $row['allytag'];
 $allystatus = $row['ally_status'];
 
-//$allytag=utf8_decode($allytag);
-
 //freien platz im Artefaktgebäude feststellen
 $freeartefactplaces = get_free_artefact_places($ums_user_id);
 
-/*
-$allydailygift_lang['bonusdescription'][0]='<br>+ 1 Kriegsartefakt
-<br>+ 1 Tronic
-<br>+ 1.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
 
-$allydailygift_lang['bonusdescription'][1]='<br>+ 1 Kriegsartefakt
-<br>+ 2 Tronic
-<br>+ 2.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-
-$allydailygift_lang['bonusdescription'][2]='<br>+ 1 Kriegsartefakt
-<br>+ 3 Tronic
-<br>+ 3.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-
-$allydailygift_lang['bonusdescription'][3]='<br>+ 1 Kriegsartefakt
-<br>+ 4 Tronic
-<br>+ 4.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-
-$allydailygift_lang['bonusdescription'][4]='<br>+ 1 Kriegsartefakt
-<br>+ 5 Tronic
-<br>+ 5.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-
-$allydailygift_lang['bonusdescription'][5]='<br>+ 1 Kriegsartefakt
-<br>+6 Tronic
-<br>+6.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-
-$allydailygift_lang['bonusdescription'][6]='<br>+ 1 Kriegsartefakt
-<br>+ 7 Tronic
-<br>+ 7.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen
-<br>+ 1 zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-<br>+ 1 gestartete Auktion im Auktionshaus mit einem Preisnachlass
-';
-*/
 
 ?>
 <!DOCTYPE HTML>
@@ -101,8 +49,8 @@ if ($ally_id > 0 && $allystatus == 1) {
 
     //der Bonus hängt von den Rundensiegartefakten ab
     //allydaten laden
-    $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$ally_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, questpoints FROM de_allys WHERE id=?", [$ally_id]);
+    $row = mysqli_fetch_array($result);
     $allyid = $row['id'];
     $allyrelverbreitung = $row['questpoints'];
 
@@ -113,13 +61,13 @@ if ($ally_id > 0 && $allystatus == 1) {
         //transaktionsbeginn
         if (setLock($_SESSION["ums_user_id"])) {
             //auslesen ob er das geschenk schon bekommen hat
-            $db_daten = mysql_query("SELECT dailyallygift FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-            $row = mysql_fetch_array($db_daten);
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT dailyallygift FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+            $row = mysqli_fetch_array($result);
             if ($row['dailyallygift'] == 1) {
 
                 //in der db und session den bonus für den tag deaktivieren
                 $dailyallygift = 0;
-                mysql_query("UPDATE de_user_data SET dailyallygift=0 WHERE user_id='$ums_user_id'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET dailyallygift=0 WHERE user_id=?", [$ums_user_id]);
 
                 //feststellen welchen bonus man bekommt
                 $bonus_anzahl = 6;
@@ -141,21 +89,25 @@ if ($ally_id > 0 && $allystatus == 1) {
                 $bonusstr = '';
                 switch ($bonus) {
                     case 0: // Rang 0
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+1, kartefakt=kartefakt+1, defenseexp=defenseexp+1000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+1, kartefakt=kartefakt+1, defenseexp=defenseexp+1000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>1 Tronic<br>1.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>1 Titanen-Energiekern';
 
                         for ($i = 0;$i < 1;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+1 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+1 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>1 Allianzartefakt';
 
                         //Titanen-Energiekern
@@ -166,13 +118,17 @@ if ($ally_id > 0 && $allystatus == 1) {
                         break;
 
                     case 1: // Rang 1
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+2, kartefakt=kartefakt+1, defenseexp=defenseexp+2000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+2, kartefakt=kartefakt+1, defenseexp=defenseexp+2000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>2 Tronic<br>2.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>2 Titanen-Energiekerne';
                         for ($i = 0;$i < 2;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
@@ -193,21 +149,25 @@ if ($ally_id > 0 && $allystatus == 1) {
                         break;
 
                     case 2: // Rang 2
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+3, kartefakt=kartefakt+1, defenseexp=defenseexp+3000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+3, kartefakt=kartefakt+1, defenseexp=defenseexp+3000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>3 Tronic<br>3.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>2 Titanen-Energiekerne';
 
                         for ($i = 0;$i < 2;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>2 Allianzartefakte';
 
                         createAuction($_SESSION['ums_user_id']);
@@ -221,14 +181,18 @@ if ($ally_id > 0 && $allystatus == 1) {
                         break;
 
                     case 3: // Rang 3
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+4, kartefakt=kartefakt+1, defenseexp=defenseexp+4000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+4, kartefakt=kartefakt+1, defenseexp=defenseexp+4000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>4 Tronic<br>4.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>3 Titanen-Energiekerne';
 
                         for ($i = 0;$i < 2;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
@@ -249,14 +213,18 @@ if ($ally_id > 0 && $allystatus == 1) {
                         break;
 
                     case 4: // Rang 4
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+5, kartefakt=kartefakt+1, defenseexp=defenseexp+5000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+5, kartefakt=kartefakt+1, defenseexp=defenseexp+5000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>5 Tronic<br>5.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>3 Titanen-Energiekerne';
 
                         for ($i = 0;$i < 3;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }
@@ -277,14 +245,18 @@ if ($ally_id > 0 && $allystatus == 1) {
                         break;
 
                     case 5: // Rang 5
-                        mysql_query("UPDATE de_user_data SET restyp05=restyp05+6, kartefakt=kartefakt+1, defenseexp=defenseexp+6000 WHERE user_id='$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                            "UPDATE de_user_data SET restyp05=restyp05+6, kartefakt=kartefakt+1, defenseexp=defenseexp+6000 WHERE user_id=?", 
+                            [$ums_user_id]);
 
                         $bonusstr = '<br>1 Kriegsartefakt<br>6 Tronic<br>6.000 Erfahrungspunkte f&uuml;r Verteidigungsanlagen<br>4 Titanen-Energiekern';
 
                         for ($i = 0;$i < 3;$i++) {
                             if ($freeartefactplaces > 0) {
                                 $artid = mt_rand(1, 15);
-                                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], 
+                                    "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", 
+                                    [$ums_user_id, $artid]);
                                 $bonusstr .= '<br>1 '.$ua_name[$artid - 1].'-Artefakt';
                                 $freeartefactplaces--;
                             }

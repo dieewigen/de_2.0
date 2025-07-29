@@ -9,11 +9,15 @@ include 'inc/'.$sv_server_lang.'_links.inc.php';
 include 'functions.php';
 
 //�berpr�fen ob es der 1. login ist, in dem fall den beitritt im allgemeinen chat hinterlegen
-$db_daten=mysql_query("SELECT logins FROM de_login WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], 
+  "SELECT logins FROM de_login WHERE user_id=?", 
+  [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
 if($row['logins']==1){
 	insert_chat_msg(0, 2, $ums_spielername, ' <font color="#FFFF00">Ich habe mich '.$sv_server_tag.' angeschlossen.</font>');
-	mysql_query("UPDATE de_login SET logins=logins+1 WHERE user_id='$ums_user_id'",$db);
+	mysqli_execute_query($GLOBALS['dbi'], 
+	  "UPDATE de_login SET logins=logins+1 WHERE user_id=?", 
+	  [$ums_user_id]);
 }
 
 @ob_start("ob_gzhandler");

@@ -3,16 +3,16 @@
 include "kt_einheitendaten.php";
 
 //anzahl der maximalen kollektoren eines spielers
-$db_daten = mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0", []);
+$row = mysqli_fetch_array($db_daten);
 $maxcol = $row['maxcol'];
 if ($maxcol == 0) {
     $maxcol = 1;
 }
 
 //maximale tickzeit auslesen
-$db_daten = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+$row = mysqli_fetch_array($db_daten);
 $rtick = $row["tick"];
 
 function wirkungsgrad($j, $k, $s, $t, $r) //kleine schiffe schlechter machen
@@ -89,20 +89,20 @@ function wirkungsgrad2($anzahl_jaeger, $anzahl_kreuzer, $anzahl_schlachter, $r, 
 }
 
 //in welchen systemen wird gek�mpft?
-$res = mysql_query("SELECT zielsec, zielsys FROM de_user_fleet WHERE aktion = 1 AND zeit = 1 ORDER BY zielsec, zielsys", $db);
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec, zielsys FROM de_user_fleet WHERE aktion = 1 AND zeit = 1 ORDER BY zielsec, zielsys");
 
-$num = mysql_num_rows($res);
+$num = mysqli_num_rows($res);
 //echo '<br>'.$num.' Kampfsysteme<br>';
 $z = 0;
 $oldsec = 0;
 $oldsys = 0;
-for ($i = 0; $i < $num; $i++) { //kampfsysteme auslesen und gleich verdichten
-    $zielsec  = mysql_result($res, $i, "zielsec");
-    $zielsys  = mysql_result($res, $i, "zielsys");
+while ($row = mysqli_fetch_array($res)) {//kampfsysteme auslesen und gleich verdichten
+    $zielsec  = $row["zielsec"];
+    $zielsys  = $row["zielsys"];
     if ($oldsec <> $zielsec or $oldsys <> $zielsys) {
-        // �berpr�fen, ob es das zielsystem gibt
-        $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsec' AND `system`='$zielsys'", $db);
-        $exist = mysql_num_rows($db_daten);
+        // überprüfen, ob es das zielsystem gibt
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector= ? AND `system`= ?", [$zielsec, $zielsys]);
+        $exist = mysqli_num_rows($db_daten);
         echo 'Exist: '.$exist.'<br>';
         if ($exist == 1) {
             $kampfsys[$z][0] = $zielsec;
@@ -133,10 +133,10 @@ for ($c = 0; $c < $z; $c++) {
     /////////////////////////////////////////////
     /////////////////////////////////////////////
 
-    $res = mysql_query("select user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90, 
+    $res = mysqli_execute_query($GLOBALS['dbi'], "select user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90, 
   komatt, komdef, hsec, hsys, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3, artid4, artlvl4, artid5, artlvl5, artid6, artlvl6
-  FROM de_user_fleet WHERE zielsec = $zsec AND zielsys = $zsys
-  AND aktion = 1 AND zeit = 1 ORDER BY hsec, hsys", $db);
+  FROM de_user_fleet WHERE zielsec = ? AND zielsys = ? 
+  AND aktion = 1 AND zeit = 1 ORDER BY hsec, hsys", [$zsec, $zsys]);
 
     echo "select user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90, 
   komatt, komdef, hsec, hsys, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3, artid4, artlvl4, artid5, artlvl5, artid6, artlvl6
@@ -148,7 +148,7 @@ for ($c = 0; $c < $z; $c++) {
     $rsysold = -1;
     $psextmalus = 0;
     $recmalus = 0;
-    while ($row = mysql_fetch_array($res)) {//f�r jede flotte die daten auslesen
+    while ($row = mysqli_fetch_array($res)) {//f�r jede flotte die daten auslesen
         $a_userdata[$anz_atter][0] = $row["user_id"];
         $a_userdata[$anz_atter][1] = $row["hsec"];
         $a_userdata[$anz_atter][2] = $row["hsys"];
@@ -156,8 +156,8 @@ for ($c = 0; $c < $z; $c++) {
         //rasse usw. auslesen
         $rsec = $a_userdata[$anz_atter][1];
         $rsys = $a_userdata[$anz_atter][2];
-        $result = mysql_query("SELECT user_id, rasse, spielername, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'", $db);
-        $db_data = mysql_fetch_array($result);
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, rasse, spielername, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = ? and `system` = ?", [$rsec, $rsys]);
+        $db_data = mysqli_fetch_array($result);
         if ($rsec != $rsecold or $rsys != $rsysold) {
             if ($db_data["rasse"] == 1) {
                 $rflag = 'E';
@@ -294,12 +294,12 @@ for ($c = 0; $c < $z; $c++) {
     // Flotten des Angegriffenen Laden
     ///////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////
-    $res = mysql_query("SELECT user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90,
+    $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90,
   komatt, komdef, hsec, hsys, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3, artid4, artlvl4, artid5, artlvl5, artid6, artlvl6
-  FROM de_user_fleet where hsec = $zsec AND hsys = $zsys AND (aktion = 0 OR (aktion = 3 AND zeit = 1)) ORDER BY user_id", $db);
-    $anz_heimatflotten = mysql_num_rows($res);
+  FROM de_user_fleet where hsec = $zsec AND hsys = $zsys AND (aktion = 0 OR (aktion = 3 AND zeit = 1)) ORDER BY user_id");
+    $anz_heimatflotten = mysqli_num_rows($res);
     $anz_deffer = 0;
-    while ($row = mysql_fetch_array($res)) {//f�r jede flotte die daten auslesen
+    while ($row = mysqli_fetch_array($res)) {//f�r jede flotte die daten auslesen
         $d_userdata[$anz_deffer][0] = $row["user_id"];
         $d_userdata[$anz_deffer][1] = $row["hsec"];
         $d_userdata[$anz_deffer][2] = $row["hsys"];
@@ -307,8 +307,8 @@ for ($c = 0; $c < $z; $c++) {
         $rsec = $d_userdata[$anz_deffer][1];
         $rsys = $d_userdata[$anz_deffer][2];
 
-        $result = mysql_query("SELECT rasse, spielername, npc, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'", $db);
-        $db_data = mysql_fetch_array($result);
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT rasse, spielername, npc, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'");
+        $db_data = mysqli_fetch_array($result);
         $d_userdata[$anz_deffer][3] = $db_data["rasse"];
         $spielername = $db_data["spielername"];
         $npc = $db_data["npc"];
@@ -400,15 +400,15 @@ for ($c = 0; $c < $z; $c++) {
     ///////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////
 
-    $res = mysql_query("select user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90,
+    $res = mysqli_execute_query($GLOBALS['dbi'], "select user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90,
   komatt, komdef, hsec, hsys, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3, artid4, artlvl4, artid5, artlvl5, artid6, artlvl6 
   FROM de_user_fleet where zielsec = $zsec AND zielsys = $zsys
-  AND aktion = 2 AND (zeit = 1 OR (zeit = 0 AND aktzeit > 0)) ORDER BY hsec, hsys", $db);
+  AND aktion = 2 AND (zeit = 1 OR (zeit = 0 AND aktzeit > 0)) ORDER BY hsec, hsys");
 
 
     $rsecold = -1;
     $rsysold = -1;
-    while ($row = mysql_fetch_array($res)) {//f�r jede flotte die daten auslesen
+    while ($row = mysqli_fetch_array($res)) {//f�r jede flotte die daten auslesen
         $d_userdata[$anz_deffer][0] = $row["user_id"];
         $d_userdata[$anz_deffer][1] = $row["hsec"];
         $d_userdata[$anz_deffer][2] = $row["hsys"];
@@ -416,8 +416,8 @@ for ($c = 0; $c < $z; $c++) {
         //rasse auslesen
         $rsec = $d_userdata[$anz_deffer][1];
         $rsys = $d_userdata[$anz_deffer][2];
-        $result = mysql_query("SELECT user_id, rasse, spielername, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'", $db);
-        $db_data = mysql_fetch_array($result);
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, rasse, spielername, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'");
+        $db_data = mysqli_fetch_array($result);
         $d_userdata[$anz_deffer][3] = $db_data["rasse"];
         $d_userdata[$anz_deffer]['spec1'] = $db_data['spec1'];
         $d_userdata[$anz_deffer]['spec2'] = $db_data['spec2'];
@@ -506,9 +506,9 @@ for ($c = 0; $c < $z; $c++) {
     }
 
     //t�rme, kollektoren, kopfgeld aus der db holen
-    $res = mysql_query("SELECT user_id, e100, e101, e102, e103, e104, defenseexp, col, kg01, kg02, kg03, kg04 FROM
-						de_user_data WHERE sector = '$zsec' AND `system` = '$zsys'", $db);
-    $row = mysql_fetch_array($res);
+    $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, e100, e101, e102, e103, e104, defenseexp, col, kg01, kg02, kg03, kg04 FROM
+						de_user_data WHERE sector = '$zsec' AND `system` = '$zsys'");
+    $row = mysqli_fetch_array($res);
     $uid = $row["user_id"];
     $zuid = $uid;
 
@@ -538,8 +538,8 @@ for ($c = 0; $c < $z; $c++) {
     if (hasTech($d_userdata[0]['techs'], 30) == 1) {
         //spielerartefakte auslesen die den erweiterten schild verst�rken
         $psextbonus = 0;
-        $db_datenx = mysql_query("SELECT id, level FROM de_user_artefact WHERE id=13 AND user_id='$uid'", $db);
-        while ($rowx = mysql_fetch_array($db_datenx)) {
+        $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=13 AND user_id='$uid'");
+        while ($rowx = mysqli_fetch_array($db_datenx)) {
             $psextbonus = $psextbonus + $ua_werte[$rowx["id"] - 1][$rowx["level"] - 1][0] / 100;
         }
 
@@ -582,16 +582,16 @@ for ($c = 0; $c < $z; $c++) {
 
     //turmartefakte laden
     //feuerkraft
-    $db_daten = mysql_query("SELECT id, level FROM de_user_artefact WHERE id=8 AND user_id='$uid'", $db);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=8 AND user_id='$uid'");
     $tawartbonus = 1;
-    while ($row = mysql_fetch_array($db_daten)) {
+    while ($row = mysqli_fetch_array($db_daten)) {
         $tawartbonus = $tawartbonus + ($ua_werte[$row["id"] - 1][$row["level"] - 1][0] / 100);
     }
 
     //blockkraft
-    $db_daten = mysql_query("SELECT id, level FROM de_user_artefact WHERE id=9 AND user_id='$uid'", $db);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=9 AND user_id='$uid'");
     $tbwartbonus = 1;
-    while ($row = mysql_fetch_array($db_daten)) {
+    while ($row = mysqli_fetch_array($db_daten)) {
         $tbwartbonus = $tbwartbonus + ($ua_werte[$row["id"] - 1][$row["level"] - 1][0] / 100);
     }
 
@@ -1313,13 +1313,13 @@ for ($c = 0; $c < $z; $c++) {
                 $ai = mt_rand(1, $ua_index + 1);
 
                 //artefakt dem spieler im geb�ude hinterlegen
-                mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$uid', '$ai', '1')", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$uid', '$ai', '1')");
 
                 //artefakt info  für die news
                 $text = $kt_lang['npcartget'].$ua_name[$ai - 1];
 
                 //npc-artefact-counter erhöhen
-                mysql_query("UPDATE de_user_data SET npcartefact = npcartefact+1 WHERE user_id = $uid", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET npcartefact = npcartefact+1 WHERE user_id = $uid");
             } else { //newsinfo, dass das gebäude voll war
                 $text = $kt_lang['npcartbldgfull'];
             }
@@ -1327,14 +1327,14 @@ for ($c = 0; $c < $z; $c++) {
             //allianzartefakt vergeben
             $allyid = get_player_allyid($uid);
             if ($allyid > 0) {
-                mysql_query("UPDATE de_allys SET artefacts = artefacts+1 WHERE id = $allyid", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts = artefacts+1 WHERE id = $allyid");
                 $text .= ', '.$kt_lang['allianzartefakt'];
             }
 
             //news in der db hinterlegen
             $time = strftime("%Y%m%d%H%M%S");
-            mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')", $db);
-            mysql_query("UPDATE de_user_data SET newnews = 1 WHERE user_id = $uid", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = $uid");
         }
 
         //wenn der/die angreifer gewonnen haben findet die kollieverteilung statt
@@ -1382,19 +1382,19 @@ for ($c = 0; $c < $z; $c++) {
 
     //wenn kollektoren gestohlen wurden, dem ziel direkt diese abziehen und bei der allianz vermerken
     if ($stolenkollies > 0) {
-        mysql_query("UPDATE de_user_data SET col = col - '$stolenkollies' WHERE sector='$zsec' AND `system`='$zsys';", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col = col - '$stolenkollies' WHERE sector='$zsec' AND `system`='$zsys';");
         //allianz
         //id auslesen
         $allyid = get_player_allyid(get_user_id_from_coord($zsec, $zsys));
         //ally gutschreiben
         if ($allyid > 0) {
-            mysql_query("UPDATE de_allys SET collost = collost + '$stolenkollies' WHERE id='$allyid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET collost = collost + '$stolenkollies' WHERE id='$allyid'");
         }
     }
 
     //wenn es erfahrungspunkte für verteidigungsanlagen gibt, diese gutschreiben
     if ($defenseexp > 0 && $sv_oscar != 1) {
-        mysql_query("UPDATE de_user_data SET defenseexp = defenseexp + '$defenseexp' WHERE sector='$zsec' AND `system`='$zsys'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET defenseexp = defenseexp + '$defenseexp' WHERE sector='$zsec' AND `system`='$zsys'");
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -1469,22 +1469,22 @@ for ($c = 0; $c < $z; $c++) {
 
 
                 //dem ziel das kopfgeld abziehen
-                mysql_query("UPDATE de_user_data SET 
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET 
 					kg01 = kg01 - '$getkg[0]',
 					kg02 = kg02 - '$getkg[1]',
 					kg03 = kg03 - '$getkg[2]',
 					kg04 = kg04 - '$getkg[3]'
-					WHERE sector='$zsec' AND `system`='$zsys'", $db);
+					WHERE sector='$zsec' AND `system`='$zsys'");
 
                 //dem angreifer die rohstoffe gutschreiben und vermerken wie gut er ist
                 $kgjaeger = $getkg[0] + $getkg[1] * 2 + $getkg[2] * 3 + $getkg[3] * 4;
-                mysql_query("UPDATE de_user_data SET 
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET 
 					restyp01 = restyp01 + '$getkg[0]',
 					restyp02 = restyp02 + '$getkg[1]',
 					restyp03 = restyp03 + '$getkg[2]',
 					restyp04 = restyp04 + '$getkg[3]',
 					kgget=kgget+'$kgjaeger'
-					WHERE user_id='$auid'", $db);
+					WHERE user_id='$auid'");
 
 
                 //kopfgeldinfo an den angreifer
@@ -1502,7 +1502,7 @@ for ($c = 0; $c < $z; $c++) {
                 $nachricht .= '<br>Das erhaltene Kopfgeld kann nicht gr&ouml;&szlig;er als 25% der selbst verlorenen Punkte sein.';
 
 
-                mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$auid', 3,'$time','$nachricht')", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$auid', 3,'$time','$nachricht')");
                 echo $nachricht.'<br>';
                 /*
                 $text ='$auid: '.$auid;
@@ -1689,8 +1689,8 @@ for ($c = 0; $c < $z; $c++) {
 
     foreach ($global_user_id as $value) {
         //owner_id anhand der user_id auslesen
-        $db_dateng = mysql_query("SELECT owner_id FROM de_login WHERE user_id='".$value."'", $db);
-        $rowg = mysql_fetch_array($db_dateng);
+        $db_dateng = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id='".$value."'");
+        $rowg = mysqli_fetch_array($db_dateng);
         $owner_id = $rowg["owner_id"];
         if ($global_atter != '') {
             $global_atter .= ';';
@@ -1717,9 +1717,9 @@ for ($c = 0; $c < $z; $c++) {
 
         foreach ($global_user_id as $value) {
             //owner_id anhand der user_id auslesen
-            $db_dateng = mysql_query("SELECT owner_id FROM de_login WHERE user_id='".$value."'", $db);
+            $db_dateng = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id='".$value."'");
             echo "<br>SELECT owner_id FROM de_login WHERE user_id='".$value."'";
-            $rowg = mysql_fetch_array($db_dateng);
+            $rowg = mysqli_fetch_array($db_dateng);
             $owner_id = $rowg["owner_id"];
             if ($global_deffer != '') {
                 $global_deffer .= ';';
@@ -1759,7 +1759,7 @@ for ($c = 0; $c < $z; $c++) {
 
         //lastpcatt-tick setzen
         if ($npc == 0) {
-            mysql_query("UPDATE de_user_data SET lastpcatt='$rtick' WHERE user_id = '$uid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET lastpcatt='$rtick' WHERE user_id = '$uid'");
         }
 
         //teil des spielers selbst vom kb machen
@@ -1818,37 +1818,37 @@ for ($c = 0; $c < $z; $c++) {
             //if ($col*$col_angriffsgrenze_final<=$kollies OR $npc==1)//man erh�lt kollektoren
             if ($col * $col_angriffsgrenze_final <= $kollies) {//man erh�lt kollektoren
                 echo 'Kollektoren erbeutet.';
-                mysql_query("UPDATE de_user_data SET col = col + '$atter_sk[$i]' WHERE user_id = '$uid'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col = col + '$atter_sk[$i]' WHERE user_id = '$uid'");
                 //fix für br, jeder kollektor gibt x M
                 //24.09.2015 abgeschafft wegen pushing
                 /*
                 if($rtick>2500000){
                     $br_m_res=$atter_sk[$i]*1000000;
-                    mysql_query("UPDATE de_user_data SET restyp01=restyp01+".$br_m_res." WHERE user_id = '$uid'",$db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01=restyp01+".$br_m_res." WHERE user_id = '$uid'",$db);
                     //nachricht an den account
                     $time=strftime("%Y%m%d%H%M%S");
                     $text='Battleround-Multiplex-Bonus f&uuml;r eroberte Kollektoren: '.number_format($br_m_res, 0, ",",".");
-                    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
 
                 }*/
 
                 if ($allyid > 0 and $npc == 0) {
-                    mysql_query("UPDATE de_allys SET colstolen = colstolen + '".$atter_sk[$i]."' WHERE id='$allyid'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET colstolen = colstolen + '".$atter_sk[$i]."' WHERE id='$allyid'");
                 }
                 if ($allyid > 0 and $npc == 1) {
-                    mysql_query("UPDATE de_allys SET colstolennpc = colstolennpc + '".$atter_sk[$i]."' WHERE id='$allyid'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET colstolennpc = colstolennpc + '".$atter_sk[$i]."' WHERE id='$allyid'");
                 }
                 //allyaufgabe erbeute kollektoren allgemein gutschreiben
                 if ($allyid > 0 and $npc == 0) {
-                    mysql_query("UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=1", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=1");
                 }
                 if ($allyid > 0 and $npc == 1) {
-                    mysql_query("UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=3", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=3");
                 }
             } else { //die kollektoren werden vernichtet
                 echo 'Kollektoren zerstört.';
                 if ($allyid > 0) {
-                    mysql_query("UPDATE de_allys SET coldestroy = coldestroy + '".$atter_sk[$i]."' WHERE id='$allyid'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET coldestroy = coldestroy + '".$atter_sk[$i]."' WHERE id='$allyid'");
                 }
                 //kollektorwert negativ gestalten um die zerstörung ersichtlich zu machen
                 $atter_sk[$i] = $atter_sk[$i] * (-1);
@@ -1872,7 +1872,7 @@ for ($c = 0; $c < $z; $c++) {
 
         //allyaufgabe kriegsartefakte
         if ($allyid > 0 and $kartefakte > 0) {
-            mysql_query("UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5");
         }
 
         //schlachterrecycling
@@ -1899,7 +1899,7 @@ for ($c = 0; $c < $z; $c++) {
             $kg4 = floor($energiewert / 16);
 
             //das Kopfgeld in die DB schreiben
-            mysql_query("UPDATE de_user_data SET kg01=kg01+'$kg1', kg02=kg02+'$kg2', kg03=kg03+'$kg3', kg04=kg04+'$kg4' WHERE user_id='$uid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kg01=kg01+'$kg1', kg02=kg02+'$kg2', kg03=kg03+'$kg3', kg04=kg04+'$kg4' WHERE user_id='$uid'");
 
             //für den KB die Werte vermerken
             $kb_daten_spieler['kg_set_01'] = $kg1;
@@ -1941,20 +1941,20 @@ for ($c = 0; $c < $z; $c++) {
         echo '<br>DATENSTRING: '.$datenstring;
         */
         //kb an den account schicken
-        //mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')", $db);
+        //mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')");
 
         //nachrichten und kriegsartefakte updaten
         $res1 = $atter_rec[$i][0];
         $res2 = $atter_rec[$i][1];
-        mysql_query("UPDATE de_user_data set newnews = 1, kartefakt = kartefakt + '$kartefakte', restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set newnews = 1, kartefakt = kartefakt + '$kartefakte', restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid");
 
         //und noch zum testen extra bei account 1 ablegen
-        //if ($uid!=1)mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
+        //if ($uid!=1)mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
 
         //mitloggen wieviele kollektoren man von npcs holt
         if ($atter_sk[$i] > 0 and $npc == 1) {
-            mysql_query("UPDATE de_user_data SET npccol = npccol + '$atter_sk[$i]' WHERE user_id = '$uid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET npccol = npccol + '$atter_sk[$i]' WHERE user_id = '$uid'");
         }
         //mitloggen wie viele kollektoren man von jemandem holt
         if ($atter_sk[$i] > 0 or $atter_sk[$i] < 0) {
@@ -1972,7 +1972,7 @@ for ($c = 0; $c < $z; $c++) {
 
             $anzcol = $atter_sk[$i];
             $getexp = $atter_exp[$i];
-            mysql_query("INSERT INTO de_user_getcol (user_id, zuser_id, time, colanz, energiewert, getexp) VALUES ('$uid','$zuid','$zeit','$anzcol','$energiewert', '$getexp')", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_getcol (user_id, zuser_id, time, colanz, energiewert, getexp) VALUES ('$uid','$zuid','$zeit','$anzcol','$energiewert', '$getexp')");
         }
 
         //altes system nach Kollektoren
@@ -1986,7 +1986,7 @@ for ($c = 0; $c < $z; $c++) {
         $kg3=floor($energiewert/12);
         $kg4=floor($energiewert/16);
 
-        mysql_query("UPDATE de_user_data SET kg01=kg01+'$kg1', kg02=kg02+'$kg2', kg03=kg03+'$kg3', kg04=kg04+'$kg4' WHERE user_id='$uid'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kg01=kg01+'$kg1', kg02=kg02+'$kg2', kg03=kg03+'$kg3', kg04=kg04+'$kg4' WHERE user_id='$uid'",$db);
         */
 
         ///////////////////////////////////////////////////////
@@ -1998,7 +1998,7 @@ for ($c = 0; $c < $z; $c++) {
             $erges = $erges + ($atter[$i][$s] - $atter_zer[$i][$s]);
         }
         $updateid = $a_userdata[$i][0];
-        mysql_query("UPDATE de_user_fleet SET
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET
 			e81='$er[0]',
 			e82='$er[1]',
 			e83='$er[2]',
@@ -2014,7 +2014,7 @@ for ($c = 0; $c < $z; $c++) {
         //wenn alle schiffe vernichtet wurden flotte direkt heim schicken
         if ($erges <= 0) { // wenn flotte vernichtet
             echo ' ANULLFLOTTE ';
-            mysql_query("UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0, zielsec = 0, zielsys = 0, aktzeit = 0 WHERE user_id = '$updateid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0, zielsec = 0, zielsys = 0, aktzeit = 0 WHERE user_id = '$updateid'");
         }
     }
     ////////////////////////////////////////////////////////////////
@@ -2061,7 +2061,7 @@ for ($c = 0; $c < $z; $c++) {
         //nachrichten und updaten
         $res1 = $deffer_rec[$i][0];
         $res2 = $deffer_rec[$i][1];
-        mysql_query("UPDATE de_user_data set newnews = 1, restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set newnews = 1, restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid");
 
         //neue flottendaten in die db schreiben
         $erges = 0;
@@ -2071,7 +2071,7 @@ for ($c = 0; $c < $z; $c++) {
         }
         $updateid = $d_userdata[$i][0];
         if ($sv_oscar != 1) {
-            mysql_query("UPDATE de_user_fleet SET
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET
 				e81='$er[0]',
 				e82='$er[1]',
 				e83='$er[2]',
@@ -2090,7 +2090,7 @@ for ($c = 0; $c < $z; $c++) {
         if($erges<=0){
             // wenn flotte vernichtet
             echo ' ANULLFLOTTE ';
-            mysql_query("UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0,
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0,
             zielsec = 0, zielsys = 0, aktzeit = 0 WHERE user_id = '$updateid'",$db);
         }
         */
@@ -2139,13 +2139,13 @@ for ($c = 0; $c < $z; $c++) {
             //allyaufgabe kriegsartefakte
             if ($sv_oscar != 1) {
                 if ($allyid > 0 and $kartefakte > 0) {
-                    mysql_query("UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5");
                 }
             }
 
             //kriegsartefakte updaten
             if ($sv_oscar != 1) {
-                mysql_query("UPDATE de_user_data SET kartefakt = kartefakt + '$kartefakte' WHERE user_id = $uid", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt = kartefakt + '$kartefakte' WHERE user_id = $uid");
             }
 
             //kriegsartefakte
@@ -2174,13 +2174,13 @@ for ($c = 0; $c < $z; $c++) {
             echo '<br>DATENSTRING: '.$datenstring;
             */
             //kb an den account schicken
-            //mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
-            mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')", $db);
+            //mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')");
 
             echo 'SQL-HEIMDEFFER: '."INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')";
 
             //und noch zum testen extra bei account 1 ablegen
-            //if ($uid!=1)mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
+            //if ($uid!=1)mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
         }
     }
 
@@ -2249,7 +2249,7 @@ for ($c = 0; $c < $z; $c++) {
 
         //allyaufgabe kriegsartefakte
         if ($allyid > 0 and $kartefakte > 0) {
-            mysql_query("UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$kartefakte."' WHERE id='$allyid' AND questtyp=5");
         }
 
         $nachricht = $atterstring.$defferstring.$spielerstring.$datenstring;
@@ -2269,16 +2269,16 @@ for ($c = 0; $c < $z; $c++) {
         echo '<br>DATENSTRING: '.$datenstring;
         */
         //kb an den account schicken
-        //mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')", $db);
+        //mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 50,'$time','$nachricht')",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 57,'$time','".serialize($kb_array)."')");
 
         //nachrichten und kriegsartefakte updaten
         $res1 = $deffer_rec[$i][0];
         $res2 = $deffer_rec[$i][1];
-        mysql_query("UPDATE de_user_data set newnews = 1, kartefakt = kartefakt + '$kartefakte', restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set newnews = 1, kartefakt = kartefakt + '$kartefakte', restyp01 = restyp01 + '$res1', restyp02 = restyp02 + '$res2' WHERE user_id = $uid");
 
         //und noch zum testen extra bei account 1 ablegen
-        //if ($uid!=1)mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
+        //if ($uid!=1)mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (1, 50,'$time','$nachricht')",$db);
 
         //neue flottendaten in die db schreiben
         $erges = 0;
@@ -2287,7 +2287,7 @@ for ($c = 0; $c < $z; $c++) {
             $erges = $erges + ($deffer[$i][$s] - $deffer_zer[$i][$s]);
         }
         $updateid = $d_userdata[$i][0];
-        mysql_query("UPDATE de_user_fleet SET
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET
 			e81='$er[0]',
 			e82='$er[1]',
 			e83='$er[2]',
@@ -2303,8 +2303,8 @@ for ($c = 0; $c < $z; $c++) {
         //wenn alle schiffe vernichtet wurden flotte direkt heim schicken
         if ($erges <= 0) { // wenn flotte vernichtet
             echo ' ANULLFLOTTE ';
-            mysql_query("UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0,
-		  zielsec = 0, zielsys = 0, aktzeit = 0 WHERE user_id = '$updateid'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET aktion = 0, zeit = 0, aktzeit = 0,
+		  zielsec = 0, zielsys = 0, aktzeit = 0 WHERE user_id = '$updateid'");
         }
         //}
     }
@@ -2320,12 +2320,12 @@ for ($c = 0; $c < $z; $c++) {
         $er[$s] = ($turm[$s] - $deffertuerme_zer[$s]);
     }
     if ($sv_oscar != 1) {
-        mysql_query("UPDATE de_user_data SET
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET
 		 e100 = '$er[0]',
 		 e101 = '$er[1]',
 		 e102 = '$er[2]',
 		 e103 = '$er[3]',
-		 e104 = '$er[4]' WHERE sector = '$zsec' AND `system` = '$zsys'", $db);
+		 e104 = '$er[4]' WHERE sector = '$zsec' AND `system` = '$zsys'");
     }
 
     ////////////////////////////////////////////////////////////
@@ -2338,7 +2338,7 @@ for ($c = 0; $c < $z; $c++) {
         $hv = explode("-", $d_userdata[0][0]);
         $uid = $hv[0];
 
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 55,'$time','$nachricht')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 55,'$time','$nachricht')");
     }
 
     if ($rec == 1) {
@@ -2360,9 +2360,9 @@ for ($c = 0; $c < $z; $c++) {
             }
             //schauen ob er evtl. recarion-artefakte hat, welche das recyclortorn verst�rken
             //userartefakte auslesen
-            $db_daten = mysql_query("SELECT id, level FROM de_user_artefact WHERE id=10 AND user_id='$uid'", $db);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=10 AND user_id='$uid'");
             $recbonus = 0;
-            while ($row = mysql_fetch_array($db_daten)) {
+            while ($row = mysqli_fetch_array($db_daten)) {
                 $recbonus = $recbonus + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
             }
             //artefaktbonus draufaddieren
@@ -2374,15 +2374,15 @@ for ($c = 0; $c < $z; $c++) {
                 echo 'secrecbonuns1: '.$rec_secbonus;
             } else {
                 //zuerst anzahl der pc-sektoren auslesen
-                $db_daten = mysql_query("SELECT sec_id FROM de_sector WHERE npc=0 AND platz>0", $db);
-                $num = mysql_num_rows($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>0");
+                $num = mysqli_num_rows($db_daten);
                 if ($num < 1) {
                     $num = 1;
                 }
                 echo 'num: '.$num;
                 //eigenen sektorplatz auslesen
-                $db_daten = mysql_query("SELECT platz FROM de_sector WHERE sec_id='$zsec'", $db);
-                $row = mysql_fetch_array($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT platz FROM de_sector WHERE sec_id='$zsec'");
+                $row = mysqli_fetch_array($db_daten);
                 $ownsectorplatz = $row["platz"];
 
                 echo 'ownsectorplatz: '.$ownsectorplatz;
@@ -2399,8 +2399,8 @@ for ($c = 0; $c < $z; $c++) {
             $anteil = $anteil + $rec_secbonus;
 
             //spezialisierung sektorbonus recycling
-            $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' AND spec4=3", $db);
-            $specrecbonus = mysql_num_rows($db_daten) * 1;
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector='$zsec' AND spec4=3");
+            $specrecbonus = mysqli_num_rows($db_daten) * 1;
             if ($specrecbonus > 10) {
                 $specrecbonus = 10;
             }
@@ -2440,12 +2440,12 @@ for ($c = 0; $c < $z; $c++) {
             $restyp04 = floor($restyp04 / 100 * $anteil);
             $restyp05 = floor($restyp05 / 100 * $anteil);
 
-            mysql_query("UPDATE de_user_data SET
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET
 			 restyp01 = restyp01 + '$restyp01',
 			 restyp02 = restyp02 + '$restyp02',
 			 restyp03 = restyp03 + '$restyp03',
 			 restyp04 = restyp04 + '$restyp04',
-			 restyp05 = restyp05 + '$restyp05' WHERE sector = '$zsec' AND `system` = '$zsys'", $db);
+			 restyp05 = restyp05 + '$restyp05' WHERE sector = '$zsec' AND `system` = '$zsys'");
 
             //eine nachricht an den account schicken
 
@@ -2455,7 +2455,7 @@ for ($c = 0; $c < $z; $c++) {
 
             echo '<br>recycler->'.$nachricht.' A:'.$anteil.'<br>';
 
-            mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 55,'$time','$nachricht')", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 55,'$time','$nachricht')");
         }
     }//recyclotron ende
 

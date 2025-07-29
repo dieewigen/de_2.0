@@ -3,52 +3,18 @@ if(intval(date("i"))==0 && intval(date("H"))==19 || $erhabenenstop==1)
 {
   //anzahl der stimmen auslesen
   $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT user_id FROM de_login WHERE status=1 AND last_click > '$time'",$db);
-  $anz = mysql_num_rows($db_daten);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE status=1 AND last_click > ?", [$time]);
+  $anz = mysqli_num_rows($db_daten);
   
   //daten aus der db auslesen und werte berechnen
-  /*
+  //daten über median ermitteln
   $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT 
-  SUM(de_user_comserver.v1) AS v1, 
-  SUM(de_user_comserver.v2) AS v2,
-  SUM(de_user_comserver.v3) AS v3,
-  SUM(de_user_comserver.v4) AS v4,
-  SUM(de_user_comserver.v5) AS v5,
-  SUM(de_user_comserver.v6) AS v6,
-  SUM(de_user_comserver.v7) AS v7,
-  SUM(de_user_comserver.v8) AS v8,
-  SUM(de_user_comserver.v9) AS v9,
-  SUM(de_user_comserver.v10) AS v10,
-  SUM(de_user_comserver.v11) AS v11,
-  SUM(de_user_comserver.v12) AS v12,
-  SUM(de_user_comserver.v13) AS v13,
-  SUM(de_user_comserver.v14) AS v14,
-  SUM(de_user_comserver.v15) AS v15,
-  SUM(de_user_comserver.v16) AS v16,
-  SUM(de_user_comserver.v17) AS v17,
-  SUM(de_user_comserver.v18) AS v18,
-  SUM(de_user_comserver.v19) AS v19,
-  SUM(de_user_comserver.v20) AS v20,
-  SUM(de_user_comserver.v21) AS v21,
-  SUM(de_user_comserver.v22) AS v22,
-  SUM(de_user_comserver.v23) AS v23,
-  SUM(de_user_comserver.v24) AS v24,
-  SUM(de_user_comserver.v25) AS v25,
-  SUM(de_user_comserver.v26) AS v26,
-  SUM(de_user_comserver.v27) AS v27,
-  SUM(de_user_comserver.v28) AS v28
-  FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
-  WHERE de_login.last_click > '$time'",$db);*/
-
-  //daten �ber median ermitteln
-  $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT de_user_comserver.* FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
-  WHERE de_login.status=1 AND de_login.last_click > '$time' AND de_user_comserver.user_id>0",$db);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_comserver.* FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
+  WHERE de_login.status=1 AND de_login.last_click > ? AND de_user_comserver.user_id>0", [$time]);
   
   //alle daten in ein array packen
   unset($votes);
-  while($row = mysql_fetch_array($db_daten))
+  while($row = mysqli_fetch_array($db_daten))
   {
     for($i=1;$i<=40;$i++)if(!is_null($row['v'.$i]))$votes[$i][]=$row['v'.$i];
   }
@@ -92,41 +58,6 @@ if(intval(date("i"))==0 && intval(date("H"))==19 || $erhabenenstop==1)
   $server_v34=round(median($votes[34]));  
   $server_v35=round(median($votes[35]));  
 
-
-
-
-      
-    /*$row = mysql_fetch_array($db_daten);
-  	
-    $server_v1=round($row['v1']/$anz);
-  	$server_v2=round($row['v2']/$anz);
-  	$server_v3=round($row['v3']/$anz);
-  	$server_v4=round($row['v4']/$anz);
-  	$server_v5=round($row['v5']/$anz);
-  	$server_v6=round($row['v6']/$anz);
-  	$server_v7=round($row['v7']/$anz);
-  	$server_v8=round($row['v8']/$anz);
-  	$server_v9=round($row['v9']/$anz);
-  	$server_v10=round($row['v10']/$anz);
-  	$server_v11=round($row['v11']/$anz);
-  	$server_v12=round($row['v12']/$anz);
-  	$server_v13=round($row['v13']/$anz);
-  	$server_v14=round($row['v14']/$anz);
-  	$server_v15=round($row['v15']/$anz);
-  	$server_v16=round($row['v16']/$anz);
-  	$server_v17=round($row['v17']/$anz);
-  	$server_v18=round($row['v18']/$anz);
-  	$server_v19=round($row['v19']/$anz);
-  	$server_v20=round($row['v20']/$anz);
-  	$server_v21=round($row['v21']/$anz);
-  	$server_v22=round($row['v22']/$anz);
-  	$server_v23=round($row['v23']/$anz);
-  	$server_v24=round($row['v24']/$anz);
-  	$server_v25=round($row['v25']/$anz);
-  	$server_v26=round($row['v26']/$anz);
-  	$server_v27=round($row['v27']/$anz);
-  	$server_v28=round($row['v28']/$anz);*/
-  	
   
     //daten in die entsprechende datei schreiben
     $filename="../inc/svcomserver.inc.php";

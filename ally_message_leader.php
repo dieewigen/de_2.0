@@ -2,16 +2,26 @@
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.messageleader.lang.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$allytag=$row["allytag"];
+$db_daten = mysqli_execute_query(
+    $GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]
+);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
+$punkte = $row["score"];
+$newtrans = $row["newtrans"];
+$newnews = $row["newnews"];
+$sector = $row["sector"];
+$system = $row["system"];
+$allytag = $row["allytag"];
 include_once('functions.php');
-
-/*$db_daten=mysql_query("SELECT nic FROM de_login WHERE user_id='$ums_user_id'");
-$row = mysql_fetch_array($db_daten);
-$nic=$row["nic"];*/
 
 ?>
 <!DOCTYPE HTML>
@@ -22,35 +32,43 @@ $nic=$row["nic"];*/
 </head>
 <body>
 
-<font face="tahoma" style="font-size:8pt;">
-
 <?php
 include('resline.php');
 $leaderpage = true;
 include('ally/ally.menu.inc.php');
-$text=$_POST['text'] ?? '';
-$select=$_POST['select'] ?? '';
+$text = $_POST['text'] ?? '';
+$select = $_POST['select'] ?? '';
 
-if($text) {
-	$text=nl2br($text);
-	$betreff=$_POST['betreff'];
+if ($text) {
+    $text = nl2br($text);
+    $betreff = $_POST['betreff'];
 
-	$an=$_POST['an'];
+    $an = $_POST['an'];
 
-	$resource=mysql_query("SELECT leaderid FROM de_allys  WHERE allytag='$an'");
+    $resource = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT leaderid FROM de_allys WHERE allytag=?",
+        [$an]
+    );
 
-	while($row=mysql_fetch_array($resource)) {
-		mysql_query("update de_user_data set newtrans = 1 where user_id = $row[leaderid]");
-		$time=strftime("%Y%m%d%H%M%S");
-		mysql_query("insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values ('$row[leaderid]', '$ums_user_id', '0', '0', '$allytag Leader', '$time', '$betreff', '$text',0)",$db);
+    while ($row = mysqli_fetch_assoc($resource)) {
+        mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "UPDATE de_user_data SET newtrans=1 WHERE user_id=?",
+            [$row['leaderid']]
+        );
+        $time = strftime("%Y%m%d%H%M%S");
+        mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) 
+			 VALUES (?, ?, 0, 0, ?, ?, ?, ?, 0)",
+            [$row['leaderid'], $ums_user_id, $allytag.' Leader', $time, $betreff, $text]
+        );
+    }
 
-
-		mysql_query($query);
-	}
-
-	echo $allymessageleader_lang['msg_1'];
-}else {
-	echo '<form name="register" method="POST">
+    echo $allymessageleader_lang['msg_1'];
+} else {
+    echo '<form name="register" method="POST">
 				<table border="0" width="602" cellspacing="1" cellpadding="0">
 					<tr class="tc">
 						<td width="50%" height="21" colspan=2>'.$allymessageleader_lang['msg_2'].'</td>
@@ -60,21 +78,24 @@ if($text) {
 						<td width="50%">
 							<select name="an">';
 
-					$query = "SELECT allytag FROM de_allys order by allytag";
-					$result = mysql_query($query);
-					while ($row = mysql_fetch_array($result))
-					{
-							echo '
+    $result = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT allytag FROM de_allys ORDER BY allytag"
+    );
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo '
 								<option value="'.$row['allytag'].'"
 							';
-							
-							if ($select == urldecode($row['allytag'])) echo " selected";
-							
-							echo '>'.$row['allytag'].'</option>
-							';
-					}
 
-	echo '
+        if ($select == urldecode($row['allytag'])) {
+            echo " selected";
+        }
+
+        echo '>'.$row['allytag'].'</option>
+							';
+    }
+
+    echo '
 							</select></td>
 				</tr>
 				<tr class="cl">

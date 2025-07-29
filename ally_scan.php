@@ -11,11 +11,15 @@
 //  --------------------------------------------------------------------------------
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.scan.lang.php';
-include_once 'functions.php';
+include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, spielername 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $spielername=$row["spielername"]
 ?>
@@ -34,14 +38,18 @@ include ("ally/ally.menu.inc.php");
 
 $scancost = 200;
 $full_access = false;
-$query = "SELECT allytag FROM de_user_data where user_id='$ums_user_id'";
-$result = mysql_query($query);
-$clankuerzel = mysql_result($result,0,"allytag");
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT allytag FROM de_user_data WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($result);
+$clankuerzel = $row["allytag"];
 
-$ally_result = mysql_query("SELECT * FROM de_allys WHERE allytag='$clankuerzel'");
+$ally_result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_allys WHERE allytag=?",
+    [$clankuerzel]);
 if ($ally_result)
 {
-	$ally_data = mysql_fetch_array($ally_result);
+	$ally_data = mysqli_fetch_assoc($ally_result);
 	$ally_tronic = $ally_data["t_depot"];
 	$clanid = $ally_data["id"];
 	//scannerphalanx
@@ -68,10 +76,12 @@ if ($action == "do_scan" && $full_access && isset($ally_id) && !empty($ally_id))
 	}
 	else
 	{
-		$scan_ally_result = mysql_query("SELECT * FROM de_allys WHERE id='$ally_id'");
+		$scan_ally_result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT * FROM de_allys WHERE id=?",
+			[$ally_id]);
 		if ($scan_ally_result)
 		{
-			$scan_ally_data = mysql_fetch_array($scan_ally_result);
+			$scan_ally_data = mysqli_fetch_assoc($scan_ally_result);
 			$scan_ally_tag = $scan_ally_data["allytag"];
 			$scan_ally_name = html_entity_decode($scan_ally_data["allyname"]);
 
@@ -79,8 +89,12 @@ if ($action == "do_scan" && $full_access && isset($ally_id) && !empty($ally_id))
 		$timestamp = time();
 		$datum = date("d.m.Y - G:i", $timestamp);
 		$scanlist = createScanList($scan_ally_tag, $scan_ally_name, $datum);
-		mysql_query("UPDATE de_allys SET t_depot = t_depot - $scancost WHERE id = $clanid");
-		mysql_query("INSERT INTO de_ally_scans SET owner_allytag='$clankuerzel', target_allytag='$scan_ally_tag', target_allyname='$scan_ally_name', target_memberlist='$scanlist', scandate='$datum', timestamp='$timestamp'");
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_allys SET t_depot = t_depot - ? WHERE id = ?",
+			[$scancost, $clanid]);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"INSERT INTO de_ally_scans SET owner_allytag=?, target_allytag=?, target_allyname=?, target_memberlist=?, scandate=?, timestamp=?",
+			[$clankuerzel, $scan_ally_tag, $scan_ally_name, $scanlist, $datum, $timestamp]);
 		print("$allyscan_lang[msg_2_1] $scan_ally_tag $allyscan_lang[msg_2_2] $scancost $allyscan_lang[msg_2_3]");
 		include("ally/allyfunctions.inc.php");
 		writeHistory($clankuerzel, "$allyscan_lang[msg_3_1] <i>$scan_ally_name</i> $allyscan_lang[msg_3_2]", true);
@@ -107,14 +121,15 @@ if ($full_access)
 		print("$allyscan_lang[msg_5_1] $scancost $allyscan_lang[msg_5_2].<br><br>");
 		print("<form action=\"ally_scan.php\" name=\"scan\" method=\"post\">");
 		print("<input type=\"hidden\" name=\"action\" value=\"do_scan\">");
-		$list_result = mysql_query("SELECT id, allytag, allyname from de_allys order by allyname asc");
+		$list_result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT id, allytag, allyname FROM de_allys ORDER BY allyname ASC");
 		if ($list_result)
 		{
-			$numrows = mysql_num_rows($list_result);
+			$numrows = mysqli_num_rows($list_result);
 			print("<select name=ally_id><option value=\"\" selected>$allyscan_lang[plschoose]...</option>");
 			for ($i=0;$i<$numrows;$i++)
 			{
-				$list_data = mysql_fetch_array($list_result);
+				$list_data = mysqli_fetch_assoc($list_result);
 				$id = $list_data["id"];
 				$tag = $list_data["allytag"];
 				$name = $list_data["allyname"];
@@ -137,13 +152,15 @@ print("<tr><td><h3>$allyscan_lang[archiviertememberlisten]</h3></td></tr>");
 print("<tr><td><hr></td></tr>");
 print("<tr><td><table width=100%>");
 print("<tr><td><strong>$allyscan_lang[allianztag]</td><td><strong>$allyscan_lang[allianzname]</strong></td><td><strong>$allyscan_lang[scandatum]</strong></td><td></td></tr>");
-$ml_result = mysql_query("SELECT * FROM de_ally_scans WHERE owner_allytag = '$clankuerzel' ORDER BY timestamp DESC");
+$ml_result = mysqli_execute_query($GLOBALS['dbi'],
+	"SELECT * FROM de_ally_scans WHERE owner_allytag = ? ORDER BY timestamp DESC",
+	[$clankuerzel]);
 if ($ml_result)
 {
-	$numrows_ml = mysql_num_rows($ml_result);
+	$numrows_ml = mysqli_num_rows($ml_result);
 	for ($j=0;$j<$numrows_ml;$j++)
 	{
-		$ml_data = mysql_fetch_array($ml_result);
+		$ml_data = mysqli_fetch_assoc($ml_result);
 		$scan_id = $ml_data["id"];
 		$target_allytag = $ml_data["target_allytag"];
 		$target_allyname = $ml_data["target_allyname"];
@@ -162,10 +179,12 @@ print("</table></div>");
 
 if (isset($scan_id) && !empty($scan_id))
 {
-	$scanid_result = mysql_query("SELECT * FROM de_ally_scans WHERE id = '$showid'");
+	$scanid_result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT * FROM de_ally_scans WHERE id = ?",
+		[$showid]);
 	if ($scanid_result)
 	{
-		$scanid_data = mysql_fetch_array($scanid_result);
+		$scanid_data = mysqli_fetch_assoc($scanid_result);
 		$owner_allytag = $scanid_data["owner_allytag"];
 		$scan_list = $scanid_data["target_memberlist"];
 		if ($clankuerzel == $owner_allytag)
@@ -201,24 +220,26 @@ function createScanList($clankuerzel, $clanname, $datum)
 	//$scanlist.= "<td class=\"tc\">Aktiv</td>";
 	$scanlist.= "</tr>";
 
-	$query = "SELECT *  FROM de_user_data WHERE status='1' AND allytag='$clankuerzel' ORDER BY sector, `system`";
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT * FROM de_user_data WHERE status='1' AND allytag=? ORDER BY sector, `system`",
+		[$clankuerzel]);
 
-	$result = mysql_query($query);
-
-	$nb = mysql_num_rows($result);
+	$nb = mysqli_num_rows($result);
 
 	$row = 0;
+	$all_rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 	while ($row < $nb)
 	{
-        $userid = mysql_result($result,$row,"user_id");
-        $sector = mysql_result($result,$row,"sector");
-        $system = mysql_result($result,$row,"system");
-        $score = mysql_result($result,$row,"score");
-        $kollies = mysql_result($result,$row,"col");
-        $m_rasse = mysql_result($result,$row,"rasse");
-        $m_actpoints = mysql_result($result,$row,"actpoints");
-        $m_tick = mysql_result($result,$row,"tick");
+        $user_data = $all_rows[$row];
+        $userid = $user_data["user_id"];
+        $sector = $user_data["sector"];
+        $system = $user_data["system"];
+        $score = $user_data["score"];
+        $kollies = $user_data["col"];
+        $m_rasse = $user_data["rasse"];
+        $m_actpoints = $user_data["actpoints"];
+        $m_tick = $user_data["tick"];
 
     	$activity=$m_actpoints/$m_tick*1000;
 
@@ -245,10 +266,15 @@ function createScanList($clankuerzel, $clanname, $datum)
         $sectorjump = explode(":",$sector);
         $sectorjump = $sectorjump[0];
 
-        $tquery= mysql_fetch_array(mysql_query("SELECT * FROM de_user_data where user_id='$userid'"));
-        $name = $tquery[spielername];
-        $de_login_result = mysql_query("select status from de_login WHERE user_id='$userid'");
-        $de_login_data = mysql_fetch_array($de_login_result);
+        $tquery = mysqli_execute_query($GLOBALS['dbi'], 
+            "SELECT * FROM de_user_data WHERE user_id=?", 
+            [$userid]);
+        $user_row = mysqli_fetch_assoc($tquery);
+        $name = $user_row['spielername'];
+        $de_login_result = mysqli_execute_query($GLOBALS['dbi'], 
+            "SELECT status FROM de_login WHERE user_id=?", 
+            [$userid]);
+        $de_login_data = mysqli_fetch_assoc($de_login_result);
         $de_login_status = $de_login_data["status"];
         if ($de_login_status != 1)
         {
@@ -261,7 +287,6 @@ function createScanList($clankuerzel, $clanname, $datum)
 	    $scanlist.= "<td class=\"cr\">".number_format($score, 0,'','.')."</td>\n";
 	    $scanlist.= "<td class=\"cc\"><a href=\"javascript:document.f".$sector."x".$system.".submit()\">[".$sector.":".$system."]</a></font></a></td>\n";
 	    $scanlist.= "<td class=\"cc\">$r_text</td>\n";
-	    //$scanlist.= "<td class=\"cr\">".number_format($activity, 2,",",".")."</td>\n";
 	    $scanlist.= "</tr>";
 	    $scanlist.= "</form>";
 		$row++;

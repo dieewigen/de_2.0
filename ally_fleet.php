@@ -16,8 +16,12 @@ include_once('functions.php');
 
 checkMissionEnd();
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
+            newtrans, newnews, allytag 
+     FROM de_user_data WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];
 $sector=$row['sector'];$system=$row['system'];
@@ -65,10 +69,13 @@ if ($full_access){
 	echo '</tr>';
 }
 
-$query = "SELECT user_id, spielername, sector, `system`, rasse  FROM de_user_data WHERE status='1' AND allytag='$allytag' ORDER BY sector, `system`";
-//echo $query;
-$result = mysql_query($query);
-$numrows = mysql_num_rows($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT user_id, spielername, sector, `system`, rasse  
+     FROM de_user_data 
+     WHERE status='1' AND allytag=? 
+     ORDER BY sector, `system`",
+    [$allytag]);
+$numrows = mysqli_num_rows($result);
 
  $fleet_attack = 0;
  $fleet_deff = 0;
@@ -77,7 +84,7 @@ $numrows = mysql_num_rows($result);
  $fleet_home = 0;
 
 for ($i=0; $i<$numrows;$i++){
-	$values = mysql_fetch_array($result);
+	$values = mysqli_fetch_array($result);
     $userid = $values['user_id'];
     $spielername = $values['spielername'];
     $sector = $values['sector'];
@@ -111,8 +118,13 @@ for ($i=0; $i<$numrows;$i++){
 	}
 	
 	for ($fnum = 0; $fnum<=3; $fnum++){
-    	$f_result = mysql_query("SELECT aktion, zeit, (e81+e82+e83+e84+e85+e86+e87+e88+e89+e90) as fsize from de_user_fleet where user_id='{$userid}-{$fnum}'");
-    	$fleet = mysql_fetch_array($f_result);
+    	$user_fleet_id = $userid.'-'.$fnum;
+    	$f_result = mysqli_execute_query($GLOBALS['dbi'], 
+    	    "SELECT aktion, zeit, (e81+e82+e83+e84+e85+e86+e87+e88+e89+e90) as fsize 
+    	     FROM de_user_fleet 
+    	     WHERE user_id=?",
+    	    [$user_fleet_id]);
+    	$fleet = mysqli_fetch_array($f_result);
 	    $fleet_aktion = $fleet['aktion'];
 	    if ($fnum > 0)
 	    {

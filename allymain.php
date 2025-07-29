@@ -1,26 +1,12 @@
 <?php
-//        --------------------------------- allymain.php ---------------------------------
-//        Funktion der Seite:                Anzeige der Allianz&uuml;bersicht
-//        Letzte &Auml;nderung:                05.09.2002
-//        Letzte &Auml;nderung von:        Ascendant
-//
-//        &Auml;nderungshistorie:
-//
-//        05.02.2002 (Ascendant)        - Erweiterung der &Auml;nderungsbefugnis der Allianzdaten
-//                                                          auf Coleader
-//                                                        - Erweiterung der Seite um Anzeige des Leaders und der
-//                                                          Coleader. Per Klick auf die Namen kann dem Leader und
-//                                                          den Co-Leadern eine Nachricht gesendet werden.
-//  --------------------------------------------------------------------------------
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php');
-include('lib/religion.lib.php');
 include('lib/basefunctions.lib.php');
 include('inc/allyjobs.inc.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$row = mysqli_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $dailyallygift=$row['dailyallygift'];
@@ -38,17 +24,17 @@ if ($row['status']==1) $ownally = $row['allytag'];else $ownally='';
 
 <?php
 /*
-        Die Function getLink($user) erzeugt einen Transfunk-Link f&uuml;r den Benutzer mit der
+        Die Function getLink($user) erzeugt einen Hyperfunk-Link f&uuml;r den Benutzer mit der
         ID $user. Als Linktext wird der Name des Users angezeigt. Per Klick auf den
         Link kann der Benutzer dem User mit der ID $user eine Transfunknachricht schreiben.
 
         Parameterbeschreibung:
 
-        $user    : Id des Users, f&uuml;r den der TF-Link erzeugt werden soll (Int)
+        $user    : Id des Users, f&uuml;r den der HF-Link erzeugt werden soll (Int)
 
         R&uuml;ckgabewert:
 
-        $lnk                 : Transfunklink, Linktext ist der Name des Users, dessen ID an die
+        $lnk                 : Hyperfunklink, Linktext ist der Name des Users, dessen ID an die
                                    Funktion &uuml;bergeben wurde. Existiert die ID nicht, wird der Text
                                    "Nicht belegt" anstelle des Links generiert. Tritt ein Datenbankfehler
                                    auf, wird der String "Datenbankfehler" zur&uuml;ckgegeben.
@@ -59,14 +45,15 @@ function getLink($user){
 	//Pr&uuml;fen, ob eine g&uuml;ltige UserID &uuml;bergeben wurde
 	if ($user > -1){
 			//Ermitteln des Benutzerdatensatzes
-			$result_userlink = mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='$user'",$db);
+			$result_userlink = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sector, `system` FROM de_user_data WHERE user_id=?", [$user]);
 			//Pr&uuml;fen, ob ein g&uuml;ltiges Resultset zur&uuml;ckgegeben wurde
 			if ($result_userlink){
-				if (mysql_num_rows($result_userlink) == 1){
+				if (mysqli_num_rows($result_userlink) == 1){
 					//Feldwerte ermitteln
-					$name = mysql_result($result_userlink,0,"spielername");
-					$sector = mysql_result($result_userlink,0,"sector");
-					$system = mysql_result($result_userlink,0,"system");
+					$row_userlink = mysqli_fetch_assoc($result_userlink);
+					$name = $row_userlink['spielername'];
+					$sector = $row_userlink['sector'];
+					$system = $row_userlink['system'];
 					//Erzeugen des Transfunk-Links
 					$lnk = "<a href=details.php?se=$sector&sy=$system>$name ($allyallymain_lang[sendhf])</a>";
 				}
@@ -90,12 +77,13 @@ function getName($user){
 	if ($user >- 1)
 	{
 			//Ermitteln des Benutzerdatensatzes
-			$result_userlink = mysql_query("SELECT spielername FROM de_user_data WHERE user_id='$user'",$db);
+			$result_userlink = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername FROM de_user_data WHERE user_id=?", [$user]);
 			//Pr&uuml;fen, ob ein g&uuml;ltiges Resultset zur&uuml;ckgegeben wurde
 			if ($result_userlink)
 			{
 					//Feldwerte ermitteln
-					$name = mysql_result($result_userlink,0,"spielername");
+					$row_userlink = mysqli_fetch_assoc($result_userlink);
+					$name = $row_userlink['spielername'];
 			}
 	}
 	return $name;
@@ -114,71 +102,52 @@ include('ally/ally.menu.inc.php');
 if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.inc.php"));
 
 if($isleader || $iscoleader){
-        $query = "SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
-        $result = mysql_query($query,$db);
+        $query = "SELECT * FROM de_allys where leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?";
+        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
 }else{
-        $query = "SELECT * FROM de_allys ally, de_user_data user where user.allytag=ally.allytag and user.user_id='$ums_user_id'";
-        $result = mysql_query($query,$db);
+        $query = "SELECT * FROM de_allys ally, de_user_data user where user.allytag=ally.allytag and user.user_id=?";
+        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
 }
-$clanid 		= mysql_result($result,0,"id");
-$clanname 		= html_entity_decode(mysql_result($result,0,"allyname"));
-$t_depot		= mysql_result($result,0,"t_depot");
-$memberlimit 	= mysql_result($result,0,"memberlimit");
-/*
-if ($mode=="inclimit"){
-	if ($isleader)
-	{
-		if ($t_depot >=10)
-		{
-			$memberlimit++;
-			mysql_query("UPDATE de_allys SET memberlimit='$memberlimit', t_depot=t_depot-10 WHERE id='$clanid'",$db);
-			$message = "$allyallymain_lang[msg_1]";
-		}
-		else
-		{
-			$message = "$allyallymain_lang[msg_2]";
-		}
-	}
-	else
-	{
-		$message="$allyallymain_lang[msg_3]";
-	}
-}
-*/
+$row_result = mysqli_fetch_assoc($result);
+$clanid 		= $row_result["id"];
+$clanname 		= html_entity_decode($row_result["allyname"]);
+$t_depot		= $row_result["t_depot"];
+$memberlimit 	= $row_result["memberlimit"];
 
-$clankuerzel 	= mysql_result($result,0,"allytag");
-$homepageurl 	= mysql_result($result,0,"homepage");
-$leaderid 		= mysql_result($result,0,"leaderid");
-$coleaderid1 	= mysql_result($result,0,"coleaderid1");
-$coleaderid2 	= mysql_result($result,0,"coleaderid2");
-$coleaderid3 	= mysql_result($result,0,"coleaderid3");
-$fcid1 			= mysql_result($result,0,"fleetcommander1");
-$fcid2 			= mysql_result($result,0,"fleetcommander2");
-$toid1 			= mysql_result($result,0,"tacticalofficer1");
-$toid2 			= mysql_result($result,0,"tacticalofficer2");
-$moid1 			= mysql_result($result,0,"memberofficer1");
-$moid2 			= mysql_result($result,0,"memberofficer2");
-$leadername 	= mysql_result($result,0,"leadername");
-$coleadername1 	= mysql_result($result,0,"coleadername1");
-$coleadername2 	= mysql_result($result,0,"coleadername2");
-$coleadername3 	= mysql_result($result,0,"coleadername3");
-$fcname1 		= mysql_result($result,0,"fcname1");
-$fcname2 		= mysql_result($result,0,"fcname2");
-$toname1 		= mysql_result($result,0,"toname1");
-$toname2 		= mysql_result($result,0,"toname2");
-$moname1 		= mysql_result($result,0,"moname1");
-$moname2 		= mysql_result($result,0,"moname2");
-$openirc	 	= mysql_result($result,0,"openirc");
-$internirc 		= mysql_result($result,0,"internirc");
-$metairc 		= mysql_result($result,0,"metairc");
-$discord_bot	= mysql_result($result,0,"discord_bot");
-$keywords 		= mysql_result($result,0,"keywords");
-$leadermessage 	= formatString(mysql_result($result,0,"leadermessage"));
-$bewerberinfo 	= formatString(mysql_result($result,0,"bewerberinfo"));
-$publicactivity = mysql_result($result,0,"public_activity");
 
-$mission_counter[1]=	mysql_result($result,0,"mission_counter_1");
-$mission_counter[2]=	mysql_result($result,0,"mission_counter_2");
+$clankuerzel 	= $row_result["allytag"];
+$homepageurl 	= $row_result["homepage"];
+$leaderid 		= $row_result["leaderid"];
+$coleaderid1 	= $row_result["coleaderid1"];
+$coleaderid2 	= $row_result["coleaderid2"];
+$coleaderid3 	= $row_result["coleaderid3"];
+$fcid1 			= $row_result["fleetcommander1"];
+$fcid2 			= $row_result["fleetcommander2"];
+$toid1 			= $row_result["tacticalofficer1"];
+$toid2 			= $row_result["tacticalofficer2"];
+$moid1 			= $row_result["memberofficer1"];
+$moid2 			= $row_result["memberofficer2"];
+$leadername 	= $row_result["leadername"];
+$coleadername1 	= $row_result["coleadername1"];
+$coleadername2 	= $row_result["coleadername2"];
+$coleadername3 	= $row_result["coleadername3"];
+$fcname1 		= $row_result["fcname1"];
+$fcname2 		= $row_result["fcname2"];
+$toname1 		= $row_result["toname1"];
+$toname2 		= $row_result["toname2"];
+$moname1 		= $row_result["moname1"];
+$moname2 		= $row_result["moname2"];
+$openirc	 	= $row_result["openirc"];
+$internirc 		= $row_result["internirc"];
+$metairc 		= $row_result["metairc"];
+$discord_bot	= $row_result["discord_bot"];
+$keywords 		= $row_result["keywords"];
+$leadermessage 	= formatString($row_result["leadermessage"]);
+$bewerberinfo 	= formatString($row_result["bewerberinfo"]);
+$publicactivity = $row_result["public_activity"];
+
+$mission_counter[1]=	$row_result["mission_counter_1"];
+$mission_counter[2]=	$row_result["mission_counter_2"];
 
 if ($publicactivity)
 {
@@ -227,19 +196,12 @@ if ($moid2 > -1)
 }
 
 
-
-
-$membercount = mysql_num_rows(mysql_query("SELECT * FROM de_user_data WHERE allytag='$clankuerzel' AND status=1",$db));
-$bio = formatString(mysql_result($result,0,"besonderheiten"));
-$ausrichtung = mysql_result($result,0,"ausrichtung");
-$regierungsform = mysql_result($result,0,"regierungsform");
-$allianzform = mysql_result($result,0,"allianzform");
-
-/*if (strlen($message) > 0){
-	print('<br><table width="600px"><tr>');
-	print("<td width=30 align=left valign=top><img src=\"".$ums_gpfad."g/trade/".$ums_rasse."_arz.gif\" alt=Information border=0> </td><td align=left><font size=1> $message</font><br>");
-	print("</td></tr></table>");
-}*/
+$membercount_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE allytag=? AND status=1", [$clankuerzel]);
+$membercount = mysqli_num_rows($membercount_result);
+$bio = formatString($row_result["besonderheiten"]);
+$ausrichtung = $row_result["ausrichtung"];
+$regierungsform = $row_result["regierungsform"];
+$allianzform = $row_result["allianzform"];
 
 echo '<div class="cell" style="width: 600px;">';
 //////////////////////////////////////////////////////////////////////////////
@@ -248,8 +210,8 @@ echo '<div class="cell" style="width: 600px;">';
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //allydaten laden
-$db_daten=mysql_query("SELECT * FROM de_allys WHERE allytag='$ownally'", $db);
-$row = mysql_fetch_array($db_daten);    
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE allytag=?", [$ownally]);
+$row = mysqli_fetch_array($db_daten);    
 $allyid=$row['id'];
 $questpoints=$row['questpoints'];
 $ownallyid=$allyid;
@@ -268,11 +230,8 @@ if($row['questgoal']==0){
 
 echo '</div><br>';
 
-
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 // Allianzmissionen: Fortschritt anzeigen
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 echo '
 <div class="info_box" style="color: #FFFFFF;">
@@ -291,24 +250,21 @@ echo '
 <br>
 ';
 
-
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 // allianzinformationen anzeigen
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //partnerallianz
 $allyidpartner=get_allyid_partner($allyid);
 $partnerallianz='';
 if($allyidpartner>0){
-  	$db_daten2=mysql_query("SELECT * FROM de_allys WHERE id='$allyidpartner'", $db);
-	$row2 = mysql_fetch_array($db_daten2);
+  	$db_daten2=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyidpartner]);
+	$row2 = mysqli_fetch_array($db_daten2);
     $partnerallianz=$row2['allyname'].' ('.$row2['allytag'].')<br>';
 }
 
 //platz nach rundensiegpunkten
-$db_datenx=mysql_query("SELECT COUNT(*) AS wert FROM de_allys WHERE questpoints > '$questpoints' ORDER BY id ASC", $db);
-$rowx = mysql_fetch_array($db_datenx);
+$db_datenx=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS wert FROM de_allys WHERE questpoints > ? ORDER BY id ASC", [$questpoints]);
+$rowx = mysqli_fetch_array($db_datenx);
 $platz=$rowx['wert']+1;
 $rundensiegartefatke=number_format($questpoints, 0,"",".").' (Platz: '.$platz.')';
 
@@ -332,21 +288,8 @@ echo '<tr><td>
     		<tr class=cl>
       			<td height=21>Mitglieder:</td>
       			<td height=21><b>'.$membercount.'/'.$memberlimit.'</b></td>
-
 	   		';
 
-//religiöse verbreitung in der allianz anzeigen
-$allyrelcounter=0;
-$result=mysql_query("SELECT * FROM de_user_data WHERE allytag='$clankuerzel' AND status=1",$db);
-while($rowx = mysql_fetch_array($result)){
-  $uid=$rowx['user_id'];
-  $db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$uid'",$db);
-  $row = mysql_fetch_array($db_daten);
-  $owner_id=intval($row['owner_id']);
-  //$relrang=get_religion_level($owner_id);
-  //$allyrelcounter+=$relrang;
-  $allyrelcounter+=getAnzahlGeworbeneSpielerByOwnerid($owner_id);
-}
 if($dailyallygift==1){
 	$grafikname='symbol1.png';
 }else{
@@ -356,15 +299,11 @@ if($dailyallygift==1){
 echo '
       	<td height="32">Geworbene-Spieler-Bonus:</td>
       	<td height="32" colspan="3">
-			<table border="0" cellpadding="0" cellspacing="0">
-  			<tr>
-    			<td><b>'.$allyrelcounter.'&nbsp;</b></td>
-    			<td><a href="ally_dailygift.php"><img src="'.$ums_gpfad.'g/'.$grafikname.'" border="0"></a></td>
-  			</tr>
-  			</table>
-  			
+    		<a href="ally_dailygift.php"><img src="'.$ums_gpfad.'g/'.$grafikname.'" border="0"></a>
+ 			
   			  	
-	  </td></tr>';
+	  	</td>
+	</tr>';
 
 $discord_open_link='';
 $discord_intern_link='';
@@ -530,16 +469,7 @@ if ($isleader || $iscoleader)
     		<tr>
       			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['changedaten'].':</h3></td>
     		</tr>
-			<form method="POST" action="ally_settings.php">';
-			
-			/*
-    		<tr>
-    			<td>$allyallymain_lang[memberlimit]:<br>
-    				<input name=memberlimit value=\"$memberlimit\" size=1 maxlength=2 readonly>   <a href=\"allymain.php?mode=inclimit\"><strong>+</strong> (10 $allyallymain_lang[tronic])</a>
-    			</td>
-			</tr>
-			*/
-	echo '
+			<form method="POST" action="ally_settings.php">
 			<tr>
 				<td colspan="2">'.$allyallymain_lang['homepage'].':<br>
       			<input type="text" name="hpurl" size="50" maxlength="50" value="'.$homepageurl.'"></td>
@@ -593,13 +523,6 @@ if ($isleader || $iscoleader)
 			</form>
 	';
 }
-
-/*
-    		<tr>
-    			<td colspan=2 width=600>$allyallymain_lang[activityvisible]: &nbsp;
-      			<input type=\"checkbox\" name=\"showactivity\" value=\"1\" $activity_checked>$allyallymain_lang[ja]</td>
-    		</tr>
-*/
 
 echo '</table></td></tr></table></div></div>';
 

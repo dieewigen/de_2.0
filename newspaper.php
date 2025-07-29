@@ -2,9 +2,11 @@
 include "inc/header.inc.php";
 include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves FROM de_user_data WHERE user_id=?",
+  [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
 $secmoves=$row["secmoves"];
 
@@ -23,11 +25,15 @@ include "resline.php";
 $id=isset($id)?(int)$id:-1;
 //news anzeigen
 if($action!="archiv"){
-	$sel_news_show = mysql_query("SELECT * FROM de_news_overview where id='$id'");
+	$sel_news_show = mysqli_execute_query($GLOBALS['dbi'],
+	  "SELECT * FROM de_news_overview WHERE id=?",
+	  [$id]);
 
-	$row=mysql_fetch_array($sel_news_show);
+	$row=mysqli_fetch_assoc($sel_news_show);
 
-	mysql_query("UPDATE de_news_overview set klicks=klicks+1,time=time WHERE id='$id'");
+	mysqli_execute_query($GLOBALS['dbi'],
+	  "UPDATE de_news_overview SET klicks=klicks+1, time=time WHERE id=?",
+	  [$id]);
 
 
 	$nachricht = utf8_encode(nl2br(umlaut($row['nachricht'])));
@@ -52,9 +58,7 @@ if($action!="archiv"){
 	</table><br>';
 
 //////////////////////////////////////
-//////////////////////////////////////
 // feedback formular
-//////////////////////////////////////
 //////////////////////////////////////
 
 //e-mail senden
@@ -120,9 +124,11 @@ else  //archiv
     <td><div class="cell"><br>
     <?php
      $typ=(int)$typ;
-     $sel_news=mysql_query("SELECT * FROM de_news_overview where typ='$typ' order by id desc");
+     $sel_news=mysqli_execute_query($GLOBALS['dbi'],
+       "SELECT * FROM de_news_overview WHERE typ=? ORDER BY id DESC",
+       [$typ]);
 
-     while($rew=mysql_fetch_array($sel_news))
+     while($rew=mysqli_fetch_assoc($sel_news))
      {
        $t=$rew['time'];
        $time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];

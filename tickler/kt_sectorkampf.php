@@ -36,31 +36,32 @@ function create_bknachricht(){
 	//an den bk ne info schicken
 	///zuerst schauen wer bk ist
 	$bk=getSKSystemBySecID($sec_id);
-	//$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$sec_id'",$db);
-	//$bk=mysql_result($db_daten, 0,0);
-
-	//echo '<br>Sektorkampf-SK: '.$bk.'/'.$sec_id.'/'.$sv_maxsystem;
   
 	if ($bk>0){ //bk vorhanden, dann dessen daten raussuchen und nachricht einfügen
-	  	$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sec_id' and `system`='$bk'",$db);
-    	$anz = mysql_num_rows($db_daten);
+	  	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND `system`=?", [$sec_id, $bk]);
+    	$anz = mysqli_num_rows($db_daten);
 	  	if ($anz>0){//bk-system ist auch besetzt
-			$uid=mysql_result($db_daten, 0,0);
+			$row = mysqli_fetch_array($db_daten);
+			$uid = $row[0];
 			$time=strftime("%Y%m%d%H%M%S");
-			mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 56,'$time','$nachricht')",$db);
-			mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 56, ?, ?)", [$uid, $time, $nachricht]);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
 	  	}
 	}
 }
 
-$res = mysql_query("SELECT zielsec FROM de_sector WHERE aktion = 1 AND zeit = 1 ORDER BY zielsec",$db);
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec FROM de_sector WHERE aktion = 1 AND zeit = 1 ORDER BY zielsec", []);
 
-$num = mysql_num_rows($res);
+$num = mysqli_num_rows($res);
 //echo '<br>'.$num.' Kampfsysteme<br>';
 $z=0;$oldsec=0; $oldsys=0;
 $kampfsec=array();
+$all_rows = [];
+while($row = mysqli_fetch_array($res)) {
+    $all_rows[] = $row;
+}
 for ($i=0; $i<$num; $i++){ //kampfsysteme auslesen und gleich verdichten
-	$zielsec  = mysql_result($res, $i, "zielsec");
+	$zielsec = $all_rows[$i]['zielsec'];
 	if ($oldsec<>$zielsec)
 	{
 		$kampfsec[$z]=$zielsec;
@@ -80,9 +81,9 @@ for ($c=0; $c<$num; $c++){
 	$dstr=$kampfsec[$c];
 
 	//angreifer laden
-	$res = mysql_query("select sec_id, e2 from de_sector where zielsec = $zsec AND aktion = 1 AND zeit = 1 ORDER BY sec_id",$db);
+	$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, e2 FROM de_sector WHERE zielsec = ? AND aktion = 1 AND zeit = 1 ORDER BY sec_id", [$zsec]);
 	$z=0;
-	while($row = mysql_fetch_array($res)){//f�r jede flotte die daten auslesen
+	while($row = mysqli_fetch_array($res)){//f�r jede flotte die daten auslesen
 		$asecid[$z] = $row["sec_id"];
 		$atter[$z][0] = $row["e2"];
 		$z++;
@@ -95,8 +96,8 @@ for ($c=0; $c<$num; $c++){
 
 	// Flotten des Angegriffenen Laden
 
-	$res = mysql_query("select sec_id, e1, e2, aktion, zeit from de_sector where sec_id = $zsec",$db);
-	$row = mysql_fetch_array($res);//heimatflotte auslesen
+	$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, e1, e2, aktion, zeit FROM de_sector WHERE sec_id = ?", [$zsec]);
+	$row = mysqli_fetch_array($res);//heimatflotte auslesen
 	$dsecid[$z] = $row["sec_id"];
 	$deffer[$z][0] = $row["e1"];
 	$z++;
@@ -109,11 +110,11 @@ for ($c=0; $c<$num; $c++){
 
 
 	//verteidigerhilfsflotten laden
-	$res = mysql_query("select sec_id, e2 from de_sector where zielsec = $zsec
-	AND aktion = 2 AND (zeit = 1 OR (zeit = 0 AND aktzeit > 0))",$db);
+	$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, e2 FROM de_sector WHERE zielsec = ?
+	AND aktion = 2 AND (zeit = 1 OR (zeit = 0 AND aktzeit > 0))", [$zsec]);
 
 
-	while($row = mysql_fetch_array($res)){//f�r jede flotte die daten auslesen
+	while($row = mysqli_fetch_array($res)){//f�r jede flotte die daten auslesen
 		$dsecid[$z] = $row["sec_id"];
 		$deffer[$z][0] = $row["e2"];
 		$dstr=$dstr.', '.$dsecid[$z];
@@ -155,16 +156,20 @@ for ($c=0; $c<$num; $c++){
 	$stolestr='';
 	if ($r<=$klauw){ //ein artefakt wird mitgenommen
 	//schauen ob es artefakte gibt
-	$res = mysql_query("SELECT id FROM de_artefakt WHERE sector='$zsec' AND (id<'11' OR id >'20')",$db);
-	$artnum = mysql_num_rows($res);
+	$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_artefakt WHERE sector=? AND (id<'11' OR id >'20')", [$zsec]);
+	$artnum = mysqli_num_rows($res);
 	if ($artnum>0){//artefakt vorhanden
 		//schauen welches transferiert wird
 		$r=rand (1, $artnum);
-		$id     = mysql_result($res, $r-1, "id");
-		mysql_query("UPDATE de_artefakt SET sector='$artziel' WHERE id='$id'",$db);
+		$all_art_rows = [];
+		while($art_row = mysqli_fetch_array($res)) {
+		    $all_art_rows[] = $art_row;
+		}
+		$id = $all_art_rows[$r-1]['id'];
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_artefakt SET sector=? WHERE id=?", [$artziel, $id]);
 		//artefaktnamen laden
-		$db_daten_artefakt = mysql_query("SELECT artname FROM de_artefakt WHERE id='$id'",$db);
-		$rowartefakt = mysql_fetch_array($db_daten_artefakt);
+		$db_daten_artefakt = mysqli_execute_query($GLOBALS['dbi'], "SELECT artname FROM de_artefakt WHERE id=?", [$id]);
+		$rowartefakt = mysqli_fetch_array($db_daten_artefakt);
 		//meldung über das eroberte artefakt
 		$stolestr=$kt_lang['sektor'].' '.$artziel.' '.$kt_lang['konnteartefakterobern'].$rowartefakt["artname"].'<br>';
 		//echo 'AAA'.$artziel.'BBB';
@@ -172,7 +177,7 @@ for ($c=0; $c<$num; $c++){
 		//artefaktumzug in der db hinterlegen
 		//typ: 0 = hypersturm, 1 = angriff
 		$text=$id.';'.$zsec.';'.$artziel;
-		mysql_query("INSERT INTO de_news_server(wt, typ, text) VALUES ('$maxtick', '1', '$text');",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_server(wt, typ, text) VALUES (?, '1', ?)", [$maxtick, $text]);
 	}
 	}
 
@@ -257,11 +262,11 @@ for ($c=0; $c<$num; $c++){
 		$sec_id=$asecid[$i];
 		create_bknachricht();
 		//flotte updaten
-		mysql_query("UPDATE de_sector SET e2 = e2 - $subeinheiten WHERE sec_id = $sec_id",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e2 = e2 - ? WHERE sec_id = ?", [$subeinheiten, $sec_id]);
 
 		//falls keine schiffe �berlebt haben direkt flotte nach hause
 		if ($eigenue==0){
-			mysql_query("UPDATE de_sector SET aktion = 0, zeit = 0, aktzeit = 0, zielsec = 0, aktzeit = 0, gesrzeit=0 WHERE sec_id = '$asecid[$i]'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET aktion = 0, zeit = 0, aktzeit = 0, zielsec = 0, aktzeit = 0, gesrzeit=0 WHERE sec_id = ?", [$asecid[$i]]);
 		}
 	}
 
@@ -276,7 +281,7 @@ for ($c=0; $c<$num; $c++){
 				$subeinheiten1=$deffer[$i][1];
 				$subeinheiten2=$deffer[$i+1][1];
 
-				mysql_query("update de_sector set e1 = e1 - ".intval($subeinheiten1).", e2 = e2 - ".intval($subeinheiten2)." where sec_id = $sec_id",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e1 = e1 - ?, e2 = e2 - ? WHERE sec_id = ?", [intval($subeinheiten1), intval($subeinheiten2), $sec_id]);
 				$i++;
 				create_bknachricht();
 			}else{
@@ -285,13 +290,13 @@ for ($c=0; $c<$num; $c++){
 				$subeinheiten=$deffer[$i][1];
 				create_bknachricht();
 				if ($sec_id==$zsec)//kann nur die wachflotte sein, daher auch von dort abziehen
-				mysql_query("update de_sector set e1 = e1 - ".intval($subeinheiten)." where sec_id = $sec_id",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e1 = e1 - ? WHERE sec_id = ?", [intval($subeinheiten), $sec_id]);
 				else
-				mysql_query("update de_sector set e2 = e2 - ".intval($subeinheiten)." where sec_id = $sec_id",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e2 = e2 - ? WHERE sec_id = ?", [intval($subeinheiten), $sec_id]);
 
 				if ($eigenue==0 AND $sec_id!=$zsec)//falls keine schiffe überlebt haben direkt flotte nach hause
-				mysql_query("update de_sector set aktion = 0, zeit = 0, aktzeit = 0,
-				zielsec = 0, aktzeit = 0, gesrzeit=0 where sec_id = '$dsecid[$i]'",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET aktion = 0, zeit = 0, aktzeit = 0,
+				zielsec = 0, aktzeit = 0, gesrzeit=0 WHERE sec_id = ?", [$dsecid[$i]]);
 			}
 		}
 	}

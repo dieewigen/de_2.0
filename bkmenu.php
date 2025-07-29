@@ -7,35 +7,44 @@ include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include 'functions.php';
 include "issectork.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
-$restyp05=$row[4];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id=?", 
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];
+$restyp05=$row["restyp05"];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 $sector=$row["sector"];$system=$row["system"];
 
 //Maximale Tickanzahl auslesen
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
-$row     = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT wt AS tick FROM de_system LIMIT 1");
+$row = mysqli_fetch_assoc($result);
 $maxtick = $row["tick"];
 
 //anzahl der spieler im sektor auslesen
-$result  = mysql_query("SELECT COUNT(*) AS wert FROM de_user_data WHERE sector='$sector'",$db);
-$row     = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT COUNT(*) AS wert FROM de_user_data WHERE sector=?",
+    [$sector]);
+$row = mysqli_fetch_assoc($result);
 $spielerimsektor = $row['wert'];
 
 //sektordaten auslesen
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, buildgnr, buildgtime, bk, techs, col, ekey FROM de_sector WHERE sec_id='$sector'",$db);
-$row = mysql_fetch_array($db_daten);
-$srestyp01=$row[0];$srestyp02=$row[1];$srestyp03=$row[2];$srestyp04=$row[3];
-$srestyp05=$row[4];$buildgnr=$row["buildgnr"];$buildgtime=$row["buildgtime"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, buildgnr, buildgtime, bk, techs, col, ekey FROM de_sector WHERE sec_id=?",
+    [$sector]);
+$row = mysqli_fetch_assoc($db_daten);
+$srestyp01=$row["restyp01"];$srestyp02=$row["restyp02"];$srestyp03=$row["restyp03"];$srestyp04=$row["restyp04"];
+$srestyp05=$row["restyp05"];$buildgnr=$row["buildgnr"];$buildgtime=$row["buildgtime"];
 $bk=$row["bk"];
 $seccol=$row["col"];
 $sekey=$row["ekey"];
 $techs='sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss'.$row["techs"];
 
 //spezialisierung sektorkollektoren
-$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND spec5=3;",$db);
-$specseccol = mysql_num_rows($db_daten) * 10;
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT user_id FROM de_user_data WHERE sector=? AND spec5=3",
+    [$sector]);
+$specseccol = mysqli_num_rows($db_daten) * 10;
 if($specseccol>100)$specseccol=100;
 
 $seccol=$seccol+$specseccol;
@@ -54,8 +63,10 @@ if ($hv[3]=='') $hv[3]=0;
 $keym=$hv[0];$keyd=$hv[1];$keyi=$hv[2];$keye=$hv[3];
 
 //spezialisierung bzgl. der baukostenreduzierung überprüfen
-$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND spec2=3;",$db);
-$baukostenreduzierung = mysql_num_rows($db_daten) * 2;
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT user_id FROM de_user_data WHERE sector=? AND spec2=3",
+    [$sector]);
+$baukostenreduzierung = mysqli_num_rows($db_daten) * 2;
 if($baukostenreduzierung>20)$baukostenreduzierung=20;
 $baukostenreduzierung=$baukostenreduzierung/100;
 
@@ -79,7 +90,9 @@ if((isset($_POST["e_t1"]) ||isset($_POST["e_t2"]) ||isset($_POST["e_t3"]) || iss
 			$fehlermsg=$bkmenu_lang['reswarnung'];
 		}else{
 			$keym=$e_t1;$keyd=$e_t2;$keyi=$e_t3;$keye=$e_t4;
-			mysql_query("UPDATE de_sector SET ekey = '$newkey' WHERE sec_id = '$sector'",$db);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_sector SET ekey = ? WHERE sec_id = ?",
+				[$newkey, $sector]);
 			//keys aktualisieren
 		$hv=explode(";",$newkey);
 		$keym=$hv[0];$keyd=$hv[1];$keyi=$hv[2];$keye=$hv[3];
@@ -146,22 +159,7 @@ echo '<td><a href="politics.php?s=1" class="btn">'.$politics_lang["allgemein"].'
 if($system==issectorcommander()){
 	echo '<td><a href="politics.php?s=2" class="btn">SK-Politik</a></td>';
 	echo '<td><a href="bkmenu.php" class="btn">SK-Bau/Flotte</a></td>';
-}else{
-
 }
- 
-/*
-if($spielerimsektor>1){
-    if($system==issectorcommander())echo '<td><a href="politics.php?&s=2" class="btn">'.$politics_lang["skmenu"].'</a></td>';
-    elseif($system==$bk)echo '<td><a href="bkmenu.php" class="btn">'.$politics_lang["bkmenu"].'</a></td>';
-}
-else  //in 1-mann-sektoren kann der sk auch der bk sein 
-{
-	if($system==issectorcommander())echo '<td><a href="politics.php?&s=2" class="btn">'.$politics_lang["skmenu"].'</a></td>';
-    if($system==$bk)echo '<td><a href="bkmenu.php" class="btn">'.$politics_lang["bkmenu"].'</a></td>';
-}
-
-*/
 
 echo '</tr>';
 echo '</table>';
@@ -183,12 +181,14 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 	$akttyp=(int)$akttyp;
 	$aktzeit=(int)$aktzeit;
 	//teste ob die flotte bereit ist befehle zu bekommen
-	$sql="SELECT aktion, e2 FROM de_sector WHERE sec_id = '$ownsector'";
-	$db_daten=mysql_query($sql,$db);
-	$akt=mysql_result($db_daten, 0, "aktion");
-	$schiffe=mysql_result($db_daten, 0, "e2");
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT aktion, e2 FROM de_sector WHERE sec_id = ?",
+		[$ownsector]);
+	$row = mysqli_fetch_assoc($db_daten);
+	$akt = $row["aktion"];
+	$schiffe = $row["e2"];
 
-	$akt=mysql_result($db_daten, 0, "aktion");
+	// $akt wurde bereits gesetzt
 	//echo $schiffe.':'.$akt;
 	if ($schiffe==0) echo $bkmenu_lang['fleeterror1'];
 	if ($schiffe>=1 and $akt<>0) echo $bkmenu_lang['fleeterror2'];
@@ -199,13 +199,15 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 	  $ak=$ownsector;
 	  if ($zk==$ak) $zsec=0;
 
-	  $db_daten=mysql_query("SELECT techs FROM de_sector WHERE sec_id=$zsec",$db);
-	  $num = mysql_num_rows($db_daten);
+	  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+	    "SELECT techs FROM de_sector WHERE sec_id=?",
+		[$zsec]);
+	  $num = mysqli_num_rows($db_daten);
 
 	  if($num==1)//die koordinaten stimmen
 	  {
 		//zuerstmal schauen ob das ziel ne srb hat
-		$rowx = mysql_fetch_array($db_daten);
+		$rowx = mysqli_fetch_assoc($db_daten);
 		$ztechs = $rowx["techs"];
 
 		if ($ztechs[1]==1) $ok=1;else $ok=0;//wenn srb dann hinflug m�glich
@@ -222,29 +224,35 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 
 			//nachricht an den account schicken
 			//bk rausfinden
-			//$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$zsec'",$db);
-      //$bk=mysql_result($db_daten, 0, "bk");
 	  	$bk=getSKSystemBySecID($zsec);
 
 			//user_id vom bk rausfinden
-			$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' and system='$bk'",$db);
-			$numbk = mysql_num_rows($db_daten);
+			$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT user_id FROM de_user_data WHERE sector=? and system=?",
+				[$zsec, $bk]);
+			$numbk = mysqli_num_rows($db_daten);
 
 			if ($numbk!=0){//nachricht an bk schicken
+				$row = mysqli_fetch_assoc($db_daten);
 				$ge=$schiffe;
 				$time=strftime("%Y%m%d%H%M%S");
-				$uid=mysql_result($db_daten, 0, "user_id");
+				$uid=$row["user_id"];
 
 			if ($akttyp==1) $freind=$bkmenu_lang['feindliche'];else $freind=$bkmenu_lang['verbuendete'];
 				if ($ge==1) $sb=$bkmenu_lang['schiff'];else $sb=$bkmenu_lang['schiffen'];
 				$msg=$bkmenu_lang['attmsg1'].' '.$freind.' '.$bkmenu_lang['attmsg2'].' '.$ge.' '.$sb.' '.$bkmenu_lang['attmsg3'].'('.$ak.') '.$bkmenu_lang['reisezeit'].': '.$rz;
-				mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 3,'$time','$msg')",$db);
-				mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
+				mysqli_execute_query($GLOBALS['dbi'],
+					"INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+					[$uid, $time, $msg]);
+				mysqli_execute_query($GLOBALS['dbi'],
+					"UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
+					[$uid]);
 			}
 
 			//flotte losschicken
-			$sql="update de_sector set aktion = $akttyp, zeit = $rz, gesrzeit = $rz, zielsec=$zsec, aktzeit = $aktzeit where sec_id = '$ownsector'";
-			mysql_query($sql,$db);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_sector SET aktion = ?, zeit = ?, gesrzeit = ?, zielsec = ?, aktzeit = ? WHERE sec_id = ?",
+				[$akttyp, $rz, $rz, $zsec, $aktzeit, $ownsector]);
 		}else echo $bkmenu_lang['fehlerkeinesrb'].'<br>';
 		//return $rz;
 	  } //else return 0;
@@ -255,27 +263,33 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 function recall($ownsector, $db){
 	global $bkmenu_lang;
 	//erstmal die daten der flotte holen und sichern
-	$sql="select aktion, zeit, zielsec, e2 from de_sector where sec_id = '$ownsector'";
-	$db_daten=mysql_query($sql,$db);
-	$akttyp=mysql_result($db_daten, 0, "aktion");
-	$zsec=mysql_result($db_daten, 0, "zielsec");
-	$e2=mysql_result($db_daten, 0, "e2");
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT aktion, zeit, zielsec, e2 FROM de_sector WHERE sec_id = ?",
+		[$ownsector]);
+	$row = mysqli_fetch_assoc($db_daten);
+	$akttyp = $row["aktion"];
+	$zsec = $row["zielsec"];
+	$e2 = $row["e2"];
 
 	//flotte zurückrufen
 	//erstmal schauen, ob man sie überhaupt zurückrufen kann
 	if ($akttyp==1 OR $akttyp==2){//also wenn sie hinfliegt
-		$sql="update de_sector set aktion = 3, zeit = gesrzeit-zeit, zielsec = '$ownsector', aktzeit=0 where sec_id = '$ownsector'";
-		mysql_query($sql,$db);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_sector SET aktion = 3, zeit = gesrzeit-zeit, zielsec = ?, aktzeit = 0 WHERE sec_id = ?",
+			[$ownsector, $ownsector]);
 
 
 		//schon weit weg? wenn nicht, dann status wieder auf defence
-		$sql="select zeit from de_sector where sec_id = '$ownsector'";
-		$db_daten1=mysql_query($sql,$db);
-		$zeit=mysql_result($db_daten1, 0, "zeit");
+		$db_daten1 = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT zeit FROM de_sector WHERE sec_id = ?",
+			[$ownsector]);
+		$row1 = mysqli_fetch_assoc($db_daten1);
+		$zeit = $row1["zeit"];
 		if ($zeit==0)//setzte gleich wieder status verteidigen, da noch nicht soweit geflogen
 		{
-		$sql="update de_sector set aktion = 0, zielsec = 0 where sec_id = '$ownsector'";
-		mysql_query($sql,$db);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_sector SET aktion = 0, zielsec = 0 WHERE sec_id = ?",
+				[$ownsector]);
 		}
 
 		//r�ckzugsnachricht schreiben
@@ -285,21 +299,25 @@ function recall($ownsector, $db){
 
 		//bk rausfinden
 		$bk=getSKSystemBySecID($zsec);
-
-		//$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$zsec'",$db);
-		//$bk=mysql_result($db_daten, 0, "bk");
-
-		//user_id vom bk rausfinden
-		$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zsec' and system='$bk'",$db);
-		$numbk = mysql_num_rows($db_daten);
+		
+    //user_id vom bk rausfinden
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT user_id FROM de_user_data WHERE sector=? AND system=?",
+			[$zsec, $bk]);
+		$numbk = mysqli_num_rows($db_daten);
 		//gibt es einen SK?
 		if ($numbk!=0){//nachricht an bk schicken
-			$uid=mysql_result($db_daten, 0, "user_id");
+			$row = mysqli_fetch_assoc($db_daten);
+			$uid = $row["user_id"];
 
 			if ($akttyp==1) $freind=$bkmenu_lang['feindliche'];else $freind=$bkmenu_lang['verbuendete'];
 			if ($ge==1) $sb=$bkmenu_lang['schiff'];else $sb=$bkmenu_lang['schiffen'];
-			mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 3,'$time','".$bkmenu_lang['recallmsg1']." $freind ".$bkmenu_lang['recallmsg2']." $ge $sb ".$bkmenu_lang['recallmsg3'].": $ownsector')",$db);
-			mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+				[$uid, $time, $bkmenu_lang['recallmsg1']." $freind ".$bkmenu_lang['recallmsg2']." $ge $sb ".$bkmenu_lang['recallmsg3'].": $ownsector"]);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
+				[$uid]);
 		}
 	}//ende der if ($akttyp==1 OR $akttyp==2)
 }
@@ -335,7 +353,9 @@ if(!empty($befehle)){
 
 $verlegen=$_POST['verlegen'] ?? false;
 if ($verlegen){
-	$einheiten_daten=mysql_query("SELECT aktion, e1, e2 FROM de_sector WHERE sec_id='$sector'",$db);
+	$einheiten_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT aktion, e1, e2 FROM de_sector WHERE sec_id=?",
+		[$sector]);
 	$h=0;
 	$b1=intval($_POST['b1']);
 	$from=intval($_POST['from1']);
@@ -349,16 +369,21 @@ if ($verlegen){
 		$from=intval($from+1);
 		$to=intval($to+1);
 		//echo 'mach was<br>';
-		$ea=mysql_result($einheiten_daten, 0, "e$from");//schauen wieviele einheiten vorhanden sind
+		$row = mysqli_fetch_assoc($einheiten_daten);
+		$ea=$row["e$from"];//schauen wieviele einheiten vorhanden sind
 		if ($ea>=$h) $ta=$h;else $ta=$ea;
 		$ta=(int)$ta;
 		//quellflotte aktualisieren
 
 		//schauen ob beide flotten daheim sind
-		$aktion=mysql_result($einheiten_daten, 0, "aktion");
+		$aktion=$row["aktion"];
 		if ($aktion==0 && $from!=$to){ //wenn beide null (flotten daheim) verlegen
-			mysql_query("update de_sector set e$from = e$from - $ta WHERE sec_id = '$sector'",$db);
-			mysql_query("update de_sector set e$to = e$to + $ta WHERE sec_id = '$sector'",$db);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_sector SET e$from = e$from - ? WHERE sec_id = ?",
+				[$ta, $sector]);
+			mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_sector SET e$to = e$to + ? WHERE sec_id = ?",
+				[$ta, $sector]);
 		}else{
 			echo $bkmenu_lang['verlegenwarnung'];
 		}
@@ -366,16 +391,19 @@ if ($verlegen){
 }
 
 //sektordaten auslesen
-$db_daten=mysql_query("SELECT name, url, bk, e1, e2, aktion, zeit, aktzeit, zielsec FROM de_sector WHERE sec_id=$sector",$db);
-$secname=mysql_result($db_daten, 0,0);
-$url=mysql_result($db_daten, 0,1);
-$bk=mysql_result($db_daten, 0,2);
-$showe1=mysql_result($db_daten, 0,3);
-$showe2=mysql_result($db_daten, 0,4);
-$a1=mysql_result($db_daten, 0,5);
-$t1=mysql_result($db_daten, 0,6);
-$at1=mysql_result($db_daten, 0,7);
-$zsec1=mysql_result($db_daten, 0,8);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+	"SELECT name, url, bk, e1, e2, aktion, zeit, aktzeit, zielsec FROM de_sector WHERE sec_id=?",
+	[$sector]);
+$row = mysqli_fetch_assoc($db_daten);
+$secname=$row["name"];
+$url=$row["url"];
+$bk=$row["bk"];
+$showe1=$row["e1"];
+$showe2=$row["e2"];
+$a1=$row["aktion"];
+$t1=$row["zeit"];
+$at1=$row["aktzeit"];
+$zsec1=$row["zielsec"];
 
 //wurde der produzieren-button gedrückt?
 $prod=$_POST['prod'] ?? false;
@@ -392,10 +420,12 @@ if ($prod)//ja, es wurde ein button gedrueckt
       $benrestyp01=2000*(1-$baukostenreduzierung);$benrestyp02=500*(1-$baukostenreduzierung);$benrestyp03=500*(1-$baukostenreduzierung);$benrestyp04=2000*(1-$baukostenreduzierung);$benrestyp05=0;$tech_ticks=16;
 
       //rohstoffe im sektorlager
-      $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id='$sector'",$db);
-      $row = mysql_fetch_array($db_daten);
-      $srestyp01=$row[0];$srestyp02=$row[1];$srestyp03=$row[2];$srestyp04=$row[3];
-      $srestyp05=$row[4];
+      $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id=?",
+        [$sector]);
+      $row = mysqli_fetch_assoc($db_daten);
+      $srestyp01=$row["restyp01"];$srestyp02=$row["restyp02"];$srestyp03=$row["restyp03"];$srestyp04=$row["restyp04"];
+      $srestyp05=$row["restyp05"];
       $gr01=$srestyp01;$gr02=$srestyp02;$gr03=$srestyp03;$gr04=$srestyp04;$gr05=$srestyp05;
 
       $z=0;
@@ -413,12 +443,18 @@ if ($prod)//ja, es wurde ein button gedrueckt
         else break;
       }
       //gibt $z schiffe in auftrag
-      $result = mysql_query("SELECT anzahl FROM de_sector_build WHERE sector_id = '$sector' AND tech_id=1 AND verbzeit=$tech_ticks",$db);
-      $row = mysql_fetch_array($result);
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT anzahl FROM de_sector_build WHERE sector_id = ? AND tech_id=1 AND verbzeit=?",
+        [$sector, $tech_ticks]);
+      $row = mysqli_fetch_assoc($result);
       if ($z>0)
-      if ($row[0]==0) //es gibt keine schiffe mit tech_ticks laenge in der queue
-        mysql_query("INSERT INTO de_sector_build (sector_id, tech_id, anzahl, verbzeit) VALUES ($sector, 1, $z, $tech_ticks)",$db);
-      else mysql_query("update de_sector_build set anzahl = anzahl + $z WHERE sector_id = '$sector' AND tech_id=1 AND verbzeit=$tech_ticks ",$db);
+      if (empty($row["anzahl"])) //es gibt keine schiffe mit tech_ticks laenge in der queue
+        mysqli_execute_query($GLOBALS['dbi'],
+          "INSERT INTO de_sector_build (sector_id, tech_id, anzahl, verbzeit) VALUES (?, 1, ?, ?)",
+          [$sector, $z, $tech_ticks]);
+      else mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_sector_build SET anzahl = anzahl + ? WHERE sector_id = ? AND tech_id=1 AND verbzeit=?",
+        [$z, $sector, $tech_ticks]);
 
       //aktualisiert die rohstoffe
       $gr01=$gr01-$srestyp01;
@@ -426,9 +462,15 @@ if ($prod)//ja, es wurde ein button gedrueckt
       $gr03=$gr03-$srestyp03;
       $gr04=$gr04-$srestyp04;
       $gr05=$gr05-$srestyp05;
-      mysql_query("update de_sector set restyp01 = restyp01 - $gr01,
-       restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03,
-       restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE sec_id = '$sector'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_sector SET 
+         restyp01 = restyp01 - ?,
+         restyp02 = restyp02 - ?,
+         restyp03 = restyp03 - ?,
+         restyp04 = restyp04 - ?,
+         restyp05 = restyp05 - ? 
+         WHERE sec_id = ?",
+        [$gr01, $gr02, $gr03, $gr04, $gr05, $sector]);
 
     }
 
@@ -464,14 +506,18 @@ if(isset($_REQUEST['ida'])){
 // Sektorgebäude
 ////////////////////////////////////////////////////////////////
 if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
-	$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id='$sector'",$db);
-	$row = mysql_fetch_array($db_daten);
-	$srestyp01=$row[0];$srestyp02=$row[1];$srestyp03=$row[2];$srestyp04=$row[3];
-	$srestyp05=$row[4];
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id=?",
+		[$sector]);
+	$row = mysqli_fetch_assoc($db_daten);
+	$srestyp01=$row["restyp01"];$srestyp02=$row["restyp02"];$srestyp03=$row["restyp03"];$srestyp04=$row["restyp04"];
+	$srestyp05=$row["restyp05"];
 	$gr01=$srestyp01;$gr02=$srestyp02;$gr03=$srestyp03;$gr04=$srestyp04;$gr05=$srestyp05;
 	
-	$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor, tech_name FROM de_tech_data1 WHERE tech_id=$t",$db);
-	$row = mysql_fetch_array($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor, tech_name FROM de_tech_data1 WHERE tech_id=?",
+		[$t]);
+	$row = mysqli_fetch_assoc($db_daten);
 	
 	$benrestyp01=floor($row[0]/$kostenfaktor);
 	$benrestyp02=floor($row[1]/$kostenfaktor);
@@ -506,9 +552,21 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 		$gr03=$gr03-$srestyp03;
 		$gr04=$gr04-$srestyp04;
 		$gr05=$gr05-$srestyp05;
-		mysql_query("update de_sector set restyp01 = restyp01 - $gr01, restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03, restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE sec_id = '$sector'",$db);
-		mysql_query("update de_sector set buildgnr = $t WHERE sec_id = '$sector'",$db);
-		mysql_query("update de_sector set buildgtime = $tech_ticks WHERE sec_id = '$sector'",$db);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_sector SET 
+			restyp01 = restyp01 - ?,
+			restyp02 = restyp02 - ?,
+			restyp03 = restyp03 - ?,
+			restyp04 = restyp04 - ?,
+			restyp05 = restyp05 - ? 
+			WHERE sec_id = ?",
+			[$gr01, $gr02, $gr03, $gr04, $gr05, $sector]);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_sector SET buildgnr = ? WHERE sec_id = ?",
+			[$t, $sector]);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_sector SET buildgtime = ? WHERE sec_id = ?",
+			[$tech_ticks, $sector]);
 		$buildgnr=$t;
 		$verbtime=$tech_ticks;
 		$buildgtime=$tech_ticks;
@@ -517,9 +575,9 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 		insert_chat_msg($sector, 0, '', 'Folgendes Sektorgeb&auml;ude wurde in Auftrag gegeben: '.$row['tech_name'].'  (BZ: '.$tech_ticks.' WT)');
 
 		//Nachricht in der Sektorstatistik hinterlegen
-		$sql="INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', 7, $sector, '".$row['tech_name']."');";
-		//echo $sql;
-		mysql_query($sql ,$db);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, 7, ?, ?)",
+			[$maxtick, $sector, $row['tech_name']]);
 
 
   	}
@@ -531,19 +589,23 @@ $sc2=$_POST['sc2'] ?? false;
 $scansec=$_POST['scansec'];
 if (($sc1 || $sc2) && $scansec){
   $scansec=(int)$scansec;
-  $db_daten=mysql_query("SELECT * FROM de_sector WHERE sec_id=$scansec",$db);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_sector WHERE sec_id=?",
+    [$scansec]);
 
-  $num = mysql_num_rows($db_daten);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)//die koordinaten stimmen, gib die daten aus
   {
-    $row = mysql_fetch_array($db_daten);
+    $row = mysqli_fetch_assoc($db_daten);
 
     if($sc1) //scanlevel 1
     if($srestyp05>=5)
     {
       //schiffe im bau
-      $db_daten=mysql_query("SELECT SUM(anzahl) as anzahl FROM de_sector_build WHERE sector_id='$scansec'",$db);
-      $row1 = mysql_fetch_array($db_daten);
+      $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT SUM(anzahl) as anzahl FROM de_sector_build WHERE sector_id=?",
+        [$scansec]);
+      $row1 = mysqli_fetch_assoc($db_daten);
 
       //daten des zielsectors ausgeben
       $zgesschiffe=$row["e1"]+$row["e2"];
@@ -589,7 +651,9 @@ if (($sc1 || $sc2) && $scansec){
 
 
       //tronic f�r die aktion abziehen
-      mysql_query("update de_sector set restyp05 = restyp05 - 5 WHERE sec_id = '$sector'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_sector SET restyp05 = restyp05 - 5 WHERE sec_id = ?",
+        [$sector]);
       $srestyp05=$srestyp05-5;
     }
     else echo '<font color="#FF0000">'.$bkmenu_lang['fehlerzuwenigtronic'].'</font>';
@@ -617,15 +681,18 @@ if (($sc1 || $sc2) && $scansec){
       echo '</tr>';
 	  
       //flotten die zu dem sektor hinfliegen
-      $flotten=mysql_query("SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = '$scansec' AND sec_id<>'$scansec'",$db);
-      $fa = mysql_num_rows($flotten);
-      for ($i=0; $i<$fa; $i++)
+      $flotten = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = ? AND sec_id <> ?",
+        [$scansec, $scansec]);
+      $fa = mysqli_num_rows($flotten);
+      $i = 0;
+      while ($row = mysqli_fetch_assoc($flotten))
       {
-        //$zsec1=mysql_result($flotten, $i, "zielsec");
-        $sec_id=mysql_result($flotten, $i, "sec_id");
-        $a1=mysql_result($flotten, $i, "aktion");
-        $t1=mysql_result($flotten, $i, "zeit");
-        $at1=mysql_result($flotten, $i, "aktzeit");
+        //$zsec1=$row["zielsec"];
+        $sec_id=$row["sec_id"];
+        $a1=$row["aktion"];
+        $t1=$row["zeit"];
+        $at1=$row["aktzeit"];
 
         if ($a1==0) $a1=$bkmenu_lang['systemverteidigung'];
         elseif ($a1==1) {$a1=$bkmenu_lang['angriff']; $cl='ccr';}
@@ -635,7 +702,7 @@ if (($sc1 || $sc2) && $scansec){
         if ($a1[0]=='V' && $t1==0) {$a1=$bkmenu_lang['Verteidige'];$t1=$at1;}
 
         //einheiten z�hlen
-        $ge=mysql_result($flotten, $i, "e2");
+        $ge=$row["e2"];
 
         echo '<tr>';
         echo '<td class="'.$cl.'">'.$bkmenu_lang['sektor'].'</td>';
@@ -644,18 +711,22 @@ if (($sc1 || $sc2) && $scansec){
         echo '<td class="'.$cl.'">'.$t1.'</td>';
         echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';
         echo '</tr>';
+        $i++;
       }
 
       //flotten des gescannten sektors
-      $flotten=mysql_query("SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion<>0 AND sec_id='$scansec'",$db);
-      $fa = mysql_num_rows($flotten);
-      for ($i=0; $i<$fa; $i++)
+      $flotten = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion <> 0 AND sec_id = ?",
+        [$scansec]);
+      $fa = mysqli_num_rows($flotten);
+      $i = 0;
+      while ($row = mysqli_fetch_assoc($flotten))
       {
-        $zsec1=mysql_result($flotten, $i, "zielsec");
-        $sec_id=mysql_result($flotten, $i, "sec_id");
-        $a1=mysql_result($flotten, $i, "aktion");
-        $t1=mysql_result($flotten, $i, "zeit");
-        $at1=mysql_result($flotten, $i, "aktzeit");
+        $zsec1=$row["zielsec"];
+        $sec_id=$row["sec_id"];
+        $a1=$row["aktion"];
+        $t1=$row["zeit"];
+        $at1=$row["aktzeit"];
 
         if ($a1==0) $a1=$bkmenu_lang['systemverteidigung'];
         elseif ($a1==1) {$a1=$bkmenu_lang['angriff']; $cl='ccr';}
@@ -665,7 +736,7 @@ if (($sc1 || $sc2) && $scansec){
         if ($a1[0]=='V' && $t1==0) {$a1=$bkmenu_lang['Verteidige'];$t1=$at1;}
 
         //einheiten z�hlen
-        $ge=mysql_result($flotten, $i, "e2");
+        $ge=$row["e2"];
 
         echo '<tr>';
         echo '<td class="'.$cl.'">['.$zsec1.']</td>';
@@ -674,6 +745,7 @@ if (($sc1 || $sc2) && $scansec){
         echo '<td class="'.$cl.'">'.$t1.'</td>';
         echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';
         echo '</tr>';
+        $i++;
 
       }
 
@@ -681,7 +753,9 @@ if (($sc1 || $sc2) && $scansec){
       }
       showsecfleetstatus();
       //tronic f�r die aktion abziehen
-      mysql_query("update de_sector set restyp05 = restyp05 - 10 WHERE sec_id = '$sector'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_sector SET restyp05 = restyp05 - 10 WHERE sec_id = ?",
+        [$sector]);
       $srestyp05=$srestyp05-10;
     }
     else echo '<font color="#FF0000">'.$bkmenu_lang['fehlerzuwenigtronic'].'</font>';
@@ -825,14 +899,16 @@ echo '<form action="bkmenu.php" method="post">';
 $bg='cell1';
 
 $c1=0;$c2=0;
-$db_daten=mysql_query("SELECT  tech_id, tech_name, restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id",$db);
-$num = mysql_num_rows($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+	"SELECT tech_id, tech_name, restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id");
+$num = mysqli_num_rows($db_daten);
 
 for ($i=0; $i<$num; $i++) //jeder gefundene datensatz wird geprueft
 {
   //zerlege vorbedinguns-string
   $z1=0;$z2=0;
-  $tech_vor = mysql_result($db_daten, $i, "tech_vor");
+  $row = mysqli_fetch_assoc($db_daten);
+  $tech_vor = $row["tech_vor"];
   $vorb=explode(";",$tech_vor);
   foreach($vorb as $einzelb) //jede einzelne bedingung checken
   {
@@ -852,13 +928,13 @@ for ($i=0; $i<$num; $i++) //jeder gefundene datensatz wird geprueft
       $c1=0;
       $bg='cell1';
     }
-    showtech(mysql_result($db_daten, $i, "tech_name"), mysql_result($db_daten, $i, "tech_id"),
-	  mysql_result($db_daten, $i, "restyp01")/$kostenfaktor, 
-	  mysql_result($db_daten, $i, "restyp02")/$kostenfaktor,
-	  mysql_result($db_daten, $i, "restyp03")/$kostenfaktor, 
-	  mysql_result($db_daten, $i, "restyp04")/$kostenfaktor,
-      mysql_result($db_daten, $i, "restyp05")/$kostenfaktor,
-      mysql_result($db_daten, $i, "tech_ticks"), $buildgnr, $techs, 2, $buildgtime, $bg, 0);
+    showtech($row["tech_name"], $row["tech_id"],
+	  $row["restyp01"]/$kostenfaktor, 
+	  $row["restyp02"]/$kostenfaktor,
+	  $row["restyp03"]/$kostenfaktor, 
+	  $row["restyp04"]/$kostenfaktor,
+      $row["restyp05"]/$kostenfaktor,
+      $row["tech_ticks"], $buildgnr, $techs, 2, $buildgtime, $bg, 0);
   }
 }
 //echo "</table>";
@@ -935,8 +1011,10 @@ echo "</tr>";
 echo '<br><input type="Submit" name="prod" value="'.$bkmenu_lang['bauen'].'"><br>';
 
 //zeige aktive bauauftr�ge an
-$result=mysql_query("SELECT  anzahl, verbzeit FROM de_sector_build WHERE sector_id=$sector AND tech_id=1 ORDER BY verbzeit ASC",$db);
-$num = mysql_num_rows($result);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+	"SELECT anzahl, verbzeit FROM de_sector_build WHERE sector_id=? AND tech_id=1 ORDER BY verbzeit ASC",
+	[$sector]);
+$num = mysqli_num_rows($result);
 if ($num>0)
 {
 echo '<br><table border="0" cellpadding="0" cellspacing="1" width="310" bgcolor="#000000">';
@@ -952,7 +1030,7 @@ echo '<td class="tc" width="20%">'.$bkmenu_lang['wochen'].'</td>';
 echo '</tr>';
 echo '</table>';
 
-while($row = mysql_fetch_array($result)) //jeder gefundene datensatz wird geprueft
+while($row = mysqli_fetch_assoc($result)) //jeder gefundene datensatz wird geprueft
 {
 echo '<table border="0" cellpadding="0" cellspacing="1" width="310" bgcolor="#000000">';
 echo '<tr>';
@@ -1073,8 +1151,6 @@ if ($techs[124]==1) //scannerphalanx vorhanden?
 <?php
 rahmen_unten();
 }//scannerphalanx ende
-
-//echo '<br><div class="cell" style="width: 250px;"><a href="bkmenu.php">'.$bkmenu_lang[aktualisieren].'</a></div><br><br>';
 
 ?>
 </div>

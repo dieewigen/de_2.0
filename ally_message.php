@@ -15,18 +15,15 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.message.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector']; $system=$row['system'];
 $allytag=$row['allytag'];
-
-/*$db_daten=mysql_query("SELECT nic FROM de_login WHERE user_id='$ums_user_id'");
-$row = mysql_fetch_array($db_daten);
-$nic=$row['nic'];*/
-
-// Sperre f&uuml;r den Fall, dasss user das Script abbrechen.
-@ignore_user_abort();
 
 function insertmessage($message,$color){
   global $allymessage_lang;
@@ -75,12 +72,14 @@ include('ally/ally.menu.inc.php');
 
 $action=$_REQUEST['action'] ?? '';
 
-if($action=="del"){//nachricht l&ouml;schen
+if($action=="del"){//nachricht löschen
 	$se=(int)$se;
 	$sy=(int)$sy;
 	if(!preg_match("/^[0-9]*$/i", $t))$t='';
 
-	mysql_query("DELETE FROM de_hfn_usr_ally WHERE allytag='$allytag' and fromsec='$se' and  fromsys='$sy' and time='$t'",$db);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"DELETE FROM de_hfn_usr_ally WHERE allytag=? AND fromsec=? AND fromsys=? AND time=?",
+		[$allytag, $se, $sy, $t]);
 
 	echo insertmessage($allymessage_lang['msg_1'],"g");
 }
@@ -89,8 +88,12 @@ $ak=$_POST['ak'] ?? false;
 $deak=$_POST['deak'] ?? false;
 
 if ($ak || $deak){//HFNs direkt weiterleiten?
-	if($ak)mysql_query("update de_allys set hfn_forwarding = 1 where allytag='$allytag'");
-	if($deak)mysql_query("update de_allys set hfn_forwarding = 0 where allytag='$allytag'");
+	if($ak)mysqli_execute_query($GLOBALS['dbi'],
+		"UPDATE de_allys SET hfn_forwarding=1 WHERE allytag=?",
+		[$allytag]);
+	if($deak)mysqli_execute_query($GLOBALS['dbi'],
+		"UPDATE de_allys SET hfn_forwarding=0 WHERE allytag=?",
+		[$allytag]);
 
 	if($ak)echo insertmessage($allymessage_lang['msg_2'],"g");
 	if($deak)echo insertmessage($allymessage_lang['msg_3'],"r");
@@ -99,8 +102,13 @@ if ($ak || $deak){//HFNs direkt weiterleiten?
 if($action=="fw"){
 	//$text=nl2br($_POST['text']);
 
-	$db_tfn=mysql_query("SELECT absender, fromsec, fromsys, fromnic, betreff, text FROM de_hfn_usr_ally WHERE allytag='$allytag' and fromsec='$se' and  fromsys='$sy' and time='$t' ORDER BY time DESC",$db);
-	$rowtfn = mysql_fetch_array($db_tfn);
+	$db_tfn = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT absender, fromsec, fromsys, fromnic, betreff, text 
+		 FROM de_hfn_usr_ally 
+		 WHERE allytag=? AND fromsec=? AND fromsys=? AND time=? 
+		 ORDER BY time DESC",
+		[$allytag, $se, $sy, $t]);
+	$rowtfn = mysqli_fetch_assoc($db_tfn);
 
 	$time=strftime("%Y%m%d%H%M%S");
 
@@ -113,14 +121,23 @@ if($action=="fw"){
 	$text = $rowtfn['text'];
 
 
-	$resource=mysql_query("SELECT user_id FROM de_user_data WHERE allytag='$allytag' AND status=1");
+	$resource = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT user_id FROM de_user_data WHERE allytag=? AND status=1",
+		[$allytag]);
 
-	while($row=mysql_fetch_array($resource)){
-		mysql_query("update de_user_data set newtrans = 1 where user_id = $row[user_id]");
-		mysql_query("insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values ('$row[user_id]', '$absender', '$fromsec', '$fromsys', '$fromnic', '$time', '$betreff', '$text',0)",$db);
+	while($row = mysqli_fetch_assoc($resource)){
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_user_data SET newtrans=1 WHERE user_id=?",
+			[$row['user_id']]);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) 
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
+			[$row['user_id'], $absender, $fromsec, $fromsys, $fromnic, $time, $betreff, $text]);
 	}
 
-	mysql_query("DELETE FROM de_hfn_usr_ally WHERE allytag='$allytag' and fromsec='$se' and  fromsys='$sy' and time='$t'",$db);
+	mysqli_execute_query($GLOBALS['dbi'],
+		"DELETE FROM de_hfn_usr_ally WHERE allytag=? AND fromsec=? AND fromsys=? AND time=?",
+		[$allytag, $se, $sy, $t]);
 	echo insertmessage($allymessage_lang['msg_4'],"g");
 
 }
@@ -130,12 +147,18 @@ if($send){
 	$text=nl2br($_POST['text']);
 	$betreff=$_POST['betreff'];
 
-	$resource=mysql_query("SELECT user_id FROM de_user_data WHERE allytag='$allytag' AND status=1");
+	$resource = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT user_id FROM de_user_data WHERE allytag=? AND status=1",
+		[$allytag]);
 	$time=strftime("%Y%m%d%H%M%S");
-	while($row=mysql_fetch_array($resource)) {
-		mysql_query("update de_user_data set newtrans = 1 where user_id = $row[user_id]");
-		mysql_query("insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values ('$row[user_id]', '$ums_user_id', '$sector', '$system', '$ums_spielername', '$time', 'Allianzrundmail: $betreff', '$text',0)",$db);
-
+	while($row = mysqli_fetch_assoc($resource)) {
+		mysqli_execute_query($GLOBALS['dbi'],
+			"UPDATE de_user_data SET newtrans=1 WHERE user_id=?",
+			[$row['user_id']]);
+		mysqli_execute_query($GLOBALS['dbi'],
+			"INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) 
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
+			[$row['user_id'], $ums_user_id, $sector, $system, $ums_spielername, $time, 'Allianzrundmail: '.$betreff, $text]);
 	}
 	echo insertmessage($allymessage_lang['msg_5'],"g");
 
@@ -193,8 +216,10 @@ if($send){
 <tr class="tc">
 <td width="50%" align="center" colspan="2">
 <?php
-$hfnforward=mysql_query("SELECT hfn_forwarding FROM de_allys WHERE allytag='$allytag'");
-$rowhfnforward=mysql_fetch_array($hfnforward);
+$hfnforward = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT hfn_forwarding FROM de_allys WHERE allytag=?",
+    [$allytag]);
+$rowhfnforward = mysqli_fetch_assoc($hfnforward);
 
 if($rowhfnforward['hfn_forwarding']=="1")
 {
@@ -224,17 +249,21 @@ echo '<input type=submit  style="background-color:#000000;border:1;border-color:
 
 
       <?php
-      $db_memhfnmem=mysql_query("SELECT absender, fromsec, fromsys, fromnic, time, betreff, text FROM de_hfn_usr_ally WHERE allytag='$allytag'");
+      $db_memhfnmem = mysqli_execute_query($GLOBALS['dbi'],
+          "SELECT absender, fromsec, fromsys, fromnic, time, betreff, text 
+           FROM de_hfn_usr_ally 
+           WHERE allytag=?",
+          [$allytag]);
 
-      $num = mysql_num_rows($db_memhfnmem);
+      $num = mysqli_num_rows($db_memhfnmem);
 
-      if($num=="0")
+      if($num==0)
       {
-      echo '<tr class="cell"><td colspan="2" align="center"> '.$allymessage_lang['msg_10'].'</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
+          echo '<tr class="cell"><td colspan="2" align="center"> '.$allymessage_lang['msg_10'].'</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
       }
       else
       {
-      while($hfnrow = mysql_fetch_array($db_memhfnmem))
+          while($hfnrow = mysqli_fetch_assoc($db_memhfnmem))
       {
       $t=$hfnrow['time'];
       $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];

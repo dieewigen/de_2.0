@@ -52,17 +52,17 @@ if (!isset($sv_comserver_roundtyp)) {
 
 //rohstoffe für die battleround auf communityservern
 if ($sv_comserver == 1 and $sv_comserver_roundtyp == 1) {
-    mysql_query("UPDATE de_user_data set tick=tick+2500000, sm_rboost=0, restyp01=restyp01+9000000000,
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET tick=tick+2500000, sm_rboost=0, restyp01=restyp01+9000000000,
 restyp02=restyp02+4500000000, restyp03=restyp03+1000000000, restyp04=restyp04+500000000, restyp05=restyp05+100000, col=col+10000 
-WHERE user_id='$ums_user_id' AND tick<1000000;", $db);
+WHERE user_id=? AND tick<1000000", [$ums_user_id]);
 }
 
 //logincounter zurücksetzen
-mysql_query("UPDATE de_login SET points = 0 WHERE user_id='$ums_user_id'", $db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$ums_user_id]);
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$row = mysqli_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
 $restyp03 = $row[2];
@@ -103,12 +103,12 @@ $ovoptfelder = explode(";", $ovopt);
 $rang = $rangnamen[$rang_nr];
 
 //die Anzahl von erfoschen "Vergessenen Systemen" auslesen
-$db_daten = mysql_query("SELECT user_id  FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."';", $db);
-$anz_vergessene_systeme_erforscht = mysql_num_rows($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_map WHERE user_id=?", [$_SESSION['ums_user_id']]);
+$anz_vergessene_systeme_erforscht = mysqli_num_rows($db_daten);
 
 
 //zu den Agenten kommen noch die Agenten dazu die auf einer Mission sind
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT SUM(need_agents) AS anzahl FROM de_user_mission WHERE user_id='".$_SESSION['ums_user_id']."' AND get_reward=0;");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(need_agents) AS anzahl FROM de_user_mission WHERE user_id=? AND get_reward=0", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $agent += $row['anzahl'];
 
@@ -140,8 +140,8 @@ include "resline.php";
 
 //test auf com-sperre
 $akttime = date("Y-m-d H:i:s", time());
-$db_daten = mysql_query("SELECT com_sperre FROM de_login WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$ums_user_id]);
+$row = mysqli_fetch_array($db_daten);
 if ($row['com_sperre'] > $akttime) {
     $sperrtime = strtotime($row['com_sperre']);
     echo('<div class="info_box text2" style="margin-bottom: 5px; font-size: 14px;">Account: Sperre f&uuml;r ausgehende Kommunikation bis: '.date("d.m.Y - H:i", $sperrtime).'</div>');
@@ -212,8 +212,8 @@ for ($j = 0;$j <= 6;$j++) {
             ///////////////////////////////////////////////////////////////
             if ($sv_hardcore == 1) {
 
-                $db_daten = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data", $db);
-                $row = mysql_fetch_array($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+                $row = mysqli_fetch_array($db_daten);
                 $maxtick = $row['tick'];
 
 
@@ -221,12 +221,12 @@ for ($j = 0;$j <= 6;$j++) {
 
                 //Top 3
                 //die ersten drei Pl�tze anzeigen
-                $db_daten = mysql_query("SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 AND (eh_siege>0 OR eh_counter>0) ORDER BY eh_siege DESC, eh_counter DESC LIMIT 3", $db);
-                $num = mysql_num_rows($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 AND (eh_siege>0 OR eh_counter>0) ORDER BY eh_siege DESC, eh_counter DESC LIMIT 3", []);
+                $num = mysqli_num_rows($db_daten);
                 if ($num > 0) {
                     $rca .= '<div style="width: 100%; height: 78px; margin-top: 8px;">';
                     $platzc = 1;
-                    while ($row = mysql_fetch_array($db_daten)) {
+                    while ($row = mysqli_fetch_array($db_daten)) {
                         if ($row['status'] == 1 && !empty($row['allytag'])) {
                             $allianz = '<br>Allianz: '.$row['allytag'];
                         } else {
@@ -250,12 +250,12 @@ for ($j = 0;$j <= 6;$j++) {
                 $rca .= '<div style="width: 100%; height: 78px; margin-top: 24px; margin-bottom: 10px;">';
                 //aktueller EH-Counter
                 if ($maxtick > 1000) {
-                    $db_daten = mysql_query("SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 ORDER BY ehscore DESC LIMIT 1", $db);
-                    $num = mysql_num_rows($db_daten);
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 ORDER BY ehscore DESC LIMIT 1", []);
+                    $num = mysqli_num_rows($db_daten);
                     if ($num > 0) {
 
                         $platzc = 1;
-                        while ($row = mysql_fetch_array($db_daten)) {
+                        while ($row = mysqli_fetch_array($db_daten)) {
                             if ($row['status'] == 1 && !empty($row['allytag'])) {
                                 $allianz = '<br>Allianz: '.$row['allytag'];
                             } else {
@@ -277,12 +277,12 @@ for ($j = 0;$j <= 6;$j++) {
                     }
                 }
                 //man selbst
-                $db_daten = mysql_query("SELECT * FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."' LIMIT 1", $db);
-                $num = mysql_num_rows($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=? LIMIT 1", [$_SESSION['ums_user_id']]);
+                $num = mysqli_num_rows($db_daten);
                 if ($num > 0) {
 
                     $platzc = 1;
-                    while ($row = mysql_fetch_array($db_daten)) {
+                    while ($row = mysqli_fetch_array($db_daten)) {
                         if ($row['status'] == 1 && !empty($row['allytag'])) {
                             $allianz = '<br>Allianz: '.$row['allytag'];
                         } else {
@@ -314,8 +314,8 @@ for ($j = 0;$j <= 6;$j++) {
                 //gesamtbreite der inneren spalten
                 $gessb = 520;
                 //rundenstatus auslesen
-                $db_daten = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data", $db);
-                $row = mysql_fetch_array($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+                $row = mysqli_fetch_array($db_daten);
                 if ($row["tick"] <= 0) {
                     $ticks = 1;
                 } else {
@@ -359,8 +359,8 @@ for ($j = 0;$j <= 6;$j++) {
                         $sb2 = round($gessb / 2);
 
                         //�berpr�fen ob der eh-kampf noch l�uft, oder ab es schon rum ist
-                        $result = mysql_query("SELECT doetick, winid, winticks FROM de_system", $db);
-                        $row = mysql_fetch_array($result);
+                        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT doetick, winid, winticks FROM de_system", []);
+                        $row = mysqli_fetch_array($result);
                         $doetick = $row["doetick"];
                         $winticks = $row["winticks"];
                         $winid = $row["winid"];
@@ -587,8 +587,8 @@ for ($j = 0;$j <= 6;$j++) {
             $fid1 = $ums_user_id.'-1';
             $fid2 = $ums_user_id.'-2';
             $fid3 = $ums_user_id.'-3';
-            $db_daten = mysql_query("SELECT e81, e82, e83, e84, e85, e86, e87,e88,e89,e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC", $db);
-            while ($row = mysql_fetch_array($db_daten)) {
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87,e88,e89,e90 FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
+            while ($row = mysqli_fetch_array($db_daten)) {
                 $ec[81] += $row['e81'];
                 $ec[82] += $row['e82'];
                 $ec[83] += $row['e83'];
@@ -620,8 +620,8 @@ for ($j = 0;$j <= 6;$j++) {
             $ec[103] = 0;
             $ec[104] = 0;
 
-            $db_daten = mysql_query("SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-            $row = mysql_fetch_array($db_daten);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+            $row = mysqli_fetch_array($db_daten);
             $ec[100] = $row['e100'];
             $ec[101] = $row['e101'];
             $ec[102] = $row['e102'];
@@ -803,16 +803,16 @@ for ($j = 0;$j <= 6;$j++) {
             echo('<tr align="center"><td width="50" class="cell">'.$ov_lang['stufe'].'</td><td width="510" class="cell">'.$ov_lang['aufgabe'].'</td></tr>');
 
             //alle errungenschaften auslesen
-            $db_daten = mysql_query("SELECT * FROM de_user_achievement WHERE user_id = '$ums_user_id'", $db);
-            $num = mysql_num_rows($db_daten);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$ums_user_id]);
+            $num = mysqli_num_rows($db_daten);
             //wenn es noch keinen datensatz gibt, diesen anlegen
             if ($num == 0) {
-                mysql_query("INSERT INTO de_user_achievement (user_id) VALUES ('$ums_user_id')", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_achievement (user_id) VALUES (?)", [$ums_user_id]);
                 //jetzt nochmal auslesen
-                $db_daten = mysql_query("SELECT * FROM de_user_achievement WHERE user_id = '$ums_user_id'", $db);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$ums_user_id]);
             }
             //errungenschaften laden
-            $ac_daten = mysql_fetch_array($db_daten);
+            $ac_daten = mysqli_fetch_array($db_daten);
 
             //alle belohnungen in einer schleife �berpr�fen
             //$ticks=30000;
@@ -948,8 +948,8 @@ for ($j = 0;$j <= 6;$j++) {
                         $fid1 = $ums_user_id.'-1';
                         $fid2 = $ums_user_id.'-2';
                         $fid3 = $ums_user_id.'-3';
-                        $einheiten_daten = mysql_query("SELECT * FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC", $db);
-                        while ($row = mysql_fetch_array($einheiten_daten)) { //jeder gefundene datensatz wird geprueft
+                        $einheiten_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
+                        while ($row = mysqli_fetch_array($einheiten_daten)) { //jeder gefundene datensatz wird geprueft
                             if ($row["artlvl1"] > 0) {
                                 $zielwert++;
                             }
@@ -1119,8 +1119,8 @@ for ($j = 0;$j <= 6;$j++) {
                                 //nachricht f�r jede gutschrift hinterlegen
                                 $time = strftime("%Y%m%d%H%M%S");
                                 $news = $ov_lang['errungenschaftenbonus'].' ('.$text1.' - '.$ov_lang['stufe'].' '.$ac_akt.'): '.number_format($rewards[$i][1], 0, "", ".").' M';
-                                mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$ums_user_id', '60','$time','$news')", $db);
-                                mysql_query("UPDATE de_user_data SET newnews = 1 WHERE user_id = '$ums_user_id'", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, ?)", [$ums_user_id, $time, $news]);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$ums_user_id]);
                             }
                         }
                     }
@@ -1199,7 +1199,7 @@ for ($j = 0;$j <= 6;$j++) {
                     $rca = '-';
                 }
                 //ac_akt updaten
-                mysql_query("UPDATE de_user_achievement SET $ac_table_field='$ac_akt' WHERE user_id='$ums_user_id'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_achievement SET {$ac_table_field}=? WHERE user_id=?", [$ac_akt, $ums_user_id]);
 
                 //ziele ausgeben ausgeben
                 if ($c1 == 0) {
@@ -1239,7 +1239,7 @@ for ($j = 0;$j <= 6;$j++) {
             echo($output);
 
             //belohnungen mit einem mal in der db gutschreiben
-            mysql_query("UPDATE de_user_data SET restyp01 = restyp01 + '$ac_belohnung' WHERE user_id = '$ums_user_id'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ? WHERE user_id = ?", [$ac_belohnung, $ums_user_id]);
             //echo ($ac_belohnung);
 
             echo('</table>');

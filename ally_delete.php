@@ -3,8 +3,11 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.delete.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_id FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_id 
+     FROM de_user_data WHERE user_id=?", 
+    [$ums_user_id]);
+$row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];$ally_id=$row['ally_id'];
 $allytag=$row['allytag'];
@@ -28,15 +31,20 @@ else
 {
 	if(isset($a) && $a == 1)
 	{
-		$query = "select id from de_allys where leaderid=$ums_user_id";
-		if ($result = @mysql_query($query))
+		$result = mysqli_execute_query($GLOBALS['dbi'], 
+            "SELECT id FROM de_allys WHERE leaderid=?", 
+            [$ums_user_id]);
+		if ($row = mysqli_fetch_array($result))
 		{
-			$allyid = mysql_result($result,0,"id");
+			$allyid = $row['id'];
 		}
-		$query = "select max(kriegsstart) \"kriegsstart\" from de_ally_war, de_allys where (ally_id_angreifer=$allyid or ally_id_angegriffener=$allyid)";
-		if ($result = @mysql_query($query))
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT MAX(kriegsstart) AS kriegsstart FROM de_ally_war, de_allys 
+             WHERE (ally_id_angreifer=? OR ally_id_angegriffener=?)",
+            [$allyid, $allyid]);
+		if ($row = mysqli_fetch_array($result))
 		{
-			$kriegsstarttime = @mysql_result($result,0,"kriegsstart");
+			$kriegsstarttime = $row['kriegsstart'];
 			if ($kriegsstarttime)
 			{
 				$kriegsstart = strtotime($kriegsstarttime);
@@ -62,17 +70,30 @@ else
 				}
 			}
 		}
-		mysql_query("DELETE FROM de_allys where leaderid='$ums_user_id'");
-		mysql_query("DELETE FROM de_ally_partner where ally_id_1=$allyid or ally_id_2=$allyid");
-		mysql_query("DELETE FROM de_ally_war where ally_id_angreifer=$allyid or ally_id_angegriffener=$allyid");
-		mysql_query("DELETE FROM de_ally_buendniss_antrag where ally_id_antragsteller=$allyid or ally_id_partner=$allyid");
-		mysql_query("DELETE FROM de_ally_antrag where ally_id=$allyid");
-
+		mysqli_execute_query($GLOBALS['dbi'], 
+            "DELETE FROM de_allys WHERE leaderid=?",
+            [$ums_user_id]);
+		mysqli_execute_query($GLOBALS['dbi'],
+            "DELETE FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
+            [$allyid, $allyid]);
+		mysqli_execute_query($GLOBALS['dbi'],
+            "DELETE FROM de_ally_war WHERE ally_id_angreifer=? OR ally_id_angegriffener=?",
+            [$allyid, $allyid]);
+		mysqli_execute_query($GLOBALS['dbi'],
+            "DELETE FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller=? OR ally_id_partner=?",
+            [$allyid, $allyid]);
+		mysqli_execute_query($GLOBALS['dbi'],
+            "DELETE FROM de_ally_antrag WHERE ally_id=?",
+            [$allyid]);
 
 		if($ally_id>0){
-			mysql_query("UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE ally_id='$ally_id'");
+			mysqli_execute_query($GLOBALS['dbi'],
+                "UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE ally_id=?",
+                [$ally_id]);
 		}else{
-			mysql_query("UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE allytag='$allytag'");
+			mysqli_execute_query($GLOBALS['dbi'],
+                "UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE allytag=?",
+                [$allytag]);
 		}
 		//echo $allydelete_lang[msg_3];
 		header("Location: allymain.php");

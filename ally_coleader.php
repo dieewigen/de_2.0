@@ -14,13 +14,18 @@ include('inc/lang/'.$sv_server_lang.'_ally.coleader.lang.php');
 include_once('functions.php');
 
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, ally_id, allytag, status, spielername FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];
-$restyp02=$row[1];
-$restyp03=$row[2];
-$restyp04=$row[3];
-$restyp05=$row[4];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, 
+            `system`, newtrans, newnews, ally_id, allytag, status, spielername 
+     FROM de_user_data WHERE user_id = ?",
+    [$ums_user_id]
+);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];
+$restyp02=$row['restyp02'];
+$restyp03=$row['restyp03'];
+$restyp04=$row['restyp04'];
+$restyp05=$row['restyp05'];
 $punkte=$row['score'];
 $newtrans=$row['newtrans'];
 $newnews=$row['newnews'];
@@ -69,16 +74,18 @@ function getSelect($leaderid, $select_name, $co, $ally){
 	//Erzeugen des öffnenden <select> - Tags
 	$select = '<select name="'.$select_name.'" id="'.$select_name.'" style="width:150px;height:18;font-size:8pt;font-family:Tahoma">';
 	//Ermitteln aller Mitglieder der Allianz $ally
-	//$result_member = mysql_query("SELECT user_id, spielername FROM de_user_data WHERE allytag='$ally' AND status='1'");
-	$result_member = mysql_query("SELECT user_id, spielername FROM de_user_data WHERE ally_id='$ally' AND status='1'");
+	$result_member = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT user_id, spielername FROM de_user_data WHERE ally_id = ? AND status = '1'",
+		[$ally]
+	);
 	//Prüfen, ob ein gültiges Resultset vom Datenbankserver erzeugt wurde
 	if ($result_member){
 		//Ermitteln der Anzahl Datensätze im Resultset
-		$numrows = mysql_num_rows($result_member);
+		$numrows = mysqli_num_rows($result_member);
 		//Schleife über alle Elemente des Resultsets
 		for ($i=0;$i<$numrows;$i++){
 			//Auslesen des aktuellen Datensatzes aus dem Resultset
-			$ally_members[$i] = mysql_fetch_array($result_member);
+			$ally_members[$i] = mysqli_fetch_assoc($result_member);
 			//Ermitteln der user_id
 			$uid = $ally_members[$i]['user_id'];
 			//Ermitteln des Spielernamens
@@ -160,8 +167,29 @@ if ($isleader && $ally_id > 0 ){
 			$membername1=$_POST['membername1'];
 			$membername2=$_POST['membername2'];
 
-			$query = "UPDATE de_allys SET coleaderid1='$coleader1', coleaderid2='$coleader2', coleaderid3='$coleader3', fleetcommander1='$fc1', fleetcommander2='$fc2', tacticalofficer1='$tactic1', tacticalofficer2='$tactic2', memberofficer1='$member1', memberofficer2='$member2', leadername='$leadername', coleadername1='$coleadername1', coleadername2='$coleadername2', coleadername3='$coleadername3', fcname1='$fcname1', fcname2='$fcname2', toname1='$tacticname1', toname2='$tacticname2', moname1='$membername1', moname2='$membername2' WHERE leaderid='$ums_user_id'";
-			$result_update = mysql_query($query, $db);
+			$result_update = mysqli_execute_query($GLOBALS['dbi'],
+				"UPDATE de_allys SET 
+					coleaderid1 = ?, coleaderid2 = ?, coleaderid3 = ?,
+					fleetcommander1 = ?, fleetcommander2 = ?,
+					tacticalofficer1 = ?, tacticalofficer2 = ?,
+					memberofficer1 = ?, memberofficer2 = ?,
+					leadername = ?, coleadername1 = ?, coleadername2 = ?, coleadername3 = ?,
+					fcname1 = ?, fcname2 = ?,
+					toname1 = ?, toname2 = ?,
+					moname1 = ?, moname2 = ?
+				WHERE leaderid = ?",
+				[
+					$coleader1, $coleader2, $coleader3,
+					$fc1, $fc2,
+					$tactic1, $tactic2,
+					$member1, $member2,
+					$leadername, $coleadername1, $coleadername2, $coleadername3,
+					$fcname1, $fcname2,
+					$tacticname1, $tacticname2,
+					$membername1, $membername2,
+					$ums_user_id
+				]
+			);
 			if ($result_update){
 				echo '<br><div class="info_box text3">'.$allycoleader_lang['msg_5'].'</div>';
 			}else{
@@ -171,29 +199,40 @@ if ($isleader && $ally_id > 0 ){
 	}
 
 	//Allianz-Datensatz laden und Daten anzeigen
-	$result = mysql_query("SELECT * FROM de_allys WHERE id='$ally_id'");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT coleaderid1, coleaderid2, coleaderid3,
+				fleetcommander1, fleetcommander2,
+				tacticalofficer1, tacticalofficer2,
+				memberofficer1, memberofficer2,
+				leadername, coleadername1, coleadername2, coleadername3,
+				fcname1, fcname2, toname1, toname2, moname1, moname2
+		FROM de_allys WHERE id = ?",
+		[$ally_id]
+	);
+	
+	$row = mysqli_fetch_assoc($result);
 	
 	//Ermitteln der neuen Coleader
-	$coleaderid1 = mysql_result($result,0,"coleaderid1");
-	$coleaderid2 = mysql_result($result,0,"coleaderid2");
-	$coleaderid3 = mysql_result($result,0,"coleaderid3");
-	$fleetcommander1 = mysql_result($result,0,"fleetcommander1");
-	$fleetcommander2 = mysql_result($result,0,"fleetcommander2");
-	$tacticalofficer1 = mysql_result($result,0,"tacticalofficer1");
-	$tacticalofficer2 = mysql_result($result,0,"tacticalofficer2");
-	$memberofficer1 = mysql_result($result,0,"memberofficer1");
-	$memberofficer2 = mysql_result($result,0,"memberofficer2");
+	$coleaderid1 = $row["coleaderid1"];
+	$coleaderid2 = $row["coleaderid2"];
+	$coleaderid3 = $row["coleaderid3"];
+	$fleetcommander1 = $row["fleetcommander1"];
+	$fleetcommander2 = $row["fleetcommander2"];
+	$tacticalofficer1 = $row["tacticalofficer1"];
+	$tacticalofficer2 = $row["tacticalofficer2"];
+	$memberofficer1 = $row["memberofficer1"];
+	$memberofficer2 = $row["memberofficer2"];
 
-	$leadername = mysql_result($result,0,"leadername");
-	$coleadername1 = mysql_result($result,0,"coleadername1");
-	$coleadername2 = mysql_result($result,0,"coleadername2");
-	$coleadername3 = mysql_result($result,0,"coleadername3");
-	$fcname1 = mysql_result($result,0,"fcname1");
-	$fcname2 = mysql_result($result,0,"fcname2");
-	$tacticname1 = mysql_result($result,0,"toname1");
-	$tacticname2 = mysql_result($result,0,"toname2");
-	$membername1 = mysql_result($result,0,"moname1");
-	$membername2 = mysql_result($result,0,"moname2");
+	$leadername = $row["leadername"];
+	$coleadername1 = $row["coleadername1"];
+	$coleadername2 = $row["coleadername2"];
+	$coleadername3 = $row["coleadername3"];
+	$fcname1 = $row["fcname1"];
+	$fcname2 = $row["fcname2"];
+	$tacticname1 = $row["toname1"];
+	$tacticname2 = $row["toname2"];
+	$membername1 = $row["moname1"];
+	$membername2 = $row["moname2"];
 
 
 	//Generieren der Auswahlboxen

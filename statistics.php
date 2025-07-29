@@ -3,10 +3,11 @@ include "inc/header.inc.php";
 include "inc/lang/".$sv_server_lang."_statistics.lang.php";
 include "functions.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
-$restyp05=$row[4];$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, status FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];
+$restyp05=$row['restyp05'];$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
 $sector=$row['sector'];$system=$row['system'];$hasally=$row['status'];
 
 ?>
@@ -49,7 +50,8 @@ if($_REQUEST['mp']==1)
   echo '</tr>';
   
   //daten auslesen
-  $db_daten=mysql_query("SELECT * FROM de_user_stat WHERE user_id='$ums_user_id' ORDER BY datum DESC LIMIT 7",$db);
+  $sql = "SELECT * FROM de_user_stat WHERE user_id=? ORDER BY datum DESC LIMIT 7";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 
 
   //daten ausgeben
@@ -57,7 +59,7 @@ if($_REQUEST['mp']==1)
   $bgcolors[1]='F88017';
   $bgcolors[2]='00FF00';
   
-  while($row = mysql_fetch_array($db_daten))
+  while($row = mysqli_fetch_assoc($db_daten))
   {
   	$bg='cell';
   	echo '<tr align="center">';
@@ -81,23 +83,26 @@ if($_REQUEST['mp']==1)
   rahmen_unten();
   
   //kollektoren die dir gestohlen worden sind
-  $db_daten=mysql_query("SELECT SUM(CASE WHEN colanz < 0 THEN colanz * -1 ELSE colanz END) AS colanz FROM de_user_getcol WHERE zuser_id='$ums_user_id';",$db);
+  $sql = "SELECT SUM(CASE WHEN colanz < 0 THEN colanz * -1 ELSE colanz END) AS colanz FROM de_user_getcol WHERE zuser_id=?";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
   
-  $row = mysql_fetch_array($db_daten);
+  $row = mysqli_fetch_assoc($db_daten);
   rahmen_oben($stat_lang['verlorenekollektoren'].' ('.number_format($row['colanz'], 0, ',' ,'.').')');
   //tabellenkopf
   echo '<table width="580px">';
   echo '<tr align="center" class="cell"><td>Zeitpunkt</td><td>Kollektoren</td><td>Spielername</td></tr>';
-  $db_daten=mysql_query("SELECT * FROM de_user_getcol WHERE zuser_id='$ums_user_id'",$db);
-  while($row = mysql_fetch_array($db_daten)){
+  $sql = "SELECT * FROM de_user_getcol WHERE zuser_id=?";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  while($row = mysqli_fetch_assoc($db_daten)){
     $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['user_id'];
-  	$result=mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='$duid'",$db);
-  	$num = mysql_num_rows($result);
+  	$sql2 = "SELECT spielername, sector, `system` FROM de_user_data WHERE user_id=?";
+  	$result = mysqli_execute_query($GLOBALS['dbi'], $sql2, [$duid]);
+  	$num = mysqli_num_rows($result);
   	if($num==1)
   	{
-  	  $rowx = mysql_fetch_array($result);
+  	  $rowx = mysqli_fetch_assoc($result);
   	  $spielername='<a href="details.php?se='.$rowx['sector'].'&sy='.$rowx['system'].'">'.$rowx['spielername'].' ('.$rowx['sector'].':'.$rowx['system'].')</a>';
   	}
   	else $spielername=$stat_lang['geloeschterspieler'];
@@ -108,23 +113,26 @@ if($_REQUEST['mp']==1)
   rahmen_unten();
   
   //kollektoren die du erobert hast
-  $db_daten=mysql_query("SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id='$ums_user_id' AND colanz>0;",$db);
-  $row = mysql_fetch_array($db_daten);
+  $sql = "SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id=? AND colanz>0";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $row = mysqli_fetch_assoc($db_daten);
   rahmen_oben($stat_lang['erobertekollektoren'].' ('.number_format($row['colanz'], 0, ',' ,'.').')');
   
   echo '<table width="580px">';
   echo '<tr align="center" class="cell"><td>Zeitpunkt</td><td>Kollektoren</td><td>Spielername</td></tr>';
-  $db_daten=mysql_query("SELECT * FROM de_user_getcol WHERE user_id='$ums_user_id'",$db);
-  while($row = mysql_fetch_array($db_daten))
+  $sql = "SELECT * FROM de_user_getcol WHERE user_id=?";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  while($row = mysqli_fetch_assoc($db_daten))
   {
     $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
   	$duid=$row['zuser_id'];
-  	$result=mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='$duid'",$db);
-  	$num = mysql_num_rows($result);
+  	$sql2 = "SELECT spielername, sector, `system` FROM de_user_data WHERE user_id=?";
+  	$result = mysqli_execute_query($GLOBALS['dbi'], $sql2, [$duid]);
+  	$num = mysqli_num_rows($result);
   	if($num==1)
   	{
-  	  $rowx = mysql_fetch_array($result);
+  	  $rowx = mysqli_fetch_assoc($result);
   	  $spielername='<a href="details.php?se='.$rowx['sector'].'&sy='.$rowx['system'].'">'.$rowx['spielername'].' ('.$rowx['sector'].':'.$rowx['system'].')</a>';
   	}
   	else $spielername=$stat_lang['geloeschterspieler'];
@@ -163,8 +171,8 @@ elseif($_REQUEST['mp']==2)
 	</tr>';
   
   //$sector=137;
-  $sql="SELECT * FROM de_news_sector WHERE sector='$sector' ORDER BY wt DESC";
-  $db_daten=mysql_query($sql,$db);
+  $sql="SELECT * FROM de_news_sector WHERE sector=? ORDER BY wt DESC";
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
   
   if($ums_user_id==1){
 	  //echo $sql;
@@ -177,7 +185,7 @@ elseif($_REQUEST['mp']==2)
   //5: sektorstatus sichtbar
   //6: sektorstatus unsichtbar
   $c1=0;
-  while($row = mysql_fetch_array($db_daten))
+  while($row = mysqli_fetch_assoc($db_daten))
   {
   	if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';} 
   	
@@ -257,20 +265,20 @@ elseif($_REQUEST['mp']==4)
 	</tr>
     </table><br>';
   //gr��ter tick
-  $result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-  $row     = mysql_fetch_array($result);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data");
+  $row = mysqli_fetch_assoc($result);
   $wt = $row['tick']-96;
   
   //artefaktnamen auslesen
-  $db_daten=mysql_query("SELECT id, artname FROM `de_artefakt`",$db);
-  while($row = mysql_fetch_array($db_daten))
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname FROM `de_artefakt`");
+  while($row = mysqli_fetch_assoc($db_daten))
   {
     $artdata[$row['id']]=$row['artname'];
   }	  
 
   //Serveralter
-  $db_daten=mysql_query("SELECT * FROM de_system",$db);
-  $row = mysql_fetch_array($db_daten);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system");
+  $row = mysqli_fetch_assoc($db_daten);
   echo '<div>Server-Wirtschaftsticks: '.number_format($row['wt']).'</div>';
   echo '<div>Server-Kampfticks: '.number_format($row['kt']).'</div>';  
 
@@ -283,12 +291,13 @@ elseif($_REQUEST['mp']==4)
 
 
   
-  $db_daten=mysql_query("SELECT * FROM de_news_server WHERE wt<='$wt' ORDER BY id DESC",$db);
+  $sql = "SELECT * FROM de_news_server WHERE wt<=? ORDER BY id DESC";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$wt]);
   //typdefinitionen:
   //0: sektorartefakt hypersturm
   //1: sektorartefakt angriff
   $c1=0;
-  while($row = mysql_fetch_array($db_daten))
+  while($row = mysqli_fetch_assoc($db_daten))
   {
   	if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';} 
   	

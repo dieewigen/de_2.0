@@ -4,9 +4,13 @@ include('lib/basefunctions.lib.php');
 include('inc/lang/'.$sv_server_lang.'_ally.join.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, col FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, col 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($result);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $col_count=$row['col'];
 
@@ -29,10 +33,12 @@ if ($t_tojoin > 200)
 }
 $row=0;
 $sum=0;
-$transaction_result = mysql_query("SELECT * FROM de_transactions WHERE user_id='$ums_user_id' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
+$transaction_result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'",
+    [$ums_user_id]);
 if ($transaction_result){
-	if (mysql_num_rows($transaction_result)==1){
-		$data = mysql_fetch_array($transaction_result);
+	if (mysqli_num_rows($transaction_result)==1){
+		$data = mysqli_fetch_assoc($transaction_result);
 		$sum = $data['amount'];
 	}
 }
@@ -74,14 +80,18 @@ $ok=$_POST['ok'];
 $warnung=$_POST['warnung'];
 if($ok || $warnung){
 	if(!$warnung)	{
-		$query="SELECT * FROM de_user_data WHERE user_id='$ums_user_id'";
-		$result = mysql_query($query);
-		$row = mysql_fetch_array($result);
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT * FROM de_user_data WHERE user_id=?",
+			[$ums_user_id]);
+		$row = mysqli_fetch_assoc($result);
 
 		$user_ally_id = $row['ally_id'];
 		$status = $row['status'];
 
-		if(mysql_num_rows(mysql_query("SELECT id FROM de_allys WHERE leaderid='$ums_user_id'")))
+		$leader_result = mysqli_execute_query($GLOBALS['dbi'],
+			"SELECT id FROM de_allys WHERE leaderid=?",
+			[$ums_user_id]);
+		if(mysqli_num_rows($leader_result))
 		{
 			die("$allyjoin_lang[msg_4]");
 		}
@@ -106,17 +116,13 @@ if($ok || $warnung){
 			$clan=str_replace("'","\'",$clan);
 			//$clan=str_replace("%20","+'",$clan);
 
-			$query="SELECT * FROM de_allys WHERE id='$ally_id'";
-			/*
-			if($_SESSION['ums_user_id']==1){
-				echo $query;
-			}*/
-			
-			$result = mysql_query($query);
-			$nb = mysql_num_rows($result);
+			$result = mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT * FROM de_allys WHERE id=?",
+				[$ally_id]);
+			$nb = mysqli_num_rows($result);
 
 			if($nb>0){
-				$row     = mysql_fetch_array($result);
+				$row = mysqli_fetch_assoc($result);
 
 				$clanid = $row['id'];
 				$allytag = $row['allytag'];
@@ -125,33 +131,47 @@ if($ok || $warnung){
 				$coleaderid2 = $row['coleaderid2'];
 				$coleaderid3 = $row['coleaderid3'];
 
-				$sqlquery = "UPDATE de_user_data SET ally_id='$ally_id', allytag='$allytag', status=0 WHERE (user_id = '$ums_user_id')";
-				$result = mysql_query($sqlquery);
-				$antrag = htmlentities ($antrag,ENT_QUOTES);
+				$result = mysqli_execute_query($GLOBALS['dbi'],
+					"UPDATE de_user_data SET ally_id=?, allytag=?, status=0 WHERE user_id=?",
+					[$ally_id, $allytag, $ums_user_id]);
+				$antrag = htmlentities($antrag, ENT_QUOTES);
 				$antrag = str_replace("\n","<br>",$antrag);
-				$sqlquery = "INSERT into de_ally_antrag (user_id, ally_id, antrag) VALUES ($ums_user_id, $clanid, '$antrag')";
-				//echo $sqlquery;
-				$result = @mysql_query($sqlquery);
+				$result = mysqli_execute_query($GLOBALS['dbi'],
+					"INSERT into de_ally_antrag (user_id, ally_id, antrag) VALUES (?, ?, ?)",
+					[$ums_user_id, $clanid, $antrag]);
 				if (!$result){
-					$sqlquery = "UPDATE de_ally_antrag SET ally_id=$clanid, antrag='$antrag' where user_id=$ums_user_id";
-					$result = @mysql_query($sqlquery);
+					$result = mysqli_execute_query($GLOBALS['dbi'],
+						"UPDATE de_ally_antrag SET ally_id=?, antrag=? WHERE user_id=?",
+						[$clanid, $antrag, $ums_user_id]);
 				}
 				notifyUser($leaderid, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid1, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid2, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid3, $allyjoin_lang['msg_8'], "6");
-				$transaction_result = mysql_query("SELECT * FROM de_transactions WHERE user_id='$ums_user_id' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
+				$transaction_result = mysqli_execute_query($GLOBALS['dbi'],
+					"SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'",
+					[$ums_user_id]);
 				if ($transaction_result){
-					if (mysql_num_rows($transaction_result)==1){
-						$data = mysql_fetch_array($transaction_result);
+					if (mysqli_num_rows($transaction_result)==1){
+						$data = mysqli_fetch_assoc($transaction_result);
 						$sum = $data['amount'];
-						mysql_query("UPDATE de_user_data SET restyp05=restyp05+$sum WHERE user_id='$ums_user_id'");
-						$transaction_result = mysql_query("UPDATE de_transactions SET amount='$t_tojoin' WHERE user_id='$ums_user_id' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
-						mysql_query("UPDATE de_user_data SET restyp05=restyp05-$t_tojoin WHERE user_id='$ums_user_id'");
+						mysqli_execute_query($GLOBALS['dbi'],
+							"UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?",
+							[$sum, $ums_user_id]);
+						mysqli_execute_query($GLOBALS['dbi'],
+							"UPDATE de_transactions SET amount=? WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'",
+							[$t_tojoin, $ums_user_id]);
+						mysqli_execute_query($GLOBALS['dbi'],
+							"UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?",
+							[$t_tojoin, $ums_user_id]);
 						print('<strong>'.$allyjoin_lang['msg_9_1'].' '.$sum.' '.$allyjoin_lang['msg_9_2'].'</strong><br />');
 					}else{
-						mysql_query("INSERT INTO de_transactions (user_id, type, identifier, name, amount) VALUES($ums_user_id, 'C.A.R.S.', 'reg_fee', 'Tronic', '$t_tojoin')");
-						mysql_query("UPDATE de_user_data SET restyp05=restyp05-$t_tojoin WHERE user_id='$ums_user_id'");
+						mysqli_execute_query($GLOBALS['dbi'],
+							"INSERT INTO de_transactions (user_id, type, identifier, name, amount) VALUES(?, 'C.A.R.S.', 'reg_fee', 'Tronic', ?)",
+							[$ums_user_id, $t_tojoin]);
+						mysqli_execute_query($GLOBALS['dbi'],
+							"UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?",
+							[$t_tojoin, $ums_user_id]);
 					}
 				}
 				echo '<strong>'.$allyjoin_lang['msg_10_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_10_2'].'</strong>';
@@ -165,16 +185,17 @@ if($ok || $warnung){
 
 	} // $ok check
 }else{ // else $ok
-	$query = "SELECT allyname, antrag FROM de_ally_antrag antrag, de_allys allys where allys.id=antrag.ally_id and user_id = $ums_user_id";
-	$result = mysql_query($query, $db);
-	$row = mysql_fetch_array($result);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT allyname, antrag FROM de_ally_antrag antrag, de_allys allys WHERE allys.id=antrag.ally_id AND user_id=?",
+		[$ums_user_id]);
+	$row = mysqli_fetch_assoc($result);
 
 	$antrag_allyname = $row["allyname"];
 	$antrag_antrag 	 = $row["antrag"];
 
-	$query = "SELECT * FROM de_allys ORDER BY allyname ASC";
-	$result = mysql_query($query, $db);
-	$nb = mysql_num_rows($result);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT * FROM de_allys ORDER BY allyname ASC");
+	$nb = mysqli_num_rows($result);
 
 	if ($antrag_allyname == "")
 	{
@@ -217,38 +238,6 @@ if($ok || $warnung){
 			</table>
 	');
 
-
-	/*
-	echo 	"<script language=\"javascript\">\n".
-		"function wechsel() {\n".
-		"document.register.clan.value = document.register.clanlist.value+\"\";\n".
-		"document.register.clan.focus();\n".
-		"}\n".
-		"</script>\n".
-		"<form name=\"register\" method=\"POST\" action=\"ally_join.php\">\n".
-		"Ich möchte Mitglied in der <input type=\"text\" name=\"clan\" value=\"$antrag_allyname\" size=\"20\"> Allianz werden. \n".
-		"<br>\n".
-		"<br>Clanliste:<br><select onChange=\"javascript:wechsel()\" size=\"6\" name=\"clanlist\">\n";
-
-
-	$row = 0;
-
-	while ($row < $nb)
-	{
-		$clanname 	= mysql_result($result,$row,"allyname");
-		//$clankuerzel 	= mysql_result($result,$row,"allytag");
-
-		echo "<option value=\"$clanname\">".$clanname."</option>";
-
-		$row++;
-	}
-
-	echo 	"</select><BR><BR>".
-		"Antragstext:<BR>".
-		"<textarea name=\"antrag\" cols=\"40\" rows=\"7\" wrap=\"virtual\">$antrag_antrag</textarea><BR><BR>".
-		"<input type=\"submit\" value=\"Fertig !\" name=\"ok\">".
-		"</form>";
-		*/
 }
 
 print('</div><br /><br />');

@@ -6,14 +6,24 @@ include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include_once "functions.php";
 include "issectork.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves, secatt FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves, secatt 
+     FROM de_user_data 
+     WHERE user_id=?", 
+    [$ums_user_id]
+);
+$row = mysqli_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
 $secmoves=$row["secmoves"];$secatt=$row["secatt"];
 
-$db_daten=mysql_query("SELECT name, url, bk, skmes, techs, ssteuer, e1, e2, pass, votecounter, col, ekey FROM de_sector WHERE sec_id='$sector'",$db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT name, url, bk, skmes, techs, ssteuer, e1, e2, pass, votecounter, col, ekey 
+     FROM de_sector 
+     WHERE sec_id=?",
+    [$sector]
+);
+$row = mysqli_fetch_array($db_daten);
 $url=$row["url"];$name=$row["name"];$bk=$row["bk"];$stext=$row["skmes"];
 $sectechs=$row["techs"];
 $ssteuer=$row["ssteuer"];
@@ -25,14 +35,17 @@ $secekey=$row["ekey"];
 
 
 //maximalen tick auslesen
-//$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
-$row     = mysql_fetch_array($result);
+//$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
+$row = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 
 //anzahl der spieler im sektor auslesen
-$result  = mysql_query("SELECT COUNT(*) AS wert FROM de_user_data WHERE sector='$sector'",$db);
-$row     = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT COUNT(*) AS wert FROM de_user_data WHERE sector=?",
+    [$sector]
+);
+$row = mysqli_fetch_array($result);
 $spielerimsektor = $row['wert'];
 
 ?>
@@ -267,37 +280,45 @@ if(isset($_REQUEST["do"]) && $_REQUEST["do"]==2 AND $system==issectorcommander()
 	
   $sys=intval($_REQUEST["sys"]);
   //daten des spielers auslesen
-  $db_daten=mysql_query("SELECT spielername, secstatdisable FROM de_user_data WHERE sector='$sector' AND `system`='$sys'",$db);
-  if(mysql_num_rows($db_daten)==1)
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT spielername, secstatdisable 
+     FROM de_user_data 
+     WHERE sector=? AND `system`=?",
+    [$sector, $sys]
+  );
+  if(mysqli_num_rows($db_daten)==1)
   {
-    $row = mysql_fetch_array($db_daten);
+    $row = mysqli_fetch_array($db_daten);
     $spielername=$row["spielername"];
     $secstatdisable=$row["secstatdisable"];
     if($secstatdisable==0)$secstatdisable=1;
     elseif($secstatdisable==1)$secstatdisable=0;
-    mysql_query("UPDATE de_user_data SET secstatdisable='$secstatdisable' WHERE sector='$sector' AND `system`='$sys'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], 
+        "UPDATE de_user_data SET secstatdisable=? WHERE sector=? AND `system`=?",
+        [$secstatdisable, $sector, $sys]
+    );
     //info in die sektorhistorie packen - komplette spielerlöschung
-    if($secstatdisable==0)mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '5', '$sector', '$spielername');",$db);
-    if($secstatdisable==1)mysql_query("INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '6', '$sector', '$spielername');",$db);
+    if($secstatdisable==0)
+        mysqli_execute_query($GLOBALS['dbi'], 
+            "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, ?, ?, ?)",
+            [$maxtick, '5', $sector, $spielername]
+        );
+    if($secstatdisable==1)
+        mysqli_execute_query($GLOBALS['dbi'], 
+            "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, ?, ?, ?)",
+            [$maxtick, '6', $sector, $spielername]
+        );
   }
 }
-
-
-//für/gegen secatt stimmen
-/*
-if($_REQUEST["do"]==1)
-{
-  $secatt=intval($_REQUEST["secatt"]);
-  if($secatt<0 OR $secatt>1)$secatt=0;
-  mysql_query("UPDATE de_user_data SET secatt='$secatt' WHERE user_id='$ums_user_id'");
-}
-*/
 
 //für einen sk stimmen
 $letsgo=isset($_POST['letsgo']) ? $_POST['letsgo'] : '';
 if(!empty($letsgo) && $sector>1){
 	$userslist=intval($_POST['userslist']);
-	mysql_query("UPDATE de_user_data SET votefor='$userslist' WHERE user_id='$ums_user_id'");
+	mysqli_execute_query($GLOBALS['dbi'], 
+		"UPDATE de_user_data SET votefor=? WHERE user_id=?",
+		[$userslist, $ums_user_id]
+	);
 }
 
 //einen neuen sektor beantragen
@@ -306,8 +327,11 @@ if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 	//abfrage da die funktion  zum erstellen nur noch f�r premium accounts zul�ssig ist
 	if ($ums_premium>0 OR 1==1){
 		//schauen ob derjenige schon einen sektor beantragt hat
-		$result1 = mysql_query("SELECT user_id FROM de_sector_umzug WHERE user_id='$ums_user_id'",$db);
-		$anz1 = mysql_num_rows($result1);
+		$result1 = mysqli_execute_query($GLOBALS['dbi'], 
+			"SELECT user_id FROM de_sector_umzug WHERE user_id=?",
+			[$ums_user_id]
+		);
+		$anz1 = mysqli_num_rows($result1);
 		if ($anz1==0)//es l�uft noch kein umzug
 		{
 			//pw generieren und umzug in der db eintragen
@@ -319,13 +343,22 @@ if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 				$newpass=$pwstring[rand(0, strlen($pwstring)-1)];
 				for($i=1; $i<=10; $i++) $newpass.=$pwstring[rand(0, strlen($pwstring)-1)];
 
-				$result1 = mysql_query("SELECT user_id FROM de_sector_umzug WHERE pass='$newpass'",$db);
-				$result2 = mysql_query("SELECT sec_id FROM de_sector WHERE pass='$newpass'",$db);
+				$result1 = mysqli_execute_query($GLOBALS['dbi'], 
+					"SELECT user_id FROM de_sector_umzug WHERE pass=?",
+					[$newpass]
+				);
+				$result2 = mysqli_execute_query($GLOBALS['dbi'], 
+					"SELECT sec_id FROM de_sector WHERE pass=?",
+					[$newpass]
+				);
 
-				if (mysql_num_rows($result1)==0 AND mysql_num_rows($result2)==0) $ok=1;
+				if (mysqli_num_rows($result1)==0 AND mysqli_num_rows($result2)==0) $ok=1;
 			}
 			//eintrag in der db machen, dass er umzieht
-			mysql_query("INSERT de_sector_umzug set user_id='$ums_user_id', typ=1, sector=0, `system`=0,pass='$newpass', ticks=192",$db);
+			mysqli_execute_query($GLOBALS['dbi'], 
+				"INSERT INTO de_sector_umzug (user_id, typ, sector, `system`, pass, ticks) VALUES (?, 1, 0, 0, ?, 192)",
+				[$ums_user_id, $newpass]
+			);
 		}
 	}
 	else echo '<br><font color="#FF0000"><b>'.$politics_lang["msg_4"].'<br><br></b></font>';
@@ -340,38 +373,68 @@ if(!empty($joinsec) && $secmoves<$sv_max_secmoves && $secpass!='' && $techs[26]=
   //art des joinens festellen
 
   //anzahl der leute die in den sektor ziehen wollen
-  $result1 = mysql_query("SELECT user_id FROM de_sector_umzug WHERE pass='$secpass'",$db);
-  $anz1=mysql_num_rows($result1);
+  $result1 = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT user_id FROM de_sector_umzug WHERE pass=?",
+    [$secpass]
+  );
+  $anz1=mysqli_num_rows($result1);
 
   //gibt es den sektor schon?
-  $result2 = mysql_query("SELECT sec_id FROM de_sector WHERE pass='$secpass'",$db);
-  $anz2=mysql_num_rows($result2);
+  $result2 = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT sec_id FROM de_sector WHERE pass=?",
+    [$secpass]
+  );
+  $anz2=mysqli_num_rows($result2);
 
   //hat man evtl. schon was am laufen
-  $result3 = mysql_query("SELECT user_id FROM de_sector_umzug WHERE user_id='$ums_user_id'",$db);
-  $anz3 = mysql_num_rows($result3);
+  $result3 = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT user_id FROM de_sector_umzug WHERE user_id=?",
+    [$ums_user_id]
+  );
+  $anz3 = mysqli_num_rows($result3);
 
   if ($anz2>0 AND $anz3==0) //der sektor besteht schon, direkt reinmoven typ 2
   {
     //schauen ob noch platz im sektor ist
-    $row2 = mysql_fetch_array($result2);
+    $row2 = mysqli_fetch_array($result2);
     $zielsec=$row2["sec_id"];
-    $result = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$zielsec'",$db);
-    $accanz=mysql_num_rows($result);
-    $result = mysql_query("SELECT user_id FROM de_sector_umzug WHERE typ=2 AND sector='$zielsec'",$db);
-    $accanz+=mysql_num_rows($result);
+    $result = mysqli_execute_query($GLOBALS['dbi'], 
+        "SELECT user_id FROM de_user_data WHERE sector=?",
+        [$zielsec]
+    );
+    $accanz=mysqli_num_rows($result);
+    $result = mysqli_execute_query($GLOBALS['dbi'], 
+        "SELECT user_id FROM de_sector_umzug WHERE typ=2 AND sector=?",
+        [$zielsec]
+    );
+    $accanz+=mysqli_num_rows($result);
 
     if($accanz<$sv_max_user_per_regsector)
     {
       //es ist noch ein platz frei -> spieler zieht um
       $time=strftime("%Y%m%d%H%M%S");
       //account sperren
-      mysql_query("UPDATE de_login set status = 4 where user_id = '$ums_user_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_login SET status = ? WHERE user_id = ?",
+        [4, $ums_user_id]
+      );
+      
       //eintrag in der db machen, dass er umzieht
-      mysql_query("INSERT de_sector_umzug set user_id='$ums_user_id', typ=2, sector='$zielsec'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "INSERT INTO de_sector_umzug (user_id, typ, sector) VALUES (?, ?, ?)",
+        [$ums_user_id, 2, $zielsec]
+      );
+      
       //nachricht an den account schicken
-      mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$ums_user_id', 3,'$time','".$politics_lang["msg_25"]."')",$db);
-      mysql_query("update de_user_data set newnews = 1 where user_id = '$ums_user_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'],
+        "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, ?, ?, ?)",
+        [$ums_user_id, 3, $time, $politics_lang["msg_25"]]
+      );
+      
+      mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_user_data SET newnews = ? WHERE user_id = ?",
+        [1, $ums_user_id]
+      );
       echo die($politics_lang["msg_5"]);
 
     }
@@ -386,7 +449,10 @@ if(!empty($joinsec) && $secmoves<$sv_max_secmoves && $secpass!='' && $techs[26]=
     {
       //es ist noch ein platz frei -> spieler zieht um
       //eintrag in der db machen, dass er umzieht
-      mysql_query("INSERT de_sector_umzug set user_id='$ums_user_id', typ=1, pass='$secpass', ticks=192",$db);
+      mysqli_execute_query($GLOBALS['dbi'], 
+        "INSERT INTO de_sector_umzug (user_id, typ, pass, ticks) VALUES (?, 1, ?, 192)",
+        [$ums_user_id, $secpass]
+      );
     }
     else echo '<br><font color="FF0000">'.$politics_lang["msg_6"].'</font><br><br>';
   }
@@ -397,20 +463,35 @@ if(!empty($joinsec) && $secmoves<$sv_max_secmoves && $secpass!='' && $techs[26]=
 //laufende sektorbeantragung löschen
 $cancelgetnewsec=isset($_POST['cancelgetnewsec']) ? $_POST['cancelgetnewsec'] : '';
 if(!empty($cancelgetnewsec)){
-	mysql_query("DELETE FROM de_sector_umzug WHERE user_id='$ums_user_id' AND typ=1",$db);
+	mysqli_execute_query($GLOBALS['dbi'], 
+		"DELETE FROM de_sector_umzug WHERE user_id=? AND typ=1",
+		[$ums_user_id]
+	);
 }
 
 
 $voteoutcancel=isset($_POST['voteoutcancel']) ? $_POST['voteoutcancel'] : '';
 if(!empty($voteoutcancel) && $system==issectorcommander()){
-  mysql_query("DELETE FROM de_sector_voteout where sector_id='$sector'");
+  mysqli_execute_query($GLOBALS['dbi'], 
+    "DELETE FROM de_sector_voteout WHERE sector_id=?",
+    [$sector]
+  );
   $time=strftime("%Y%m%d%H%M%S");
   //nachrichten an alle spieler schicken
-  $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-  while($row = mysql_fetch_array($db_daten))
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT user_id FROM de_user_data WHERE sector=?",
+    [$sector]
+  );
+  while($row = mysqli_fetch_array($db_daten))
   {
-    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($row[user_id], 3,'$time','".$politics_lang["msg_26"]."')",$db);
-    mysql_query("update de_user_data set newnews = 1 where user_id = $row[user_id]",$db);
+    mysqli_execute_query($GLOBALS['dbi'], 
+      "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+      [$row['user_id'], $time, $politics_lang["msg_26"]]
+    );
+    mysqli_execute_query($GLOBALS['dbi'], 
+      "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
+      [$row['user_id']]
+    );
   }
 }
 
@@ -419,10 +500,13 @@ $setvoteout=isset($_POST['setvoteout']) ? $_POST['setvoteout'] : '';
 $vspielerwahl=isset($_POST['vspielerwahl']) ? $_POST['vspielerwahl'] : '';
 if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl==$politics_lang["nein"] || $vspielerwahl==$politics_lang["egal"])){
   //erstmal schauen ob ein vote l�uft
-  $result1 = mysql_query("SELECT user_id, votes FROM de_sector_voteout WHERE sector_id='$sector'",$db);
-  $anz1 = mysql_num_rows($result1);
+  $result1 = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT user_id, votes FROM de_sector_voteout WHERE sector_id=?",
+    [$sector]
+  );
+  $anz1 = mysqli_num_rows($result1);
   if ($anz1!=0){
-    $row=mysql_fetch_array($result1);
+    $row=mysqli_fetch_array($result1);
     $vvotes=$row["votes"];
     $vuser_id=$row["user_id"];
     //wie hat der spieler abgestimmt?
@@ -435,42 +519,75 @@ if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl
     $jastimmen=0;
     for ($i=1; $i<=($sv_maxsystem+5); $i++)if ($vvotes[$i]=='1')$jastimmen++;
     //anzahl der aktiven spieler im sektor bestimmen
-    //$result1 = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-    $result1 = mysql_query("SELECT de_user_data.`system` FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
-    WHERE de_user_data.sector='$sector' AND de_login.status=1",$db);
-    $anz1 = mysql_num_rows($result1);
+    //$result1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=?", [$sector]);
+    $result1 = mysqli_execute_query($GLOBALS['dbi'], 
+      "SELECT de_user_data.`system` FROM de_login 
+       LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) 
+       WHERE de_user_data.sector=? AND de_login.status=1",
+      [$sector]
+    );
+    $anz1 = mysqli_num_rows($result1);
     $prozentwert=($jastimmen*100)/$anz1;
     if ($prozentwert>=$sv_voteoutgrenze){
-      $result1 = mysql_query("SELECT `system` FROM de_user_data WHERE user_id='$vuser_id'",$db);
-      $row1=mysql_fetch_array($result1);
+      $result1 = mysqli_execute_query($GLOBALS['dbi'], 
+        "SELECT `system` FROM de_user_data WHERE user_id=?",
+        [$vuser_id]
+      );
+      $row1=mysqli_fetch_array($result1);
       $vsystem=$row1["system"];
       $time=strftime("%Y%m%d%H%M%S");
       //spieler wurde rausgevotet
 
       //gesperrte user und leute im umode kommen direkt in sektor 1
       //dazu erstmal accountstatus auslesen
-      $result1 = mysql_query("SELECT status FROM de_login WHERE user_id='$vuser_id'",$db);
-      $row1=mysql_fetch_array($result1);
+      $result1 = mysqli_execute_query($GLOBALS['dbi'], 
+        "SELECT status FROM de_login WHERE user_id=?",
+        [$vuser_id]
+      );
+      $row1=mysqli_fetch_array($result1);
       $accstatus=$row1["status"];
       if($accstatus==2 OR $accstatus==3){
 		//nachricht an den account schicken
-		mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$vuser_id', 3,'$time','".$politics_lang["msg_25"]."')",$db);
+		mysqli_execute_query($GLOBALS['dbi'], 
+			"INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+			[$vuser_id, $time, $politics_lang["msg_25"]]
+		);
 		
 		//auf 0:0 verschieben damit er in sektor 1 landet und einstellungen updaten
-		mysql_query("UPDATE de_user_data SET sector=0, `system`=0, newnews=1, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, votefor=0, secstatdisable=0 WHERE user_id = '$vuser_id'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], 
+			"UPDATE de_user_data 
+			 SET sector=0, `system`=0, newnews=1, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, votefor=0, secstatdisable=0 
+			 WHERE user_id = ?",
+			[$vuser_id]
+		);
 		
 		//voteumfrage aus der db l�schen
-		mysql_query("DELETE FROM de_sector_voteout WHERE sector_id='$sector'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], 
+			"DELETE FROM de_sector_voteout WHERE sector_id=?",
+			[$sector]
+		);
 		//nachricht an alle im sektor schicken
-		$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-		while($row = mysql_fetch_array($db_daten))
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+			"SELECT user_id FROM de_user_data WHERE sector=?",
+			[$sector]
+		);
+		while($row = mysqli_fetch_array($db_daten))
 		{
-			mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($row[user_id], 3,'$time','".$politics_lang["msg_27"]."')",$db);
-			mysql_query("update de_user_data set newnews = 1 where user_id = $row[user_id]",$db);
+			mysqli_execute_query($GLOBALS['dbi'], 
+				"INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+				[$row['user_id'], $time, $politics_lang["msg_27"]]
+			);
+			mysqli_execute_query($GLOBALS['dbi'], 
+				"UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
+				[$row['user_id']]
+			);
 		}
 		
 		//wenn er BK ist, den Posten auf 0 setzen
-		mysql_query("UPDATE de_sector SET bk=0 WHERE sec_id='$sector' AND bk='$vsystem'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], 
+			"UPDATE de_sector SET bk=0 WHERE sec_id=? AND bk=?",
+			[$sector, $vsystem]
+		);
 		
 		//votetimer/votecounter f�r den sektor setzen
 		mt_srand((double)microtime()*10000);
@@ -478,40 +595,80 @@ if (!empty($setvoteout) && ($vspielerwahl==$politics_lang["ja"] || $vspielerwahl
 		//$votetimer=0;
 		$sv_sector_votetime_lock=0;
 		//if($accstatus!=2)
-		mysql_query("UPDATE de_sector SET votetimer='$votetimer', votecounter='$sv_sector_votetime_lock' WHERE sec_id='$sector'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], 
+			"UPDATE de_sector SET votetimer=?, votecounter=? WHERE sec_id=?",
+			[$votetimer, $sv_sector_votetime_lock, $sector]
+		);
 
       }else{
         //accountstatus sichern und account sperren
-        mysql_query("UPDATE de_login set savestatus=status where user_id = '$vuser_id'",$db);
-        mysql_query("UPDATE de_login set status = 4 where user_id = '$vuser_id'",$db);
-        mysql_query("UPDATE de_user_data SET spend01=0, spend02=0, spend03=0, spend04=0, spend05=0 WHERE user_id = '$vuser_id'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_login SET savestatus=status WHERE user_id = ?",
+          [$vuser_id]
+        );
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_login SET status = 4 WHERE user_id = ?",
+          [$vuser_id]
+        );
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_user_data SET spend01=0, spend02=0, spend03=0, spend04=0, spend05=0 WHERE user_id = ?",
+          [$vuser_id]
+        );
         //eintrag in der db machen, dass er umzieht
-        mysql_query("INSERT de_sector_umzug set user_id='$vuser_id', typ=0, sector='$sector', `system`='$vsystem'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "INSERT INTO de_sector_umzug (user_id, typ, sector, `system`) VALUES (?, 0, ?, ?)",
+          [$vuser_id, $sector, $vsystem]
+        );
         //nachricht an den account schicken
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$vuser_id', 3,'$time','".$politics_lang["msg_25"]."')",$db);
-        mysql_query("update de_user_data set newnews = 1 where user_id = '$vuser_id'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)",
+          [$vuser_id, $time, $politics_lang["msg_25"]]
+        );
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
+          [$vuser_id]
+        );
         //voteumfrage aus der db l�schen
-        mysql_query("DELETE FROM de_sector_voteout WHERE sector_id='$sector'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "DELETE FROM de_sector_voteout WHERE sector_id=?",
+          [$sector]
+        );
         //nachricht an alle im sektor schicken
-        $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-        while($row = mysql_fetch_array($db_daten))
+        $result = mysqli_execute_query($GLOBALS['dbi'],
+          "SELECT user_id FROM de_user_data WHERE sector = ?",
+          [$sector]
+        );
+        
+        while($row = $result->fetch_assoc())
         {
-          mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($row[user_id], 3,'$time','".$politics_lang["msg_27"]."')",$db);
-          mysql_query("update de_user_data set newnews = 1 where user_id = $row[user_id]",$db);
+          mysqli_execute_query($GLOBALS['dbi'],
+            "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, ?, ?, ?)",
+            [$row["user_id"], 3, $time, $politics_lang["msg_27"]]
+          );
+          
+          mysqli_execute_query($GLOBALS['dbi'],
+            "UPDATE de_user_data SET newnews = ? WHERE user_id = ?",
+            [1, $row["user_id"]]
+          );
         }
         //votetimer/votecounter f�r den sektor setzen
         mt_srand((double)microtime()*10000);
         $votetimer=mt_rand(16,96);
         //$votetimer=0;
         //$sv_sector_votetime_lock=0;
-        mysql_query("UPDATE de_sector SET votetimer='$votetimer', votecounter='$sv_sector_votetime_lock' WHERE sec_id='$sector'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_sector SET votetimer=?, votecounter=? WHERE sec_id=?",
+          [$votetimer, $sv_sector_votetime_lock, $sector]
+        );
       }
     }
     else
     {
       //spieler wurde noch nicht rausgevotet
       //db mit den stimmen updaten
-      mysql_query("UPDATE de_sector_voteout set votes = '$vvotes' where sector_id = '$sector'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], 
+        "UPDATE de_sector_voteout SET votes = ? WHERE sector_id = ?",
+        [$vvotes, $sector]);
     }
    //echo $prozentwert;
   }
@@ -522,41 +679,39 @@ $voteout=isset($_POST['voteout']) ? $_POST['voteout'] : '';
 $voteoutlist=isset($_POST['voteoutlist']) ? $_POST['voteoutlist'] : '';
 if(!empty($voteout) && $system==issectorcommander() && $sector > 1){
   //beim reinsetzen des votes erstmal schauen ob nicht schon eins existiert
-  $result1 = mysql_query("SELECT sector_id FROM de_sector_voteout WHERE sector_id='$sector'",$db);
-  $anz1 = mysql_num_rows($result1);
+  $result1 = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT sector_id FROM de_sector_voteout WHERE sector_id = ?",
+    [$sector]
+  );
+  $anz1 = $result1->num_rows;
   
   //anhand des spielernamens die user_id und den sector rausfinden
-  $result2 = mysql_query("SELECT user_id, sector FROM de_user_data WHERE spielername='$voteoutlist'",$db);
-  $row = mysql_fetch_array($result2);
+  $result2 = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT user_id, sector FROM de_user_data WHERE spielername = ?",
+    [$voteoutlist]
+  );
+  $row = $result2->fetch_assoc();
   //id des zu votenden auslesen
   $vuser_id=$row["user_id"];
   //schaue ob der spieler auch wirklich in dem sektor ist
   $vsector=$row["sector"];
-  $anz2 = mysql_num_rows($result2);
+  $anz2 = $result2->num_rows;
   
-  //�berpr�fen ob der spieler gesperrt ist, falls ja ist es kostenlos und es gibt keinen counter
-  $db_daten=mysql_query("SELECT status, delmode FROM de_login WHERE user_id='$vuser_id'",$db);
-  $row = mysql_fetch_array($db_daten);
-  if($row["status"]==2){$gesperrt=1;$votecounter=0;}else $gesperrt=0;
+  //überprüfen ob der spieler gesperrt ist, falls ja ist es kostenlos und es gibt keinen counter
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT status, delmode FROM de_login WHERE user_id = ?",
+    [$vuser_id]
+  );
+  $row = $db_daten->fetch_assoc();
   
   //�berpr�fen ob er l�nger als 7 tage offline war
   
-  
-/*  
-  //schauen ob genug rohstoffe vorhanden sind
-  $db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id='$sector'",$db);
-  $row = mysql_fetch_array($db_daten);
-  $srestyp01=$row[0];$srestyp02=$row[1];$srestyp03=$row[2];$srestyp04=$row[3];
-  $srestyp05=$row[4];
-  if (($srestyp01>=100000 AND $srestyp02>=100000 AND $srestyp03>=100000 AND $srestyp04>=100000 AND $srestyp05>=10) OR $gesperrt==1)
-*/
   if ($gesperrt==1)
   {
     if($votecounter==0)
     {
   	  if ($anz1==0 AND $anz2>0)
       {
-        //$row = mysql_fetch_array($result2);
         
         if ($vsector!=$sector) die($politics_lang["msg_8"]);
         $vticks=96*3;
@@ -565,109 +720,64 @@ if(!empty($voteout) && $system==issectorcommander() && $sector > 1){
         for ($i=1; $i<=($sv_maxsystem+5); $i++) $vvotes.='3';
 
         //eintrag in die db packen
-        mysql_query("INSERT INTO de_sector_voteout SET sector_id='".$sector."',user_id='".$vuser_id."',votes='".$vvotes."',ticks='".$vticks."'");
+        mysqli_execute_query($GLOBALS['dbi'],
+          "INSERT INTO de_sector_voteout (sector_id, user_id, votes, ticks) VALUES (?, ?, ?, ?)",
+          [$sector, $vuser_id, $vvotes, $vticks]
+        );
         //rohstoffe vom sektor abziehen
-        //if($gesperrt==0)
-        //mysql_query("update de_sector set restyp01 = restyp01 - 100000, restyp02 = restyp02 - 100000, restyp03 = restyp03 - 100000, restyp04 = restyp04 - 100000, restyp05 = restyp05 - 10 WHERE sec_id = '$sector'",$db);
+
         //nachricht an alle im sektor schicken, dass es ein vote gibt
         $time=strftime("%Y%m%d%H%M%S");
-        $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector'",$db);
-        while($row = mysql_fetch_array($db_daten))
+        $result = mysqli_execute_query($GLOBALS['dbi'],
+          "SELECT user_id FROM de_user_data WHERE sector = ?",
+          [$sector]
+        );
+        
+        while($row = $result->fetch_assoc())
         {
-          mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($row[user_id], 3,'$time','".$politics_lang["msg_24_1"]." $voteoutlist ".$politics_lang["msg_24_2"]."')",$db);
-          mysql_query("update de_user_data set newnews = 1 where user_id = $row[user_id]",$db);
+          $message = $politics_lang["msg_24_1"]." ".$voteoutlist." ".$politics_lang["msg_24_2"];
+          mysqli_execute_query($GLOBALS['dbi'],
+            "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, ?, ?, ?)",
+            [$row["user_id"], 3, $time, $message]
+          );
+          
+          mysqli_execute_query($GLOBALS['dbi'],
+            "UPDATE de_user_data SET newnews = ? WHERE user_id = ?",
+            [1, $row["user_id"]]
+          );
         }
       }
     }
   }
-  //else echo '<br><font color="FF0000">'.$politics_lang["msg_9"].'</font><br>';
   else echo '<br><table width=600><tr><td class="ccr">'.$politics_lang["votedescription"].'</td></tr></table><br>';
-  //$userlist=(int)$userlist;
-  //mysql_query("UPDATE de_user_data SET votefor='$userslist' WHERE user_id='$ums_user_id'");
+
 }
 
 $sec_btn=isset($_POST['sec_btn']) ? $_POST['sec_btn'] : '';
-//$newurl=isset($_POST['newurl']) ? $_POST['newurl'] : '';
 $newname=isset($_POST['newname']) ? $_POST['newname'] : '';
-//$newstext=isset($_POST['newstext']) ? $_POST['newstext'] : '';
-//$newbk=isset($_POST['newbk']) ? $_POST['newbk'] : '';
 $seksteuer=isset($_POST['seksteuer']) ?  $_POST['seksteuer'] : 0;
 if(!empty($sec_btn) && $system==issectorcommander()){
-	//if (($url<>$newurl) || ($name<>$newname) || ($stext<>$newstext) || ($ssteuer<>$seksteuer)){
-		if (($name<>$newname) || ($ssteuer<>$seksteuer)){
-
-		/*
-		if($url<>$newurl){
-			$url = trim($newurl);
-			$fp = @fopen($url,"r");
-			if($fp!=false){
-
-			}else{
-				if($url!=""){
-					echo '<br>'.$politics_lang["msg_10"].'<br><br>';
-					$url='';
-				}
-			}
-			$ext =  $url[strlen($url)-3];
-			$ext .= $url[strlen($url)-2];
-			$ext .= $url[strlen($url)-1];
-
-			if($url!='' and $ext!='jpg' and $ext!='gif' and $ext!='png'){//falsche extension
-				echo $politics_lang["msg_11"];
-				$url='';
-			}else{
-				if($url==''){
-					$url=='';
-				}else{
-					$imagesize = @getimagesize($url);
-					if($imagesize[0]>"500" or $imagesize[1]>"500"){
-						echo $politics_lang["msg_12"];
-						$url='';
-					}
-				}
-			}
-		}
-		*/
+	if (($name<>$newname) || ($ssteuer<>$seksteuer)){
 
 		$name = htmlspecialchars(stripslashes($newname), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-		
-		/*
-		$stext = str_replace('\r\n', "\r\n", $newstext);
-		$stext = htmlspecialchars(stripslashes($stext), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-		$stext = str_replace('\"', '&quot;', $stext);
-		$stext = str_replace('\'', '&acute;', $stext);
-		$stext = nl2br($stext);
-		*/
 
-		//mysql_query("UPDATE de_sector set name = '$name' , url = '$url', skmes = '$stext'  WHERE sec_id='$sector'",$db);
-		mysql_query("UPDATE de_sector set name = '$name' WHERE sec_id='$sector'",$db);
+		mysqli_execute_query($GLOBALS['dbi'],
+		  "UPDATE de_sector SET name = ? WHERE sec_id = ?",
+		  [$name, $sector]
+		);
 
-		if($sectechs[4]==1){
-			//testen ob sektorsteuer einen wert hat, der ok ist
-			if (($seksteuer>1) AND ($seksteuer<6)){
-				mysql_query("UPDATE de_sector set ssteuer = '$seksteuer'  WHERE sec_id='$sector'",$db);
-			}
+		if($issectorcommander() && $sector!=1)//nur wenn man sk ist kann man die steuer ändern
+		{
+			if($sv_deactivate_vsystems!=1)
+				mysqli_execute_query($GLOBALS['dbi'],
+				  "UPDATE de_sector SET ssteuer = ? WHERE sec_id = ?",
+				  [$seksteuer, $sector]
+				);
 		}
 		$ssteuer = $seksteuer;
 	}
-
-	/*
-	if (($newbk<>$bk) AND validDigit($newbk)) //neuer bk soll eingesetzt werden
-	{
-
-		//if($newbk==$system) echo $politics_lang["msg_13"];
-		//else
-		//{
-		$result=mysql_query("SELECT * FROM de_user_data WHERE sector='$sector' AND system='$newbk'");
-		$num=mysql_num_rows($result);
-		if ($num==1) {mysql_query("UPDATE de_sector set bk = '$newbk' WHERE sec_id='$sector'",$db);$bk=$newbk;};
-
-		//}
-	}
-	*/
 }
 
-//echo '<td><a href="secforum.php" class="btn">'.$politics_lang["sektorforum"].'</a></td>';
 
 if($system==issectorcommander()){
 	echo '<table border="0" cellpadding="0" cellspacing="2" width="600">';
@@ -680,67 +790,10 @@ if($system==issectorcommander()){
 	echo '<br>';	
 }
 
-/*
-if($spielerimsektor>1)
-{
-  if($system==issectorcommander())echo '<td><a href="politics.php?s=2" class="btn">'.$politics_lang["skmenu"].'</a></td>';
-  elseif($system==$bk)echo '<td><a href="bkmenu.php" class="btn">'.$politics_lang["bkmenu"].'</a></td>';
-}
-else  //in 1-mann-sektoren kann der sk auch der bk sein 
-{
-  if($system==issectorcommander())echo '<td><a href="politics.php?s=2" class="btn">'.$politics_lang["skmenu"].'</a></td>';
-  if($system==$bk)echo '<td><a href="bkmenu.php" class="btn">'.$politics_lang["bkmenu"].'</a></td>';
-}
-*/
-
-
-
 $s=isset($_REQUEST['s']) ? $_REQUEST['s'] : 1;
-
-/*
-if(isset($_POST['vorschau'])){
-	$newstext=$_POST['newstext'];
-	//$stext =str_replace('\r\n', "\r\n", $newstext);
-	$newstext =str_replace('\r\n', "\r\n", $newstext);
-	$newstext=htmlspecialchars($newstext, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-	$newstext = nl2br_pre($newstext);
-	$newstext = formatierte_anzeige($newstext,$ums_gpfad);
-	
-	$newstext = preg_replace("/\[img\]([^[]*)\[\/img\]/","<img src=\"\\1\" border=0>",$newstext);
-	$newstext = stripslashes($newstext);
-
-	?>
-	<table width="586" border="0" cellpadding="0" cellspacing="0" class="cell">
-	<tr>
-	<td width="13" height="37" class="rol">&nbsp;</td>
-	<td class="ro" align="center"><?php echo $politics_lang["vorschausknews"]?></td>
-	<td width="13" height="37" class="ror">&nbsp;</td>
-	</tr>
-	<tr>
-	<td width="13" height="37" class="rl">&nbsp;</td>
-	<td align="left"><div class="ov_skinfo"><?php echo $newstext; ?></div></td>
-	<td width="13" class="rr">&nbsp;</td>
-	</tr>
-	<tr>
-	<td width="13" class="rul">&nbsp;</td>
-	<td class="ru">&nbsp;</td>
-	<td width="13" class="rur">&nbsp;</td>
-	</tr>
-	</table><br>
-	<?php
-	$s=2;
-}
-*/
 
 if ($s==2){
 	if($system==issectorcommander()) {
-
-	/*
-	<tr align="center" class="cell">
-	<td width="13" height="25" class="rl">&nbsp;</td>
-	<td width="550"><div class="cell"><a href="skforum.php"><?=$politics_lang["skforum"]?></a></div></td>
-	<td width="13" class="rr">&nbsp;</td>
-	*/
 
 	?>
 	<input type="hidden" name="s" value="2">
@@ -765,82 +818,6 @@ if ($s==2){
 	<td width="13" class="rr">&nbsp;</td>
 	</tr>
 
-	<?php
-	/*
-	<tr align="center">
-	<td width="13" height="37" class="rml">&nbsp;</td>
-	<td width="550" align="center" class="ro"><div class="cellu"><?php echo $politics_lang["ernennungbk"]?></div></td>
-	<td width="13" class="rmr">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td width="13" height="25" class="rl">&nbsp;</td>
-	<td width="550">
-	<div class="cell">
-	<?php
-	echo '<font size=2 face=arial><b>'.$politics_lang["bksys"].':</b><br>';
-	echo '<input type="text" name="newbk" value="'.$bk.'" size="4" maxlength="2"> ('.$politics_lang["system"].' 1-'.$sv_maxsystem.')<br><br>';
-	?>
-	</div>
-	</td>
-	<td width="13" class="rr">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td width="13" height="37" class="rml">&nbsp;</td>
-	<td width="550" align="center" class="ro"><div class="cellu"><?php echo $politics_lang["infofuersek"]?></div></td>
-	<td width="13" class="rmr">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td width="13" height="25" class="rl">&nbsp;</td>
-	<td width="550">
-	<div class="cell">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm1.gif" onclick="init('smile1')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm2.gif" onclick="init('smile2')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm3.gif" onclick="init('smile3')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm4.gif" onclick="init('smile4')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm5.gif" onclick="init('smile5')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm6.gif" onclick="init('smile6')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm7.gif" onclick="init('smile7')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm8.gif" onclick="init('smile8')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm9.gif" onclick="init('smile9')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm10.gif" onclick="init('smile10')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm11.gif" onclick="init('smile11')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm12.gif" onclick="init('smile12')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm13.gif" onclick="init('smile13')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm14.gif" onclick="init('smile14')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm15.gif" onclick="init('smile15')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm16.gif" onclick="init('smile16')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm17.gif" onclick="init('smile17')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm18.gif" onclick="init('smile18')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm19.gif" onclick="init('smile19')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<img src="<?php echo $ums_gpfad; ?>g/smilies/sm20.gif" onclick="init('smile20')" alt="<?php echo $politics_lang["altsmilie"]?>">
-	<br>
-	<input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
-	<input type="button" value="&nbsp;u&nbsp;" class="button" onclick="init('under')">
-	<input type="button" value="&nbsp;i&nbsp;" class="button" onclick="init('kursiv')">
-	<input type="button" value="<?php echo $politics_lang["panel1"]?>" class="button" onclick="init('rot')">
-	<input type="button" value="<?php echo $politics_lang["panel2"]?>" class="button" onclick="init('gelb')">
-	<input type="button" value="<?php echo $politics_lang["panel3"]?>" class="button" onclick="init('gruen')">
-	<input type="button" value="<?php echo $politics_lang["panel4"]?>" class="button" onclick="init('weiss')">
-	<input type="button" value="<?php echo $politics_lang["panel5"]?>" class="button" onclick="init('blau')">
-	<input type="button" value="<?php echo $politics_lang["panel6"]?>"  onclick="init('farbe')">
-	<br>
-	<input type="button" value="<?php echo $politics_lang["panel7"]?>"  onclick="init('size')">
-	<input type="button" value="<?php echo $politics_lang["panel8"]?>" class="button" onclick="init('center')">
-	<input type="button" value="pre" class="button"s onclick="init('pre')">
-	<input type="button" value="<?php echo $politics_lang["panel9"]?>" class="button" onclick="init('www')">
-	<input type="button" value="@" class="button"s onclick="init('mail')">
-	<input type="button" value="<?php echo $politics_lang["panel10"]?>" class="button" onclick="init('img')">
-	<input type="button" value="&nbsp;?&nbsp;" class="button" onclick="hilfe()">
-	<input type="button" value="<?php echo $politics_lang["panel11"]?>" class="button" onclick="leeren()">
-	<?php
-	echo '<textarea name="newstext" id="newstext" cols="65" rows="20">'.str_replace("<br />", "", "$stext").'</textarea><br><input type="button"  value="'.$politics_lang["checklaenge"].'" onClick="check()">&nbsp;&nbsp;&nbsp;<input type="Submit" name="vorschau"  value="'.$politics_lang["vorschau"].'">';
-	?>
-	</div>
-	</td>
-	<td width="13" class="rr">&nbsp;</td>
-	</tr>
-	*/
-	?>
 	<tr align="center">
 	<td width="13" height="37" class="rml">&nbsp;</td>
 	<td width="550" align="center" class="ro"><div class="cellu"><?php echo $politics_lang["sektax"]?></div></td>
@@ -882,47 +859,34 @@ if ($s==2){
 	<div class="cell">
 	<?php
 	//beim reinsetzen des votes erstmal schauen ob nicht schon eins existiert
-	$result1 = mysql_query("SELECT sector_id, user_id, ticks FROM de_sector_voteout WHERE sector_id='$sector'",$db);
-	$anz1 = mysql_num_rows($result1);
-	if ($anz1==0){
-		//schauen ob man zu dem zeitpunkt voten kann
-		if($votecounter==0 OR 1==1){
-			$result = mysql_query("SELECT de_user_data.spielername FROM de_user_data WHERE de_user_data.sector=$sector ORDER BY `system` ASC",$db);
-			$anz = mysql_num_rows($result);
-			echo '<br><br><select size="1" name="voteoutlist">';
-			while($row=mysql_fetch_array($result))
+	$result1 = mysqli_execute_query($GLOBALS['dbi'],
+	  "SELECT sector_id, user_id, ticks FROM de_sector_voteout WHERE sector_id = ?",
+	  [$sector]
+	);
+	$anz1 = $result1->num_rows;
+	
+	if ($anz1==0) echo $politics_lang["msg_16"].'<br><br>';
+	else {
+		if ($status!=1)  //ausgabe der spielerliste, wenn noch keine auswertung erfolgt ist.
+		{
+			$result = mysqli_execute_query($GLOBALS['dbi'],
+			  "SELECT de_user_data.spielername FROM de_user_data WHERE de_user_data.sector = ? ORDER BY `system` ASC",
+			  [$sector]
+			);
+			$anz = $result->num_rows;
+			echo '
+			<select name="voteoutlist">';
+			while($row = $result->fetch_assoc())
 			{
 			$vspielername=$row["spielername"];
 
-			echo '<option value="'.utf8_encode($vspielername).'">'.utf8_encode($vspielername).'</option>';
+			echo '<option value="'.$vspielername.'">'.$vspielername.'</option>';
 			}
 			echo '</select><input type="submit" value="'.$politics_lang["startvote"].'" name="voteout" onclick="return confirm(\''.$politics_lang["warnexec"].'?\')"><br><br>';
 			//kosten anzeigen
 			//echo $politics_lang["kosten"];
 		}
 		else echo $politics_lang["msg_15_1"].' '.$votecounter.' '.$politics_lang["msg_15_2"];
-	}
-	else  //es l�uft bereits ein vote
-	{
-		//sektorvotedaten auslesen
-		$row1 = mysql_fetch_array($result1);
-		$vuser_id=$row1["user_id"];
-		$vticks=$row1["ticks"];
-		//anhand der  user_id den spielernamen rausfinden
-		$result2 = mysql_query("SELECT spielername FROM de_user_data WHERE user_id='$vuser_id'",$db);
-		$anz2 = mysql_num_rows($result2);
-
-		if ($anz2>0)//spielername gefunden
-		{
-			$row2 = mysql_fetch_array($result2);
-			$vspielername=$row2["spielername"];
-			//eintrag in die db packen
-			//mysql_query("INSERT INTO de_sector_voteout SET sector_id='".$sector."',user_id='".$vuser_id."',ticks='".$vticks."'");
-		}
-
-		echo '<br>'.$politics_lang["msg_16_1"].' '.$vspielername.'. '.$politics_lang["msg_16_2"].' '.$vticks.' '.$politics_lang["msg_16_3"].'.<br><br>';
-		echo '<input type="submit" value="'.$politics_lang["cancelvote"].'" name="voteoutcancel"><br><br>';
-		//echo $politics_lang["noressoncancel"];
 	}
 	?>
 	</div>
@@ -960,17 +924,28 @@ echo '<td class="'.$bg.'">';
 echo '<br><font size=2 face=arial>'.$politics_lang["actualsk"].': ';
 echo '<input type="hidden" name="s" value="1">';
 //alle user des sektors auslesen
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.votefor, de_user_data.`system` FROM de_user_data WHERE de_user_data.sector='$sector' ORDER BY `system` ASC",$db);
-$anz = mysql_num_rows($result);
-while($row=mysql_fetch_array($result)){
+$result = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT de_user_data.spielername, de_user_data.votefor, de_user_data.`system` 
+   FROM de_user_data 
+   WHERE de_user_data.sector = ? 
+   ORDER BY `system` ASC",
+  [$sector]
+);
+$anz = $result->num_rows;
+while($row = $result->fetch_assoc()){
 	//�berpr�fen, ob es den Account f�r den man votet noch gibt
 	if($row["votefor"]!=0){
-		$db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND `system`='".$row["votefor"]."' ORDER BY `system` ASC",$db);
-		$anzv = mysql_num_rows($db_daten);
-		if($anzv!=1){
-			//wenn es den Spieler im Sektor nicht gibt, dann den Vote entfernen
-			//echo $row["votefor"];
-			mysql_query("UPDATE de_user_data SET votefor=0 WHERE sector='$sector' AND votefor='".$row["votefor"]."'",$db);
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+		  "SELECT user_id FROM de_user_data WHERE sector = ? AND `system` = ? ORDER BY `system` ASC",
+		  [$sector, $row["votefor"]]
+		);
+		$anzv = $db_daten->num_rows;
+		if($anzv==0)
+		{
+			mysqli_execute_query($GLOBALS['dbi'],
+			  "UPDATE de_user_data SET votefor = ? WHERE sector = ? AND votefor = ?",
+			  [0, $sector, $row["votefor"]]
+			);
 		}
 	}
 	
@@ -1036,7 +1011,7 @@ if($mw!=0){
 echo '<br><br><select size="1" name="userslist">';
 for ($i = 1; $i <= ($sv_maxsystem+5); $i++){
 	if(isset($su[$i][0]) && $su[$i][0]!=''){
-		echo '<option value="'.utf8_encode($su[$i][2]).'">'.utf8_encode($su[$i][0]).'</option>';
+		echo '<option value="'.$su[$i][2].'">'.$su[$i][0].'</option>';
 	}
 }
 
@@ -1063,7 +1038,7 @@ for ($j = 1; $j <= ($sv_maxsystem+5); $j++){
 		if ($votename=='')$votename='-';
 		if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
 		
-		echo '<tr><td class="'.$bg.'" align="center">'.utf8_encode($name).' '.$politics_lang["votefor"].' '.utf8_encode($votename).'</td></tr>';
+		echo '<tr><td class="'.$bg.'" align="center">'.$name.' '.$politics_lang["votefor"].' '.$votename.'</td></tr>';
 	}
 }
 echo '</table>';
@@ -1099,15 +1074,21 @@ $kostenfaktor=10-$avg_player;
 //sektorgeb�udekosten auslesen
 $btipstr='<table width=475px border=0 cellpadding=0 cellspacing=1><tr align=center><td>&nbsp;</td><td>M</td><td>D</td><td>I</td><td>E</td><td>T</td><tr>';
 //geb�ude
-$db_daten=mysql_query("SELECT tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id",$db);
-while($row = mysql_fetch_array($db_daten)){
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 
+   FROM de_tech_data1 
+   WHERE tech_id > ? AND tech_id < ? 
+   ORDER BY tech_id",
+  [119, 130]
+);
+while($row = $db_daten->fetch_assoc()){
 	$btipstr.= '<tr align=center>';
-	$btipstr.= '<td align=left>'.$row[0].'</td>';
-	$btipstr.= '<td>'.number_format($row[1]/$kostenfaktor, 0,",",".").'</td>';
-	$btipstr.= '<td>'.number_format($row[2]/$kostenfaktor, 0,",",".").'</td>';
-	$btipstr.= '<td>'.number_format($row[3]/$kostenfaktor, 0,",",".").'</td>';
-	$btipstr.= '<td>'.number_format($row[4]/$kostenfaktor, 0,",",".").'</td>';
-	$btipstr.= '<td>'.number_format($row[5]/$kostenfaktor, 0,",",".").'</td>';
+	$btipstr.= '<td align=left>'.$row['tech_name'].'</td>';
+	$btipstr.= '<td>'.number_format($row['restyp01']/$kostenfaktor, 0,",",".").'</td>';
+	$btipstr.= '<td>'.number_format($row['restyp02']/$kostenfaktor, 0,",",".").'</td>';
+	$btipstr.= '<td>'.number_format($row['restyp03']/$kostenfaktor, 0,",",".").'</td>';
+	$btipstr.= '<td>'.number_format($row['restyp04']/$kostenfaktor, 0,",",".").'</td>';
+	$btipstr.= '<td>'.number_format($row['restyp05']/$kostenfaktor, 0,",",".").'</td>';
 	$btipstr.= '</tr>';
 }
 //raumschiff
@@ -1156,8 +1137,8 @@ echo '</table>';
 <td width="550">
 <?php
 $c1="";
-$result = mysql_query("SELECT spielername, spend01, spend02, spend03, spend04, spend05 FROM de_user_data WHERE sector = '$sector' ORDER BY `system`",$db);
-$num = mysql_num_rows($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, spend01, spend02, spend03, spend04, spend05 FROM de_user_data WHERE sector = '$sector' ORDER BY `system`");
+$num = $result->num_rows;
 if ($num>0)
 {
   $bg='cell1';
@@ -1175,7 +1156,7 @@ if ($num>0)
 
   //tabellenheader
   $sc=0;
-  while($row = mysql_fetch_array($result))
+  while($row = $result->fetch_assoc())
   {
     if ($c1==0)
     {
@@ -1189,12 +1170,14 @@ if ($num>0)
     }
     
 	//javascript info punkte bauen
-    $spendtip[$sc] = $politics_lang['punktewertderspende'].'&'.$politics_lang['punktewertderspende'].': '.number_format(($row["spend01"]+$row["spend02"]*2+$row["spend03"]*3+$row["spend04"]*4)/10+$row["spend05"]*1000, 0,",",".").'<br><br>'.$politics_lang['punktewertformel1'].':<br>'.$politics_lang['punktewertformel2'];
+    $tip = $politics_lang['punktewertderspende'].'&'.$politics_lang['punktewertderspende'].': '.
+           number_format(($row["spend01"]+$row["spend02"]*2+$row["spend03"]*3+$row["spend04"]*4)/10+$row["spend05"]*1000, 0,",",".").'<br><br>'.
+           $politics_lang['punktewertformel1'].':<br>'.$politics_lang['punktewertformel2'];
 
-    $output.= '<tr height="30" align="center" title="'.$spendtip[$sc].'">';
+    $output .= '<tr height="30" align="center" title="'.$tip.'">';
     
 
-    $output.= '<td class="'.$bg.'">'.utf8_encode($row["spielername"]).'</td>';
+    $output.= '<td class="'.$bg.'">'.$row["spielername"].'</td>';
     $output.= '<td class="'.$bg.'">'.number_format($row["spend01"], 0,",",".").'</td>';
     $output.= '<td class="'.$bg.'">'.number_format($row["spend02"], 0,",",".").'</td>';
     $output.= '<td class="'.$bg.'">'.number_format($row["spend03"], 0,",",".").'</td>';
@@ -1222,8 +1205,16 @@ if ($num>0)
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td width="550">
 <?php
-$result = mysql_query("SELECT de_user_data.spielername, de_login.last_login,  de_login.last_click, de_user_data.`system`, de_user_data.chatoff, de_user_data.secstatdisable FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_user_data.sector='$sector' ORDER BY `system` ASC LIMIT 200",$db);
-$num = mysql_num_rows($result);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT de_user_data.spielername, de_login.last_login, de_login.last_click, 
+          de_user_data.`system`, de_user_data.chatoff, de_user_data.secstatdisable 
+   FROM de_login 
+   LEFT JOIN de_user_data ON (de_login.user_id = de_user_data.user_id) 
+   WHERE de_user_data.sector = ? 
+   ORDER BY `system` ASC LIMIT 200",
+  [$sector]
+);
+$num = $result->num_rows;
 if ($num>0)
 {
   $bg='cell1';
@@ -1237,7 +1228,7 @@ if ($num>0)
   </tr>';
 
   //tabellenheader
-  while($row = mysql_fetch_array($result))
+  while($row = $result->fetch_assoc())
   {
     if ($c1==0)
     {
@@ -1254,18 +1245,12 @@ if ($num>0)
     echo '<tr height="30" align="center">';
 
     //spielername
-    echo '<td class="'.$bg.'">'.utf8_encode($row["spielername"]).'</td>';
+    echo '<td class="'.$bg.'">'.$row["spielername"].'</td>';
     //online innerhalb der letzten 12 stunden
     echo '<td class="'.$bg.'">';
     if(strtotime($row["last_click"])+43200 > time()) echo $politics_lang["ja"];else echo $politics_lang["nein"];
     echo'</td>';
-	//sektorchat aktiviert
-	/*
-	  <td width="25%" class="'.$bg.'"><b>'.$politics_lang["acsekchat"].'</td>
-    echo '<td class="'.$bg.'">';
-    if($row["chatoff"]==0) echo $politics_lang["ja"];else echo $politics_lang["nein"];
-	echo '</td>';
-	*/
+		
     //sektorstatus sichtbar, als sk kann man das umstellen
     echo '<td class="'.$bg.'">';
     if($row["secstatdisable"]==0){
@@ -1281,10 +1266,7 @@ if ($num>0)
     }
     echo '</td>';    
     
-    //EFTA aktiviert
-    /*echo '<td class="'.$bg.'">';
-    if($row["useefta"]==1) echo $politics_lang["ja"];else echo $politics_lang["nein"];
-    echo '</td>';*/
+
 
     echo '</tr>';
   }
@@ -1296,41 +1278,9 @@ if ($num>0)
 <td width="13" class="rr">&nbsp;</td>
 </tr>
 <?php
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-// sektorinterne angriffe
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-/*
-echo '<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td width="550" align="center" class="ro"><div class="cellu">'.$politics_lang["sektorinterneangriffe"].'</div></td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="550">';
 
-echo'
-<table width="100%"border="0" cellpadding="0" cellspacing="0">
-<tr align="center"><td class="cell">'.$politics_lang["sektorinterneangriffe1"].
-'<br>'.$politics_lang["sektorinterneangriffedafuer"].': '.
-(mysql_result(mysql_query("SELECT count(*) FROM de_user_data WHERE secatt=1 AND sector='$sector'", $db),0)).
-'<br>'.$politics_lang["sektorinterneangriffedagegen"].': '.
-(mysql_result(mysql_query("SELECT count(*) FROM de_user_data WHERE secatt=0 AND sector='$sector'", $db),0)).'<br>';
-//link zum w�hlen
-if($secatt==0)echo '<a href="politics.php?s=1&do=1&secatt=1">'.$politics_lang["sektorinterneangriffewahl2"].'</a>';
-else echo '<a href="politics.php?s=1&do=1&secatt=0">'.$politics_lang["sektorinterneangriffewahl1"].'</a>';
-
-echo '</td></tr>';
-echo '</table>';
-
-echo '</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>';
-*/
 ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
 //wenn man die unendlichkeitssph�re hat, dann kann man umziehen
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -1350,34 +1300,33 @@ if ($techs[26]=='1'  AND $secmoves<$sv_max_secmoves)
 <div class="cell">
 <?php
 //schauen ob derjenige schon einen sektor beantragt hat
-$result1 = mysql_query("SELECT user_id, pass, ticks FROM de_sector_umzug WHERE user_id='$ums_user_id' AND typ=1",$db);
-$anz1 = mysql_num_rows($result1);
-if ($anz1==0)//es l�uft noch kein umzug
+$result1 = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT user_id, pass, ticks FROM de_sector_umzug WHERE user_id = ? AND typ = 1",
+  [$ums_user_id]
+);
+$anz1 = $result1->num_rows;
+if($anz1>0) {
+  $row1 = $result1->fetch_assoc();
+  
+  $result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT user_id FROM de_sector_umzug WHERE pass = ?",
+    [$row1["pass"]]
+  );
+  while($row = $result->fetch_assoc()) {
+    $result1 = mysqli_execute_query($GLOBALS['dbi'],
+      "SELECT spielername, sector, `system` FROM de_user_data WHERE user_id = ?",
+      [$row["user_id"]]
+    );
+    $row1 = $result1->fetch_assoc();
+    // ...existing code...
+  }
+}
+else
 {
-
   echo '<br>'.$politics_lang["msg_18_1"].': <input type="submit" value="'.$politics_lang["getsektor"].'" name="getnewsec"><br><br>';
   echo '<hr><br>'.$politics_lang["msg_18_2"].': <input type="text" name="secpass" value=""><br><br>
     <input type="submit" value="'.$politics_lang["selsek"].'" name="joinsec"><br><br>';
 
-}
-else
-{
-  //passwort der beantragung ausgeben
-  $row1=mysql_fetch_array($result1);
-  echo '<br>'.$politics_lang["msg_19_1"].': '.$row1["pass"];
-  echo '<br>'.$politics_lang["msg_19_2"].':<br>';
-  //alle spieler ausgeben die dran teilnehmen
-  $useranz=0;
-  $result = mysql_query("SELECT user_id FROM de_sector_umzug WHERE pass='".$row1["pass"]."'",$db);
-  while($row=mysql_fetch_array($result))
-  {
-    $result1 = mysql_query("SELECT spielername, sector, `system` FROM de_user_data WHERE user_id='".$row["user_id"]."'",$db);
-    $row1=mysql_fetch_array($result1);
-    echo $row1["spielername"].' ['.$row1["sector"].':'.$row1["system"].']<br>';
-    $useranz++;
-  }
-  echo '<br>'.$politics_lang["msg_20_1"].' '.$useranz.' '.$politics_lang["msg_20_2"].' '.$sv_min_user_per_regsector.' '.$politics_lang["msg_20_3"].'.<br>';
-  echo '<br><input type="submit" value="'.$politics_lang["cancelgetsek"].'" name="cancelgetnewsec"><br><br>';
 }
 ?>
 </div>
@@ -1390,29 +1339,38 @@ else
 //anfang rausvoten
 //schauen ob ein vote l�uft
 
-$result1 = mysql_query("SELECT sector_id, user_id, votes, ticks FROM de_sector_voteout WHERE sector_id='$sector'",$db);
-$anz1 = mysql_num_rows($result1);
+$result1 = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT sector_id, user_id, votes, ticks FROM de_sector_voteout WHERE sector_id=?",
+  [$sector]
+);
+$anz1 = $result1->num_rows;
 
 $showexilvote=0;
 if ($anz1!=0)//es gibt nen vote
 {
   $showexilvote=1;
-  $row = mysql_fetch_array($result1);
+  $row = mysqli_fetch_array($result1);
   $vuser_id=$row["user_id"];
   $vvotes=$row["votes"];
   $vticks=$row["ticks"];
 
   //sollte anz2==0 sein, dann gibts den spieler nicht mehr, wahrscheinlich gel�scht, dann sofort den datensatz entfernen
-  $result2 = mysql_query("SELECT spielername FROM de_user_data WHERE user_id='$vuser_id'",$db);
-  $anz2 = mysql_num_rows($result2);
+  $result2 = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT spielername FROM de_user_data WHERE user_id=?",
+    [$vuser_id]
+  );
+  $anz2 = $result2->num_rows;
   if ($anz2==0)
   {
-    mysql_query("DELETE FROM de_sector_voteout where sector_id='$sector'");
+    mysqli_execute_query($GLOBALS['dbi'], 
+      "DELETE FROM de_sector_voteout where sector_id=?",
+      [$sector]
+    );
     $showexilvote=0;
   }
   else
   {
-    $row = mysql_fetch_array($result2);
+    $row = $result2->fetch_assoc();
     $vspielername=$row["spielername"];
   }
 }
@@ -1432,12 +1390,14 @@ if($showexilvote==1){
 <?php
 //alle user des sektors auslesen die aktiv sind
 echo '<b>'.$politics_lang["msg_21_1"].' '.$vspielername.' '.$politics_lang["msg_21_2"].'?</b><br>';
-//$result = mysql_query("SELECT spielername, `system` FROM de_user_data WHERE sector='$sector' ORDER BY `system` ASC",$db);
-$result = mysql_query("SELECT de_user_data.spielername, de_user_data.`system` FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
-  WHERE de_user_data.sector='$sector' AND de_login.status=1 ORDER BY `system` ASC ",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+  "SELECT de_user_data.spielername, de_user_data.`system` FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) 
+  WHERE de_user_data.sector=? AND de_login.status=1 ORDER BY `system` ASC ",
+  [$sector]
+);
 
-$anz = mysql_num_rows($result);
-while($row=mysql_fetch_array($result))
+$anz = $result->num_rows;
+while($row = $result->fetch_assoc())
 {
   if ($vvotes[$row["system"]]==3)
   {
@@ -1501,8 +1461,10 @@ echo '>'.$politics_lang["egal"].'</option></select> <input type="submit" value="
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td width="550">
 <?php
-$artresult = mysql_query("SELECT id, artname, sector, color FROM de_artefakt where sector > 0 order by id",$db);
-$num = mysql_num_rows($artresult);
+$artresult = mysqli_execute_query($GLOBALS['dbi'],
+  "SELECT id, artname, sector, color FROM de_artefakt WHERE sector > 0 ORDER BY id"
+);
+$num = $artresult->num_rows;
 if ($num>0){
   $bg='cell1';
   echo'
@@ -1520,7 +1482,7 @@ if ($num>0){
 
   //tabellenheader
   $c1=0;
-  while($row = mysql_fetch_array($artresult))
+  while($row = $artresult->fetch_assoc())
   {
     if ($c1==0)
     {

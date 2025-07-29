@@ -17,8 +17,11 @@ include 'inc/lang/'.$sv_server_lang.'_ally.detail.lang.php';
 include_once 'functions.php';
 
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status 
+     FROM de_user_data WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];$status=$row["status"];
@@ -47,27 +50,33 @@ include ("ally/ally.menu.inc.php");
 $allytag=$_REQUEST['allytag'];
 $allyid=$_REQUEST['allyid'];
 
-$query = "SELECT * FROM de_allys WHERE id='$allyid' OR allytag='$allytag' LIMIT 0,1";
-$result = mysql_query($query);
-$num = mysql_num_rows($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+    "SELECT * FROM de_allys WHERE id=? OR allytag=? LIMIT 0,1",
+    [$allyid, $allytag]);
+$num = mysqli_num_rows($result);
 if($num==1)
 {
-
-	if ($result)
-
-	$clanid 		= mysql_result($result,0,"id");
-	$clanname 		= mysql_result($result,0,"allyname");
-	$clankuerzel 	= mysql_result($result,0,"allytag");
-	$leaderid		= mysql_result($result,0,"leaderid");
-	$homepageurl 	= mysql_result($result,0,"homepage");
-	$memberlimit 	= mysql_result($result,0,"memberlimit");
-	$openirc	 	= mysql_result($result,0,"openirc");
-	$bewerberinfo 	= formatString(mysql_result($result,0,"bewerberinfo"));
-	$membercount = mysql_num_rows(mysql_query("SELECT user_id FROM de_user_data WHERE allytag='$clankuerzel' AND status=1"));
-	$bio = formatString(mysql_result($result,0,"besonderheiten"));
-	$ausrichtung = mysql_result($result,0,"ausrichtung");
-	$regierungsform = mysql_result($result,0,"regierungsform");
-	$allianzform = mysql_result($result,0,"allianzform");
+	$row = mysqli_fetch_assoc($result);
+	
+	$clanid 		= $row["id"];
+	$clanname 		= $row["allyname"];
+	$clankuerzel 	= $row["allytag"];
+	$leaderid		= $row["leaderid"];
+	$homepageurl 	= $row["homepage"];
+	$memberlimit 	= $row["memberlimit"];
+	$openirc	 	= $row["openirc"];
+	$bewerberinfo 	= formatString($row["bewerberinfo"]);
+	
+	$result2 = mysqli_execute_query($GLOBALS['dbi'], 
+	    "SELECT COUNT(*) as count FROM de_user_data WHERE allytag=? AND status=1",
+	    [$clankuerzel]);
+	$count_row = mysqli_fetch_assoc($result2);
+	$membercount = $count_row['count'];
+	
+	$bio = formatString($row["besonderheiten"]);
+	$ausrichtung = $row["ausrichtung"];
+	$regierungsform = $row["regierungsform"];
+	$allianzform = $row["allianzform"];
 	
 	
 	
@@ -88,12 +97,14 @@ if($num==1)
 	      			<td height=21>$allydetail_lang[allytag]:</td>
 	      			<td height=21><b>".utf8_encode($clankuerzel)."</b></td>
 	    		</tr>");
-	//allyleader inkl. hf-m�glichkeit 
-	$db_daten=mysql_query("SELECT * FROM de_user_data WHERE user_id='$leaderid'",$db);
-	$num = mysql_num_rows($db_daten);
+	//allyleader inkl. hf-möglichkeit 
+	$result = mysqli_execute_query($GLOBALS['dbi'], 
+	    "SELECT spielername, sector, system FROM de_user_data WHERE user_id=?",
+	    [$leaderid]);
+	$num = mysqli_num_rows($result);
 	if($num==1)
 	{
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_array($result);
 		echo '	<tr class=cl>
 	      			<td height=21>Allianzleader:</td>
 	      			<td height=21><a href="details.php?se='.$row['sector'].'&sy='.$row['system'].'"><b>'.$row['spielername'].'</b></a></td>

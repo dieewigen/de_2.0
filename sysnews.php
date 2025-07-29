@@ -5,13 +5,14 @@ include 'inc/lang/'.$sv_server_lang.'_sysnews.lang.php';
 include "functions.php";
 include "tickler/kt_einheitendaten.php";
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
-$restyp01 = $row[0];
-$restyp02 = $row[1];
-$restyp03 = $row[2];
-$restyp04 = $row[3];
-$restyp05 = $row[4];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
 $punkte = $row["score"];
 $newtrans = $row["newtrans"];
 $newnews = $row["newnews"];
@@ -19,7 +20,8 @@ $sector = $row["sector"];
 $system = $row["system"];
 
 if ($newnews == 1) { //wenn einen neue nachricht vorlag, den indikator wieder auf 0 setzen
-    mysql_query("UPDATE de_user_data SET newnews = 0 WHERE user_id='$ums_user_id'", $db);
+    $sql = "UPDATE de_user_data SET newnews = 0 WHERE user_id=?";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 }
 $newnews = 0;
 
@@ -62,7 +64,8 @@ include "resline.php";
 
 //wurde ein button gedrueckt??
 if (isset($_GET["a"]) && $_GET["a"] == "d") {//alle nachricht l&ouml;schen
-    mysql_query("DELETE FROM de_user_news WHERE user_id=$ums_user_id AND seen=1", $db);
+    $sql = "DELETE FROM de_user_news WHERE user_id=? AND seen=1";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
     echo '<div class="info_box text3" style="margin-bottom: 5px; font-size: 14px;">'.$sn_lang["geloescht"].'</div>';
 }
 
@@ -96,9 +99,10 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 ';
 
 
-    $query = mysql_query("SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' ORDER BY time DESC");
+    $sql = "SELECT time, typ, text FROM de_user_news WHERE user_id=? ORDER BY time DESC";
+    $query = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
     $hrstr='';
-    while ($row = mysql_fetch_array($query)) {
+    while ($row = mysqli_fetch_assoc($query)) {
         $t = $row["time"];
         $n = $row["typ"];
         $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
@@ -178,15 +182,17 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 
     // alles per email versenden
     $filename = 'news'.date('Ymd', time()).'.html';
-    $db_mail = mysql_query("SELECT reg_mail FROM de_login WHERE user_id='$ums_user_id'", $db);
-    $rowmail = mysql_fetch_array($db_mail);
+    $sql = "SELECT reg_mail FROM de_login WHERE user_id=?";
+    $db_mail = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    $rowmail = mysqli_fetch_assoc($db_mail);
 
     //jetzt die e-mail versenden
 
     sendmail_att($rowmail['reg_mail'], 'noreply@die-ewigen.com', $sn_lang["mailbetreff"], $mailbody, $filename, $allenachrichten);
 
     //die nachrichten nach dem versand löschen
-    mysql_query("DELETE FROM de_user_news WHERE user_id='$ums_user_id' AND seen=1", $db);
+    $sql = "DELETE FROM de_user_news WHERE user_id=? AND seen=1";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 
 }//mailnews ende
 
@@ -216,8 +222,8 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th7 = '<a href="sysnews.php?option=7"><font color="#00DF00">[BG]</font></a>';
 } elseif ($_GET["option"] == "6") {
     $nachrichten = array(6);
@@ -229,8 +235,8 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th6 = '<a href="sysnews.php?option=6"><font color="#00DF00">['.$sn_lang["allianz"].']</font></a>';
 } elseif ($_GET["option"] == "5") {
     $nachrichten = array(3,7,60);
@@ -242,8 +248,8 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th5 = '<a href="sysnews.php?option=5"><font color="#00DF00">['.$sn_lang["sonstige"].']</font></a>';
 } elseif ($_GET["option"] == "4") {
     $nachrichten = array(1,2);
@@ -255,8 +261,8 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th4 = '<a href="sysnews.php?option=4"><font color="#00DF00">['.$sn_lang["gebaeude"].']</font></a>';
 } elseif ($_GET["option"] == "3") {
     $nachrichten = array(10,11,12);
@@ -268,8 +274,8 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th3 = '<a href="sysnews.php?option=3"><font color="#00DF00">['.$sn_lang["handel"].']</font></a>';
 } elseif ($_GET["option"] == "2") {
     $nachrichten = array(4,5,50,51,52,53,54,55,56,57);
@@ -281,18 +287,19 @@ if ($_GET["option"] == "7") {
         }
     }
 
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' and (".$typ.") ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th2 = '<a href="sysnews.php?option=2"><font color="#00DF00">['.$sn_lang["kampf"].']</font></u></a>';
 } elseif ($_GET["option"] == "1") {
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=?";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th1 = '<a href="sysnews.php?option=1"><font color="#00DF00">['.$sn_lang["alle"].']</font></a>';
 } elseif (empty($_GET["option"])) {
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id='$ums_user_id' AND seen=0 ORDER BY time DESC";
-    $db_daten = mysql_query($query, $db);
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? AND seen=0 ORDER BY time DESC";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
     $th0 = '<a href="sysnews.php?option=0"><font color="#00DF00">['.$sn_lang["neue"].']</font></a>';
-    mysql_query("UPDATE de_user_news set seen=1 WHERE user_id='$ums_user_id' AND seen=0", $db);
+    $sql = "UPDATE de_user_news set seen=1 WHERE user_id=? AND seen=0";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 }
 
 
@@ -316,7 +323,7 @@ if ($_GET["option"] == "7") {
 <table width="560" border="0" cellpadding="0" cellspacing="1" width="100%">
 <?php
 $hrstr = '';
-while ($row = mysql_fetch_array($db_daten)) { //jeder gefundene datensatz wird ausgegeben
+while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird ausgegeben
     $t = $row["time"];
     $n = $row["typ"];
     $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
@@ -441,8 +448,9 @@ if ($ums_cooperation == 0) {
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td align=center height="45" colspan="2" class="cell"><input type="submit" name="mailnews" value="'.$sn_lang["mailbutton"].'"';
 
-    $db_archiv = mysql_query("SELECT user_id FROM de_user_news WHERE user_id='$ums_user_id'", $db);
-    $nummer = mysql_num_rows($db_archiv);
+    $sql = "SELECT user_id FROM de_user_news WHERE user_id=?";
+    $db_archiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    $nummer = mysqli_num_rows($db_archiv);
     if ($nummer == "0") {
         echo " disabled ";
     }

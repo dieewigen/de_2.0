@@ -4,10 +4,11 @@ include "inc/schiffsdaten.inc.php";
 include "functions.php";
 include "tickler/kt_einheitendaten.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, techs, newtrans, newnews, design3 AS design, sc2, spec1, spec3 FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
-$restyp05=$row[4];$punkte=$row["score"];$techs=$row["techs"];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, techs, newtrans, newnews, design3 AS design, sc2, spec1, spec3 FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];
+$restyp05=$row["restyp05"];$punkte=$row["score"];$techs=$row["techs"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $design=$row["design"];$mysc2=$row["sc2"];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
@@ -36,9 +37,9 @@ echo'
 //zuerst mal alle Einheitennamen aus der DB laden und in ein Array packen
 $techdata=array();
 $sql="SELECT * FROM de_tech_data WHERE tech_id>=81 AND tech_id<=104 ORDER BY tech_id ASC";
-$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql);
 //echo $sql;
-while($row = mysqli_fetch_array($db_daten)){
+while($row = mysqli_fetch_assoc($db_daten)){
 	$techdata[1][$row['tech_id']]['tech_name']=getTechNameByRasse($row['tech_name'],1);
 	$techdata[2][$row['tech_id']]['tech_name']=getTechNameByRasse($row['tech_name'],2);
 	$techdata[3][$row['tech_id']]['tech_name']=getTechNameByRasse($row['tech_name'],3);
@@ -47,22 +48,6 @@ while($row = mysqli_fetch_array($db_daten)){
 
 
 //Klassenname
-/*
-$klassenname[81]='J&auml;ger';
-$klassenname[82]='Jagdboot';
-$klassenname[83]='Zerst&ouml;rer';
-$klassenname[84]='Kreuzer';
-$klassenname[85]='Schlachtschiff';
-$klassenname[86]='Bomber';
-$klassenname[87]='Transmitterschiff';
-$klassenname[88]='Tr&auml;ger';
-$klassenname[100]='Orbitalj&auml;ger-Basis';
-$klassenname[101]='Flugk&ouml;rper-Plattform';
-$klassenname[102]='Energiegeschoss-Plattform';
-$klassenname[103]='Materiegeschoss-Plattform';
-$klassenname[104]='Hochenergiegeschoss-Plattform';
-*/
-
 $klassenname[]='J&auml;ger';
 $klassenname[]='Jagdboot';
 $klassenname[]='Zerst&ouml;rer';
@@ -79,13 +64,10 @@ $klassenname[]='Energiegeschoss-Plattform';
 $klassenname[]='Materiegeschoss-Plattform';
 $klassenname[]='Hochenergiegeschoss-Plattform';
 
-
-//var_dump($techdata);
-rahmen_oben('Einheiteninformationen');
+hmen_oben('Einheiteninformationen');
 echo '<div style="width: 576px; position: relative; font-size: 10px; text-align: center;">';
 echo '<table style="width: 100%; font-size: 10px;">';
 for($i=81;$i<=104;$i++){
-	//if($techdata[1][$i]['tech_name']!=''){
 	if($i<100){
 		$unit_id=$i-81;
 	}else{

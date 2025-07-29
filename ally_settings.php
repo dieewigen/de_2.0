@@ -1,21 +1,15 @@
 <?php
-//	--------------------------------- ally_settings.php ---------------------------------
-//	Funktion der Seite:		�ndern der Allianzdaten
-//	Letzte �nderung:		05.09.2002
-//	Letzte �nderung von:	Ascendant
-//
-//	�nderungshistorie:
-//
-//	05.02.2002 (Ascendant)	- Erweiterung der �nderungsbefugnis der Allianzdaten
-//							  auf Coleader
-//  --------------------------------------------------------------------------------
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.settings.lang.php';
-include_once 'functions.php';
+include 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 ?>
 <!DOCTYPE HTML>
@@ -26,8 +20,6 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 </head>
 <body>
 
-<font face="tahoma" style="font-size:8pt;">
-
 <?php
 function formatString($string){
 	$allowed_tags="<br><i></i><b></b><strong></strong><u></u><ul></ul><li></li><p></p><font></font>";
@@ -37,12 +29,14 @@ function formatString($string){
 
 include "resline.php";
 include ("ally/ally.menu.inc.php");
-// Erweiterung des Querys um Abfrage auf Coleader von Ascendant (05.09.2002)
-$query="SELECT * FROM de_allys WHERE leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
 
-$result=mysql_query($query);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_allys 
+     WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
+    [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
 
-$clanid = mysql_result($result,0,"id");
+$row = mysqli_fetch_assoc($result);
+$clanid = $row["id"];
 
 $bio = formatString($bio);
 $leadermessage = formatString($leadermessage);
@@ -77,9 +71,13 @@ $showactivity=intval($_POST['showactivity']);
 $discord_bot=trim($_POST['discord_bot']);
 $discord_bot=utf8_decode(str_replace("'", '&#39;', $discord_bot));
 
-$query = "UPDATE de_allys SET homepage='$hpurl', besonderheiten='$bio', openirc='$openirc', internirc='$internirc', metairc='$metairc', keywords='$keywords', leadermessage='$leadermessage', bewerberinfo='$bewerberinfo', public_activity='$showactivity', discord_bot='$discord_bot' WHERE id='$clanid'";
-
-$result = mysql_query($query);
+mysqli_execute_query($GLOBALS['dbi'],
+    "UPDATE de_allys 
+     SET homepage=?, besonderheiten=?, openirc=?, internirc=?, metairc=?, 
+         keywords=?, leadermessage=?, bewerberinfo=?, public_activity=?, discord_bot=? 
+     WHERE id=?",
+    [$hpurl, $bio, $openirc, $internirc, $metairc, $keywords, $leadermessage, 
+     $bewerberinfo, $showactivity, $discord_bot, $clanid]);
 
 echo '<br><div class="info_box">';
 

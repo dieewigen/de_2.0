@@ -27,32 +27,32 @@ echo '<html><head></head><body>';
 mt_srand((double)microtime()*10000);
 
 //Systemdaten
-$result = mysql_query("SELECT * FROM de_system",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system", []);
+$row = mysqli_fetch_array($result);
 $doetick=$row["doetick"];
 $npc_leader=$row['npcleader'];
 $rundenalter_wt=$row['wt'];
 
 //npc-leader festlegen
 if($npc_leader==0){
-	$db_daten = mysql_query("SELECT * FROM de_user_data WHERE npc=1 LIMIT 1",$db);
-	$row     = mysql_fetch_array($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=1 LIMIT 1", []);
+	$row     = mysqli_fetch_array($db_daten);
 	$npc_leader = $row['user_id'];
-	mysql_query("UPDATE de_system SET npcleader='$npc_leader'",$db);
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET npcleader='$npc_leader'");
 }
 
 if ($doetick==1){
 	//anzahl der pc-spieler außerhalb von sektor 1 auslesen
-	$result  = mysql_query("SELECT count(*) AS wert FROM de_user_data WHERE npc=0 AND sector>1",$db);
-	$row     = mysql_fetch_array($result);
+	$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(*) AS wert FROM de_user_data WHERE npc=0 AND sector>1");
+	$row     = mysqli_fetch_array($result);
 	$playeractive = $row["wert"];
 		
 	$rassen_id=5;
 	
 	//alle spieler denen man folgen kann auslesen und deren user_ids in ein array packen
 	unset($player);
-	$db_daten = mysql_query("SELECT * FROM de_user_data WHERE sector>1 AND npc=0 ORDER BY col DESC",$db);
-	while($row = mysql_fetch_array($db_daten))
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE sector>1 AND npc=0 ORDER BY col DESC");
+	while($row = mysqli_fetch_array($db_daten))
 	{
 		$player[]=$row['user_id'];
 	}
@@ -60,8 +60,8 @@ if ($doetick==1){
 	//alle spieler auslesen denen bereits gefolgt wird
 	unset($npc_follow_list);
 	$npc_follow_list[]=0;
-	$db_daten = mysql_query("SELECT * FROM de_user_data WHERE npc=1 AND npcfollow>0",$db);
-	while($row = mysql_fetch_array($db_daten))
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=1 AND npcfollow>0");
+	while($row = mysqli_fetch_array($db_daten))
 	{
 		$npc_follow_list[]=$row['npcfollow'];
 	}
@@ -76,8 +76,8 @@ if ($doetick==1){
 	//raumschiffe/t�rme: x%
 	
 	//erstmal die daten der npc-accounts laden
-	$db_daten = mysql_query("SELECT * FROM de_user_data WHERE npc=1",$db);
-	while($row = mysql_fetch_array($db_daten))	{
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=1");
+	while($row = mysqli_fetch_array($db_daten))	{
 		//damit die accounts echter wirken, wird nicht bei jedem WT etwas gemacht, nur bei jedem x-ten
   		if (mt_rand(1,100)<=7){
 			$sector=$row['sector'];
@@ -90,18 +90,18 @@ if ($doetick==1){
 			
 			//nur etwas machen, wenn der npc nicht gerade angeflogen wird
 			$sql="SELECT * FROM de_user_fleet WHERE hsec<>'$sector' AND zielsec='$sector' AND zielsys='$system' AND aktion>0;";
-			$db_datenx=mysql_query($sql,$db);
-			$num = mysql_num_rows($db_datenx);
+			$db_datenx=mysqli_execute_query($GLOBALS['dbi'], $sql);
+			$num = mysqli_num_rows($db_datenx);
 			if($num==0){
 				//test auf leader, dieser erhält die Handelslieferungen
 				//if($npc_uid!=$npc_leader){
 					//wenn er jemandem folgt, dann dessen daten auslesen
 					if($npc_follow>0){
 						//die daten des spielers auslesen dem er folgt und ggf. jemanden f�r ihn finden
-						$db_datenx=mysql_query("SELECT * FROM de_user_data WHERE user_id='$npc_follow' AND sector>1;",$db);				
-						$num = mysql_num_rows($db_datenx);
+						$db_datenx=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id='$npc_follow' AND sector>1;");				
+						$num = mysqli_num_rows($db_datenx);
 						if($num==1){
-							$rowx = mysql_fetch_array($db_datenx);
+							$rowx = mysqli_fetch_array($db_datenx);
 							echo '<br>Folgt Player: '.$rowx['spielername'];
 							$fixscore=$rowx['fixscore'];
 							$fhsec=$rowx['sector'];
@@ -115,8 +115,8 @@ if ($doetick==1){
 
 							/*
 							//platz des aliens nach kollektoren des pcs berechnen um dar�ber die st�rke feintunen zu k�nnen
-							$db_datenk=mysql_query("SELECT user_id FROM de_user_data WHERE col>".$rowx['col']." AND sector>1 AND npc=0;",$db);				
-							$platz = mysql_num_rows($db_datenk);
+							$db_datenk=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE col>".$rowx['col']." AND sector>1 AND npc=0;");				
+							$platz = mysqli_num_rows($db_datenk);
 
 							$regulator=1+(100-$platz)/100;
 							if($regulator<0.55)$regulator=0.55;
@@ -214,10 +214,10 @@ if ($doetick==1){
 							$e104=round(($playerscore*$anteil[4]/615)*$regulator);
 							
 							//datensatz updaten
-							mysql_query("UPDATE de_user_data SET fixscore='$fixscore', col='$newcol', 
+							mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET fixscore='$fixscore', col='$newcol', 
 								restyp01=0, restyp02=0, restyp03=0, restyp04=0, restyp05=0, 
 								techs='$techs', e100='$e100', e101='$e101', e102='$e102', e103='$e103', e104='$e104' 
-							WHERE user_id='$npc_uid';",$db);
+							WHERE user_id='$npc_uid';");
 							
 							echo "<br>UPDATE de_user_data SET col='$newcol', techs='$techs', e100='$e100', e101='$e101', e102='$e102', e103='$e103', e104='$e104' 
 							WHERE user_id='$npc_uid';";
@@ -234,15 +234,15 @@ if ($doetick==1){
 
 							//schiffsdatensatz updaten
 							$fleet_id=$npc_uid.'-0';
-							mysql_query("UPDATE de_user_fleet SET e81='$e81', e82='$e82', e83='$e83', e84='$e84', e85='$e85', 
-							e86='$e86', e87='$e87', e88='$e88', e89='$e89', e90='$e90' WHERE user_id='$fleet_id'",$db);
+							mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET e81='$e81', e82='$e82', e83='$e83', e84='$e84', e85='$e85', 
+							e86='$e86', e87='$e87', e88='$e88', e89='$e89', e90='$e90' WHERE user_id='$fleet_id'");
 							
 							echo "<br>UPDATE de_user_fleet SET e81='$e81', e82='$e82', e83='$e83', e84='$e84', e85='$e85', 
 							e86='$e86', e87='$e87', e88='$e88', e89='$e89', e90='$e90' WHERE user_id='$fleet_id'";
 							
 							//es kann passieren, dass der NPC per Zufall seinen Spieler verliert und sich ein neues Ziel dem er folgen kann suchen muss
 							if(mt_rand(0,100)>99){
-								mysql_query("UPDATE de_user_data SET npcfollow=0 WHERE user_id='$npc_uid';",$db);
+								mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET npcfollow=0 WHERE user_id='$npc_uid';");
 							}
 							
 							
@@ -282,7 +282,7 @@ function find_player($npc_uid)
 	}
 
 	//neuen player dem er folgt hinterlegen
-	mysql_query("UPDATE de_user_data SET npcfollow='$newplayer' WHERE user_id='$npc_uid';",$db);
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET npcfollow='$newplayer' WHERE user_id='$npc_uid';");
 	
 	echo '<br>Neuer Spieler: '.$newplayer;
 }

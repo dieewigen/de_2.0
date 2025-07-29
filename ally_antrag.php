@@ -13,9 +13,13 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.antrag.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data WHERE user_id = ?",
+    [$ums_user_id]
+);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 ?>
 <!DOCTYPE HTML>
@@ -38,16 +42,20 @@ include('ally/ally.menu.inc.php');
 </tr>
 <?php
 //Pr&uuml;fung auf coleader hinzugef&uuml;gt von Ascendant (4.9.2002)
-$query = "SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
-$result = mysql_query($query);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT allytag FROM de_allys 
+     WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
+    [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+);
+$row = mysqli_fetch_assoc($result);
+$clankuerzel = $row["allytag"] ?? '';
 
-$clankuerzel = @mysql_result($result,0,"allytag");
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT user_id, sector, `system` FROM de_user_data WHERE status = '0' AND allytag = ?",
+    [$clankuerzel]
+);
 
-$query = "SELECT user_id, sector, `system` FROM de_user_data WHERE status='0' AND allytag='$clankuerzel'";
-
-$result = @mysql_query($query);
-
-$nb = @mysql_num_rows($result);
+$nb = mysqli_num_rows($result);
 
 $row = 0;
 
@@ -55,21 +63,26 @@ $row = 0;
 if ($clankuerzel=='') $row=$nb;
 
 while ($row < $nb){
-        $userid         = mysql_result($result,$row,"user_id");
-        $se                 = @mysql_result($result,$row,"sector");
-        $sy                 = @mysql_result($result,$row,"system");
+        $userData = mysqli_fetch_assoc($result);
+        $userid = $userData["user_id"];
+        $se = $userData["sector"];
+        $sy = $userData["system"];
 
-        $query = "SELECT spielername, tick, col, score, sector, `system`, rasse, actpoints, tick FROM de_user_data where user_id='$userid'";
-        $result2         = @mysql_query($query);
-        $name            = @mysql_result($result2,0,"spielername");
-        $b_score		 = @mysql_result($result2,0,"score");
-        $b_sector		 = @mysql_result($result2,0,"sector");
-        $b_system		 = @mysql_result($result2,0,"system");
-        $b_actpoints	 = @mysql_result($result2,0,"actpoints");
-        $b_cols	 		= @mysql_result($result2,0,"col");
-        $b_race	 		= @mysql_result($result2,0,"rasse");
-        $m_actpoints 	= @mysql_result($result2,0,"actpoints");
-        $m_tick 		= @mysql_result($result2,0,"tick");
+        $result2 = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT spielername, tick, col, score, sector, `system`, rasse, actpoints, tick 
+             FROM de_user_data WHERE user_id = ?",
+            [$userid]
+        );
+        $playerData = mysqli_fetch_assoc($result2);
+        $name = $playerData["spielername"];
+        $b_score = $playerData["score"];
+        $b_sector = $playerData["sector"];
+        $b_system = $playerData["system"];
+        $b_actpoints = $playerData["actpoints"];
+        $b_cols = $playerData["col"];
+        $b_race = $playerData["rasse"];
+        $m_actpoints = $playerData["actpoints"];
+        $m_tick = $playerData["tick"];
 
     	$activity=$m_actpoints/$m_tick*1000;
 
@@ -92,21 +105,12 @@ while ($row < $nb){
         	$r_text = "Z";
         }
 
-        $query = "SELECT antrag FROM de_ally_antrag where user_id='$userid'";
-        $result2         = @mysql_query($query);
-        $antragstext         = @mysql_result($result2,0,"antrag");
-
-        /*$a_values=mysql_query("SELECT MAX(actpoints) FROM de_user_data");
-		$a_val = mysql_fetch_array($a_values);
-		$maxactivity=$a_val[0];
-		if ($maxactivity>0)
-		{
-			$activity=($b_actpoints * 100) / $maxactivity;
-		}
-		else
-		{
-			$activity=100;
-		}*/
+        $result2 = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT antrag FROM de_ally_antrag WHERE user_id = ?",
+            [$userid]
+        );
+        $antragData = mysqli_fetch_assoc($result2);
+        $antragstext = $antragData["antrag"] ?? '';
 
         echo '
 			<tr>
@@ -151,16 +155,22 @@ while ($row < $nb){
 </tr>
 <?php
 //Pr&uuml;fung auf coleader hinzugef&uuml;gt von Ascendant (4.9.2002)
-$query = "SELECT id FROM de_allys WHERE leaderid=$ums_user_id OR coleaderid1=$ums_user_id OR coleaderid2=$ums_user_id OR coleaderid3='$ums_user_id'";
-$result = mysql_query($query);
-$allyid = @mysql_result($result,0,"id");
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT id FROM de_allys 
+     WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
+    [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+);
+$row = mysqli_fetch_assoc($result);
+$allyid = $row["id"] ?? 0;
 
-$query =         "SELECT allytag, antrag, ally_id_antragsteller ".
-                "FROM de_allys, de_ally_buendniss_antrag ".
-                "WHERE ally_id_antragsteller=id and ally_id_partner=$allyid";
-$result = @mysql_query($query);
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT allytag, antrag, ally_id_antragsteller 
+     FROM de_allys, de_ally_buendniss_antrag 
+     WHERE ally_id_antragsteller = id AND ally_id_partner = ?",
+    [$allyid]
+);
 
-while($row = @mysql_fetch_array($result)) {
+while($row = mysqli_fetch_assoc($result)) {
         $name = $row['allytag'];
         $antragstext = $row['antrag'];
         $ally_id_antragsteller = $row['ally_id_antragsteller'];

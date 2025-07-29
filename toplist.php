@@ -3,9 +3,10 @@ include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_toplist.lang.php';
 include "functions.php";
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row["restyp05"];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];$restyp05=$row["restyp05"];
 $punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 $sector=$row["sector"];$system=$row["system"];
 if ($row["status"]==1) $ownally = $row["allytag"];
@@ -29,8 +30,9 @@ if(isset($_GET['show_history']) && $_GET['show_history']==1){
 	
 	rahmen_oben('Gewinner der vergangen Runden');
 	echo '<div class="cell" style="width: 570px;">';
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_server_round_toplist ORDER BY round_id DESC");
-	while($row = mysqli_fetch_array($db_daten)){
+	$sql = "SELECT * FROM de_server_round_toplist ORDER BY round_id DESC";
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql);
+	while($row = mysqli_fetch_assoc($db_daten)){
 		echo '<div style="text-align: center; font-weight: bold;">Runde '.$row['round_id'].'</div>';
 		echo '<div>ERHABENE/ERHABENER: '.$row['player_spielername'].'</div>';
 		echo '<div>Koordinaten: '.$row['player_sector'].':'.$row['player_system'].'</div>';

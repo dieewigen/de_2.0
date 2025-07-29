@@ -13,13 +13,15 @@ $getpamsg = '';
 
 $ehlockfaktor = 4;
 
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
-$restyp01 = $row[0];
-$restyp02 = $row[1];
-$restyp03 = $row[2];
-$restyp04 = $row[3];
-$restyp05 = $row[4];
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+  "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id=?", 
+  [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
 $punkte = $row['score'];
 $newtrans = $row['newtrans'];
 $allytag = $row['allytag'];
@@ -40,14 +42,17 @@ $patime = $row['patime'];
 $trade_reminder = $row['trade_reminder'];
 
 //owner id auslesen
-$db_daten = mysql_query("SELECT owner_id FROM de_login WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+  "SELECT owner_id FROM de_login WHERE user_id=?", 
+  [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
 $owner_id = intval($row['owner_id']);
 
 //maximalen tick auslesen
-//$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1", $db);
-$row     = mysql_fetch_array($result);
+//$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data");
+$result = mysqli_execute_query($GLOBALS['dbi'], 
+  "SELECT wt AS tick FROM de_system LIMIT 1");
+$row = mysqli_fetch_assoc($result);
 $maxtick = $row['tick'];
 
 //einstellungen für die nächste runde speichern
@@ -58,8 +63,10 @@ if (isset($_POST['donr'])) {
         if (!preg_match("/^[[:alpha:]0-9äöü_=-]*$/i", $spielername)) {
             $errmsg .= 'Im Spielernamen d&uuml;rfen keine Sonderzeichen sein (Ausnahmen sind nur: _-=).';
         } else {
-            $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE (spielername='$spielername' OR nrspielername='$spielername') AND spielername!='$ums_spielername'", $db);
-            $vorhanden = mysql_num_rows($db_daten);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+              "SELECT user_id FROM de_user_data WHERE (spielername=? OR nrspielername=?) AND spielername!=?", 
+              [$spielername, $spielername, $ums_spielername]);
+            $vorhanden = mysqli_num_rows($db_daten);
             if ($vorhanden > 0) {
                 $errmsg .= '<br>'.$options_lang['fehler5'];
             }
@@ -88,7 +95,9 @@ if (isset($_POST['donr'])) {
 
     //wenn alles ok ist, daten in der db ablegen
     if ($errmsg == '') {
-        mysql_query("UPDATE de_user_data SET nrspielername='$spielername', nrrasse='$gewrasse' WHERE user_id = '$ums_user_id'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_user_data SET nrspielername=?, nrrasse=? WHERE user_id=?", 
+          [$spielername, $gewrasse, $ums_user_id]);
         $nrrasse = $gewrasse;
         $nrspielername = $spielername;
     }
@@ -102,7 +111,9 @@ if (isset($_POST['graop'])) {
         $helper = intval($_POST['helper'] ?? 0);
         $traderem = intval($_POST['traderem'] ?? 0);
 
-        mysql_query("UPDATE de_user_data SET chatoff='$chat', chatoffallg='$chatallg', chatoffglobal='$chatglobal', helper='$helper', trade_reminder='$traderem' WHERE user_id = '$ums_user_id'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_user_data SET chatoff=?, chatoffallg=?, chatoffglobal=?, helper=?, trade_reminder=? WHERE user_id=?", 
+          [$chat, $chatallg, $chatglobal, $helper, $traderem, $ums_user_id]);
         $errmsg .= $options_lang['uebernommen'];
         $chatoff = $chat;
         $chatoffallg = $chatallg;
@@ -114,40 +125,16 @@ if (isset($_POST['graop'])) {
     }
 }
 
-//wurde ein button gedrueckt??
-$oldpass = $_POST['oldpass'] ?? '';
-$pass1 = $_POST['pass1'] ?? '';
-$pass2 = $_POST['pass2'] ?? '';
-if (isset($_POST['newpass']) && $owner_id == 0) {
-    //echo '<br>'.HTTP_REFERER.'<br>';
-    $db_daten = mysql_query("SELECT user_id FROM de_login WHERE user_id = '$ums_user_id' AND pass=MD5('$oldpass')");
-    $num = mysql_num_rows($db_daten);
-    if ($num == 1) { //oldpass ist korrekt
-        $pass1 = trim($pass1);
-        $pass2 = trim($pass2);
-        if ($pass1 == $pass2) {
-            if (strlen($pass1) > 3) {
-                mysql_query("update de_login set pass = MD5('$pass1'), newpass='' WHERE user_id = '$ums_user_id'", $db);
-                $errmsg .= $options_lang['pwnew'];
-            } else {
-                $errmsg .= '<font color="FF0000">'.$options_lang['pw2short'].'</font>';
-            }
-        } else {
-            $errmsg .= '<font color="FF0000">'.$options_lang['pwdifferent'].'</font>';
-        }
-    } else {
-        $errmsg .= '<font color="FF0000">'.$options_lang['pwfalsch'].'</font>';
-    }
-}
-
 $delacc = $_POST['delacc'] ?? false;
 if ($delacc) { //account l�schen
     $delpass = $_POST['delpass'];
     $delcheck1 = $_POST['delcheck1'];
     $delcheck2 = $_POST['delcheck2'];
 
-    $db_datenx = mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
-    $rowx = mysql_fetch_array($db_datenx);
+    $db_datenx = mysqli_execute_query($GLOBALS['dbi'], 
+      "SELECT * FROM de_login WHERE user_id=?", 
+      [$ums_user_id]);
+    $rowx = mysqli_fetch_assoc($db_datenx);
 
     $passwordOK = false;
     if (password_verify(trim($delpass), $rowx['pass'])) {
@@ -157,8 +144,10 @@ if ($delacc) { //account l�schen
     if ($passwordOK) { //oldpass ist korrekt
         if ($delcheck1 == "1" and $delcheck2 == "1") {//l�sche
             //�berpr�fen ob man evtl. allianzleader ist, da ist es notwendig den posten aufzugeben
-            $db_daten = mysql_query("SELECT * FROM de_allys WHERE leaderid='$ums_user_id';", $db);
-            $num = mysql_num_rows($db_daten);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+              "SELECT * FROM de_allys WHERE leaderid=?", 
+              [$ums_user_id]);
+            $num = mysqli_num_rows($db_daten);
             if ($num == 0) {//man ist kein leader
                 $uid = $ums_user_id;
 
@@ -167,16 +156,21 @@ if ($delacc) { //account l�schen
                 $tis = time() + 86400 * $urltage;
                 $datum = date("Y-m-d H:i:s", $tis);
 
-                mysql_query("UPDATE de_login SET last_login='$datum', status=3, inaktmail=1, delmode=1 WHERE user_id=$uid", $db);
+                mysqli_execute_query($GLOBALS['dbi'], 
+                  "UPDATE de_login SET last_login=?, status=3, inaktmail=1, delmode=1 WHERE user_id=?", 
+                  [$datum, $uid]);
 
                 //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
                 $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
-                mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid", $db);
-
+                mysqli_execute_query($GLOBALS['dbi'], 
+                  "UPDATE de_user_data SET ehlock=? WHERE user_id=?", 
+                  [$newtick, $uid]);
 
                 //mail an den accountinhaber schicken
-                $db_daten = mysql_query("SELECT reg_mail FROM de_login WHERE user_id='$ums_user_id'", $db);
-                $row = mysql_fetch_array($db_daten);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
+                  "SELECT reg_mail FROM de_login WHERE user_id=?", 
+                  [$ums_user_id]);
+                $row = mysqli_fetch_assoc($db_daten);
                 $reg_mail = $row['reg_mail'];
                 @mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: noreply@die-ewigen.com');
 
@@ -266,8 +260,10 @@ $urlacc = $_POST['urlacc'] ?? false;
 $showattumode=0;
 if ($urlacc) { //account in urlaubsmodus versetzen
     $urlpass = $_POST['urlpass'];
-    $db_datenx = mysql_query("SELECT * FROM de_login WHERE user_id = '$ums_user_id'");
-    $rowx = mysql_fetch_array($db_datenx);
+    $db_datenx = mysqli_execute_query($GLOBALS['dbi'], 
+      "SELECT * FROM de_login WHERE user_id=?", 
+      [$ums_user_id]);
+    $rowx = mysqli_fetch_assoc($db_datenx);
 
     $passwordOK = false;
     if (password_verify(trim($urlpass), $rowx['pass'])) {
@@ -292,18 +288,24 @@ if ($urlacc) { //account in urlaubsmodus versetzen
                 if ($errmsg == '') {
                     //schauen ob es credits kostet
                     if ($urltage < 3) {
-                        mysql_query("UPDATE de_user_data SET credits=credits-'$creditkosten' WHERE user_id = '$ums_user_id'", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], 
+                          "UPDATE de_user_data SET credits=credits-? WHERE user_id=?", 
+                          [$creditkosten, $ums_user_id]);
                         writetocreditlog("Urlaubsmodus");
                     }
                     $uid = $ums_user_id;
                     $tis = time() + 86400 * $urltage;
                     $datum = date("Y-m-d H:i:s", $tis);
 
-                    mysql_query("UPDATE de_login SET last_login='$datum', status=3 WHERE user_id=$uid", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], 
+                      "UPDATE de_login SET last_login=?, status=3 WHERE user_id=?", 
+                      [$datum, $uid]);
 
                     //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
                     $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
-                    mysql_query("UPDATE de_user_data SET ehlock='$newtick' WHERE user_id=$uid", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], 
+                      "UPDATE de_user_data SET ehlock=? WHERE user_id=?", 
+                      [$newtick, $uid]);
 
                     session_destroy();
                     header("Location: urlaub.php");
@@ -323,27 +325,6 @@ if ($urlacc) { //account in urlaubsmodus versetzen
 if ($errmsg != '') {
     echo '<table width=600><tr><td class="cc">'.$errmsg.'</td></tr></table>';
 }
-
-//strings der Übersichtsoptionen vorbelegen
-/*
-$ovoptfeld='
-<option>'.$ovbes[0].'</option>
-<option>'.$ovbes[1].'</option>
-<option>'.$ovbes[2].'</option>
-<option>'.$ovbes[3].'</option>
-<option>'.$ovbes[4].'</option>
-<option>'.$ovbes[5].'</option>
-<option>'.$ovbes[6].'</option>
-<option>'.$ovbes[7].'</option>';
-
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[0]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[1]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[2]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[3]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[4]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[5]].'</option>';
-$ovselected[]='<option selected>'.$ovbes[$ovoptfelder[6]].'</option>';
-*/
 
 if ($patime > time()) {
     $palaufzeit = date("H:i:s d.m.Y", $patime);
@@ -428,21 +409,8 @@ if ($desktop_version == 1) {
 echo '>Classic</option>
   </td>
   <td width="13" class="rr">&nbsp;</td>
-</tr>';
-
-/*
 </tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang['chatdeaktivieren'].'</td>
-<td><input type="Checkbox" name="chat"';
-if($chatoff=="1") echo "checked ";
-echo 'value="1"></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-*/
 
-echo '
 <tr align="center">
 <td width="13" height="25" class="rl">&nbsp;</td>
 <td>Server-Chat-Channel deaktivieren</td>
@@ -494,128 +462,8 @@ echo 'value="1"></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
 </form>
-</table>';
-
-/*
-
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang[ircname].'</td>
-<td><input type="Text" name="ircname" value="'.$db_ircname.'" maxlength="255"></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-
-
-<form action="options.php" method="POST">
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td width="560" align="center" class="ro"><?=$options_lang[einteilunguebersicht]?></td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
-</table>
-<table border="0" cellpadding="0" cellspacing="0">
-
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="200"><?=$options_lang[position]?> 1</td>
-<td width="360"><select name="opt1"><?=$ovselected[0]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 2</td>
-<td><select name="opt2"><?=$ovselected[1]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 3</td>
-<td><select name="opt3"><?=$ovselected[2]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 4</td>
-<td><select name="opt4"><?=$ovselected[3]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 5</td>
-<td><select name="opt5"><?=$ovselected[4]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 6</td>
-<td><select name="opt6"><?=$ovselected[5]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[position]?> 7</td>
-<td><select name="opt7"><?=$ovselected[6]?><?=$ovoptfeld?></select></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="37" class="rl">&nbsp;</td>
-<td width="560" colspan="2"><br><?=$options_lang[uebersichtinfo]?><br><br><input type="hidden" name="dooveinst" value="1"><input type="submit" name="oveinst" value="<?=$options_lang[einstellungenuebernehmen]?>"><br><br></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</form>
-<form action="options.php" method="POST">
 </table>
 
-
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td width="560" align="center" class="ro"><?=$options_lang[accountdetails]?></td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><?=$options_lang[accountid]?>: <?=$sv_server_tag.$ums_user_id?></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</form>
-*/
-/*
-echo '
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td align="center" class="ro">'.$options_lang[lastlogins].'</td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="560">
-<table border="0">
-<colgroup>
-<col width="250">
-<col width="250">
-</colgroup>
-<tr>
-<td class="cell1" align="center"><b>'.$options_lang[ipadresse].'</b></td>
-<td class="cell1" align="center"><b>'.$options_lang[loginzeit].'</b></td>
-</tr>';
-
-$sel_user_ip = mysql_query("SELECT ip, time FROM de_user_ip WHERE user_id='$ums_user_id' order by time desc limit 10");
-while($row_user_ip = mysql_fetch_array($sel_user_ip))
-{
-$ip=explode(".",$row_user_ip[ip]);
-
-echo '<tr align="center"><td>'.$ip[0].'.'.$ip[1].'.X.X</td><td>'.$row_user_ip[time].'</td></tr> ';
-}
-echo '
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</table>
-*/
-echo '
 <form action="options.php" method="POST">
 <table border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
@@ -706,54 +554,8 @@ if ($owner_id == 0) {
 </form>';
 }
 
-/*
-if ($sector!=1 AND 1==2)
-{
-?>
-<tr align="center">
-<td width="13" height="37" class="rml">&nbsp;</td>
-<td width="560" class="ro">Account resetten</td>
-<td width="13" class="rmr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="37" class="rl">&nbsp;</td>
-<td>Um den Account zu resetten das Passwort eingeben, beide Best�tigungen anklicken und dann mit "Account resetten" best�tigen. Durch den Reset werden alle Technologien auf den Startwert gesetzt, es gehen alle Schiffe/Kollektoren und sonstige Errungenschaften verloren. Durch den Reset wird das System Sektor 1 zugewiesen.</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="15" class="rl">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</table>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td width="280">Passwort</td>
-<td width="280"><input type="password" name="umzpass" value=""></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr align="center">
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td><input name="umzcheck1" type="checkbox" value="1"> Best&auml;tigung 1</td>
-<td><input name="umzcheck2" type="checkbox" value="1"> Best&auml;tigung 2</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</table>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rl">&nbsp;</td>
-<td width="560"><input type="Submit" name="selfvoteout" value="Account resetten"></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<?php
-}
-*/
-
-/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 // account löschen
-/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 echo '
 <table border="0" cellpadding="0" cellspacing="0">

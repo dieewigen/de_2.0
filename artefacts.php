@@ -24,16 +24,16 @@ $tcost2=10;
 $errmsg='';
 
 //Maximale Tickanzahl auslesen
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
-$row     = mysql_fetch_array($result);
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
+$row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 
 //die anzahl von allianzgebäudeupgrades auslesen
 $allyid=$allyid=get_player_allyid($ums_user_id);
 $ally_geb_bonus=0;
 if($allyid>0){
-	$db_daten=mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
-	$row = mysql_fetch_array($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
+	$row = mysqli_fetch_array($db_daten);
 	$ally_geb_bonus=$row['bldg5'];
 }
 
@@ -54,14 +54,14 @@ if (isset($_GET["a"]) && $_GET["a"]==1){
 		//ist das artefakt ein g�ltiges flottenartefakt?
 		if($id==6 OR $id==7 OR $id==14 OR $id==15){
 		  //schauen ob man das artefakte hat
-		  $db_daten=mysql_query("SELECT id FROM de_user_artefact WHERE user_id='$ums_user_id' AND id='$id' AND level='$lvl'",$db);
-		  $num = mysql_num_rows($db_daten);
+		  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=? AND level=?", [$ums_user_id, $id, $lvl]);
+		  $num = mysqli_num_rows($db_daten);
 
 		  if($num>=1) {
 			//flottendaten laden
 			$fleetid=$ums_user_id.'-'.$flotte;
-			$result=mysql_query("SELECT * FROM de_user_fleet WHERE user_id='$fleetid'",$db);
-			$row = mysql_fetch_array($result);
+			$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+			$row = mysqli_fetch_array($result);
 
 			//schauen ob die flotte daheim ist
 			if($row["aktion"]==0){
@@ -82,9 +82,9 @@ if (isset($_GET["a"]) && $_GET["a"]==1){
 				if($row["artid1"]==0)$useslot=1;
 
 				//flotte upadten
-				mysql_query("UPDATE de_user_fleet SET artid$useslot='$id', artlvl$useslot='$lvl' WHERE user_id='$fleetid'",$db);
-				//artefakt aus dem geb�ude entfernen
-				mysql_query("DELETE FROM de_user_artefact WHERE user_id='$ums_user_id' AND id='$id' AND level='$lvl' LIMIT 1",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$useslot=?, artlvl$useslot=? WHERE user_id=?", [$id, $lvl, $fleetid]);
+				//artefakt aus dem gebäude entfernen
+				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND id=? AND level=? LIMIT 1", [$ums_user_id, $id, $lvl]);
 				$errmsg.='<span class="ccg">Das Artefakt wurde in das Basisschiff transferiert.</span>';
 			  }
 			  else $errmsg.='<span class="ccr">Es ist kein freier Slot vorhanden.</span>';
@@ -126,14 +126,14 @@ elseif (isset($_GET["a"]) && $_GET["a"]==2)
 
     //flottendaten laden
     $fleetid=$ums_user_id.'-'.$flotte;
-    $result=mysql_query("SELECT * FROM de_user_fleet WHERE user_id='$fleetid'",$db);
-    $row = mysql_fetch_array($result);
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+    $row = mysqli_fetch_array($result);
 
     //ist das artefakt im basisschiff vorhanden
     if($row["artid$id"]>0) {
-      //schauen ob im artefakggeb�ude platz ist
-      $db_datenx=mysql_query("SELECT user_id FROM de_user_artefact WHERE user_id='$ums_user_id'",$db);
-      $numx = mysql_num_rows($db_datenx);
+      //schauen ob im artefaktgebäude platz ist
+      $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_artefact WHERE user_id=?", [$ums_user_id]);
+      $numx = mysqli_num_rows($db_datenx);
       if($numx<$artbldglevel+$ally_geb_bonus) //es gibt noch platz
       {
 
@@ -141,10 +141,10 @@ elseif (isset($_GET["a"]) && $_GET["a"]==2)
         if($row["aktion"]==0)
         {
           //flotte upadten
-          mysql_query("UPDATE de_user_fleet SET artid$id=0, artlvl$id=0 WHERE user_id='$fleetid'",$db);
-          //artefakt in das geb�ude transferieren
+          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$id=0, artlvl$id=0 WHERE user_id=?", [$fleetid]);
+          //artefakt in das gebäude transferieren
           $artid=$row["artid$id"];$artlvl=$row["artlvl$id"];
-          mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '$artlvl')",$db);
+          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, ?)", [$ums_user_id, $artid, $artlvl]);
           $errmsg.='<span class="ccg">Das Artefakt wurde in das Artefaktgeb&auml;ude transferiert.</span>';
         }
         else $errmsg.='<span class="ccr">Die Flotte befindet sich in einem Einsatz.</span>';
@@ -182,18 +182,18 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 	if (setLock($ums_user_id)){
 		$lid=intval($_REQUEST['lid']);
 		//schauen ob man das artefakte hat
-		$db_daten=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid'",$db);
-		$num = mysql_num_rows($db_daten);
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
+		$num = mysqli_num_rows($db_daten);
 
 		if($num>0)//man hat das artefakt
 		{
 		  //id auslesen
-		  $row = mysql_fetch_array($db_daten);
+		  $row = mysqli_fetch_array($db_daten);
 
 		  //ist jetzt immer zerstörbar
 		  //if($ua_useable[$row["id"]-1]!=1){
 			//artefakt löschen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 			//palenium gutschreiben
 			change_storage_amount($_SESSION['ums_user_id'],1,100*$row['level']);
@@ -221,11 +221,11 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 	if (setLock($ums_user_id)){
 		$lid=intval($_REQUEST['lid']);
 		//schauen ob man das artefakte hat
-		$db_daten=mysql_query("SELECT id FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid'",$db);
-		$num = mysql_num_rows($db_daten);
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
+		$num = mysqli_num_rows($db_daten);
 
 		if($num>0){
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_array($db_daten);
 		$id=$row['id'];
 		//angriffserfahrungspunkte
 		if($id==11){
@@ -233,19 +233,19 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			$exp=10000;
 			//exp verteilen
 			//$fleet_id=$ums_user_id.'-0';
-			//mysql_query("UPDATE de_user_fleet SET komatt=komatt+'$exp' WHERE user_id='$fleet_id'",$db);
+			//mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-1';
-			mysql_query("UPDATE de_user_fleet SET komatt=komatt+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-2';
-			mysql_query("UPDATE de_user_fleet SET komatt=komatt+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-3';
-			mysql_query("UPDATE de_user_fleet SET komatt=komatt+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			//artefakt löschen
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 			
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'];
@@ -257,19 +257,19 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			$exp=10000;
 			//exp verteilen
 			$fleet_id=$ums_user_id.'-0';
-			mysql_query("UPDATE de_user_fleet SET komdef=komdef+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-1';
-			mysql_query("UPDATE de_user_fleet SET komdef=komdef+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-2';
-			mysql_query("UPDATE de_user_fleet SET komdef=komdef+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
 			$fleet_id=$ums_user_id.'-3';
-			mysql_query("UPDATE de_user_fleet SET komdef=komdef+'$exp' WHERE user_id='$fleet_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			//artefakt löschen
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'];
@@ -280,10 +280,10 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 		{
 			$tronic=mt_rand(15,20);
 
-			mysql_query("UPDATE de_user_data SET restyp05=restyp05+'$tronic' WHERE user_id='$ums_user_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $ums_user_id]);
 			$restyp05+=$tronic;
 			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['tronic'].': '.$tronic;
@@ -292,14 +292,14 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 		elseif($id==17)
 		{
 			//das artefakt kann nur verwendet werden, wenn aktuell kein ausbau l�uft
-			$db_daten = mysql_query("SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id='$ums_user_id'",$db);
-			$gebinbau = mysql_num_rows($db_daten);
+			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+			$gebinbau = mysqli_num_rows($db_daten);
 			if($gebinbau==0)
 			{
-				mysql_query("UPDATE de_user_data SET artbldglevel=artbldglevel+1 WHERE user_id='$ums_user_id'",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET artbldglevel=artbldglevel+1 WHERE user_id=?", [$ums_user_id]);
 				$artbldglevel++;
-				//artefakt l�schen
-				mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+				//artefakt löschen
+				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 				//message ausgeben
 				$errmsg.=$artefacts_lang['fehler7'];
@@ -310,9 +310,9 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 		elseif($id==18)
 		{
 			$kartefakt=mt_rand(1,3);
-			mysql_query("UPDATE de_user_data SET kartefakt=kartefakt+'$kartefakt' WHERE user_id='$ums_user_id'",$db);
-			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+? WHERE user_id=?", [$kartefakt, $ums_user_id]);
+			//artefakt löschen
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['kriegsartefakte'].': '.$kartefakt;
@@ -320,12 +320,12 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 		//kollimania 6-8 kollektoren, oder 200 Palenium
 		elseif($id==19)
 		{
-			$result=mysql_query("SELECT id FROM de_user_artefact WHERE user_id='$ums_user_id' AND id=19",$db);
-			$num = mysql_num_rows($result);
+			$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=19", [$ums_user_id]);
+			$num = mysqli_num_rows($result);
 			if($num<=5){
 				//Kollektoren
 				$value=mt_rand(6,8);
-				mysql_query("UPDATE de_user_data SET col=col+'$value' WHERE user_id='$ums_user_id'",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col+? WHERE user_id=?", [$value, $ums_user_id]);
 
 				//message ausgeben
 				$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['kollektoren'].': '.$value;
@@ -339,15 +339,15 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			}
 
 			//artefakt löschen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 		}
 		//sekkollus 1-2 sektorkollektoren
 		elseif($id==20)
 		{
 			$value=mt_rand(1,2);
-			mysql_query("UPDATE de_sector SET col=col+'$value' WHERE sec_id='$sector'",$db);
-			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET col=col+? WHERE sec_id=?", [$value, $sector]);
+			//artefakt löschen
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
 			//message ausgeben
 			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['sektorkollektoren'].': '.$value;
@@ -358,12 +358,12 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			$amount=mt_rand(3,5);
 			
 			//credit gutschreiben
-			//mysql_query("UPDATE de_user_data SET credits=credits+'$amount' WHERE user_id = '$ums_user_id'",$db);
+			//mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $ums_user_id]);
 			changeCredits($_SESSION['ums_user_id'], $amount, 'Creditruessel');
 			$errmsg.='<font color="#00FF00">Du hast dem gro&szlig;en Ishtarus '.$amount.' Credits wegger&uuml;sselt.</font>';
 			
 			//artefakt entfernen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 		}elseif($id==22){
 			////////////////////////////////////////////////////////////
 			// neue Auktion erstellen
@@ -383,16 +383,16 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 			//�berpr�fen ob dem spieler schonmal kollektoren gestohlen worden sind und ob davon noch jemand dabei ist
 			unset($atter);
 			$ac=0;
-			$db_daten=mysql_query("SELECT * FROM de_user_getcol WHERE zuser_id='$ums_user_id'",$db);
-			while($row = mysql_fetch_array($db_daten))
+			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_getcol WHERE zuser_id=?", [$ums_user_id]);
+			while($row = mysqli_fetch_array($db_daten))
 			{
 				//spielername des atters feststellen
 				$duid=$row["user_id"];
-				$result=mysql_query("SELECT spielername, col, sector, system FROM de_user_data WHERE user_id='$duid'",$db);
-				$num = mysql_num_rows($result);
+				$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, col, sector, system FROM de_user_data WHERE user_id=?", [$duid]);
+				$num = mysqli_num_rows($result);
 				if($num==1)
 				{
-					$rowx = mysql_fetch_array($result);
+					$rowx = mysqli_fetch_array($result);
 					if($rowx['col']>0)//nur ziele mit kollektor gehen
 					{
 						$atter[$ac]['user_id']=$duid;
@@ -412,26 +412,26 @@ if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
 				$time=strftime("%Y%m%d%H%M%S");
 				
 				//dem ziel den kollektor entfernen
-				mysql_query("UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE user_id='$zuid'",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE user_id=?", [$zuid]);
 
 				//info an das ziel bzgl. r�sselung
-				mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$zuid', '60','$time','Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')",$db);
+				mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, 'Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')", [$zuid, $time]);
 				
 				//dem spieler das kriegsartefakt gutschreiben
-				mysql_query("UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id='$ums_user_id'",$db);      		
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);      		
 				
 				$errmsg.='<font color="#00FF00">Du hast '.$zspielername.' einen Kollektor wegger&uuml;sselt.</font>';
 			}
 			else //es trifft einen dx
 			{
 				//dem spieler das kriegsartefakt gutschreiben
-				mysql_query("UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id='$ums_user_id'",$db);      		
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);      		
 							
 				$errmsg.='<font color="#00FF00">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</font>';
 			}
 
 			//artefakt l�schen
-			mysql_query("DELETE FROM de_user_artefact WHERE lid='$lid'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 		}      
 		*/
 		}
@@ -459,27 +459,25 @@ if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
   if (setLock($ums_user_id))
   {
     //rohstoffe auslesen
-	$db_daten=mysql_query("SELECT restyp05 FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-	$row = mysql_fetch_array($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp05 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+	$row = mysqli_fetch_array($db_daten);
     $restyp05=$row['restyp05'];    
     
     //artefakt-ids
-    $lid1=intval($_REQUEST['lid1']);
+		$lid1=intval($_REQUEST['lid1']);
     $lid2=intval($_REQUEST['lid2']);
     //schauen ob man beide artefakte hat
-    $db_daten1=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid1'",$db);
-    $num1 = mysql_num_rows($db_daten1);
+    $db_daten1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
+    $num1 = mysqli_num_rows($db_daten1);
     
-    $db_daten2=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid2'",$db);
-    $num2 = mysql_num_rows($db_daten2);
-    
-    if($num1==1 AND $num2==1)//man hat beide artefakte
+    $db_daten2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
+    $num2 = mysqli_num_rows($db_daten2);    if($num1==1 AND $num2==1)//man hat beide artefakte
     {
       //artefaktdaten auslesen
-      $row1 = mysql_fetch_array($db_daten1);
+      $row1 = mysqli_fetch_array($db_daten1);
       $id1=$row1['id'];
       $lvl1=$row1['lvl'];
-      $row2 = mysql_fetch_array($db_daten2);
+      $row2 = mysqli_fetch_array($db_daten2);
       $id2=$row2['id'];
       $lvl2=$row2['lvl'];  
       
@@ -491,7 +489,7 @@ if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
         {
           //rohstoffe abziehen
           $restyp05=$restyp05-$tcost2;
-          mysql_query("UPDATE de_user_data SET restyp05=restyp05-'$tcost2' WHERE user_id='$ums_user_id'",$db);
+          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost2, $ums_user_id]);
           
           //neues artefakt erzeugen, muss anderer art als die quellartefakte sein
           $artid=0;
@@ -501,17 +499,17 @@ if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
           }
         
           //neues artefakt hinterlegen
-          mysql_query("INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$ums_user_id', '$artid', '1')",$db);
+          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", [$ums_user_id, $artid]);
       
-          //alte l�schen
-          mysql_query("DELETE FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid1'",$db);
-          mysql_query("DELETE FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid2'",$db);
+          //alte löschen
+          mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
+          mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
 
 		  //allyid auslesen
 		  $allyid=get_player_allyid($ums_user_id);
 
 		  //allyaufgabe kriegsartefakte
-		  if($allyid>0)mysql_query("UPDATE de_allys SET questreach = questreach + 1 WHERE id='$allyid' AND questtyp=6",$db);
+		  if($allyid>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);
 
 		  
           //info dass alles geklappt hat
@@ -528,21 +526,23 @@ if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
           {
             //rohstoffe abziehen
             $restyp05=$restyp05-$tcost1;
-            mysql_query("UPDATE de_user_data SET restyp05=restyp05-'$tcost1' WHERE user_id='$ums_user_id'",$db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost1, $ums_user_id]);
         
             $errmsg.='<font color="#00FF00">'.$artefacts_lang['fehler'].'</font>';
           
             //ein artefakt upgraden lid1
-            mysql_query("UPDATE de_user_artefact SET level=level+1 WHERE user_id='$ums_user_id' AND lid='$lid1'",$db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_artefact SET level=level+1 WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
      
-            //alte l�schen lid2
-            mysql_query("DELETE FROM de_user_artefact WHERE user_id='$ums_user_id' AND lid='$lid2'",$db);
+            //alte löschen lid2
+            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
 
 			//allyid auslesen
 			$allyid=get_player_allyid($ums_user_id);
 
 			//allyaufgabe kriegsartefakte
-			if($allyid>0)mysql_query("UPDATE de_allys SET questreach = questreach + 1 WHERE id='$allyid' AND questtyp=6",$db);			
+			if($allyid>0){
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);			
+			}
 			
           }
           else $errmsg.='<font color="#FF0000">Du ben&ouml;tigst f�r den Vorgang '.$tcost1.' Tronic.</font><br><br>';
@@ -575,9 +575,9 @@ if (isset($_REQUEST["bupgrade"]) AND hasTech($pt,28) AND $artbldglevel<$maxlevel
   $benrestyp01=0;$benrestyp02=0;$benrestyp03=$ausbaukosten;$benrestyp04=0;$benrestyp05=0;
   $tech_ticks=$ausbauzeit;
 
-  //schauen ob man es bauen kann, oder ob schon ein upgrade l�uft
-  $db_daten = mysql_query("SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id='$ums_user_id'",$db);
-  $gebinbau = mysql_num_rows($db_daten);
+  //schauen ob man es bauen kann, oder ob schon ein upgrade läuft
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+  $gebinbau = mysqli_num_rows($db_daten);
   if($gebinbau!=0) $fehlermsg='<font color="FF0000">'.$artefacts_lang['fehler4'];
 
   //genug ressourcen vorhanden?
@@ -593,12 +593,11 @@ if (isset($_REQUEST["bupgrade"]) AND hasTech($pt,28) AND $artbldglevel<$maxlevel
     $gr04=$gr04-$restyp04;
      $gr05=$gr05-$restyp05;
     //rohstoffe abziehen
-    mysql_query("update de_user_data set restyp01 = restyp01 - $gr01,
-     restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03,
-     restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE user_id = '$ums_user_id'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01=restyp01-?, restyp02=restyp02-?, restyp03=restyp03-?, restyp04=restyp04-?, restyp05=restyp05-? WHERE user_id=?", 
+    [$gr01, $gr02, $gr03, $gr04, $gr05, $ums_user_id]);
     //upgrade in der db hinterlegen
-    //mysql_query("update de_user_data set buildgnr = $t WHERE user_id='$ums_user_id'",$db);
-    mysql_query("INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES ($ums_user_id, 1000, 1, $tech_ticks)",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 1000, 1, ?)", 
+    [$ums_user_id, $tech_ticks]);
     //meldung an den account �ber den ausbau
     $errmsg.='<font color="#00FF00">Der Geb&auml;udeausbau wurde gestartet.</font>';
   }else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler5'].'</font>';
@@ -625,7 +624,7 @@ if (isset($errmsg) && $errmsg!='')echo '<div class="info_box">'.$errmsg.'</div><
 
 if(!hasTech($pt,28)){
 	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=28";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
+	$db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
 	$row_techcheck = mysqli_fetch_array($db_tech);
 
 
@@ -640,8 +639,8 @@ if(!hasTech($pt,28)){
 	rahmen_unten();  
 }else{
 	//schauen ob schon ein gebäudeupgrade läuft
-	$db_daten = mysql_query("SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id='$ums_user_id'",$db);
-	$gebinbau = mysql_num_rows($db_daten);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+	$gebinbau = mysqli_num_rows($db_daten);
 
 	////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////
@@ -675,7 +674,7 @@ if(!hasTech($pt,28)){
 
 	$title=$artefacts_lang['geblevel'].$artbldglevel.'/'.$maxlevel.'&'.$artefacts_lang['geblevel2'];
 	if ($gebinbau!=0){
-		$row = mysql_fetch_array($db_daten);  
+		$row = mysqli_fetch_array($db_daten);  
 		//geb�ude wird bereits geupgraded
 		$title.='<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].$artefacts_lang['woche'].'<br>';
 		$showbldglink=0;
@@ -713,14 +712,12 @@ if(!hasTech($pt,28)){
 	echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 58px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
 	echo '</div>';  
   
-	//artefakte aus der db holen
-	$db_daten=mysql_query("SELECT * FROM de_user_artefact WHERE user_id='$ums_user_id' ORDER BY id, level",$db);
-	$anz_artefakte = mysql_num_rows($db_daten);
-  
-	//artefakte
+  //artefakte aus der db holen
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$ums_user_id]);
+	$anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
 	$ac=0;
 	unset($artefacts);
-	while($row = mysql_fetch_array($db_daten)){
+	while($row = mysqli_fetch_array($db_daten)){
 		//title/tooltip festlegen
 		$title=$ua_name[$row["id"]-1].'&'.$ua_desc[$row["id"]-1];
 		if($ua_werte[$row["id"]-1][$row["level"]-1][0]>0){
@@ -780,8 +777,8 @@ if(!hasTech($pt,28)){
   //alle 4 flotten durchgehen
   for($flotte=0;$flotte<=3;$flotte++){
 		$fleetid=$ums_user_id.'-'.$flotte;
-		$result=mysql_query("SELECT * FROM de_user_fleet WHERE user_id='$fleetid'",$db);
-		$row = mysql_fetch_array($result);
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+		$row = mysqli_fetch_array($result);
 
 		echo '<tr>';
 

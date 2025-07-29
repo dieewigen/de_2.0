@@ -43,8 +43,8 @@ function doBattleGround($bg){
 	
 
 	//die map_id zu dem BG aus der DB holen
-	$sql="SELECT * FROM `de_map_objects` WHERE system_typ=4 AND system_subtyp='$bg';";
-	$db_data=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT * FROM `de_map_objects` WHERE system_typ=4 AND system_subtyp=?;";
+	$db_data=mysqli_execute_query($GLOBALS['dbi'],$sql, [$bg]);
 	$row = mysqli_fetch_array($db_data);
 	$map_id=$row['id'];
 
@@ -54,16 +54,19 @@ function doBattleGround($bg){
 	////////////////////////////////////////////////////////////////
 	//teilnehmende Spieler laden / special ships laden
 	////////////////////////////////////////////////////////////////
-	$sql="SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_techs ON (de_user_techs.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_techs.tech_id=159 AND de_user_techs.time_finished<='".time()."' AND de_user_map_bldg.map_id='".$map_id."' AND de_user_map_bldg.bldg_time<='".time()."';";
+	$time_now = time();
+	$sql="SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_techs ON (de_user_techs.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_techs.tech_id=159 AND de_user_techs.time_finished<=? AND de_user_map_bldg.map_id=? AND de_user_map_bldg.bldg_time<=?;";
+	$params = [$time_now, $map_id, $time_now];
 
 	//CDE-Battleground-Modus
 	if($sv_comserver_roundtyp==1){
-		$sql="SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_map_bldg.map_id='".$map_id."' AND de_user_map_bldg.bldg_time<='".time()."' GROUP BY de_user_data.user_id;";
+		$sql="SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_map_bldg.map_id=? AND de_user_map_bldg.bldg_time<=? GROUP BY de_user_data.user_id;";
+		$params = [$map_id, $time_now];
 	}
 
 	echo $sql;
 
-	$db_data=mysqli_query($GLOBALS['dbi'],$sql);
+	$db_data=mysqli_execute_query($GLOBALS['dbi'],$sql, $params);
 	while($row = mysqli_fetch_array($db_data)){
 		//Schiff laden
 		$player[$player_id]['user_id']=$row['user_id'];
@@ -221,13 +224,13 @@ function doBattleGround($bg){
 
 						if($player[$winner_id]['user_id']>0){
 							if($bg==0){
-								$sql="UPDATE `de_user_data` SET restyp05=restyp05+1, bgscore$bg=bgscore$bg+1 WHERE user_id='".$player[$winner_id]['user_id']."';";
+								$sql="UPDATE `de_user_data` SET restyp05=restyp05+1, bgscore$bg=bgscore$bg+1 WHERE user_id=?;";
 							}elseif($bg==1){
-								$sql="UPDATE `de_user_data` SET kartefakt=kartefakt+1, bgscore$bg=bgscore$bg+1 WHERE user_id='".$player[$winner_id]['user_id']."';";
+								$sql="UPDATE `de_user_data` SET kartefakt=kartefakt+1, bgscore$bg=bgscore$bg+1 WHERE user_id=?;";
 							}
 							
 							//echo $sql;
-							mysqli_query($GLOBALS['dbi'],$sql);
+							mysqli_execute_query($GLOBALS['dbi'],$sql, [$player[$winner_id]['user_id']]);
 						}
 					}
 				}
@@ -239,14 +242,14 @@ function doBattleGround($bg){
 			for($p=0;$p<count($player);$p++){
 				$uid=$player[$p]['user_id'];
 				//Kampfbericht
-				$sql="INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 70,'$time','$kb')";
+				$sql="INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 70, ?, ?)";
 				//echo $sql;
-				mysqli_query($GLOBALS['dbi'],$sql);
+				mysqli_execute_query($GLOBALS['dbi'],$sql, [$uid, $time, $kb]);
 
 				//neue News vorhanden
-				$sql="UPDATE `de_user_data` SET newnews=1 WHERE user_id='".$uid."';";
+				$sql="UPDATE `de_user_data` SET newnews=1 WHERE user_id=?;";
 				//echo $sql;
-				mysqli_query($GLOBALS['dbi'],$sql);
+				mysqli_execute_query($GLOBALS['dbi'],$sql, [$uid]);
 
 			}
 
@@ -333,9 +336,9 @@ function doBattleGround($bg){
 
 							if($bg==2){
 								echo '<br>C: BG2';
-								$sql="UPDATE de_allys SET bgscore$bg=bgscore$bg+1 WHERE id='".$allys[$winner_id]['ally_id']."';";
+								$sql="UPDATE de_allys SET bgscore$bg=bgscore$bg+1 WHERE id=?;";
 								echo $sql;
-								mysqli_query($GLOBALS['dbi'],$sql);
+								mysqli_execute_query($GLOBALS['dbi'],$sql, [$allys[$winner_id]['ally_id']]);
 
 								//Quantenglimmer gutschreiben
 								changeAllyStorageAmount($allys[$winner_id]['ally_id'], 13, 1, false);
@@ -356,14 +359,14 @@ function doBattleGround($bg){
 				if($player[$p]['ally_id']>0){
 					$uid=$player[$p]['user_id'];
 					//Kampfbericht
-					$sql="INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 70,'$time','$kb')";
+					$sql="INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 70, ?, ?)";
 					//echo $sql;
-					mysqli_query($GLOBALS['dbi'],$sql);
+					mysqli_execute_query($GLOBALS['dbi'],$sql, [$uid, $time, $kb]);
 
 					//neue News vorhanden
-					$sql="UPDATE `de_user_data` SET newnews=1 WHERE user_id='".$uid."';";
+					$sql="UPDATE `de_user_data` SET newnews=1 WHERE user_id=?;";
 					//echo $sql;
-					mysqli_query($GLOBALS['dbi'],$sql);
+					mysqli_execute_query($GLOBALS['dbi'],$sql, [$uid]);
 				}
 
 			}

@@ -9,16 +9,19 @@ $bar = !empty($_REQUEST['bar']) ? $_REQUEST['bar'] : '';
 $action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
 // User-Daten holen
-$db_daten_vote = mysql_query("SELECT submit FROM de_user_info WHERE user_id='$ums_user_id'", $db);
-$row_vote = mysql_fetch_array($db_daten_vote);
-$db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, tick FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-$row = mysql_fetch_array($db_daten);
+$sql = "SELECT submit FROM de_user_info WHERE user_id=?";
+$db_daten_vote = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row_vote = mysqli_fetch_assoc($db_daten_vote);
 
-$restyp01 = $row[0];
-$restyp02 = $row[1];
-$restyp03 = $row[2];
-$restyp04 = $row[3];
-$restyp05 = $row[4];
+$sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, tick FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+
+$restyp01 = $row["restyp01"];
+$restyp02 = $row["restyp02"];
+$restyp03 = $row["restyp03"];
+$restyp04 = $row["restyp04"];
+$restyp05 = $row["restyp05"];
 $punkte = $row["score"];
 $newtrans = $row['newtrans'];
 $newnews = $row['newnews'];
@@ -28,7 +31,8 @@ $system = $row['system'];
 
 // Newtrans zurücksetzen
 if ($newtrans == 1) {
-    mysql_query("UPDATE de_user_data SET newtrans = 0 WHERE user_id='$ums_user_id'", $db);
+    $sql = "UPDATE de_user_data SET newtrans = 0 WHERE user_id=?";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 }
 $newtrans = 0;
 
@@ -49,15 +53,19 @@ $newtrans = 0;
 // Wenn Formular abgesendet wurde
 if (!empty($subform)) {
 
-    $db_check = mysql_query("SELECT vote_id FROM de_vote_stimmen WHERE user_id='$ums_user_id' AND vote_id='$id'");
-    $vote_aktiv = mysql_query("SELECT id, status FROM de_vote_umfragen WHERE id='$id'");
-    $aktiv = mysql_fetch_array($vote_aktiv);
-    $menge = mysql_num_rows($db_check);
+    $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=? AND vote_id=?";
+    $db_check = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $id]);
+    
+    $sql = "SELECT id, status FROM de_vote_umfragen WHERE id=?";
+    $vote_aktiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
+    $aktiv = mysqli_fetch_assoc($vote_aktiv);
+    $menge = mysqli_num_rows($db_check);
 
     if ($menge == 0 && $aktiv['status'] == 1) {
         if ($vote != "0" && $vote != "") {
             echo '<h2>'.$vote_lang['msg_3'].'</h2>';
-            mysql_query("INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES ('$ums_user_id','$id', '$vote')", $db);
+            $sql = "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)";
+            mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $id, $vote]);
             $_SESSION['ums_vote'] = 0;
         } else {
             echo $vote_lang['msg_4'];
@@ -79,16 +87,18 @@ if ($action == "" || $action == "uebersicht") {
 </tr>
 
 <?php
-    $schonabgestimmt = mysql_query("SELECT vote_id FROM de_vote_stimmen WHERE user_id='$ums_user_id'");
+    $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?";
+    $schonabgestimmt = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
     $gevotetevotes = [];
-    while ($rew = mysql_fetch_array($schonabgestimmt)) {
+    while ($rew = mysqli_fetch_assoc($schonabgestimmt)) {
         $gevotetevotes[] = $rew['vote_id'];
     }
 
     $votevorhanden = 0;
-    $db_umfrage = mysql_query("SELECT de_vote_umfragen.id, de_vote_umfragen.frage, de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id='$ums_user_id' ORDER BY de_vote_umfragen.id");
+    $sql = "SELECT de_vote_umfragen.id, de_vote_umfragen.frage, de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id";
+    $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 
-    while ($row = mysql_fetch_array($db_umfrage)) {
+    while ($row = mysqli_fetch_assoc($db_umfrage)) {
         if (!in_array($row['id'], $gevotetevotes)) {
             echo '<tr align="center"><td class="rl" width="13">&nbsp;</td>';
             echo '<td class="cell"><a href="vote.php?action=abstimmen&id='.$row['id'].'">'.utf8_encode_fix($row['frage']).'</a></td><td class="rr" width="13">&nbsp;</td></tr>';
@@ -117,9 +127,10 @@ if ($action == "" || $action == "uebersicht") {
 
 <?php
     $alteumfragenvorhanden = 0;
-    $db_alteumfragen = mysql_query("SELECT id, frage FROM de_vote_umfragen WHERE status=2");
+    $sql = "SELECT id, frage FROM de_vote_umfragen WHERE status=2";
+    $db_alteumfragen = mysqli_execute_query($GLOBALS['dbi'], $sql);
 
-    while ($row = mysql_fetch_array($db_alteumfragen)) {
+    while ($row = mysqli_fetch_assoc($db_alteumfragen)) {
         echo '<tr align="center"><td class="rl" width="13">&nbsp;</td><td><div class="cellu"><a href="vote.php?action=show&id='.$row['id'].'">'.utf8_encode_fix($row['frage']).'</a></div></td><td class="rr" width="13">&nbsp;</td></tr>';
         $alteumfragenvorhanden++;
     }
@@ -140,10 +151,11 @@ if ($action == "" || $action == "uebersicht") {
 
 // Alte Umfrage anzeigen
 elseif ($action == "show") {
-    $db_checkobende = mysql_query("SELECT frage, antworten, hinweis, stimmen, status, startdatum, enddatum, ergebnisse FROM de_vote_umfragen WHERE status=2 AND id='$id'");
+    $sql = "SELECT frage, antworten, hinweis, stimmen, status, startdatum, enddatum, ergebnisse FROM de_vote_umfragen WHERE status=2 AND id=?";
+    $db_checkobende = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 
-    if (mysql_num_rows($db_checkobende) > 0) {
-        $row = mysql_fetch_array($db_checkobende);
+    if (mysqli_num_rows($db_checkobende) > 0) {
+        $row = mysqli_fetch_assoc($db_checkobende);
         ?>
 <br><br>
 <a href="javascript:history.back()"><div class="cellu"><b><?php echo $vote_lang['zzu']; ?></b></div></a>
@@ -202,9 +214,10 @@ elseif ($action == "show") {
 
 // Abstimmen
 elseif ($action == "abstimmen") {
-    $db_umfrage = mysql_query("SELECT id, frage, hinweis, antworten FROM de_vote_umfragen WHERE id='$id' AND status=1");
-    $row = mysql_fetch_array($db_umfrage);
-    $vorhanden = mysql_num_rows($db_umfrage);
+    $sql = "SELECT id, frage, hinweis, antworten FROM de_vote_umfragen WHERE id=? AND status=1";
+    $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
+    $row = mysqli_fetch_assoc($db_umfrage);
+    $vorhanden = mysqli_num_rows($db_umfrage);
 
     if ($vorhanden > 0) {
         ?>

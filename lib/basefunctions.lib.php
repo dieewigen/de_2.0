@@ -11,8 +11,11 @@ function notifyUser($id, $text, $type)
 	 $time=strftime("%Y%m%d%H%M%S");
 	if ($id > 0)
 	{
-		$result = mysql_query("INSERT INTO $newstable (user_id, typ, time, text) VALUES ('$id', '$type', '$time', '$text')");
-		$result2 = mysql_query("UPDATE $userdatatable SET newnews = 1 WHERE user_id = '$id'");
+		$sql = "INSERT INTO $newstable (user_id, typ, time, text) VALUES (?, ?, ?, ?)";
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $type, $time, $text]);
+		
+		$sql = "UPDATE $userdatatable SET newnews = 1 WHERE user_id = ?";
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 	}
 }
 ?>

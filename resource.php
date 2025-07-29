@@ -7,8 +7,6 @@ include 'inc/sabotage.inc.php';
 include "functions.php";
 include "issectork.php";
 
-//$db_daten=mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-//$row = mysql_fetch_array($db_daten);
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 $pd = loadPlayerData($_SESSION['ums_user_id']);
 $row = $pd;
@@ -41,22 +39,21 @@ $gr03 = $restyp03;
 $gr04 = $restyp04;
 
 //maximalen tick auslesen
-//$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-$result  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1", $db);
-$rowx     = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1");
+$rowx = mysqli_fetch_assoc($result);
 $maxtick = $rowx["tick"];
 
 //spezialisierung bzgl. der baukostenreduzierung �berpr�fen
-$db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND spec1=3;", $db);
-$baukostenreduzierung = mysql_num_rows($db_daten) * 2;
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND spec1=3", [$sector]);
+$baukostenreduzierung = mysqli_num_rows($db_daten) * 2;
 if ($baukostenreduzierung > 20) {
     $baukostenreduzierung = 20;
 }
 $baukostenreduzierung = $baukostenreduzierung / 100;
 
 //spezialisierung bzgl. des erh�hten planetaren ertrages
-$db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' AND spec3=3;", $db);
-$planertragbonus = mysql_num_rows($db_daten) * 10;
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND spec3=3", [$sector]);
+$planertragbonus = mysqli_num_rows($db_daten) * 10;
 if ($planertragbonus > 100) {
     $planertragbonus = 100;
 }
@@ -66,8 +63,8 @@ $planertragbonus = $planertragbonus / 100;
 //schauen welche sektorartefakte in dem sektor sind
 $sartefakt = 0;
 $sa_grund = array(0,0,0,0);
-$result = mysql_query("SELECT id FROM de_artefakt WHERE sector = '$sector'", $db);
-while ($row2 = mysql_fetch_array($result)) { //jeder gefundene datensatz wird geprueft
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_artefakt WHERE sector = ?", [$sector]);
+while ($row2 = mysqli_fetch_assoc($result)) { //jeder gefundene datensatz wird geprueft
     $sartefakt = $sartefakt + $sv_artefakt[$row2["id"] - 1][0];
     $sa_grund[0] = $sa_grund[0] + $sv_artefakt[$row2["id"] - 1][1];
     $sa_grund[1] = $sa_grund[1] + $sv_artefakt[$row2["id"] - 1][2];
@@ -137,8 +134,8 @@ $keye = $hv[3];
 
 //anzahl der kollektoren, die im bau sind ermitteln
 $anzahl = 0;
-$result = mysql_query("SELECT anzahl FROM de_user_build WHERE user_id = '$ums_user_id' AND tech_id=80", $db);
-while ($row2 = mysql_fetch_array($result)) { //jeder gefundene datensatz wird geprueft
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80", [$ums_user_id]);
+while ($row2 = mysqli_fetch_assoc($result)) { //jeder gefundene datensatz wird geprueft
     $anzahl = $anzahl + $row2["anzahl"];
 }
 $colanz = $anzahl + $col;
@@ -157,16 +154,16 @@ $handelssteuersatz = 50;
 $ally_has_notfallkonverter = false;
 
 //allydaten laden
-$db_daten = mysql_query("SELECT * FROM de_allys WHERE allytag='$ownally'", $db);
-$row = mysql_fetch_array($db_daten);
-$num = mysql_num_rows($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE allytag=?", [$ownally]);
+$row = mysqli_fetch_assoc($db_daten);
+$num = mysqli_num_rows($db_daten);
 if ($num == 1) {
     $allyid = $row['id'];
 
-    $db_daten = mysql_query("SELECT * FROM de_allys WHERE id='$allyid'", $db);
-    $num = mysql_num_rows($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
+    $num = mysqli_num_rows($db_daten);
     if ($num == 1) {
-        $row = mysql_fetch_array($db_daten);
+        $row = mysqli_fetch_assoc($db_daten);
 
         if ($row['bldg6'] > 0) {
             $ally_has_notfallkonverter = true;
@@ -197,8 +194,8 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
         //test ob quelle und ziel unterschiedlich sind
         if ($res_target != $res_source) {
             //aktuellen rohstoffstand auslesen
-            $db_daten = mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-            $row = mysql_fetch_array($db_daten);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+            $row = mysqli_fetch_assoc($db_daten);
             $hasres[1] = $row['restyp01'];
             $hasres[2] = $row['restyp02'];
             $hasres[3] = $row['restyp03'];
@@ -219,8 +216,9 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
                 //$steueranteil=$res_cost-($res_cost*100/(100+$handelssteuersatz+$sektorsteuersatz));
 
                 //sektorsteuersatz auslesen
-                $db_daten = mysql_query("SELECT ssteuer FROM de_sector WHERE sec_id='$sector'", $db);
-                $sektorsteuersatz = mysql_result($db_daten, 0, 0);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT ssteuer FROM de_sector WHERE sec_id=?", [$sector]);
+                $row_steuer = mysqli_fetch_assoc($db_daten);
+                $sektorsteuersatz = $row_steuer['ssteuer'];
 
                 $steueranteil = $res_cost / 100 * ($handelssteuersatz + $sektorsteuersatz);
 
@@ -239,18 +237,18 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
 					Verlust: '.number_format($res_cost, 0, ",", ".").' '.$resnames[$res_source - 1];
 
                     //sektorsteuer in der sektorkasse gutschreiben
-                    mysql_query("UPDATE de_sector SET restyp0$res_source=restyp0$res_source+$steueranteil_sektor WHERE sec_id='$sector'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET restyp0$res_source=restyp0$res_source+? WHERE sec_id=?", [$steueranteil_sektor, $sector]);
 
                     //rohstoffe und sektorspende gutschreiben
-                    mysql_query("UPDATE de_user_data SET 
-					restyp0$res_source=restyp0$res_source-$res_cost, 
-					restyp0$res_target=restyp0$res_target+$res_get,  
-					spend0$res_source=spend0$res_source+$steueranteil_sektor WHERE user_id='$ums_user_id'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET 
+					restyp0$res_source=restyp0$res_source-?, 
+					restyp0$res_target=restyp0$res_target+?,  
+					spend0$res_source=spend0$res_source+? WHERE user_id=?", [$res_cost, $res_get, $steueranteil_sektor, $ums_user_id]);
 
 
                     //aktuellen rohstoffwert für die resline auslesen
-                    $db_daten = mysql_query("SELECT * FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-                    $row = mysql_fetch_array($db_daten);
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+                    $row = mysqli_fetch_assoc($db_daten);
                     $restyp01 = $row['restyp01'];
                     $restyp02 = $row['restyp02'];
                     $restyp03 = $row['restyp03'];
@@ -298,8 +296,8 @@ $kostenfaktor = 10 - $avg_player;
 //sektorgebäudekosten auslesen
 $btipstr = '<table width=500px border=0 cellpadding=0 cellspacing=1><tr align=center><td>&nbsp;</td><td>M</td><td>D</td><td>I</td><td>E</td><td>T</td><tr>';
 //gebäude
-$db_daten = mysql_query("SELECT  tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id", $db);
-while ($row = mysql_fetch_array($db_daten)) {
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id");
+while ($row = mysqli_fetch_assoc($db_daten)) {
     $btipstr .= '<tr align=center>';
     $btipstr .= '<td align=left>'.$row[0].'</td>';
     $btipstr .= '<td>'.number_format($row[1] / $kostenfaktor, 0, ",", ".").'</td>';
@@ -346,7 +344,7 @@ if (!empty($e_t1) || !empty($e_t2) || !empty($e_t3) || !empty($e_t4)) {
                 $keyd = $e_t2;
                 $keyi = $e_t3;
                 $keye = $e_t4;
-                mysql_query("UPDATE de_user_data SET ekey = '$newkey' WHERE user_id = '$ums_user_id'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET ekey = ? WHERE user_id = ?", [$newkey, $ums_user_id]);
                 //keys aktualisieren
                 $hv = explode(";", $newkey);
                 $keym = $hv[0];
@@ -414,8 +412,8 @@ if ($num > 0) {
 }
 
 //maximale anzahl von kollektoren auslesen
-$db_daten = mysql_query("SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0", $db);
-$row = mysql_fetch_array($db_daten);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0");
+$row = mysqli_fetch_assoc($db_daten);
 $maxcol = $row['maxcol'];
 
 $adebonus = 0;
@@ -508,32 +506,32 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
             if ($mtr >= 0 && $dtr >= 0 && $itr >= 0 && $etr >= 0 && $ttr >= 0) {
 
                 //rohstofftransfer
-                mysql_query("UPDATE de_user_data set restyp01 = restyp01 - $mtr, restyp02 = restyp02 - $dtr,
-				restyp03 = restyp03 - $itr, restyp04 = restyp04 - $etr, restyp05 = restyp05 - $ttr,
-				spend01 = spend01 + $mtr, spend02 = spend02 + $dtr, spend03 = spend03 + $itr,
-				spend04 = spend04 + $etr, spend05 = spend05 + $ttr WHERE user_id = '$ums_user_id'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set restyp01 = restyp01 - ?, restyp02 = restyp02 - ?,
+				restyp03 = restyp03 - ?, restyp04 = restyp04 - ?, restyp05 = restyp05 - ?,
+				spend01 = spend01 + ?, spend02 = spend02 + ?, spend03 = spend03 + ?,
+				spend04 = spend04 + ?, spend05 = spend05 + ? WHERE user_id = ?", 
+                [$mtr, $dtr, $itr, $etr, $ttr, $mtr, $dtr, $itr, $etr, $ttr, $ums_user_id]);
 
-                mysql_query("UPDATE de_sector set restyp01 = restyp01 + $mtr, restyp02 = restyp02 + $dtr, restyp03 = restyp03 + $itr, restyp04 = restyp04 + $etr, restyp05 = restyp05 + $ttr WHERE sec_id = '$sector'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, restyp03 = restyp03 + ?, restyp04 = restyp04 + ?, restyp05 = restyp05 + ? WHERE sec_id = ?", 
+                [$mtr, $dtr, $itr, $etr, $ttr, $sector]);
                 $restyp01 = $restyp01 - $mtr;
                 $restyp02 = $restyp02 - $dtr;
                 $restyp03 = $restyp03 - $itr;
                 $restyp04 = $restyp04 - $etr;
                 $restyp05 = $restyp05 - $ttr;
                 //an den bk ne info schicken
-                ///zuerst schauen wer bk ist
-                //$db_daten=mysql_query("SELECT bk FROM de_sector WHERE sec_id='$sector'",$db);
-                //$bk=mysql_result($db_daten, 0,0);
                 $bk = getSKSystemBySecID($sector);
 
                 if ($bk > 0) { //bk vorhanden, dann dessen daten raussuchen und nachricht einf&uuml;gen
-                    $db_daten = mysql_query("SELECT user_id FROM de_user_data WHERE sector='$sector' and system='$bk'", $db);
-                    $anz = mysql_num_rows($db_daten);
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND system=?", [$sector, $bk]);
+                    $anz = mysqli_num_rows($db_daten);
                     if ($anz > 0) {//bk-system ist auch besetzt
-                        $uid = mysql_result($db_daten, 0, 0);
+                        $row_uid = mysqli_fetch_assoc($db_daten);
+                        $uid = $row_uid['user_id'];
                         $time = date("YmdHis");
                         $nachricht = $resource_lang['sekeinzahlung'].$ums_spielername.': '.number_format($mtr, 0, "", ".").' M -- '.number_format($dtr, 0, "", ".").' D -- '.number_format($itr, 0, "", ".").' I -- '.number_format($etr, 0, "", ".").' E -- '.number_format($ttr, 0, "", ".").' T';
-                        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 7,'$time','$nachricht')", $db);
-                        mysql_query("update de_user_data set newnews = 1 where user_id = $uid", $db);
+                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 7, ?, ?)", [$uid, $time, $nachricht]);
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
                     }
                 }
             } else {
@@ -564,12 +562,12 @@ if (isset($_POST["b_col"])) {
     //transaktionsbeginn
     if (setLock($ums_user_id)) {
         //nochmal vorher die rohstoffe auslesen
-        $db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id='$ums_user_id'", $db);
-        $row = mysql_fetch_array($db_daten);
-        $restyp01 = $row[0];
-        $restyp02 = $row[1];
-        $restyp03 = $row[2];
-        $restyp04 = $row[3];
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+        $row = mysqli_fetch_assoc($db_daten);
+        $restyp01 = $row['restyp01'];
+        $restyp02 = $row['restyp02'];
+        $restyp03 = $row['restyp03'];
+        $restyp04 = $row['restyp04'];
         $restyp05 = $row[4];
         $gr01 = $restyp01;
         $gr02 = $restyp02;
@@ -604,32 +602,32 @@ if (isset($_POST["b_col"])) {
                     $restyp04 = $gr04;
                 } else {
                     //gibt $z kollektoren in auftrag
-                    $result = mysql_query("SELECT anzahl FROM de_user_build WHERE user_id = '$ums_user_id' AND tech_id=80 AND verbzeit=4", $db);
-                    $row = mysql_fetch_array($result);
+                    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$ums_user_id]);
+                    $row = mysqli_fetch_assoc($result);
                     if ($z > 0) {
-                        if ($row[0] == 0) { //es gibt keine kollektoren mit 4 ticks laenge in der queue
-                            mysql_query("INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES ($ums_user_id, 80, '$z', 4)", $db);
+                        if ($row['anzahl'] == 0) { //es gibt keine kollektoren mit 4 ticks laenge in der queue
+                            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 80, ?, 4)", [$ums_user_id, $z]);
                         } else {
-                            mysql_query("UPDATE de_user_build SET anzahl = anzahl + '$z' WHERE user_id = '$ums_user_id' AND tech_id=80 AND verbzeit=4 ", $db);
+                            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_build SET anzahl = anzahl + ? WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$z, $ums_user_id]);
                         }
                         //test auf allyaufgabe
                         if ($ownally != '') {
                             //allydaten laden
-                            $db_daten = mysql_query("SELECT * FROM de_allys WHERE allytag='$ownally'", $db);
-                            $row = mysql_fetch_array($db_daten);
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE allytag=?", [$ownally]);
+                            $row = mysqli_fetch_assoc($db_daten);
                             $allyid = $row['id'];
                             if ($row['questtyp'] == 0) {
-                                mysql_query("UPDATE de_allys SET questreach=questreach+'$z' WHERE id='$allyid' AND questtyp=0", $db);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach=questreach+? WHERE id=? AND questtyp=0", [$z, $allyid]);
                             }
                         }
                     }
                     //anzahl der gebauen kollektoren mitloggen
-                    mysql_query("UPDATE de_user_data SET col_build = col_build + '$z' WHERE user_id = '$ums_user_id'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col_build = col_build + ? WHERE user_id = ?", [$z, $ums_user_id]);
 
                     //aktualisiert die rohstoffe
                     $gr01 = $gr01 - $restyp01;
                     $gr02 = $gr02 - $restyp02;
-                    mysql_query("UPDATE de_user_data SET restyp01 = restyp01 - $gr01, restyp02 = restyp02 - $gr02 WHERE user_id = '$ums_user_id'", $db);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 - ?, restyp02 = restyp02 - ? WHERE user_id = ?", [$gr01, $gr02, $ums_user_id]);
                     $anzahl = $anzahl + $z;
                     //echo "Sonnenkollektoren in Auftrag gegeben: ".$z."<br>";
                 }
@@ -665,8 +663,8 @@ if (isset($trademsg) && !empty($trademsg)) {
 //k�nnen Kollektoren gebaut werden?
 if (!hasTech($pt, 7)) {
     $techcheck = "SELECT tech_name FROM de_tech_data".$ums_rasse." WHERE tech_id=7";
-    $db_tech = mysql_query($techcheck, $db);
-    $row_techcheck = mysql_fetch_array($db_tech);
+    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
+    $row_techcheck = mysqli_fetch_assoc($db_tech);
 
     echo '<br>';
     rahmen_oben($resource_lang['fehlendesgebaeude']);
@@ -1107,12 +1105,12 @@ rahmen_unten();
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlung ins sektorlager m&ouml;glich
-    $db_daten = mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id='$sector'", $db);
-    $row = mysql_fetch_array($db_daten);
-    $srestyp01 = $row[0];
-    $srestyp02 = $row[1];
-    $srestyp03 = $row[2];
-    $srestyp04 = $row[3];
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id=?", [$sector]);
+    $row = mysqli_fetch_assoc($db_daten);
+    $srestyp01 = $row['restyp01'];
+    $srestyp02 = $row['restyp02'];
+    $srestyp03 = $row['restyp03'];
+    $srestyp04 = $row['restyp04'];
     $srestyp05 = $row[4];
     ?>
 <br>

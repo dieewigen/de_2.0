@@ -80,8 +80,8 @@ if ($anzahl > 0) {
         $ok = 0;
         while ($ok == 0) {
             $spielername = generierespielername();
-            $result = mysql_query("SELECT user_id FROM de_user_data WHERE spielername='$spielername'", $db);
-            if (mysql_num_rows($result) == 0) {
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE spielername=?", [$spielername]);
+            if (mysqli_num_rows($result) == 0) {
                 $ok = 1;
             }
             echo $spielername.'<br>';
@@ -92,8 +92,8 @@ if ($anzahl > 0) {
         while ($ok == 0) {
             $zz = rand(100000000, 900000000);
             $loginname = 'ki'.$zz;
-            $result = mysql_query("SELECT user_id FROM de_login WHERE nic='$loginname'", $db);
-            if (mysql_num_rows($result) == 0) {
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE nic=?", [$loginname]);
+            if (mysqli_num_rows($result) == 0) {
                 $ok = 1;
             }
             echo $loginname.'<br>';
@@ -103,8 +103,8 @@ if ($anzahl > 0) {
         $ok = 0;
         while ($ok == 0) {
             $reg_mail = 'ki'.$zz.'@example.com';
-            $result = mysql_query("SELECT user_id FROM de_login WHERE reg_mail='$reg_mail'", $db);
-            if (mysql_num_rows($result) == 0) {
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE reg_mail=?", [$reg_mail]);
+            if (mysqli_num_rows($result) == 0) {
                 $ok = 1;
             }
             $zz = rand(1000000000, 4000000000);
@@ -113,33 +113,34 @@ if ($anzahl > 0) {
 
         //account einfügen
         //de_login
-        mysql_query("INSERT INTO de_login (nic, reg_mail, pass, register, last_login, status, last_ip)
-      VALUES ('$loginname', '$reg_mail', PASSWORD('$reg_mail'), NOW(), NOW(), 1, '127.0.0.1')", $db);
-        $user_id = mysql_insert_id();
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_login (nic, reg_mail, pass, register, last_login, status, last_ip)
+      VALUES (?, ?, PASSWORD(?), NOW(), NOW(), 1, '127.0.0.1')", [$loginname, $reg_mail, $reg_mail]);
+        $user_id = mysqli_insert_id($GLOBALS['dbi']);
 
         //de_user_data
-        mysql_query("INSERT INTO de_user_data (user_id, spielername, restyp01, restyp02, techs,
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_data (user_id, spielername, restyp01, restyp02, techs,
       ekey, sector, `system`, rasse, npc, nrrasse, nrspielername)
-      VALUES ($user_id , '$spielername' ,10000, 5000,
+      VALUES (?, ?, 10000, 5000,
       's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
-      '100;0;0;0', 0, 0, 5, $npc, 5, '$spielername')", $db);
+      '100;0;0;0', 0, 0, 5, ?, 5, ?)", 
+      [$user_id, $spielername, $npc, $spielername]);
 
         //de_user_fleet
         $fleet_id = $user_id.'-0';
-        mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
         $fleet_id = $user_id.'-1';
-        mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
         $fleet_id = $user_id.'-2';
-        mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
         $fleet_id = $user_id.'-3';
-        mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
         //de_user_info
         $sql = "INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht)
-      VALUES ('$user_id', '', '', '', 0, '', '', '', 0, 0, 0, 0)";
-        mysql_query($sql, $db);
+      VALUES (?, '', '', '', 0, '', '', '', 0, 0, 0, 0)";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id]);
 
     }
     echo("Done. Es wurden ".$anzahl." Accounts erstellt.<br><br>");

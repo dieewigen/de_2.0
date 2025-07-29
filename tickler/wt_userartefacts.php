@@ -4,11 +4,11 @@
 
 /*
 //gesamtspielerzahl
-$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE npc=0",$db);
-$gesamzanzahl = mysql_num_rows($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=0");
+$gesamzanzahl = mysqli_num_rows($db_daten);
 //spieler mit cyborg
-$db_daten=mysql_query("SELECT user_id FROM de_cyborg_data WHERE 1",$db);
-$cyborganzahl = mysql_num_rows($db_daten);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_cyborg_data WHERE 1");
+$cyborganzahl = mysqli_num_rows($db_daten);
 
 //wenn genug spieler mit cyborg vorhandne sind anfangen
 if($cyborganzahl>=$gesamanzahl/10)
@@ -19,15 +19,15 @@ if($cyborganzahl>=$gesamanzahl/10)
     //wenn w zutrifft, dann schauen ob man einf�gen mu�
     if(mt_rand(1,100)<=1)
     {
-      $db_daten=mysql_query("SELECT id FROM de_trade_artefact WHERE id='$i' AND level=1",$db);
-      $anz = mysql_num_rows($db_daten);
+      $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_trade_artefact WHERE id='$i' AND level=1");
+      $anz = mysqli_num_rows($db_daten);
       //wenn keine artefakte vorhanden sind x artefakte einf�gen
       if($anz==0)
       {
         $anz=mt_rand(1,2);
         for($j=1;$j<=$anz;$j++)
         {
-          mysql_query("INSERT INTO de_trade_artefact (id, level) VALUES ('$i', 1)",$db);
+          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_trade_artefact (id, level) VALUES ('$i', 1)");
         }
       }
     }

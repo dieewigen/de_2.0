@@ -3,15 +3,23 @@ include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.messagezwei.lang.php';
 include_once 'functions.php';
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
-$allytag=$row["allytag"];
-
-/*$db_daten=mysql_query("SELECT nic FROM de_login WHERE user_id='$ums_user_id'");
-$row = mysql_fetch_array($db_daten);
-$nic=$row["nic"];*/
+$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data 
+     WHERE user_id=?",
+    [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
+$punkte = $row["score"];
+$newtrans = $row["newtrans"];
+$newnews = $row["newnews"];
+$sector = $row["sector"];
+$system = $row["system"];
+$allytag = $row["allytag"];
 
 ?>
 <!DOCTYPE HTML>
@@ -21,40 +29,39 @@ $nic=$row["nic"];*/
 <?php include "cssinclude.php"; ?>
 </head>
 <body>
-
-<font face="tahoma" style="font-size:8pt;">
-
-<?
+<?php
 include "resline.php";
 
-if($text) {
+if ($text) {
 
-$allys=mysql_query("SELECT id FROM de_allys where leaderid='$ums_user_id'");
+    $allys = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT id FROM de_allys WHERE leaderid=?",
+        [$ums_user_id]);
+
+    if (mysqli_num_rows($allys) < 1) {
+        $resource = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT user_id FROM de_user_data WHERE allytag='FG�' AND status=1");
+    }
+
+    while ($row = mysqli_fetch_assoc($resource)) {
+        mysqli_execute_query($GLOBALS['dbi'],
+            "UPDATE de_user_data SET newtrans=1 WHERE user_id=?",
+            [$row['user_id']]);
+
+        $text = nl2br($text);
+        mysqli_execute_query($GLOBALS['dbi'],
+            "INSERT INTO de_user_trans (user_id, fromsec, fromsys, fromnic, time, betreff, text) 
+             VALUES (?, ?, ?, ?, NOW(), ?, ?)",
+            [$row['user_id'], $sector, $system, $ums_spielername, $betreff, $text]);
+    }
+
+    echo $allymessagezwei_lang[msg_1];
 
 
-if(mysql_num_rows($allys)<1)
 
+} else {
 
-
-$resource=mysql_query("SELECT user_id FROM de_user_data WHERE allytag='FG�' AND status=1");
-
-while($row=mysql_fetch_array($resource)) {
-mysql_query("update de_user_data set newtrans = 1 where user_id = $row[user_id]");
-
-$text=nl2br($text);
-mysql_query("INSERT INTO de_user_trans (user_id,fromsec,fromsys,fromnic,time,betreff,text) VALUES ('$row[user_id]','$sector','$system', '$ums_spielername',NOW(),'$betreff','$text')");
-}
-
-echo $allymessagezwei_lang[msg_1];
-
-
-
-}
-
-
-else {
-
-?>
+    ?>
 
 
 <p><font face="Verdana" size="7"><?=$allymessagezwei_lang[allymultimsg]?></font></p>
@@ -87,7 +94,7 @@ else {
 
 </form>
 
-<?
+<?php
 }
 ?>
 <?php include("ally/ally.footer.inc.php") ?>

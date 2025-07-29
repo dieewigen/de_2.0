@@ -6,9 +6,13 @@ include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.annehmen.lang.php');
 include_once('functions.php');
 
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
+     FROM de_user_data WHERE user_id = ?",
+    [$ums_user_id]
+);
+$row = mysqli_fetch_assoc($result);
+$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];
 
@@ -25,54 +29,85 @@ include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');
 //Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
-$allys=mysql_query("SELECT * FROM de_allys where leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'");
+$allys = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT * FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
+    [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+);
 
-
-if(mysql_num_rows($allys)<1)
+if(mysqli_num_rows($allys) < 1)
 {
 	echo $allyablehnen_lang['msg_1'];
 }
 else
 {
 	//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
-	$query="SELECT * FROM de_allys WHERE leaderid='$ums_user_id' OR coleaderid1='$ums_user_id' OR coleaderid2='$ums_user_id' OR coleaderid3='$ums_user_id'";
-	$result=mysql_query($query);
-	$clanid = mysql_result($result,0,"id");
-	$clantag = mysql_result($result,0,"allytag");
-	$memberlimit = mysql_result($result,0,"memberlimit");
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT id, allytag, memberlimit FROM de_allys 
+         WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
+        [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+    );
+    $row = mysqli_fetch_assoc($result);
+    $clanid = $row["id"];
+    $clantag = $row["allytag"];
+    $memberlimit = $row["memberlimit"];
 
 
 	if ($userid)
 	{
-		$query="SELECT * FROM de_user_data WHERE user_id='$userid'";
-		$result=mysql_query($query);
-		$clan = mysql_result($result,0,"allytag");
-		$c_result = mysql_query("SELECT count(*) FROM de_user_data WHERE allytag='$clantag' AND status='1'");
-		$m_counter = mysql_result($c_result,0,0);
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT allytag FROM de_user_data WHERE user_id = ?",
+            [$userid]
+        );
+        $row = mysqli_fetch_assoc($result);
+        $clan = $row["allytag"];
+        
+        $c_result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT COUNT(*) as count FROM de_user_data WHERE allytag = ? AND status = '1'",
+            [$clantag]
+        );
+        $row = mysqli_fetch_assoc($c_result);
+        $m_counter = $row["count"];
 
 		if ($memberlimit > $m_counter)
 		{
 			if($clantag==$clan)
 			{
-				$query = "UPDATE de_user_data SET status='1' WHERE user_id='$userid'";
-				$result = mysql_query($query);
+				mysqli_execute_query($GLOBALS['dbi'],
+                    "UPDATE de_user_data SET status = '1' WHERE user_id = ?",
+                    [$userid]
+                );
 
-				$u_data=mysql_query("SELECT spielername FROM de_user_data WHERE user_id='$userid'",$db);
-				$u_row = mysql_fetch_array($u_data);
-				$u_name=$u_row["spielername"];
+                $u_data = mysqli_execute_query($GLOBALS['dbi'],
+                    "SELECT spielername FROM de_user_data WHERE user_id = ?",
+                    [$userid]
+                );
+                $u_row = mysqli_fetch_assoc($u_data);
+                $u_name = $u_row["spielername"];
 
-
-				$query = "DELETE from de_ally_antrag WHERE user_id='$userid'";
-				$result = mysql_query($query);
-				$transaction_result = mysql_query("SELECT * FROM de_transactions WHERE user_id='$userid' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
-				if ($transaction_result)
-				{
-					if (mysql_num_rows($transaction_result)==1)
-					{
-						$data = mysql_fetch_array($transaction_result);
-						$sum = $data["amount"];
-						mysql_query("UPDATE de_allys SET t_depot=t_depot+$sum WHERE id='$clanid'");
-						$transaction_result = mysql_query("UPDATE de_transactions SET amount='0' WHERE user_id='$userid' AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'");
+                mysqli_execute_query($GLOBALS['dbi'],
+                    "DELETE FROM de_ally_antrag WHERE user_id = ?",
+                    [$userid]
+                );
+				$transaction_result = mysqli_execute_query($GLOBALS['dbi'],
+                    "SELECT * FROM de_transactions 
+                     WHERE user_id = ? AND type = 'C.A.R.S.' AND identifier = 'reg_fee' AND name = 'Tronic'",
+                    [$userid]
+                );
+                if ($transaction_result)
+                {
+                    if (mysqli_num_rows($transaction_result) == 1)
+                    {
+                        $data = mysqli_fetch_assoc($transaction_result);
+                        $sum = $data["amount"];
+                        mysqli_execute_query($GLOBALS['dbi'],
+                            "UPDATE de_allys SET t_depot = t_depot + ? WHERE id = ?",
+                            [$sum, $clanid]
+                        );
+                        mysqli_execute_query($GLOBALS['dbi'],
+                            "UPDATE de_transactions SET amount = '0' 
+                             WHERE user_id = ? AND type = 'C.A.R.S.' AND identifier = 'reg_fee' AND name = 'Tronic'",
+                            [$userid]
+                        );
 					}
 				}
 				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Ihrem Antrag zugestimmt und Sie aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachten Sie, das Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
@@ -93,49 +128,63 @@ else
 	}
 	elseif($allyid)
 	{
-		$query = "select count(*) from de_ally_partner where ally_id_1 = '$allyid' OR ally_id_2 = '$clanid'";
-		$result = mysql_query($query);
-		$alreadyinXallys = mysql_result($result,0,0);
-		if ($alreadyinXallys >= 2)
-			die ($allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3']);
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT COUNT(*) as count FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?",
+            [$allyid, $clanid]
+        );
+        $row = mysqli_fetch_assoc($result);
+        $alreadyinXallys = $row['count'];
+        if ($alreadyinXallys >= 2)
+            die ($allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3']);
 
-
-		$query = "select count(*) from de_ally_buendniss_antrag where ally_id_antragsteller='$allyid'";
-		$result = mysql_query($query);
-		$antragexists = 0;
-		$antragexists = mysql_result($result,0,0);
+        $result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ?",
+            [$allyid]
+        );
+        $row = mysqli_fetch_assoc($result);
+        $antragexists = $row['count'];
 		if ($antragexists == 0)
 			die($allyablehnen_lang['msg_7']);
 			
 		//überprüfen ob man mit dem gewünschten bündnispartner evtl. im krieg ist
-		$query = "SELECT * FROM de_ally_war WHERE (ally_id_angreifer = '$allyid' AND ally_id_angegriffener = '$allyid_partner') OR (ally_id_angreifer = '$allyid_partner' AND ally_id_angegriffener = '$allyid')";
-		$db_daten = mysql_query($query);
-		$num = mysql_num_rows($db_daten);
-		if ($num>0){
-			die ('<div class="info_box text2">Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.</div></body></html>');
-		}
+		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT * FROM de_ally_war 
+             WHERE (ally_id_angreifer = ? AND ally_id_angegriffener = ?) 
+             OR (ally_id_angreifer = ? AND ally_id_angegriffener = ?)",
+            [$allyid, $allyid_partner, $allyid_partner, $allyid]
+        );
+        $num = mysqli_num_rows($db_daten);
+        if ($num > 0) {
+            die ('<div class="info_box text2">Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.</div></body></html>');
+        }
 
-		//Test auf Diplomatiezentrum
-		$ally_result = mysql_query("SELECT * FROM de_allys WHERE allytag='$allytag'");
-		if ($ally_result){
-			$ally_data = mysql_fetch_array($ally_result);
-			//diplomatiezentrum
-			$bldg=$ally_data['bldg1'];
-		}
+        //Test auf Diplomatiezentrum
+        $ally_result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT bldg1 FROM de_allys WHERE allytag = ?",
+            [$allytag]
+        );
+        if ($ally_result){
+            $ally_data = mysqli_fetch_assoc($ally_result);
+            //diplomatiezentrum
+            $bldg = $ally_data['bldg1'];
+        }
 
 		//test auf vorhandenes allianzprojekt Diplomatiezentrum
 		if($bldg<1){
 		die('<br><div class="info_box text2">F&uuml;r ein Allianzb&uuml;ndnis wird ein Diplomatiezentrum ben&ouml;tigt.</div></body></html>');
 		}
-		
 
-		//$query = "delete from de_ally_war where (ally_id_angreifer='$clanid' AND ally_id_angegriffener='$allyid) or (ally_id_angreifer=$allyid and ally_id_angegriffener=$clanid)";
-		//$result = @mysql_query($query);
-
-		$query = "INSERT INTO de_ally_partner (ally_id_1, ally_id_2) VALUES ($clanid,$allyid)";
-		$result = mysql_query($query);
-		$query = "DELETE FROM de_ally_buendniss_antrag WHERE (ally_id_antragsteller='$allyid' AND ally_id_partner='$clanid') OR (ally_id_antragsteller='$clanid' AND ally_id_partner='$allyid')";
-		$result = mysql_query($query);
+		mysqli_execute_query($GLOBALS['dbi'],
+            "INSERT INTO de_ally_partner (ally_id_1, ally_id_2) VALUES (?, ?)",
+            [$clanid, $allyid]
+        );
+        
+        mysqli_execute_query($GLOBALS['dbi'],
+            "DELETE FROM de_ally_buendniss_antrag 
+             WHERE (ally_id_antragsteller = ? AND ally_id_partner = ?) 
+             OR (ally_id_antragsteller = ? AND ally_id_partner = ?)",
+            [$allyid, $clanid, $clanid, $allyid]
+        );
 		echo $allyablehnen_lang['msg_8'];
 		include("ally/allyfunctions.inc.php");
 		$delallyid1_tag = getAllyTag($clanid);

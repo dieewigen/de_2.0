@@ -28,7 +28,7 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
     $_SESSION['restore_botcheck_data'] = 1;
 
     //points zurücksetzen
-    mysql_query("UPDATE de_login SET points = 0 WHERE user_id='$ums_user_id'", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$ums_user_id]);
 
     $sekundenbiszumlogout = ($_SESSION['ums_session_start'] + $sv_session_lifetime) - time();
     $restminuten = floor($sekundenbiszumlogout / 60);
@@ -73,19 +73,19 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
 } else { //botschutz falsch beantwortet
 
     //fehlercounter erh�hen
-    mysql_query("UPDATE de_login SET points = points + 1 WHERE user_id='$ums_user_id'", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = points + 1 WHERE user_id=?", [$ums_user_id]);
 
     //test ob man schon ie maximale fehleranzahl erreicht hat
-    $db_daten = mysql_query("SELECT points FROM de_login  WHERE user_id='$ums_user_id'", $db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT points FROM de_login WHERE user_id=?", [$ums_user_id]);
+    $row = mysqli_fetch_array($db_daten);
     if ($row['points'] >= 10) {
         $fehlermsg = $index_lang['falschesergebnisgesperrt'];
         $time = strftime("%Y-%m-%d %H:%M:%S");
-        $comment = mysql_query("SELECT kommentar from de_user_info WHERE user_id='$ums_user_id'");
-        $rowz = mysql_fetch_array($comment);
+        $comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$ums_user_id]);
+        $rowz = mysqli_fetch_array($comment);
         $eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht. Botgrafik zu oft falsch gel�st. \n$time";
-        mysql_query("UPDATE de_user_info SET kommentar='$eintrag' WHERE user_id='$ums_user_id'");
-        mysql_query("UPDATE de_login SET status=2, points=0 WHERE user_id='$ums_user_id'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2, points=0 WHERE user_id=?", [$ums_user_id]);
 
         //Spieler informieren
         echo '<html><head>';

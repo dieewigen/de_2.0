@@ -49,8 +49,8 @@ if($sv_ewige_runde==1){
 	//normale runde
 	
 	//rundenstatus auslesen
-	$db_daten=mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-	$row = mysql_fetch_array($db_daten);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+	$row = mysqli_fetch_array($db_daten);
 	if($row["tick"]<=0)$ticks=1;else $ticks=$row["tick"];
 	
 	if ($ticks<2500000 OR $sv_comserver_roundtyp==1){
@@ -61,8 +61,8 @@ if($sv_ewige_runde==1){
 		}else{ //erhabenenkampf, oder die runde ist zu ende
 
 			//überprüfen ob der eh-kampf noch läuft, oder ab es schon rum ist
-			$result = mysql_query("SELECT doetick, winid, winticks FROM de_system",$db);
-			$row = mysql_fetch_array($result);
+			$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT doetick, winid, winticks FROM de_system", []);
+			$row = mysqli_fetch_array($result);
 			$doetick=$row["doetick"];
 			$winticks=$row["winticks"];
 			$winid=$row["winid"];
@@ -80,8 +80,8 @@ if($sv_ewige_runde==1){
 ///////////////////////////////////////////////////////
 // Tickdate auslesen
 ///////////////////////////////////////////////////////
-$result = mysql_query("SELECT domtick FROM de_system",$db);
-$row = mysql_fetch_array($result);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT domtick FROM de_system", []);
+$row = mysqli_fetch_array($result);
 $domtick=$row["domtick"];
 if ($domtick==1){
 echo '<br>Starte Tick';
@@ -89,15 +89,14 @@ echo date("d/m/Y - H:i:s");
 echo '<br><br>';
 
 //Kampfticks mitzählen
-mysql_query("UPDATE de_system SET kt=kt+1;",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET kt=kt+1", []);
 
 //Check ob die Missionen zu Ende sind
 checkMissionEnd();
 
 //größter tick
-//$result  = mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-$result  = mysql_query("SELECT wt AS tick, kt AS max_kt FROM de_system LIMIT 1",$db);
-$row     = mysql_fetch_array($result);
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick, kt AS max_kt FROM de_system LIMIT 1", []);
+$row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 $max_kt = $row["max_kt"];
 
@@ -111,30 +110,21 @@ include_once "kt_systemkampf.php";
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-//archäologie
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-
-//include "kt_archeology.php";
-
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
 //flottenbewegung - spielerflotten
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-$res = mysql_query("select user_id, aktion, zeit, aktzeit, e81, e82, e83, e84,
-e85, e86, e87, e88, e89, e90, hsec, hsys, zielsec from de_user_fleet where aktion > 0",$db);
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, aktion, zeit, aktzeit, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90, hsec, hsys, zielsec FROM de_user_fleet WHERE aktion > 0", []);
 
-$num = mysql_num_rows($res);
+$num = mysqli_num_rows($res);
 
 echo "<br>$num Flotten-Datens&auml;tze gefunden<br>";
 
-for ($i=0; $i<$num; $i++){
-	$uid     = mysql_result($res, $i, "user_id");
-	$aktion  = mysql_result($res, $i, "aktion");
-	$zeit    = mysql_result($res, $i, "zeit");
-	$aktzeit = mysql_result($res, $i, "aktzeit");
+while ($fleet_row = mysqli_fetch_assoc($res)) {
+	$uid     = $fleet_row['user_id'];
+	$aktion  = $fleet_row['aktion'];
+	$zeit    = $fleet_row['zeit'];
+	$aktzeit = $fleet_row['aktzeit'];
 
 
 
@@ -146,22 +136,22 @@ for ($i=0; $i<$num; $i++){
 	if ($zeit==0 && $aktzeit==0){ //er ist mit allem fertig
 		//if ($aktion==1 OR $aktion==2 OR $aktion==4){ //gekämpft oder verteidigt-> heimflug
 		if ($aktion==1 OR $aktion==2){ //gekämpft oder verteidigt-> heimflug
-			$ez[0]  = mysql_result($res, $i, "e81");
-			$ez[1]  = mysql_result($res, $i, "e82");
-			$ez[2]  = mysql_result($res, $i, "e83");
-			$ez[3]  = mysql_result($res, $i, "e84");
-			$ez[4]  = mysql_result($res, $i, "e85");
-			$ez[5]  = mysql_result($res, $i, "e86");
-			$ez[6]  = mysql_result($res, $i, "e87");
-			$ez[7]  = mysql_result($res, $i, "e88");
-			$ez[8]  = mysql_result($res, $i, "e89");
-			$ez[9]  = mysql_result($res, $i, "e90");
-			$zsec   = mysql_result($res, $i, "zielsec");
-			$sector = mysql_result($res, $i, "hsec");
-			$system = mysql_result($res, $i, "hsys");
+			$ez[0]  = $fleet_row['e81'];
+			$ez[1]  = $fleet_row['e82'];
+			$ez[2]  = $fleet_row['e83'];
+			$ez[3]  = $fleet_row['e84'];
+			$ez[4]  = $fleet_row['e85'];
+			$ez[5]  = $fleet_row['e86'];
+			$ez[6]  = $fleet_row['e87'];
+			$ez[7]  = $fleet_row['e88'];
+			$ez[8]  = $fleet_row['e89'];
+			$ez[9]  = $fleet_row['e90'];
+			$zsec   = $fleet_row['zielsec'];
+			$sector = $fleet_row['hsec'];
+			$system = $fleet_row['hsys'];
 			//rasse laden
-			$db_daten=mysql_query("SELECT rasse FROM de_user_data WHERE sector='$sector' AND `system`='$system'",$db);
-			$db_daten = mysql_fetch_array($db_daten);
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT rasse FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
+			$db_daten = mysqli_fetch_array($db_daten);
 			$rasse=$db_daten["rasse"];
 			echo '<br>Rasse: '.$rasse;
 
@@ -169,9 +159,7 @@ for ($i=0; $i<$num; $i++){
 			$rz=get_fleet_ground_speed($ez, $rasse, $uid);
 
 			//entfernungszuschlag
-			//schauen wieviele artefakte man, die die nahen sektoren vergr��ern
-			//$db_datennah=mysql_query("SELECT id FROM de_user_artefact WHERE id=5 AND user_id='$uid'",$db);
-			$wert = 5;// + mysql_num_rows($db_datennah);
+			$wert = 5;
 
 			if ($zsec<>$sector){
 				/*
@@ -181,28 +169,25 @@ for ($i=0; $i<$num; $i++){
 				$rz=$rz+2;
 			}
 
-			$sql="UPDATE de_user_fleet SET aktion = 3, zeit = $rz, aktzeit = $aktzeit, zielsec=hsec, zielsys=hsys WHERE user_id = '$uid'";
 			//fix für archäologie
 			//if($aktion==4)$sql="UPDATE de_user_fleet SET aktion = 3, zeit = gesrzeit, zielsec=hsec, zielsys=hsys WHERE user_id = '$uid'";
 
-			mysql_query($sql,$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET aktion = 3, zeit = ?, aktzeit = ?, zielsec=hsec, zielsys=hsys WHERE user_id = ?", [$rz, $aktzeit, $uid]);
 		}
 		else //ist daheim angekommen->verteidige heimatsystem
 		{
 			//Kein Update bei Missionen, die werden über den Timestamp gesteuert
 			if($aktion!=4){
-				$sql="UPDATE de_user_fleet SET aktion = 0, zeit = 0, gesrzeit = 0, aktzeit = 0, zielsec = 0, zielsys = 0 where user_id = '$uid'";
-				mysql_query($sql,$db);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET aktion = 0, zeit = 0, gesrzeit = 0, aktzeit = 0, zielsec = 0, zielsys = 0 WHERE user_id = ?", [$uid]);
 			}
 		}
 	}else{ //er ist noch unterwegs, bzw. verteidigt-> update der zeiten
-		$sql="update de_user_fleet set zeit = $zeit, aktzeit = $aktzeit where	user_id = '$uid'";
-		mysql_query($sql,$db);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zeit = ?, aktzeit = ? WHERE user_id = ?", [$zeit, $aktzeit, $uid]);
 	}
 }
 
 //nach dem kampf die fleetsize für deffende flotten neu berechnen
-mysql_query("UPDATE de_user_fleet SET fleetsize = e81+e82+e83+e84+e85+e86+e87+e88+e89+e90 WHERE zeit=0 AND aktzeit>0",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET fleetsize = e81+e82+e83+e84+e85+e86+e87+e88+e89+e90 WHERE zeit=0 AND aktzeit>0", []);
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -213,18 +198,18 @@ mysql_query("UPDATE de_user_fleet SET fleetsize = e81+e82+e83+e84+e85+e86+e87+e8
 include_once "kt_sectorkampf.php";
 
 //flottenbewegung - sektorflotten
-$res = mysql_query("select sec_id, aktion, zeit, aktzeit, zielsec from de_sector where aktion > 0",$db);
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, aktion, zeit, aktzeit, zielsec FROM de_sector WHERE aktion > 0", []);
 
-$num = mysql_num_rows($res);
+$num = mysqli_num_rows($res);
 
 echo "<br>$num Sektor-Flotten-Datens�tze gefunden<br>";
 
-for ($i=0; $i<$num; $i++)
+while ($sector_row = mysqli_fetch_assoc($res))
 {
-  $sec_id     = mysql_result($res, $i, "sec_id");
-  $aktion  = mysql_result($res, $i, "aktion");
-  $zeit    = mysql_result($res, $i, "zeit");
-  $aktzeit = mysql_result($res, $i, "aktzeit");
+  $sec_id     = $sector_row['sec_id'];
+  $aktion  = $sector_row['aktion'];
+  $zeit    = $sector_row['zeit'];
+  $aktzeit = $sector_row['aktzeit'];
 
   //flottenbewegung
   if ($zeit==0 && $aktzeit>0) $aktzeit--; //wenn er nicht fliegt, dann verteidigt er gerade
@@ -235,27 +220,21 @@ for ($i=0; $i<$num; $i++)
   {
     if ($aktion==1 OR $aktion==2) //gek�mpft oder verteidigt-> heimflug
     {
-      $zsec   = mysql_result($res, $i, "zielsec");
+      $zsec   = $sector_row['zielsec'];
       $rz=12;
       //entfernungzuschlag
       //if ($zsec<$sec_id+5 and $zsec>$sec_id-5) $rz=$rz+0;else $rz=$rz+2;
         
-      $sql="update de_sector set aktion = 3, zeit = $rz, aktzeit =
-      $aktzeit, zielsec=$sec_id where sec_id = '$sec_id'";
-      mysql_query($sql,$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET aktion = 3, zeit = ?, aktzeit = ?, zielsec = ? WHERE sec_id = ?", [$rz, $aktzeit, $sec_id, $sec_id]);
     }
     else //ist daheim angekommen->verteidige heimatsystem
     {
-      $sql="update de_sector set aktion = 0, zeit = 0, gesrzeit = 0,
-      aktzeit = 0, zielsec = 0 where sec_id = '$sec_id'";
-      mysql_query($sql,$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET aktion = 0, zeit = 0, gesrzeit = 0, aktzeit = 0, zielsec = 0 WHERE sec_id = ?", [$sec_id]);
     }
   }
   else //er ist noch unterwegs, bzw. verteidigt-> update der zeiten
   {
-    $sql="update de_sector set zeit = $zeit, aktzeit = $aktzeit where
-  sec_id = '$sec_id'";
-    mysql_query($sql,$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET zeit = ?, aktzeit = ? WHERE sec_id = ?", [$zeit, $aktzeit, $sec_id]);
   }
 }
 
@@ -269,7 +248,7 @@ include_once 'kt_manage_bg.php';
 
 //lege in der datenbank die zeit des letzten ticks ab
 $time=date("YmdHis");
-mysql_query("update de_system set lastmtick = '$time'",$db);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET lastmtick = ?", [$time]);
 print '<br><br>Letzter Tick: '.date("d/m/Y - H:i:s");
 
 function xecho($str){

@@ -103,13 +103,13 @@ ALTER TABLE `de_login` ADD INDEX(`loginkey`);
 ALTER TABLE `de_login` ADD INDEX(`loginkeytime`); 
 	*/
 
-	$result = mysql_query($sql) OR die(mysql_error());
-	$num = mysql_num_rows($result);
+	$result = mysqli_execute_query($GLOBALS['dbi'], $sql, []) OR die(mysqli_error($GLOBALS['dbi']));
+	$num = mysqli_num_rows($result);
 	
 	if($num==1){
 		
 	  session_regenerate_id(true);
-	  $row = mysql_fetch_array($result);
+	  $row = mysqli_fetch_array($result);
 	  $ums_status=$row["status"];
 	  $_SESSION["ums_cooperation"]=$row["cooperation"];
 	  $_SESSION["ums_owner_id"]=$row["owner_id"];
@@ -125,10 +125,10 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 	  if($ums_status==3)//urlaubsmodus/l�schmodus
 	  {
 		//den account aus dem l�schmodus holen
-		mysql_query("UPDATE de_login SET delmode=0 WHERE user_id='$row[user_id]'");
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET delmode=0 WHERE user_id=?", [$row['user_id']]);
 		//pa reaktivieren, wenn notwendig
 		$patime=time();
-		mysql_query("UPDATE de_user_data SET premium=1 WHERE patime>'$patime' AND user_id='$row[user_id]'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET premium=1 WHERE patime>? AND user_id=?", [$patime, $row['user_id']]);
 
 
 		//abbruchtermin
@@ -154,17 +154,17 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		else{
 		  $fehlermsg=$index_lang['umodebeendet'];
 		  //umode beenden
-		  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$row[user_id]'",$db);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id=?", [$row['user_id']]);
 		  $ums_status=1;
 		  $zstatus='(x Tage sind um, Login m&ouml;glich)';
 		}
 
 		//info im kommentarfeld hinterlegen
 		$datum=date("Y-m-d H:i:s",time());
-		$comment = mysql_query("select kommentar from de_user_info WHERE user_id='$row[user_id]'");
-		$rowz = mysql_fetch_array($comment);
+		$comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$row['user_id']]);
+		$rowz = mysqli_fetch_array($comment);
 		$eintrag = "$rowz[kommentar]\n$datum Loginversuch Account Status 3(Umode/L&ouml;schmode)! $zstatus\n$time";
-		mysql_query("UPDATE de_user_info SET kommentar='$eintrag' WHERE user_id='$row[user_id]'");
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $row['user_id']]);
 
 
 	  }    
@@ -182,7 +182,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//$ums_one_way_bot_protection=0;
 
 		//spielerdaten aus de_user_data holen und in die session packen
-		$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id='$ums_user_id'") OR die(mysql_error());
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
 		$row = mysqli_fetch_array($result);
 
 		$techs=$row["techs"];
@@ -233,17 +233,17 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//////////////////////////////////////////////////////////////////////
 		//spielerdaten aus de_user_info holen und in die session packen
 		//////////////////////////////////////////////////////////////////////
-		$result = mysql_query("SELECT submit, gpfad FROM de_user_info WHERE user_id='$ums_user_id'") OR die(mysql_error());
-		$row = mysql_fetch_array($result);
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT submit, gpfad FROM de_user_info WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
+		$row = mysqli_fetch_array($result);
 		$ums_submit=$row["submit"];
 		$ums_gpfad=$row["gpfad"];
 		if(($ums_gpfad=='')||($_REQUEST['grapa']=="off"))$ums_gpfad=$sv_image_server;
 
 		//vote
-		$schonabgestimmt=mysql_query("SELECT vote_id FROM de_vote_stimmen where user_id='$ums_user_id'") OR die(mysql_error());
+		$schonabgestimmt=mysqli_execute_query($GLOBALS['dbi'], "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
 		$i=0;
 		$gevotetevotes = array();
-		while($rew = mysql_fetch_array($schonabgestimmt))
+		while($rew = mysqli_fetch_array($schonabgestimmt))
 		{
 		  $gevotetevotes[$i]=$rew['vote_id'];
 		  $i++;
@@ -251,8 +251,8 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$i=0;
 		$votevorhanden=0;
 
-		$db_umfrage=mysql_query("SELECT de_vote_umfragen.id, de_vote_umfragen.frage,de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login where de_vote_umfragen.status=1 and UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) and de_login.user_id='$ums_user_id' order by de_vote_umfragen.id");
-		while($row = mysql_fetch_array($db_umfrage)){
+		$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_vote_umfragen.id, de_vote_umfragen.frage,de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id", [$ums_user_id]);
+		while($row = mysqli_fetch_array($db_umfrage)){
 			$i=0;
 			while($i<=count($gevotetevotes)+1){
 				if($gevotetevotes[$i]==$row['id']){
@@ -290,20 +290,18 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;
 
 		//testen ob er das alternativ-pw verwendet hat
-		$sql = "SELECT user_id FROM de_login WHERE user_id='$ums_user_id' AND newpass = MD5('".($_POST['pass'] ?? '')."');";
-		$result = mysql_query($sql) OR die(mysql_error());
-		$num = mysql_num_rows($result);
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND newpass = MD5(?)", [$ums_user_id, ($_POST['pass'] ?? '')]) OR die(mysqli_error($GLOBALS['dbi']));
+		$num = mysqli_num_rows($result);
 
 		if($num==1 AND $_REQUEST["loginkey"]=='')//er hat das alternative pw benutzt
 		{
-		  mysql_query("UPDATE de_login set pass=newpass WHERE user_id='$ums_user_id'");
-		  mysql_query("UPDATE de_login set newpass='' WHERE user_id='$ums_user_id'");
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET pass=newpass WHERE user_id=?", [$ums_user_id]);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET newpass='' WHERE user_id=?", [$ums_user_id]);
 		}
 
 		//testen ob er �ber den loginkey reingekommen ist
-		$sql = "SELECT user_id FROM de_login WHERE user_id='$ums_user_id' AND loginkey='".$_REQUEST['loginkey']."';";
-		$result = mysql_query($sql) OR die(mysql_error());
-		$num = mysql_num_rows($result);
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND loginkey=?", [$ums_user_id, $_REQUEST['loginkey']]) OR die(mysqli_error($GLOBALS['dbi']));
+		$num = mysqli_num_rows($result);
 
 		if($num==1 AND $_REQUEST['loginkey']!='')//er hat den loginkey benutzt
 		{
@@ -321,7 +319,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  }        
 
 		  //if (($_SESSION['ums_session_start']+$sv_session_lifetime)<time())$_SESSION['ums_one_way_bot_protection']=1;
-		  mysql_query("UPDATE de_login SET loginkey='', loginkeytime=0, loginkeyip='' WHERE user_id='$ums_user_id'");
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET loginkey='', loginkeytime=0, loginkeyip='' WHERE user_id=?", [$ums_user_id]);
 		}
 
 		//$ergebnis = $_SESSION['loginzahl'];
@@ -333,13 +331,13 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//loginzeit und ip aktualisieren
 		//ip loggen
 		$ip=getenv("REMOTE_ADDR");
-		mysql_query("UPDATE de_login SET last_login=NOW(), last_ip='$ip', logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id='$ums_user_id'");
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=NOW(), last_ip=?, logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id=?", [$ip, $ums_user_id]);
 		$loginhelpstr=$_COOKIE["loginhelp"];
 			
 		$ip_adresse=$_SERVER['REMOTE_ADDR'];
 		$parts=explode(".",$ip_adresse);
 		$ip_adresse=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
-		mysql_query("INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp)VALUES('$ums_user_id','$ip_adresse',NOW(), '$_SERVER[HTTP_USER_AGENT]', '$loginhelpstr')");
+		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp) VALUES(?,?,NOW(), ?, ?)", [$ums_user_id, $ip_adresse, $_SERVER['HTTP_USER_AGENT'], $loginhelpstr]);
 
 		//Logout anzeige für den title
 		$sekundenbiszumlogout=($_SESSION['ums_session_start']+$sv_session_lifetime)-time();
@@ -464,7 +462,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		}
 		else
 		{
-		  mysql_query("UPDATE de_login SET points = points + 1 WHERE user_id='$ums_user_id'");
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = points + 1 WHERE user_id=?", [$ums_user_id]);
 
 		  //zahl wurde falsch eingegeben, session wieder killen und neu anlegen
 		  session_destroy();
@@ -474,11 +472,11 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		  {
 			$fehlermsg=$index_lang[falschesergebnisgesperrt];
 			$time=strftime("%Y-%m-%d %H:%M:%S");
-			$comment = mysql_query("select kommentar from de_user_info WHERE user_id='$ums_user_id'");
-			$rowz = mysql_fetch_array($comment);
+			$comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$ums_user_id]);
+			$rowz = mysqli_fetch_array($comment);
 			$eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht �ber das Login-Script! \n$time";
-			mysql_query("UPDATE de_user_info SET kommentar='$eintrag' WHERE user_id='$ums_user_id'");
-			mysql_query("UPDATE de_login SET status=2 WHERE user_id='$ums_user_id'",$db);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $ums_user_id]);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2 WHERE user_id=?", [$ums_user_id]);
 		  }
 		  else $fehlermsg=$index_lang[falschezahl];
 		}*/
@@ -486,8 +484,8 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 	  elseif($ums_status==0) $fehlermsg=$index_lang['accnochnichtaktiv'];
 	  elseif($ums_status==2)
 	  {
-		$sel_supporter = mysql_query("SELECT supporter FROM de_login WHERE user_id='$row[user_id]'");
-		$row_supporter = mysql_fetch_array($sel_supporter);
+		$sel_supporter = mysqli_execute_query($GLOBALS['dbi'], "SELECT supporter FROM de_login WHERE user_id=?", [$row['user_id']]);
+		$row_supporter = mysqli_fetch_array($sel_supporter);
 
 		if($row_supporter['supporter']=="")
 			$row_supporter['supporter']="Support@Die-Ewigen.com";

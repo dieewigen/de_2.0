@@ -20,14 +20,14 @@ if(isset($_REQUEST["gettlscore"]) && $_REQUEST["gettlscore"]==1){
 	//zuerst die anzahl der aktiven spieler feststellen
 	//bei non-bezahlservern alle spieler werten, auf bezahlservern nur die pa-user
 	if($sv_payserver==0){
-		$db_daten=mysql_query("SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1 ORDER BY score DESC",$db);
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1 ORDER BY score DESC", []);
 	}else{
-		$db_daten=mysql_query("SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.premium=1 AND de_user_data.sector>1 ORDER BY score DESC",$db);  	
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.premium=1 AND de_user_data.sector>1 ORDER BY score DESC", []);  	
 	}
 	
-	$anzspieler = mysql_num_rows($db_daten);
+	$anzspieler = mysqli_num_rows($db_daten);
 	//alle aktiven spieler erhalten punkte
-	while($row = mysql_fetch_array($db_daten)){
+	while($row = mysqli_fetch_array($db_daten)){
 		echo $row["owner_id"].'@'.($anzspieler).';';
 		$anzspieler--;
 	}
@@ -38,10 +38,10 @@ if(isset($_REQUEST["gettlscore"]) && $_REQUEST["gettlscore"]==1){
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 if(isset($_REQUEST["getaccountanz"]) && $_REQUEST["getaccountanz"]==1){
-	//$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE sector>1 AND npc=0",$db);
-	$db_daten=mysql_query("SELECT de_login.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1",$db);
+	//$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector>1 AND npc=0", []);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1", []);
 
-	$num = mysql_num_rows($db_daten);
+	$num = mysqli_num_rows($db_daten);
 	echo $num;
 }
 
@@ -49,10 +49,10 @@ if(isset($_REQUEST["getaccountanz"]) && $_REQUEST["getaccountanz"]==1){
 if(isset($_REQUEST["isaccount"]) && $_REQUEST["isaccount"]==1){
 	$id=intval($_REQUEST["id"]);
 	if($id==0)$id='-1';
-	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE owner_id=?", [$id]);
+	$num = mysqli_num_rows($db_daten);
 	if($num==1){
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_array($db_daten);
 		$user_id=$row["user_id"];
 		echo $user_id;
 	}
@@ -68,8 +68,8 @@ if(isset($_REQUEST["isaccount_user_id"]) && $_REQUEST["isaccount_user_id"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE user_id='$id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=?", [$id]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)
   {
     echo '1';
@@ -85,10 +85,10 @@ if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
 {
   $id=intval($_REQUEST["id"]);
   if($id==0)$id='-1';
-  $db_daten=mysql_query("SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id='$id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.supporter, de_login.last_login, de_login.delmode, de_login.status AS astatus, de_user_data.spielername, de_user_data.tick, de_user_data.score, de_login.status AS lstatus, de_login.last_login, de_user_data.sector, de_user_data.`system`, de_user_data.allytag, de_user_data.status, de_user_data.credits, de_user_data.patime FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id=?", [$id]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1){
-    $row = mysql_fetch_array($db_daten);
+    $row = mysqli_fetch_array($db_daten);
     $user_id=$row["user_id"];
     $accstatus=$row["astatus"];
     $delmode=$row["delmode"];
@@ -134,19 +134,19 @@ if(isset($_REQUEST["setloginkey"]) && $_REQUEST["setloginkey"]==1)
   $pass=$_REQUEST["pass"];
   if($id==0)$id='-1';
   //schauen ob es den account gibt
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE owner_id=?", [$id]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)
   {
     //falls ja user id auslesen und per zufall den key generieren
-    $row = mysql_fetch_array($db_daten);
+    $row = mysqli_fetch_array($db_daten);
     $user_id=$row["user_id"];
     //key generieren
     $pwstring='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $loginkey=$pwstring[rand(0, strlen($pwstring)-1)];
     for($i=1; $i<16; $i++) $loginkey.=$pwstring[rand(0, strlen($pwstring)-1)];
     //den key und den zeitpunkt der generierung in der datenbank hinterlegen
-    mysql_query("UPDATE de_login SET loginkey='$loginkey', loginkeytime=UNIX_TIMESTAMP( ), loginkeyip='$ip', pass='$pass' WHERE owner_id = '$id'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET loginkey=?, loginkeytime=UNIX_TIMESTAMP( ), loginkeyip=?, pass=? WHERE owner_id = ?", [$loginkey, $ip, $pass, $id]);
     //den key zur�ckgeben
     echo $loginkey;
   }
@@ -163,13 +163,13 @@ if(isset($_REQUEST["credittransfer"]) && $_REQUEST["credittransfer"]==1){
 	$credits=intval($_REQUEST["credits"]);
 	if($id==0)$id='-1';
 	//schauen ob es den account gibt
-	$db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
-	$num = mysql_num_rows($db_daten);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE owner_id=?", [$id]);
+	$num = mysqli_num_rows($db_daten);
 	if($num==1){
 		//falls ja user id auslesen und die credits gutschreiben
-		$row = mysql_fetch_array($db_daten);
+		$row = mysqli_fetch_array($db_daten);
 		$user_id=$row["user_id"];
-		mysql_query("UPDATE de_user_data SET credits=credits+'$credits', credittransfer=credittransfer+'$credits' WHERE user_id = '$user_id'",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+?, credittransfer=credittransfer+? WHERE user_id = ?", [$credits, $credits, $user_id]);
 		//transfer mitloggen
 		$datum=date("Y-m-d H:i:s",time());
 		$ip=getenv("REMOTE_ADDR");
@@ -195,7 +195,7 @@ if(isset($_REQUEST["credittransfer_billing"]) && $_REQUEST["credittransfer_billi
   if($id==0)$id='-1';
 
   //credits gutschreiben  
-  mysql_query("UPDATE de_user_data SET credits=credits+'$credits' WHERE user_id = '$user_id'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id = ?", [$credits, $user_id]);
   //transfer mitloggen
   $datum=date("Y-m-d H:i:s",time());
   $ip=getenv("REMOTE_ADDR");
@@ -217,30 +217,30 @@ if(isset($_REQUEST["getplaytime"]) && $_REQUEST["getplaytime"]==1)
   $tage=intval($_REQUEST["tage"]);
   if($id==0)$id='-1';
   //schauen ob es den account gibt
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE owner_id=?", [$id]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)
   {
     //falls ja user id auslesen und die pa-zeit gutschreiben
-    $row = mysql_fetch_array($db_daten);
+    $row = mysqli_fetch_array($db_daten);
     $user_id=$row["user_id"];
     
     //aktuelle laufzeit auslesen
-    $db_daten=mysql_query("SELECT patime FROM de_user_data WHERE user_id='$user_id'",$db);
-    $row = mysql_fetch_array($db_daten);
+    $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT patime FROM de_user_data WHERE user_id=?", [$user_id]);
+    $row = mysqli_fetch_array($db_daten);
     $palaufzeit=$row["patime"];
     
     if ($palaufzeit<time())
     {
       //er hat aktuell keinen pa, also neue gesamtlaufzeit setzen
       $patime=time()+(3600*24*$tage);
-      mysql_query("UPDATE de_user_data SET premium=1, patime='$patime' WHERE user_id = '$user_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET premium=1, patime=? WHERE user_id = ?", [$patime, $user_id]);
     }
     else
     {
       //er hat einen pa, also zeit dazuaddieren
       $patime=(3600*24*$tage);
-      mysql_query("UPDATE de_user_data SET patime=patime+'$patime' WHERE user_id = '$user_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET patime=patime+? WHERE user_id = ?", [$patime, $user_id]);
     }
     //transfer mitloggen
 	$datum=date("Y-m-d H:i:s",time());
@@ -281,21 +281,21 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
 
 
   //schauen ob der spielername bereits verwendet wird
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE nic='$spielername'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE nic=?", [$spielername]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)die('2');
-  $db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE spielername='$spielername' OR nrspielername='$spielername'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE spielername=? OR nrspielername=?", [$spielername, $spielername]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)die('2');
 
   //schauen ob die e-mail bereits verwendet wird
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE reg_mail='$email'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE reg_mail=?", [$email]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1)die('3');
   
   //schauen ob die id bereits vergeben ist, bzw. g�ltig
-  $db_daten=mysql_query("SELECT user_id FROM de_login WHERE owner_id='$id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE owner_id=?", [$id]);
+  $num = mysqli_num_rows($db_daten);
   if($num==1 AND $id>0)die('4');
 
   //wenn soweit alles ok ist den account anlegen
@@ -307,48 +307,48 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   $status=1;
 
   $sql="INSERT INTO de_login (owner_id, nic, reg_mail, register, last_login, status)
-  VALUES ('$id', '$spielername', '$email', NOW(), NOW(), '$status')";
-  mysql_query($sql, $db);
+  VALUES (?, ?, ?, NOW(), NOW(), ?)";
+  mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $spielername, $email, $status]);
 
-  $user_id=mysql_insert_id();
+  $user_id=mysqli_insert_id($db);
   
   if($patime>time())$premium=1; else $premium=0;
   
   //de_user_data
   $sql="INSERT INTO de_user_data (user_id, spielername, tick, restyp01, restyp02, techs,
     sector, `system`, rasse, nrspielername, nrrasse, ovopt, hide_secpics, premium, patime, werberid)
-    VALUES ($user_id , '$spielername' , 1, 100000, 50000, 's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
-    0, 0, '$rasse', '$spielername', '$rasse', '1;2;3;4;5;6;7','0', '$premium', '$patime', '$werberid')";
+    VALUES (?, ?, 1, 100000, 50000, 's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
+    0, 0, ?, ?, ?, '1;2;3;4;5;6;7','0', ?, ?, ?)";
     
-  mysql_query($sql, $db);
+  mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $spielername, $rasse, $spielername, $rasse, $premium, $patime, $werberid]);
   //de_user_data fix f�r ekey in der dedv-version
-  mysql_query("UPDATE de_user_data SET ekey='100;0;0;0' WHERE user_id='$user_id';", $db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET ekey='100;0;0;0' WHERE user_id=?", [$user_id]);
 
   //de_user_info
-  mysql_query("INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
-    VALUES ('$user_id', '$vorname', '$nachname', '$strasse', '$plz', '$ort', '$land', '$telefon', '$tag', '$monat', '$jahr', '$geschl', '', '', '', '')", $db);
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '')", [$user_id, $vorname, $nachname, $strasse, $plz, $ort, $land, $telefon, $tag, $monat, $jahr, $geschl]);
 
   if($sv_efta_in_de==1 AND $sv_sou_in_de==1)
   {
     //de_user_fleet
     $fleet_id=$user_id.'-0';
-    mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
     $fleet_id=$user_id.'-1';
-    mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
     $fleet_id=$user_id.'-2';
-    mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
     $fleet_id=$user_id.'-3';
-    mysql_query("INSERT INTO de_user_fleet (user_id) VALUES ('$fleet_id')", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
    
     $time=strftime("%Y%m%d%H%M%S");
     //späteinsteigerhilfe, gilt nicht in der ewigen runde
     if($sv_ewige_runde!=1){
       //zuerst schauen wieviel ticks bereits vergangen sind
-      //$db_daten=mysql_query("SELECT MAX(tick) AS tick FROM de_user_data",$db);
-      $db_daten  = mysql_query("SELECT wt AS tick FROM de_system LIMIT 1",$db);
-      $row = mysql_fetch_array($db_daten);
+      //$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
+      $db_daten  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
+      $row = mysqli_fetch_array($db_daten);
       $maxtick=$row["tick"];
       if($maxtick>1){
         //fix f�r br
@@ -357,11 +357,11 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
         $m=round($sv_plan_grundertrag[0]*($maxtick-1)/5);
         $d=round($sv_plan_grundertrag[1]*($maxtick-1)/5);
         //rohstoffe gutschreiben und nachrichten auf new setzen
-        mysql_query("UPDATE de_user_data SET restyp01 = restyp01 + '$m', restyp02 = restyp02 + '$d', newnews=1 WHERE user_id='$user_id'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, newnews=1 WHERE user_id=?", [$m, $d, $user_id]);
         //nachricht hinterlegen
         $nachricht=$rpc_lang['spaet1'].number_format($maxtick, 0,"",".").$rpc_lang['spaet2'].
         number_format($m, 0,"",".").$rpc_lang['spaet3'].number_format($d, 0,"",".").$rpc_lang['spaet4'];
-        mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ('$user_id', 3,'$time','$nachricht')",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$user_id, $time, $nachricht]);
       }
 	  }
   }

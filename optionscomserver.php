@@ -2,9 +2,10 @@
 include "inc/header.inc.php";
 include "outputlib.php";
 include "functions.php";
-$db_daten=mysql_query("SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, helper, patime FROM de_user_data WHERE user_id='$ums_user_id'",$db);
-$row = mysql_fetch_array($db_daten);
-$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
+$query = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, system, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, soundoff, credits, chatoff, chatoffallg, helper, patime FROM de_user_data WHERE user_id=?";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
+$row = mysqli_fetch_assoc($db_daten);
+$restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];$restyp05=$row["restyp05"];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$allytag=$row["allytag"];$newnews=$row["newnews"];$hidepic=$row["hide_secpics"];
 $sector=$row["sector"];$system=$row["system"];$nrrasse=$row["nrrasse"];$nrspielername=$row["nrspielername"];
 $tick=$row["tick"];$ovopt=$row["ovopt"];$soundoff=$row["soundoff"];
@@ -354,13 +355,19 @@ else //einstellungsmöglichkeiten anzeigen
     else $v31='NULL'; 
       
     //die Einstellungen speichern
-	mysql_query("UPDATE de_user_comserver SET 
-	v1=$v1, v2=$v2, v3=$v3, v4=$v4, v5=$v5, v6=$v6, v7=$v7, v8=$v8, v9=$v9, v10=$v10, 
-	v11=$v11, v12=$v12, v13=$v13, v14=$v14, v15=$v15, v16=$v16, v17=$v17, v18=$v18, v19=$v19, v20=$v20,
-	v21=$v21, v22=$v22, v23=$v23, v24=$v24, v25=$v25, v26=$v26, v27=$v27, v28=$v28, v29=$v29, v30=$v30,
-    v31=$v31
+	$query = "UPDATE de_user_comserver SET 
+	v1=?, v2=?, v3=?, v4=?, v5=?, v6=?, v7=?, v8=?, v9=?, v10=?, 
+	v11=?, v12=?, v13=?, v14=?, v15=?, v16=?, v17=?, v18=?, v19=?, v20=?,
+	v21=?, v22=?, v23=?, v24=?, v25=?, v26=?, v27=?, v28=?, v29=?, v30=?,
+    v31=?
 	
-	WHERE user_id='$ums_user_id'",$db);
+	WHERE user_id=?";
+	mysqli_execute_query($GLOBALS['dbi'], $query, [
+	    $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10,
+	    $v11, $v12, $v13, $v14, $v15, $v16, $v17, $v18, $v19, $v20,
+	    $v21, $v22, $v23, $v24, $v25, $v26, $v27, $v28, $v29, $v30,
+	    $v31, $ums_user_id
+	]);
 	
 	
   }
@@ -370,15 +377,16 @@ else //einstellungsmöglichkeiten anzeigen
   //die in der db hinterlegten einstellungen des spielers laden
   ///////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////
-  $db_daten=mysql_query("SELECT * FROM de_user_comserver WHERE user_id='$ums_user_id'",$db);
-  $num = mysql_num_rows($db_daten);
+  $query = "SELECT * FROM de_user_comserver WHERE user_id=?";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
+  $num = mysqli_num_rows($db_daten);
   //wenn es noch keinen datensatz gibt, einen anlegen
   if($num==0)
   {
-    mysql_query("INSERT INTO de_user_comserver SET user_id='$ums_user_id'",$db);
-    $db_daten=mysql_query("SELECT * FROM de_user_comserver WHERE user_id='$ums_user_id'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_comserver SET user_id=?", [$ums_user_id]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
   }
-  $playervalues = mysql_fetch_array($db_daten);
+  $playervalues = mysqli_fetch_assoc($db_daten);
   
   ///////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////
@@ -388,8 +396,9 @@ else //einstellungsmöglichkeiten anzeigen
   
   //daten über median ermitteln
   $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT de_user_comserver.* FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
-  WHERE de_login.status=1 AND de_login.last_click > '$time' AND de_user_comserver.user_id>0",$db);
+  $query = "SELECT de_user_comserver.* FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
+  WHERE de_login.status=1 AND de_login.last_click > ? AND de_user_comserver.user_id>0";
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$time]);
   
   if($_SESSION['ums_user_id']==1){
     //echo "SELECT de_user_comserver.* FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) WHERE de_login.status=1 AND de_login.last_click > '$time' AND de_user_comserver.user_id>0";
@@ -397,7 +406,7 @@ else //einstellungsmöglichkeiten anzeigen
 
   //alle daten in ein array packen
   unset($votes);
-  while($row = mysql_fetch_array($db_daten))
+  while($row = mysqli_fetch_assoc($db_daten))
   {
     for($i=1;$i<=40;$i++)if(!is_null($row['v'.$i]))$votes[$i][]=$row['v'.$i];
   }
@@ -437,80 +446,6 @@ else //einstellungsmöglichkeiten anzeigen
   $server_v33=round(median($votes[33]));  
   $server_v34=round(median($votes[34]));  
   $server_v35=round(median($votes[35]));  
-  
-
-  //anzahl der stimmen auslesen
-  /*
-  $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT user_id FROM de_login WHERE last_click > '$time'",$db);
-  $anz = mysql_num_rows($db_daten);
-  if($anz==0)$anz=1;
-  
-  //daten aus der db auslesen und werte berechnen
-  $time=time()-(3600*24*3);
-  $db_daten = mysql_query("SELECT 
-  SUM(de_user_comserver.v1) AS v1, 
-  SUM(de_user_comserver.v2) AS v2,
-  SUM(de_user_comserver.v3) AS v3,
-  SUM(de_user_comserver.v4) AS v4,
-  SUM(de_user_comserver.v5) AS v5,
-  SUM(de_user_comserver.v6) AS v6,
-  SUM(de_user_comserver.v7) AS v7,
-  SUM(de_user_comserver.v8) AS v8,
-  SUM(de_user_comserver.v9) AS v9,
-  SUM(de_user_comserver.v10) AS v10,
-  SUM(de_user_comserver.v11) AS v11,
-  SUM(de_user_comserver.v12) AS v12,
-  SUM(de_user_comserver.v13) AS v13,
-  SUM(de_user_comserver.v14) AS v14,
-  SUM(de_user_comserver.v15) AS v15,
-  SUM(de_user_comserver.v16) AS v16,
-  SUM(de_user_comserver.v17) AS v17,
-  SUM(de_user_comserver.v18) AS v18,
-  SUM(de_user_comserver.v19) AS v19,
-  SUM(de_user_comserver.v20) AS v20,
-  SUM(de_user_comserver.v21) AS v21,
-  SUM(de_user_comserver.v22) AS v22,
-  SUM(de_user_comserver.v23) AS v23,
-  SUM(de_user_comserver.v24) AS v24,
-  SUM(de_user_comserver.v25) AS v25,
-  SUM(de_user_comserver.v26) AS v26,
-  SUM(de_user_comserver.v27) AS v27,
-  SUM(de_user_comserver.v28) AS v28
-  FROM de_login LEFT JOIN de_user_comserver ON(de_login.user_id = de_user_comserver.user_id) 
-  WHERE de_login.last_click > '$time'",$db);
-  
-  $row = mysql_fetch_array($db_daten);
-  
-  $server_v1=round($row['v1']/$anz);
-  $server_v2=round($row['v2']/$anz);
-  $server_v3=round($row['v3']/$anz);
-  $server_v4=round($row['v4']/$anz);
-  $server_v5=round($row['v5']/$anz);
-  $server_v6=round($row['v6']/$anz);
-  $server_v7=round($row['v7']/$anz);
-  $server_v8=round($row['v8']/$anz);
-  $server_v9=round($row['v9']/$anz);
-  $server_v10=round($row['v10']/$anz);
-  $server_v11=round($row['v11']/$anz);
-  $server_v12=round($row['v12']/$anz);
-  $server_v13=round($row['v13']/$anz);
-  $server_v14=round($row['v14']/$anz);
-  $server_v15=round($row['v15']/$anz);
-  $server_v16=round($row['v16']/$anz);
-  $server_v17=round($row['v17']/$anz);
-  $server_v18=round($row['v18']/$anz);
-  $server_v19=round($row['v19']/$anz);
-  $server_v20=round($row['v20']/$anz);
-  $server_v21=$row['v21']/$anz;
-  $server_v22=$row['v22']/$anz;
-  $server_v23=round($row['v23']/$anz);
-  $server_v24=$row['v24']/$anz;
-  $server_v25=$row['v25']/$anz;
-  $server_v26=$row['v26']/$anz;
-  $server_v27=$row['v27']/$anz;
-  $server_v28=$row['v28']/$anz;*/
-  
   
   //auswahloptionen anzeigen
   echo '<form action="optionscomserver.php" method="post">';
@@ -691,21 +626,8 @@ else //einstellungsmöglichkeiten anzeigen
   <br>Tageswert: '.$sv_max_palenium.' - Aktuelle Abstimmung: '.$server_v19.' - Deine Wahl: <input type="number" min="10" max="400" name="v19" value="'.$playervalues['v19'].'" size="10" maxlength="10">   
   </div>';
 
-  //kopfgeldklaurate
-  /*
-  if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-  echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
-  <img title="Kopfgelderoberung&<br>Der Wert gibt an wie viel Prozent Kopfgeld man pro Angriff erobern kann, wobei der Wert nicht die Kollektoreroberungsrate &uuml;berschreiten kann.<br>
-  <br><br>Erlaubte Werte: 1 bis 20 (Standard: 10)" style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0">
-  Wie viel Prozent Kopfgeld kann erobert werden?
-  <br>Tageswert: '.($sv_bounty_rate*100).'% - Aktuelle Abstimmung: '.$server_v20.'% - Deine Wahl: <input type="number" min="1" max="20" name="v20" value="'.$playervalues['v20'].'" size="10" maxlength="10">%   
-  </div>';
-  */
-  
-  /////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////
   // einstellungen für die nächste runde
-  /////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////
   
   echo '<br><div style="width: 100%; text-align: center; font-size: 18px;">Einstellungen f&uuml;r die n&auml;chste Runde</div>';
