@@ -22,9 +22,6 @@ include "../inccon.php";
 
 include "det_userdata.inc.php";
 
-//24643A79-838A-4A03-97C5-D29BF52F7F30
-//7UQ3OI3dZJoxIKbxSiUPA5zC8eNxy4dv
-
 function getmicrotime(){
 	list($usec, $sec) = explode(" ",microtime());
 	return ((float)$usec + (float)$sec);
@@ -32,9 +29,9 @@ function getmicrotime(){
 
 $time_start = getmicrotime();
 
-$db_daten=mysql_query("SELECT de_login.*, de_user_ip.*, de_user_data.*, de_login.status AS loginstatus FROM de_login LEFT JOIN de_user_ip ON(de_login.user_id = de_user_ip.user_id) 
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.*, de_user_ip.*, de_user_data.*, de_login.status AS loginstatus FROM de_login LEFT JOIN de_user_ip ON(de_login.user_id = de_user_ip.user_id) 
 	LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id)
- WHERE de_user_ip.loginhelp<>'' ORDER BY de_user_ip.loginhelp, de_user_ip.user_id",$db);
+ WHERE de_user_ip.loginhelp<>'' ORDER BY de_user_ip.loginhelp, de_user_ip.user_id");
 
 $gesuser=0;
 
@@ -56,7 +53,7 @@ $gesuser=0;
 unset($olduserid);
 unset($oldloginhelp);
   
-while($row = mysql_fetch_array($db_daten)){
+while($row = mysqli_fetch_assoc($db_daten)){
 	if(!isset($olduserid))$olduserid=$row["user_id"];
 	if(!isset($oldloginhelp))$oldloginhelp=$row["loginhelp"];
 
@@ -100,13 +97,9 @@ while($row = mysql_fetch_array($db_daten)){
 		
 }
   echo '</table><br><br>';
-echo 'Verdächtige: '.$gesuser;
-/*
-select last_ip, count(last_ip) "zaehler" from de_login group by last_ip ORDER BY `zaehler` DESC LIMIT 0, 30
-update de_login set status=2 where last_ip='217.225.120.26'
-select * from de_login where last_ip= '217.225.120.26'*/
+echo 'VerdÃ¤chtige: '.$gesuser;
 
-mysql_close($db);
+// Keine mysqli_close hier notwendig, da die Verbindung global verwaltet wird
 
   $time_end = getmicrotime();
   $ltime = number_format($time_end - $time_start,2,".","");
@@ -121,6 +114,6 @@ function modpass($pass){
 ?>
 
  <br>
- Seite in <? echo $ltime; ?> Sekunden erstellt.
+ Seite in <?php echo $ltime; ?> Sekunden erstellt.
 </body>
 </html>

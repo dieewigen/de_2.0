@@ -18,30 +18,32 @@ $action = $_GET['action'] ?? '';
 
 if (isset($_POST['absenden'])) {
     $time = date("Y-m-d H:i:s");
-    $betreff = $betreff;
-    $nachricht = $nachricht;
-    mysql_query("INSERT INTO de_news_overview (typ, betreff, nachricht, time) VALUES (1,'$betreff','$nachricht','$time')");
+    $betreff = $_POST['betreff'] ?? '';
+    $nachricht = $_POST['nachricht'] ?? '';
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_overview (typ, betreff, nachricht, time) VALUES (?, ?, ?, ?)", 
+                      [1, $betreff, $nachricht, $time]);
     echo '<br><br><h1>Nachricht erfolgreich eingetragen</h1><br><br>';
 }
 
 if (isset($_POST['edit'])) {
-    $betreff = $betreff;
-    $nachricht = $nachricht;
+    $betreff = $_POST['betreff'] ?? '';
+    $nachricht = $_POST['nachricht'] ?? '';
 
-    mysql_query("Update de_news_overview set betreff='$betreff', nachricht='$nachricht', time=time where id='$id'");
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_news_overview SET betreff=?, nachricht=?, time=time WHERE id=?",
+                      [$betreff, $nachricht, $id]);
     echo '<br><br><h1>Nachricht erfolgreich editiert</h1><br><br>';
 }
 
 if ($action == "del") {
-    mysql_query("DELETE FROM de_news_overview WHERE id='$id'");
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_news_overview WHERE id=?", [$id]);
     echo '<br><br><h1>Nachricht erfolgreich gel&ouml;scht</h1><br><br>';
 }
 
 if ($action == "aendern") {
 
-    $sel_news_edit = mysql_query("SELECT * FROM de_news_overview where id='$id'");
+    $sel_news_edit = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_news_overview WHERE id=?", [$id]);
 
-    $row = mysql_fetch_array($sel_news_edit);
+    $row = mysqli_fetch_assoc($sel_news_edit);
 
     echo '<form action="de_news.php?id='.$id.'" method="post" target="Hauptframe">
   <table border="1">
@@ -92,9 +94,9 @@ if ($action != "aendern") {
   <tr><td align="center"><h1>N a c h r i c h t e n</h1></td></tr>
   <?php
 
-      $sel_news = mysql_query("SELECT * FROM de_news_overview where typ=1 order by id desc");
+      $sel_news = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_news_overview WHERE typ=? ORDER BY id DESC", [1]);
 
-    while ($row = mysql_fetch_array($sel_news)) {
+    while ($row = mysqli_fetch_assoc($sel_news)) {
 
         $t = $row['time'];
         $time = $t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];

@@ -45,8 +45,8 @@ include "det_userdata.inc.php";
     echo '<td width="40">Ort</td>';
     echo '</tr>';
 
-$result=mysql_query("select de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort, de_login.last_ip from de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) left join de_user_info on(de_login.user_id = de_user_info.user_id) ORDER BY `user_id` DESC limit 50",$db);
-while($user = mysql_fetch_array($result))
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort, de_login.last_ip FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) LEFT JOIN de_user_info ON(de_login.user_id = de_user_info.user_id) ORDER BY `user_id` DESC LIMIT 50");
+while($user = mysqli_fetch_assoc($result))
 {
   if ($user["status"]==0) $status='Inaktiv';
   if ($user["status"]==1) $status='Aktiv';
@@ -61,7 +61,7 @@ while($user = mysql_fetch_array($result))
        echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
        echo '<td>'.$user["nic"].'</td>';
        echo '<td>'.$user["reg_mail"].'</td>';
-       echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
+       echo '<td>'.modpass($user["pass"]).'</td>';
        echo '<td>'.$user["register"].'</td>';
        echo '<td>'.$user["last_login"].'</td>';
        echo '<td>'.$user["last_ip"].'</td>';
@@ -69,7 +69,6 @@ while($user = mysql_fetch_array($result))
        echo '<td>'.$status.'</td>';
        echo '<td>'.$user["logins"].'</td>';
        echo '<td>'.$user["sector"].'</td>';
-       echo '<td>'.$user["ort"].'</td>';
        echo '</tr>';
     }
   }
@@ -79,7 +78,7 @@ while($user = mysql_fetch_array($result))
     echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
     echo '<td>'.$user["nic"].'</td>';
     echo '<td>'.$user["reg_mail"].'</td>';
-    echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
+    echo '<td>'.modpass($user["pass"]).'</td>';
     echo '<td>'.$user["register"].'</td>';
     echo '<td>'.$user["last_login"].'</td>';
     echo '<td>'.$user["last_ip"].'</td>';
@@ -87,14 +86,13 @@ while($user = mysql_fetch_array($result))
     echo '<td>'.$status.'</td>';
     echo '<td>'.$user["logins"].'</td>';
     echo '<td>'.$user["sector"].'</td>';
-    echo '<td>'.$user["ort"].'</td>';
     echo '</tr>';
   }
 }
   echo '</table><br><br>';
 
 
-mysql_close($db);
+// Keine mysqli_close hier notwendig, da die Verbindung global verwaltet wird
 
   $time_end = getmicrotime();
   $ltime = number_format($time_end - $time_start,2,".","");

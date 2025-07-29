@@ -25,9 +25,6 @@ a {
 <a href="comparetool/index.php" target="Hauptframe">Compare-Tool</a><br>
 <a href="user_act.php" target="Hauptframe">Extremaktivit&auml;t</a><br><br>
 
-<a href="regdata.php" target="Hauptframe">Registrierungsdaten</a><br>
-<a href="samepw.php" target="Hauptframe">Gleiche Passwörter</a><br><br>
-
 <a href="allys.php" target="Hauptframe">Allianz-Listen</a><br>
 <a href="sektor.php" target="Hauptframe">Sektor bearbeiten</a><br>
 
@@ -36,8 +33,5 @@ a {
 <a href="umfragen.php" target="Hauptframe">Umfragen</a><br>
 
 <a href="npctool.php" target="Hauptframe">NPC-Tool</a><br><br>
-
-<a href="browse.php?id=0" target="Hauptframe">Benutzerverwaltung</a>
-<a href="rights.php" target="Hauptframe">Rechteverwaltung</a><br>
 </body>
 </html>

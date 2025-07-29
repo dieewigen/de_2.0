@@ -1,4 +1,4 @@
-<?
+<?php
 include "../inccon.php";
 include '../functions.php';
 
@@ -10,38 +10,32 @@ function getmicrotime(){
 $time_start = getmicrotime();
 
 $Tab1 = ""; $Tab2 = "";
+$FCounter = array(0, 0); // Initialisierung des Zähler-Arrays
 
-/*
-$DBData = mysql_query("SELECT de_allys.* FROM de_allys LEFT JOIN de_login ON (de_allys.leaderid = de_login.user_id) WHERE (de_login.nic) Is Null ORDER BY de_allys.id") or die ("Fehler beim Auslesen der Daten: " . mysql_error());
-while($AData = mysql_fetch_array($DBData)) {
-	$iAnz = mysql_result(mysql_query("SELECT Count(de_user_data.allytag) FROM de_user_data WHERE de_user_data.allytag='".$AData["allytag"]."'"),0);
-	if ($iAnz == 0) { $sC = ' class="r"'; } else { $sC = ''; }
-	if ($AData["coleaderid1"] == -1) { $Co1 = "---"; } else { $Co1 = $AData["coleaderid1"]; }
-	if ($AData["coleaderid2"] == -1) { $Co2 = "---"; } else { $Co2 = $AData["coleaderid2"]; }
-	$Tab1 .= "  <tr><td>".$AData["id"]."</td><td>".$AData["allyname"]."</td><td>".$AData["allytag"]."</td><td>".$Co1."</td><td>".$Co2."</td><td".$sC.">".$iAnz."</td></tr>\r\n";
-	$FCounter[0]++;
-} 
-*/
 
-$DBData = mysql_query("SELECT de_allys.*, de_login.user_id FROM de_allys, de_login WHERE de_allys.leaderid = de_login.user_id ORDER BY de_allys.id")
-		or die ("Fehler beim Auslesen der Daten: " . mysql_error());
+$DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_allys.*, de_login.user_id FROM de_allys, de_login WHERE de_allys.leaderid = de_login.user_id ORDER BY de_allys.id")
+		or die ("Fehler beim Auslesen der Daten: " . mysqli_error($GLOBALS['dbi']));
 
-while($AData = mysql_fetch_array($DBData)) {
+while($AData = mysqli_fetch_assoc($DBData)) {
 	//Anzahl der Bündnisse
-	$iAnz = mysql_result(mysql_query("SELECT Count(de_ally_partner.ally_id_1) FROM de_ally_partner WHERE de_ally_partner.ally_id_1='".$AData["id"]."' OR de_ally_partner.ally_id_2='".$AData["id"]."'"),0);
+	$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT Count(de_ally_partner.ally_id_1) AS count_allies FROM de_ally_partner WHERE de_ally_partner.ally_id_1=? OR de_ally_partner.ally_id_2=?", [$AData["id"], $AData["id"]]);
+	$row_count = mysqli_fetch_assoc($result);
+	$iAnz = $row_count['count_allies'];
 	$allytag=$AData["allytag"];
 	
 	//Mitgliederanzahl
-	$mAnz = mysql_result(mysql_query("SELECT Count(de_user_data.allytag) FROM de_user_data WHERE allytag='$allytag' AND status=1"),0);
+	$member_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT Count(de_user_data.allytag) AS member_count FROM de_user_data WHERE allytag=? AND status=1", [$allytag]);
+	$member_row = mysqli_fetch_assoc($member_result);
+	$mAnz = $member_row['member_count'];
 	if ($iAnz > 2) { $sC = ' class="r"'; } else { $sC = ''; }
 
 	//Anzahl geworbener Spieler
 	$geworben=0;
-	$result=mysql_query("SELECT * FROM de_user_data WHERE allytag='$allytag' AND status=1",$db);
-	while($rowx = mysql_fetch_array($result)){
-		$uid=$rowx[user_id];
-		$db_daten=mysql_query("SELECT owner_id FROM de_login WHERE user_id='$uid'",$db);
-		$row = mysql_fetch_array($db_daten);
+	$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE allytag=? AND status=1", [$allytag]);
+	while($rowx = mysqli_fetch_assoc($result)){
+		$uid=$rowx['user_id'];
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id=?", [$uid]);
+		$row = mysqli_fetch_assoc($db_daten);
 		$owner_id=intval($row["owner_id"]);
 		
 		$geworben+=getAnzahlGeworbeneSpielerByOwnerid($owner_id);
@@ -72,7 +66,7 @@ while($AData = mysql_fetch_array($DBData)) {
 <?php
 include "det_userdata.inc.php";
 ?>
- <b>DE-Allianzen</b> (Gefunden: <? echo intval($FCounter[1]); ?>) <br><br>
+ <b>DE-Allianzen</b> (Gefunden: <?php echo intval($FCounter[1]); ?>) <br><br>
  <table border="0" cellpadding="2" cellspacing="0">
   <tr><td>ID</td><td>Allyname</td><td>AllyTag</td><td>B&uuml;ndnisse</td><td>Mitglieder</td><td>geworben</td></tr>
 <? echo $Tab2; ?>
@@ -102,27 +96,29 @@ for ($i=0;$i<count($tagliste);$i++){
 			'<td class="tc">Koordinaten</td>';
 	echo '</tr>';
 
-	$query = "SELECT * FROM de_user_data WHERE status='1' AND allytag='$clankuerzel' ORDER BY sector, system";
+	$query = "SELECT * FROM de_user_data WHERE status='1' AND allytag=? ORDER BY sector, system";
 
-	$result = mysql_query($query);
+	$result = mysqli_execute_query($GLOBALS['dbi'], $query, [$clankuerzel]);
 
-	$nb = mysql_num_rows($result);
+	$rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+	$nb = count($rows);
 
 	$row = 0;
 
 
 	while ($row < $nb){
 		
-			$userid = mysql_result($result,$row,"user_id");
-			$sector = mysql_result($result,$row,"sector");
-			$system = mysql_result($result,$row,"system");
-			$score = mysql_result($result,$row,"score");
-			$kollies = mysql_result($result,$row,"col");
-			$spielername = mysql_result($result,$row,"spielername");
+			$userid = $rows[$row]["user_id"];
+			$sector = $rows[$row]["sector"];
+			$system = $rows[$row]["system"];
+			$score = $rows[$row]["score"];
+			$kollies = $rows[$row]["col"];
+			$spielername = $rows[$row]["spielername"];
 			$sectorjump = explode(":",$sector);
 			$sectorjump = $sectorjump[0];
 
-			$logindata= mysql_fetch_array(mysql_query("SELECT * FROM de_login where user_id='$userid'"));
+			$login_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_login WHERE user_id=?", [$userid]);
+			$logindata = mysqli_fetch_assoc($login_result);
 			
 			echo"<tr>".
 				"<td class=\"cl\"><a href=\"idinfo.php?UID=".$logindata['user_id']."\" target=\"_blank\">".$logindata['user_id']."</a></td>".
@@ -150,11 +146,13 @@ for ($i=0;$i<count($tagliste);$i++){
 
 $Tab1 = ""; $Tab2 = "";
 
- $DBData = mysql_query("SELECT de_allys.* FROM de_allys LEFT JOIN de_login ON (de_allys.leaderid = de_login.user_id) WHERE (de_login.nic) Is Null ORDER BY de_allys.id")
-           or die ("Fehler beim Auslesen der Daten: " . mysql_error());
+ $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_allys.* FROM de_allys LEFT JOIN de_login ON (de_allys.leaderid = de_login.user_id) WHERE (de_login.nic) Is Null ORDER BY de_allys.id")
+           or die ("Fehler beim Auslesen der Daten: " . mysqli_error($GLOBALS['dbi']));
 
- while($AData = mysql_fetch_array($DBData)) {
-  $iAnz = mysql_result(mysql_query("SELECT Count(de_user_data.allytag) FROM de_user_data WHERE de_user_data.allytag='".$AData["allytag"]."'"),0);
+ while($AData = mysqli_fetch_assoc($DBData)) {
+  $count_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT Count(de_user_data.allytag) AS count_tags FROM de_user_data WHERE de_user_data.allytag=?", [$AData["allytag"]]);
+  $count_row = mysqli_fetch_assoc($count_result);
+  $iAnz = $count_row['count_tags'];
   if ($iAnz == 0) { $sC = ' class="r"'; } else { $sC = ''; }
   if ($AData["coleaderid1"] == -1) { $Co1 = "---"; } else { $Co1 = $AData["coleaderid1"]; }
   if ($AData["coleaderid2"] == -1) { $Co2 = "---"; } else { $Co2 = $AData["coleaderid2"]; }
@@ -162,39 +160,41 @@ $Tab1 = ""; $Tab2 = "";
   $FCounter[0]++;
  }
 
- $DBData = mysql_query("SELECT de_allys.*, de_login.user_id FROM de_allys, de_login WHERE de_allys.leaderid = de_login.user_id ORDER BY de_allys.id")
-           or die ("Fehler beim Auslesen der Daten: " . mysql_error());
+ $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_allys.*, de_login.user_id FROM de_allys, de_login WHERE de_allys.leaderid = de_login.user_id ORDER BY de_allys.id")
+           or die ("Fehler beim Auslesen der Daten: " . mysqli_error($GLOBALS['dbi']));
 
- while($AData = mysql_fetch_array($DBData)) {
-  $iAnz = mysql_result(mysql_query("SELECT Count(de_ally_partner.ally_id_1) FROM de_ally_partner WHERE de_ally_partner.ally_id_1='".$AData["id"]."' OR de_ally_partner.ally_id_2='".$AData["id"]."'"),0);
+ while($AData = mysqli_fetch_assoc($DBData)) {
+  $ally_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT Count(de_ally_partner.ally_id_1) AS count_partners FROM de_ally_partner WHERE de_ally_partner.ally_id_1=? OR de_ally_partner.ally_id_2=?", [$AData["id"], $AData["id"]]);
+  $ally_row = mysqli_fetch_assoc($ally_result);
+  $iAnz = $ally_row['count_partners'];
   if ($iAnz > 2) { $sC = ' class="r"'; } else { $sC = ''; }
   $Tab2 .= "  <tr><td>".$AData["id"]."</td><td>".$AData["allyname"]."</td><td>".$AData["allytag"]."</td><td".$sC.">".$iAnz."</td></tr>\r\n";
   $FCounter[1]++;
  }
 ?>
 
-<b>DE-Allianzen ohne Leader</b> (Gefunden: <? echo intval($FCounter[0]); ?>) <br><br>
+<b>DE-Allianzen ohne Leader</b> (Gefunden: <?php echo intval($FCounter[0]); ?>) <br><br>
  <table border="0" cellpadding="2" cellspacing="0">
   <tr><td>ID</td><td>Allyname</td><td>AllyTag</td><td>Co1</td><td>Co2</td><td>Member</td></tr>
-<? echo $Tab1; ?>
+<?php echo $Tab1; ?>
  </table>
  <br><br>
 
- <b>DE-Allianzen mit Leader</b> (Gefunden: <? echo intval($FCounter[1]); ?>) <br><br>
+ <b>DE-Allianzen mit Leader</b> (Gefunden: <?php echo intval($FCounter[1]); ?>) <br><br>
  <table border="0" cellpadding="2" cellspacing="0">
-  <tr><td>ID</td><td>Allyname</td><td>AllyTag</td><td>B�ndnisse</td></tr>
-<? echo $Tab2; ?>
+  <tr><td>ID</td><td>Allyname</td><td>AllyTag</td><td>Bündnisse</td></tr>
+<?php echo $Tab2; ?>
  </table>
  <br><br>
 
 
- <?
+ <?php
   $time_end = getmicrotime();
   $ltime = number_format($time_end - $time_start,2,".","");
  ?>
 
  <br>
- Seite in <? echo $ltime; ?> Sekunden erstellt.
+ Seite in <?php echo $ltime; ?> Sekunden erstellt.
 
 </body>
 </html>

@@ -24,18 +24,22 @@ include "../inccon.php";
 <?php
 include "det_userdata.inc.php";
 
+// Sicherstellen, dass die Variable $action definiert ist
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+$id = isset($_REQUEST['id']) ? $_REQUEST['id'] : 0;
+
 if($action=="ak"){
 	$time=strftime("%Y-%m-%d %H:%M:%S");
-	mysql_query("UPDATE de_vote_umfragen SET status = 1, startdatum='$time' WHERE id='$id'");
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET status = 1, startdatum=? WHERE id=?", [$time, $id]);
 	echo "<h2>Vote aktiviert</h2>";
 
-	$anzahlantworten = mysql_query("Select antworten from de_vote_umfragen WHERE id='$id'");
-	$riw = mysql_fetch_array($anzahlantworten);
+	$anzahlantworten = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
+	$riw = mysqli_fetch_assoc($anzahlantworten);
 
-	$antworten = explode("|",$riw[antworten]);
+	$antworten = explode("|",$riw['antworten']);
 	$i=1;
 	while($i<=count($antworten)){
-		mysql_query("INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (0,'$id','$i')",$db);
+		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)", [0, $id, $i]);
 		$i++;
 	}
 }
@@ -43,15 +47,15 @@ if($action=="ak"){
 if($action=="deak"){
 	$endstimmen = array();
 	$counter=0;
-	$db_endstimmen=mysql_query("Select count(votefor), votefor from de_vote_stimmen  where vote_id='$id' group by votefor");
-	while($stimmen=mysql_fetch_array($db_endstimmen)){
-		$endstimmen[$counter]=$stimmen[0];
+	$db_endstimmen=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(votefor) AS count, votefor FROM de_vote_stimmen WHERE vote_id=? GROUP BY votefor", [$id]);
+	while($stimmen=mysqli_fetch_assoc($db_endstimmen)){
+		$endstimmen[$counter]=$stimmen['count'];
 		$counter++;
 	}
 
-	$anzahlantworten = mysql_query("Select antworten from de_vote_umfragen WHERE id='$id'");
-	$riw = mysql_fetch_array($anzahlantworten);
-	$antworten = explode("|",$riw[antworten]);
+	$anzahlantworten = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
+	$riw = mysqli_fetch_assoc($anzahlantworten);
+	$antworten = explode("|",$riw['antworten']);
 
 	$z=0;
 	$abgegebenestimmen=0;
@@ -75,7 +79,8 @@ if($action=="deak"){
 
 	$time=strftime("%Y-%m-%d %H:%M:%S");
 
-	mysql_query("UPDATE de_vote_umfragen SET status=2, enddatum='$time', ergebnisse='$db_ergebnisse', stimmen='$stimmen' WHERE id='$id'");
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET status=2, enddatum=?, ergebnisse=?, stimmen=? WHERE id=?", 
+	                  [$time, $db_ergebnisse, $stimmen, $id]);
 echo "<h2>Vote deaktiviert</h2>";
 
 
@@ -116,10 +121,8 @@ if(isset($_REQUEST['subentry']) && !empty($_REQUEST['frage']) && !empty($_REQUES
 	if($a9!="") $antworten = "$antworten|$a9";
 	if($a10!="") $antworten = "$antworten|$a10";
 
-	$sql="INSERT INTO de_vote_umfragen(frage, antworten, hinweis, status) VALUES ('".utf8_decode($frage)."', '".utf8_decode($antworten)."','".utf8_decode($hinweis)."',0)";
-	
-	mysql_query($sql,$db);
-
+	mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_vote_umfragen(frage, antworten, hinweis, status) VALUES (?, ?, ?, 0)", 
+	                  [utf8_decode($frage), utf8_decode($antworten), utf8_decode($hinweis)]);
 
 	echo "<h2>Umfrage erfolgreich erstellt</h2>";
 }
@@ -159,23 +162,21 @@ if(isset($_REQUEST['subedit'])){
 	if($a9!="") $antworten = "$antworten|$a9";
 	if($a10!="") $antworten = "$antworten|$a10";
 
-	$sql="UPDATE de_vote_umfragen SET frage = '".utf8_decode($frage)."', antworten='".utf8_decode($antworten)."', hinweis='".utf8_decode($hinweis)."' WHERE id='$id'";
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET frage=?, antworten=?, hinweis=? WHERE id=?", 
+	                  [utf8_decode($frage), utf8_decode($antworten), utf8_decode($hinweis), $id]);
 	
-	//echo $sql;
-	
-	mysql_query($sql, $db);
 	echo "<h2>Umfrage editiert</h2>";
 
 	$action=edit;
 }
 
 if($addant){
-	$db_umfrage=mysql_query("SELECT antworten FROM de_vote_umfragen where id='$id'");
-	$row = mysql_fetch_array($db_umfrage);
+	$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
+	$row = mysqli_fetch_assoc($db_umfrage);
 
-	$antworten = "$row[antworten]|$wantwort";
+	$antworten = $row['antworten'].'|'.$wantwort;
 
-	mysql_query("UPDATE de_vote_umfragen SET antworten='$antworten' WHERE id='$id'");
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET antworten=? WHERE id=?", [$antworten, $id]);
 	echo "<h2>weitere Antwort erfolgreich hinzugef&uuml;gt</h2>";
 
 	$action=edit;
@@ -183,7 +184,7 @@ if($addant){
 
 if($delvote)
 {
-mysql_query("Delete From de_vote_umfragen WHERE id='$id'");
+mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_vote_umfragen WHERE id=?", [$id]);
 echo "<h2>Umfrage erfolgreich gel&ouml;scht</h2>";
 }
 
@@ -203,11 +204,11 @@ echo "<h2>Umfrage erfolgreich gel&ouml;scht</h2>";
 </tr>
 
 <?php
-$db_umfrage=mysql_query("SELECT id, frage, status FROM de_vote_umfragen where status=0 order by id");
-while($row = mysql_fetch_array($db_umfrage)){
+$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, status FROM de_vote_umfragen WHERE status=0 ORDER BY id");
+while($row = mysqli_fetch_assoc($db_umfrage)){
 	echo '<tr align="center"><td class="rl" width="13">&nbsp;</td>';
-	echo '<td>'.$row[id].'</td><td><a href="umfragen.php?action=edit&id='.$row[id].'">'.utf8_encode($row[frage]).'</a></td><td>';
-	echo '<a href="umfragen.php?action=ak&id='.$row[id].'" onclick="return confirm(\'M&ouml;chtes du diese Umfrage wirklich aktivieren?\')"><font color="#FF8000">inaktiv</font></a> </td><td class="rr" width="13">&nbsp;</td></tr>';
+	echo '<td>'.$row['id'].'</td><td><a href="umfragen.php?action=edit&id='.$row['id'].'">'.utf8_encode($row['frage']).'</a></td><td>';
+	echo '<a href="umfragen.php?action=ak&id='.$row['id'].'" onclick="return confirm(\'M&ouml;chtes du diese Umfrage wirklich aktivieren?\')"><font color="#FF8000">inaktiv</font></a> </td><td class="rr" width="13">&nbsp;</td></tr>';
 }
 ?>
 
@@ -230,10 +231,10 @@ while($row = mysql_fetch_array($db_umfrage)){
 </tr>
 
 <?php
-$db_umfrage=mysql_query("SELECT id, frage, status FROM de_vote_umfragen WHERE status=1 order by id DESC");
-while($row = mysql_fetch_array($db_umfrage)){
+$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, status FROM de_vote_umfragen WHERE status=1 ORDER BY id DESC");
+while($row = mysqli_fetch_assoc($db_umfrage)){
 	echo '<tr align="center"><td class="rl" width="13">&nbsp;</td>';
-	echo '<td>'.$row[id].'</td><td><a href="umfragen.php?action=tendenz&id='.$row['id'].'">'.utf8_encode($row['frage']).'</a></td><td>';
+	echo '<td>'.$row['id'].'</td><td><a href="umfragen.php?action=tendenz&id='.$row['id'].'">'.utf8_encode($row['frage']).'</a></td><td>';
 	echo '<a href="umfragen.php?action=deak&id='.$row['id'].'" onclick="return confirm(\'M&ouml;chtes du diese Umfrage wirklich beenden?\')"><font color="#00FF00">offen</font></a> </td><td class="rr" width="13">&nbsp;</td></tr>';
 }
 ?>
@@ -257,10 +258,10 @@ while($row = mysql_fetch_array($db_umfrage)){
 </tr>
 
 <?php
-$db_umfrage=mysql_query("SELECT id, frage, status FROM de_vote_umfragen where status=2 order by id DESC");
-while($row = mysql_fetch_array($db_umfrage)){
+$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, status FROM de_vote_umfragen WHERE status=2 ORDER BY id DESC");
+while($row = mysqli_fetch_assoc($db_umfrage)){
 	echo '<tr align="center"><td class="rl" width="13">&nbsp;</td>';
-	echo '<td>'.$row[id].'</td><td><a href="umfragen.php?action=show&id='.$row[id].'">'.utf8_encode($row[frage]).'</a></td><td>';
+	echo '<td>'.$row['id'].'</td><td><a href="umfragen.php?action=show&id='.$row['id'].'">'.utf8_encode($row['frage']).'</a></td><td>';
 	echo '<font color="#FF0000">geschlossen</font></td><td class="rr" width="13">&nbsp;</td></tr>';
 }
 ?>
@@ -277,32 +278,32 @@ while($row = mysql_fetch_array($db_umfrage)){
 
 <?php
 	if($action=="edit"){
-	$db_umfrage=mysql_query("SELECT id, frage, hinweis, antworten, status FROM de_vote_umfragen where id='$id'");
-	$row = mysql_fetch_array($db_umfrage);
+	$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, hinweis, antworten, status FROM de_vote_umfragen WHERE id=?", [$id]);
+	$row = mysqli_fetch_assoc($db_umfrage);
 
 	?>
 	<form action="umfragen.php" methode="post">
 	<table border="1" width="600px" bordercolor="#3399FF">
 	<tr>
-	<td colspan="2" class="fett" align="center">Umfrage <? if($row[status]==0)echo 'editieren'; else echo 'nicht editierbar';  ?></td>
+	<td colspan="2" class="fett" align="center">Umfrage <?php if($row['status']==0)echo 'editieren'; else echo 'nicht editierbar';  ?></td>
 	</tr>
 	<tr>
 	<td>Frage:</td>
-	<td><input type="text" name="frage" size="48" value="<? echo utf8_encode($row[frage]).'"'; if($row[status]!=0)echo 'disabled'; ?>></td>
+	<td><input type="text" name="frage" size="48" value="<?php echo utf8_encode($row['frage']).'"'; if($row['status']!=0)echo 'disabled'; ?>></td>
 	</tr>
 	<tr>
 	<td valign="top">Hinweis:</td>
-	<td><textarea name="hinweis" cols="70" rows="20" <? if($row[status]!=0)echo 'disabled'; ?>><?php echo utf8_encode($row['hinweis']); ?></textarea></td>
+	<td><textarea name="hinweis" cols="70" rows="20" <?php if($row['status']!=0)echo 'disabled'; ?>><?php echo utf8_encode($row['hinweis']); ?></textarea></td>
 	</tr>
-	<?
+	<?php
 	$i=0;
 
-	$antworten = explode("|",$row[antworten]);
+	$antworten = explode("|",$row['antworten']);
 
 	while($i<count($antworten)){
 		$zaehler=$i+1;
 		echo '<tr align="center"><td>'.$zaehler.'</td><td><input type="text" name="a'.$zaehler.'" value="'.utf8_encode($antworten[$i]).'" size="48"';
-		if($row[status]!=0){
+		if($row['status']!=0){
 			echo "disabled";
 		}
 		echo '></td></tr>';
@@ -310,14 +311,14 @@ while($row = mysql_fetch_array($db_umfrage)){
 	}
 	?>
 	<tr>
-	<td colspan="2" align="center"><input type="submit" <? if($row[status]!=0)echo 'disabled'; ?> class="buttons" name="subedit" value="&Auml;nderungen speichern"></td>
+	<td colspan="2" align="center"><input type="submit" <?php if($row['status']!=0)echo 'disabled'; ?> class="buttons" name="subedit" value="&Auml;nderungen speichern"></td>
 	</tr>
 	</table>
-	<input type="hidden" name="id" value="<? echo $id; ?>">
+	<input type="hidden" name="id" value="<?php echo $id; ?>">
 	</form>
 	<form action="umfragen.php?action=edit" methode="post">
-	<?
-	if(count($antworten)<10 && $row[status]==0){
+	<?php
+	if(count($antworten)<10 && $row['status']==0){
 	?>
 
 	<table border="1" width="325"  bordercolor="#3399FF">
@@ -334,7 +335,7 @@ while($row = mysql_fetch_array($db_umfrage)){
 	</table>
 	<br><br>
 
-	<?
+	<?php
 	}
 	?>
 	<table border="1" width="325"  bordercolor="#3399FF">
@@ -345,7 +346,7 @@ while($row = mysql_fetch_array($db_umfrage)){
 	<td align="center"><input type="submit" class="buttons" name="delvote" value="Umfrage l&ouml;schen" onclick="return confirm('M&ouml;chtes du diese Umfrage wirklich l&ouml;schen?')"></td>
 	</tr>
 	</table>
-	<input type="hidden" name="id" value="<? echo $id; ?>">
+	<input type="hidden" name="id" value="<?php echo $id; ?>">
 	</form>
 <?php
 	}elseif($anzant){
@@ -414,18 +415,18 @@ while($row = mysql_fetch_array($db_umfrage)){
 
 
 if($action=="show"){
-	$db_checkobende=mysql_query("Select frage, antworten, hinweis, stimmen, status, startdatum, enddatum, ergebnisse from de_vote_umfragen where status=2 and id='$id'");
+	$db_checkobende=mysqli_execute_query($GLOBALS['dbi'], "SELECT frage, antworten, hinweis, stimmen, status, startdatum, enddatum, ergebnisse FROM de_vote_umfragen WHERE status=2 AND id=?", [$id]);
 
-	if(mysql_num_rows($db_checkobende)>0){
-
-			$row=mysql_fetch_array($db_checkobende);
-			?>
-			<br><br><br><br>
-			<table border="0" cellpadding="0" cellspacing="0" width="600">
+	if(mysqli_num_rows($db_checkobende)>0)
+	{
+		$row=mysqli_fetch_assoc($db_checkobende);
+		?>
+		<br><br><br><br>
+		<table border="0" cellpadding="0" cellspacing="0" width="600">
 			<tr height="37" align="center">
-			<td class="rol">&nbsp;</td>
-			<td class="ro" colspan="1"><?php echo utf8_encode($row['frage']); ?></td>
-			<td class="ror">&nbsp;</td>
+				<td class="rol">&nbsp;</td>
+				<td class="ro" colspan="1"><?php echo utf8_encode($row['frage']); ?></td>
+				<td class="ror">&nbsp;</td>
 			</tr>
 			<tr height="20">
 			<td class="rl" width="13">&nbsp;</td>
@@ -440,8 +441,8 @@ if($action=="show"){
 
 					<?php
 					//aktive Spieler auslesen
-					$db_spieleranz=mysql_query("SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE npc=0 AND sector>1");
-					$rows=mysql_fetch_array($db_spieleranz);
+					$db_spieleranz=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE npc=0 AND sector>1");
+					$rows=mysqli_fetch_assoc($db_spieleranz);
 					$spieler_anz=$rows['anzahl'];
 
 					//Prozentwert berechnen
@@ -452,32 +453,28 @@ if($action=="show"){
 					der Spieler an der Umfrage teilgenommen!</td>
 					</tr>
 
-					<tr height="25">
-					<td class="cell">&nbsp;Ende: <? echo str_replace(" ","&nbsp;&nbsp;/&nbsp;&nbsp;",$row['enddatum']); ?></td>
-					<td  cellspacing="2"  class="cell">&nbsp;</td>
-					</tr>
-
-					<tr height="25">
+	<tr height="25">
+	<td class="cell">&nbsp;Ende: <?php echo str_replace(" ","&nbsp;&nbsp;/&nbsp;&nbsp;",$row['enddatum']); ?></td>
+	<td  cellspacing="2"  class="cell">&nbsp;</td>
+	</tr>					<tr height="25">
 					<td colspan="4" class="cell">Hinweis: <?php echo nl2br(utf8_encode($row['hinweis'])); ?></td>
 					</tr>
 					<tr>
 					<td colspan="4">
 					<table border="0" width="100%" cellspacing="2" cellpadding="0">
-					<?
+					<?php
 
-					$antworten = explode("|",$row[antworten]);
-					$ergebnisse = explode("|",$row[ergebnisse]);
-					$i=0;
-					$farbe=0;
-					while($i<count($antworten)){
-
-						echo "
+	$antworten = explode("|",$row['antworten']);
+	$ergebnisse = explode("|",$row['ergebnisse']);
+	$i=0;
+	$farbe=0;
+	while($i<count($antworten)){						echo "
 						<tr  class=\"cell\">
 						<td height=\"25\">&nbsp;".utf8_encode($antworten[$i])."</td><td>&nbsp;";
 						$prozente = number_format(($ergebnisse[$i]*100)/$stimmen[0],2,",",".");
 						?>
 						<img src="g/vote/l<?php echo $farbe; ?>.gif" border="0"><img src="g/vote/m<?php echo $farbe; ?>.gif" border="0" width="<?php echo $prozente;?>" height="9"><img src="g/vote/r<?php echo $farbe; ?>.gif">
-						<?
+						<?php
 						echo "</td><td width=\"40\" nowrap>&nbsp;$ergebnisse[$i]</td><td width=\"50\" nowrap>";
 
 
@@ -516,25 +513,25 @@ if($action=="show"){
 			<td class="rur" width="13">&nbsp;</td>
 			</tr>
 			</table>
-			<?
+		<?php
 	}
-}
+} // Ende des if($action=="show") Blocks
 
 
-if($action=="tendenz"){
-	$db_vorabdaten=mysql_query("Select frage, antworten, hinweis, stimmen, status, startdatum, ergebnisse from de_vote_umfragen where status=1 and id='$id'");
-	$row=mysql_fetch_array($db_vorabdaten);
+if($action=="tendenz"){ // Start des tendenz-Blocks
+	$db_vorabdaten=mysqli_execute_query($GLOBALS['dbi'], "SELECT frage, antworten, hinweis, stimmen, status, startdatum, ergebnisse FROM de_vote_umfragen WHERE status=1 AND id=?", [$id]);
+	$row=mysqli_fetch_assoc($db_vorabdaten);
 
 
 	$vorabstimmen = array();
 
 	$counter=0;
-	$db_stimmen=mysql_query("Select count(votefor), votefor from de_vote_stimmen  where vote_id='$id' group by votefor");
-	while($stimmen=mysql_fetch_array($db_stimmen))
+	$db_stimmen=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(votefor) AS count, votefor FROM de_vote_stimmen WHERE vote_id=? GROUP BY votefor", [$id]);
+	while($stimmen=mysqli_fetch_assoc($db_stimmen))
 	{
-	$vorabstimmen[$counter]=$stimmen[0];
-	$counter++;
-	}
+		$vorabstimmen[$counter]=$stimmen['count'];
+		$counter++;
+	} // Ende der while($stimmen=mysqli_fetch_assoc($db_stimmen)) Schleife
 
 
 
@@ -543,7 +540,7 @@ if($action=="tendenz"){
 	<table border="0" cellpadding="0" cellspacing="0" width="600">
 	<tr height="37" align="center">
 	<td class="rol">&nbsp;</td>
-	<td class="ro" colspan="1"><? echo $row[frage]; ?></td>
+	<td class="ro" colspan="1"><?php echo $row['frage']; ?></td>
 	<td class="ror">&nbsp;</td>
 	</tr>
 	<tr height="20">
@@ -554,19 +551,19 @@ if($action=="tendenz"){
 	<table border="0" width="100%"  cellspacing="2" cellpadding="0">
 
 	<tr height="20">
-	<td class="cell"  cellspacing="2">&nbsp;Start: <? echo str_replace(" ","&nbsp;&nbsp;/&nbsp;&nbsp;",$row[startdatum]); ?></td>
+	<td class="cell"  cellspacing="2">&nbsp;Start: <?php echo str_replace(" ","&nbsp;&nbsp;/&nbsp;&nbsp;",$row['startdatum']); ?></td>
 	<td class="cell"  cellspacing="2" align="center">Es haben bis jetzt
 
 	<?php
 
 	//include("../cache/anz_user.tmp");
-	$db_daten=mysql_query("SELECT user_id FROM de_user_data WHERE npc=0 AND sector>1",$db);
-	$gesamtuser = mysql_num_rows($db_daten);							   
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=0 AND sector>1");
+	$gesamtuser = mysqli_num_rows($db_daten);							   
 
 
-	$anzahlantworten = mysql_query("Select antworten from de_vote_umfragen WHERE id='$id'");
-	$riw = mysql_fetch_array($anzahlantworten);
-	$antworten = explode("|",$riw[antworten]);
+	$anzahlantworten = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
+	$riw = mysqli_fetch_assoc($anzahlantworten);
+	$antworten = explode("|",$riw['antworten']);
 
 
 	$temp=0;
@@ -574,33 +571,32 @@ if($action=="tendenz"){
 	while($temp<(count($vorabstimmen))){
 		$abgegebenestimmen = $abgegebenestimmen + $vorabstimmen[$temp];
 		$temp++;
-	}
+	} // Ende der while($temp<(count($vorabstimmen))) Schleife
 	echo number_format((($abgegebenestimmen-count($antworten))*100)/$gesamtuser,2,",",".")."%";
 	?>
 	der Spieler an der Umfrage teilgenommen!</td>
 	</tr>
 
 	<tr height="25">
-	<td colspan="4" class="cell">&nbsp;Hinweis: <? echo nl2br($row['hinweis']); ?></td>
+	<td colspan="4" class="cell">&nbsp;Hinweis: <?php echo nl2br($row['hinweis']); ?></td>
 	</tr>
 	<tr>
 	<td colspan="4">
 	<table border="0" width="100%" cellspacing="2" cellpadding="0">
-	<?
+	<?php
 
-	$antworten = explode("|",$row[antworten]);
+	$antworten = explode("|",$row['antworten']);
 
 	$i=0;
 	$farbe=0;
 	while($i<count($antworten)){
-
-	echo "
-	<tr  class=\"cell\">
-	<td height=\"25\">&nbsp;".utf8_encode($antworten[$i])."</td><td>&nbsp;";
+		echo "
+		<tr  class=\"cell\">
+		<td height=\"25\">&nbsp;".utf8_encode($antworten[$i])."</td><td>&nbsp;";
 	$prozente = number_format((($vorabstimmen[$i]-1)*100)/($abgegebenestimmen-count($antworten)),2,",",".");
 	?>
-	<img src="../g/vote/l<? echo $farbe; ?>.gif" border="0"><img src="../g/vote/m<? echo $farbe; ?>.gif" border="0" width="<? echo $prozente;?>" height="9"><img src="../g/vote/r<? echo $farbe; ?>.gif">
-	<?
+	<img src="../g/vote/l<?php echo $farbe; ?>.gif" border="0"><img src="../g/vote/m<?php echo $farbe; ?>.gif" border="0" width="<?php echo $prozente;?>" height="9"><img src="../g/vote/r<?php echo $farbe; ?>.gif">
+	<?php
 	echo '</td><td width="40" nowrap>&nbsp;'.($vorabstimmen[$i]-1).'</td><td width="50" nowrap>';
 
 
@@ -613,15 +609,15 @@ if($action=="tendenz"){
 
 	if($farbe==0)
 	{
-	$farbe=1;
+		$farbe=1;
 	}
 	else
 	{
-	$farbe=0;
+		$farbe=0;
 	}
 
 	$i=$i+1;
-	}
+	} // Ende der while($i<count($antworten)) Schleife
 
 	echo '<tr class="cell"  height="25"><td colspan="2" align="right"><b>Insgesamt:</b>&nbsp;&nbsp;</td><td>&nbsp;'.($stimmengesamt-count($antworten)).'</td><td>&nbsp;'.$prozentegesamt.'%</td></tr>';
 
@@ -642,8 +638,7 @@ if($action=="tendenz"){
 	<td class="rur" width="13">&nbsp;</td>
 	</tr>
 	</table>
-				<?
-
+				<?php
 }
 ?>
 

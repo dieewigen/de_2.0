@@ -22,17 +22,6 @@ include "../inccon.php";
 
 $show_statistic=isset($_GET['statistic']) ? $_GET['statistic'] : 0;
 
-/*
-echo'
-IP Adressen des gleichen Oktetts:
-<a href="multi.php?okt=1">[ 1 ]</a> -
-<a href="multi.php?okt=2">[ 2 ]</a> -
-<a href="multi.php?okt=3">[ 3 ]</a> -
-<a href="multi.php?okt=4">[ 4 ]</a> <br><br><br>';
-if(!isset($okt)){
-	$okt=4;
-}
-*/
 
 $okt=4;
 
@@ -43,14 +32,14 @@ $gesuser=0;
 
 if($show_statistic==1 || $show_statistic==2){
 	//alle verdächtigen IP-Adressen auslesen, letzte IP
-	$sql="SELECT SUBSTRING_INDEX(last_ip, '.', $okt) AS last_ip, COUNT(last_ip) 'zaehler' FROM de_login WHERE last_ip<>'127.0.0.1' GROUP BY SUBSTRING_INDEX(last_ip, '.', $okt) ORDER BY `zaehler` DESC, `last_ip` ASC" ;
+	$sql="SELECT SUBSTRING_INDEX(last_ip, '.', ?) AS last_ip, COUNT(last_ip) 'zaehler' FROM de_login WHERE last_ip<>'127.0.0.1' GROUP BY SUBSTRING_INDEX(last_ip, '.', ?) ORDER BY `zaehler` DESC, `last_ip` ASC" ;
 	//echo $sql;
 
-	$db_daten=mysql_query($sql,$db);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$okt, $okt]);
 
 	
 
-	while($row = mysql_fetch_array($db_daten)){
+	while($row = mysqli_fetch_assoc($db_daten)){
 		//echo '<br>'.$row['last_ip'].'/'.$row['zaehler'];
 		if (($row["zaehler"]>1)&&($row["last_ip"]<>'')){
 			$z=$row["zaehler"]; $ip=$row["last_ip"];
@@ -79,10 +68,10 @@ if($show_statistic==1 || $show_statistic==2){
 			echo '</tr>';
 
 
-			$result=mysql_query("select de_login.last_ip, de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort from de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) left join de_user_info on(de_login.user_id = de_user_info.user_id) where last_ip like '$ip%' order by pass",$db);
+			$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.last_ip, de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) LEFT JOIN de_user_info ON(de_login.user_id = de_user_info.user_id) WHERE last_ip LIKE CONCAT(?, '%') ORDER BY pass", [$ip]);
 
 			$oldpass='';
-			while($user = mysql_fetch_array($result)){
+			while($user = mysqli_fetch_assoc($result)){
 				if ($oldpass==$user["pass"]) $str=' class="r"'; else $str='';
 				$oldpass=$user["pass"];
 
@@ -142,13 +131,13 @@ if($show_statistic==1 || $show_statistic==2){
 	$time=date("Y-m-d H:i:s", time()-3600*24*$tage);
 
 	//alle vorhandenen IP-Adressen in ein Array packen
-	$sql="SELECT * FROM de_user_ip WHERE time>'$time' GROUP BY ip" ;
+	$sql="SELECT * FROM de_user_ip WHERE time>? GROUP BY ip" ;
 	//echo '<br>'.$sql.'<br>';
 
 	$ip_adressen=array();
 
-	$db_daten=mysql_query($sql,$db);
-	while($row = mysql_fetch_array($db_daten)){
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time]);
+	while($row = mysqli_fetch_assoc($db_daten)){
 		$ip_adressen[]=$row['ip'];
 	}
 
@@ -170,18 +159,18 @@ if($show_statistic==1 || $show_statistic==2){
 	for($i=0;$i<count($ip_adressen);$i++){
 		$ip=$ip_adressen[$i];
 
-		$sql="SELECT COUNT(DISTINCT user_id) AS anzahl FROM de_user_ip WHERE time>'$time' AND ip='$ip';";
+		$sql="SELECT COUNT(DISTINCT user_id) AS anzahl FROM de_user_ip WHERE time>? AND ip=?;";
 		//echo '<br>'.$sql.'<br>';
-		$result=mysql_query($sql,$db);
-		$rowx = mysql_fetch_array($result);
+		$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
+		$rowx = mysqli_fetch_assoc($result);
 		$anzahl=$rowx['anzahl'];
 
 		if($rowx['anzahl']>1){
 
 			//die beteiligten Spieler ausgeben
-			$sql="SELECT * FROM de_user_ip LEFT JOIN de_login ON(de_user_ip.user_id=de_login.user_id) WHERE time>'$time' AND ip='$ip' GROUP BY de_user_ip.user_id;";
+			$sql="SELECT * FROM de_user_ip LEFT JOIN de_login ON(de_user_ip.user_id=de_login.user_id) WHERE time>? AND ip=? GROUP BY de_user_ip.user_id;";
 			//echo '<br>'.$sql.'<br>';
-			$result=mysql_query($sql,$db);
+			$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
 	
 			echo '<table border="0" cellpadding="2" cellspacing="0" width="200">';
 			echo '<tr>';
@@ -202,7 +191,7 @@ if($show_statistic==1 || $show_statistic==2){
 			echo '</tr>';
 
 			$oldpass='';
-			while($user = mysql_fetch_array($result)){
+			while($user = mysqli_fetch_assoc($result)){
 				if ($oldpass==$user["pass"]) $str=' class="r"'; else $str='';
 				$oldpass=$user["pass"];
 
@@ -239,10 +228,10 @@ if($show_statistic==1 || $show_statistic==2){
 						</tr>
 			';
 
-			$sql="SELECT * FROM de_user_ip WHERE time>'$time' AND ip='$ip' ORDER BY time;";
+			$sql="SELECT * FROM de_user_ip WHERE time>? AND ip=? ORDER BY time;";
 			//echo '<br>'.$sql.'<br>';
-			$result=mysql_query($sql,$db);
-			while($rowx = mysql_fetch_array($result)){
+			$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
+			while($rowx = mysqli_fetch_assoc($result)){
 				echo '<tr>';
 
 				echo '<td>'.$rowx['user_id'].'</td>';
@@ -268,77 +257,7 @@ if($show_statistic==1 || $show_statistic==2){
 	
 	echo '<br><br>';
 
-	/*
-	while($row = mysql_fetch_array($db_daten)){
-		//echo '<br>'.$row['last_ip'].'/'.$row['zaehler'];
-		if (($row["zaehler"]>1)&&($row["last_ip"]<>'')){
-			$z=$row["zaehler"]; $ip=$row["last_ip"];
-			$ipz=$ip;
-			if ($ipz=='212.227.110.246') $ipz='!!! 1&1 !!!';
-			//kopf mit ip und anzahl
-			echo '<table border="0" cellpadding="2" cellspacing="0" width="200">';
-			echo '<tr>';
-			echo '<td align="center">IP: '.$ipz.' Anzahl: '.$z.'</td>';
-			echo '</tr>';
-			echo '</table>';
-
-			echo '<table border="0" cellpadding="2" cellspacing="0">';
-			echo '<tr>';
-			echo '<td width="50">UserID</td>';
-			echo '<td width="150">Name</td>';
-			echo '<td width="200">E-Mail</td>';
-			echo '<td width="150">Passwort</td>';
-			echo '<td width="140">Registriert</td>';
-			echo '<td width="140">Letzter Login</td>';
-			echo '<td width="70">Status</td>';
-			echo '<td width="40">Logins</td>';
-			echo '<td width="40">Sektor</td>';
-			echo '<td width="40">Ort</td>';
-			echo '<td width="40">IP</td>';
-			echo '</tr>';
-
-
-			$result=mysql_query("select de_login.last_ip, de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort from de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) left join de_user_info on(de_login.user_id = de_user_info.user_id) where last_ip like '$ip%' order by pass",$db);
-
-			$oldpass='';
-			while($user = mysql_fetch_array($result)){
-				if ($oldpass==$user["pass"]) $str=' class="r"'; else $str='';
-				$oldpass=$user["pass"];
-
-				if ($user["status"]==0) $status='Inaktiv';
-				if ($user["status"]==1) $status='Aktiv';
-				if ($user["status"]==2) $status='Gesperrt';
-				if ($user["status"]==3) $status='Urlaub';
-
-				echo '<tr>';
-				echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
-				echo '<td>'.$user["nic"].'</td>';
-				echo '<td>'.$user["reg_mail"].'</td>';
-				echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
-				echo '<td>'.$user["register"].'</td>';
-				echo '<td>'.$user["last_login"].'</td>';
-				$status.=' <a href="de_set_user_status.php?uid='.$user["user_id"].'&status=2" target="setuserstatus">[S]</a>';
-				echo '<td>'.$status.'</td>';
-				echo '<td>'.$user["logins"].'</td>';
-				echo '<td>'.$user["sector"].'</td>';
-				echo '<td>'.$user["ort"].'</td>';
-				echo '<td>'.$user["last_ip"].'</td>';
-				echo '</tr>';
-				$gesuser++;
-
-			}
-			echo '</table><br><br>';
-		}
-	}
-	*/
-
-
 }
-
-/*
-select last_ip, count(last_ip) "zaehler" from de_login group by last_ip ORDER BY `zaehler` DESC LIMIT 0, 30
-update de_login set status=2 where last_ip='217.225.120.26'
-select * from de_login where last_ip= '217.225.120.26'*/
 
 $time_end = getmicrotime();
 $ltime = number_format($time_end - $time_start,2,".","");

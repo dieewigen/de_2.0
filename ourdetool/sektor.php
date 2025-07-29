@@ -3,22 +3,22 @@ include "../inccon.php";
 
 function skmesaufbereitung($skmes)
 {
-$skmes=eregi_replace("\\[img\\]([^\\[]*)\\[/img\\]","<img src=\"\\1\" border=0>",$skmes);
+$skmes=preg_replace("/\\[img\\]([^\\[]*)\\[\/img\\]/i","<img src=\"\\1\" border=0>",$skmes);
 
-$skmes= eregi_replace("\[b\]", "<b>",$skmes);
-$skmes= eregi_replace("\[/b\]", "</b>",$skmes);
+$skmes= preg_replace("/\[b\]/i", "<b>",$skmes);
+$skmes= preg_replace("/\[\/b\]/i", "</b>",$skmes);
 
-$skmes= eregi_replace("\[i\]", "<i>",$skmes);
-$skmes= eregi_replace("\[/i\]", "</i>",$skmes);
+$skmes= preg_replace("/\[i\]/i", "<i>",$skmes);
+$skmes= preg_replace("/\[\/i\]/i", "</i>",$skmes);
 
-$skmes= eregi_replace("\[u\]", "<u>",$skmes);
-$skmes= eregi_replace("\[/u\]", "</u>",$skmes);
+$skmes= preg_replace("/\[u\]/i", "<u>",$skmes);
+$skmes= preg_replace("/\[\/u\]/i", "</u>",$skmes);
 
-$skmes= eregi_replace("\[center\]", "<center>",$skmes);
-$skmes= eregi_replace("\[/center\]", "</center>",$skmes);
+$skmes= preg_replace("/\[center\]/i", "<center>",$skmes);
+$skmes= preg_replace("/\[\/center\]/i", "</center>",$skmes);
 
-$skmes= eregi_replace("\[pre\]", "<pre>",$skmes);
-$skmes= eregi_replace("\[/pre\]", "</pre>",$skmes);
+$skmes= preg_replace("/\[pre\]/i", "<pre>",$skmes);
+$skmes= preg_replace("/\[\/pre\]/i", "</pre>",$skmes);
 
 $skmes = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$skmes);
 $skmes = str_replace("[CROT]","<font color=\"#F10505\">",$skmes);
@@ -26,13 +26,13 @@ $skmes = str_replace("[CDE]","<font color=\"#3399FF\">",$skmes);
 $skmes = str_replace("[CGELB]","<font color=\"#FDFB59\">",$skmes);
 
 
-$skmes=eregi_replace("\\[email\\]([^\\[]*)\\[/email\\]","<a href=\"mailto:\\1\">\\1</a>",$skmes);
-$skmes=eregi_replace("\\[url\\]www.([^\\[]*)\\[/url\\]","<a href=\"http://www.\\1\" target=\"_blank\">\\1</a>",$skmes);
-$skmes=eregi_replace("\\[url\\]([^\\[]*)\\[/url\\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$skmes);
-$skmes=eregi_replace("\\[url=http://([^\\[]+)\\]([^\\[]*)\\[/url\\]","<a href=\"http://\\1\" target=\"_blank\">\\2</a>",$skmes);
+$skmes=preg_replace("/\\[email\\]([^\\[]*)\\[\/email\\]/i","<a href=\"mailto:\\1\">\\1</a>",$skmes);
+$skmes=preg_replace("/\\[url\\]www.([^\\[]*)\\[\/url\\]/i","<a href=\"http://www.\\1\" target=\"_blank\">\\1</a>",$skmes);
+$skmes=preg_replace("/\\[url\\]([^\\[]*)\\[\/url\\]/i","<a href=\"\\1\" target=\"_blank\">\\1</a>",$skmes);
+$skmes=preg_replace("/\\[url=http:\/\/([^\\[]+)\\]([^\\[]*)\\[\/url\\]/i","<a href=\"http://\\1\" target=\"_blank\">\\2</a>",$skmes);
 
-$skmes = eregi_replace("\\[color=#([^\\[]+)\\]([^\\[]*)\\[/color\\]","<font color=\"#\\1\" >\\2</font>",$skmes);
-$skmes = eregi_replace("\\[size=([^\\[]+)\\]([^\\[]*)\\[/size\\]","<font size=\"\\1\" >\\2</font>",$skmes);
+$skmes = preg_replace("/\\[color=#([^\\[]+)\\]([^\\[]*)\\[\/color\\]/i","<font color=\"#\\1\" >\\2</font>",$skmes);
+$skmes = preg_replace("/\\[size=([^\\[]+)\\]([^\\[]*)\\[\/size\\]/i","<font size=\"\\1\" >\\2</font>",$skmes);
 
 
 if ($skmes=='') $skmes='&nbsp;';
@@ -58,7 +58,7 @@ return $skmes;
 </head>
 <body>
 <center>
-<form method="post" action="<? echo $PHP_SELF; ?>">
+<form method="post" action="sektor.php">
 Sektornummer oder Sektorname (%):
 <input type="text" name="sektor" size="15" value=""><br><br>
 <input type="submit" name="search" value="Suchen">
@@ -67,8 +67,9 @@ Sektornummer oder Sektorname (%):
 <?php
 include "det_userdata.inc.php";
  if ($_REQUEST["savedata"]) {
-   mysql_query("UPDATE de_sector SET name = '".$_REQUEST["sektorname"]."', url = '".$_REQUEST["sektorbild"]."' WHERE sec_id = ".$_REQUEST["savesek"],$db);
-                         if (mysql_errno()) { echo '<font color="#FF0000">Error '.mysql_errno().'</font>: '.mysql_error().'<br>'; }
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET name = ?, url = ? WHERE sec_id = ?", 
+                      [$_REQUEST["sektorname"], $_REQUEST["sektorbild"], $_REQUEST["savesek"]]);
+                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<font color="#FF0000">Error '.mysqli_errno($GLOBALS['dbi']).'</font>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
    echo "Daten zu Sektor ".$_REQUEST["savesek"]." gespeichert.";
    $showsek = $_REQUEST["savesek"];
  }
@@ -78,11 +79,11 @@ include "det_userdata.inc.php";
  if ($_REQUEST["search"]) {
    switch($_REQUEST["sektor"][0]){
      case '%':
-       $DBData = mysql_query("SELECT sec_id, name FROM de_sector WHERE name LIKE '%".$sektor."%'",$db);
+       $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, name FROM de_sector WHERE name LIKE ?", ['%' . $sektor . '%']);
 
        echo '<table border="0" cellpadding="5" cellspacing="0">';
        echo '<tr><td>Sektor</td><td>Name</td><td>&nbsp;</td></tr>';
-       while($SData = mysql_fetch_array($DBData)) {
+       while($SData = mysqli_fetch_assoc($DBData)) {
          echo '<tr><td>'.$SData["sec_id"].'</td><td>'.$SData["name"].'</td><td><a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'">Anzeigen</a></td></tr>';
        }
        echo '</table><br><br>';
@@ -96,21 +97,23 @@ include "det_userdata.inc.php";
  }
 
  if ((isset($delvote)) AND ($delvote != "")) {
-   mysql_query("UPDATE de_user_data SET votefor = 0 WHERE sector = ".$showsek." AND system = ".$delvote,$db);
-                         if (mysql_errno()) { echo '<font color="#FF0000">Error '.mysql_errno().'</font>: '.mysql_error().'<br>'; }
-   echo "Vote von ".$showsek.":".$delvote." gelöscht.";
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET votefor = 0 WHERE sector = ? AND system = ?", [$showsek, $delvote]);
+                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<font color="#FF0000">Error '.mysqli_errno($GLOBALS['dbi']).'</font>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
+   echo "Vote von ".$showsek.":".$delvote." gelÃ¶scht.";
  }
 
  if ((isset($showsek)) AND ($showsek != "")) {
    if (is_numeric($showsek) == true) {
-     $spieler = mysql_result(mysql_query("SELECT count(user_id) FROM de_user_data WHERE sector = ".$showsek,$db),0);
+     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) FROM de_user_data WHERE sector = ?", [$showsek]);
+     $row = mysqli_fetch_row($result);
+     $spieler = $row[0];
      if ($spieler > 0) {
-       $DBData = mysql_query("SELECT sec_id, name, url, bk, skmes, e1, e2 FROM de_sector WHERE sec_id = ".$showsek,$db);
+       $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, name, url, bk, skmes, e1, e2 FROM de_sector WHERE sec_id = ?", [$showsek]);
 
        echo '<form method="post" action="'.$PHP_SELF.'">';
        echo '<input type="hidden" name="savesek" size="4" value="'.$showsek.'">';
        echo '<table border="0" cellpadding="5" cellspacing="0">';
-       $SData = mysql_fetch_array($DBData);
+       $SData = mysqli_fetch_assoc($DBData);
 
        echo '<tr><td>Sektor</td><td>'.$SData["sec_id"].'</td></tr>';
        echo '<tr><td>Spieler</td><td>'.$spieler.'</td></tr>';
@@ -119,18 +122,18 @@ include "det_userdata.inc.php";
 
        echo '<tr><td>Name</td><td><input type="text" name="sektorname" size="50" value="'.$SData["name"].'"></td></tr>';
 
-       if ($SData["url"] != "") { $ShowPic = '[<a href="'.$SData["url"].'" target="_blank">ANZEIGEN</a>]'; } else { $ShowPic = ""; }
-       echo '<tr><td>Sekbild</td><td><input type="text" name="sektorbild" size="50" value="'.$SData["url"].'"> '.$ShowPic.'</td></tr>';
-
-       $SKData = mysql_query("SELECT user_id, spielername, votefor, system FROM de_user_data WHERE sector = ".$SData["sec_id"]." ORDER BY system",$db);
+       $SKData = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername, votefor, system FROM de_user_data WHERE sector = ? ORDER BY system", [$SData["sec_id"]]);
        $SKVotes = '<tr><td>&nbsp;</td><td>';
-       while($SKInfo = mysql_fetch_array($SKData)) {
+       $Votes = []; // Initialisierung des Votes-Arrays
+       $nicks = []; // Initialisierung des nicks-Arrays
+       $userids = []; // Initialisierung des userids-Arrays
+       while($SKInfo = mysqli_fetch_assoc($SKData)) {
          if ($SKInfo["votefor"] != 0) { $Votes[$SKInfo["votefor"]]++; }
          $nicks[$SKInfo["system"]] = $SKInfo["spielername"];
          $userids[$SKInfo["system"]] = $SKInfo["user_id"];
 
          $SKVotes .= $SKInfo["system"].' votes for '.$SKInfo["votefor"];
-         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"].'">löschen</a>]'; }
+         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"].'">lï¿½schen</a>]'; }
          $SKVotes .= '<br>';
        }
        $SKVotes .= '</td></tr>';
@@ -157,7 +160,8 @@ include "det_userdata.inc.php";
 
        if ($_REQUEST["showskvotes"]) { echo $SKVotes; }
 
-       $BKInfo = mysql_fetch_array(mysql_query("SELECT user_id, spielername FROM de_user_data WHERE sector = ".$SData["sec_id"]." AND system = ".$SData["bk"],$db));
+       $BKResult = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername FROM de_user_data WHERE sector = ? AND system = ?", [$SData["sec_id"], $SData["bk"]]);
+       $BKInfo = mysqli_fetch_assoc($BKResult);
        if ($BKInfo == false) { echo '<tr><td>BK</td><td>---</td></tr>'; }
         else { echo '<tr><td>BK</td><td><a href="idinfo.php?UID='.$BKInfo["user_id"].'" target="_blank">'.$BKInfo["spielername"].'</a></td></tr>'; }
 
@@ -175,7 +179,7 @@ include "det_userdata.inc.php";
    }
    else { echo "Fehlerhafte Sektorangabe!"; }
  }
- else { echo "Es wurde kein Sektor gewählt."; }
+ else { echo "Es wurde kein Sektor gewï¿½hlt."; }
 ?>
 
 </center>
