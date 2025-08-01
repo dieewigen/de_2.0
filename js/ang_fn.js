@@ -213,15 +213,6 @@ function reset_map(){
 }
 
 function switch_iframe_main_container_big(file){
-	/*
-	if($('#iframe_main_container_big').css('display')=='none' || iframe_big_content_filename!=file){
-		$('#iframe_main_container_big').html('<iframe src="'+file+'" id="iframe_main_big" name="iframe_main_big" scrolling="no" height="100%" width="100%" frameBorder="0"></iframe>');
-		$('#iframe_main_container_big').css('display','');
-		$('#iframe_main_container').css('display','none');
-	}else{
-		$('#iframe_main_container').css('display','none');
-		$('#iframe_main_container_big').css('display','none');
-	}*/
 	$('#iframe_main_container_big').html('<iframe src="'+file+'" id="iframe_main_big" name="iframe_main_big" scrolling="no" height="100%" width="100%" frameBorder="0"></iframe>');
 	$('#iframe_main_container_big').css('display','');
 	$('#iframe_main_container').css('display','none');
@@ -230,16 +221,6 @@ function switch_iframe_main_container_big(file){
 }
 
 function switch_iframe_main_container(file){
-	/*
-	if($('#iframe_main_container').css('display')=='none' || iframe_big_content_filename!=file){
-		$('#iframe_main_container').html('<iframe src="'+file+'" id="iframe_main" name="iframe_main" height="100%" width="100%" frameBorder="0"></iframe>');
-		$('#iframe_main_container').css('display','');
-		$('#iframe_main_container_big').css('display','none');
-	}else{
-		$('#iframe_main_container').css('display','none');
-		$('#iframe_main_container_big').css('display','none');
-	}*/
-	
 	if($('#iframe_main_container').length>0){
 		$('#iframe_main_container').html('<iframe src="'+file+'" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe>');
 		$('#iframe_main_container').css('display','');

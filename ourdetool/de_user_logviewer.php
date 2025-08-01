@@ -8,20 +8,92 @@
  */
 require 'det_userdata.inc.php';
 require '../inc/sv.inc.php';
+require '../inc/env.inc.php';
 
-define('DIRECT',1);
-require_once 'logviewer/class/cfg.php';
-require_once 'logviewer/class/database.php';
-require_once 'logviewer/class/dbExtend.php';
+// Stelle sicher, dass eine Datenbankverbindung hergestellt ist
+if (!isset($GLOBALS['dbi'])) {
+    // Verbindung zur Hauptdatenbank
+    $GLOBALS['dbi'] = mysqli_connect(
+        $GLOBALS['env_db_dieewigen_host'], 
+        $GLOBALS['env_db_dieewigen_user'], 
+        $GLOBALS['env_db_dieewigen_password'], 
+        $GLOBALS['env_db_dieewigen_database']
+    );
+}
 
+// Erstelle direkte Verbindung zur Logging-Datenbank
+if (!isset($GLOBALS['dbi_log'])) {
+    $GLOBALS['dbi_log'] = mysqli_connect(
+        $GLOBALS['env_db_logging_host'], 
+        $GLOBALS['env_db_logging_user'], 
+        $GLOBALS['env_db_logging_password'], 
+        $GLOBALS['env_db_logging_database']
+    ) or die("Keine Verbindung zur Logging-Datenbank möglich: " . mysqli_connect_error());
+}
 
-//if(!$_REQUEST["uid"]) $_REQUEST["uid"] = 334;
-//if(!$_REQUEST["sid"]) $_REQUEST["sid"] = 1;
+// Hilfsfunktion für sql_escape
+function sqlescape($value) {
+    global $GLOBALS;
+    // Prüfe auf null oder nicht gesetzten Wert und ersetze ihn durch einen leeren String
+    if ($value === null || !isset($value)) {
+        $value = '';
+    }
+    return mysqli_real_escape_string($GLOBALS['dbi_log'], $value);
+}
+
+// Einfache Ersatzfunktionen für dbExtend
+class dbHelperFunctions {
+    public static function getInstance() {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new self();
+        }
+        return $instance;
+    }
+    
+    public function get($sql, $index = null) {
+        try {
+            // SQL-Fehler abfangen und vor der Abfrage ausgeben
+            if (!$sql) {
+                echo '<div style="color: red;">SQL-Fehler: Leere Abfrage</div>';
+                return array();
+            }
+            
+            // Debug-Ausgabe der SQL-Abfrage für die Fehlersuche
+            // echo '<div style="font-size:10px;color:#999;">DEBUG SQL: ' . htmlspecialchars($sql) . '</div>';
+            
+            $result = mysqli_query($GLOBALS['dbi_log'], $sql);
+            if (!$result) {
+                echo '<div style="color: red;">SQL-Fehler: ' . mysqli_error($GLOBALS['dbi_log']) . '</div>';
+                return array();
+            }
+            
+            $data = array();
+            while ($row = mysqli_fetch_object($result)) {
+                if ($index !== null && isset($row->$index)) {
+                    $data[$row->$index] = $row;
+                } else {
+                    $data[] = $row;
+                }
+            }
+            
+            return $data;
+        } catch (Exception $e) {
+            echo '<div style="color: red;">Exception: ' . htmlspecialchars($e->getMessage()) . '</div>';
+            return array();
+        }
+    }
+}
+
+// Kompatibilitätslayer für bestehenden Code
+class dbExtend {
+    public static function getInstance() {
+        return dbHelperFunctions::getInstance();
+    }
+}
 
 $userID = $_REQUEST["uid"];
 $serverID = $sv_servid;
-
-
 
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -158,27 +230,42 @@ background:#FFFFff;border:1px solid #FF3333; color:#000000; display:none; font-s
         </style>
     </head>
     <body leftmargin="0" topmargin="0" marginheight="0" marginwidth="0">
-    <?if((!$userID) || (!$serverID)) die('Bitte uid(userId) UND sid(serverId) angeben</body></html>');?>
+    <?php if((!$userID) || (!$serverID)) die('Bitte uid(userId) UND sid(serverId) angeben</body></html>');?>
 
         <form name="allData" action="getAjax.php">
             <input type="hidden" name="job" value="" id="job">
-            <input type="hidden" name="uid" value="<?=$userID?>">
-            <input type="hidden" name="sid" value="<?=$serverID?>">
+            <input type="hidden" name="uid" value="<?php echo $userID?>">
+            <input type="hidden" name="sid" value="<?php echo $serverID?>">
             <div id="daySelect">
-<?
+<?php
 
+// Initialisiere $startDate mit Standardwert
+$startDate = date('Y-m-d');
 
-$d = dbExtend::getInstance()->get('SELECT time from gameserverlogdata '
-			.' where serverid='.sqlescape($serverID)
-			.' and userid='.sqlescape($userID)
-			.' order by time asc limit 1',0); 
-list($startDate,$dummy) = explode(' ', $d->time);
+try {
+    // Verwenden von mysqli mit Prepared Statement auf der direkten Verbindung
+    $query = "SELECT time FROM gameserverlogdata WHERE serverid = ? AND userid = ? ORDER BY time ASC LIMIT 1";
+    $result = mysqli_execute_query($GLOBALS['dbi_log'], $query, [$serverID, $userID]);
+    
+    // Wenn Ergebnisse gefunden wurden, verwende diese
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_object($result);
+        if (isset($row->time)) {
+            list($startDate, $dummy) = explode(' ', $row->time);
+        }
+    }
+} catch (Exception $e) {
+    // Fehlerbehandlung, aber Fortfahren der Seite
+    echo '<div style="color: red">Fehler bei der Datenbankabfrage: ' . htmlspecialchars($e->getMessage()) . '</div>';
+}
+
+// Dieser Code-Block wurde bereits in der vorherigen Änderung integriert und kann entfernt werden.
 
 ?>
-                <input type="text" name="day" value="<?=$startDate?>">
+                <input type="text" name="day" value="<?php echo $startDate?>">
                 <button job="loadDay">Tag Laden</button>
                 <table> <thead> <tr><th>entfernen</th><th>Tag</th>
-                            <?for($i=0;$i<=23;$i++)echo "<th>$i</th>" ?>
+                            <?php for($i=0;$i<=23;$i++)echo "<th>$i</th>" ?>
                     </tr></thead>
                     <tbody class="dayList">
 
@@ -229,4 +316,3 @@ list($startDate,$dummy) = explode(' ', $d->time);
         </div>
     </body>
 </html>
-<?die();?>

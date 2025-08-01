@@ -78,29 +78,3 @@ $datenstring="Zeit: $datum\nIP: $ip\nDatei: ".$_SERVER['PHP_SELF']."\n".$datenst
 $fp234=fopen("logs/".$det_username.".txt", "a");
 fputs($fp234, $datenstring);
 fclose($fp234);
-//}
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//aktivit�t mitloggen
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-/*
-//db konnekten
-if(!$db)include "../inccon.php";
-//richtige tabelle ausw�hlen
-//mysql_select_db('de_supporttool', $db);
-
-//�berpr�fen ob es f�r den tag schon einen tabelleneintrag f�r den user gibt
-$zeit=strftime("%Y-%m-%d");
-$db_daten=mysql_query("SELECT * FROM de_supporttool.de_user_stat WHERE username='$det_username' AND datum='$zeit'",$db); 
-$num = mysql_num_rows($db_daten);
-
-if($num==0)mysql_query("INSERT INTO de_supporttool.de_user_stat SET username='$det_username', datum='$zeit'",$db);
-//echo "INSERT INTO de_supporttool.de_user_stat SET username='$det_username', datum='$zeit'";
-
-//aktivit�t vermerken
-$time=(int)strftime("%H");
-mysql_query("UPDATE de_supporttool.de_user_stat SET h$time=h$time+1 WHERE username='$det_username' AND datum='$zeit'",$db);
-*/
-
-?>

@@ -4,6 +4,37 @@ include "../inc/sv.inc.php";
 include "det_userdata.inc.php";
 
 $uid=$_REQUEST['uid'];
+$sendhyperfunk = isset($_POST['sendhyperfunk']) ? $_POST['sendhyperfunk'] : false;
+$sendmailregdaten = isset($_POST['sendmailregdaten']) ? $_POST['sendmailregdaten'] : false;
+$activateaccount = isset($_POST['activateaccount']) ? $_POST['activateaccount'] : false;
+$stataktiv = isset($_POST['stataktiv']) ? $_POST['stataktiv'] : false;
+$statgesperrt = isset($_POST['statgesperrt']) ? $_POST['statgesperrt'] : false;
+$staturlaub = isset($_POST['staturlaub']) ? $_POST['staturlaub'] : false;
+$locktrade = isset($_POST['locktrade']) ? $_POST['locktrade'] : false;
+$unlocktrade = isset($_POST['unlocktrade']) ? $_POST['unlocktrade'] : false;
+$statbk = isset($_POST['statbk']) ? $_POST['statbk'] : false;
+$observationgo = isset($_POST['observationgo']) ? $_POST['observationgo'] : false;
+$kommentar = isset($_POST['kommentar']) ? $_POST['kommentar'] : false;
+$infostomail = isset($_POST['infostomail']) ? $_POST['infostomail'] : false;
+$mail = isset($_POST['mail']) ? $_POST['mail'] : "none";
+$savedata = 0; // Initialisiere $savedata
+
+// Initialisiere weitere Variablen aus Formulardaten
+$email = isset($_POST['email']) ? $_POST['email'] : '';
+$loginname = isset($_POST['loginname']) ? $_POST['loginname'] : '';
+$spielername = isset($_POST['spielername']) ? $_POST['spielername'] : '';
+$lastlogin = isset($_POST['lastlogin']) ? $_POST['lastlogin'] : '';
+$comsperre = isset($_POST['comsperre']) ? $_POST['comsperre'] : '';
+$vorname = isset($_POST['vorname']) ? $_POST['vorname'] : '';
+$nachname = isset($_POST['nachname']) ? $_POST['nachname'] : '';
+$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : '';
+$plz = isset($_POST['plz']) ? $_POST['plz'] : '';
+$ort = isset($_POST['ort']) ? $_POST['ort'] : '';
+$land = isset($_POST['land']) ? $_POST['land'] : '';
+$telefon = isset($_POST['telefon']) ? $_POST['telefon'] : '';
+$kommentartext = isset($_POST['kommentartext']) ? $_POST['kommentartext'] : '';
+$hyperfunkbetreff = isset($_POST['hyperfunkbetreff']) ? $_POST['hyperfunkbetreff'] : '';
+$hyperfunktext = isset($_POST['hyperfunktext']) ? $_POST['hyperfunktext'] : '';
 
 ?>
 <!DOCTYPE HTML>
@@ -106,8 +137,8 @@ if ($handle = opendir('user'))
 
 function insertemp($spieler)
 {
-          $empfa=mysql_query("SELECT sector, system, spielername FROM de_user_data WHERE user_id=$spieler");
-          $rowemp = mysql_fetch_array($empfa);
+          $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, system, spielername FROM de_user_data WHERE user_id=?", [$spieler]);
+          $rowemp = mysqli_fetch_array($result);
 
           $namekoords = "$rowemp[sector]:$rowemp[system] ($rowemp[spielername])";
 
@@ -118,69 +149,69 @@ if ($sendhyperfunk) {
   $hyperfunktext = str_replace("\r\n", "<br>",$hyperfunktext);
   $hyperfunktext = str_replace("\n", "<br>",$hyperfunktext);
   $hftime=strftime("%Y%m%d%H%M%S");
-  mysql_query("INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, betreff, text, time) VALUES ('$uid', '0', '0', '1', 'Die-Ewigen-Team', '$hyperfunkbetreff', '$hyperfunktext','$hftime')");
-  mysql_query("UPDATE de_user_data SET newtrans=1 WHERE user_id='$uid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, betreff, text, time) VALUES (?, '0', '0', '1', 'Die-Ewigen-Team', ?, ?,?)", [$uid, $hyperfunkbetreff, $hyperfunktext, $hftime]);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans=1 WHERE user_id=?", [$uid]);
   echo "&nbsp; &nbsp;<font color=\"#ffffff\">Hyperfunk wurde gespeichert</font><br>";
 }
 
 if ($sendmailregdaten) {
-  $db_daten = mysql_query("SELECT de_user_data.spielername, de_login.reg_mail FROM de_user_data, de_login WHERE de_user_data.user_id = '".$uid."' AND de_login.user_id = '".$uid."'",$db);
-  $mail_data = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.reg_mail FROM de_user_data, de_login WHERE de_user_data.user_id = ? AND de_login.user_id = ?", [$uid, $uid]);
+  $mail_data = mysqli_fetch_array($result);
   $det_email='noreply@die-ewigen.com';
   $emailtext = "Hallo, \r\n";
   $emailtext .= "dein Account bei Die-Ewigen (".$mail_data["spielername"].") wurde wegen der Angabe falscher Userdaten bei der Registrierung gesperrt. \r\n";
   $emailtext .= "Bitte erstelle in der Accountverwaltung ein Ticket mit den Daten (Vorname, Nachname, PLZ, Ort, Land).\r\n";
-  $emailtext .= "Falls Du Dich nicht meldest, wird dein Account nach Ablauf der Inaktivenfrist gel�scht. \r\n \r\n";
-  $emailtext .= "Mit freundlichen Gr��en \r\n";
+  $emailtext .= "Falls Du Dich nicht meldest, wird dein Account nach Ablauf der Inaktivenfrist gelöscht. \r\n \r\n";
+  $emailtext .= "Mit freundlichen Grüßen \r\n";
   $emailtext .= "Dein DE-Team";
 
   @mail($mail_data["reg_mail"], 'Die Ewigen - Accountsperrung', utf8_encode($emailtext), 'FROM: '.$det_email);
 
-  echo "&nbsp; &nbsp;<font color=\"#ffffff\">eMail an ".$mail_data["spielername"]." (".$mail_data["reg_mail"].") wurde versandt. (�ber: ".$det_email.")</font><br>";
+  echo "&nbsp; &nbsp;<font color=\"#ffffff\">eMail an ".$mail_data["spielername"]." (".$mail_data["reg_mail"].") wurde versandt. (über: ".$det_email.")</font><br>";
   $savedata=1;
 }
 
 if ($activateaccount)
 {
-  mysql_query("UPDATE de_user_data SET system=0 WHERE user_id='$uid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET system=0 WHERE user_id=?", [$uid]);
   $savedata=1;
 }
 if ($stataktiv)
 {
-  mysql_query("UPDATE de_login SET status=1 WHERE user_id='$uid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id=?", [$uid]);
   //$savedata=1;
 }
 if ($statgesperrt)
 {
-  mysql_query("UPDATE de_login SET status=2, supporter='$det_email' WHERE user_id='$uid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2, supporter=? WHERE user_id=?", [$det_email, $uid]);
   //$savedata=1;
 }
 if ($staturlaub)
 {
-  mysql_query("UPDATE de_login SET status=3 WHERE user_id='$uid'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=3 WHERE user_id=?", [$uid]);
   //$savedata=1;
 }
 if ($locktrade)
 {
-	mysql_query("UPDATE de_user_data SET trade_forbidden='1' WHERE user_id='$uid'",$db);
-	//$savedata=1;
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET trade_forbidden='1' WHERE user_id=?", [$uid]);
+  //$savedata=1;
 }
 if ($unlocktrade)
 {
-	mysql_query("UPDATE de_user_data SET trade_forbidden='0' WHERE user_id='$uid'",$db);
-	//$savedata=1;
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET trade_forbidden='0' WHERE user_id=?", [$uid]);
+  //$savedata=1;
 }
 if ($statbk)
 {
   //sektor rausfinden
-  $db_daten = mysql_query("SELECT sector,system FROM de_user_data WHERE user_id='$uid'",$db);
-  $db_daten = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, system FROM de_user_data WHERE user_id=?", [$uid]);
+  $db_daten = mysqli_fetch_array($result);
   $sector=$db_daten["sector"];
   $system=$db_daten["system"];
 
   //zum bk machen und vote zum sk entfernen
-  mysql_query("UPDATE de_user_data SET votefor=0 WHERE sector='$sector'",$db);
-  mysql_query("UPDATE de_sector SET bk='$system' WHERE sec_id='$sector'",$db);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET votefor=0 WHERE sector=?", [$sector]);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET bk=? WHERE sec_id=?", [$system, $sector]);
 
   $savedata=1;
 }
@@ -188,14 +219,12 @@ if ($statbk)
 if($observationgo) 
 {
   //Beobachtungsdaten auslesen
-  $untbeo_daten = mysql_query("SELECT observation_stat, observation_by FROM de_user_info WHERE user_id='$uid'", $db);
-  $observation_daten = mysql_fetch_array($untbeo_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT observation_stat, observation_by FROM de_user_info WHERE user_id=?", [$uid]);
+  $observation_daten = mysqli_fetch_array($result);
 
-  
-  //status �ndern
-  if($observation_daten[observation_stat] == 0) {
-    mysql_query("UPDATE de_user_info SET observation_stat = 1, observation_by = '$det_username' WHERE user_id='$uid'", $db);
-    
+  //status ändern
+  if($observation_daten['observation_stat'] == 0) {
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET observation_stat = 1, observation_by = ? WHERE user_id=?", [$det_username, $uid]);
   } 
   //$savedata=1;
 }
@@ -206,17 +235,18 @@ if ($kommentar) //daten speichern
 }
 if ($savedata==1)
 {
-   $db_daten = mysql_query("SELECT user_id FROM de_login WHERE reg_mail='$email'",$db);
-   $de_login = mysql_fetch_array($db_daten);
+   $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE reg_mail=?", [$email]);
+   $de_login = mysqli_fetch_array($result);
    if (($de_login["user_id"] != $uid) AND (intval($de_login["user_id"]) != 0)) { echo '&nbsp; &nbsp;<font color="#ff0000">eMail: '.$email.' ist bereits vergeben! ID: '.$de_login["user_id"].'</font><br>'; }
 
-   mysql_query("UPDATE de_login SET last_login='$lastlogin', com_sperre='$comsperre' WHERE user_id='$uid'",$db);
-   mysql_query("UPDATE de_user_info SET kommentar='$kommentartext', vorname='$vorname', nachname='$nachname', strasse='$strasse', plz='$plz', ort='$ort', land='$land', telefon='$telefon' WHERE user_id='$uid'",$db);
-   mysql_query("UPDATE de_login SET nic='$loginname', reg_mail='$email' WHERE user_id='$uid'",$db);
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=?, com_sperre=? WHERE user_id=?", [$lastlogin, $comsperre, $uid]);
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=?, vorname=?, nachname=?, strasse=?, plz=?, ort=?, land=?, telefon=? WHERE user_id=?", 
+   [$kommentartext, $vorname, $nachname, $strasse, $plz, $ort, $land, $telefon, $uid]);
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET nic=?, reg_mail=? WHERE user_id=?", [$loginname, $email, $uid]);
 
    $trade_ins = intval($trade_ins);
    $trade_acc = intval($trade_acc);
-   mysql_query("UPDATE de_user_data SET spielername='$spielername' WHERE user_id='$uid'",$db);
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET spielername=? WHERE user_id=?", [$spielername, $uid]);
 }
 
 if($mail=="none" && $infostomail==true)
@@ -227,20 +257,20 @@ echo "<center><font color=#FFFFFF><b>Kein DET ausgew&auml;hlt.</b></font></cente
 if($infostomail==true && $mail!="none")
 {
   //de_login
-  $db_daten=mysql_query("SELECT nic, last_ip, reg_mail, pass, register, last_login, status, logins, last_ip, clicks, pass FROM de_login WHERE user_id='$uid'",$db);
-  $de_login = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT nic, last_ip, reg_mail, pass, register, last_login, status, logins, last_ip, clicks, pass FROM de_login WHERE user_id=?", [$uid]);
+  $de_login = mysqli_fetch_array($result);
   $loginname=$de_login['nic'];
   $email=$de_login['reg_mail'];
   $lastlogin=$de_login['last_login'];
 
   //de_user_data
-  $db_daten=mysql_query("SELECT spielername, allytag, sector, system, score, tradescore, sells, col, agent, sonde, rasse, eartefakt, kartefakt, dartefakt, werberid FROM de_user_data WHERE user_id='$uid'",$db);
-  $de_user_data = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, allytag, sector, system, score, tradescore, sells, col, agent, sonde, rasse, eartefakt, kartefakt, dartefakt, werberid FROM de_user_data WHERE user_id=?", [$uid]);
+  $de_user_data = mysqli_fetch_array($result);
   $spielername=$de_user_data['spielername'];
 
   //de_user_info
-  $db_daten=mysql_query("SELECT vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar FROM de_user_info WHERE user_id='$uid'",$db);
-  $de_user_info = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar FROM de_user_info WHERE user_id=?", [$uid]);
+  $de_user_info = mysqli_fetch_array($result);
   $vorname=$de_user_info['vorname'];
   $nachname=$de_user_info['nachname'];
   $strasse=$de_user_info['strasse'];
@@ -404,9 +434,9 @@ $infos = $infos . '
 
 //hyperfunknachrichten
 $infos.='<br>Eingang<br>';
-$db_tfn=mysql_query("SELECT fromsec, fromsys, fromnic, time, betreff, text FROM de_user_hyper WHERE empfaenger='$uid' and sender=0 and archiv=0 ORDER BY time DESC",$db);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromnic, time, betreff, text FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 ORDER BY time DESC", [$uid]);
 
-  while($row = mysql_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
+  while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
 
     /*
@@ -461,9 +491,9 @@ $db_tfn=mysql_query("SELECT fromsec, fromsys, fromnic, time, betreff, text FROM 
     $infos.= '<br><br>';
   }
   $infos.='<br>Ausgang<br>';
-  $db_tfn=mysql_query("SELECT empfaenger, time, betreff, text FROM de_user_hyper WHERE absender='$uid' and sender='1' ORDER BY time DESC",$db);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT empfaenger, time, betreff, text FROM de_user_hyper WHERE absender=? and sender='1' ORDER BY time DESC", [$uid]);
 
-  while($row = mysql_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
+  while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
     /*
     $row[text]=eregi_replace("\\[img\\]([^\\[]*)\\[/img\\]","<img src=\"\\1\" border=0>",$row[text]);
@@ -518,9 +548,9 @@ $db_tfn=mysql_query("SELECT fromsec, fromsys, fromnic, time, betreff, text FROM 
     $infos.= '<br><br>';
   }
   $infos.='<br>Archiv<br>';
-  $db_tfn=mysql_query("SELECT fromsec, fromsys, fromnic, time, betreff, text FROM de_user_hyper WHERE empfaenger='$uid' and archiv='1' ORDER BY time DESC",$db);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromnic, time, betreff, text FROM de_user_hyper WHERE empfaenger=? and archiv='1' ORDER BY time DESC", [$uid]);
 
-  while($row = mysql_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
+  while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
     /*
     $row[text]=eregi_replace("\\[img\\]([^\\[]*)\\[/img\\]","<img src=\"\\1\" border=0>",$row[text]);
@@ -579,12 +609,12 @@ $db_tfn=mysql_query("SELECT fromsec, fromsys, fromnic, time, betreff, text FROM 
 
   $infos.='Nachrichten:<br><br>';
 
-  $query="SELECT time, typ, text FROM de_user_news WHERE user_id='$uid' ORDER BY time DESC";
+  $query="SELECT time, typ, text FROM de_user_news WHERE user_id=? ORDER BY time DESC";
   $th='Alle Nachrichten';
-  $db_daten=mysql_unbuffered_query($query,$db);
+  $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$uid]);
   $infos.= '<table>';
 
-  while($row = mysql_fetch_array($db_daten)) //jeder gefundene datensatz wird ausgegeben
+  while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
     $t=$row["time"];$n=$row["typ"];
     $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
@@ -621,17 +651,16 @@ echo "<h1>Es ist ein Fehler beim Versenden aufgetreten.</h1>";
 if ($uid>0)
 {
   //de_login
-  $db_daten=mysql_query("SELECT * FROM de_login WHERE user_id='$uid'",$db);
-  $de_login = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_login WHERE user_id=?", [$uid]);
+  $de_login = mysqli_fetch_array($result);
 
   //de_user_data
-  $db_daten=mysql_query("SELECT * FROM de_user_data WHERE user_id='$uid'",$db);
-  $de_user_data = mysql_fetch_array($db_daten);
-
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$uid]);
+  $de_user_data = mysqli_fetch_array($result);
 
   //de_user_info
-  $db_daten=mysql_query("SELECT vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, observation_stat, observation_by FROM de_user_info WHERE user_id='$uid'",$db);
-  $de_user_info = mysql_fetch_array($db_daten);
+  $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, observation_stat, observation_by FROM de_user_info WHERE user_id=?", [$uid]);
+  $de_user_info = mysqli_fetch_array($result);
   
   // Beobachtungsliste ?
   if($de_user_info["observation_stat"] == 1) {
@@ -698,9 +727,8 @@ if ($uid>0)
       echo '<tr>';
       echo '<td align="center">Registriert</td>';
       echo '<td align="center">'.$de_login["register"].'</td>';
-  	  echo '<td align="center">Diplomatie-Artefakte</td>';
-  	  echo '<td align="center">'.$de_user_data["dartefakt"].'</td>';
-      
+      echo '<td align="center">Koordinaten</td>';
+      echo '<td align="center">'.$de_user_data["sector"].':'.$de_user_data["system"].'</td>';      
       echo '</tr>';
       echo '<tr>';
       echo '<td align="center">Zuletzt online</td>';
@@ -709,73 +737,18 @@ if ($uid>0)
       echo '<td align="center">'.$de_user_data["allytag"].'</td>';
       echo '</tr>';
       echo '<tr>';
-      echo '<td align="center">Passwort</td>';
-      echo '<td align="center"><a href="samepw.php?spw='.$uid.'" target="_blank">'.modpass($de_login["pass"]).'</a></td>';
-	  echo '<td align="center">Koordinaten</td>';
-      echo '<td align="center">'.$de_user_data["sector"].':'.$de_user_data["system"].'</td>';      
-      echo '</tr>';
-                echo '<tr>';
-      echo '<td align="center">Vorname</td>';
-      echo '<td align="center"><input type="text" name="vorname" value="'.$de_user_info["vorname"].'"></td>';
+
+      
       echo '<td align="center">Rasse</td>';
       echo '<td align="center">'.$rasse[$de_user_data["rasse"]].'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Nachname</td>';
-      echo '<td align="center"><input type="text" name="nachname" value="'.$de_user_info["nachname"].'"></td>';
-      echo '<td align="center">Premium-Account</td>';
-      if($de_user_data["patime"]>time())$palz=' ('.date("d.m.Y - G:i".')', $de_user_data["patime"]);else $palz='';
-      echo  '<td align="center">'.$de_user_data["premium"].$palz.'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Strasse</td>';
-      echo '<td align="center"><input type="text" name="strasse" value="'.$de_user_info["strasse"].'"></td>';
       echo '<td align="center">Kollektoren</td>';
       echo '<td align="center">'.$de_user_data["col"].'</td>';
       echo '</tr>';
       echo '<tr>';
-      echo '<td align="center">PLZ</td>';
-      echo '<td align="center"><input type="text" name="plz" value="'.$de_user_info["plz"].'"></td>';
-      echo '<td align="center">Werber ID</td>';
-      echo '<td align="center">'.$de_user_data["werberid"].'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Ort</td>';
-      echo '<td align="center"><input type="text" name="ort" value="'.$de_user_info["ort"].'"></td>';
-      echo '<td align="center">Handelsstatus</td>';
-      if ($de_user_data["trade_forbidden"] === "1")
-      {
-      		$tradestat = '<font color=red>Handeln verboten [1]</font> (<a href="info.php?unlocktrade=1&uid='.$uid.'">entsperren</a>))</font>';
-      }
-      else
-      {
-      		$tradestat = '<font color=green>Handeln erlaubt [0]</font> (<a href="info.php?locktrade=1&uid='.$uid.'">sperren</a>)</font>';
-      }
-      echo '<td align="center">'.$tradestat.'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Land</td>';
-      echo '<td align="center"><input type="text" name="land" value="'.$de_user_info["land"].'"></td>';
-      echo '<td align="center">Handelspunkte</td>';
-      echo '<td align="center">'.$de_user_data["tradescore"].'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Telefon</td>';
-      echo '<td align="center"><input type="text" name="telefon" value="'.$de_user_info["telefon"].'"></td>';
-      echo '<td align="center">Verk&auml;ufe</td>';
-      echo '<td align="center">'.$de_user_data["sells"].'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td align="center">Geburtsdatum</td>';
-      echo '<td align="center">'.$de_user_info["tag"].'-'.$de_user_info["monat"].'-'.$de_user_info["jahr"].'</td>';
       echo '<td align="center">Com-Sperre</td>';
       echo '<td align="center"><input type="text" name="comsperre" value="'.$de_login["com_sperre"].'"></td>';
       echo '</tr>';
       echo '<tr>';
-      echo '<td align="center">Geschlecht</td>';
-      if ($de_user_info["geschlecht"]==1)$geschlecht='m&auml;nnlich';else $geschlecht='weiblich';
-      echo '<td align="center">'.$geschlecht.'</td>';
-      echo '</tr>';
 
   echo '</table>';
 

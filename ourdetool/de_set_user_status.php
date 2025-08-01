@@ -1,5 +1,17 @@
 <?php
-include "../inccon.php";
+include "../inc/sv.inc.php";
+include "../functions.php";
+include "../inc/env.inc.php";
+
+// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
+if (!isset($GLOBALS['dbi'])) {
+    $GLOBALS['dbi'] = mysqli_connect(
+        $GLOBALS['env_db_dieewigen_host'], 
+        $GLOBALS['env_db_dieewigen_user'], 
+        $GLOBALS['env_db_dieewigen_password'], 
+        $GLOBALS['env_db_dieewigen_database']
+    );
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -13,18 +25,38 @@ include "../inccon.php";
 
 include "det_userdata.inc.php";
 
-if (isset($uid))
+if (isset($_GET['uid']))
 {
-  mysql_query("UPDATE de_login set status=2, supporter='$det_email' where user_id='$uid'",$db);
+  $uid = (int)$_GET['uid'];
+  
+  // Benutzer sperren
+  mysqli_execute_query($GLOBALS['dbi'],
+    "UPDATE de_login SET status=2, supporter=? WHERE user_id=?",
+    [$det_email, $uid]
+  );
 
-  $time=strftime("%Y-%m-%d %H:%M:%S");
+  // Aktuelles Datum/Zeit mit DateTime-Objekt
+  $dateTime = new DateTime();
+  $time = $dateTime->format("Y-m-d H:i:s");
 
-  $comment = mysql_query("select kommentar from de_user_info WHERE user_id='$uid'");
-  $row = mysql_fetch_array($comment);
-
-  $eintrag = "$row[kommentar]\nDirektsperrung von $det_username über die Multiliste! \n$time";
-
-  mysql_query("UPDATE de_user_info SET kommentar='$eintrag' WHERE user_id='$uid'");
+  // Kommentar auslesen
+  $result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT kommentar FROM de_user_info WHERE user_id=?",
+    [$uid]
+  );
+  
+  if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    
+    // Neuen Eintrag erstellen
+    $eintrag = $row['kommentar'] . "\nDirektsperrung von " . $det_username . " Ã¼ber die Multiliste! \n" . $time;
+    
+    // Kommentar aktualisieren
+    mysqli_execute_query($GLOBALS['dbi'],
+      "UPDATE de_user_info SET kommentar=? WHERE user_id=?",
+      [$eintrag, $uid]
+    );
+  }
 
   echo 'User gesperrt.';
 }

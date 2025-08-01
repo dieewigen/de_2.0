@@ -11,26 +11,29 @@ include "../inccon.php";
 <br><center>
 <?php
 include "det_userdata.inc.php";
+
+$recall = isset($_GET['recall']) ? $_GET['recall'] : false;
+
 if ($uid>0)
 {
-  $query="SELECT sector, system FROM de_user_data WHERE user_id='$uid'";
-  $db_daten=mysql_query($query,$db);
-  $row = mysql_fetch_array($db_daten);
+  $query="SELECT sector, system FROM de_user_data WHERE user_id=?";
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], $query, [$uid]);
+  $row = mysqli_fetch_array($db_daten);
   $sector=$row["sector"];
   $system=$row["system"];
   echo 'Sektor: '.$sector.'<br>';
 
   if($recall)//flotte nach daheim verlegen
   {
-    mysql_query("UPDATE de_user_fleet set zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0 WHERE
-     hsec='$sector' AND hsys='$system'",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet set zielsec=hsec, zielsys=hsys, aktion=0, zeit=0, aktzeit=0, gesrzeit=0, entdeckt=0 WHERE
+     hsec=? AND hsys=?", [$sector, $system]);
     //nachricht an den account schicken
     $time=strftime("%Y%m%d%H%M%S");
-    mysql_query("INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 2,'$time','Alle Flotten wurden vom DET ins Heimatsystem verlegt.')",$db);
-    mysql_query("update de_user_data set newnews = 1 where user_id = $uid",$db);
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 2, ?, 'Alle Flotten wurden vom DET ins Heimatsystem verlegt.')", [$uid, $time]);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
   }
 
-  //recall-button für alle flotten des spielers
+  //recall-button fï¿½r alle flotten des spielers
   echo '<form action="sektorstatus.php" method="get">';
   echo '<input type="hidden" name="uid" value="'.$uid.'">';
   echo '<input type="Submit" name="recall" value="Alle Flotten von ('.$sector.':'.$system.') in das Heimatsystem verlegen"><br>';
@@ -60,31 +63,31 @@ if ($uid>0)
 <col width="45">
 </colgroup>
 <?php
-$flotten=mysql_query("SELECT zielsec, zielsys, aktion, aktzeit, hsec, hsys, zeit, e81, e82, e83, e84, e85, e86, e87 FROM de_user_fleet WHERE zielsec = $sector AND (aktion = 1 OR aktion = 2) ORDER BY zielsys, aktion ASC",$db);
+$flotten=mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec, zielsys, aktion, aktzeit, hsec, hsys, zeit, e81, e82, e83, e84, e85, e86, e87 FROM de_user_fleet WHERE zielsec = ? AND (aktion = 1 OR aktion = 2) ORDER BY zielsys, aktion ASC", [$sector]);
 $zsecold=0;$zsysold=0;
-$fa = mysql_num_rows($flotten);
-for ($i=0; $i<$fa; $i++)
+$i = 0;
+while($fleetRow = mysqli_fetch_assoc($flotten))
 {
-  $zsec1=mysql_result($flotten, $i, "zielsec");
-  $zsys1=mysql_result($flotten, $i, "zielsys");
-  $a1=mysql_result($flotten, $i, "aktion");
-  $t1=mysql_result($flotten, $i, "zeit");
-  $at1=mysql_result($flotten, $i, "aktzeit");
-  $hsec=mysql_result($flotten, $i, "hsec");
-  $hsys=mysql_result($flotten, $i, "hsys");
+  $zsec1 = $fleetRow["zielsec"];
+  $zsys1 = $fleetRow["zielsys"];
+  $a1 = $fleetRow["aktion"];
+  $t1 = $fleetRow["zeit"];
+  $at1 = $fleetRow["aktzeit"];
+  $hsec = $fleetRow["hsec"];
+  $hsys = $fleetRow["hsys"];
 
   if ($a1==0) $a1='Systemverteidigung';
   elseif ($a1==1) {$a1='Angriff'; $cl='ccr';}
   elseif ($a1==2) {$a1='Verteidigung'; $cl='ccg';}
-  elseif ($a1==3) {$a1='Rückflug'; $cl='cc';}
+  elseif ($a1==3) {$a1='Rï¿½ckflug'; $cl='cc';}
 
   if ($a1[0]=='V' && $t1==0) {$a1='Verteidige';$t1=$at1;}
 
-  //einheiten zählen
+  //einheiten zï¿½hlen
   $ge=0;
   for ($z=81;$z<=87;$z++)
   {
-    $erg=mysql_result($flotten, $i, "e$z");
+    $erg = isset($fleetRow["e$z"]) ? $fleetRow["e$z"] : 0;
     $ez[$z-81]=$erg;
     $ge=$ge+$erg;
   }
@@ -103,25 +106,24 @@ for ($i=0; $i<$fa; $i++)
   $zsecold=$zsec1;$zsysold=$zsys1;
 }
 //ankommende sektorflotten anzeigen
-$flotten=mysql_query("SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = $sector",$db);
-$fa = mysql_num_rows($flotten);
-for ($i=0; $i<$fa; $i++)
+$flotten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = ?", [$sector]);
+while($fleetRow = mysqli_fetch_assoc($flotten))
 {
-  //$zsec1=mysql_result($flotten, $i, "zielsec");
-  $sec_id=mysql_result($flotten, $i, "sec_id");
-  $a1=mysql_result($flotten, $i, "aktion");
-  $t1=mysql_result($flotten, $i, "zeit");
-  $at1=mysql_result($flotten, $i, "aktzeit");
+  //$zsec1=$fleetRow["zielsec"];
+  $sec_id=$fleetRow["sec_id"];
+  $a1=$fleetRow["aktion"];
+  $t1=$fleetRow["zeit"];
+  $at1=$fleetRow["aktzeit"];
 
   if ($a1==0) $a1='Systemverteidigung';
   elseif ($a1==1) {$a1='Angriff'; $cl='ccr';}
   elseif ($a1==2) {$a1='Verteidigung'; $cl='ccg';}
-  elseif ($a1==3) {$a1='Rückflug'; $cl='cc';}
+  elseif ($a1==3) {$a1='Rï¿½ckflug'; $cl='cc';}
 
   if ($a1[0]=='V' && $t1==0) {$a1='Verteidige';$t1=$at1;}
 
-  //einheiten zählen
-  $ge=mysql_result($flotten, $i, "e2");
+  //einheiten zï¿½hlen
+  $ge=$fleetRow["e2"];
 
   echo '<tr>';
   echo '<td class="'.$cl.'" width="14%">Sektor</td>';
@@ -176,30 +178,29 @@ for ($i=0; $i<$fa; $i++)
 <col width="45">
 </colgroup>
 <?php
-$flotten=mysql_query("SELECT zielsec, zielsys, aktion, aktzeit, hsec, hsys, zeit, e81, e82, e83, e84, e85, e86, e87 FROM de_user_fleet WHERE hsec=$sector AND aktion>0 ORDER BY hsys, aktion ASC",$db);
-$fa = mysql_num_rows($flotten);
-for ($i=0; $i<$fa; $i++)
+$flotten=mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec, zielsys, aktion, aktzeit, hsec, hsys, zeit, e81, e82, e83, e84, e85, e86, e87 FROM de_user_fleet WHERE hsec=? AND aktion>0 ORDER BY hsys, aktion ASC", [$sector]);
+while($fleetRow = mysqli_fetch_assoc($flotten))
 {
-  $zsec1=mysql_result($flotten, $i, "zielsec");
-  $zsys1=mysql_result($flotten, $i, "zielsys");
-  $a1=mysql_result($flotten, $i, "aktion");
-  $t1=mysql_result($flotten, $i, "zeit");
-  $at1=mysql_result($flotten, $i, "aktzeit");
-  $hsec=mysql_result($flotten, $i, "hsec");
-  $hsys=mysql_result($flotten, $i, "hsys");
+  $zsec1=$fleetRow["zielsec"];
+  $zsys1=$fleetRow["zielsys"];
+  $a1=$fleetRow["aktion"];
+  $t1=$fleetRow["zeit"];
+  $at1=$fleetRow["aktzeit"];
+  $hsec=$fleetRow["hsec"];
+  $hsys=$fleetRow["hsys"];
 
   if ($a1==0) $a1='Systemverteidigung';
   elseif ($a1==1) {$a1='Angriff'; $cl='ccr';}
   elseif ($a1==2) {$a1='Verteidigung'; $cl='ccg';}
-  elseif ($a1==3) {$a1='Rückflug'; $cl='cc';}
+  elseif ($a1==3) {$a1='Rï¿½ckflug'; $cl='cc';}
 
   if ($a1[0]=='V' && $t1==0) {$a1='Verteidige';$t1=$at1;}
 
-  //einheiten zählen
+  //einheiten zï¿½hlen
   $ge=0;
   for ($z=81;$z<=87;$z++)
   {
-    $erg=mysql_result($flotten, $i, "e$z");
+    $erg = isset($fleetRow["e$z"]) ? $fleetRow["e$z"] : 0;
     $ez[$z-81]=$erg;
     $ge=$ge+$erg;
   }
@@ -215,25 +216,24 @@ for ($i=0; $i<$fa; $i++)
 
 }
 //sektorflotte in bewegung anzeigen
-$flotten=mysql_query("SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion<>0 AND sec_id=$sector",$db);
-$fa = mysql_num_rows($flotten);
-for ($i=0; $i<$fa; $i++)
+$flotten=mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion<>0 AND sec_id=?", [$sector]);
+while($fleetRow = mysqli_fetch_assoc($flotten))
 {
-  $zsec1=mysql_result($flotten, $i, "zielsec");
-  $sec_id=mysql_result($flotten, $i, "sec_id");
-  $a1=mysql_result($flotten, $i, "aktion");
-  $t1=mysql_result($flotten, $i, "zeit");
-  $at1=mysql_result($flotten, $i, "aktzeit");
+  $zsec1=$fleetRow["zielsec"];
+  $sec_id=$fleetRow["sec_id"];
+  $a1=$fleetRow["aktion"];
+  $t1=$fleetRow["zeit"];
+  $at1=$fleetRow["aktzeit"];
 
   if ($a1==0) $a1='Systemverteidigung';
   elseif ($a1==1) {$a1='Angriff'; $cl='ccr';}
   elseif ($a1==2) {$a1='Verteidigung'; $cl='ccg';}
-  elseif ($a1==3) {$a1='Rückflug'; $cl='cc';}
+  elseif ($a1==3) {$a1='RÃ¼ckflug'; $cl='cc';}
 
   if ($a1[0]=='V' && $t1==0) {$a1='Verteidige';$t1=$at1;}
 
-  //einheiten zählen
-  $ge=mysql_result($flotten, $i, "e2");
+  //einheiten zï¿½hlen
+  $ge=$fleetRow["e2"];
 
   echo '<tr>';
   echo '<td class="'.$cl.'" width="14%">['.$zsec1.']</td>';
@@ -265,7 +265,7 @@ for ($i=0; $i<$fa; $i++)
 
 <?php
 }
-else echo 'Kein User ausgewählt.';
+else echo 'Kein User ausgewÃ¤hlt.';
 ?>
 </form>
 </body>

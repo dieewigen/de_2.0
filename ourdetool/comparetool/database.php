@@ -19,7 +19,23 @@
 * See COPYRIGHT.php for copyright notices and details.
 */
 
-include_once "../../lib/mysql_wrapper.inc.php";
+include_once "../../inc/sv.inc.php";
+include_once "../../functions.php";
+include_once "../../inc/env.inc.php";
+
+// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
+if (!isset($GLOBALS['dbi'])) {
+    $GLOBALS['dbi'] = mysqli_connect(
+        $GLOBALS['env_db_dieewigen_host'], 
+        $GLOBALS['env_db_dieewigen_user'], 
+        $GLOBALS['env_db_dieewigen_password'], 
+        $GLOBALS['env_db_dieewigen_database']
+    );
+    
+    if (!$GLOBALS['dbi']) {
+        die("Verbindung zur Datenbank konnte nicht hergestellt werden: " . mysqli_connect_error());
+    }
+}
 
 // no direct access
 defined( 'DIRECT' ) or die( 'Restricted access' );
@@ -66,53 +82,32 @@ class database {
 	* @param string Common prefix for all tables
 	* @param boolean If true and there is an error, go offline
 	*/
-	function database( $host='localhost', $user, $pass, $db='', $table_prefix='', $goOffline=true ) {
-		// perform a number of fatality checks, then die gracefully
-		if (!function_exists('mysql_connect')) {
-			$mosSystemError = 1;
+	function database( $host='localhost', $user='', $pass='', $db='', $table_prefix='', $goOffline=true ) {
+		// Verwende globale Datenbankverbindung statt lokaler Verbindung
+		$this->_resource = $GLOBALS['dbi'];
+		
+		// Überprüfe, ob die Datenbankverbindung existiert
+		if (!$this->_resource) {
+			$mosSystemError = 2;
 			if ($goOffline) {
 				$basePath = dirname( __FILE__ );
-				//include $basePath . '/../configuration.php';
-				//include $basePath . '/../offline.php';
-				echo "Fehler 1";
+				echo "Fehler: Keine Datenbankverbindung verfügbar.";
 				exit();
 			}
 		}
-		if (phpversion() < '4.2.0') {
-			if (!($this->_resource = @mysql_connect( $host, $user, $pass ))) {
-				$mosSystemError = 2;
-				if ($goOffline) {
-					$basePath = dirname( __FILE__ );
-					//include $basePath . '/../configuration.php';
-					//include $basePath . '/../offline.php';
-					echo "Fehler 2";
-					exit();
-				}
-			}
-		} else {
-			if (!($this->_resource = @mysql_connect( $host, $user, $pass, true ))) {
-				$mosSystemError = 2;
-				if ($goOffline) {
-					$basePath = dirname( __FILE__ );
-					//include $basePath . '/../configuration.php';
-					//include $basePath . '/../offline.php';
-					echo "Fehler 3";
-					exit();
-				}
-			}
-		}
-		if ($db != '' && !mysql_select_db( $db, $this->_resource )) {
+		
+		// Datenbank auswählen falls erforderlich
+		if ($db != '' && !mysqli_select_db($this->_resource, $db)) {
 			$mosSystemError = 3;
 			if ($goOffline) {
 				$basePath = dirname( __FILE__ );
-				//include $basePath . '/../configuration.php';
-				//include $basePath . '/../offline.php';
-				echo "Fehler 4";
+				echo "Fehler: Datenbank konnte nicht ausgewählt werden.";
 				exit();
 			}
 		}
+		
 		$this->_table_prefix = $table_prefix;
-        //@mysql_query("SET NAMES 'utf8'", $this->_resource);
+		// mysqli_query($this->_resource, "SET NAMES 'utf8'");
 		$this->_ticker = 0;
 		$this->_log = array();
 	}
@@ -140,15 +135,13 @@ class database {
 	*/
 	function getEscaped( $text ) {
 		/*
-		* Use the appropriate escape string depending upon which version of php
-		* you are running
+		* Escape string using mysqli
 		*/
-		if (version_compare(phpversion(), '4.3.0', '<')) {
-			$string = mysql_escape_string($text);
-		} else 	{
-			$string = mysql_real_escape_string($text);
+		if (!$text) {
+			return '';
 		}
-
+		
+		$string = mysqli_real_escape_string($GLOBALS['dbi'], $text);
 		return $string;
 	}
 	/**
@@ -168,7 +161,7 @@ class database {
 		if (strlen( $q ) == 1) {
 			return $q . $s . $q;
 		} else {
-			return $q{0} . $s . $q{1};
+			return $q[0] . $s . $q[1];
 		}
 	}
 	/**
@@ -254,7 +247,7 @@ class database {
 					break;
 				}
 				$l = $k - 1;
-				while ($l >= 0 && $sql{$l} == '\\') {
+				while ($l >= 0 && $sql[$l] == '\\') {
 					$l--;
 					$escaped = !$escaped;
 				}
@@ -297,17 +290,26 @@ class database {
 		}
 		$this->_errorNum = 0;
 		$this->_errorMsg = '';
-		$this->_cursor = mysql_query( $this->_sql, $this->_resource );
+		
+		// Prüfen, ob wir prepared statements verwenden können (wenn Parameter vorhanden)
+		if (strpos($this->_sql, '?') !== false) {
+			// Hier könnte man prepared statements implementieren, aber es fehlen die Parameter
+			// In dieser Umgebung bleiben wir bei direkten Abfragen
+			$this->_cursor = mysqli_query($GLOBALS['dbi'], $this->_sql);
+		} else {
+			// Normale Abfrage ohne Parameter
+			$this->_cursor = mysqli_query($GLOBALS['dbi'], $this->_sql);
+		}
+		
 		if (!$this->_cursor) {
-			$this->_errorNum = mysql_errno( $this->_resource );
-			$this->_errorMsg = mysql_error( $this->_resource )." SQL=$this->_sql";
+			$this->_errorNum = mysqli_errno($GLOBALS['dbi']);
+			$this->_errorMsg = mysqli_error($GLOBALS['dbi']) . " SQL=$this->_sql";
 			if ($this->_debug) {
-				trigger_error( mysql_error( $this->_resource ), E_USER_NOTICE );
-				//echo "<pre>" . $this->_sql . "</pre>\n";
-				if (function_exists( 'debug_backtrace' )) {
-					foreach( debug_backtrace() as $back) {
+				trigger_error(mysqli_error($GLOBALS['dbi']), E_USER_NOTICE);
+				if (function_exists('debug_backtrace')) {
+					foreach(debug_backtrace() as $back) {
 						if (@$back['file']) {
-							echo '<br />'.$back['file'].':'.$back['line'];
+							echo '<br />' . $back['file'] . ':' . $back['line'];
 						}
 					}
 				}
@@ -321,15 +323,15 @@ class database {
 	 * @return int The number of affected rows in the previous operation
 	 */
 	function getAffectedRows() {
-		return mysql_affected_rows( $this->_resource );
+		return mysqli_affected_rows($GLOBALS['dbi']);
 	}
 
-	function query_batch( $abort_on_error=true, $p_transaction_safe = false) {
+	function query_batch($abort_on_error=true, $p_transaction_safe=false) {
 		$this->_errorNum = 0;
 		$this->_errorMsg = '';
 		if ($p_transaction_safe) {
-			$si = mysql_get_server_info( $this->_resource );
-			preg_match_all( "/(\d+)\.(\d+)\.(\d+)/i", $si, $m );
+			$si = mysqli_get_server_info($GLOBALS['dbi']);
+			preg_match_all("/(\d+)\.(\d+)\.(\d+)/i", $si, $m);
 			if ($m[1] >= 4) {
 				$this->_sql = 'START TRANSACTION;' . $this->_sql . '; COMMIT;';
 			} else if ($m[2] >= 23 && $m[3] >= 19) {
@@ -338,16 +340,16 @@ class database {
 				$this->_sql = 'BEGIN;' . $this->_sql . '; COMMIT;';
 			}
 		}
-		$query_split = preg_split ("/[;]+/", $this->_sql);
+		$query_split = preg_split("/[;]+/", $this->_sql);
 		$error = 0;
 		foreach ($query_split as $command_line) {
-			$command_line = trim( $command_line );
+			$command_line = trim($command_line);
 			if ($command_line != '') {
-				$this->_cursor = mysql_query( $command_line, $this->_resource );
+				$this->_cursor = mysqli_query($GLOBALS['dbi'], $command_line);
 				if (!$this->_cursor) {
 					$error = 1;
-					$this->_errorNum .= mysql_errno( $this->_resource ) . ' ';
-					$this->_errorMsg .= mysql_error( $this->_resource )." SQL=$command_line <br />";
+					$this->_errorNum .= mysqli_errno($GLOBALS['dbi']) . ' ';
+					$this->_errorMsg .= mysqli_error($GLOBALS['dbi']) . " SQL=$command_line <br />";
 					if ($abort_on_error) {
 						return $this->_cursor;
 					}
@@ -372,23 +374,23 @@ class database {
 
 		$buf = "<table cellspacing=\"1\" cellpadding=\"2\" border=\"0\" bgcolor=\"#000000\" align=\"center\">";
 		$buf .= $this->getQuery();
-		while ($row = mysql_fetch_assoc( $cur )) {
+		while ($row = mysqli_fetch_assoc($cur)) {
 			if ($first) {
 				$buf .= "<tr>";
 				foreach ($row as $k=>$v) {
-					$buf .= "<th bgcolor=\"#ffffff\">$k</th>";
+					$buf .= "<th bgcolor=\"#ffffff\">" . htmlspecialchars($k) . "</th>";
 				}
 				$buf .= "</tr>";
 				$first = false;
 			}
 			$buf .= "<tr>";
 			foreach ($row as $k=>$v) {
-				$buf .= "<td bgcolor=\"#ffffff\">$v</td>";
+				$buf .= "<td bgcolor=\"#ffffff\">" . htmlspecialchars($v) . "</td>";
 			}
 			$buf .= "</tr>";
 		}
 		$buf .= "</table><br />&nbsp;";
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 
 		$this->_sql = $temp;
 
@@ -397,8 +399,8 @@ class database {
 	/**
 	* @return int The number of rows returned from the most recent query.
 	*/
-	function getNumRows( $cur=null ) {
-		return mysql_num_rows( $cur ? $cur : $this->_cursor );
+	function getNumRows($cur=null) {
+		return mysqli_num_rows($cur ? $cur : $this->_cursor);
 	}
 
 	/**
@@ -411,10 +413,10 @@ class database {
 			return null;
 		}
 		$ret = null;
-		if ($row = mysql_fetch_row( $cur )) {
+		if ($row = mysqli_fetch_row($cur)) {
 			$ret = $row[0];
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $ret;
 	}
 	/**
@@ -425,10 +427,10 @@ class database {
 			return null;
 		}
 		$array = array();
-		while ($row = mysql_fetch_row( $cur )) {
+		while ($row = mysqli_fetch_row($cur)) {
 			$array[] = $row[$numinarray];
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $array;
 	}
 	/**
@@ -436,19 +438,19 @@ class database {
 	* @param string The field name of a primary key
 	* @return array If <var>key</var> is empty as sequential list of returned records.
 	*/
-	function loadAssocList( $key='' ) {
+	function loadAssocList($key='') {
 		if (!($cur = $this->query())) {
 			return null;
 		}
 		$array = array();
-		while ($row = mysql_fetch_assoc( $cur )) {
+		while ($row = mysqli_fetch_assoc($cur)) {
 			if ($key) {
 				$array[$row[$key]] = $row;
 			} else {
 				$array[] = $row;
 			}
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $array;
 	}
 	/**
@@ -459,22 +461,22 @@ class database {
 	* @param string The SQL query
 	* @param object The address of variable
 	*/
-	function loadObject( &$object ) {
+	function loadObject(&$object) {
 		if ($object != null) {
 			if (!($cur = $this->query())) {
 				return false;
 			}
-			if ($array = mysql_fetch_assoc( $cur )) {
-				mysql_free_result( $cur );
-				mosBindArrayToObject( $array, $object, null, null, false );
+			if ($array = mysqli_fetch_assoc($cur)) {
+				mysqli_free_result($cur);
+				mosBindArrayToObject($array, $object, null, null, false);
 				return true;
 			} else {
 				return false;
 			}
 		} else {
 			if ($cur = $this->query()) {
-				if ($object = mysql_fetch_object( $cur )) {
-					mysql_free_result( $cur );
+				if ($object = mysqli_fetch_object($cur)) {
+					mysqli_free_result($cur);
 					return true;
 				} else {
 					$object = null;
@@ -492,19 +494,19 @@ class database {
 	* If <var>key</var> is not empty then the returned array is indexed by the value
 	* the database key.  Returns <var>null</var> if the query fails.
 	*/
-	function loadObjectList( $key='' ) {
+	function loadObjectList($key='') {
 		if (!($cur = $this->query())) {
 			return null;
 		}
 		$array = array();
-		while ($row = mysql_fetch_object( $cur )) {
+		while ($row = mysqli_fetch_object($cur)) {
 			if ($key) {
 				$array[$row->$key] = $row;
 			} else {
 				$array[] = $row;
 			}
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $array;
 	}
 	/**
@@ -515,10 +517,10 @@ class database {
 			return null;
 		}
 		$ret = null;
-		if ($row = mysql_fetch_row( $cur )) {
+		if ($row = mysqli_fetch_row($cur)) {
 			$ret = $row;
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $ret;
 	}
 	/**
@@ -528,19 +530,19 @@ class database {
 	* If <var>key</var> is not empty then the returned array is indexed by the value
 	* the database key.  Returns <var>null</var> if the query fails.
 	*/
-	function loadRowList( $key='' ) {
+	function loadRowList($key='') {
 		if (!($cur = $this->query())) {
 			return null;
 		}
 		$array = array();
-		while ($row = mysql_fetch_row( $cur )) {
+		while ($row = mysqli_fetch_row($cur)) {
 			if ($key) {
 				$array[$row[$key]] = $row;
 			} else {
 				$array[] = $row;
 			}
 		}
-		mysql_free_result( $cur );
+		mysqli_free_result($cur);
 		return $array;
 	}
 	/**
@@ -569,7 +571,7 @@ class database {
 		if (!$this->query()) {
 			return false;
 		}
-		$id = mysql_insert_id( $this->_resource );
+		$id = mysqli_insert_id($GLOBALS['dbi']);
 		($verbose) && print "id=[$id]<br />\n";
 		if ($keyName && $id) {
 			$object->$keyName = $id;
@@ -620,11 +622,11 @@ class database {
 	}
 
 	function insertid() {
-		return mysql_insert_id( $this->_resource );
+		return mysqli_insert_id($GLOBALS['dbi']);
 	}
 
 	function getVersion() {
-		return mysql_get_server_info( $this->_resource );
+		return mysqli_get_server_info($GLOBALS['dbi']);
 	}
 
 	/**
@@ -677,5 +679,11 @@ class database {
 	}
 }
 
-function sqlescape($d) { return '"'.addslashes($d).'"'; }
+function sqlescape($d) { 
+    if ($GLOBALS['dbi']) {
+        return '"' . mysqli_real_escape_string($GLOBALS['dbi'], $d) . '"';
+    } else {
+        return '"' . addslashes($d) . '"';
+    }
+}
 ?>

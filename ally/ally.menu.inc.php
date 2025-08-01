@@ -57,7 +57,7 @@ elseif (mysqli_num_rows($coleader)>=1){
 
 function has_position($position, $allytag, $userid){
 	// Whitelist für erlaubte Spaltennamen
-	$allowed_positions = array('leaderid', 'coleaderid1', 'coleaderid2', 'coleaderid3');
+	$allowed_positions = array('leaderid', 'coleaderid1', 'coleaderid2', 'coleaderid3', 'fleetcommander1', 'fleetcommander2');
 	
 	if (!in_array($position, $allowed_positions)) {
 		return false;

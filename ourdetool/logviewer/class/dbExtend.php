@@ -9,7 +9,11 @@
 class dbExtend extends database {
     private static $aryRef = array();
     public static function getInstance($num=0) {
-
+        // Initialisiere das Array, wenn es nicht existiert
+        if(!isset(self::$aryRef[$num])) {
+            self::$aryRef[$num] = null;
+        }
+        
         if(self::$aryRef[$num] == null) dbExtend::$aryRef[$num] = new self();
         return dbExtend::$aryRef[$num];
     }
@@ -25,13 +29,28 @@ class dbExtend extends database {
      * @return dbExtend
      */
     private function __construct(  ) {
-        if(!cfg::getInstance()->sql[0]->goOffline) cfg::getInstance()->sql[0]->goOffline=1;
-        parent::database(cfg::getInstance()->sql[0]->host
-            , cfg::getInstance()->sql[0]->user
-            , cfg::getInstance()->sql[0]->pass
-            , cfg::getInstance()->sql[0]->db
-            , cfg::getInstance()->sql[0]->table_prefix
-            , cfg::getInstance()->sql[0]->goOffline);
+        // Stelle sicher, dass alle benötigten Eigenschaften existieren
+        if(!isset(cfg::getInstance()->sql[0]->goOffline)) cfg::getInstance()->sql[0]->goOffline = 1;
+        if(!isset(cfg::getInstance()->sql[0]->table_prefix)) cfg::getInstance()->sql[0]->table_prefix = '';
+        
+        // Hard-coded Verbindungsparameter, falls die cfg-Werte nicht gesetzt sind
+        $user = "root";
+        $pass = "GhzLjR";
+        $host = "127.0.0.1";
+        $db = "gameserverlogdata";
+        $table_prefix = "";
+        $goOffline = 1;
+        
+        // Wenn cfg-Werte gesetzt sind, verwende diese
+        if(isset(cfg::getInstance()->sql[0]->user)) $user = cfg::getInstance()->sql[0]->user;
+        if(isset(cfg::getInstance()->sql[0]->pass)) $pass = cfg::getInstance()->sql[0]->pass;
+        if(isset(cfg::getInstance()->sql[0]->host)) $host = cfg::getInstance()->sql[0]->host;
+        if(isset(cfg::getInstance()->sql[0]->db)) $db = cfg::getInstance()->sql[0]->db;
+        if(isset(cfg::getInstance()->sql[0]->table_prefix)) $table_prefix = cfg::getInstance()->sql[0]->table_prefix;
+        if(isset(cfg::getInstance()->sql[0]->goOffline)) $goOffline = cfg::getInstance()->sql[0]->goOffline;
+        
+        // Initialisiere die Datenbankverbindung
+        parent::database($user, $pass, $host, $db, $table_prefix, $goOffline);
         if ($this->getErrorNum())  die($this->getErrorMsg());
 
     }

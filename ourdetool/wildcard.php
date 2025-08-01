@@ -1,5 +1,17 @@
 <?PHP
- include "../inccon.php";
+ include "../inc/sv.inc.php";
+ include "../functions.php";
+ include "../inc/env.inc.php";
+
+ // Stelle sicher, dass eine Datenbankverbindung vorhanden ist
+ if (!isset($GLOBALS['dbi'])) {
+     $GLOBALS['dbi'] = mysqli_connect(
+         $GLOBALS['env_db_dieewigen_host'], 
+         $GLOBALS['env_db_dieewigen_user'], 
+         $GLOBALS['env_db_dieewigen_password'], 
+         $GLOBALS['env_db_dieewigen_database']
+     );
+ }
 
  function getmicrotime(){
   list($usec, $sec) = explode(" ",microtime());
@@ -28,7 +40,10 @@
 </head>
 <body>
 
-<?
+<?php
+  // Sicherstellen, dass sstr definiert ist
+  $sstr = isset($_GET['sstr']) ? $_GET['sstr'] : '';
+  
   echo '<table border="0" cellpadding="2" cellspacing="0">';
   echo '<tr>';
   echo '<td>UserID</td>';
@@ -40,33 +55,42 @@
   switch($sstr[0]){
     case '-': //nic
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id, nic FROM de_login WHERE nic LIKE '%".$sstr."%'",$db);
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, nic FROM de_login WHERE nic LIKE ?",
+        ['%'.$sstr.'%']
+      );
 
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["nic"].'</td></tr>';
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["nic"]).'</td></tr>';
        $UCount++;
       }
 
       break;
     case '*': //spielername
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id, spielername FROM de_user_data WHERE spielername LIKE '%".$sstr."%'",$db);
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, spielername FROM de_user_data WHERE spielername LIKE ?",
+        ['%'.$sstr.'%']
+      );
 
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["spielername"].'</td></tr>';
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["spielername"]).'</td></tr>';
        $UCount++;
       }
 
       break;
     case '$': //email-adresse
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id, reg_mail FROM de_login WHERE reg_mail LIKE '%".$sstr."%'",$db);
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, reg_mail FROM de_login WHERE reg_mail LIKE ?",
+        ['%'.$sstr.'%']
+      );
 
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["reg_mail"].'</td></tr>';
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["reg_mail"]).'</td></tr>';
        $UCount++;
       }
 
@@ -74,10 +98,13 @@
 
     case '~': //IP
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id,  last_ip FROM de_login WHERE  last_ip LIKE '%".$sstr."%' order by last_ip",$db);
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["last_ip"].'</td></tr>';
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, last_ip FROM de_login WHERE last_ip LIKE ? ORDER BY last_ip",
+        ['%'.$sstr.'%']
+      );
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["last_ip"]).'</td></tr>';
        $UCount++;
       }
 
@@ -85,19 +112,25 @@
 
     case '|': //Vor-/Nachname
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id, vorname, nachname FROM de_user_info WHERE vorname LIKE '%".$sstr."%' or nachname LIKE '%".$sstr."%'",$db);
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["vorname"].' '.$UData["nachname"].'</td></tr>';
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, vorname, nachname FROM de_user_info WHERE vorname LIKE ? OR nachname LIKE ?",
+        ['%'.$sstr.'%', '%'.$sstr.'%']
+      );
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["vorname"]).' '.htmlspecialchars($UData["nachname"]).'</td></tr>';
        $UCount++;
       }
 	break;
-    case 'ฐ': //Ort
+    case 'รถ': //Ort (korrigiertes Zeichen)
       $sstr = str_replace($sstr[0].$sstr[1],$sstr[1],$sstr);
-      $db_daten=mysql_query("SELECT user_id, ort FROM de_user_info WHERE ort LIKE '%".$sstr."%'",$db);
-      while($UData = mysql_fetch_array($db_daten)) {
-       echo '<tr><td><a href="idinfo.php?UID='.$UData["user_id"].'" target="_blank">'.$UData["user_id"].'</a></td>';
-       echo '<td>'.$UData["ort"].'</td></tr>';
+      $result = mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, ort FROM de_user_info WHERE ort LIKE ?",
+        ['%'.$sstr.'%']
+      );
+      while($UData = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+       echo '<tr><td><a href="idinfo.php?UID='.htmlspecialchars($UData["user_id"]).'" target="_blank">'.htmlspecialchars($UData["user_id"]).'</a></td>';
+       echo '<td>'.htmlspecialchars($UData["ort"]).'</td></tr>';
        $UCount++;
       }
 
@@ -112,7 +145,7 @@
 ?>
 
  <br>
- Seite in <? echo $ltime; ?> Sekunden erstellt.
+ Seite in <?php echo $ltime; ?> Sekunden erstellt.
 
 </body>
 </html>

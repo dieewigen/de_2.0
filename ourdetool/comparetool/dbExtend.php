@@ -9,8 +9,9 @@
 class dbExtend extends database {
     private static $aryRef = array();
     public static function getInstance($num=0) {
-
-        if(self::$aryRef[$num] == null) dbExtend::$aryRef[$num] = new self();
+        if(!isset(self::$aryRef[$num]) || self::$aryRef[$num] == null) {
+            dbExtend::$aryRef[$num] = new self();
+        }
         return dbExtend::$aryRef[$num];
     }
     /**
@@ -25,13 +26,18 @@ class dbExtend extends database {
      * @return dbExtend
      */
     private function __construct(  ) {
-        if(!cfg::getInstance()->sql[0]->goOffline) cfg::getInstance()->sql[0]->goOffline=1;
-        parent::database(cfg::getInstance()->sql[0]->host
-            , cfg::getInstance()->sql[0]->user
-            , cfg::getInstance()->sql[0]->pass
-            , cfg::getInstance()->sql[0]->db
-            , cfg::getInstance()->sql[0]->table_prefix
-            , cfg::getInstance()->sql[0]->goOffline);
+        $cfg = cfg::getInstance();
+        
+        // Standardwerte setzen, falls die Eigenschaften nicht definiert sind
+        if (!isset($cfg->sql[0]->goOffline)) $cfg->sql[0]->goOffline = 1;
+        if (!isset($cfg->sql[0]->table_prefix)) $cfg->sql[0]->table_prefix = '';
+        
+        parent::database($cfg->sql[0]->host
+            , $cfg->sql[0]->user
+            , $cfg->sql[0]->pass
+            , $cfg->sql[0]->db
+            , $cfg->sql[0]->table_prefix
+            , $cfg->sql[0]->goOffline);
         if ($this->getErrorNum())  die($this->getErrorMsg());
 
     }
@@ -53,6 +59,7 @@ class dbExtend extends database {
      * @return Array mit oder einzelnes Object mit den gelesenen Daten
      */
     function get($sqlQuery, $SortKey = '') {
+        $back0 = false; // Variable initialisieren
         if ($SortKey === 0) {
             $back0 = true;
             $SortKey = '';

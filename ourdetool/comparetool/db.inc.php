@@ -1,4 +1,4 @@
-<?
+<?php
 class cfg {
     public $sql;
     private static $ref;
@@ -7,12 +7,11 @@ class cfg {
         return self::$ref;
     }
     private function  __construct() {
-
+        $this->sql[0] = new stdClass();
         $this->sql[0]->host = 'localhost';
         $this->sql[0]->user = 'user';
         $this->sql[0]->pass = 'password';
         $this->sql[0]->db = 'gameserverlogdata';
-       
     }
 }
 ?>

@@ -21,11 +21,11 @@ require_once 'viewer.php';
 
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-// festlegen wer �berpr�ft werden soll
+// festlegen wer überprüft werden soll
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-if($_REQUEST['userid1'] OR $_REQUEST['userid2'] OR $_REQUEST['userid3'] OR $_REQUEST['userid4'] OR $_REQUEST['userid5'] 
-OR $_REQUEST['dayOverview'] OR $_REQUEST['hourOverview']){
+if(isset($_REQUEST['userid1']) OR isset($_REQUEST['userid2']) OR isset($_REQUEST['userid3']) OR isset($_REQUEST['userid4']) OR isset($_REQUEST['userid5']) 
+OR isset($_REQUEST['dayOverview']) OR isset($_REQUEST['hourOverview'])){
 
 }else{
 	echo '<form action="index.php" method="POST" name="f">';
@@ -40,38 +40,23 @@ OR $_REQUEST['dayOverview'] OR $_REQUEST['hourOverview']){
 	die();
 }
 
-$uid1=intval($_REQUEST[userid1]);
-$uid2=intval($_REQUEST[userid2]);
-$uid3=intval($_REQUEST[userid3]);
-$uid4=intval($_REQUEST[userid4]);
-$uid5=intval($_REQUEST[userid5]);
+$uid1=isset($_REQUEST['userid1']) ? intval($_REQUEST['userid1']) : 0;
+$uid2=isset($_REQUEST['userid2']) ? intval($_REQUEST['userid2']) : 0;
+$uid3=isset($_REQUEST['userid3']) ? intval($_REQUEST['userid3']) : 0;
+$uid4=isset($_REQUEST['userid4']) ? intval($_REQUEST['userid4']) : 0;
+$uid5=isset($_REQUEST['userid5']) ? intval($_REQUEST['userid5']) : 0;
 
 $v = new viewer($uid1, $uid2, $uid3, $uid4, $uid5);
 
-if($_GET['hourOverview']) {
-    die( $v->getHourOverview($_GET['date'], $_GET['hour']) );
+if(isset($_GET['hourOverview']) && $_GET['hourOverview']) {
+    die( $v->getHourOverview(isset($_GET['date']) ? $_GET['date'] : '', isset($_GET['hour']) ? $_GET['hour'] : '') );
 }
-if($_GET['dayOverview']) {
-    die( $v->getDayTableRow($_GET['date']) );
+if(isset($_GET['dayOverview']) && $_GET['dayOverview']) {
+    die( $v->getDayTableRow(isset($_GET['date']) ? $_GET['date'] : '') );
 }    
 
-
-/*
-if($_GET['readLogs']) {
-    dbExtend::getInstance()->set('truncate table log;' ); // leert die Datenbank
-    // max 5 Logfiles
-	// wenn weniger benötigt werden, einfach zeilen auskommetieren
-	new logfile2database(15606,'logfiles/15606_getpost.txt'); // logfile 1
-    new logfile2database(19078,'logfiles/19078_getpost.txt'); // logfile 2
-    new logfile2database(76258,'logfiles/76258_getpost.txt'); // logfile 3
-    new logfile2database(77098,'logfiles/77098_getpost.txt'); // logfile 4
-    new logfile2database(76947,'logfiles/76947_getpost.txt'); // logfile 5
-	die('ready');
-}
-*/
 // hier die ID´s rein die im viewer selbst angezeigt werden sollen
 // wenn weniger, einfach entfernen
-
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -116,7 +101,7 @@ if($_GET['readLogs']) {
             })
             function loadHour(d,h) {
                 $('#loading').show();
-                $.get('?hourOverview=1&userid1=<?=$uid1?>&userid2=<?=$uid2?>&userid3=<?=$uid3?>&userid4=<?=$uid4?>&userid5=<?=$uid5?>&date='+d+'&hour='+h,function(d){
+                $.get('?hourOverview=1&userid1=<?php echo $uid1?>&userid2=<?php echo $uid2?>&userid3=<?php echo $uid3?>&userid4=<?php echo $uid4?>&userid5=<?php echo $uid5?>&date='+d+'&hour='+h,function(d){
                     $('#loading').hide();
                     $('#hourTable').html(d);
                     $('#dialog').dialog('open');
@@ -138,7 +123,7 @@ if($_GET['readLogs']) {
             }
             function startLoadDay() {
                 $('#loading').show();
-                $.get('?dayOverview=1&userid1=<?=$uid1?>&userid2=<?=$uid2?>&userid3=<?=$uid3?>&userid4=<?=$uid4?>&userid5=<?=$uid5?>&date='+$('#day2load').val(),function(d){
+                $.get('?dayOverview=1&userid1=<?php echo $uid1?>&userid2=<?php echo $uid2?>&userid3=<?php echo $uid3?>&userid4=<?php echo $uid4?>&userid5=<?php echo $uid5?>&date='+$('#day2load').val(),function(d){
                     $('#loading').hide();
                     $(d).appendTo('#daysTBody');
                     $('.jTPSdays').jTPS({
@@ -187,21 +172,13 @@ if($_GET['readLogs']) {
     <body leftmargin="0" topmargin="0" marginheight="0" marginwidth="0">
     
  <?php    
-echo 'Untersuche folgende User-IDs: '.intval($_REQUEST[userid1]).','.intval($_REQUEST[userid2]).','.intval($_REQUEST[userid3]).','
-.intval($_REQUEST[userid4]).','.intval($_REQUEST[userid5])
+echo 'Untersuche folgende User-IDs: '.$uid1.','.$uid2.','.$uid3.','.$uid4.','.$uid5
     ?>  
         <br>Datum in die Tagesübersicht  <input type="text" name="addDate" class="datepicker" id="day2load"> <button onclick="startLoadDay();">hinzufügen</button><br>
         <center><span id="loading"> <img src="sandclock.gif"> Lade Daten, ein Moment geduld bitte</span></center>
         <table class="jTPSDays" border="0">
-            <thead><tr><th> Datum </th> <?for($h=0;$h<=23;$h++) {echo "<th>$h</th>";}?></tr></thead>
+            <thead><tr><th> Datum </th> <?php for($h=0;$h<=23;$h++) {echo "<th>$h</th>";}?></tr></thead>
             <tbody id="daysTBody">
-                <?
-                //          echo  $v->getDayTableRow('2009-01-07');
-                //         echo  $v->getDayTableRow('2009-01-08');
-                //          echo  $v->getDayTableRow('2009-01-09');
-                //          echo  $v->getDayTableRow('2009-01-10');
-                //          echo  $v->getDayTableRow('2009-01-11');
-                ?>
             </tbody>
             <tfoot></tfoot>
         </table>

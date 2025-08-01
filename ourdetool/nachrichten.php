@@ -49,18 +49,20 @@ for($rasse=1;$rasse<=5;$rasse++){
 //$uid=292;
 include "det_userdata.inc.php";
 if ($uid>0){
-  $query="SELECT time, typ, text FROM de_user_news WHERE user_id='$uid' ORDER BY time DESC";
+  $query="SELECT time, typ, text FROM de_user_news WHERE user_id=? ORDER BY time DESC";
   $th='Alle Nachrichten';
-  $db_daten=mysql_query($query,$db);
+  $db_daten=mysqli_execute_query($GLOBALS['dbi'], $query, [$uid]);
   echo '<table>';
 
-  $db_daten_sec=mysql_query("SELECT spielername, sector, system, rasse FROM de_user_data WHERE user_id='$uid'");
-  $rew = mysql_fetch_array($db_daten_sec);
+  $db_daten_sec=mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sector, system, rasse FROM de_user_data WHERE user_id=?", [$uid]);
+  $rew = mysqli_fetch_array($db_daten_sec);
 
-  while($row = mysql_fetch_array($db_daten)) //jeder gefundene datensatz wird ausgegeben
+  while($row = mysqli_fetch_array($db_daten)) //jeder gefundene datensatz wird ausgegeben
   {
     $t=$row["time"];$n=$row["typ"];
     $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
+    $hrstr = ''; // Variable initialisieren
+    $typ = ''; // Variable initialisieren
 
   if ($n==0) $typ='';
   if ($n==1) $typ='Geb&auml;ude';
@@ -114,7 +116,7 @@ if ($uid>0){
   }
   echo '</table>';
 }
-else echo 'Kein User ausgew�hlt.';
+else echo 'Kein User ausgewählt.';
 ?>
 </form>
 </body>
