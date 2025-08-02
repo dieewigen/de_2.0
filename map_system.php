@@ -2,7 +2,7 @@
 $GLOBALS['deactivate_old_design']=true;
 
 include "inc/header.inc.php";
-include "lib/transactioni.lib.php";
+include "lib/transaction.lib.php";
 include "functions.php";
 include 'lib/map_system.class.php';
 include "tickler/kt_einheitendaten.php";

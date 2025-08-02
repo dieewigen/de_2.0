@@ -1,6 +1,6 @@
 <?php
 include "inc/header.inc.php";
-include "lib/transactioni.lib.php";
+include "lib/transaction.lib.php";
 include "lib/map_system.class.php";
 include "lib/bg_defs.inc.php";
 include 'lib/special_ship.class.php';

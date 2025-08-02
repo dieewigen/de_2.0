@@ -1,6 +1,6 @@
 <?php
 include 'inc/header.inc.php';
-include 'lib/transactioni.lib.php';
+include 'lib/transaction.lib.php';
 include 'functions.php';
 
 ?>
