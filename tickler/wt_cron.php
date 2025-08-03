@@ -302,6 +302,9 @@ function give_sector_bonus()
             for ($p = 0;$p < count($playerdata);$p++) {
 
                 //berechnen wie viele rohstoffe der spieler bekommt
+                if($sektorgesamtstunden == 0){
+                    $sektorgesamtstunden = 1; //damit es keine division durch 0 gibt
+                }
                 $anteilige_rohstoffe_insgesamt = ($secdata[count($secdata) - 1 - $i]['col'] * $anzwticksprostunde * 24 * 100 / 10) / 100 * ($playerdata[$p]['gesamtstunden'] * 100 / $sektorgesamtstunden);
 
                 $spieler_anteil[1] = $anteilige_rohstoffe_insgesamt / 100 * $playerdata[$p]['keym'];
