@@ -207,9 +207,7 @@ $mapcontent_height = 100000;
 $output = '';
 
 ////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-//npc anzeigen
-////////////////////////////////////////////////////////////////////////
+//npc in Sektor 2 anzeigen
 ////////////////////////////////////////////////////////////////////////
 
 //kein malus bei aliens
@@ -329,30 +327,11 @@ $containerPositionX = 46000;
 $containerPositionY = 51000 - $anzahlSpielerSektoren * $sector_height;
 echo '<div id="sectorcontainer" style="position: absolute; left: '.$containerPositionX.'px; top: '.$containerPositionY.'px; z-index: 2;">';
 
-
-for ($player_sector = 0; $player_sector < count($sectorList) ;$player_sector++) {
-
-    $sf = $player_sector + 3;
+foreach ($sectorList as $sf) {
 
     //die daten des sektors auslesen
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id=?", [$sf]);
     $sec_data = mysqli_fetch_array($db_daten);
-
-    //Rahmenfarbe je nach Sektortyp
-    //$sec_color='#FFFFFF';
-    //$sec_color='rgba(255,255,255,0.9)';
-    if ($sec_data['npc'] == 1) {
-
-    } elseif ($sec_data['sec_id'] == $ownsector) {
-        $sector_x_focus = $containerPositionX;
-        $sector_y_focus = $containerPositionY;
-    }
-
-    //fokus sicherheitshalb setzen, Problem mit Sektor 1
-    if (!isset($sector_x_focus) || !isset($sector_y_focus)) {
-        $sector_x_focus = $containerPositionX;
-        $sector_y_focus = $containerPositionY;
-    }
 
     echo '<div id="sector_'.$sf.'" 
 		style="width: '.($sector_width).'px; height: '.($sector_height).'px;
@@ -364,7 +343,6 @@ for ($player_sector = 0; $player_sector < count($sectorList) ;$player_sector++) 
     }
 
     if ($sec_data['npc'] == 1) {
-
 
     } else {
 
