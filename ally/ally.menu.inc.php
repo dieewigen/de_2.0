@@ -1,5 +1,20 @@
 <?php
 include 'inc/lang/'.$sv_server_lang.'_ally.menu.lang.php'; 
+
+// Sicherheitsprüfung: Bestimme anhand des Dateinamens, ob es eine Leader-Seite ist
+$script_name = basename($_SERVER['SCRIPT_NAME']);
+$leader_pages = [
+    'ally_message_leader.php',
+    'ally_leader.php', 
+    'ally_coleader.php',
+    'ally_settings.php',
+    'ally_finance.php',
+    'ally_kick.php',
+    'ally_delete.php'
+];
+
+$leaderpage = in_array($script_name, $leader_pages);
+
 /*
 print("
 <div align=center><br>
@@ -64,7 +79,7 @@ function has_position($position, $allytag, $userid){
 	}
 	
 	$has_position = false;
-	$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT ?? FROM de_allys WHERE allytag = ?", [$position, $allytag]);
+	$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT $position FROM de_allys WHERE allytag = ?", [$allytag]);
 	$ally_data = mysqli_fetch_array($result);
 	if ($ally_data[$position] == $userid) {
 		$has_position = true;

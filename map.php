@@ -67,16 +67,6 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login
 $row = mysqli_fetch_array($db_daten);
 $owner_id = intval($row["owner_id"]);
 
-
-/*
-if($_REQUEST["sso"]){
-  $sso=intval($_REQUEST["sso"]);
-  $sso--;
-  mysqli_execute_query($GLOBALS['dbi'],"UPDATE de_user_data SET secsort=? WHERE user_id=?", [$sso, $ums_user_id]);
-  $secsort=$sso;
-}
-*/
-
 //spieler sortiert auslesen
 $orderby = '`system`';
 if ($secsort == '1') {
@@ -89,58 +79,133 @@ if ($secsort == '1') {
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0");
 $row = mysqli_fetch_array($db_daten);
 $maxcol = $row['maxcol'];
-
 ?>
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-<title>Karte</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Karte</title>
+  <link rel="stylesheet" type="text/css" href="/g/d.css">
+  <script>
+    var ownSector = <?php echo ($ownsector > 1) ? $ownsector : 3; ?>;
+  </script>
+  <style>
+    html, body {
+      margin: 0; padding: 0; overflow: hidden; height: 100%;
+      background: #1e1e2f;
+      font-family: sans-serif;
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+/Edge */
+      user-select: none; /* Standard */
+    }
+    #viewport {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        touch-action: none; /* WICHTIG: verhindert Browser-Gesten (z.B. Scroll) bei Touch */
+
+        background-image:    url(g/PurpleNebula2048_back.jpg);
+        background-size:     cover;
+        background-repeat:   no-repeat;
+        background-position: center center;      
+
+    }
+    #map {
+      position: absolute;
+      top: 0; left: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+      user-select: none;
+      cursor: grab;
+    }
+    
+    /* Custom Tooltip Styles */
+    #custom-tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.95);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      max-width: 400px;
+      word-wrap: break-word;
+      z-index: 10000;
+      pointer-events: none;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Tabellen-Styles für Tooltips */
+    #custom-tooltip table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 5px 0;
+    }
+    
+    #custom-tooltip td {
+      padding: 3px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      text-align: center;
+    }
+    
+    #custom-tooltip tr:first-child td {
+      background-color: rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+    }
+    
+    #custom-tooltip .text2 {
+      color: #ff6b6b;
+    }
+    
+    #custom-tooltip .text3 {
+      color: #51cf66;
+    }
+    
+    #custom-tooltip .tc1 {
+      color: #74c0fc;
+    }
+    
+    #custom-tooltip .tc2 {
+      color: #ff6b6b;
+    }
+    
+    #custom-tooltip .tc3 {
+      color: #51cf66;
+    }
+    
+    #custom-tooltip .tc4 {
+      color: #ffd43b;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="viewport">
+  <div id="map">
+
 <?php
-$newcss = 1;
-include "cssinclude.php";
-?>
+//links oben spielname
+echo '<div id="gamename" style="top:40000px; left:40000px;" data-left="40000" data-top="40000">die ewigen</div>';
+echo '<div id="serverdesc" style="top:40512px; left:40000px;" data-left="40000" data-top="40512">'.$sv_server_name.' '.$sv_server_tag.'</div>';    
 
-<link rel="stylesheet" href="/js/jquery-ui-1.14.1/jquery-ui.min.css">
 
-<script src="/js/jquery-3.7.1.min.js"></script>
-<script src="/js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
-<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 
-<script>
-$(function() {
-$(document).tooltip({
-          content: function () {
-              return $(this).prop('title');
-          }
-      });
-});
-</script>
-<?php
-$sektor_width = 720;
-$sektor_height = 720;
-
-$npc_sec_counter = 0;
-$pc_sec_counter = 0;
+$sector_width = 1200;
+$sector_height = 150;
 
 $mapcontent_width = 100000;
 $mapcontent_height = 100000;
 
-echo '</head><body>';
-echo '<div id="mapcontainer" style="position:absolute; top: 0px; left: 0px; width:100%; height:100%; overflow:hidden; background-color: #000000; z-index:0;
-background-image:    url(g/PurpleNebula2048_back.jpg);
-background-size:     cover;
-background-repeat:   no-repeat;
-background-position: center center;
-">
-    <div id="mapcontent" style="transform-origin: 0 0; position:absolute; overflow:hidden; left: 0px; top: 0px; width: '.$mapcontent_width.'px; height: '.$mapcontent_height.'px;  z-index:1;">';
-
-//links oben spielname
-echo '<div id="gamename" style="top:40000px; left:40000px;" data-left="40000" data-top="40000">die ewigen</div>';
-echo '<div id="serverdesc" style="top:40512px; left:40000px;" data-left="40000" data-top="40512">'.$sv_server_name.' '.$sv_server_tag.'</div>';
-
+//Karte generieren
 //die Aliens verteilen, sind alle in Sektor 2
 $output = '';
-$npc_sec_counter++;
+
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //npc anzeigen
@@ -162,15 +227,13 @@ if ($rzadd == 0) {
 
 $sektorinfo = '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
 if (!empty($sf)) {
-    //hinweistext f�r npc-sektoren
+    //hinweistext für npc-sektoren
     $npchint = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
             $sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($ums_user_id).'<br>'.$sec_lang['npsecinfo3'].
             '<br>'.$sec_lang['npsecinfo4'].
             $sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze * 100, 2, ",", ".").' / '.
             number_format($col_angriffsgrenze_final * 100, 2, ",", ".").'%'.
             '">';
-    //$output.='<div style="text-align: left; width: 100%; background-color: #FFFFFF; color: #000000;">'.$sektorinfo.' '.$npchint.' '.$sec_data['name'].' Sektor '.$sf.' (NPC)</div>';
-
 
 }
 
@@ -180,18 +243,11 @@ $alien_anz = mysqli_num_rows($db_daten);
 $alien_nr = 0;
 $planet_id = 1;
 while ($row = mysqli_fetch_array($db_daten)) {
-    //$planet_id=$row['system'];
-    /*
-    if($npc_sec_counter % 2==0){
-        $planet_id*=2;
-    }*/
-
-
 
     //Position auf der Karte berechnen
     $kradius = 9800;
     $alien_anzahl = 200;
-    //$winkel=2*pi()/360*(360/$player_sector*(360/$sec_anzahl));
+
     $alienpos_x = cos(2 * pi() * ($alien_nr + 1) / ($alien_anz)) * -1;
     $alienpos_y = sin(2 * pi() * ($alien_nr + 1) / ($alien_anz));
 
@@ -218,7 +274,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
         $csstag = ' text2';
     }
     $tooltip = 'Punkte: '.number_format($row['score'], 0, "", ".").'<br>Gr&uuml;ner Punktewert: Ziel ist angreifbar, da oberhalb der Punkteangriffsgrenze.<br><br>Roter Punktewert: Ziel ist nicht angreifbar, da unterhalb der Punkteangriffsgrenze.';
-    //echo '<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['score'], 0,"",".").'</div></td>';
+
     $output .= '<div class="tac'.$csstag.'" style="background-color: rgba(10,10,10,0.8); font-size: 12px; position: absolute; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.formatMasseinheit($row['score']).'</div>';
 
     //kollektoren
@@ -228,7 +284,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
         $csstag = ' text2';
     }
     $tooltip = wellenrechner($row['col'], $maxcol, 1);
-    //echo '<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['col'], 0,"",".").'</div></td>';
+
     $output .= '<div class="tac'.$csstag.'" style="background-color: rgba(10,10,10,0.8); font-size: 12px; text-align: right; position: absolute; right: 0px; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.number_format($row['col'], 0, "", ".").'</div>';
     //aktion
     $aktion = '<a class="text1" target="h" href="military.php?se='.$sf.'&sy='.$row['system'].'" title="Flotteneinsatz">F</a>';
@@ -247,26 +303,34 @@ while ($row = mysqli_fetch_array($db_daten)) {
     }
 }
 
-//sektorendaten
-//echo '<tr><td colspan="5" class="cell" height="24px">&nbsp;'.$sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze*100, 2,",",".").' / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%</td></tr>';
-
-//echo '</table>';
-//rahmen_unten();
-
 echo $output;
-//$output='';
 
 ////////////////////////////////////////////////////////
 //die einzelnen Spieler-Sektoren-Container erstellen
 ////////////////////////////////////////////////////////
-$divid = 0;
-$sec_anzahl = 78;
-//for($y=0;$y<$sektoren_y;$y++){
-//	for($x=0;$x<$sektoren_x;$x++){
-for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
+//eine Liste aller Sektoren mit Spielern erstellen
+$sectorList = array();
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector FROM de_user_data WHERE sector > 2 GROUP BY sector", []);
+$anzahlSpielerSektoren = mysqli_num_rows($db_daten);
+while ($row = mysqli_fetch_assoc($db_daten)) {
+    $sectorList[] = $row['sector'];
+}
 
-    //$temp = mysqli_fetch_array($sec_daten);
-    //$sf=$temp['sector'];
+//zuerst anzahl der pc-sektoren auslesen
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz > 1");
+$anzahlSpielerSektoren = mysqli_num_rows($db_daten);
+if ($anzahlSpielerSektoren < 1) {
+    $anzahlSpielerSektoren = 1;
+}
+
+
+//Container um alle Sektoren aufzunehmen, aktuell links von den VS
+$containerPositionX = 46000;
+$containerPositionY = 51000 - $anzahlSpielerSektoren * $sector_height;
+echo '<div id="sectorcontainer" style="position: absolute; left: '.$containerPositionX.'px; top: '.$containerPositionY.'px; z-index: 2;">';
+
+
+for ($player_sector = 0; $player_sector < count($sectorList) ;$player_sector++) {
 
     $sf = $player_sector + 3;
 
@@ -274,81 +338,39 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id=?", [$sf]);
     $sec_data = mysqli_fetch_array($db_daten);
 
-    //Position des Sektors auf der Karte bestimmen
-    $kradius = 9200;
-    //$winkel=2*pi()/360*(360/$player_sector*(360/$sec_anzahl));
-    $secpos_x = cos(2 * pi() * ($player_sector + 1) / ($sec_anzahl)) * -1;
-    $secpos_y = sin(2 * pi() * ($player_sector + 1) / ($sec_anzahl));
-
-    //radius-skalierung
-    $secpos_x = round($secpos_x * $kradius);
-    $secpos_y = round($secpos_y * $kradius);
-
-    //positionierung im zentrum des div
-    $secpos_x = $mapcontent_width / 2 + $secpos_x;
-    $secpos_y = $mapcontent_height / 2 + $secpos_y;
-
-    //um die breite des containers nach links/oben verschieben
-    $secpos_x = $secpos_x - round($sektor_width / 4);
-    $secpos_y = $secpos_y - round($sektor_height / 4);
-
-
-    //fokus sicherheitshalb setzen, Problem mit Sektor 1
-    if (!isset($sector_x_focus) || !isset($sector_y_focus)) {
-        $sector_x_focus = $secpos_x;
-        $sector_y_focus = $secpos_y;
-    }
-
     //Rahmenfarbe je nach Sektortyp
     //$sec_color='#FFFFFF';
     //$sec_color='rgba(255,255,255,0.9)';
     if ($sec_data['npc'] == 1) {
-        //$sec_color='#cd02d9';
-        //$sec_color='rgba(205,2,218,0.9)';
-    } elseif ($sec_data['sec_id'] == $ownsector) {
-        //$sec_color='#00FF00';
-        //$sec_color='rgba(0,160,0,0.9)';
-        //$sector_x_focus=$x*$sektor_width;
-        //$sector_y_focus=$y*$sektor_height;
-        $sector_x_focus = $secpos_x;
-        $sector_y_focus = $secpos_y;
 
+    } elseif ($sec_data['sec_id'] == $ownsector) {
+        $sector_x_focus = $containerPositionX;
+        $sector_y_focus = $containerPositionY;
     }
 
-    //sektor-div �ffnen
-    /*
-    echo '<div id="'.$divid.'" style="position: absolute; z-index: 10; left: '.($x*$sektor_width).'px; top: '.($y*$sektor_height).'px; width: '.($sektor_width-2).'px; height: '.($sektor_height-2).'px;
-        border: 1px solid '.$sec_color.'; padding: 0px; margin:0px; background: rgba(10,10,10,0.8);">';
-    */
+    //fokus sicherheitshalb setzen, Problem mit Sektor 1
+    if (!isset($sector_x_focus) || !isset($sector_y_focus)) {
+        $sector_x_focus = $containerPositionX;
+        $sector_y_focus = $containerPositionY;
+    }
 
-    /*
-    echo '<div id="sec'.$player_sector.'" data-left="'.($secpos_x).'" data-top="'.($secpos_y).'"
-        style="position: absolute; z-index: 10; left: '.($secpos_x).'px; top: '.($secpos_y).'px;
-        width: '.($sektor_width-2).'px; height: '.($sektor_height-2).'px;
-        border: 4px solid '.$sec_color.'; padding: 0px; margin:0px; background: rgba(10,10,10,0.8);">';
-     */
-
-    echo '<div id="sec'.$player_sector.'" data-left="'.($secpos_x).'" data-top="'.($secpos_y).'"
-		style="position: absolute; z-index: 10; left: '.($secpos_x).'px; top: '.($secpos_y).'px; 
-		width: '.($sektor_width).'px; height: '.($sektor_height).'px;
-		padding: 0px; margin:0px; background-image: url(g/sec_border1.png);">';
+    echo '<div id="sector_'.$sf.'" 
+		style="width: '.($sector_width).'px; height: '.($sector_height).'px;
+		padding: 0px; margin: 0 0 30px 0; background-color: rgba(0, 0, 0, 0.6); ">';
 
     $rzadd = 0;
     if ($ownsector <> $sf) {
         $rzadd = 2;
     }
 
-
     if ($sec_data['npc'] == 1) {
 
 
     } else {
+
         $output = '';
-        //$npc_sec_counter++;
-        ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         //spieler anzeigen
-        ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         //sektorkommandant feststellen
         $sector = $sf;
@@ -393,12 +415,6 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
         }
 
         //sektormalus bei der attgrenze berechnen
-        //zuerst anzahl der pc-sektoren auslesen
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1");
-        $num = mysqli_num_rows($db_daten);
-        if ($num < 1) {
-            $num = 1;
-        }
 
         //eigenen sektorplatz auslesen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT platz FROM de_sector WHERE sec_id=?", [$ownsector]);
@@ -413,7 +429,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
         }
 
         //secmalus berechnen
-        $sec_malus = $sv_sector_attmalus / $num * $secplatzunterschied;
+        $sec_malus = $sv_sector_attmalus / $anzahlSpielerSektoren * $secplatzunterschied;
 
         //secmalus darf nicht größer als maximum sein
         if ($sec_malus > $sv_sector_attmalus) {
@@ -422,7 +438,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
         $sec_angriffsgrenze = $sv_attgrenze - $sv_attgrenze_whg_bonus + $sec_malus;
 
         //recyclotronbonus berechnen
-        $rec_bonus = $sv_recyclotron_sector_bonus / $num * ($secplatz - 1);
+        $rec_bonus = $sv_recyclotron_sector_bonus / $anzahlSpielerSektoren * ($secplatz - 1);
         //recyclotronbonus darf nicht größer als das maximum sein
         if ($rec_bonus > $sv_recyclotron_sector_bonus) {
             $rec_bonus = $sv_recyclotron_sector_bonus;
@@ -441,12 +457,8 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             $col_angriffsgrenze_final = $sv_min_col_attgrenze;
         }
 
-        //anzeige ob der sektorstatus deaktiviert worden ist
-        //if($secstatdisable==1 AND $ownsector==$sf) echo '<div class="info_box text2">'.$sec_lang['secstatdisable'].'</div><br>';
-
         $gesamtpunkte = 0;
         $anz = 0;
-
 
         //alles anzeigen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
@@ -464,17 +476,8 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             $gescol += $row['col'];
             $sector = $sf;
 
-            //$output.='<tr>';
-            /*
-            $planet_id=$row['system'];
-            if($pc_sec_counter % 2==0){
-                $planet_id*=2;
-            }*/
-
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             //system inkl sk/bk und accountstatus
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             $systemstr = $row['system'];
             if ($row["lstatus"] == 2) {
@@ -488,36 +491,16 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             }//umode
 
             if ($sksystem == $row['system']) {
-                //überprüfen ob der sk auch bk ist, ist in 1-mann-sektoren möglich
-                /*
-                if($row['system']==$sec_data['bk'] AND $anz>1){
-                    mysqli_execute_query($GLOBALS['dbi'],"UPDATE de_sector set bk = 0 WHERE sec_id=?", [$sector]);
-                    $sec_data['bk']=0;
-                }
-                */
                 $systemstr = '<span class="tc3">^'.$systemstr.'^</span>';
             }
 
-            /*
-            if($row['system']==$sec_data['bk']){
-                $systemstr='<span class="tc2">&deg;'.$systemstr.'&deg;</span>';
-            }
-            */
-            //$output.='<td class="cell tac" style="font-size: 10pt;">'.$systemstr.'</td>';
-
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             //rang
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
             $rang = "<img src='".$ums_gpfad.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
-            //$output.='<td class="cell tac">'.$rang.'</td>';
-
 
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
-            //spielername, geworben, details, im sektor online
-            ////////////////////////////////////////////////////////////////////////
+            //spielername, details, im sektor online
             ////////////////////////////////////////////////////////////////////////
             $playername = umlaut($row['spielername']);
             if (strtotime($row["last_login"]) + 1800 > time() and $row["lstatus"] == 1) {
@@ -532,26 +515,15 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             }
             $csstag = 'tc1';
             $playertooltip = '';
-            if ($row["werberid"] == $owner_id) {
-                $csstag = 'tc3';
-                $playertooltip = $sec_lang['spielergeworben'];
-            }
             $playercsstag = $csstag;
-            /*
-            $output.='<td class="cell tac" style="font-size: 10pt;"><a href="details.php?se='.$sector.'&sy='.$row['system'].'">
-            <span title="'.$playertooltip.'" class="'.$csstag.'">'.$playername.$osown.'</span></a></td>';
-            */
-            //$output.='<div style="width: 100%; word-wrap: break-word; border-bottom: 1px solid #666666;">'.$playername.'</div>';
-
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             //rasse
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
+
             $knowrasse = 0;
             $playerstatus = 0;
             $rasse = '';
-            //hat man scandaten �ber die rasse/allianz?
+            //hat man scandaten über die rasse/allianz?
             unset($allytagscan);
             if (isset($scandaten)) {
                 for ($i = 0;$i < count($scandaten);$i++) {
@@ -565,7 +537,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 }
             }
 
-            //im eigenen sektor sieht man alle rassen, au�er in sektor 1
+            //im eigenen sektor sieht man alle rassen, außer in sektor 1
             if ($sector == $ownsector and $ownsector > 1) {
                 $knowrasse = 1;
             }
@@ -580,21 +552,16 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                     $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
                 }
                 if ($row['rasse'] == 3) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceK.png" title="K´Tharr" width="16px" height="16px">';
                 }
                 if ($row['rasse'] == 4) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceZ.png" title="Z´tah-ara" width="16px" height="16px">';
                 }
                 $planet_id = $row['rasse'];
             }
 
-            //$output.='<td class="cell tac">'.$rasse.'</td>';
-            //$output.='<div style="width: 100%; border-bottom: 1px solid #666666;">'.$rasse.'</div>';
-
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
-            //allianz, sichtbarkeit durch ally, allyb�ndnis, scandaten, sektor
-            ////////////////////////////////////////////////////////////////////////
+            //allianz, sichtbarkeit durch ally, allybündnis, scandaten, sektor
             ////////////////////////////////////////////////////////////////////////
             if ($row['status'] == 1) {
                 $allytag = $row['allytag'];
@@ -615,7 +582,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 $csstag = 'tc2';
                 $showallytag = $allytag;
             }
-            //ganze andere ally, nichts anzeigen, au�er es gibt scandaten, oder es ist der eigene sektor
+            //ganze andere ally, nichts anzeigen, außer es gibt scandaten, oder es ist der eigene sektor
             elseif (($ownally != $allytag) or ($allytag == '') or ($ownally == '')) {
                 //anzeige im eigenen sektor
                 if ($ownsector == $sf and $ownsector > 1) {
@@ -643,49 +610,38 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 $showallytag = '&nbsp;';
             }
 
-            /*
-            if($showallytag!='&nbsp;'){
-                $showallytag='<a href="ally_detail.php?allytag='.urlencode($showallytag).'"><span class="'.$csstag.'">'.$showallytag.'</span></a>';
-            }
-            */
-
-            //$output.='<td class="cell tac" style="font-size: 10pt;">'.$showallytag.'</td>';
             if ($showallytag != '&nbsp;') {
                 $showallytag = '<br><span class="'.$csstag.'" title="Allianz">'.$showallytag.'</span>';
             } else {
                 $showallytag = '';
             }
 
-            $output .= '<div style="position: absolute; width: 98px; height: 104px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;
-				left: '.($player_std_pos[$row['system'] - 1][0] * 98 + 110).'px;
-				top: '.($player_std_pos[$row['system'] - 1][1] * 160 + 136).'px;
+            $output .= '<div style="
+                position: relative; 
+                width: 98px; 
+                height: 104px;
+                margin-left: 10px;
+                border: 0px solid #FFFFFF; 
+                color: #FFFFFF;
+                font-size: 14px;
 				background: url('.$ums_gpfad.'g/derassenlogo'.$planet_id.'.png);
-				background-size: 90% auto;
+				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
 				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')">';
 
 
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
             //Name / Rasse / Ally
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
 
             $output .= '<div style="margin-left: 5px; width: 90px; word-wrap: break-word; background: rgba(10,10,70,0.8);">
 				<a href="details.php?se='.$sector.'&sy='.$row['system'].'" target="h" class="'.$playercsstag.'">'.$playername.$osown.'</a>'.$showallytag.'</div>';
-            /*
-            if(!empty($rasse)){
-                $output.='<div style="position: absolute; right: 0px; bottom: 16px;">'.$rasse.'</div>';
-            }
-            */
 
-
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             //punkte
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
+
             if ($punkte * $sec_angriffsgrenze <= $row['score']) {
                 $csstag = ' text3';
             } else {
@@ -704,14 +660,10 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 $tooltip .= '<br>E: '.number_format($row['kg04'], 0, "", ".");
             }
 
-
-            //$output.='<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['score'], 0,"",".").'</div></td>';
             $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.formatMasseinheit($row['score']).'</div>';
 
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
             //kollektoren
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
             if ($col * $col_angriffsgrenze_final <= $row['col']) {
                 $csstag = ' text3';
@@ -719,13 +671,10 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 $csstag = ' text2';
             }
             $tooltip = wellenrechner($row['col'], $maxcol, 0);
-            //$output.='<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['col'], 0,"",".").'</div></td>';
             $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; right: 0px; text-align: right; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.number_format($row['col'], 0, "", ".").'</div>';
 
             ////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////
             //aktion
-            ////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
 
             $aktion = '
@@ -734,19 +683,15 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
 				<a class="text1" target="h" href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">F</a>&nbsp;
 				<a class="text1" target="h" href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'"><img src="'.$ums_gpfad.'g/ps_'.$playerstatus.'.gif" border="0" title="Geheimdienstinformationen"></a>';
 
-            $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; right: 0px; text-align: right; bottom: 20px; width: 100%;">'.$aktion.'</div>';
+            $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; right: 0px; text-align: right; bottom: 20px; width: 100%; z-index: 10;">'.$aktion.'</div>';
 
-            //$output.='</tr>';
             $output .= '</div>';//player
         }
 
-
-        //$output.='</table>';
-
         if ($rzadd == 0) {
-            $style = 'border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
         } else {
-            $style = 'border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
         }
 
 
@@ -754,7 +699,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
         $rec_bonus = number_format($rec_bonus, 2, ",", ".").'%';
 
         if ($anz > 0) {
-            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
+            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="'.
             $sec_lang['angriffsgrenze'].': '.$sec_angriffsgrenze.' / '.number_format($col_angriffsgrenze_final * 100, 2, ",", ".").'%<br>'.
             $sec_lang['kollektoren'].': '.number_format($gescol, 0, "", ".").'<br>'.
             $sec_lang['kollektorendurchschnitt'].': '.number_format($gescol / $anz, 2, ",", ".").'<br>'.
@@ -765,7 +710,7 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             $sec_lang['recyclingbonus'].': '.$rec_bonus.'<br>'.
             $sec_lang['sektorartefakthaltezeit'].': '.number_format($sec_data['arthold'], 0, "", ".").'">';
         } else {
-            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="freier Sektor">';
+            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="freier Sektor">';
         }
 
         if ($anz > 0) {
@@ -785,15 +730,47 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
             $sektorinfo .= ' '.$infostr.' freier Sektor';
             $sektorinfo .= '</span>';
         }
+        
+        $sektorHeadline='<div style="text-align: left; width: 100%; height: 24px; background-color: rgba(0,68,124,0.5); color: #DDDDDD; overflow: hidden;">'.$sektorinfo.'</div>';
 
-
-        echo '<div style="text-align: left; width: 480px; height: 24px; margin-left: 120px; margin-top: 110px; 
-			background-color: rgba(0,68,124,0.5); color: #DDDDDD; overflow: hidden;">'.$sektorinfo.'</div>';
-
-        echo $output;
-
-
+        $artstr='';
+        $basestr='';
         if ($anz > 0) {
+            //Artefakte im Sektor
+            $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [$sf]);
+            $artnum = mysqli_num_rows($res);
+            $c = 0;
+
+            if ($artnum > 0) {
+                include_once "inc/artefakt.inc.php";
+            }
+
+
+            while ($row = mysqli_fetch_array($res)) {
+                //artefakttooltip bauen
+                $desc = $row["artdesc"];
+                $desc = str_replace("{WERT1}", number_format($sv_artefakt[$row["id"] - 1][0], 2, ",", "."), $desc);
+                $desc = str_replace("{WERT2}", number_format($sv_artefakt[$row["id"] - 1][1], 0, "", "."), $desc);
+                $desc = str_replace("{WERT3}", number_format($sv_artefakt[$row["id"] - 1][2], 0, "", "."), $desc);
+                $desc = str_replace("{WERT4}", number_format($sv_artefakt[$row["id"] - 1][3], 0, "", "."), $desc);
+                $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
+                $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
+
+
+                $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
+
+                $artstr .= '
+                <a href="help.php?a=1" target="_blank" title="'.umlaut($atip[$c]).'">
+                    <img src="'.$ums_gpfad.'g/sa'.$row["picid"].'.gif" style="width: 25px; height: 25px;">
+                </a>';
+
+                $c++;
+            }
+
+            if ($artstr != '') {
+                $artstr='<div style="text-align: center;">'.$artstr.'</div>';
+            }
+
             //bild von der sternenbasis anzeigen
 
             $bed = $sec_data['techs'][1].$sec_data['techs'][2].$sec_data['techs'][3];
@@ -843,60 +820,33 @@ for ($player_sector = 0;$player_sector < $sec_anzahl;$player_sector++) {
                 }
 
                 $stip = 'Sektorraumbasis'.$srbstr;
-                $basestr = '<a href="'.$ums_gpfad.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.$ums_gpfad.'g/'.$bn.'" name="sb" title="'.$stip.'"></a>';
+                $basestr = '<a href="'.$ums_gpfad.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.$ums_gpfad.'g/'.$bn.'" name="sb" title="'.$stip.'" style="width: 100%; height: auto;"></a>';
                 //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen
                 if ($bed == '000') {
                     $basestr = '&nbsp;';
                 }
 
-                echo '<div style="position: absolute; width: 98px; height: 120px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;
-					left: 260px;
-					top: 260px;">'.$basestr.'</div>';
+                $basestr='<div style="width: 98px; height: 120px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;">'.$basestr.$artstr.'</div>';
 
-
-            }
-
-            //Artefakte im Sektor
-
-            //schauen ob es artefakte gibt
-            $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [$sf]);
-            $artnum = mysqli_num_rows($res);
-            //if ($artnum>0 OR $bed!='000')//artefakt vorhanden, oder raumbasis gebaut
-            //{
-
-            $artstr = '';
-            $c = 0;
-
-            if ($artnum > 0) {
-                include_once "inc/artefakt.inc.php";
-            }
-
-
-            while ($row = mysqli_fetch_array($res)) {
-                //artefakttooltip bauen
-                $desc = $row["artdesc"];
-                $desc = str_replace("{WERT1}", number_format($sv_artefakt[$row["id"] - 1][0], 2, ",", "."), $desc);
-                $desc = str_replace("{WERT2}", number_format($sv_artefakt[$row["id"] - 1][1], 0, "", "."), $desc);
-                $desc = str_replace("{WERT3}", number_format($sv_artefakt[$row["id"] - 1][2], 0, "", "."), $desc);
-                $desc = str_replace("{WERT4}", number_format($sv_artefakt[$row["id"] - 1][3], 0, "", "."), $desc);
-                $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
-                $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
-
-
-                $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
-
-                $artstr .= '<a href="help.php?a=1" target="_blank" title="'.umlaut($atip[$c]).'"><img src="'.$ums_gpfad.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
-                $c++;
-            }
-            if ($artstr != '') {
-                echo '<div style="position: absolute; width: 98px; height: 120px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;
-					left: 430px;
-					top: 280px;">'.$artstr.'</div>';
             }
         }
+
+        
+
+        //Sektorkopfzeile ausgeben
+        echo $sektorHeadline;
+
+        //Ausgabe von Sektorraumbasis, die Artefakte und die Spieler in einer Zeile
+        echo '<div style="display: flex; padding: 10px;">';
+        echo $basestr; //Sektorraumbasis + Artefakte
+        echo $output; //Spieler
+
+        echo '</div>'; //flex div (SRB, Artefakte, Spieler)
     }
     echo '</div>';//sektor ende
 }
+
+echo '</div>';
 
 ///////////////////////////////////////////////////////////////////////////
 // erforschbare/erforschte Systeme für Handel/Missionen/Events
@@ -990,21 +940,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
     $data = unserialize($row['data']);
 
     $output = '';
-
-    /*
-    //$winkel=2*pi()/360*(360/$player_sector*(360/$sec_anzahl));
-    $alienpos_x=cos(2*pi()*($alien_nr+1)/($alien_anz))*-1;
-    $alienpos_y=sin(2*pi()*($alien_nr+1)/($alien_anz));
-
-    //radius-skalierung
-    $alienpos_x=round($alienpos_x*$kradius);
-    $alienpos_y=round($alienpos_y*$kradius);
-    */
-
-    /*
-    $alienpos_x=round($data->getSystemPosX()*150);
-    $alienpos_y=round($data->getSystemPosY()*150);
-    */
 
     $alienpos_x = round($data->getSystemPosX() * 800);
     $alienpos_y = round($data->getSystemPosY() * 800);
@@ -1195,18 +1130,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
     $output .= '</div>';
 
-
-
-    //Stufe ausgeben
-    //$output.='<div>S'.$data->getSystemLevel().'</div>';
-
-    //Cluster ausgeben
-    //$output.='<div>C'.$row['cluster_x'].'/'.$row['cluster_y'].'</div>';
-
-    //Kanten ausgeben
-    //$output.='<div>K'.$data->getSystemLevel().'</div>';
-
-    //echo '</tr>';
     $output .= '</div>';
 
     //if($row['user_id']<1 && $data->always_visible==0){
@@ -1249,260 +1172,486 @@ echo $output;
 
 
 
-echo '</div>';//mapcontent
-echo '</div>';//mapcontainer
 
-/*
-if($_SESSION['ums_user_id']==99966){
-    die();
-}
-*/
-
-$showx = 1;
-$showy = 1;
 
 ?>
-<script type="text/javascript">
-var inmove=0;
-var mapdata=new Array();
-var zoomfactor=1.0;
-var neworigin='';
-var newleft=<?php echo ($sector_x_focus - 500) * -1; ?>;
-var newtop=<?php echo ($sector_y_focus - 500) * -1; ?>;
-var map_left=<?php echo ($sector_x_focus - 500) * -1; ?>;
-var map_top=<?php echo ($sector_y_focus - 500) * -1; ?>;
-<?php
-if (isset($_COOKIE['map_zoomfactor']) && !empty($_COOKIE['map_zoomfactor']) && isset($_COOKIE['map_newleft']) && !empty($_COOKIE['map_newleft']) && isset($_COOKIE['map_newtop']) && !empty($_COOKIE['map_newtop']) && isset($_COOKIE['map_neworigin']) && !empty($_COOKIE['map_neworigin'])) {
-    echo 'zoomfactor='.$_COOKIE['map_zoomfactor'].';';
-    echo 'newleft="'.$_COOKIE['map_newleft'].'";';
-    echo 'newtop="'.$_COOKIE['map_newtop'].'";';
-    echo 'neworigin="'.$_COOKIE['map_neworigin'].'";';
 
-    echo 'set_map_data();';
-} else {
-    ?>
-$('#mapcontent').css('left',<?php echo ($sector_x_focus - 500) * -1; ?>);
-$('#mapcontent').css('top',<?php echo ($sector_y_focus - 250) * -1; ?>);
-<?php
-}
-?>
+  </div>
+  <div id="custom-tooltip"></div>
+</div>
 
-$('#mapcontent').bind('mousewheel DOMMouseScroll', function (event) {
-	if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-		if(isNaN(zoomfactor)){
-			zoomfactor=1.0;
-			console.log('NaN');
-		}
-		//zoom in
-		zoomfactor=zoomfactor+0.02;
-		
-		if(zoomfactor>1.4){
-			zoomfactor=1.4;
-		}else{
-			set_map_data();
-		}
-	}
-	else {
-		//zoom out
-		zoomfactor=zoomfactor-0.02;
-		
-		if(zoomfactor<0.04){
-			zoomfactor=0.04;
-		}else{
-			set_map_data();
-		}
-	}
-	
-	//console.log('ZF: '+zoomfactor);
-	setCookie('map_zoomfactor', zoomfactor);
-});
+<script>
+  const map = document.getElementById('map');
+  const viewport = document.getElementById('viewport');
 
-function set_map_data(){
-	$('#mapcontent').css('left', newleft+"px");
-	$('#mapcontent').css('top', newtop+"px");
-	$('#mapcontent').css('transform-origin', neworigin);	
+  const mapWidth = <?php echo $mapcontent_width; ?>;
+  const mapHeight = <?php echo $mapcontent_height; ?>;
 
-	$('#mapcontent').css({
-	  'transform'         : 'scale(' + zoomfactor + ')'
-	});		
-}
+  // Transformation State
+  let offsetX = 0;
+  let offsetY = 0;
+  let zoom = 0.8;
+  let maxZoom = 3.0;
 
-jQuery(document).ready(function(){
-	$('#mapcontent').mousemove(function(e){
-		/*
-		var mapcontent_top=$('#mapcontent').css('top');
-		mapcontent_top=parseFloat(mapcontent_top.replace("px", ""))*-1;
-		var top = (mapcontent_top+e.pageY - $(window).scrollTop())/1000;
-		newtop=(mapcontent_top+e.pageY - $(window).scrollTop())*-1;
-		
-		var mapcontent_left=$('#mapcontent').css('left');
-		mapcontent_left=parseFloat(mapcontent_left.replace("px", ""))*-1;
-		var left = (mapcontent_left+e.pageX - $(window).scrollLeft())/1000;
-		newleft=(mapcontent_left+e.pageX - $(window).scrollLeft());
-		*/
-		//left=(e.offsetX+e.pageX)/1000;
-		//top=(e.offsetY+e.pageY)/1000;
-		//console.log(e);
-		//console.log(e.target.id);
-		var dataleft=0;
-		var datatop=0;
-		
-		if(e.target.id){
-			//console.log($('#'+e.target.id).data('left'));
-			if($('#'+e.target.id).data('left')){
-				dataleft=parseInt($('#'+e.target.id).data('left'));
-				datatop=parseInt($('#'+e.target.id).data('top'));
-				//console.log('A: '+dataleft);
-			}
-		}
-		//console.log(e.target.style['left']);
-		if(e.offsetX>510 || dataleft>0){
-			map_left=(e.offsetX+dataleft)/1000;
-			newleft=(e.offsetX+dataleft-e.clientX)*-1;
-		}
-		
-		if(e.offsetY>510 || datatop>0){
-			map_top=(e.offsetY+datatop)/1000;
-			newtop=(e.offsetY+datatop-e.clientY)*-1;
-		}
-		
-		neworigin=map_left+"% "+map_top+"%";
-		//console.log(neworigin);
-		/*
-		if(zoomfactor>=1){
-			//console.log(map_left+"/"+map_top);
-			console.log(newleft);
-			//console.log(neworigin);
-			//console.log(newleft+(newleft*(zoomfactor-1)/100));
-			//console.log(e.offsetX);
-		}else{
-			//console.log(neworigin);
-			//console.log(map_left+"/"+map_top);
-			//console.log(e.offsetX);
-			console.log(newleft);
-			//console.log(newleft+(newleft/(100*zoomfactor)/100));
-		}
-		*/
-		//console.log(newleft);
-		//$('#mapcontent').css('transform-origin', neworigin);
-	}); 
-})
-
-$(function(){
-
-<?php
-/*
-  var transformFix_old1 = function(el, e) {
-    var offset = el.offset(),
-        x = e.pageX - offset.left,
-        y = e.pageY - offset.top,
-        transform = el.css('transform'),
-        dx, dy;
-
-    el.css('transform', '');
-    offset = el.offset();
-    dx = e.pageX - offset.left - x;
-    dy = e.pageY - offset.top - y;
-    el.css('transform', transform);
-
-    return {
-      left : x + dx,
-      top : y + dy
-    };
-  };
-*/
-?>
-  var transformFix = function(el, e) {
-    return {
-	  left: -parseInt(el.css("left")) + e.pageX,
-	  top: -parseInt(el.css("top")) + e.pageY
-	};
+  // Gespeicherte Werte aus localStorage laden
+  function loadMapState() {
+    const saved = localStorage.getItem('mapState');
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        offsetX = state.offsetX || 0;
+        offsetY = state.offsetY || 0;
+        zoom = state.zoom || 0.8;
+        // Zoom-Grenzen prüfen
+        zoom = Math.min(3, Math.max(0.1, zoom));
+        return true;
+      } catch (e) {
+        console.log('Fehler beim Laden der Kartenposition:', e);
+      }
+    }
+    return false;
   }
 
-  $('#mapcontent').draggable()
-	.mousedown(function(e) {
-		var el = $(this);
-		el.draggable('option', { 
-		  cursorAt: transformFix(el, e)
-		});
-	})
-	.mouseup(function(e) {
-		var el = $(this);
-		el.draggable('option', { 
-		  cursorAt: transformFix(el, e)
-		});
+  // Aktuelle Werte in localStorage speichern
+  function saveMapState() {
+    const state = {
+      offsetX: offsetX,
+      offsetY: offsetY,
+      zoom: zoom
+    };
+    localStorage.setItem('mapState', JSON.stringify(state));
+  }
 
-		setCookie('map_newleft', parseInt($('#mapcontent').css('left'),10));
-		setCookie('map_newtop',  parseInt($('#mapcontent').css('top'),10));
-		setCookie('map_neworigin', $('#mapcontent').css('transform-origin'));
-	});
-});
+  // Drag State
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragOriginX = 0;
+  let dragOriginY = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
 
-$.extend($.support,{touch: "ontouchend" in document });
-$.fn.addTouch = function() {if ($.support.touch){this.each(function(i,el){el.addEventListener("touchstart", iPadTouchHandler, false);                         el.addEventListener("touchmove", iPadTouchHandler, false);                         el.addEventListener("touchend", iPadTouchHandler, false);                         el.addEventListener("touchcancel", iPadTouchHandler, false);                 });         } }; 
-var lastTap = null;
+  // Touch Pinch Zoom State
+  let lastTouchDist = null;
+  let lastTouchMid = null;
 
-$('#mapcontent').addTouch();
+  // Update Map Transform
+  function update() {
+    map.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+    // Nach jeder Änderung speichern
+    saveMapState();
+  }
 
-window.onresize = setsize;
+  // Zentrieren auf Bildschirmmitte
+  function centerMap() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    
+    // Versuche auf sector_1 zu zentrieren
+    const targetElement = document.getElementById('sector_'+ownSector);
+    const containerElement = document.getElementById('sectorcontainer');
+    
+    if (targetElement && containerElement) {
+      // Berechne absolute Position
+      const containerX = parseFloat(containerElement.style.left) || 0;
+      const containerY = parseFloat(containerElement.style.top) || 0;
+      
+      // sector_1 ist der zweite Sektor (Index 1), also bei Y-Position 0 im Container
+      const elementX = containerX;
+      const elementY = containerY; // sector_1 ist der erste angezeigte Sektor
+      
+      // Element in der Bildschirmmitte positionieren
+      offsetX = (vw / 2) - (elementX * zoom) - (600 * zoom); // 600 = halbe Sektorbreite
+      offsetY = (vh / 2) - (elementY * zoom) - (75 * zoom);  // 75 = halbe Sektorhöhe
+      
+      console.log('Zentriert auf sector_1');
+    } else {
+      // Fallback: Standard-Zentrierung
+      console.log('sector_1 oder sectorcontainer nicht gefunden - verwende Standard-Zentrierung');
+      offsetX = (vw - mapWidth * zoom) / 2;
+      offsetY = (vh - mapHeight * zoom) / 2;
+    }
+    update();
+  }
 
-function setsize(){
-	var height=document.getElementById("mapcontainer").offsetHeight-70;
-	var left=(document.getElementById("mapcontainer").offsetWidth-880)/2;
-	$('#mainarea').css('height', height+'px');  
-	$('#mainarea').css('left', left+'px');
-}
+  // Initial Laden: Erst gespeicherte Position laden, dann zentrieren falls nichts gespeichert
+  if (!loadMapState()) {
+    centerMap();
+  } else {
+    update();
+  }
 
-setsize();
+  // Drag starten
+  function startDrag(clientX, clientY) {
+    isDragging = true;
+    dragStartX = clientX;
+    dragStartY = clientY;
+    dragOriginX = offsetX;
+    dragOriginY = offsetY;
+    lastMouseX = clientX;
+    lastMouseY = clientY;
+    viewport.style.cursor = 'grabbing';
+  }
 
+  // Drag bewegen - verbesserte Version
+  function dragMove(clientX, clientY) {
+    if (!isDragging) return;
+    
+    // Verwende die Differenz zur letzten Position statt zur Start-Position
+    const deltaX = clientX - lastMouseX;
+    const deltaY = clientY - lastMouseY;
+    
+    offsetX += deltaX;
+    offsetY += deltaY;
+    
+    // Aktuelle Position als neue letzte Position speichern
+    lastMouseX = clientX;
+    lastMouseY = clientY;
+    
+    update();
+  }
+
+  // Drag stoppen
+  function stopDrag() {
+    isDragging = false;
+    viewport.style.cursor = 'default';
+  }
+
+  // Hilfsfunktionen für Touch
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function getMidpoint(touches) {
+    return {
+      x: (touches[0].clientX + touches[1].clientX)/2,
+      y: (touches[0].clientY + touches[1].clientY)/2
+    };
+  }
+
+  // Maus-Events fürs Draggen - verbessert
+  viewport.addEventListener('mousedown', (e) => {
+    // Nur linke Maustaste und nicht auf klickbare Elemente
+    if (e.button !== 0) return;
+    
+    // Verhindere Dragging auf Links und Buttons
+    if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
+      return;
+    }
+    
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      dragMove(e.clientX, e.clientY);
+    }
+  });
+
+  document.addEventListener('mouseup', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      stopDrag();
+    }
+  });
+
+  // Touch-Events - verbessert
+  viewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      
+      // Verhindere Touch-Dragging auf klickbare Elemente
+      if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
+        return;
+      }
+      
+      startDrag(t.clientX, t.clientY);
+      lastTouchDist = null;
+      lastTouchMid = null;
+    } else if (e.touches.length === 2) {
+      stopDrag();
+      lastTouchDist = getDistance(e.touches);
+      lastTouchMid = getMidpoint(e.touches);
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1 && isDragging) {
+      const t = e.touches[0];
+      dragMove(t.clientX, t.clientY);
+      e.preventDefault();
+    } else if (e.touches.length === 2) {
+      const newDist = getDistance(e.touches);
+      const newMid = getMidpoint(e.touches);
+      if (lastTouchDist) {
+        const delta = newDist - lastTouchDist;
+        const zoomFactor = 0.005;
+        const oldZoom = zoom;
+        zoom += delta * zoomFactor;
+        zoom = Math.min(3, Math.max(0.1, zoom));
+        const zoomChange = zoom / oldZoom;
+
+        // Karte-Position so anpassen, dass Mittelpunkt gleich bleibt
+        offsetX = newMid.x - zoomChange * (newMid.x - offsetX);
+        offsetY = newMid.y - zoomChange * (newMid.y - offsetY);
+
+        update();
+      }
+      lastTouchDist = newDist;
+      lastTouchMid = newMid;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      stopDrag();
+      lastTouchDist = null;
+      lastTouchMid = null;
+    }
+  }, { passive: false });
+
+  // Mausrad zum Zoomen - verbessert
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // Position innerhalb der Karte (unskaliert)
+    const relX = (mouseX - offsetX);
+    const relY = (mouseY - offsetY);
+
+    const oldZoom = zoom;
+
+    // Scrollbeschleunigung dämpfen
+    const maxDelta = 30;
+    const delta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), maxDelta);
+
+    const zoomFactor = 0.002;
+
+    zoom -= delta * zoomFactor;
+    zoom = Math.min(3, Math.max(0.1, zoom));
+
+    const zoomChange = zoom / oldZoom;
+
+    // Karte so verschieben, dass der Punkt unter dem Mauszeiger gleich bleibt
+    offsetX = mouseX - relX * zoomChange;
+    offsetY = mouseY - relY * zoomChange;
+
+    update();
+  }, { passive: false });
+
+  // Fenstergröße neu ausrichten und Karte zentrieren
+  window.addEventListener('resize', () => {
+    centerMap();
+  });
+
+  // Custom Tooltip Funktionalität
+  const customTooltip = document.getElementById('custom-tooltip');
+  let tooltipTimeout = null;
+
+  // Alle Elemente mit title-Attribut finden und Tooltip-Events hinzufügen
+  function initTooltips() {
+    const elementsWithTitle = document.querySelectorAll('[title]');
+    
+    elementsWithTitle.forEach(element => {
+      const originalTitle = element.getAttribute('title');
+      
+      // Originales title-Attribut entfernen, um Standard-Tooltip zu verhindern
+      element.removeAttribute('title');
+      element.setAttribute('data-tooltip', originalTitle);
+      
+      element.addEventListener('mouseenter', (e) => {
+        showTooltip(e, originalTitle);
+      });
+      
+      element.addEventListener('mouseleave', () => {
+        hideTooltip();
+      });
+      
+      element.addEventListener('mousemove', (e) => {
+        updateTooltipPosition(e);
+      });
+    });
+  }
+
+  function showTooltip(event, text) {
+    clearTimeout(tooltipTimeout);
+    
+    if (!text || text.trim() === '') return;
+    
+    // HTML-Entities dekodieren aber HTML-Tags beibehalten
+    const decodedText = text
+      .replace(/&uuml;/g, 'ü')
+      .replace(/&auml;/g, 'ä')
+      .replace(/&ouml;/g, 'ö')
+      .replace(/&Uuml;/g, 'Ü')
+      .replace(/&Auml;/g, 'Ä')
+      .replace(/&Ouml;/g, 'Ö')
+      .replace(/&szlig;/g, 'ß')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&nbsp;/g, ' ');
+    
+    // HTML direkt verwenden (Tabellen bleiben erhalten)
+    customTooltip.innerHTML = decodedText;
+    customTooltip.style.display = 'block';
+    updateTooltipPosition(event);
+  }
+
+  function hideTooltip() {
+    tooltipTimeout = setTimeout(() => {
+      customTooltip.style.display = 'none';
+    }, 100);
+  }
+
+  function updateTooltipPosition(event) {
+    const tooltipRect = customTooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let x = event.clientX + 10;
+    let y = event.clientY + 10;
+    
+    // Tooltip nicht über den rechten Rand hinaus
+    if (x + tooltipRect.width > viewportWidth) {
+      x = event.clientX - tooltipRect.width - 10;
+    }
+    
+    // Tooltip nicht über den unteren Rand hinaus
+    if (y + tooltipRect.height > viewportHeight) {
+      y = event.clientY - tooltipRect.height - 10;
+    }
+    
+    // Mindestabstände zu den Rändern
+    x = Math.max(5, Math.min(x, viewportWidth - tooltipRect.width - 5));
+    y = Math.max(5, Math.min(y, viewportHeight - tooltipRect.height - 5));
+    
+    customTooltip.style.left = x + 'px';
+    customTooltip.style.top = y + 'px';
+  }
+
+  // Tooltips beim Laden der Seite initialisieren
+  document.addEventListener('DOMContentLoaded', () => {
+    initTooltips();
+  });
+
+  // Tooltips auch initialisieren, falls das DOM bereits geladen ist
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTooltips);
+  } else {
+    initTooltips();
+  }
+
+  // MutationObserver für dynamisch hinzugefügte Elemente
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) { // Element node
+          // Prüfen ob das Element selbst ein title-Attribut hat
+          if (node.hasAttribute && node.hasAttribute('title')) {
+            const originalTitle = node.getAttribute('title');
+            node.removeAttribute('title');
+            node.setAttribute('data-tooltip', originalTitle);
+            
+            node.addEventListener('mouseenter', (e) => {
+              showTooltip(e, originalTitle);
+            });
+            
+            node.addEventListener('mouseleave', () => {
+              hideTooltip();
+            });
+            
+            node.addEventListener('mousemove', (e) => {
+              updateTooltipPosition(e);
+            });
+          }
+          
+          // Prüfen ob Kindelemente title-Attribute haben
+          const childrenWithTitle = node.querySelectorAll && node.querySelectorAll('[title]');
+          if (childrenWithTitle) {
+            childrenWithTitle.forEach(child => {
+              const originalTitle = child.getAttribute('title');
+              child.removeAttribute('title');
+              child.setAttribute('data-tooltip', originalTitle);
+              
+              child.addEventListener('mouseenter', (e) => {
+                showTooltip(e, originalTitle);
+              });
+              
+              child.addEventListener('mouseleave', () => {
+                hideTooltip();
+              });
+              
+              child.addEventListener('mousemove', (e) => {
+                updateTooltipPosition(e);
+              });
+            });
+          }
+        }
+      });
+    });
+  });
+
+  // Observer starten
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 </script>
-<?php
-die('</body></html>');
 
+</body>
+</html>
+
+<?php
 function wellenrechner($kol, $maxcol, $npcsec)
 {
     global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $ums_premium, $sv_kollie_klaurate;
     $str = 'Kollektoren-Wellenrechner';
     $str .= "<table width=200px border=0 cellpadding=0 cellspacing=1><tr align=center><td width=15%>&nbsp</td><td width=17%>".$sec_lang['kollektoren']."</td></tr>";
     $str .= "<tr align=center><td>&nbsp;</td><td>".number_format($kol, 0, ',', '.')."</td></tr>";
-    if ($ums_premium == 1) {
-        $owncol = $col;
-        if ($maxcol == 0) {
-            $maxcol = 1;
+
+    $owncol = $col;
+    if ($maxcol == 0) {
+        $maxcol = 1;
+    }
+    for ($we = 0; $we < 5; $we++) {
+        if ($owncol > $maxcol) {
+            $maxcol = $owncol;
         }
-        for ($we = 0; $we < 5; $we++) {
-            if ($owncol > $maxcol) {
-                $maxcol = $owncol;
+
+        if ($npcsec == 0) {
+
+            $col_angriffsgrenze = $owncol * 100 / $maxcol;
+            $col_angriffsgrenze = $col_angriffsgrenze / 100 * $sv_max_col_attgrenze;
+            if ($col_angriffsgrenze > $sv_max_col_attgrenze) {
+                $col_angriffsgrenze = $sv_max_col_attgrenze;
             }
-
-            if ($npcsec == 0) {
-
-                $col_angriffsgrenze = $owncol * 100 / $maxcol;
-                $col_angriffsgrenze = $col_angriffsgrenze / 100 * $sv_max_col_attgrenze;
-                if ($col_angriffsgrenze > $sv_max_col_attgrenze) {
-                    $col_angriffsgrenze = $sv_max_col_attgrenze;
-                }
-                if ($col_angriffsgrenze < $sv_min_col_attgrenze) {
-                    $col_angriffsgrenze = $sv_min_col_attgrenze;
-                }
-            } else {
+            if ($col_angriffsgrenze < $sv_min_col_attgrenze) {
                 $col_angriffsgrenze = $sv_min_col_attgrenze;
             }
-
-            if ($kol < $col_angriffsgrenze * $owncol) {
-                $colclass = "text2";
-            } else {
-                $colclass = "text3";
-            }
-
-            $str .= "<tr align=center><td nowrap>".($we + 1).". ".$sec_lang['welle']."</td><td class=".$colclass.">".
-            number_format(floor($kol * $sv_kollie_klaurate), 0, ',', '.')."</td></tr>";
-            $owncol = $owncol + floor($kol * $sv_kollie_klaurate);
-            $kol = $kol - floor($kol * $sv_kollie_klaurate);
+        } else {
+            $col_angriffsgrenze = $sv_min_col_attgrenze;
         }
 
-    } else {
-        $str .= "<tr><td colspan=2>".$sec_lang['painfo']."</td></tr>";
+        if ($kol < $col_angriffsgrenze * $owncol) {
+            $colclass = "text2";
+        } else {
+            $colclass = "text3";
+        }
+
+        $str .= "<tr align=center><td nowrap>".($we + 1).". ".$sec_lang['welle']."</td><td class=".$colclass.">".
+        number_format(floor($kol * $sv_kollie_klaurate), 0, ',', '.')."</td></tr>";
+        $owncol = $owncol + floor($kol * $sv_kollie_klaurate);
+        $kol = $kol - floor($kol * $sv_kollie_klaurate);
     }
 
     //info bzgl. erobern/zerst�ren von kollektoren
@@ -1510,6 +1659,3 @@ function wellenrechner($kol, $maxcol, $npcsec)
 
     return ($str);
 }
-?>
-</body>
-</html>

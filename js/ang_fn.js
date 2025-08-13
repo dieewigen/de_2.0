@@ -203,12 +203,7 @@ function vs_system_init(){
 }
 
 function reset_map(){
-
-	setCookie('map_zoomfactor', '');
-	setCookie('map_newleft', '');
-	setCookie('map_newtop',  '');
-	setCookie('map_neworigin', '');
-
+	localStorage.removeItem('mapState');
 	document.getElementById('iframe_map').contentDocument.location.reload(true);
 }
 

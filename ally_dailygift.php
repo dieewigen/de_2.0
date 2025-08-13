@@ -231,7 +231,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE ally_id='$ally_id'");
+                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id='$ally_id'");
                         $bonusstr .= '<br>3 Allianzartefakte';
 
                         createAuction($_SESSION['ums_user_id']);

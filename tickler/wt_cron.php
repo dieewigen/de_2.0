@@ -219,15 +219,6 @@ function give_sector_bonus()
 
         $time = strftime("%Y%m%d%H%M%S");
 
-        //ticks pro tag auslesen
-        /*
-            $filename="runtick.sh";
-            $cachefile = fopen ($filename, 'r');
-            $wticks=trim(fgets($cachefile, 1024));
-            $anzwticksprostunde=0;
-        for($i=1;$i<=60;$i++)if($wticks[$i]==1)$anzwticksprostunde++;
-        */
-
         $anzwticksprostunde = count($GLOBALS['wts'][12]);
 
         //echo 'AnzStunden: '.$anzwticksprostunde;

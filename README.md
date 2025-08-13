@@ -17,10 +17,6 @@ Voraussetzung: MySQL / MariaDB Datenbanksystem installiert
 	- Schritt 1: Datenbank erstellen (eine pro Server) z.B. tde
 	- Schritt 2: Datenbankschema / Datenbank durch die.sql files unter https://github.com/dieewigen/de_2.0/tree/master/database erstellen.
 	- Schritt 3: de.sql Datei für die Hauptspieldatenbank verwenden
-	- Schritt 4: ea.zip entpacken und ea.sql für EA-Datenbankverwenden
-	- Schritt 5: efta.zip entpacken und efta.sql für EFTA Datenbank verwenden
-
-
 
 ### Parameter setzen und DBs verlinken
 
@@ -56,8 +52,8 @@ Man kann sich an tickler/wt_auto_reset.php orientieren
 
 
 ## Verfügbare Repositories
-	- Das eigentliche Spiel an sich incl. EA+EFTA: https://github.com/dieewigen/de_2.0
+	- Das eigentliche Spiel an sich: https://github.com/dieewigen/de_2.0
 	- Techtree Editor für DE: https://github.com/dieewigen/techtree_editor
 	- Editor um die initiale Karte des VS - Vergessenen Systeme Spieles zu erstellen 
 	https://github.com/dieewigen/vs_starmap_editor
-	- Toolsammlung die bei der Erstellung der EA verwendet worden ist. https://github.com/dieewigen/ea_tools
+

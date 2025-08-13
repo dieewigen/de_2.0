@@ -185,7 +185,10 @@ if($num==1){
 								$need_storage_res=array();
 								
 								//test auf ausreichende Rohstoffe
-								$einzelkosten=explode(';', $def_allybldg[$build]['bldg_cost'][$def_allybldg[$build]['haslevel']]);
+								$cost_string = isset($def_allybldg[$build]['bldg_cost'][$def_allybldg[$build]['haslevel']]) 
+									? $def_allybldg[$build]['bldg_cost'][$def_allybldg[$build]['haslevel']] 
+									: '';
+								$einzelkosten = $cost_string ? explode(';', $cost_string) : array();
 								//print_r($einzelkosten);
 								foreach ($einzelkosten as $value) {
 									$parts=explode("x", $value);
@@ -314,7 +317,10 @@ if($num==1){
 
 			//Item-Baukosten
 			$kosten='';
-			$einzelkosten=explode(';', $def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']]);
+			$cost_string = isset($def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']]) 
+				? $def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']] 
+				: '';
+			$einzelkosten = $cost_string ? explode(';', $cost_string) : array();
 			foreach ($einzelkosten as $value) {
 				/*
 				if($kosten!='<span style="color: #00AA00;">'){
@@ -353,7 +359,7 @@ if($num==1){
 			}
 			else{
 				if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){
-					echo '<a href="ally_bldg.php?sf='.$sf.'&build='.$i.'">';
+					echo '<a href="ally_bldg.php?build='.$i.'">';
 				}
 
 				//////////////////////////////////////////

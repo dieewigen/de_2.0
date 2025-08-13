@@ -21,7 +21,6 @@ include $directory."inccon.php";
 echo '<html><head></head><body>';
 
 //größter tick
-//$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data",$db);
 $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
@@ -195,16 +194,16 @@ if ($dortick == 1) {
         //flottenkoordinaten updaten
         $fleet_id = $uid.'-0';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-1';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-2';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-3';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
 
         if ($secz > 1) {
             //mail($GLOBALS['env_admin_email'], $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', $sv_server_tag.': '.$uid.'  hat Sektor 1 verlassen.', 'FROM: '.$GLOBALS['env_admin_email']);
@@ -320,32 +319,32 @@ if ($dortick == 1) {
         //31588
         //freie position ermitteln - ende
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=savestatus WHERE user_id='$uid'", $db);//status aktiv
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=savestatus WHERE user_id='$uid'");//status aktiv
         //heimatsystem festlegen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, last_sector='$secz' WHERE user_id='$uid'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, last_sector='$secz' WHERE user_id='$uid'");
         //info in der sektorhistorie hinterlegen
-        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '2', '$secz', '$spielername');", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '2', '$secz', '$spielername');");
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET fromsec=$secz,  fromsys=$sysz WHERE  absender='$uid' and sender=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET fromsec=$secz,  fromsys=$sysz WHERE  absender='$uid' and sender=0");
         //flottenkoordinaten updaten
         $fleet_id = $uid.'-0';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-1';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-2';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-3';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
 
         //flottendaten von angreifenden/deffenden flotten auf das neue ziel umlegen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz");
 
         //datensatz aus dem umzug entfernen
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=0 AND user_id='$uid'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=0 AND user_id='$uid'");
 
         /*
         if($secz>1){
@@ -362,14 +361,14 @@ if ($dortick == 1) {
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, sector FROM de_sector_umzug WHERE typ=2", $db);
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, sector FROM de_sector_umzug WHERE typ=2");
     $num = mysqli_num_rows($result);
     while ($res = mysqli_fetch_array($result)) { //jeder gefundene datensatz wird geprueft
         $uid = $res["user_id"];
         $zielsec = $res["sector"];
 
         //herkunftssektor und -system
-        $result1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'", $db);
+        $result1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'");
         $res1 = mysqli_fetch_array($result1);
 
         $herksec = $res1["sector"];
@@ -409,30 +408,30 @@ if ($dortick == 1) {
         echo '<br>[3]Sektor: '.$secz.' System: '.$sysz;
 
         //freie position ermitteln - ende
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'", $db);//status aktiv
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'", $db);//heimatsystem festlegen
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'");//status aktiv
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'");//heimatsystem festlegen
         //flottenkoordinaten updaten
         $fleet_id = $uid.'-0';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-1';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-2';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
         $fleet_id = $uid.'-3';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
 
         //flottendaten von angreifenden/deffenden flotten auf das neue ziel umlegen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz");
 
         //evtl. laufende votes gegen den account l�schen
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE user_id='$uid'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE user_id='$uid'");
     }
     //alle daten aus de_sector_umzug entfernen
-    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=2", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=2");
 
     echo "<br>$num Spieler-Systeme Typ 2 verschoben.<br>";
 
@@ -443,22 +442,22 @@ if ($dortick == 1) {
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
     //erstmal die gruppen anhand der passw�rter ausfindig machen
-    $result1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT pass FROM de_sector_umzug WHERE typ=1 GROUP BY pass", $db);
+    $result1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT pass FROM de_sector_umzug WHERE typ=1 GROUP BY pass");
     $num = 0;
     while ($res1 = mysqli_fetch_array($result1)) { //jeder gefundene datensatz wird geprueft
         $sektorpass = $res1["pass"];
         //einen freien sektor suchen
-        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE sec_id>=$sv_min_regsec AND pass='' ORDER BY sec_id ASC", $db);
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE sec_id>=$sv_min_regsec AND pass='' ORDER BY sec_id ASC");
         $res = mysqli_fetch_array($result);
         $zielsec = $res["sec_id"];
 
-        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_sector_umzug WHERE typ=1 AND pass='$sektorpass'", $db);
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_sector_umzug WHERE typ=1 AND pass='$sektorpass'");
         $useranz = mysqli_num_rows($result);
         echo $sektorpass.'<br>';
         echo $useranz.'<br>';
         //das passwort im sektor hinterlegen
         if ($useranz >= $sv_min_user_per_regsector) {
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set pass='$sektorpass' WHERE sec_id='$zielsec'", $db);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set pass='$sektorpass' WHERE sec_id='$zielsec'");
         }
 
         if ($useranz >= $sv_min_user_per_regsector) {
@@ -466,7 +465,7 @@ if ($dortick == 1) {
 
                 $uid = $res["user_id"];
                 //herkunftssektor und -system
-                $result2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'", $db);
+                $result2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, techs FROM de_user_data WHERE user_id='$uid'");
                 $res2 = mysqli_fetch_array($result2);
 
                 $herksec = $res2["sector"];
@@ -514,43 +513,43 @@ if ($dortick == 1) {
 
                 //freie position ermitteln - ende
 
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'", $db);//status aktiv
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'", $db);//heimatsystem festlegen
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'");//status aktiv
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, secmoves=secmoves+1, techs='$techs', last_sector='$secz' WHERE user_id='$uid'");//heimatsystem festlegen
                 //flottenkoordinaten updaten
                 $fleet_id = $uid.'-0';
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
                 $fleet_id = $uid.'-1';
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
                 $fleet_id = $uid.'-2';
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
                 $fleet_id = $uid.'-3';
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id' AND aktion=0");
 
                 //flottendaten von angreifenden/deffenden flotten auf das neue ziel umlegen
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE zielsec='$herksec' AND zielsys='$herksys' AND hsec<>$secz AND hsys<>$sysz");
                 //den umzugsdatensatz l�schen
-                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE user_id='$uid'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE user_id='$uid'");
                 //evtl. votes l�schen
-                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE user_id='$uid'", $db);
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE user_id='$uid'");
 
                 $num++;
             }
         }
     }
     //die umzugsdaten 1 tick runterz�hlen und falls <=0 kicken
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector_umzug set ticks=ticks-1 WHERE typ=1", $db);
-    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=1 AND ticks<=0", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector_umzug set ticks=ticks-1 WHERE typ=1");
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_umzug WHERE typ=1 AND ticks<=0");
 
     echo "<br>$num Spieler-Systeme Typ 1 verschoben.<br>";
 
 
     //npc-accounts
     /*
-    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=0 AND `system`=2",$db);
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=0 AND `system`=2");
     $num = mysqli_num_rows($result);
     while($res = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
     {
@@ -582,18 +581,18 @@ if ($dortick == 1) {
       //freie position ermitteln - ende
 
       $uid=$res["user_id"];
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'",$db);//status aktiv
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz WHERE user_id='$uid'",$db);//heimatsystem festlegen
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid'");//status aktiv
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz WHERE user_id='$uid'");//heimatsystem festlegen
       //flottenkoordinaten updaten
 
       $fleet_id=$uid.'-0';
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
       $fleet_id=$uid.'-1';
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
       $fleet_id=$uid.'-2';
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
       $fleet_id=$uid.'-3';
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz, zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
 
     }
 
@@ -601,7 +600,7 @@ if ($dortick == 1) {
     */
 
     //dortag wieder setzen
-    mysqli_execute_query($GLOBALS['dbi'], "update de_system set dortick=1", $db);
+    mysqli_execute_query($GLOBALS['dbi'], "update de_system set dortick=1");
 } else {
     echo 'Registrierung deaktiviert.';
 }
@@ -612,7 +611,7 @@ function reshuffle()
 
     $daten = array();
     //alle pc-spieler �ber sektor 1 auslesen
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE sector>1 AND npc=0", $db);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE sector>1 AND npc=0");
     $anz = mysqli_num_rows($db_daten);
     $akti_gesamt = 0;
     $akti_gewertet = 0;
@@ -624,7 +623,7 @@ function reshuffle()
         $daten[$uid]['uid'] = $uid;
 
         //aktivit�t innerhalb der letzten 60 Tage feststellen und daraus den Mittelwert bilden
-        $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_stat WHERE user_id='$uid' ORDER BY datum DESC LIMIT 60", $db);
+        $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_stat WHERE user_id='$uid' ORDER BY datum DESC LIMIT 60");
         $anzx = mysqli_num_rows($db_datenx);
         echo '<br>statistische Daten Anzahl: '.$anzx;
         $daten[$uid]['sektor_aktuell'] = $sector_aktuell;
@@ -675,7 +674,7 @@ function reshuffle()
     //schauen welche pc-sektoren es gibt
     $sektoren = array();
 
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND sec_id>1 AND sec_id<='".$sv_maxsector."'ORDER BY sec_id ASC", $db);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND sec_id>1 AND sec_id<='".$sv_maxsector."'ORDER BY sec_id ASC");
     while ($row = mysqli_fetch_array($db_daten)) {
         $sektoren[] = $row['sec_id'];
     }
@@ -775,25 +774,25 @@ function reshuffle()
         echo("<br>UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
 
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid' AND status=0", $db);//status aktiv
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=1 WHERE user_id='$uid' AND status=0");//status aktiv
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login='".date("Y-m-d H:i:s")."', last_click='".date("Y-m-d H:i:s")."' 
-			WHERE user_id='$uid' AND (status=1 OR status=3)", $db);//status aktiv
+			WHERE user_id='$uid' AND (status=1 OR status=3)");//status aktiv
 
         //heimatsystem festlegen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector='$secz', `system`='$sysz' WHERE user_id='$uid'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector='$secz', `system`='$sysz' WHERE user_id='$uid'");
         //flottenkoordinaten updaten
         $fleet_id = $uid.'-0';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
         $fleet_id = $uid.'-1';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'", $db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
         $fleet_id = $uid.'-2';
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'");
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
         $fleet_id = $uid.'-3';
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'",$db);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'",$db);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=$secz, hsys=$sysz WHERE user_id='$fleet_id'");
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET zielsec=$secz, zielsys=$sysz WHERE user_id='$fleet_id'");
     }
 
 

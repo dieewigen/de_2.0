@@ -299,12 +299,12 @@ $btipstr = '<table width=500px border=0 cellpadding=0 cellspacing=1><tr align=ce
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id");
 while ($row = mysqli_fetch_assoc($db_daten)) {
     $btipstr .= '<tr align=center>';
-    $btipstr .= '<td align=left>'.$row[0].'</td>';
-    $btipstr .= '<td>'.number_format($row[1] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row[2] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row[3] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row[4] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row[5] / $kostenfaktor, 0, ",", ".").'</td>';
+    $btipstr .= '<td align=left>'.$row['tech_name'].'</td>';
+    $btipstr .= '<td>'.number_format($row['restyp01'] / $kostenfaktor, 0, ",", ".").'</td>';
+    $btipstr .= '<td>'.number_format($row['restyp02'] / $kostenfaktor, 0, ",", ".").'</td>';
+    $btipstr .= '<td>'.number_format($row['restyp03'] / $kostenfaktor, 0, ",", ".").'</td>';
+    $btipstr .= '<td>'.number_format($row['restyp04'] / $kostenfaktor, 0, ",", ".").'</td>';
+    $btipstr .= '<td>'.number_format($row['restyp05'] / $kostenfaktor, 0, ",", ".").'</td>';
     $btipstr .= '</tr>';
 }
 
@@ -1111,7 +1111,7 @@ if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlu
     $srestyp02 = $row['restyp02'];
     $srestyp03 = $row['restyp03'];
     $srestyp04 = $row['restyp04'];
-    $srestyp05 = $row[4];
+    $srestyp05 = $row['restyp05'];
     ?>
 <br>
 <form action="resource.php" method="POST">
