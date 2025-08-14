@@ -47,7 +47,6 @@ $GLOBALS['duration_factor']=1-($artbonus_duration/100);
 <meta charset="utf-8"/>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <?php 
-//$newcss=1;
 include "cssinclude.php";
 ?>
 </head>

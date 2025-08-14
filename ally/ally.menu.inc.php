@@ -8,25 +8,11 @@ $leader_pages = [
     'ally_leader.php', 
     'ally_coleader.php',
     'ally_settings.php',
-    'ally_finance.php',
     'ally_kick.php',
     'ally_delete.php'
 ];
 
 $leaderpage = in_array($script_name, $leader_pages);
-
-/*
-print("
-<div align=center><br>
-		<img src=\"ally/cars.gif\" alt=\"Central Alliance Registration System\"><br><br>
-</div>
-");
-*/
-/*print("
-<div align=center><br>
-		<img src=".$ums_gpfad."g/ally/".$ums_rasse."_cars.gif alt=\"Central Alliance Registration System\"><br><br>
-</div>
-");*/
 
 $allys=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys where leaderid=?", [$ums_user_id]);
 

@@ -325,7 +325,6 @@ $md[$md_index]['ally_mission_counter_id']=2;
 
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <?php 
-//$newcss=1;
 include "cssinclude.php";
 ?>
 </head>

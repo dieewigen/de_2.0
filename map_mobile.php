@@ -23,7 +23,6 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 <head>
 <title>Vergessene Systeme</title>
 <?php 
-//$newcss=1;
 include "cssinclude.php";
 ?>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
