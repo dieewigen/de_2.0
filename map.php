@@ -86,103 +86,10 @@ $maxcol = $row['maxcol'];
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Karte</title>
-  <link rel="stylesheet" type="text/css" href="/g/d.css">
+  <link rel="stylesheet" type="text/css" href="/g/de-map.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-map.css'); ?>">
   <script>
     var ownSector = <?php echo ($ownsector > 1) ? $ownsector : 3; ?>;
   </script>
-  <style>
-    html, body {
-      margin: 0; padding: 0; overflow: hidden; height: 100%;
-      background: #1e1e2f;
-      font-family: sans-serif;
-      -webkit-user-select: none; /* Safari */
-      -moz-user-select: none; /* Firefox */
-      -ms-user-select: none; /* IE10+/Edge */
-      user-select: none; /* Standard */
-    }
-    #viewport {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        touch-action: none; /* WICHTIG: verhindert Browser-Gesten (z.B. Scroll) bei Touch */
-
-        background-image:    url(g/PurpleNebula2048_back.jpg);
-        background-size:     cover;
-        background-repeat:   no-repeat;
-        background-position: center center;      
-
-    }
-    #map {
-      position: absolute;
-      top: 0; left: 0;
-      transform-origin: 0 0;
-      will-change: transform;
-      user-select: none;
-      cursor: grab;
-    }
-    
-    /* Custom Tooltip Styles */
-    #custom-tooltip {
-      position: absolute;
-      background: rgba(0, 0, 0, 0.95);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 12px;
-      line-height: 1.4;
-      max-width: 400px;
-      word-wrap: break-word;
-      z-index: 10000;
-      pointer-events: none;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    /* Tabellen-Styles für Tooltips */
-    #custom-tooltip table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 5px 0;
-    }
-    
-    #custom-tooltip td {
-      padding: 3px 8px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      text-align: center;
-    }
-    
-    #custom-tooltip tr:first-child td {
-      background-color: rgba(255, 255, 255, 0.1);
-      font-weight: bold;
-    }
-    
-    #custom-tooltip .text2 {
-      color: #ff6b6b;
-    }
-    
-    #custom-tooltip .text3 {
-      color: #51cf66;
-    }
-    
-    #custom-tooltip .tc1 {
-      color: #74c0fc;
-    }
-    
-    #custom-tooltip .tc2 {
-      color: #ff6b6b;
-    }
-    
-    #custom-tooltip .tc3 {
-      color: #51cf66;
-    }
-    
-    #custom-tooltip .tc4 {
-      color: #ffd43b;
-    }
-
-  </style>
 </head>
 <body>
 
@@ -191,12 +98,11 @@ $maxcol = $row['maxcol'];
 
 <?php
 //links oben spielname
-echo '<div id="gamename" style="top:40000px; left:40000px;" data-left="40000" data-top="40000">die ewigen</div>';
-echo '<div id="serverdesc" style="top:40512px; left:40000px;" data-left="40000" data-top="40512">'.$sv_server_name.' '.$sv_server_tag.'</div>';    
+echo '<div id="gamename" style="top:40000px; left:40000px;">die ewigen</div>';
+echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.' '.$sv_server_tag.'</div>';    
 
 
-
-$sector_width = 1200;
+$sector_width = 1300;
 $sector_height = 150;
 
 $mapcontent_width = 100000;
@@ -333,9 +239,12 @@ foreach ($sectorList as $sf) {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id=?", [$sf]);
     $sec_data = mysqli_fetch_array($db_daten);
 
-    echo '<div id="sector_'.$sf.'" 
-		style="width: '.($sector_width).'px; height: '.($sector_height).'px;
-		padding: 0px; margin: 0 0 30px 0; background-color: rgba(0, 0, 0, 0.6); ">';
+    // CSS-Klasse für eigenen Sektor
+    $sectorClass = ($sf == $ownsector) ? 'sector-container own-sector' : 'sector-container';
+
+    echo '<div id="sector_'.$sf.'" class="'.$sectorClass.'" 
+		style="width: '.($sector_width).'px; height: auto; min-height: '.($sector_height).'px;
+		padding: 0px; margin: 0 0 30px 0;">';
 
     $rzadd = 0;
     if ($ownsector <> $sf) {
@@ -477,6 +386,17 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
             $rang = "<img src='".$ums_gpfad.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
 
+            $userTitle='';
+            if($row['owner_id'] > 0) {
+                $sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
+                $db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
+                if(mysqli_num_rows($db_datenx) > 0){
+                    while ($rowx = mysqli_fetch_assoc($db_datenx)){
+                        $userTitle.=$rowx['title'].'<br>';
+                    }
+                }            
+            }
+
             ////////////////////////////////////////////////////////////////////////
             //spielername, details, im sektor online
             ////////////////////////////////////////////////////////////////////////
@@ -501,6 +421,7 @@ foreach ($sectorList as $sf) {
             $knowrasse = 0;
             $playerstatus = 0;
             $rasse = '';
+            $playerStatusClass = '';
             //hat man scandaten über die rasse/allianz?
             unset($allytagscan);
             if (isset($scandaten)) {
@@ -511,6 +432,13 @@ foreach ($sectorList as $sf) {
                         }
                         $playerstatus = $scandaten[$i]['ps'];
                         $allytagscan = $scandaten[$i]['allytag'];
+
+                        if($playerstatus == 1) {
+                            $playerStatusClass = ' player-actions-secret-info-friend';
+                        } elseif($playerstatus == 2) {
+                            $playerStatusClass = ' player-actions-secret-info-enemy';
+                        }
+
                     }
                 }
             }
@@ -594,26 +522,19 @@ foreach ($sectorList as $sf) {
                 $showallytag = '';
             }
 
-            $output .= '<div style="
-                position: relative; 
-                width: 98px; 
-                height: 104px;
-                margin-left: 10px;
-                border: 0px solid #FFFFFF; 
-                color: #FFFFFF;
-                font-size: 14px;
+            $output .= '<div class="player-card" style="
 				background: url('.$ums_gpfad.'g/derassenlogo'.$planet_id.'.png);
 				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
-				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')">';
+				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')<br>'.$userTitle.'"">';
 
 
             ////////////////////////////////////////////////////////////////////////
             //Name / Rasse / Ally
             ////////////////////////////////////////////////////////////////////////
 
-            $output .= '<div style="margin-left: 5px; width: 90px; word-wrap: break-word; background: rgba(10,10,70,0.8);">
+            $output .= '<div class="player-name">
 				<a href="details.php?se='.$sector.'&sy='.$row['system'].'" target="h" class="'.$playercsstag.'">'.$playername.$osown.'</a>'.$showallytag.'</div>';
 
             ////////////////////////////////////////////////////////////////////////
@@ -638,7 +559,9 @@ foreach ($sectorList as $sf) {
                 $tooltip .= '<br>E: '.number_format($row['kg04'], 0, "", ".");
             }
 
-            $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.formatMasseinheit($row['score']).'</div>';
+            // Punkte und Kollektoren in einer Zeile
+            $output .= '<div class="player-stats">';
+            $output .= '<div class="tac'.$csstag.'" title="'.$tooltip.'">'.formatMasseinheit($row['score']).'</div>';
 
             ////////////////////////////////////////////////////////////////////////
             //kollektoren
@@ -649,21 +572,33 @@ foreach ($sectorList as $sf) {
                 $csstag = ' text2';
             }
             $tooltip = wellenrechner($row['col'], $maxcol, 0);
-            $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; right: 0px; text-align: right; bottom: 0px; width: 50%;" title="'.$tooltip.'">'.number_format($row['col'], 0, "", ".").'</div>';
+            $output .= '<div class="tac'.$csstag.'" title="'.$tooltip.'">'.number_format($row['col'], 0, "", ".").'</div>';
+            $output .= '</div>';
 
             ////////////////////////////////////////////////////////////////////////
             //aktion
             ////////////////////////////////////////////////////////////////////////
 
             $aktion = '
-				<a class="text1" target="h" href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Sonde starten">S</a>&nbsp;
-				<a class="text1" target="h" href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'" title="Agenteneinsatz">A</a>&nbsp;
-				<a class="text1" target="h" href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">F</a>&nbsp;
-				<a class="text1" target="h" href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'"><img src="'.$ums_gpfad.'g/ps_'.$playerstatus.'.gif" border="0" title="Geheimdienstinformationen"></a>';
+				<a target="h" href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Sonde starten">
+                    <div class="icon-sonde"></div>
+                </a>
 
-            $output .= '<div class="tac'.$csstag.'" style="font-size: 12px; position: absolute; right: 0px; text-align: right; bottom: 20px; width: 100%; z-index: 10;">'.$aktion.'</div>';
+				<a target="h" href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'" title="Agenteneinsatz">
+                    <div class="icon-agent"></div>
+                </a>
 
-            $output .= '</div>';//player
+				<a class="text1" target="h" href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">
+                    <div class="icon-fleet"></div>
+                </a>
+				
+                <a class="text1'.$playerStatusClass.'" target="h" href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Geheimdienstinformationen">
+                    <div class="icon-secret-info"></div>
+                </a>';
+
+            $output .= '<div class="player-actions">'.$aktion.'</div>';
+
+            $output .= '</div>';//player-card
         }
 
         if ($rzadd == 0) {
@@ -703,13 +638,14 @@ foreach ($sectorList as $sf) {
             $sektorinfo .= '</span>';
         } else {
             $sektorinfo = '';
-            $sektorinfo = '';
             $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
             $sektorinfo .= ' '.$infostr.' freier Sektor';
             $sektorinfo .= '</span>';
         }
         
-        $sektorHeadline='<div style="text-align: left; width: 100%; height: 24px; background-color: rgba(0,68,124,0.5); color: #DDDDDD; overflow: hidden;">'.$sektorinfo.'</div>';
+        // Neue Struktur mit verbessertem Design
+        echo '<div class="sector-header">'.$sektorinfo.'</div>';
+        echo '<div class="sector-content">';
 
         $artstr='';
         $basestr='';
@@ -804,22 +740,22 @@ foreach ($sectorList as $sf) {
                     $basestr = '&nbsp;';
                 }
 
-                $basestr='<div style="width: 98px; height: 120px; border: 0px solid #FFFFFF; color: #FFFFFF; font-size: 14px;">'.$basestr.$artstr.'</div>';
+                $basestr='<div class="sector-base">'.$basestr.$artstr.'</div>';
 
             }
         }
 
+        // Sektorraumbasis und Artefakte anzeigen
+        if ($basestr != '') {
+            echo $basestr;
+        }
         
-
-        //Sektorkopfzeile ausgeben
-        echo $sektorHeadline;
-
-        //Ausgabe von Sektorraumbasis, die Artefakte und die Spieler in einer Zeile
-        echo '<div style="display: flex; padding: 10px;">';
-        echo $basestr; //Sektorraumbasis + Artefakte
-        echo $output; //Spieler
-
-        echo '</div>'; //flex div (SRB, Artefakte, Spieler)
+        // Spieler in verbesserter Darstellung
+        echo '<div class="sector-players">';
+        echo $output;
+        echo '</div>'; // sector-players
+        
+        echo '</div>'; // sector-content
     }
     echo '</div>';//sektor ende
 }
