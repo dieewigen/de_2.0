@@ -28,10 +28,10 @@ if (!isset($_SESSION["de_chat_inputchannel"])) {
 <?php
 
 if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
-	echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$_SESSION['ums_rasse'].'_m.css">';
+	echo '<link rel="stylesheet" type="text/css" href="gp/c'.$_SESSION['ums_rasse'].'_m.css">';
 	echo '<meta name="viewport" content="width=620">';
 }else{
-	echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'c'.$_SESSION['ums_rasse'].'.css">';
+	echo '<link rel="stylesheet" type="text/css" href="gp/c'.$_SESSION['ums_rasse'].'.css">';
 }
 
 

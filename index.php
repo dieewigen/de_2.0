@@ -92,17 +92,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		$_REQUEST['loginkey'] = '';
 	}
 		
-	//$sql = "SELECT * FROM de_login WHERE nic = '".$nic."' AND (pass = MD5('".$pass."') OR newpass = MD5('".$pass."')) OR loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
 	$sql = "SELECT * FROM de_login WHERE loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
-	//echo $sql;
-
-	/*
-ALTER TABLE `de_login` ADD INDEX(`pass`); 
-ALTER TABLE `de_login` ADD INDEX(`newpass`); 
-ALTER TABLE `de_login` ADD INDEX(`loginkey`); 
-ALTER TABLE `de_login` ADD INDEX(`loginkeytime`); 
-	*/
-
 	$result = mysqli_execute_query($GLOBALS['dbi'], $sql, []) OR die(mysqli_error($GLOBALS['dbi']));
 	$num = mysqli_num_rows($result);
 	
@@ -111,16 +101,7 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 	  session_regenerate_id(true);
 	  $row = mysqli_fetch_array($result);
 	  $ums_status=$row["status"];
-	  $_SESSION["ums_cooperation"]=$row["cooperation"];
 	  $_SESSION["ums_owner_id"]=$row["owner_id"];
-
-	  //hier die ip beim login über den deb-link überpr�fen
-	  /*
-	  if($_REQUEST["loginkey"]!='')
-	  {
-		if($row["loginkeyip"]!='' AND $row["loginkeyip"]!=getenv("REMOTE_ADDR"))$ums_status=5;	
-	  }
-	  */
 
 	  if($ums_status==3)//urlaubsmodus/l�schmodus
 	  {
@@ -192,13 +173,6 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$ums_spielername=$row["spielername"];
 		$ums_rasse=$row["rasse"];
 		$ums_premium=$row["premium"];
-		$_SESSION['ums_sm_remtime']=$row["sm_remtime"];
-		$_SESSION['ums_sm_remtimer']=0;
-		$_SESSION['ums_sm_haswhg']=$techs[4];
-		$_SESSION['ums_useefta']=$row["useefta"];
-		$_SESSION['sou_user_id']=$row["sou_user_id"];
-		$_SESSION['efta_user_id']=$row["efta_user_id"];
-		$_SESSION['ums_werberid']=$row["werberid"];
 		
 		if(isset($_REQUEST['mobi'])){
 			$_SESSION['ums_mobi']=intval($_REQUEST['mobi']);
@@ -211,7 +185,6 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		//////////////////////////////////////////////////////////////////////
 		//check ob die mobile Version verwendet werden soll
 		//////////////////////////////////////////////////////////////////////
-		//if($_REQUEST['mobilversion']=="on")$_SESSION['ums_mobi']=1;
 		//zuerst auf Cookie checken
 		//wenn es kein Cookie gibt, dann eins per MobileDetect setzen
 		if(isset($_COOKIE['use_mobile_version'])){
@@ -289,8 +262,20 @@ ALTER TABLE `de_login` ADD INDEX(`loginkeytime`);
 		$_SESSION['ums_premium']=$ums_premium;
 		//$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;
 
+		//überprüfen ob es der 1. login ist, in dem fall den beitritt im allgemeinen chat hinterlegen
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], 
+		"SELECT logins FROM de_login WHERE user_id=?", 
+		[$_SESSION['ums_user_id']]);
+		$row = mysqli_fetch_assoc($db_daten);
+		if($row['logins']==1){
+			insert_chat_msg(0, 2, $_SESSION['ums_spielername'], ' <font color="#FFFF00">Ich habe mich '.$sv_server_tag.' angeschlossen.</font>');
+			mysqli_execute_query($GLOBALS['dbi'], 
+			"UPDATE de_login SET logins=logins+1 WHERE user_id=?", 
+			[$_SESSION['ums_user_id']]);
+		}
+
 		//testen ob er das alternativ-pw verwendet hat
-		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND newpass = MD5(?)", [$ums_user_id, ($_POST['pass'] ?? '')]) OR die(mysqli_error($GLOBALS['dbi']));
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND newpass = MD5(?)", [$_SESSION['ums_user_id'], ($_POST['pass'] ?? '')]) OR die(mysqli_error($GLOBALS['dbi']));
 		$num = mysqli_num_rows($result);
 
 		if($num==1 AND $_REQUEST["loginkey"]=='')//er hat das alternative pw benutzt
