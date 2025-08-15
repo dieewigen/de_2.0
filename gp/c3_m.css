@@ -1,0 +1,14 @@
+body {scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333;scrollbar-3dlight-color: #692323;
+scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;scrollbar-arrow-color: #C85A5A;
+background-color: #000000;
+padding:0px; color: #DE3939; margin-left:0px; margin-top:0px; margin-right:0px; margin-bottom:0px;
+font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}
+
+font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}
+form {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt}
+A:link {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: none; color: #DE3939}
+A:visited {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: none; color: #DE3939}
+A:hover {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: underline; color: #DE3939}
+input { font-size:8pt; font-family:Tahoma; color:#DE3939; background-color:#000000; border:1px solid #DE3939; }
+input.c { border: none; }
+.cellbg {background:url(g/cellblack.png) repeat; color: #ffffff; font-size:12px;}

@@ -19,7 +19,7 @@ $rowx = mysqli_fetch_assoc($db_datenx);
 $rundenstart_datum = $rowx["rundenstart_datum"];
 
 //hintergund laden
-$im = imagecreatefrompng("smilies/statvorl2.png");
+$im = imagecreatefrompng("lib/statvorl2.png");
 
 //statistische daten auslesen
 //spieler

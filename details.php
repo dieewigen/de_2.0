@@ -86,22 +86,9 @@ function zeichenundsmiliecheck()
 
 var nachricht =  document.getElementById("nachricht").value;
 var zeichen = document.getElementById("nachricht").value.length;
-var i=0;
-var j=2;
-var smilies=0;
 
-while(i<zeichen)
-{
-if(nachricht.substring(i,j)==":)" || nachricht.substring(i,j+1)=="(!)" || nachricht.substring(i,j+1)=="(?)" || nachricht.substring(i,j)==":L" || nachricht.substring(i,j)==":}" || nachricht.substring(i,j)==":{" || nachricht.substring(i,j)==":p" || nachricht.substring(i,j)=="x(" || nachricht.substring(i,j)==":(" || nachricht.substring(i,j)==":x" || nachricht.substring(i,j)==";)" || nachricht.substring(i,j)==":D")
-{
-smilies++;
-}
-j++;
-i++;
-}
-if(smilies>20)alert("<?php echo $details_lang['err_zu_viele_smilies'];?>");
 if(document.getElementById("nachricht").value.length>10000)alert("<?php echo $details_lang['err_zu_viele_zeichen']?>");
-if(smilies<=20 && document.getElementById("nachricht").value.length<=10000)
+if(document.getElementById("nachricht").value.length<=10000)
 {
 var temp=0;
 }
@@ -126,25 +113,14 @@ function check()
 {
 var nachricht =  document.getElementById("nachricht").value;
 var zeichen = document.getElementById("nachricht").value.length;
-var i=0;
-var j=2;
-var smilies=0;
-while(i<zeichen)
-{
-if(nachricht.substring(i,j)==":)" || nachricht.substring(i,j+1)=="(!)" || nachricht.substring(i,j+1)=="(?)" || nachricht.substring(i,j)==":L" || nachricht.substring(i,j)==":}" || nachricht.substring(i,j)==":{" || nachricht.substring(i,j)==":p" || nachricht.substring(i,j)=="x(" || nachricht.substring(i,j)==":(" || nachricht.substring(i,j)==":x" || nachricht.substring(i,j)==";)" || nachricht.substring(i,j)==":D")
-{
-smilies++;
-}
-j++;
-i++;
-}
-if(document.getElementById("nachricht").value.length>=10000 || smilies>20)
+
+if(document.getElementById("nachricht").value.length>=10000)
 {
 alert("<?php echo $details_lang['msg_zeichensmilie']?>");
 }
 else
 {
-alert("<?php echo $details_lang['msg_summezeichensmilie1']?> " + document.getElementById("nachricht").value.length + " <?php echo $details_lang['msg_summezeichensmilie2']?> "+ (10000 - document.getElementById("nachricht").value.length) +" <?php echo $details_lang['msg_summezeichensmilie3']?> " + smilies + " <?php $details_lang['msg_summezeichensmilie4']?> " + (20 - smilies) + " <?php echo $details_lang['msg_summezeichensmilie5']?>");
+alert("<?php echo $details_lang['msg_summezeichensmilie1']?> " + document.getElementById("nachricht").value.length + " <?php echo $details_lang['msg_summezeichensmilie2']?> "+ (10000 - document.getElementById("nachricht").value.length) +" <?php echo $details_lang['msg_summezeichensmilie3']?> " + " <?php $details_lang['msg_summezeichensmilie4']?> " + " <?php echo $details_lang['msg_summezeichensmilie5']?>");
 }
 }
 
@@ -353,27 +329,6 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 <tr class="cell">
               <td width='13' height='37' class='rl'>&nbsp;</td>
               <td colspan=2 align=center height=50>
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm1.gif" onclick="init('smile1')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm2.gif" onclick="init('smile2')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm3.gif" onclick="init('smile3')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm4.gif" onclick="init('smile4')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm5.gif" onclick="init('smile5')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm6.gif" onclick="init('smile6')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm7.gif" onclick="init('smile7')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm8.gif" onclick="init('smile8')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm9.gif" onclick="init('smile9')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm10.gif" onclick="init('smile10')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm11.gif" onclick="init('smile11')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm12.gif" onclick="init('smile12')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm13.gif" onclick="init('smile13')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm14.gif" onclick="init('smile14')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm15.gif" onclick="init('smile15')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm16.gif" onclick="init('smile16')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm17.gif" onclick="init('smile17')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm18.gif" onclick="init('smile18')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm19.gif" onclick="init('smile19')" alt="<?php echo $details_lang['altsmilie']?>">
-              <img src="<?php echo $ums_gpfad; ?>g/smilies/sm20.gif" onclick="init('smile20')" alt="<?php echo $details_lang['altsmilie']?>">
-              <br>
 
               <input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
               <input type="button" value="&nbsp;u&nbsp;"  onclick="init('under')">

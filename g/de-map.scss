@@ -76,9 +76,10 @@ body {
 	height: 100vh;
 	overflow: hidden;
 	touch-action: none;
+	z-index: 10;
 	/* WICHTIG: verhindert Browser-Gesten (z.B. Scroll) bei Touch */
 
-	background-image: url(g/PurpleNebula2048_back.jpg);
+	background-image: url(/g/PurpleNebula2048_back.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center center;
@@ -101,7 +102,7 @@ body {
 	background: rgba(0, 0, 0, 0.95);
 	color: white;
 	padding: 10px 15px;
-	border-radius: 8px;
+	border-radius: 6px;
 	font-size: 12px;
 	line-height: 1.4;
 	max-width: 400px;
@@ -158,7 +159,7 @@ body {
 /* Verbessertes Styling für Spielersektoren */
 .sector-container {
 	background: linear-gradient(135deg, rgba(30, 30, 47, 0.95), rgba(50, 50, 70, 0.95));
-	border: 2px solid rgba(79, 195, 247, 0.3);
+	border: 2px solid rgba(195, 195, 195, 0.3);
 	border-radius: 6px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(5px);
@@ -167,7 +168,7 @@ body {
 }
 
 .sector-header {
-	background: linear-gradient(90deg, rgba(79, 195, 247, 0.8), rgba(33, 150, 243, 0.8));
+	background: linear-gradient(90deg, rgba(195, 195, 195, 0.8), rgba(150, 150, 150, 0.8));
 	padding: 8px 12px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 	font-size: 13px;
@@ -224,8 +225,8 @@ body {
 
 .player-card:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
-	border-color: rgba(79, 195, 247, 0.6);
+	box-shadow: 0 4px 12px rgba(195, 195, 195, 0.3);
+	border-color: rgba(79, 79, 79, 0.6);
 }
 
 .player-card::before {
@@ -247,6 +248,10 @@ body {
 	text-align: center;
 	flex-shrink: 0;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+	a{
+		text-decoration: none;
+	}
 }
 
 .player-stats {

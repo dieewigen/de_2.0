@@ -1,0 +1,19 @@
+@font-face { font-family: 'envy'; src: url('EnvyCodeR.ttf');}
+body{
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer */
+  -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+  -webkit-user-select: none; /* Chrome, Safari, and Opera */
+  -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+  font-family: 'envy';
+}
+
+.text1{color: #ffffff;}
+.text2{color: #ff0000;}
+.text3{color: #00ff00;}
+.fett{font-weight: bold;}
+.tac{text-align: center;}
+.tc1{color: #ffffff;}
+.tc2{color: #ff0000;}
+.tc3{color: #00ff00;}
+.tc4{color: #FDFB59;}

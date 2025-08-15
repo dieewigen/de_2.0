@@ -27,7 +27,7 @@ $rowx = mysqli_fetch_array($resultx, MYSQLI_BOTH);
 $allyid = isset($rowx["id"]) ? $rowx["id"] : 0;
 
 //hintergund laden
-$im = imagecreatefrompng("smilies/statvorl2.png");
+$im = imagecreatefrompng("lib/statvorl2.png");
 
 //statistische daten auslesen mit prepared statements
 $result = null;

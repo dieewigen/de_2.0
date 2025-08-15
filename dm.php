@@ -187,25 +187,6 @@ $_SESSION['ic_last_refresh']=0;
 	
 	
 	<?php
-	//<div onclick="switch_iframe_main_container_big('ang_techs.php')" style="position: absolute; left: 4px; bottom: 4px;"><img src="g/button_tech.png" style="height: 48px; width: auto;" title="Technologien"></div>
-	//<a href="production.php" target="h" style="position: absolute; left: 56px; bottom: 4px;"><img src="g/button_production.png" style="height: 48px; width: auto;" title="Produktion"></a>
-	//<a href="specialization.php" target="h" style="position: absolute; left: 108px; bottom: 4px;"><img src="g/button_specialization.png" style="height: 48px; width: auto;" title="Spezialisierung"></a>
-	
-	//<div onclick="switch_iframe_main_container_big('ang_production.php')" style="position: absolute; left: 56px; bottom: 4px;"><img src="g/button_production.png" style="height: 48px; width: auto;" title="Produktion"></div>
-	/*
-	<script type='text/javascript'>
-	var Module = {
-		TOTAL_MEMORY: 268435456,
-		errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
-		compatibilitycheck: null,
-		dataUrl: "Release/Build.data",
-		codeUrl: "Release/Build.js",
-		memUrl: "Release/Build.mem",
-	};
-</script>
-<script src="Release/UnityLoader.js"></script>
-*/
-
 //gibt es eine Chatgröße im Cookie?
 $chat_width=400;
 $chat_height=400;

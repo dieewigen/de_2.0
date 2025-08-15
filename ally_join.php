@@ -134,6 +134,8 @@ if($ok || $warnung){
 				$result = mysqli_execute_query($GLOBALS['dbi'],
 					"UPDATE de_user_data SET ally_id=?, allytag=?, status=0 WHERE user_id=?",
 					[$ally_id, $allytag, $ums_user_id]);
+
+				$antrag= $_POST['antrag'];
 				$antrag = htmlentities($antrag, ENT_QUOTES);
 				$antrag = str_replace("\n","<br>",$antrag);
 				$result = mysqli_execute_query($GLOBALS['dbi'],
@@ -144,10 +146,12 @@ if($ok || $warnung){
 						"UPDATE de_ally_antrag SET ally_id=?, antrag=? WHERE user_id=?",
 						[$clanid, $antrag, $ums_user_id]);
 				}
+				
 				notifyUser($leaderid, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid1, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid2, $allyjoin_lang['msg_8'], "6");
 				notifyUser($coleaderid3, $allyjoin_lang['msg_8'], "6");
+
 				$transaction_result = mysqli_execute_query($GLOBALS['dbi'],
 					"SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'",
 					[$ums_user_id]);

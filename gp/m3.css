@@ -1,0 +1,27 @@
+body{scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333;scrollbar-3dlight-color: #692323;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;scrollbar-arrow-color: #C85A5A; font-family: Arial, helvetica, geneva, sans-serif; color: #0bbfff; font-size:11px; background-image:url(g/bgr3_1.jpg); background-position: 209px 0px; background-repeat:repeat; background-attachment:fixed;background-color: #000000; margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto;}
+
+a:link {text-decoration:none;cursor: pointer;color: #FFFFFF; font-size:14px;}
+a:active {text-decoration:none;cursor: pointer;color: #FFFFFF; font-size:14px;}
+a:visited {text-decoration:none;cursor: pointer;color: #FFFFFF; font-size:14px;}
+a:hover {text-decoration:none;cursor: pointer;color: #FFFFFF;  font-size:14px; font-weight:bold;}
+
+#content {float: none;width:209px;height:100%;overflow: hidden; position:absolute;}
+
+#gig1{background:url(g/m/3_gig1.png); width:50px; height:50px; position: absolute; top: 42px; left: 30px; cursor: pointer; z-index: 20;}
+#gig2{background:url(g/m/3_gig2.png); width:50px; height:50px; position: absolute; top: 42px; left: 117px; cursor: pointer; z-index: 20;}
+
+#menumain{z-index: 20; position: absolute; left: 40px; width: 120px; height: 500px; overflow: hidden; margin-top:197px; margin-bottom:400px;}
+#menubtns{z-index: 21; position: absolute; left: 0px; width: 120px; overflow: hidden;}
+
+.m1{background:url(g/m/3_menu1.png);background-repeat: no-repeat; width:197px; height:400px; position: absolute; top:0px; z-index:10;}
+.m2{background:url(g/m/3_menu2.png);background-repeat: repeat; width:197px; height: 80%; position: absolute; top: 70px; bottom: 200px; z-index: 1;}
+.m3{background:url(g/m/3_menu3.png);background-repeat: no-repeat; width:197px; height:309px; position: absolute;bottom:0px; z-index: 5;}
+
+A.btn:link, A.btn:visited, A.btn:hover{background:url(g/m/3_btn.png); display: block; cursor: pointer; width:120px; height:18px; padding-top:0px; text-align: center; background-repeat: no-repeat; margin-top: 2px; z-index: 20;}
+.btnspacer{width:118px; height:8px; font-size:8px;}
+
+#btnup1{background:url(g/m/3_btnup1.png); width:72px; height:31px; position: absolute; top: 155px; left: 62px; z-index: 15;}
+#btnup2{background:url(g/m/3_btnup2.png); width:72px; height:31px; position: absolute; top: 155px; left: 62px; visibility:hidden; z-index: 16;}
+
+#btndown1{background:url(g/m/3_btndown1.png); width:72px; height:31px; position: absolute; bottom: 104px; left: 62px; z-index: 15;}
+#btndown2{background:url(g/m/3_btndown2.png); width:72px; height:31px; position: absolute; bottom: 104px; left: 62px; visibility:hidden; z-index: 16;}

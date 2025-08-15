@@ -82,20 +82,6 @@ $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT empfaenger, time, betref
 
   while($row = mysqli_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
   {
-
-    $row[text] = str_replace(":)","<img src=\"../g/smilies/sm1.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":D","<img src=\"../g/smilies/sm2.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(";)","<img src=\"../g/smilies/sm3.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":x","<img src=\"../g/smilies/sm4.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":(","<img src=\"../g/smilies/sm5.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("x(","<img src=\"../g/smilies/sm6.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":p","<img src=\"../g/smilies/sm7.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(?)","<img src=\"../g/smilies/sm8.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(!)","<img src=\"../g/smilies/sm9.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":{","<img src=\"../g/smilies/sm10.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":}","<img src=\"../g/smilies/sm11.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":L","<img src=\"../g/smilies/sm12.gif\" alt=\"Smilie\">",$row[text]);
-
     $row[text] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row[text]);
     $row[text] = str_replace("[CROT]","<font color=\"#F10505\">",$row[text]);
     $row[text] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row[text]);

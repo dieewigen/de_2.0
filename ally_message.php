@@ -265,7 +265,7 @@ echo '<input type=submit  style="background-color:#000000;border:1;border-color:
       {
           while($hfnrow = mysqli_fetch_assoc($db_memhfnmem))
       {
-      $t=$hfnrow['time'];
+      $t=(string)$hfnrow['time'];
       $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
       ?>
 

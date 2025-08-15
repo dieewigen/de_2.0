@@ -64,7 +64,7 @@ $klassenname[]='Energiegeschoss-Plattform';
 $klassenname[]='Materiegeschoss-Plattform';
 $klassenname[]='Hochenergiegeschoss-Plattform';
 
-hmen_oben('Einheiteninformationen');
+rahmen_oben('Einheiteninformationen');
 echo '<div style="width: 576px; position: relative; font-size: 10px; text-align: center;">';
 echo '<table style="width: 100%; font-size: 10px;">';
 for($i=81;$i<=104;$i++){
