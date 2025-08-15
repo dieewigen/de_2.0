@@ -91,8 +91,8 @@ $_SESSION['ic_last_refresh']=0;
 		echo '<div onclick="switch_iframe_main_container(\'resource.php\')" id="tb_res5" class="topbar_textfield" style="cursor: pointer; top: 8px; left: 466px;" rel="tooltip"></div>';
 
 		//Deffer
-		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img_grey" src="g/icon6_grey.png" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 32px; width: 24px; height: auto;" title="zum Sektorstatus" rel="tooltip">';
-		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img" src="g/icon6.png" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 32px; width: 24px; height: auto;" title="Du wirst von diesen Einheiten verteidigt." rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img_grey" src="g/icon6_grey.png" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 36px; width: 24px; height: auto;" title="zum Sektorstatus" rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img" src="g/icon6.png" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 36px; width: 24px; height: auto;" title="Du wirst von diesen Einheiten verteidigt." rel="tooltip">';
 		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 66px;" title="zum Sektorstatus" rel="tooltip">&nbsp;</div>';
 		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer" class="topbar_textfield" style="color: rgba(40,112,53,1); display: none; cursor: pointer; top: 36px; left: 66px;" rel="tooltip"></div>';
 		
