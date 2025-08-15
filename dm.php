@@ -19,7 +19,7 @@ $_SESSION['ic_last_refresh']=0;
 	<link rel="shortcut icon" href="favicon.ico" />
 
 	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
-	<link rel="stylesheet" href="g/style.css?<?php echo filemtime('g/style.css');?>">	
+	<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-desktop.css');?>">	
 	
 	<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
