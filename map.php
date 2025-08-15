@@ -86,7 +86,7 @@ $maxcol = $row['maxcol'];
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Karte</title>
-  <link rel="stylesheet" type="text/css" href="/gp/de-map.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-map.css'); ?>">
+  <link rel="stylesheet" type="text/css" href="/gp/de-map.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-map.css'); ?>">
   <script>
     var ownSector = <?php echo ($ownsector > 1) ? $ownsector : 3; ?>;
   </script>
@@ -166,7 +166,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
     $output .= '<div style="left: '.$alienpos_x.'px; top: '.$alienpos_y.'px; position: absolute; width: 98px; height: 104px; 
 		border: 0px solid #cd02d9; color: #FFFFFF; font-size: 14px;
-		background: url('.$ums_gpfad.'s/p'.$planet_id.'.png);
+		background: url('.$ums_gpfad.'g/s/p'.$planet_id.'.png);
 		background-size: 90% auto;
 		background-position: 5px 0px;
 		background-repeat: no-repeat;
@@ -879,10 +879,10 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
         //immer sichtbare Systeme haben einen Sonderstatus
         if (in_array($row['id'], $immer_sichtbare_systeme)) {
-            $bg_image = $ums_gpfad.'s/sym3.png';
+            $bg_image = $ums_gpfad.'g/s/sym3.png';
 
         } else {
-            $bg_image = $ums_gpfad.'s/p'.$planet_id.'.png';
+            $bg_image = $ums_gpfad.'g/s/p'.$planet_id.'.png';
 
             $planet_id++;
             if ($planet_id > 20) {
@@ -932,38 +932,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
             }
 
             ///////////////////////////////////////////
-            //Feld anzeigen
-            ///////////////////////////////////////////
-            //$output.='<div style="height: 50px; width: 300px; border: 1px solid '.$bordercolor.'; margin-bottom: 10px; box-sizing: border-box; padding: 5px; cursor: pointer;" onclick="location.href=\'map_system.php?id='.$data->system_id.'&fieldid='.$i.'\'">';
-            ///////////////////////////////////////////
-            //Blocker anzeigen
-            ///////////////////////////////////////////
-            /*
-            if(isset($data->fields[$i][1])){
-                $output.='Feldblocker: '.$data->fields[$i][1][1].'x '.$GLOBALS['map_field_blocker'][$data->fields[$i][1][0]]['name'].'<br>';
-            }*/
-
-            ///////////////////////////////////////////
-            //Gebäude anzeigen
-            ///////////////////////////////////////////
-            /*
-            for($b=0;$b<count($data->playerBldg);$b++){
-                if($data->playerBldg[$b]['field_id']==$i){
-                    //wird das Gebäude gerade ausgebaut?
-                    if(time()<$data->playerBldg[$b]['bldg_time']){
-                        //Ausbau läuft
-                        $output.=$GLOBALS['map_buildings'][$data->playerBldg[$b]['bldg_id']]['name'].' (Ausbau auf Stufe '.($data->playerBldg[$b]['bldg_level']).': <span id="build_counter'.$i.'"></span>)';
-                        $output.='<script type="text/javascript">ang_countdown('.($data->playerBldg[$b]['bldg_time']-time()).',"build_counter'.$i.'",0)</script>';
-                        $output.='<br>';
-                    }else{
-                        //wird nicht ausgebaut
-                        $output.=$GLOBALS['map_buildings'][$data->playerBldg[$b]['bldg_id']]['name'].' (Stufe '.$data->playerBldg[$b]['bldg_level'].')<br>';
-                    }
-                }
-            }*/
-
-
-            ///////////////////////////////////////////
             //Feld-Ressource anzeigen
             ///////////////////////////////////////////
             //Gebäudestufe bestimmen
@@ -999,15 +967,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
                 //Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
                 if (isset($bldg[$row['id']][$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'])) {
 
-                    //$GLOBALS['greek_chars']
-                    /*
-                    $output.='
-                    <div style="text-align:center; margin-right: 1px; font-size: 10px; line-height: 10px;">
-                        <img style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 5px;'.$border.'" src="'.$ums_gpfad.'g/r/'.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['name'].'">
-                        '.$stufeninfo.'
-                    </div>';
-                    */
-
                     $output .= '
 						<div style="font-size: 10px; line-height: 10px; text-align:center;">
 							<div style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #999999; text-align: center; box-sizing: border-box; border-radius: 5px;" title="'.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['name'].'">'.$GLOBALS['greek_chars'][$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id']].'</div>
@@ -1016,7 +975,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
 
                 } else {
-                    //$output.='<div title="keine Rohstoffe" style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;'.$border.'">-'.$bldg[$row['id']][$i]['bldg_id'].'</div>';
                     $output .= '<div title="keine Rohstoffe" style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;'.$border.'">-</div>';
                 }
 
@@ -1029,13 +987,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
             if (($i + 1) % 5 == 0) {
                 $output .= '</div><div style="display: flex;">';
             }
-            //}
-
-            //$output.='</div>';
-
-            //Test auf Loot
-            //$output.=print_r($immer_sichtbare_systeme,true);
-
         }
     }
 
