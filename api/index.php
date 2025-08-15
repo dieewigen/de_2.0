@@ -50,6 +50,12 @@ if(isset($data['action']) && !empty($data['action'])) {
             echo json_encode(['status' => 'success', 'data' => $users]);
             break;
 
+        case 'getAllUsers':
+            $userModel = new GetAllUsers();
+            $users = $userModel->getAllUsers();
+            echo json_encode(['status' => 'success', 'data' => $users]);
+            break;
+
             
         case 'getUserFleet':
             //is user_id valid
