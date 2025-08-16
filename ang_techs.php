@@ -14,7 +14,7 @@ include 'functions.php';
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 
 	<link rel="stylesheet" href="js/jquery-ui.min-1.12.0.css">
-	<link rel="stylesheet" href="g/style.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/style.css');?>">
+	<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-desktop.css');?>">
 
 <?php
 //include "cssinclude.php";

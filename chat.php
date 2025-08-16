@@ -9,15 +9,13 @@ $chat_sectorcolor = '#FFFFFF';
 $chat_allycolor = '#00FF00';
 $chat_allgemeincolor = '#4a91fc';
 
-//aus performancegr�nden den sektor nur alle x minuten auslesen
 //schauen ob es die variablen schon gibt
 if (!isset($_SESSION["de_chat_inputchannel"])) {
     $_SESSION["de_chat_inputchannel"] = 0;
 }
 
-//$_SESSION['de_chat_lastid']=0;
+//$_SESSION['ums_mobi']=0;
 
-//include "functions.php";
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -25,61 +23,44 @@ if (!isset($_SESSION["de_chat_inputchannel"])) {
 <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 <title>DE Chat</title>
 <meta charset="UTF-8">
+
+<link rel="stylesheet" type="text/css" href="/gp/de-chat.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-chat.css'); ?>">
 <?php
 
+$pageType='desktop';
 if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
-	echo '<link rel="stylesheet" type="text/css" href="gp/c'.$_SESSION['ums_rasse'].'_m.css">';
-	echo '<meta name="viewport" content="width=620">';
-}else{
-	echo '<link rel="stylesheet" type="text/css" href="gp/c'.$_SESSION['ums_rasse'].'.css">';
-}
-
-
-//die Textgröße in der mobilen Version anpassen
-if ($_SESSION['ums_mobi'] == 1) {
-    echo '
-<style type="text/css">
-#chatcontent{font-size: 28px;}
-A:link{font-size: 28px;}
-A:visited{font-size: 28px;}
-A:hover{font-size: 28px;}
-</style>';
-
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
+	$pageType='mobile';
 }
 
 echo '</head>';
-echo '<body bgcolor="#000000" style="overflow: hidden">';
+echo '<body bgcolor="#000000" style="overflow:hidden;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.$pageType.'">';
+
+if($pageType==='mobile'){
+	echo '<div class="chat-wrapper">';
+	echo '<div id="chatheader"><a href="menu.php" style="color:#fff; text-decoration:none;">zum Menü</a></div>';
+}
 
 //container-div
-echo '<div id="container" class="cellbg" style="width: 100%; height: 100%; position: absolute;">';
+echo '<div id="container" class="cellbg" style="'.($pageType==='mobile'
+	? 'flex:1 1 auto; display:flex; flex-direction:column; width:100%; min-height:0;'
+	: 'width:100%; height:100%; position:absolute;').'">';
+
+// alter mobiler Menü-Block entfernt (Header jetzt außerhalb von chatcontent)
 
 //ausgabe div
-echo '<div id="chatcontent" style="width: 100%; height: 100px; overflow: auto; position: relative;">';
-
-if ($_SESSION['ums_mobi'] == 1) {
-    //Menu in der mobilen Version
-    echo '<a href="menu.php"><div style="
-		margin-bottom: 5px; 
-		width: 100%; 
-		margin-top: 5px; 
-		border: 1px solid #333333;
-		background-color: #222222;
-		color: #FFFFFF !important;
-		font-size: 30px !important;
-		padding: 3px;
-		box-sizing: border-box;
-		text-align: center;
-		">zum Men&uuml;</div></a>';
-}
+echo '<div id="chatcontent" style="'.($pageType==='mobile'
+	? 'flex:1 1 auto; overflow:auto; -webkit-overflow-scrolling:touch; min-height:0;'
+	: 'width:100%; height:100px; overflow:auto; position:relative;').'">';
 
 echo '</div>';
 
 //input div
-if ($_SESSION['ums_mobi'] == 1) {
+if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
 
-    $chatchannelchangefontsize = 26;
-    $chatinputheight = 60;
-    $inputfontsize = 50;
+    $chatchannelchangefontsize = 20;
+    $chatinputheight = 40;
+    $inputfontsize = 24;
 
     if (!isset($_COOKIE['deactivate_swipe'])) {
         $_COOKIE['deactivate_swipe'] = 0;
@@ -87,7 +68,7 @@ if ($_SESSION['ums_mobi'] == 1) {
 
     if ($_COOKIE['deactivate_swipe'] != 1) {
         ?>
-<script type="text/javascript">
+<script>
 function swipedetect(el, callback){
   
     var touchsurface = el,
@@ -155,33 +136,46 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 } else {
     $chatchannelchangefontsize = 10;
-    $chatinputheight = 12;
+    $chatinputheight = 16;
     $inputfontsize = 12;
 }
 
 if ($_SESSION['ums_mobi'] == 1) {
-    $inputtags = ' autocomplete="on" autocorrect="on" spellcheck="on" ';
+	$inputtags = ' autocomplete="on" autocorrect="on" spellcheck="on" ';
 } else {
-    $inputtags = '';
+	$inputtags = '';
 }
+$chatHeight = $chatinputheight + 1;
+$containerStyle = ($pageType==='mobile' ? 'position:relative; width:100%;' : 'bottom:0; position:relative; width:100%;');
+$chatinput_html = <<<HTML
+<div id="chatinput" style="$containerStyle">
+	<form onsubmit="return chat_input()">
+		<div style="display:flex;">
+			<div style="flex-grow:1;">
+				<span id="chatchannelchanger" style="font-size: {$chatchannelchangefontsize}px;"></span>&nbsp;
+			</div>
+			<div style="font-size:14px;">
+				<span>Autoscroll</span> <input type="checkbox" id="autoscroll" checked>
+			</div>
+		</div>
+		<div style="width:100%; display:flex; justify-content:center; align-items:center; height: {$chatHeight}px;">
+			<div style="flex-grow:1;">
+				<input $inputtags class="chatinput" style="width:100%; height: {$chatHeight}px; font-size: {$inputfontsize}px" type="text" name="chatinputfield" id="chatinputfield" maxlength="1000" value="" autocomplete="off">
+			</div>
+			<div style="width:100px; text-align:center; margin-left:2px;">
+				<input style="width:100%; height: {$chatHeight}px; font-size: {$chatchannelchangefontsize}px;" type="submit" name="send" value="{$chat_lang['senden']}" onclick="chat_input()">
+			</div>
+		</div>
+	</form>
+</div>
+HTML;
+echo $chatinput_html;
 
-echo '<div id="chatinput" style="bottom: 0px; position: relative; width: 100%;">
-    <form OnSubmit="return chat_input()">';
+echo '</div>'; // container
 
-echo '<table width="100%" border="0" cellpadding="0px" cellspacing="0px">
-  		<tr>
-    		<td colspan="2"><span id="chatchannelchanger" style="font-size: '.$chatchannelchangefontsize.'px;">
-    		</span>&nbsp;Autoscroll <input type="checkbox" id="autoscroll" checked></td>
-  		</tr>
-  		<tr>
-    		<td width="85%"><input '.$inputtags.' class="chatinput" style="width: 99%; height: '.($chatinputheight + 1).'px; font-size: '.$inputfontsize.'px" type="text" name="chatinputfield" id="chatinputfield" maxlength="1000" value="" autocomplete="off"></td>
-    		<td width="15%"><input style="width: 99%; height: '.($chatinputheight + 4).'px; font-size: '.$chatchannelchangefontsize.'px" type="Submit" name="send" value="'.$chat_lang['senden'].'" onClick="chat_input()"></td>
-  		</tr></table>';
-
-echo '</form>
-    </div>';
-
-echo '</div>';
+if($pageType==='mobile'){
+	echo '</div>'; // chat-wrapper
+}
 
 ?>
 <script type="text/javascript">
@@ -296,23 +290,10 @@ function chat_input(){
 }
 
 function setsize(){
-  var height=document.getElementById("container").offsetHeight-document.getElementById("chatinput").offsetHeight-4;
-  //var height=window.innerHeight-document.getElementById("chatinput").offsetHeight-4;
-  $('#chatcontent').css('height', height+'px');
-  $('#chatcontent').css('max-height', height+'px');
-  <?php
-  if ($ums_user_id == 1) {
-      ?>
-  	//$('#chatcontent').css('height', '300px');
-  	//$('body').css('height', '300px');
-  	//alert($('#chatcontent').css('height'));
-	//$('#chatcontent').css('height', '200px');
-    //$('#chatcontent').css('max-height', '200px');
-    //alert(window.screen.height);
-  	
-  	<?php
-  }
-?>  
+	if('<?php echo $pageType; ?>'==='mobile') return; // Flex regelt mobil automatisch
+	var height=document.getElementById('container').offsetHeight-document.getElementById('chatinput').offsetHeight;
+	if(height<50) height=50;
+	$('#chatcontent').css({height: height+'px', 'max-height': height+'px'});
 }
 
 show_chatmenu(<?php echo $_SESSION['de_chat_inputchannel']; ?>);

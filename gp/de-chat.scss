@@ -1,0 +1,150 @@
+@use 'sass:map';
+
+// CSS Reset
+
+// Basisboxmodell auf alle Elemente anwenden
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+// Standard-Margins entfernen
+body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd {
+  margin: 0;
+}
+
+// Grundschrift und Hintergrund
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+  font-family: sans-serif;
+  background-color: #fff;
+  color: #000;
+}
+
+// Bilder & Medien skalierbar machen
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+// Formulare vereinheitlichen
+input, button, textarea, select {
+  font: inherit;
+}
+
+// Überscroll-Effekte vermeiden
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+// ------------------------------------------------------------
+// Theme System (Variante B: Klassen .theme-rasseX + optional .mobile/.desktop)
+// Verwendung:
+//   <body class="theme-rasse1">            // mobile Fallback
+//   <body class="theme-rasse1 mobile">     // explizit mobile
+//   <body class="theme-rasse1 desktop">    // Desktop-Hintergrundbild
+// Umschalten: nur Klassen am <body> anpassen, eine einzige compilierte CSS einbinden.
+// ------------------------------------------------------------
+
+// Konfiguration: Farb- und Desktop-Hintergrund je Theme
+$themes: (
+  rasse1: (color: #3399FF, desktop-bg-image: 'g/bgr1_1.jpg'),
+  rasse2: (color: #A6A6A6, desktop-bg-image: 'g/bgr2_1.jpg'),
+  rasse3: (color: #DE3939, desktop-bg-image: 'g/bgr3_1.jpg'),
+  rasse4: (color: #ED951E, desktop-bg-image: 'g/bgr4_1.jpg')
+);
+
+// Gemeinsame Zell-Hintergründe – in allen alten Dateien identisch
+.cellbg {
+  background: url(g/cellblack.png) repeat;
+  color: #fff;
+}
+
+// Mobile Layout (flex-basiert)
+html, body.mobile { height: 100%; }
+body.mobile {
+  height: 100vh;       // Fallback
+  height: 100dvh;      // Dynamische Viewport-Höhe (Mobile Browser UI berücksichtigt)
+  min-height: 100dvh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;    // Verhindert Gesamtscroll; nur Content scrollt
+}
+body.mobile .chat-wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;       // Wichtig für scrollbares Kind
+}
+body.mobile #container {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;       // Erlaubt Schrumpfen -> #chatcontent kann scrollen
+  width: 100%;
+}
+body.mobile #chatheader {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border: 1px solid #333;
+  background: #222;
+  color: #fff;
+  font-size: 30px;
+  padding: 3px;
+  text-align: center;
+  box-sizing: border-box;
+}
+body.mobile #chatcontent {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: 20px;
+}
+body.mobile #chatinput {
+  flex: 0 0 auto;
+  background: #000;
+  padding: 4px 4px 4px;
+  box-sizing: border-box;
+  border-top: 1px solid #333;
+}
+body.mobile #chatinput input[type=text] {
+  width: 100%;
+  box-sizing: border-box;
+}
+body.mobile a { font-size: 20px; }
+
+// Theme-Generator
+@each $name, $cfg in $themes {
+  $col: map.get($cfg, color);
+  $img: map.get($cfg, desktop-bg-image);
+
+  // Basis (Fallback = mobile)
+  body.theme-#{$name} {
+    // Mobile-Variante
+    background-color: #000; // wie *_m.css
+    color: $col;
+    // Links
+    a, a:link, a:visited { color: $col; text-decoration: none; }
+    a:hover { color: $col; text-decoration: underline; }
+    // Formulareingaben
+    input {
+      font-size: 8pt;
+      font-family: Tahoma;
+      color: $col;
+      background-color: #000;
+      border: 1px solid $col;
+    }
+    input.c { border: none; }
+  }
+
+  // Desktop-Variante: ersetzt nur den Hintergrund gemäß Originaldateien
+  body.theme-#{$name}.desktop {
+    // Komplettes Background-Shorthand + Fallback-Farbe
+    background: #000 url(#{$img}) -620px 0 / auto repeat fixed;
+  }
+}
+ 

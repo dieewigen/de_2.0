@@ -33,7 +33,7 @@ $max_kt = $row["kt"];
 <?php 
 include "cssinclude.php";
 ?>
-<link rel="stylesheet" href="g/style.css?<?php echo filemtime('g/style.css');?>">
+<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime('g/de-desktop.css');?>">
 </head>
 <body>
 <?php 

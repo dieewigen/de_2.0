@@ -1,8 +1,58 @@
-body {scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333;scrollbar-3dlight-color: #236923;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000; scrollbar-arrow-color: #5AC85A;background-image:url(g/bgr4_1.jpg); background-position: -620px 0px; background-repeat:repeat;background-attachment:fixed; padding:0px; color: #ED951E; margin-left:0px; margin-top:0px; margin-right:0px; margin-bottom:0px;font-family: helvetica, arial,geneva, sans-serif;  font-size:10px;}
-form {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt}
-A:link {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: none; color: #ED951E}
-A:visited {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: none; color: #ED951E}
-A:hover {font-family: arial, geneva,helvetica,sans-serif; font-size: 10pt; text-decoration: underline; color: #ED951E}
-input { font-size:8pt; font-family:Tahoma; color:#ED951E; background-color:#000000; border:1px solid #ED951E;}
-input.c { border: none; }
-.cellbg {background:url(g/cellblack.png) repeat; color: #ffffff; font-size:12px;}
+body {
+	background-image: url(g/bgr4_1.jpg);
+	background-position: -620px 0px;
+	background-repeat: repeat;
+	background-attachment: fixed;
+	padding: 0px;
+	color: #ED951E;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	font-family: helvetica, arial, geneva, sans-serif;
+	font-size: 10px;
+}
+
+form {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 10pt
+}
+
+A:link {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 10pt;
+	text-decoration: none;
+	color: #ED951E
+}
+
+A:visited {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 10pt;
+	text-decoration: none;
+	color: #ED951E
+}
+
+A:hover {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 10pt;
+	text-decoration: underline;
+	color: #ED951E
+}
+
+input {
+	font-size: 8pt;
+	font-family: Tahoma;
+	color: #ED951E;
+	background-color: #000000;
+	border: 1px solid #ED951E;
+}
+
+input.c {
+	border: none;
+}
+
+.cellbg {
+	background: url(g/cellblack.png) repeat;
+	color: #ffffff;
+	font-size: 12px;
+}
