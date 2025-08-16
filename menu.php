@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     <a class="menu-btn" data-icon="📊" href="statistics.php">'.$menu_lang['eintrag_21'].'</a>
     <a class="menu-btn" data-icon="★" href="toplist.php">'.$menu_lang['eintrag_22'].'</a>
     <a class="menu-btn" data-icon="⚙" href="options.php">'.$menu_lang['eintrag_24'].'</a>
-    <a class="menu-btn danger" data-icon="⏻" href="index.php?logout=1">'.$menu_lang['eintrag_29'].'</a>
+    <a class="menu-btn danger" data-icon="🚪" href="index.php?logout=1">'.$menu_lang['eintrag_29'].'</a>
   </nav>
   '.$swipeHint.'
 </div>
