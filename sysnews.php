@@ -433,8 +433,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
 // alle nachrichten per e-mail versenden
 //////////////////////////////////////////////
 //////////////////////////////////////////////
-if ($ums_cooperation == 0) {
-    echo '
+echo '
 <br><br>
 <form action="sysnews.php" method="post">
 <table border="0" cellspacing="0" cellpadding="0" width="300">
@@ -465,7 +464,6 @@ if ($ums_cooperation == 0) {
 </tr>
 </table>
 </form>';
-}
 
 
 echo '<br>';

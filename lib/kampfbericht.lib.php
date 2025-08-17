@@ -418,15 +418,20 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	$atterliste=$kbd['daten']['atterliste'];
 	$defferliste=$kbd['daten']['defferliste'];
 
-	$kollieserbeutet=$kbd['daten_spieler']['colstolen'];
-	$exp=$kbd['daten_spieler']['exp'];
-	$kartefakte=$kbd['daten_spieler']['kartefakt'];
-	$srec1=$kbd['daten_spieler']['recycling1'];
-	$srec2=$kbd['daten_spieler']['recycling2'];
-	$kg_set_01=$kbd['daten_spieler']['kg_set_01'];
-	$kg_set_02=$kbd['daten_spieler']['kg_set_02'];
-	$kg_set_03=$kbd['daten_spieler']['kg_set_03'];
-	$kg_set_04=$kbd['daten_spieler']['kg_set_04'];
+	// Sicherer Zugriff auf Spieler-Daten, Defaults verhindern PHP-Warnungen bei fehlenden Keys
+	$daten_spieler = [];
+	if(isset($kbd['daten_spieler']) && is_array($kbd['daten_spieler'])){
+		$daten_spieler = $kbd['daten_spieler'];
+	}
+	$kollieserbeutet = isset($daten_spieler['colstolen']) ? (int)$daten_spieler['colstolen'] : 0;
+	$exp            = isset($daten_spieler['exp']) ? (int)$daten_spieler['exp'] : 0;
+	$kartefakte     = isset($daten_spieler['kartefakt']) ? (int)$daten_spieler['kartefakt'] : 0;
+	$srec1          = isset($daten_spieler['recycling1']) ? (int)$daten_spieler['recycling1'] : 0;
+	$srec2          = isset($daten_spieler['recycling2']) ? (int)$daten_spieler['recycling2'] : 0;
+	$kg_set_01      = isset($daten_spieler['kg_set_01']) ? (int)$daten_spieler['kg_set_01'] : 0;
+	$kg_set_02      = isset($daten_spieler['kg_set_02']) ? (int)$daten_spieler['kg_set_02'] : 0;
+	$kg_set_03      = isset($daten_spieler['kg_set_03']) ? (int)$daten_spieler['kg_set_03'] : 0;
+	$kg_set_04      = isset($daten_spieler['kg_set_04']) ? (int)$daten_spieler['kg_set_04'] : 0;
 
 	//eigenen spielername fett darstellen
 	if($ums_rasse==1)$rflag='E';

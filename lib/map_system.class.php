@@ -612,7 +612,7 @@ class map_system{
 									//Technologie anzeigen
 									$content.='<div style="width: 100%; border: 1px solid #FFFFFF;padding: 5px; box-sizing: border-box; margin-bottom: 8px;">';
 									//Textfarbe für Tech-Name, damit erkennbar ist, ob man sie erforscht hat
-									if(hasTech($GLOBALS['pt'],$GLOBALS['map_buildings'][$g]['need_tech']) || !isset($GLOBALS['map_buildings'][$g]['need_tech'])){
+									if(!isset($GLOBALS['map_buildings'][$g]['need_tech']) || hasTech($GLOBALS['pt'], $GLOBALS['map_buildings'][$g]['need_tech'])){
 										$tech_name_color='#FFFFFF';
 										$has_tech=true;
 									}else{

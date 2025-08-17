@@ -86,7 +86,7 @@ $maxcol = $row['maxcol'];
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Karte</title>
-  <link rel="stylesheet" type="text/css" href="/gp/de-map.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-map.css'); ?>">
+  <link rel="stylesheet" type="text/css" href="/gp/de-map.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-map.css'); ?>">
   <script>
     var ownSector = <?php echo ($ownsector > 1) ? $ownsector : 3; ?>;
   </script>

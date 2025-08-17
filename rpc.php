@@ -312,7 +312,7 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
 
   $user_id=mysqli_insert_id($GLOBALS['dbi']);
   
-  if($patime>time())$premium=1; else $premium=0;
+  $premium=0;
   
   //de_user_data
   $sql="INSERT INTO de_user_data (user_id, spielername, tick, restyp01, restyp02, techs,

@@ -1,16 +1,11 @@
 <?php
 include "inc/header.inc.php";
 //daten laden
-$sql = "SELECT sector, allytag FROM de_user_data WHERE user_id=?";
+$sql = "SELECT sector, ally_id FROM de_user_data WHERE user_id=?";
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
 $row = mysqli_fetch_assoc($db_daten);
 $sector = $row["sector"];
-$allytag = $row["allytag"];
-//allyid auslesen
-$sql = "SELECT id FROM de_allys WHERE allytag=?";
-$db_datenx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allytag]);
-$rowx = mysqli_fetch_assoc($db_datenx);
-$allyid = $rowx["id"];
+$ally_id = $row["ally_id"];
 
 //rundenstart auslesen
 $sql = "SELECT rundenstart_datum FROM de_system";

@@ -736,7 +736,7 @@ if (!hasTech($pt, 28)) {
     if ($gebinbau != 0) {
         $row = mysqli_fetch_array($db_daten);
         //geb�ude wird bereits geupgraded
-        $title .= '<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].$artefacts_lang['woche'].'<br>';
+        $title .= '<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].' WT<br>';
         $showbldglink = 0;
     } elseif ($artbldglevel < $maxlevel) {//das geb�ude kann noch weiter ausgebaut werden
         $title .= '<br>'.$artefacts_lang['kosten'].': '.number_format($ausbaukosten, 0, ",", ".").' Iradium';
@@ -944,6 +944,7 @@ if (!hasTech($pt, 28)) {
 		<br><br>
 		<b>Welche Artefakte gibt es?</b>';
         echo '<table width="100%">';
+        $c1=0;
         for ($i = 0;$i <= $ua_index;$i++) {
             if ($c1 == 0) {
                 $c1 = 1;

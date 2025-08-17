@@ -163,7 +163,6 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 						}
 					}
 				}
-				//else $recyclingmessage='<div class="info_box text2">Dieser Zieltyp ist ung&uuml;ltig.</div>';
 			}
 		}
 
@@ -212,19 +211,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 						}
 					}
 				}
-				//else $recyclingmessage='<div class="info_box text2">Dieser Zieltyp ist ung&uuml;ltig.</div>';
-
 			}
-
-			/*
-			$recyclingmessage='<div class="info_box text3" style="text-align: left;">Erhaltene Rohstoffe:
-			<br>'.number_format($rec_gesamt[0] ,0,",",".").' M
-			<br>'.number_format($rec_gesamt[1] ,0,",",".").' D
-			<br>'.number_format($rec_gesamt[2] ,0,",",".").' I
-			<br>'.number_format($rec_gesamt[3] ,0,",",".").' E
-			<br>'.number_format($rec_gesamt[4] ,0,",",".").' T
-			</div>';
-			*/
 		}			
 
 		//transaktionsende
@@ -272,11 +259,6 @@ if($sabotage==1)
   echo $emsg;
   
   die('</body></html>');
-}
-
-if($recyclingmessage!=''){
-	echo $recyclingmessage;
-	echo '<br>';
 }
 
 //ben�tigtes geb�ude recyclotron

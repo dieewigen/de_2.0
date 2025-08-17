@@ -1142,6 +1142,10 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
 
             //angreiferliste
             if ($a1 == 1) {
+                // Sicherstellen, dass Zähler und String existieren
+                if (!isset($sc[$ssc][0][$eta][0])) { $sc[$ssc][0][$eta][0] = 0; }
+                if (!isset($sc[$ssc][0][$eta][2])) { $sc[$ssc][0][$eta][2] = ''; }
+
                 $sc[$ssc][0][$eta][0] += $ge;//atter
 
                 $pos = strpos($sc[$ssc][0][$eta][2], $hsec.':'.$hsys);
@@ -1152,10 +1156,13 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                     $sc[$ssc][0][$eta][2] .= $hsec.':'.$hsys;
                 }
             } else { //defferliste
+                if (!isset($sc[$ssc][0][$eta][1])) { $sc[$ssc][0][$eta][1] = 0; }
+                if (!isset($sc[$ssc][0][$eta][3])) { $sc[$ssc][0][$eta][3] = ''; }
                 $sc[$ssc][0][$eta][1] += $ge;//deffer
 
                 //deffer3 liste
                 for ($j = 0;$j <= $at1;$j++) {
+                    if (!isset($sc[$ssc][0][$eta + $j][4])) { $sc[$ssc][0][$eta + $j][4] = 0; }
                     $sc[$ssc][0][$eta + $j][4] += $ge;
                     if ($eta + $j > $sc[$ssc][1][1]) {
                         $sc[$ssc][1][1] = $eta + $j;
@@ -1181,9 +1188,11 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             $sss = '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'" title="Milit&auml;r">'.$zsec1.':'.$zsys1.'</a>';
             $eta = $t1;
             if ($a1 == 1) {
+                if (!isset($sc[$ssc][0][$eta][0])) { $sc[$ssc][0][$eta][0] = 0; }
                 $sc[$ssc][0][$eta][0] = $ge;
             }//atter
             if ($a1 == 2) {
+                if (!isset($sc[$ssc][0][$eta][1])) { $sc[$ssc][0][$eta][1] = 0; }
                 $sc[$ssc][0][$eta][1] = $ge;
             }//deffer
             $sc[$ssc][1][0] = $zsys1;//system
@@ -1198,10 +1207,13 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                 $sc[$ssc][1][1] = $eta;//maxeta
             }
             if ($a1 == 1) {
+                if (!isset($sc[$ssc][0][$eta][2])) { $sc[$ssc][0][$eta][2] = ''; }
                 $sc[$ssc][0][$eta][2] = $hsec.':'.$hsys;
             } else { //defferliste
+                if (!isset($sc[$ssc][0][$eta][3])) { $sc[$ssc][0][$eta][3] = ''; }
                 $sc[$ssc][0][$eta][3] = $hsec.':'.$hsys;
                 for ($j = 0;$j <= $at1;$j++) {
+                    if (!isset($sc[$ssc][0][$eta + $j][4])) { $sc[$ssc][0][$eta + $j][4] = 0; }
                     $sc[$ssc][0][$eta + $j][4] += $ge;
                     if ($eta + $j > $sc[$ssc][1][1]) {
                         $sc[$ssc][1][1] = $eta + $j;

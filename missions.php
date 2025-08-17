@@ -873,14 +873,11 @@ if(!hasTech($pt,29)){
 					if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
 						$belohnung.=generateMissionReward($md[$m]['reward']);
 					}else{
-						$belohnung.=generateMissionReward($um[$m]['reward'], $um[$m]['reward_percentage']);
-						/*
-						if($_SESSION['ums_user_id']==1){
-							$belohnung.='<br>'.print_r($um[$m],true).'<br>A: '.$um[$m]['reward_percentage'].'<br>';
-							//138.874
-							//1.000.257.696
-						}
-						*/
+							// Absicherung: Falls einzelne Keys (reward / reward_percentage) im laufenden Missions-Datensatz fehlen,
+							// auf Missions-Definition ($md) bzw. Standard 100% zurückfallen, um PHP-Warnings zu vermeiden.
+							$mission_reward_array = (isset($um[$m]['reward']) && is_array($um[$m]['reward'])) ? $um[$m]['reward'] : (isset($md[$m]['reward']) ? $md[$m]['reward'] : array());
+							$mission_reward_percent = isset($um[$m]['reward_percentage']) ? (int)$um[$m]['reward_percentage'] : 100;
+							$belohnung.=generateMissionReward($mission_reward_array, $mission_reward_percent);
 					}
 				}
 

@@ -184,8 +184,11 @@ function doBattleGround($bg){
 					if($player_id1!=-1 || $player_id2!=-1){
 						$winner_id=letSpecialShipFight($player_id1 , $player_id2, $player);
 
-						echo '<br>P1: '.$player[$player_id1]['spielername'];
-						echo '<br>P2: '.$player[$player_id2]['spielername'];
+						$spielername1 = ($player_id1>-1 && isset($player[$player_id1])) ? $player[$player_id1]['spielername'] : 'Freilos';
+						$spielername2 = ($player_id2>-1 && isset($player[$player_id2])) ? $player[$player_id2]['spielername'] : 'Freilos';
+
+						echo '<br>P1: '.$spielername1;
+						echo '<br>P2: '.$spielername2;
 						echo '<br>GE: '.$player[$winner_id]['spielername'];
 
 						echo '<br><br>';
@@ -213,10 +216,10 @@ function doBattleGround($bg){
 						//ergebnis speichern
 						$fightresult[$runde][]=array(
 							'winner_user_id' => $player[$winner_id]['user_id'],
-							'user_id1' => $player[$player_id1]['user_id'],
-							'user_id2' => $player[$player_id2]['user_id'],
-							'spielername1' => $player[$player_id1]['spielername'].$p1_ship_level,
-							'spielername2' => $player[$player_id2]['spielername'].$p2_ship_level,
+							'user_id1' => ($player_id1>-1 && isset($player[$player_id1])) ? $player[$player_id1]['user_id'] : 0,
+							'user_id2' => ($player_id2>-1 && isset($player[$player_id2])) ? $player[$player_id2]['user_id'] : 0,
+							'spielername1' => $spielername1.$p1_ship_level,
+							'spielername2' => $spielername2.$p2_ship_level,
 							'gewinn' => $gewinn_text
 						);
 
@@ -300,8 +303,11 @@ function doBattleGround($bg){
 					if($player_id1!=-1 || $player_id2!=-1){
 						$winner_id=letSpecialShipFight($player_id1 , $player_id2, $allys);
 
-						echo '<br>P1: '.$allys[$player_id1]['spielername'];
-						echo '<br>P2: '.$allys[$player_id2]['spielername'];
+						$spielername1 = ($player_id1>-1 && isset($allys[$player_id1])) ? $allys[$player_id1]['spielername'] : 'Freilos';
+						$spielername2 = ($player_id2>-1 && isset($allys[$player_id2])) ? $allys[$player_id2]['spielername'] : 'Freilos';
+
+						echo '<br>P1: '.$spielername1;
+						echo '<br>P2: '.$spielername2;
 						echo '<br>GE: '.$allys[$winner_id]['spielername'];
 
 						echo '<br><br>';
@@ -325,10 +331,10 @@ function doBattleGround($bg){
 						//ergebnis speichern
 						$fightresult[$runde][]=array(
 							'winner_user_id' => $allys[$winner_id]['ally_id'],
-							'user_id1' => $allys[$player_id1]['ally_id'],
-							'user_id2' => $allys[$player_id2]['ally_id'],
-							'spielername1' => $allys[$player_id1]['spielername'].$p1_ship_level,
-							'spielername2' => $allys[$player_id2]['spielername'].$p2_ship_level,
+							'user_id1' => ($player_id1>-1 && isset($allys[$player_id1])) ? $allys[$player_id1]['ally_id'] : 0,
+							'user_id2' => ($player_id2>-1 && isset($allys[$player_id2])) ? $allys[$player_id2]['ally_id'] : 0,
+							'spielername1' => $spielername1.$p1_ship_level,
+							'spielername2' => $spielername2.$p2_ship_level,
 							'gewinn' => $gewinn_text
 						);
 
@@ -458,11 +464,10 @@ function letSpecialShipFight($player_id1 , $player_id2, $player){
 			//zum testen auf 50% gesetzt
 			if ($trefferwahrscheinlichkeit[$c] >= mt_rand(0, 100)){
 			//waffenschaden
-			/*
-			$schaden[$c]=round(mt_rand($enm[$c][mindmg], $enm[$c][maxdmg]));
-			if($c==0)$schadenssenkung_enm=$schadenssenkung[1];
-			elseif($c==1)$schadenssenkung_enm=$schadenssenkung[0];
-			*/
+			$schadenssenkung_enm = 0;
+			if(isset($schadenssenkung[0]) && isset($schadenssenkung[1])){
+				$schadenssenkung_enm = ($c==0) ? $schadenssenkung[1] : $schadenssenkung[0];
+			}
 			$schaden[$c]=round($schaden[$c]*(100-$schadenssenkung_enm)/100);
 			
 			//$schaden[$c]+=$eschaden[$c];

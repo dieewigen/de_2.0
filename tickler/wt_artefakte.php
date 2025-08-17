@@ -634,8 +634,11 @@ while ($row = mysqli_fetch_array($res)) {
 
         //artefakt verschieben
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_artefakt set sector=? WHERE id=?", [$zielsec, $artid]);
-        echo 'Artefakttransfer: A-ID: '.$artid.', Herkunftssektor: '.$artsec.', Zielsektor: '.$zielsec.', 
-      News SK (Herkunft): '.$uidh.', News SK (Ziel): '.$uidz.'<br>';
+                // Fallback falls keine Nutzer-IDs gefunden wurden (verhindert Undefined Variable Warnungen)
+                if(!isset($uidh)) $uidh = 0;
+                if(!isset($uidz)) $uidz = 0;
+                echo 'Artefakttransfer: A-ID: '.$artid.', Herkunftssektor: '.$artsec.', Zielsektor: '.$zielsec.', 
+            News SK (Herkunft): '.$uidh.', News SK (Ziel): '.$uidz.'<br>';
 
         //artefaktumzug in der db hinterlegen
         //typ: 0 = hypersturm, 1 = angriff

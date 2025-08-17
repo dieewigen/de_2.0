@@ -357,6 +357,10 @@ if ($doetick == 1) {
     //bauaufträge mit recycling
     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, SUM(score) AS score FROM `de_user_build` WHERE recycling=1 GROUP BY user_id", []);
     while ($row = mysqli_fetch_array($result)) {
+        // Falls der Benutzer in der ersten Abfrage (recycling=0) nicht vorkam, muss initialisiert werden
+        if (!isset($user_buildscore[$row['user_id']])) {
+            $user_buildscore[$row['user_id']] = 0;
+        }
         $user_buildscore[$row['user_id']] += $row['score'];
     }
 
@@ -365,15 +369,6 @@ if ($doetick == 1) {
     for ($i = 0;$i <= 2000;$i++) {
         $spec3cache[$i] = -1;
     }
-
-    //ADE-Rassenbonus
-    /*
-    $filename='../../div_server_data/ade_debonus/data.txt';
-    $fp = fopen ($filename, 'r');
-    $data=trim(fgets($fp, 1024));
-    $adeprozente=explode(";", $data);
-    fclose($fp);
-    */
 
     ////////////////////////////////////////////////
     // die Spieler nach Rassen durchgehen

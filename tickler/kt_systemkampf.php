@@ -123,6 +123,23 @@ for ($c = 0; $c < $z; $c++) {
     $defferliste = '';
     $atterliste = '';
 
+    // Arrays für aggregierte Angriffs-/Blockwerte sauber initialisieren
+    // (Verhindert Undefined Variable Warnungen wie bei $atter_awges)
+    if(!isset($atter_awges) || !is_array($atter_awges)){
+        $atter_awges = array_fill(0, $sv_anz_schiffe, 0);
+    }
+    if(!isset($atter_bwges) || !is_array($atter_bwges)){
+        $atter_bwges = array_fill(0, $sv_anz_schiffe, 0);
+    }
+
+    // Deffer aggregierte Werte initialisieren (sonst Warnungen bei +=)
+    if(!isset($deffer_awges) || !is_array($deffer_awges)){
+        $deffer_awges = array_fill(0, $sv_anz_schiffe, 0);
+    }
+    if(!isset($deffer_bwges) || !is_array($deffer_bwges)){
+        $deffer_bwges = array_fill(0, $sv_anz_schiffe, 0);
+    }
+
     echo '<br>'.$c.'<br><br>';
     $zsec = $kampfsys[$c][0];
     $zsys = $kampfsys[$c][1];
@@ -271,8 +288,15 @@ for ($c = 0; $c < $z; $c++) {
 
             $awgesamtbonus = 1 + $awartbonus + $awexpbonus + $awallybonus;
             $bwgesamtbonus = 1 + $bwartbonus + $bwexpbonus + $bwallybonus;
-            $atter_awges[$i] += $atter[$anz_atter][$i] * $wgrad * $unit[$db_data["rasse"] - 1][$i][2] * $awgesamtbonus;
-            $atter_bwges[$i] += $atter[$anz_atter][$i] * $wgrad * $unit[$db_data["rasse"] - 1][$i][3] * $bwgesamtbonus;
+            // Absicherung: falls Elemente noch nicht existieren -> auf 0 setzen
+            if(!isset($atter_awges[$i])) $atter_awges[$i]=0;
+            if(!isset($atter_bwges[$i])) $atter_bwges[$i]=0;
+            $akt_anz = isset($atter[$anz_atter][$i]) ? $atter[$anz_atter][$i] : 0;
+            // Falls unit-Daten fehlen, mit 0 weiterrechnen
+            $aw_basis = isset($unit[$db_data["rasse"] - 1][$i][2]) ? $unit[$db_data["rasse"] - 1][$i][2] : 0;
+            $bw_basis = isset($unit[$db_data["rasse"] - 1][$i][3]) ? $unit[$db_data["rasse"] - 1][$i][3] : 0;
+            $atter_awges[$i] += $akt_anz * $wgrad * $aw_basis * $awgesamtbonus;
+            $atter_bwges[$i] += $akt_anz * $wgrad * $bw_basis * $bwgesamtbonus;
             echo '<br>'.$i.'WGRAD: '.$wgrad;
         }
         echo 'AWEEEEEEEEEEEEEEEEEEEEEEEEEEEEE: ';
