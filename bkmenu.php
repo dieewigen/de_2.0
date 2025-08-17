@@ -586,7 +586,7 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 //sektorphalanx
 $sc1=$_POST['sc1'] ?? false;
 $sc2=$_POST['sc2'] ?? false;
-$scansec=$_POST['scansec'];
+$scansec = isset($_POST['scansec']) ? trim($_POST['scansec']) : null;
 if (($sc1 || $sc2) && $scansec){
   $scansec=(int)$scansec;
   $db_daten = mysqli_execute_query($GLOBALS['dbi'],

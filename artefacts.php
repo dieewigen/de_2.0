@@ -6,22 +6,33 @@ include "inc/userartefact.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_artefacts.lang.php';
 include "functions.php";
 
-$pt=loadPlayerTechs($_SESSION['ums_user_id']);
-$pd=loadPlayerData($_SESSION['ums_user_id']);
-$row=$pd;
-$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
-$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
-$sector=$row["sector"];$system=$row["system"];
-$gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
-$artbldglevel=$row["artbldglevel"];
+$pt = loadPlayerTechs($_SESSION['ums_user_id']);
+$pd = loadPlayerData($_SESSION['ums_user_id']);
+$row = $pd;
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
+$punkte = $row["score"];
+$newtrans = $row["newtrans"];
+$newnews = $row["newnews"];
+$sector = $row["sector"];
+$system = $row["system"];
+$gr01 = $restyp01;
+$gr02 = $restyp02;
+$gr03 = $restyp03;
+$gr04 = $restyp04;
+$gr05 = $restyp05;
+$artbldglevel = $row["artbldglevel"];
 
-$maxlevel=30;
-$ausbaukosten=($artbldglevel+1)*20000;
-$ausbauzeit=$artbldglevel+1;
-$tcost1=5;
-$tcost2=10;
+$maxlevel = 30;
+$ausbaukosten = ($artbldglevel + 1) * 20000;
+$ausbauzeit = $artbldglevel + 1;
+$tcost1 = 5;
+$tcost2 = 10;
 
-$errmsg='';
+$errmsg = '';
 
 //Maximale Tickanzahl auslesen
 $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
@@ -29,142 +40,183 @@ $row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 
 //die anzahl von allianzgebäudeupgrades auslesen
-$allyid=$allyid=get_player_allyid($ums_user_id);
-$ally_geb_bonus=0;
-if($allyid>0){
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
-	$row = mysqli_fetch_array($db_daten);
-	$ally_geb_bonus=$row['bldg5'];
+$allyid = $allyid = get_player_allyid($ums_user_id);
+$ally_geb_bonus = 0;
+if ($allyid > 0) {
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyid]);
+    $row = mysqli_fetch_array($db_daten);
+    $ally_geb_bonus = $row['bldg5'];
 }
 
 //Artefakt in ein Basisschiff verschieben
-if (isset($_GET["a"]) && $_GET["a"]==1){
-	//artefakt einf�gen
-	//transaktionsbeginn
-	if (setLock($ums_user_id)){
-		//flotten id festlegen
-		$flotte=0;
-		if($_GET["fid"]==1)$flotte=0;
-		if($_GET["fid"]==2)$flotte=1;
-		if($_GET["fid"]==3)$flotte=2;
-		if($_GET["fid"]==4)$flotte=3;
-
-		$id=(int)$_GET["id"];$lvl=(int)$_GET["lvl"];
-
-		//ist das artefakt ein g�ltiges flottenartefakt?
-		if($id==6 OR $id==7 OR $id==14 OR $id==15){
-		  //schauen ob man das artefakte hat
-		  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=? AND level=?", [$ums_user_id, $id, $lvl]);
-		  $num = mysqli_num_rows($db_daten);
-
-		  if($num>=1) {
-			//flottendaten laden
-			$fleetid=$ums_user_id.'-'.$flotte;
-			$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
-			$row = mysqli_fetch_array($result);
-
-			//schauen ob die flotte daheim ist
-			if($row["aktion"]==0){
-			  //schauen ob ein artefaktplatz frei ist
-				if( ($row["artid1"]==0 && hasTech($pt,133)) OR 
-					($row["artid2"]==0 && hasTech($pt,134)) OR 
-					($row["artid3"]==0 && hasTech($pt,135)) OR 
-					($row["artid4"]==0 && hasTech($pt,136)) OR 
-					($row["artid5"]==0 && hasTech($pt,137)) OR 
-					($row["artid6"]==0 && hasTech($pt,138))){
-				//schauen welcher slot frei ist
-				$useslot=6;
-				if($row["artid6"]==0)$useslot=6;
-				if($row["artid5"]==0)$useslot=5;
-				if($row["artid4"]==0)$useslot=4;
-				if($row["artid3"]==0)$useslot=3;
-				if($row["artid2"]==0)$useslot=2;
-				if($row["artid1"]==0)$useslot=1;
-
-				//flotte upadten
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$useslot=?, artlvl$useslot=? WHERE user_id=?", [$id, $lvl, $fleetid]);
-				//artefakt aus dem gebäude entfernen
-				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND id=? AND level=? LIMIT 1", [$ums_user_id, $id, $lvl]);
-				$errmsg.='<span class="ccg">Das Artefakt wurde in das Basisschiff transferiert.</span>';
-			  }
-			  else $errmsg.='<span class="ccr">Es ist kein freier Slot vorhanden.</span>';
-			}
-			else $errmsg.='<span class="ccr">Die Flotte befindet sich in einem Einsatz.</span>';
-		  }
-		  else $errmsg.='<span class="ccr">Du hast kein Artefakte dieser Art.</span>';
-		}
-		else $errmsg.='<table width=600><tr><td class="ccr">Dieses Artefakt kann nicht in einem Basisschiff verwendet werden.</span>';
-
-		//transaktionsende
-		$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-		if ($erg){
-		  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-		}else{
-		  print('Datensatz Nr. '.$ums_user_id." konnte nicht entsperrt werden!<br><br><br>");
-		}
-	}// if setlock-ende
-	else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
-}
-elseif (isset($_GET["a"]) && $_GET["a"]==2)
-{
-  //Artefakt aus einem Basisschiff entfernen
-  //transaktionsbeginn
-  if (setLock($ums_user_id))
-  {
-    //flotten id festlegen
-    $flotte=0;
-    if($_GET["fid"]==1)$flotte=0;
-    if($_GET["fid"]==2)$flotte=1;
-    if($_GET["fid"]==3)$flotte=2;
-    if($_GET["fid"]==4)$flotte=3;
-	if($_GET["fid"]==5)$flotte=4;
-	if($_GET["fid"]==6)$flotte=5;
-	if($_GET["fid"]==7)$flotte=6;
-
-    $id=(int)$_GET["id"];
-    if($id < 1 || $id > 6)$id=1;
-
-    //flottendaten laden
-    $fleetid=$ums_user_id.'-'.$flotte;
-    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
-    $row = mysqli_fetch_array($result);
-
-    //ist das artefakt im basisschiff vorhanden
-    if($row["artid$id"]>0) {
-      //schauen ob im artefaktgebäude platz ist
-      $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_artefact WHERE user_id=?", [$ums_user_id]);
-      $numx = mysqli_num_rows($db_datenx);
-      if($numx<$artbldglevel+$ally_geb_bonus) //es gibt noch platz
-      {
-
-        //schauen ob die flotte daheim ist
-        if($row["aktion"]==0)
-        {
-          //flotte upadten
-          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$id=0, artlvl$id=0 WHERE user_id=?", [$fleetid]);
-          //artefakt in das gebäude transferieren
-          $artid=$row["artid$id"];$artlvl=$row["artlvl$id"];
-          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, ?)", [$ums_user_id, $artid, $artlvl]);
-          $errmsg.='<span class="ccg">Das Artefakt wurde in das Artefaktgeb&auml;ude transferiert.</span>';
+if (isset($_GET["a"]) && $_GET["a"] == 1) {
+    //artefakt einf�gen
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        //flotten id festlegen
+        $flotte = 0;
+        if ($_GET["fid"] == 1) {
+            $flotte = 0;
         }
-        else $errmsg.='<span class="ccr">Die Flotte befindet sich in einem Einsatz.</span>';
-      }
-      else $errmsg.='<span class="ccr">Im Artefaktgeb&auml;ude ist kein Platz mehr frei.</span>';
-    }
-    else $errmsg.='<span class="ccr">Dieses Artefakt befindet sich nicht auf dem Basisschiff.</span>';
+        if ($_GET["fid"] == 2) {
+            $flotte = 1;
+        }
+        if ($_GET["fid"] == 3) {
+            $flotte = 2;
+        }
+        if ($_GET["fid"] == 4) {
+            $flotte = 3;
+        }
 
-    //transaktionsende
-    $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-    if ($erg)
-    {
-      //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        $id = (int)$_GET["id"];
+        $lvl = (int)$_GET["lvl"];
+
+        //ist das artefakt ein g�ltiges flottenartefakt?
+        if ($id == 6 or $id == 7 or $id == 14 or $id == 15) {
+            //schauen ob man das artefakte hat
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=? AND level=?", [$ums_user_id, $id, $lvl]);
+            $num = mysqli_num_rows($db_daten);
+
+            if ($num >= 1) {
+                //flottendaten laden
+                $fleetid = $ums_user_id.'-'.$flotte;
+                $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+                $row = mysqli_fetch_array($result);
+
+                //schauen ob die flotte daheim ist
+                if ($row["aktion"] == 0) {
+                    //schauen ob ein artefaktplatz frei ist
+                    if (($row["artid1"] == 0 && hasTech($pt, 133)) or
+                        ($row["artid2"] == 0 && hasTech($pt, 134)) or
+                        ($row["artid3"] == 0 && hasTech($pt, 135)) or
+                        ($row["artid4"] == 0 && hasTech($pt, 136)) or
+                        ($row["artid5"] == 0 && hasTech($pt, 137)) or
+                        ($row["artid6"] == 0 && hasTech($pt, 138))) {
+                        //schauen welcher slot frei ist
+                        $useslot = 6;
+                        if ($row["artid6"] == 0) {
+                            $useslot = 6;
+                        }
+                        if ($row["artid5"] == 0) {
+                            $useslot = 5;
+                        }
+                        if ($row["artid4"] == 0) {
+                            $useslot = 4;
+                        }
+                        if ($row["artid3"] == 0) {
+                            $useslot = 3;
+                        }
+                        if ($row["artid2"] == 0) {
+                            $useslot = 2;
+                        }
+                        if ($row["artid1"] == 0) {
+                            $useslot = 1;
+                        }
+
+                        //flotte upadten
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$useslot=?, artlvl$useslot=? WHERE user_id=?", [$id, $lvl, $fleetid]);
+                        //artefakt aus dem gebäude entfernen
+                        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND id=? AND level=? LIMIT 1", [$ums_user_id, $id, $lvl]);
+                        $errmsg .= '<span class="ccg">Das Artefakt wurde in das Basisschiff transferiert.</span>';
+                    } else {
+                        $errmsg .= '<span class="ccr">Es ist kein freier Slot vorhanden.</span>';
+                    }
+                } else {
+                    $errmsg .= '<span class="ccr">Die Flotte befindet sich in einem Einsatz.</span>';
+                }
+            } else {
+                $errmsg .= '<span class="ccr">Du hast kein Artefakte dieser Art.</span>';
+            }
+        } else {
+            $errmsg .= '<table width=600><tr><td class="ccr">Dieses Artefakt kann nicht in einem Basisschiff verwendet werden.</span>';
+        }
+
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print('Datensatz Nr. '.$ums_user_id." konnte nicht entsperrt werden!<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
     }
-    else
-    {
-      print('Datensatz Nr. '.$ums_user_id." konnte nicht entsperrt werden!<br><br><br>");
+} elseif (isset($_GET["a"]) && $_GET["a"] == 2) {
+    //Artefakt aus einem Basisschiff entfernen
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        //flotten id festlegen
+        $flotte = 0;
+        if ($_GET["fid"] == 1) {
+            $flotte = 0;
+        }
+        if ($_GET["fid"] == 2) {
+            $flotte = 1;
+        }
+        if ($_GET["fid"] == 3) {
+            $flotte = 2;
+        }
+        if ($_GET["fid"] == 4) {
+            $flotte = 3;
+        }
+        if ($_GET["fid"] == 5) {
+            $flotte = 4;
+        }
+        if ($_GET["fid"] == 6) {
+            $flotte = 5;
+        }
+        if ($_GET["fid"] == 7) {
+            $flotte = 6;
+        }
+
+        $id = (int)$_GET["id"];
+        if ($id < 1 || $id > 6) {
+            $id = 1;
+        }
+
+        //flottendaten laden
+        $fleetid = $ums_user_id.'-'.$flotte;
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+        $row = mysqli_fetch_array($result);
+
+        //ist das artefakt im basisschiff vorhanden
+        if ($row["artid$id"] > 0) {
+            //schauen ob im artefaktgebäude platz ist
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_artefact WHERE user_id=?", [$ums_user_id]);
+            $numx = mysqli_num_rows($db_datenx);
+            if ($numx < $artbldglevel + $ally_geb_bonus) { //es gibt noch platz
+
+                //schauen ob die flotte daheim ist
+                if ($row["aktion"] == 0) {
+                    //flotte upadten
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET artid$id=0, artlvl$id=0 WHERE user_id=?", [$fleetid]);
+                    //artefakt in das gebäude transferieren
+                    $artid = $row["artid$id"];
+                    $artlvl = $row["artlvl$id"];
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, ?)", [$ums_user_id, $artid, $artlvl]);
+                    $errmsg .= '<span class="ccg">Das Artefakt wurde in das Artefaktgeb&auml;ude transferiert.</span>';
+                } else {
+                    $errmsg .= '<span class="ccr">Die Flotte befindet sich in einem Einsatz.</span>';
+                }
+            } else {
+                $errmsg .= '<span class="ccr">Im Artefaktgeb&auml;ude ist kein Platz mehr frei.</span>';
+            }
+        } else {
+            $errmsg .= '<span class="ccr">Dieses Artefakt befindet sich nicht auf dem Basisschiff.</span>';
+        }
+
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print('Datensatz Nr. '.$ums_user_id." konnte nicht entsperrt werden!<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
     }
-  }// if setlock-ende
-  else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
 }
 
 ?>
@@ -177,697 +229,713 @@ elseif (isset($_GET["a"]) && $_GET["a"]==2)
 <body>
 <?php
 //artefakt zerst�ren
-if(isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact']==1){
-	//transaktionsbeginn
-	if (setLock($ums_user_id)){
-		$lid=intval($_REQUEST['lid']);
-		//schauen ob man das artefakte hat
-		$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
-		$num = mysqli_num_rows($db_daten);
+if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        $lid = intval($_REQUEST['lid']);
+        //schauen ob man das artefakte hat
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
+        $num = mysqli_num_rows($db_daten);
 
-		if($num>0)//man hat das artefakt
-		{
-		  //id auslesen
-		  $row = mysqli_fetch_array($db_daten);
+        if ($num > 0) {//man hat das artefakt
+            //id auslesen
+            $row = mysqli_fetch_array($db_daten);
 
-		  //ist jetzt immer zerstörbar
-		  //if($ua_useable[$row["id"]-1]!=1){
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+            //ist jetzt immer zerstörbar
+            //if($ua_useable[$row["id"]-1]!=1){
+            //artefakt löschen
+            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-			//palenium gutschreiben
-			change_storage_amount($_SESSION['ums_user_id'],1,100*$row['level']);
+            //palenium gutschreiben
+            change_storage_amount($_SESSION['ums_user_id'], 1, 100 * $row['level']);
 
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler8'];
-		  //}
-		}
-		else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+            //message ausgeben
+            $errmsg .= $artefacts_lang['fehler8'];
+            //}
+        } else {
+            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+        }
 
-		//transaktionsende
-		$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-		if ($erg){
-		  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-		}else{
-		  print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
-		}
-	}// if setlock-ende
-	else echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+    }
 }//ende submit1
 
 //artefakt benutzen
-	if(isset($_REQUEST['useartefact']) && $_REQUEST['useartefact']==1){
-	//transaktionsbeginn
-	if (setLock($ums_user_id)){
-		$lid=intval($_REQUEST['lid']);
-		//schauen ob man das artefakte hat
-		$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
-		$num = mysqli_num_rows($db_daten);
+if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        $lid = intval($_REQUEST['lid']);
+        //schauen ob man das artefakte hat
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid]);
+        $num = mysqli_num_rows($db_daten);
 
-		if($num>0){
-		$row = mysqli_fetch_array($db_daten);
-		$id=$row['id'];
-		//angriffserfahrungspunkte
-		if($id==11){
-			/*
-			$exp=10000;
-			//exp verteilen
-			//$fleet_id=$ums_user_id.'-0';
-			//mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
+        if ($num > 0) {
+            $row = mysqli_fetch_array($db_daten);
+            $id = $row['id'];
+            //angriffserfahrungspunkte
+            if ($id == 11) {
+                /*
+                $exp=10000;
+                //exp verteilen
+                //$fleet_id=$ums_user_id.'-0';
+                //mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			$fleet_id=$ums_user_id.'-1';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
+                $fleet_id=$ums_user_id.'-1';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			$fleet_id=$ums_user_id.'-2';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
+                $fleet_id=$ums_user_id.'-2';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			$fleet_id=$ums_user_id.'-3';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
+                $fleet_id=$ums_user_id.'-3';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komatt=komatt+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
-			
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler7'];
-			*/
-		}
-		//verteidigungserfahrungspunkte
-		elseif($id==12){
-			/*
-			$exp=10000;
-			//exp verteilen
-			$fleet_id=$ums_user_id.'-0';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-			$fleet_id=$ums_user_id.'-1';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
+                //message ausgeben
+                $errmsg.=$artefacts_lang['fehler7'];
+                */
+            }
+            //verteidigungserfahrungspunkte
+            elseif ($id == 12) {
+                /*
+                $exp=10000;
+                //exp verteilen
+                $fleet_id=$ums_user_id.'-0';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			$fleet_id=$ums_user_id.'-2';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
+                $fleet_id=$ums_user_id.'-1';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			$fleet_id=$ums_user_id.'-3';
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
+                $fleet_id=$ums_user_id.'-2';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+                $fleet_id=$ums_user_id.'-3';
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET komdef=komdef+? WHERE user_id=?", [$exp, $fleet_id]);
 
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler7'];
-			*/
-		}
-		//tronicar 15-20 tronic
-		elseif($id==16)
-		{
-			$tronic=mt_rand(15,20);
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $ums_user_id]);
-			$restyp05+=$tronic;
-			//artefakt l�schen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+                //message ausgeben
+                $errmsg.=$artefacts_lang['fehler7'];
+                */
+            }
+            //tronicar 15-20 tronic
+            elseif ($id == 16) {
+                $tronic = mt_rand(15, 20);
 
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['tronic'].': '.$tronic;
-		}
-		//Artefaktgebäudestufe erhöhen
-		elseif($id==17)
-		{
-			//das artefakt kann nur verwendet werden, wenn aktuell kein ausbau l�uft
-			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
-			$gebinbau = mysqli_num_rows($db_daten);
-			if($gebinbau==0)
-			{
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET artbldglevel=artbldglevel+1 WHERE user_id=?", [$ums_user_id]);
-				$artbldglevel++;
-				//artefakt löschen
-				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $ums_user_id]);
+                $restyp05 += $tronic;
+                //artefakt l�schen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-				//message ausgeben
-				$errmsg.=$artefacts_lang['fehler7'];
-			}
-			else $errmsg.='<font color="FF0000">W&auml;hrend der Geb&auml;udeausbau l&auml;uft, kann dieses Artefakt nicht verwendet werden.</font>';
-		}
-		//waringa 1-3 kriegsartefakte
-		elseif($id==18)
-		{
-			$kartefakt=mt_rand(1,3);
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+? WHERE user_id=?", [$kartefakt, $ums_user_id]);
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+                //message ausgeben
+                $errmsg .= $artefacts_lang['fehler7'].' '.$artefacts_lang['tronic'].': '.$tronic;
+            }
+            //Artefaktgebäudestufe erhöhen
+            elseif ($id == 17) {
+                //das artefakt kann nur verwendet werden, wenn aktuell kein ausbau l�uft
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+                $gebinbau = mysqli_num_rows($db_daten);
+                if ($gebinbau == 0) {
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET artbldglevel=artbldglevel+1 WHERE user_id=?", [$ums_user_id]);
+                    $artbldglevel++;
+                    //artefakt löschen
+                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['kriegsartefakte'].': '.$kartefakt;
-		}      
-		//kollimania 6-8 kollektoren, oder 200 Palenium
-		elseif($id==19)
-		{
-			$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=19", [$ums_user_id]);
-			$num = mysqli_num_rows($result);
-			if($num<=5){
-				//Kollektoren
-				$value=mt_rand(6,8);
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col+? WHERE user_id=?", [$value, $ums_user_id]);
+                    //message ausgeben
+                    $errmsg .= $artefacts_lang['fehler7'];
+                } else {
+                    $errmsg .= '<font color="FF0000">W&auml;hrend der Geb&auml;udeausbau l&auml;uft, kann dieses Artefakt nicht verwendet werden.</font>';
+                }
+            }
+            //waringa 1-3 kriegsartefakte
+            elseif ($id == 18) {
+                $kartefakt = mt_rand(1, 3);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+? WHERE user_id=?", [$kartefakt, $ums_user_id]);
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-				//message ausgeben
-				$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['kollektoren'].': '.$value;
-			}else{
-				//palenium gutschreiben
-				$value=200;
-				change_storage_amount($_SESSION['ums_user_id'],1,$value);
+                //message ausgeben
+                $errmsg .= $artefacts_lang['fehler7'].' '.$artefacts_lang['kriegsartefakte'].': '.$kartefakt;
+            }
+            //kollimania 6-8 kollektoren, oder 200 Palenium
+            elseif ($id == 19) {
+                $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND id=19", [$ums_user_id]);
+                $num = mysqli_num_rows($result);
+                if ($num <= 5) {
+                    //Kollektoren
+                    $value = mt_rand(6, 8);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col+? WHERE user_id=?", [$value, $ums_user_id]);
 
-				//message ausgeben
-				$errmsg.=$artefacts_lang['fehler7'].' Palenium: '.$value;
-			}
+                    //message ausgeben
+                    $errmsg .= $artefacts_lang['fehler7'].' '.$artefacts_lang['kollektoren'].': '.$value;
+                } else {
+                    //palenium gutschreiben
+                    $value = 200;
+                    change_storage_amount($_SESSION['ums_user_id'], 1, $value);
 
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
-		}
-		//sekkollus 1-2 sektorkollektoren
-		elseif($id==20)
-		{
-			$value=mt_rand(1,2);
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET col=col+? WHERE sec_id=?", [$value, $sector]);
-			//artefakt löschen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+                    //message ausgeben
+                    $errmsg .= $artefacts_lang['fehler7'].' Palenium: '.$value;
+                }
 
-			//message ausgeben
-			$errmsg.=$artefacts_lang['fehler7'].' '.$artefacts_lang['sektorkollektoren'].': '.$value;
-		}      
-		//creditrüssel
-		elseif($id==21){
-			//überprüfen wie viel credits man bekommt
-			$amount=mt_rand(3,5);
-			
-			//credit gutschreiben
-			//mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $ums_user_id]);
-			changeCredits($_SESSION['ums_user_id'], $amount, 'Creditruessel');
-			$errmsg.='<font color="#00FF00">Du hast dem gro&szlig;en Ishtarus '.$amount.' Credits wegger&uuml;sselt.</font>';
-			
-			//artefakt entfernen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
-		}elseif($id==22){
-			////////////////////////////////////////////////////////////
-			// neue Auktion erstellen
-			////////////////////////////////////////////////////////////
-			/*
-			$errmsg.='<font color="#00FF00">Die Auktion wurde gestartet.</font>';
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+            }
+            //sekkollus 1-2 sektorkollektoren
+            elseif ($id == 20) {
+                $value = mt_rand(1, 2);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET col=col+? WHERE sec_id=?", [$value, $sector]);
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-			createAuction($_SESSION['ums_user_id']);
-		
-			//artefakt entfernen
-			mysqli_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid='$lid'");
-			*/
-		}
+                //message ausgeben
+                $errmsg .= $artefacts_lang['fehler7'].' '.$artefacts_lang['sektorkollektoren'].': '.$value;
+            }
+            //creditrüssel
+            elseif ($id == 21) {
+                //überprüfen wie viel credits man bekommt
+                $amount = mt_rand(3, 5);
 
-			
-			/*
-			//�berpr�fen ob dem spieler schonmal kollektoren gestohlen worden sind und ob davon noch jemand dabei ist
-			unset($atter);
-			$ac=0;
-			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_getcol WHERE zuser_id=?", [$ums_user_id]);
-			while($row = mysqli_fetch_array($db_daten))
-			{
-				//spielername des atters feststellen
-				$duid=$row["user_id"];
-				$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, col, sector, system FROM de_user_data WHERE user_id=?", [$duid]);
-				$num = mysqli_num_rows($result);
-				if($num==1)
-				{
-					$rowx = mysqli_fetch_array($result);
-					if($rowx['col']>0)//nur ziele mit kollektor gehen
-					{
-						$atter[$ac]['user_id']=$duid;
-						$atter[$ac]['spielername']=$rowx["spielername"];
-						$ac++;
-					}
-				}
-			}
-			
-			if(count($atter)>0)//es gibt einen atter
-			{
-				//per zufall jemanden ausw�hlen
-				$w=mt_rand(0,count($atter)-1);
-				
-				$zuid=$atter[$w]['user_id'];
-				$zspielername=$atter[$w]['spielername'];
-				$time=strftime("%Y%m%d%H%M%S");
-				
-				//dem ziel den kollektor entfernen
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE user_id=?", [$zuid]);
+                //credit gutschreiben
+                //mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $ums_user_id]);
+                changeCredits($_SESSION['ums_user_id'], $amount, 'Creditruessel');
+                $errmsg .= '<font color="#00FF00">Du hast dem gro&szlig;en Ishtarus '.$amount.' Credits wegger&uuml;sselt.</font>';
 
-				//info an das ziel bzgl. r�sselung
-				mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, 'Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')", [$zuid, $time]);
-				
-				//dem spieler das kriegsartefakt gutschreiben
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);      		
-				
-				$errmsg.='<font color="#00FF00">Du hast '.$zspielername.' einen Kollektor wegger&uuml;sselt.</font>';
-			}
-			else //es trifft einen dx
-			{
-				//dem spieler das kriegsartefakt gutschreiben
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);      		
-							
-				$errmsg.='<font color="#00FF00">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</font>';
-			}
+                //artefakt entfernen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+            } elseif ($id == 22) {
+                ////////////////////////////////////////////////////////////
+                // neue Auktion erstellen
+                ////////////////////////////////////////////////////////////
+                /*
+                $errmsg.='<font color="#00FF00">Die Auktion wurde gestartet.</font>';
 
-			//artefakt l�schen
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
-		}      
-		*/
-		}
-		else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+                createAuction($_SESSION['ums_user_id']);
 
-		//transaktionsende
-		$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-		if ($erg)
-		{
-		//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-		}
-		else
-		{
-		print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
-		}
-	}// if setlock-ende
-	else echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+                //artefakt entfernen
+                mysqli_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid='$lid'");
+                */
+            }
+
+
+            /*
+            //�berpr�fen ob dem spieler schonmal kollektoren gestohlen worden sind und ob davon noch jemand dabei ist
+            unset($atter);
+            $ac=0;
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_getcol WHERE zuser_id=?", [$ums_user_id]);
+            while($row = mysqli_fetch_array($db_daten))
+            {
+                //spielername des atters feststellen
+                $duid=$row["user_id"];
+                $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, col, sector, system FROM de_user_data WHERE user_id=?", [$duid]);
+                $num = mysqli_num_rows($result);
+                if($num==1)
+                {
+                    $rowx = mysqli_fetch_array($result);
+                    if($rowx['col']>0)//nur ziele mit kollektor gehen
+                    {
+                        $atter[$ac]['user_id']=$duid;
+                        $atter[$ac]['spielername']=$rowx["spielername"];
+                        $ac++;
+                    }
+                }
+            }
+
+            if(count($atter)>0)//es gibt einen atter
+            {
+                //per zufall jemanden ausw�hlen
+                $w=mt_rand(0,count($atter)-1);
+
+                $zuid=$atter[$w]['user_id'];
+                $zspielername=$atter[$w]['spielername'];
+                $time=strftime("%Y%m%d%H%M%S");
+
+                //dem ziel den kollektor entfernen
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE user_id=?", [$zuid]);
+
+                //info an das ziel bzgl. r�sselung
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, 'Ein anderer Spieler hat Dir einen Kollektor wegger&uuml;sselt.')", [$zuid, $time]);
+
+                //dem spieler das kriegsartefakt gutschreiben
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);
+
+                $errmsg.='<font color="#00FF00">Du hast '.$zspielername.' einen Kollektor wegger&uuml;sselt.</font>';
+            }
+            else //es trifft einen dx
+            {
+                //dem spieler das kriegsartefakt gutschreiben
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$ums_user_id]);
+
+                $errmsg.='<font color="#00FF00">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</font>';
+            }
+
+            //artefakt l�schen
+            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+        }
+        */
+        } else {
+            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+        }
+
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+    }
 }//ende submit1
 
 
 //artefaktupgrade
-if(isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts']==1)
-{
-  //transaktionsbeginn
-  if (setLock($ums_user_id))
-  {
-    //rohstoffe auslesen
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp05 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
-	$row = mysqli_fetch_array($db_daten);
-    $restyp05=$row['restyp05'];    
-    
-    //artefakt-ids
-		$lid1=intval($_REQUEST['lid1']);
-    $lid2=intval($_REQUEST['lid2']);
-    //schauen ob man beide artefakte hat
-    $db_daten1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
-    $num1 = mysqli_num_rows($db_daten1);
-    
-    $db_daten2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
-    $num2 = mysqli_num_rows($db_daten2);    if($num1==1 AND $num2==1)//man hat beide artefakte
-    {
-      //artefaktdaten auslesen
-      $row1 = mysqli_fetch_array($db_daten1);
-      $id1=$row1['id'];
-      $lvl1=$row1['lvl'];
-      $row2 = mysqli_fetch_array($db_daten2);
-      $id2=$row2['id'];
-      $lvl2=$row2['lvl'];  
-      
-      //�berpr�fen ob die artefakte unterschiedlicher art sind
-      if($id1!=$id2)//wenn sie unterschiedlich sind, dann muss ein neues artefakt erzeugt werden und die beiden alten gel�scht werden
-      {
-        //�berpr�fen ob man genug tronic hat
-        if($restyp05>=$tcost2)
-        {
-          //rohstoffe abziehen
-          $restyp05=$restyp05-$tcost2;
-          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost2, $ums_user_id]);
-          
-          //neues artefakt erzeugen, muss anderer art als die quellartefakte sein
-          $artid=0;
-          while($artid==0 OR $artid==$id1 OR $artid==$id2)
-          {
-            $artid=mt_rand(1,$ua_index+1);
-          }
-        
-          //neues artefakt hinterlegen
-          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", [$ums_user_id, $artid]);
-      
-          //alte löschen
-          mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
-          mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
+if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        //rohstoffe auslesen
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp05 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+        $row = mysqli_fetch_array($db_daten);
+        $restyp05 = $row['restyp05'];
 
-		  //allyid auslesen
-		  $allyid=get_player_allyid($ums_user_id);
+        //artefakt-ids
+        $lid1 = intval($_REQUEST['lid1']);
+        $lid2 = intval($_REQUEST['lid2']);
+        //schauen ob man beide artefakte hat
+        $db_daten1 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
+        $num1 = mysqli_num_rows($db_daten1);
 
-		  //allyaufgabe kriegsartefakte
-		  if($allyid>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);
+        $db_daten2 = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
+        $num2 = mysqli_num_rows($db_daten2);
+        if ($num1 == 1 and $num2 == 1) {//man hat beide artefakte
+            //artefaktdaten auslesen
+            $row1 = mysqli_fetch_array($db_daten1);
+            $id1 = $row1['id'];
+            // 'level' ist der korrekte Spaltenname in der DB (INSERT/UPDATE nutzen 'level')
+            $lvl1 = isset($row1['level']) ? (int)$row1['level'] : (isset($row1['lvl']) ? (int)$row1['lvl'] : 0);
+            $row2 = mysqli_fetch_array($db_daten2);
+            $id2 = $row2['id'];
+            $lvl2 = isset($row2['level']) ? (int)$row2['level'] : (isset($row2['lvl']) ? (int)$row2['lvl'] : 0);
 
-		  
-          //info dass alles geklappt hat
-          $errmsg.='<font color="#00FF00">Die Artefakte wurden zu einem neuen Artefakt verschmolzen: '.$ua_name[$artid-1].'</font><br><br>';
+            //�berpr�fen ob die artefakte unterschiedlicher art sind
+            if ($id1 != $id2) {//wenn sie unterschiedlich sind, dann muss ein neues artefakt erzeugt werden und die beiden alten gel�scht werden
+                //�berpr�fen ob man genug tronic hat
+                if ($restyp05 >= $tcost2) {
+                    //rohstoffe abziehen
+                    $restyp05 = $restyp05 - $tcost2;
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost2, $ums_user_id]);
+
+                    //neues artefakt erzeugen, muss anderer art als die quellartefakte sein
+                    $artid = 0;
+                    while ($artid == 0 or $artid == $id1 or $artid == $id2) {
+                        $artid = mt_rand(1, $ua_index + 1);
+                    }
+
+                    //neues artefakt hinterlegen
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, 1)", [$ums_user_id, $artid]);
+
+                    //alte löschen
+                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
+                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
+
+                    //allyid auslesen
+                    $allyid = get_player_allyid($ums_user_id);
+
+                    //allyaufgabe kriegsartefakte
+                    if ($allyid > 0) {
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);
+                    }
+
+
+                    //info dass alles geklappt hat
+                    $errmsg .= '<font color="#00FF00">Die Artefakte wurden zu einem neuen Artefakt verschmolzen: '.$ua_name[$artid - 1].'</font><br><br>';
+                } else {
+                    $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst f&uuml;r den Vorgang '.$tcost2.' Tronic.</font><br><br>';
+                }
+            } else {
+                //schauen ob die artefakte schon auf dem maxlevel sind
+                if ($lvl1 == $lvl2 and $lvl1 < $ua_maxlvl[$id1 - 1]) {
+                    if ($restyp05 >= $tcost1) {
+                        //rohstoffe abziehen
+                        $restyp05 = $restyp05 - $tcost1;
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost1, $ums_user_id]);
+
+                        $errmsg .= '<font color="#00FF00">'.$artefacts_lang['fehler'].'</font>';
+
+                        //ein artefakt upgraden lid1
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_artefact SET level=level+1 WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
+
+                        //alte löschen lid2
+                        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
+
+                        //allyid auslesen
+                        $allyid = get_player_allyid($ums_user_id);
+
+                        //allyaufgabe kriegsartefakte
+                        if ($allyid > 0) {
+                            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);
+                        }
+
+                    } else {
+                        $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst f�r den Vorgang '.$tcost1.' Tronic.</font><br><br>';
+                    }
+                } else {
+                    $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler2'].'</font><br><br>';
+                }
+            }
+        } else {
+            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler3'].'</font>';
         }
-        else $errmsg.='<font color="#FF0000">Du ben&ouml;tigst f&uuml;r den Vorgang '.$tcost2.' Tronic.</font><br><br>';
-      }
-      else
-      {
-        //schauen ob die artefakte schon auf dem maxlevel sind
-        if($lvl1==$lvl2 AND $lvl1<$ua_maxlvl[$id1-1])
-        {
-          if($restyp05>=$tcost1)
-          {
-            //rohstoffe abziehen
-            $restyp05=$restyp05-$tcost1;
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost1, $ums_user_id]);
-        
-            $errmsg.='<font color="#00FF00">'.$artefacts_lang['fehler'].'</font>';
-          
-            //ein artefakt upgraden lid1
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_artefact SET level=level+1 WHERE user_id=? AND lid=?", [$ums_user_id, $lid1]);
-     
-            //alte löschen lid2
-            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE user_id=? AND lid=?", [$ums_user_id, $lid2]);
 
-			//allyid auslesen
-			$allyid=get_player_allyid($ums_user_id);
-
-			//allyaufgabe kriegsartefakte
-			if($allyid>0){
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=6", [$allyid]);			
-			}
-			
-          }
-          else $errmsg.='<font color="#FF0000">Du ben&ouml;tigst f�r den Vorgang '.$tcost1.' Tronic.</font><br><br>';
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
         }
-        else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler2'].'</font><br><br>';
-      }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
     }
-    else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler3'].'</font>';
-
-    //transaktionsende
-    $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-    if ($erg)
-    {
-      //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-    }
-    else
-    {
-      print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
-    }
-  }// if setlock-ende
-  else echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
 }//ende submit1
 
 
 //geb�udeupgrade
-if (isset($_REQUEST["bupgrade"]) AND hasTech($pt,28) AND $artbldglevel<$maxlevel){
-  //transaktionsbeginn
-  if (setLock($ums_user_id))
-  {
-  $benrestyp01=0;$benrestyp02=0;$benrestyp03=$ausbaukosten;$benrestyp04=0;$benrestyp05=0;
-  $tech_ticks=$ausbauzeit;
+if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxlevel) {
+    //transaktionsbeginn
+    if (setLock($ums_user_id)) {
+        $benrestyp01 = 0;
+        $benrestyp02 = 0;
+        $benrestyp03 = $ausbaukosten;
+        $benrestyp04 = 0;
+        $benrestyp05 = 0;
+        $tech_ticks = $ausbauzeit;
 
-  //schauen ob man es bauen kann, oder ob schon ein upgrade läuft
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
-  $gebinbau = mysqli_num_rows($db_daten);
-  if($gebinbau!=0) $fehlermsg='<font color="FF0000">'.$artefacts_lang['fehler4'];
+        //schauen ob man es bauen kann, oder ob schon ein upgrade läuft
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+        $gebinbau = mysqli_num_rows($db_daten);
+        if ($gebinbau != 0) {
+            $fehlermsg = '<font color="FF0000">'.$artefacts_lang['fehler4'];
+        }
 
-  //genug ressourcen vorhanden?
-  if ($fehlermsg=='' && $errmsg=='' && $restyp01>=$benrestyp01 && $restyp02>=$benrestyp02 && $restyp03>=$benrestyp03 && $restyp04>=$benrestyp04 && $restyp05>=$benrestyp05){
-    $restyp01=$restyp01-$benrestyp01;
-    $restyp02=$restyp02-$benrestyp02;
-    $restyp03=$restyp03-$benrestyp03;
-    $restyp04=$restyp04-$benrestyp04;
-    $restyp05=$restyp05-$benrestyp05;
-    $gr01=$gr01-$restyp01;
-    $gr02=$gr02-$restyp02;
-    $gr03=$gr03-$restyp03;
-    $gr04=$gr04-$restyp04;
-     $gr05=$gr05-$restyp05;
-    //rohstoffe abziehen
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01=restyp01-?, restyp02=restyp02-?, restyp03=restyp03-?, restyp04=restyp04-?, restyp05=restyp05-? WHERE user_id=?", 
-    [$gr01, $gr02, $gr03, $gr04, $gr05, $ums_user_id]);
-    //upgrade in der db hinterlegen
-    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 1000, 1, ?)", 
-    [$ums_user_id, $tech_ticks]);
-    //meldung an den account �ber den ausbau
-    $errmsg.='<font color="#00FF00">Der Geb&auml;udeausbau wurde gestartet.</font>';
-  }else $errmsg.='<font color="#FF0000">'.$artefacts_lang['fehler5'].'</font>';
-  
-  //transaktionsende
-  $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
-  if ($erg)
-  {
-	//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-  }
-  else
-  {
-	print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
-  }
-}// if setlock-ende
-else echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        //genug ressourcen vorhanden?
+        if ($fehlermsg == '' && $errmsg == '' && $restyp01 >= $benrestyp01 && $restyp02 >= $benrestyp02 && $restyp03 >= $benrestyp03 && $restyp04 >= $benrestyp04 && $restyp05 >= $benrestyp05) {
+            $restyp01 = $restyp01 - $benrestyp01;
+            $restyp02 = $restyp02 - $benrestyp02;
+            $restyp03 = $restyp03 - $benrestyp03;
+            $restyp04 = $restyp04 - $benrestyp04;
+            $restyp05 = $restyp05 - $benrestyp05;
+            $gr01 = $gr01 - $restyp01;
+            $gr02 = $gr02 - $restyp02;
+            $gr03 = $gr03 - $restyp03;
+            $gr04 = $gr04 - $restyp04;
+            $gr05 = $gr05 - $restyp05;
+            //rohstoffe abziehen
+            mysqli_execute_query(
+                $GLOBALS['dbi'],
+                "UPDATE de_user_data SET restyp01=restyp01-?, restyp02=restyp02-?, restyp03=restyp03-?, restyp04=restyp04-?, restyp05=restyp05-? WHERE user_id=?",
+                [$gr01, $gr02, $gr03, $gr04, $gr05, $ums_user_id]
+            );
+            //upgrade in der db hinterlegen
+            mysqli_execute_query(
+                $GLOBALS['dbi'],
+                "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 1000, 1, ?)",
+                [$ums_user_id, $tech_ticks]
+            );
+            //meldung an den account �ber den ausbau
+            $errmsg .= '<font color="#00FF00">Der Geb&auml;udeausbau wurde gestartet.</font>';
+        } else {
+            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler5'].'</font>';
+        }
+
+        //transaktionsende
+        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        if ($erg) {
+            //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
+        } else {
+            print($artefacts_lang['error'].$ums_user_id.$artefacts_lang['error2']."<br><br><br>");
+        }
+    }// if setlock-ende
+    else {
+        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+    }
 }
 
 
 //stelle die ressourcenleiste dar
 include "resline.php";
 
-if (isset($errmsg) && $errmsg!='')echo '<div class="info_box">'.$errmsg.'</div><br>';
+if (isset($errmsg) && $errmsg != '') {
+    echo '<div class="info_box">'.$errmsg.'</div><br>';
+}
 
-if(!hasTech($pt,28)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=28";
-	$db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
+if (!hasTech($pt, 28)) {
+    $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=28";
+    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
+    $row_techcheck = mysqli_fetch_array($db_tech);
 
 
-	echo '<br>';
-	rahmen_oben('Fehlende Technologie');
-	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-	echo '<tr align="left" class="cell">
+    echo '<br>';
+    rahmen_oben('Fehlende Technologie');
+    echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
+    echo '<tr align="left" class="cell">
 	<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=28" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_28.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
+	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
 	</tr>';
-	echo '</table>';
-	rahmen_unten();  
-}else{
-	//schauen ob schon ein gebäudeupgrade läuft
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
-	$gebinbau = mysqli_num_rows($db_daten);
+    echo '</table>';
+    rahmen_unten();
+} else {
+    //schauen ob schon ein gebäudeupgrade läuft
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$ums_user_id]);
+    $gebinbau = mysqli_num_rows($db_daten);
 
-	////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////
-	//artefakte/geb�ude darstellen
-	////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    //artefakte/geb�ude darstellen
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
 
-	//rahmen öffnen
-	$title=$artefacts_lang['upinfo'].'&Der Geb&auml;udeausbau erfolgt &uuml;ber das Anklicken der Geb&auml;udegrafik.<br><br>'.$artefacts_lang['upinfo1'].'<br>'.$artefacts_lang['upinfo2'].'<br><br>'.
-	$artefacts_lang['upinfo3'].$tcost1.' Tronic<br>'.
-	$artefacts_lang['upinfo4'].$tcost2.' Tronic<br><br>'.
-	'Das Artefakt kann auch zerst&ouml;rt und in Palenium (100 pro Artefaktstufe) umgewandelt werden.<br><br>'.
-	$artefacts_lang['upinfo5'];
+    //rahmen öffnen
+    $title = $artefacts_lang['upinfo'].'&Der Geb&auml;udeausbau erfolgt &uuml;ber das Anklicken der Geb&auml;udegrafik.<br><br>'.$artefacts_lang['upinfo1'].'<br>'.$artefacts_lang['upinfo2'].'<br><br>'.
+    $artefacts_lang['upinfo3'].$tcost1.' Tronic<br>'.
+    $artefacts_lang['upinfo4'].$tcost2.' Tronic<br><br>'.
+    'Das Artefakt kann auch zerst&ouml;rt und in Palenium (100 pro Artefaktstufe) umgewandelt werden.<br><br>'.
+    $artefacts_lang['upinfo5'];
 
-	$palenium=get_storage_amount($_SESSION['ums_user_id'], 1); 
+    $palenium = get_storage_amount($_SESSION['ums_user_id'], 1);
 
-	$ueberschrift='
+    $ueberschrift = '
 	<div style="display: flex;">
 		<div style="width: 145px;"></div>
 		<div style="flex-grow: 1;">'.$artefacts_lang['artefaktgebaeude'].' <img id="info" title="'.$title.'" style="vertical-align: middle; margin-top: -4px;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0"></div>
-		<div style="width: 145px; text-align: right;"><img id="info" title="Palenium" style="vertical-align: middle; width: 16px; height: auto; margin-top: -4px;" src="g/item1.png" border="0"> '.number_format($palenium, 0,",",".").'&nbsp;</div>
+		<div style="width: 145px; text-align: right;"><img id="info" title="Palenium" style="vertical-align: middle; width: 16px; height: auto; margin-top: -4px;" src="g/item1.png" border="0"> '.number_format($palenium, 0, ",", ".").'&nbsp;</div>
 		
 	</div>
 	';
 
-	rahmen_oben($ueberschrift);
+    rahmen_oben($ueberschrift);
 
-	$cssheight=143+(ceil($artbldglevel/10)-1)*70;
+    $cssheight = 143 + (ceil($artbldglevel / 10) - 1) * 70;
 
-	echo '<div class="cell" style="width: 576px; height: '.$cssheight.'px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
+    echo '<div class="cell" style="width: 576px; height: '.$cssheight.'px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
 
-	$title=$artefacts_lang['geblevel'].$artbldglevel.'/'.$maxlevel.'&'.$artefacts_lang['geblevel2'];
-	if ($gebinbau!=0){
-		$row = mysqli_fetch_array($db_daten);  
-		//geb�ude wird bereits geupgraded
-		$title.='<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].$artefacts_lang['woche'].'<br>';
-		$showbldglink=0;
-	}
-	elseif($artbldglevel<$maxlevel)//das geb�ude kann noch weiter ausgebaut werden
-	{
-		$title.='<br>'.$artefacts_lang['kosten'].': '.number_format($ausbaukosten, 0,",",".").' Iradium';
-		$title.='<br>'.$artefacts_lang['upgradedauer'].': '.$ausbauzeit;
-		$title.='<br><br>Klicken um das Geb&auml;ude auszubauen.';
-		$showbldglink=1;
-	}
-	else//das geb�ude ist auf maximum
-	{
-		$title.='<br>'.$artefacts_lang['gebistmax'];
-		$showbldglink=0;
-	}
-	//ally-geb�ude-bonus
-	if($allyid>0)$title.='<br>Zus&auml;tzliche Artefaktpl&auml;tze durch Allianzprojekte: '.$ally_geb_bonus;
-  
-	//<input type="submit" name="bupgrade" value="'.$artefacts_lang[zulevel].($artbldglevel+1).$artefacts_lang[zulevel2].'">'
-	//.$artefacts_lang[kosten].number_format($ausbaukosten, 0,",",".").$artefacts_lang[iradiumdauer].($ausbauzeit).'<br>';
+    $title = $artefacts_lang['geblevel'].$artbldglevel.'/'.$maxlevel.'&'.$artefacts_lang['geblevel2'];
+    if ($gebinbau != 0) {
+        $row = mysqli_fetch_array($db_daten);
+        //geb�ude wird bereits geupgraded
+        $title .= '<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].$artefacts_lang['woche'].'<br>';
+        $showbldglink = 0;
+    } elseif ($artbldglevel < $maxlevel) {//das geb�ude kann noch weiter ausgebaut werden
+        $title .= '<br>'.$artefacts_lang['kosten'].': '.number_format($ausbaukosten, 0, ",", ".").' Iradium';
+        $title .= '<br>'.$artefacts_lang['upgradedauer'].': '.$ausbauzeit;
+        $title .= '<br><br>Klicken um das Geb&auml;ude auszubauen.';
+        $showbldglink = 1;
+    } else { //das geb�ude ist auf maximum
+        $title .= '<br>'.$artefacts_lang['gebistmax'];
+        $showbldglink = 0;
+    }
+    //ally-geb�ude-bonus
+    if ($allyid > 0) {
+        $title .= '<br>Zus&auml;tzliche Artefaktpl&auml;tze durch Allianzprojekte: '.$ally_geb_bonus;
+    }
 
-	//Artefaktgebäude
-	echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
-	if($showbldglink==1){
-		echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
-	}
+    //<input type="submit" name="bupgrade" value="'.$artefacts_lang[zulevel].($artbldglevel+1).$artefacts_lang[zulevel2].'">'
+    //.$artefacts_lang[kosten].number_format($ausbaukosten, 0,",",".").$artefacts_lang[iradiumdauer].($ausbauzeit).'<br>';
 
-	echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
-	echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artbldglevel.'/'.$maxlevel.'</span>';
-	if($showbldglink==1)echo '</a>';
-	echo '</div>';
+    //Artefaktgebäude
+    echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
+    if ($showbldglink == 1) {
+        echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
+    }
 
-	//msg-area
-	echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 58px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
-	echo '</div>';  
-  
-  //artefakte aus der db holen
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$ums_user_id]);
-	$anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
-	$ac=0;
-	unset($artefacts);
-	while($row = mysqli_fetch_array($db_daten)){
-		//title/tooltip festlegen
-		$title=$ua_name[$row["id"]-1].'&'.$ua_desc[$row["id"]-1];
-		if($ua_werte[$row["id"]-1][$row["level"]-1][0]>0){
-			//einleitung
-			$title.='<br>'.$artefacts_lang['bonusderstufe'];
-			//die einzelnen bonusstufen
-			for($i=0;$i<count($ua_werte[$row["id"]-1]);$i++){
-				if($i==$row['level']-1){$fc[0]='<font color=#00FF00>';$fc[1]='</font>';}else{$fc[0]='';$fc[1]='';}
-				$title.='<br>'.$fc[0].($i+1).': '.number_format($ua_werte[$row["id"]-1][$i][0], 2,",",".").'%'.$fc[1];
-			}
-		}
-		//if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
-    
-		echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-		echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"]-1].'"></span>';
-		echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"]-1].'</span>';
-		echo '</div>';
-		//daten f�r json zusammenfassen
-		$artefacts[$ac]['lid']=$row['lid'];
-		$artefacts[$ac]['id']=$row['id'];
-		$artefacts[$ac]['level']=$row['level'];
-		$artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
-		$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1] ?? 0;
-		$artefacts[$ac]['bs']=$ua_bs[$row["id"]-1] ?? 0;
-		$artefacts[$ac]['select']=0;
+    echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
+    echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artbldglevel.'/'.$maxlevel.'</span>';
+    if ($showbldglink == 1) {
+        echo '</a>';
+    }
+    echo '</div>';
 
-		//id-counter erh�hen
-		$ac++;
-	}
-  
-	$title='Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
-	for($i=$ac;$i<$artbldglevel+$ally_geb_bonus;$i++){
-		  echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-		  echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
-		  echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artefacts_lang['frei'].'</span>';
-		  echo '</div>';
-		  $ac++;
-	}
+    //msg-area
+    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 58px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
+    echo '</div>';
 
-	echo '</div>';
-	rahmen_unten();
-  
-  ///////////////////////////////////////////////////
-  ///////////////////////////////////////////////////
-  // basisschiffe
-  ///////////////////////////////////////////////////
-  ///////////////////////////////////////////////////
-  //echo '<br>';
-  $title='Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen 3 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
-  rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0"> Basisschiffartefakte');
-  echo '<div class="cell" style="width: 576px; height: 300px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
-  
-  
-  //flottendaten laden
-  $fleetnames=array('Heimatflotte', 'Flotte I', 'Flotte II', 'Flotte III');
-  echo '<table style="width: 100%; font-size: 10px;">';
-  //alle 4 flotten durchgehen
-  for($flotte=0;$flotte<=3;$flotte++){
-		$fleetid=$ums_user_id.'-'.$flotte;
-		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
-		$row = mysqli_fetch_array($result);
+    //artefakte aus der db holen
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$ums_user_id]);
+    $anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
+    $ac = 0;
+    unset($artefacts);
+    while ($row = mysqli_fetch_array($db_daten)) {
+        //title/tooltip festlegen
+        $title = $ua_name[$row["id"] - 1].'&'.$ua_desc[$row["id"] - 1];
+        if ($ua_werte[$row["id"] - 1][$row["level"] - 1][0] > 0) {
+            //einleitung
+            $title .= '<br>'.$artefacts_lang['bonusderstufe'];
+            //die einzelnen bonusstufen
+            for ($i = 0;$i < count($ua_werte[$row["id"] - 1]);$i++) {
+                if ($i == $row['level'] - 1) {
+                    $fc[0] = '<font color=#00FF00>';
+                    $fc[1] = '</font>';
+                } else {
+                    $fc[0] = '';
+                    $fc[1] = '';
+                }
+                $title .= '<br>'.$fc[0].($i + 1).': '.number_format($ua_werte[$row["id"] - 1][$i][0], 2, ",", ".").'%'.$fc[1];
+            }
+        }
+        //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
 
-		echo '<tr>';
+        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
+        echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>';
+        echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>';
+        echo '</div>';
+        //daten f�r json zusammenfassen
+        $artefacts[$ac]['lid'] = $row['lid'];
+        $artefacts[$ac]['id'] = $row['id'];
+        $artefacts[$ac]['level'] = $row['level'];
+        $artefacts[$ac]['maxlevel'] = $ua_maxlvl[$row["id"] - 1];
+        $artefacts[$ac]['useable'] = $ua_useable[$row["id"] - 1] ?? 0;
+        $artefacts[$ac]['bs'] = $ua_bs[$row["id"] - 1] ?? 0;
+        $artefacts[$ac]['select'] = 0;
 
-		//flottenbezeichnung
-		echo '<td>';
-		echo $fleetnames[$flotte];
-		echo '</td>';
+        //id-counter erh�hen
+        $ac++;
+    }
+
+    $title = 'Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
+    for ($i = $ac;$i < $artbldglevel + $ally_geb_bonus;$i++) {
+        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
+        echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
+        echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artefacts_lang['frei'].'</span>';
+        echo '</div>';
+        $ac++;
+    }
+
+    echo '</div>';
+    rahmen_unten();
+
+    ///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // basisschiffe
+    ///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    //echo '<br>';
+    $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen 3 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
+    rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0"> Basisschiffartefakte');
+    echo '<div class="cell" style="width: 576px; height: 300px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
 
 
-		//alle artefakte der flotte durchgehen
-		for($artplace=1;$artplace<=6;$artplace++){
-			echo '<td style="font-size: 10px;">';
-			//title/tooltip festlegen
-			
-			//if($ua_werte[$row["artid".$artplace]-1][$row["artlvl".$artplace]-1][0]>0){
-			if(!empty($ua_name[$row["artid".$artplace]-1])){
-				$title=$ua_name[$row["artid".$artplace]-1].'&'.$ua_desc[$row["artid".$artplace]-1];
-				//einleitung
-				$title.='<br>'.$artefacts_lang['bonusderstufe'];
-				//die einzelnen bonusstufen
-				for($i=0;$i<count($ua_werte[$row["artid".$artplace]-1]);$i++)
-				{
-					if($i==$row['artlvl'.$artplace]-1){$fc[0]='<font color=#00FF00>';$fc[1]='</font>';}else{$fc[0]='';$fc[1]='';}
-					$title.='<br>'.$fc[0].($i+1).': '.number_format($ua_werte[$row["artid".$artplace]-1][$i][0], 2,",",".").'%'.$fc[1];
-				}
-				$title.='<br><br>Anklicken um das Artefakt ins Artefaktgeb&auml;ude zu transferieren.';
+    //flottendaten laden
+    $fleetnames = array('Heimatflotte', 'Flotte I', 'Flotte II', 'Flotte III');
+    echo '<table style="width: 100%; font-size: 10px;">';
+    //alle 4 flotten durchgehen
+    for ($flotte = 0;$flotte <= 3;$flotte++) {
+        $fleetid = $ums_user_id.'-'.$flotte;
+        $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
+        $row = mysqli_fetch_array($result);
 
-				//if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
-				echo '<a href="artefacts.php?a=2&fid='.($flotte+1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
-				echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-				echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace]-1].'"></span>';
-				echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace]-1].'</span>';
-				echo '</div>';
-				echo '</a>';
-				//daten f�r json zusammenfassen
-				/*
-				$artefacts[$ac]['lid']=$row['lid'];
-				$artefacts[$ac]['id']=$row['id'];
-				$artefacts[$ac]['level']=$row['level'];
-				$artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
-				$artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
-				$artefacts[$ac]['select']=0;
-				*/
-			}
-			else //nicht erforschter/leerer platz
-			{
-				if($artplace==1){
-					$need_tech_id=133;
-				}elseif($artplace==2){
-					$need_tech_id=134;
-				}elseif($artplace==3){
-					$need_tech_id=135;
-				}elseif($artplace==4){
-					$need_tech_id=136;
-				}elseif($artplace==5){
-					$need_tech_id=137;
-				}elseif($artplace==6){
-					$need_tech_id=138;
-				}
-				
-				if(hasTech($pt,$need_tech_id)){
-					$title='Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
-					$bezeichnung='frei';
-					$onclick='onClick="ca(\'ac'.$ac.'\')"';
-				}else{
-					$title='Fehlende Technologie&Diese Technologie muss erst noch erschlossen werden.';
-					$bezeichnung='N/A';					
-					$onclick='';
-				}
-				echo '<div id="ac'.$ac.'" title="'.$title.'" '.$onclick.' style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-				echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
-				echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$bezeichnung.'</span>';
-				echo '</div>';
-			}
-			echo '</td>';
-		}
-		echo '</tr>';
-  }
-  echo '</table>';
-  
-  
-  echo '</div>';
-  rahmen_unten();
+        echo '<tr>';
 
-	rahmen_oben('Informationen zu den Artefakten');
-	echo '<div class="cell" style="width: 576px; top: 0px; position: relative; font-size: 10px; text-align: left;">';
-	if(isset($_REQUEST['showinfo']) && $_REQUEST['showinfo']==1)
-	{
-		echo '<b>Woher bekomme ich Artefakte?</b>
+        //flottenbezeichnung
+        echo '<td>';
+        echo $fleetnames[$flotte];
+        echo '</td>';
+
+
+        //alle artefakte der flotte durchgehen
+        for ($artplace = 1;$artplace <= 6;$artplace++) {
+            echo '<td style="font-size: 10px;">';
+            //title/tooltip festlegen
+
+            //if($ua_werte[$row["artid".$artplace]-1][$row["artlvl".$artplace]-1][0]>0){
+            if (!empty($ua_name[$row["artid".$artplace] - 1])) {
+                $title = $ua_name[$row["artid".$artplace] - 1].'&'.$ua_desc[$row["artid".$artplace] - 1];
+                //einleitung
+                $title .= '<br>'.$artefacts_lang['bonusderstufe'];
+                //die einzelnen bonusstufen
+                for ($i = 0;$i < count($ua_werte[$row["artid".$artplace] - 1]);$i++) {
+                    if ($i == $row['artlvl'.$artplace] - 1) {
+                        $fc[0] = '<font color=#00FF00>';
+                        $fc[1] = '</font>';
+                    } else {
+                        $fc[0] = '';
+                        $fc[1] = '';
+                    }
+                    $title .= '<br>'.$fc[0].($i + 1).': '.number_format($ua_werte[$row["artid".$artplace] - 1][$i][0], 2, ",", ".").'%'.$fc[1];
+                }
+                $title .= '<br><br>Anklicken um das Artefakt ins Artefaktgeb&auml;ude zu transferieren.';
+
+                //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
+                echo '<a href="artefacts.php?a=2&fid='.($flotte + 1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
+                echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
+                echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$ums_gpfad.'g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace] - 1].'"></span>';
+                echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace] - 1].'</span>';
+                echo '</div>';
+                echo '</a>';
+                //daten f�r json zusammenfassen
+                /*
+                $artefacts[$ac]['lid']=$row['lid'];
+                $artefacts[$ac]['id']=$row['id'];
+                $artefacts[$ac]['level']=$row['level'];
+                $artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
+                $artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
+                $artefacts[$ac]['select']=0;
+                */
+            } else { //nicht erforschter/leerer platz
+                if ($artplace == 1) {
+                    $need_tech_id = 133;
+                } elseif ($artplace == 2) {
+                    $need_tech_id = 134;
+                } elseif ($artplace == 3) {
+                    $need_tech_id = 135;
+                } elseif ($artplace == 4) {
+                    $need_tech_id = 136;
+                } elseif ($artplace == 5) {
+                    $need_tech_id = 137;
+                } elseif ($artplace == 6) {
+                    $need_tech_id = 138;
+                }
+
+                if (hasTech($pt, $need_tech_id)) {
+                    $title = 'Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
+                    $bezeichnung = 'frei';
+                    $onclick = 'onClick="ca(\'ac'.$ac.'\')"';
+                } else {
+                    $title = 'Fehlende Technologie&Diese Technologie muss erst noch erschlossen werden.';
+                    $bezeichnung = 'N/A';
+                    $onclick = '';
+                }
+                echo '<div id="ac'.$ac.'" title="'.$title.'" '.$onclick.' style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
+                echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
+                echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$bezeichnung.'</span>';
+                echo '</div>';
+            }
+            echo '</td>';
+        }
+        echo '</tr>';
+    }
+    echo '</table>';
+
+
+    echo '</div>';
+    rahmen_unten();
+
+    rahmen_oben('Informationen zu den Artefakten');
+    echo '<div class="cell" style="width: 576px; top: 0px; position: relative; font-size: 10px; text-align: left;">';
+    if (isset($_REQUEST['showinfo']) && $_REQUEST['showinfo'] == 1) {
+        echo '<b>Woher bekomme ich Artefakte?</b>
 		<br>- Du kannst diese durch Angriffe auf NPC-Systeme der DX61a23 bekommen.
 		<br>- Im Handel gibt es bei Lieferungen die Chance Artefakte zu bekommen.
 		<br>- Im Schwarzmarkt gibt es eine Auswahl von Artefakten, die zur Finanzierung von Die Ewigen dienen.
@@ -875,34 +943,37 @@ if(!hasTech($pt,28)){
 		<br>- Bei der wiederholbaren Mission "Das Basisraumschiffwrack"
 		<br><br>
 		<b>Welche Artefakte gibt es?</b>';
-		echo '<table width="100%">';
-		for($i=0;$i<=$ua_index;$i++)
-  		{
-    		if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
-    		$ai=$i+1;
-    	
-	      	echo '<tr class="'.$bg.'" align="center">
+        echo '<table width="100%">';
+        for ($i = 0;$i <= $ua_index;$i++) {
+            if ($c1 == 0) {
+                $c1 = 1;
+                $bg = 'cell1';
+            } else {
+                $c1 = 0;
+                $bg = 'cell';
+            }
+            $ai = $i + 1;
+
+            echo '<tr class="'.$bg.'" align="center">
     	  <td align="left">
         	<div style="background-color: #000000; width: 50px; height: 50px;">
         	<img src="'.$ums_gpfad.'g/arte'.$ai.'.gif" border="0" title="'.$ua_name[$i].'">
         	</div>
       	</td>
       	<td align="left"><u><b>'.$ua_name[$i].'</b></u><br>'.$ua_desc[$i].'</td></tr>';
-  		}
-  		echo '</table>';
-	}
-	else 
-	{
-		echo '<a href="artefacts.php?showinfo=1">Hier klicken um weitere Informationen zu den Artefakten zu erhalten.</a>';
-	}
-  		
-  
-	echo '</div>';
-	rahmen_unten();
+        }
+        echo '</table>';
+    } else {
+        echo '<a href="artefacts.php?showinfo=1">Hier klicken um weitere Informationen zu den Artefakten zu erhalten.</a>';
+    }
+
+
+    echo '</div>';
+    rahmen_unten();
 }
 
 echo '<script language="javascript">';
-$data= array ('a' => $artefacts);
+$data = array('a' => $artefacts);
 echo 'var a = '.json_encode($artefacts).';';
 ?>
 

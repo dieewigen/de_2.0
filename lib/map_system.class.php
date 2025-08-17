@@ -490,8 +490,8 @@ class map_system{
 								$mainbuilding_ok=true;
 							}						
 
-						//man will es bauen und man hat alles
-						if($baukosten['has_all'] && $_POST['upgrade']==1 && $mainbuilding_ok){
+						//man will es bauen und man hat alles (upgrade angefordert)
+						if($baukosten['has_all'] && isset($_POST['upgrade']) && $_POST['upgrade']==1 && $mainbuilding_ok){
 							//Bauauftrag in der DB hinterlegen, dazu unterscheiden zwischen laufendem Upgrader oder auch nicht
 							if(time()<$this->playerBldg[$bldg_index]['bldg_time']){
 								//es läuft ein Upgrade
@@ -625,8 +625,8 @@ class map_system{
 									//Baukosten laden
 									$baukosten=$this->formatBaukosten($GLOBALS['map_buildings'][$g]['bldg_cost'][0]);
 
-									//man will es bauen und man hat alles
-									if($baukosten['has_all'] && $has_tech && $_POST['build']==$g){
+											//man will es bauen und man hat alles 
+									if($baukosten['has_all'] && $has_tech && isset($_POST['build']) && $_POST['build']==$g){
 										//Bauauftrag in der DB hinterlegen
 										setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fieldid, $g, 1, time()+($GLOBALS['map_buildings'][$g]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']));
 
