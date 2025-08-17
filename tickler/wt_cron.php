@@ -176,7 +176,7 @@ if ($nachtcron != $time) {
                 $channel = 0;
                 $channeltyp = 3;
                 $spielername = '[SYSTEM]';
-                $chat_message = '<span style="font-weight: bold; color: #ffff00;">Es gibt aktuell '.$anzahl_uc.' aktive Spieler.</span>';
+                $chat_message = '<span style="color: #ffff00;">Es gibt aktuell '.$anzahl_uc.' aktive Spieler.</span>';
                 insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, -1, 'DE');
             }
 

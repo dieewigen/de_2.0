@@ -322,7 +322,7 @@ if(!empty($letsgo) && $sector>1){
 }
 
 //einen neuen sektor beantragen
-$getnewsec=isset($_REQUEST['getnewsec']) ? getnewsec : '';
+$getnewsec=isset($_REQUEST['getnewsec']) ?? '';
 if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 	//abfrage da die funktion  zum erstellen nur noch f�r premium accounts zul�ssig ist
 	if ($ums_premium>0 OR 1==1){
@@ -365,7 +365,8 @@ if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 }
 
 //einem bestehenden sektor joinen
-$joinsec= isset($_REQUEST['joinsec']) ? $_REQUEST['joinsec'] : '';
+$joinsec  = $_REQUEST['joinsec']  ?? '';
+$secpass  = $_REQUEST['secpass']  ?? '';
 if(!empty($joinsec) && $secmoves<$sv_max_secmoves && $secpass!='' && $techs[26]=='1'){
   //es gibt 2 m�glichkeiten zu joinen
   //1. es gibt den sektor schon

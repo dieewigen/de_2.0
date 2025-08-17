@@ -310,7 +310,7 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   VALUES (?, ?, ?, NOW(), NOW(), ?)";
   mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $spielername, $email, $status]);
 
-  $user_id=mysqli_insert_id($db);
+  $user_id=mysqli_insert_id($GLOBALS['dbi']);
   
   if($patime>time())$premium=1; else $premium=0;
   
@@ -346,7 +346,6 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
     //späteinsteigerhilfe, gilt nicht in der ewigen runde
     if($sv_ewige_runde!=1){
       //zuerst schauen wieviel ticks bereits vergangen sind
-      //$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
       $db_daten  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
       $row = mysqli_fetch_array($db_daten);
       $maxtick=$row["tick"];

@@ -386,6 +386,10 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
             $rang = "<img src='".$ums_gpfad.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
 
+            ////////////////////////////////////////////////////////////////////////
+            // Titel
+            ////////////////////////////////////////////////////////////////////////            
+
             $userTitle='';
             if($row['owner_id'] > 0) {
                 $sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";

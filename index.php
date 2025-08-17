@@ -30,8 +30,6 @@ $ums_gpfad='';
 $ums_rasse=1;
 
 $gamename='Die Ewigen';
-if($sv_efta_in_de==0)$gamename='Alusania';
-if($sv_sou_in_de==0)$gamename='Ablyon';
 
 //wenn die variable logout gesetzt ist, dann ausloggen und session zerst�ren
 if(isset($_REQUEST['logout'])){
@@ -45,34 +43,8 @@ if(isset($_REQUEST['logout'])){
   }
 }
 
-//imageserver überprüfen
-$anz_imageserver=$num = count($sv_image_server_list);
-for ($i=0; $i<$anz_imageserver;$i++){
-  $url=parse_url($sv_image_server_list[$i]);
-  $host = $url["host"];
-  //echo $host;
-
-  @$fp = fsockopen ($host, 80, $errno, $errstr, 5);
-  if (!$fp)
-  {
-    //keine verbindung m�glich
-    //echo "$errstr ($errno)<br />\n";
-  }
-  else
-  {
-    //server wurde gefunden
-    $sv_image_server=$sv_image_server_list[$i];
-    break;
-    /*fputs ($fp, "GET / HTTP/1.0\r\n\r\n");
-    while (!feof($fp))
-    {
-      echo fgets($fp,128);
-    }
-    fclose($fp);*/
-  }
-}
 //wenn kein server gefunden wurde einfach den ersten eintragen
-if ($sv_image_server=='')$sv_image_server=$sv_image_server_list[0];
+$sv_image_server=$sv_image_server_list[0];
 
 //wenn pass und loginname gepostet werden, dann versuchen den account einzuloggen
 //login ist jetzt auch über den loginkey möglich, dieser ist jedoch nur 5 minuten gültig
@@ -128,7 +100,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		  $et=date("d.m.Y - G:i", $et);
 
 		  $fehlermsg=$index_lang['umode1'].$et;
-		  if($et>$fat)$fehlermsg.='<br>'.$index_lang[umode2].$fat;
+		  if($et>$fat)$fehlermsg.='<br>'.$index_lang['umode2'].$fat;
 		  $zstatus='(x Tage sind noch nicht um, kein Login m&oouml;glich)';
 		}
 		//2. m�glichkeit: account bereits 3 tage im umode
