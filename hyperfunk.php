@@ -368,9 +368,6 @@ if (isset($_POST['antbut'])) {
 
                     $time = strftime("%Y%m%d%H%M%S");
 
-                    $se = (int)$se;
-                    $sy = (int)$sy;
-
                     //include('outputlib.php');
 
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $ums_user_id, $asec, $asys, $ums_spielername, $time, $betreff, $nachricht]);
@@ -616,8 +613,6 @@ if (isset($_POST['freundemsg'])) {
 //Loeschen einzelner HFNs
 if ($action == "del") {//nachricht l&ouml;schen
     $id = intval($_REQUEST['id']);
-    $se = (int)$se;
-    $sy = (int)$sy;
 
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE (id=? AND empfaenger=? AND sender=0) or (id=? AND absender=? AND sender=1)", [$id, $ums_user_id, $id, $ums_user_id]);
 
@@ -841,7 +836,7 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
                                 ?>
                             </td>
                             <td align="right" class="cell" valign="middle">
-                                <?php echo "$neuemsg"; ?>
+                                <?php echo $neuemsg ?? ''; ?>
                             </td>
                         </tr>
                     </table>

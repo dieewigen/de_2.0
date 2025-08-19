@@ -247,6 +247,7 @@ function give_sector_bonus()
             unset($playerdata);
             while ($row = mysqli_fetch_array($result)) {
                 $playerdata[$cp]['user_id'] = $row['user_id'];
+                $playerdata[$cp]['gesamtstunden'] = 0;
 
                 $hv = explode(";", $row["ekey"]);
                 if ($hv[0] == '') {

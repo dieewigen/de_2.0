@@ -208,7 +208,8 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
 
 			if ($rasse-1!=$aktrasse)//wenn es nicht die eigene rasse ist leer lassen
 			{
-			  $keigene1 = array ('&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;');
+			  // Platzhalter dynamisch auf Anzahl der Schiffe setzen (vorher nur 8, führte zu Undefined array key Warnungen bei Index >=8)
+			  $keigene1 = array_fill(0, $sv_anz_schiffe, '&nbsp;');
 			  $keigene2 = $keigene1;
 			  $keigene3 = $keigene1;
 			}
@@ -551,7 +552,8 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 
 					//eigene Einheiten
 					if ($rasse-1!=$aktrasse){//wenn es nicht die eigene rasse ist leer lassen
-						  $keigene1 = array ('&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;', '&nbsp;');
+						  // Platzhalter dynamisch auf Anzahl der Schiffe setzen (vorher nur 8, führte zu Undefined array key Warnungen bei Index >=8)
+						  $keigene1 = array_fill(0, $sv_anz_schiffe, '&nbsp;');
 						  $keigene2 = $keigene1;
 						  $keigene3 = $keigene1;
 					}else{ //ansonsten variablen in die array packen

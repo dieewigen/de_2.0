@@ -8,6 +8,11 @@ include('inc/lang/'.$sv_server_lang.'_military.lang.php');
 $military_lang['klassennamen']=array('J&auml;ger','Jagdboot','Zerst&ouml;rer','Kreuzer','Schlachtschiff','Bomber','Transmitterschiff','Tr&auml;ger','Frachter','Titan',
 'Orbitalj&auml;ger-Basis','Flugk&ouml;rper-Plattform','Energiegeschoss-Plattform','Materiegeschoss-Plattform','Hochenergiegeschoss-Plattform');
 
+// Sicherstellen, dass $db vorhanden ist (einige Funktionen erwarten es), ansonsten aus globaler DB-Verbindung ableiten
+if(!isset($db) && isset($GLOBALS['dbi'])){
+	$db = $GLOBALS['dbi'];
+}
+
 //Check ob die Missionen zu Ende sind
 checkMissionEnd();
 
@@ -55,12 +60,13 @@ if($spec3==2){
 }
 
 if (isset($_POST['befehle'])){
-  $zsecf1=(int)$_POST['zsecf1'];
-  $zsysf1=(int)$_POST['zsysf1'];
-  $zsecf2=(int)$_POST['zsecf2'];
-  $zsysf2=(int)$_POST['zsysf2'];
-  $zsecf3=(int)$_POST['zsecf3'];
-  $zsysf3=(int)$_POST['zsysf3'];
+	// Eingangsparameter defensiv lesen, um Undefined-Index-Warnings zu vermeiden
+	$zsecf1=isset($_POST['zsecf1']) ? (int)$_POST['zsecf1'] : 0;
+	$zsysf1=isset($_POST['zsysf1']) ? (int)$_POST['zsysf1'] : 0;
+	$zsecf2=isset($_POST['zsecf2']) ? (int)$_POST['zsecf2'] : 0;
+	$zsysf2=isset($_POST['zsysf2']) ? (int)$_POST['zsysf2'] : 0;
+	$zsecf3=isset($_POST['zsecf3']) ? (int)$_POST['zsecf3'] : 0;
+	$zsysf3=isset($_POST['zsysf3']) ? (int)$_POST['zsysf3'] : 0;
 
   //sektor 1 unangreifbar machen und man kann auch nicht aus sektor 1 angegriffen werden
   if($zsecf1==1 OR $sector==1)$zsecf1='-1';
@@ -76,7 +82,7 @@ if (isset($_POST['befehle'])){
   */
   //fuer jede flotte eigene sektion
   //flotte 1
-  $af1=intval($_POST['af1']);
+	$af1=isset($_POST['af1']) ? intval($_POST['af1']) : 0; // 0 = keine neuen Befehle
   switch($af1){
     case 0: //keine neuen befehle
       break;
@@ -100,7 +106,7 @@ if (isset($_POST['befehle'])){
       break;
   }//switch af1 ende
   //flotte 2
-  $af2=intval($_POST['af2']);
+	$af2=isset($_POST['af2']) ? intval($_POST['af2']) : 0;
   switch($af2){
     case 0: //keine neuen befehle
       break;
@@ -123,7 +129,7 @@ if (isset($_POST['befehle'])){
       quest($ums_user_id.'-2', $zsecf2, $zsysf2);
       break;  }//switch af2 ende
   //flotte 3
-  $af3=intval($_POST['af3']);
+	$af3=isset($_POST['af3']) ? intval($_POST['af3']) : 0;
   switch($af3){
     case 0: //keine neuen befehle
       break;

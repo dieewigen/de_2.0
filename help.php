@@ -29,8 +29,8 @@ include "functions.php";
 <?//stelle die ressourcenleiste dar
 include "resline.php";?><br>
 <?php
-if ($_GET["t"]) {
-    $t = (int)$_GET["t"];
+if (isset($_GET["t"])) {
+    $t = intval($_GET["t"]);
     $db_daten = mysqli_execute_query($GLOBALS['dbi'],
       "SELECT tech_name, des FROM de_tech_data$ums_rasse WHERE tech_id=?",
       [$t]);

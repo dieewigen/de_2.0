@@ -57,6 +57,10 @@ body {
 	color: #FDFB59;
 }
 
+.word-break {
+	overflow-wrap: break-word;
+}
+
 #gamename {
 	position: absolute;
 	font-size: 512px;

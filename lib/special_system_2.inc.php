@@ -32,7 +32,7 @@ switch($data['phase']){
 		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
 
 		//Test auf Aktion
-		if($_REQUEST['action']==1){
+		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
 			if(hasSpecialsystemNeeds($cost)){
 				//Kosten abziehen
 				substractSpecialsystemNeeds($cost);
@@ -66,7 +66,7 @@ switch($data['phase']){
 		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
 
 		//Test auf Aktion
-		if($_REQUEST['action']==1){
+		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
 			if(hasSpecialsystemNeeds($cost)){
 				//Kosten abziehen
 				substractSpecialsystemNeeds($cost);
@@ -99,7 +99,7 @@ switch($data['phase']){
 		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
 
 		//Test auf Aktion
-		if($_REQUEST['action']==1){
+		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
 			if(hasSpecialsystemNeeds($cost)){
 				//Kosten abziehen
 				substractSpecialsystemNeeds($cost);

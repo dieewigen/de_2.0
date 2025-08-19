@@ -1975,12 +1975,13 @@ if (!hasTech($pt, 9)) {
                     $drin = 0;
                     $i = 0;
                     $einsaetze = array(array(),);
-                    $scanhis = explode("|", $scanhistory);
+                    // Einträge zerlegen; leere Elemente entfernen um Warnungen zu vermeiden
+                    $scanhis = array_filter(explode("|", $scanhistory), 'strlen');
                     while ($i < Count($scanhis)) {
-                        $daten = explode(":", $scanhis[$i]);
-                        $einsaetze[$i][0] = $daten[0];
-                        $einsaetze[$i][1] = $daten[1];
-                        $einsaetze[$i][2] = $daten[2];
+                        // Sicherstellen, dass fehlende Teile nicht zu Undefined-Index-Warnungen führen
+                        $einsaetze[$i][0] = $daten[0] ?? '';
+                        $einsaetze[$i][1] = $daten[1] ?? '';
+                        $einsaetze[$i][2] = $daten[2] ?? '';
                         $i++;
                     }
                     $i = 0;

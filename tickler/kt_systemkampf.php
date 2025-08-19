@@ -126,18 +126,18 @@ for ($c = 0; $c < $z; $c++) {
     // Arrays für aggregierte Angriffs-/Blockwerte sauber initialisieren
     // (Verhindert Undefined Variable Warnungen wie bei $atter_awges)
     if(!isset($atter_awges) || !is_array($atter_awges)){
-        $atter_awges = array_fill(0, $sv_anz_schiffe, 0);
+        $atter_awges = array_fill(0, $sv_anz_schiffe+$sv_anz_tuerme, 0);
     }
     if(!isset($atter_bwges) || !is_array($atter_bwges)){
-        $atter_bwges = array_fill(0, $sv_anz_schiffe, 0);
+        $atter_bwges = array_fill(0, $sv_anz_schiffe+$sv_anz_tuerme, 0);
     }
 
     // Deffer aggregierte Werte initialisieren (sonst Warnungen bei +=)
     if(!isset($deffer_awges) || !is_array($deffer_awges)){
-        $deffer_awges = array_fill(0, $sv_anz_schiffe, 0);
+        $deffer_awges = array_fill(0, $sv_anz_schiffe+$sv_anz_tuerme, 0);
     }
     if(!isset($deffer_bwges) || !is_array($deffer_bwges)){
-        $deffer_bwges = array_fill(0, $sv_anz_schiffe, 0);
+        $deffer_bwges = array_fill(0, $sv_anz_schiffe+$sv_anz_tuerme, 0);
     }
 
     echo '<br>'.$c.'<br><br>';
@@ -635,17 +635,15 @@ for ($c = 0; $c < $z; $c++) {
 
     echo 'TAWARTBONUS inkl Expbonus: '.$tawartbonus.'<br>';
 
-
-
     //zuerst array nullen
     for ($i = 0;$i < $sv_anz_rassen;$i++) {
-        for ($s = 0;$s < $sv_anz_schiffe;$s++) {
+        for ($s = 0;$s < $sv_anz_schiffe + $sv_anz_tuerme;$s++) {
             $atterrassen[$i][$s] = 0;
         }
     }
 
     for ($i = 0;$i < $sv_anz_rassen;$i++) {
-        for ($s = 0;$s < $sv_anz_schiffe;$s++) {
+        for ($s = 0;$s < $sv_anz_schiffe + $sv_anz_tuerme;$s++) {
             $defferrassen[$i][$s] = 0;
         }
     }
@@ -1010,6 +1008,7 @@ for ($c = 0; $c < $z; $c++) {
     }
     //die gesamtzerst�rten schiffe auf die einzelnen flotten verteilen und die erfahrungspunkte berechnen
     for ($i = 0;$i < $anz_atter;$i++) {
+        $atter_exp[$i] = 0;
         $rasse = $a_userdata[$i][3] - 1;
         for ($j = 0; $j < $sv_anz_schiffe; $j++) {
             if ($atter[$i][$j] > 0) {
@@ -1020,7 +1019,7 @@ for ($c = 0; $c < $z; $c++) {
             $atter_zer[$i][$j] = floor($atterrassen_zer[$rasse][$j] * $prozent);
             $atter_exp[$i] = floor($atter_exp[$i] + ($atter_zer[$i][$j] * $unit[$rasse][$j][4] / 100));
         }
-        //spezialisierung mehr exp f�r die flotte
+        //spezialisierung mehr exp für die flotte
         if ($a_userdata[$i]['spec2'] == 2) {
             $atter_exp[$i] = floor($atter_exp[$i] * 1.1);
         }
@@ -1029,10 +1028,10 @@ for ($c = 0; $c < $z; $c++) {
     for ($i = 0;$i < $anz_atter;$i++) {
         //nur recyceln wenn eine whg vorhanden ist
         if ($atter_whg[$i] == 1) {
-            //maximal 10% der zerst�rten kleineinheiten werden recycelt, dazu kann ein schlachter maximal das f�nfache seiner punktezahl recyceln
+            //maximal 10% der zerstörten kleineinheiten werden recycelt, dazu kann ein schlachter maximal das fünfache seiner punktezahl recyceln
             $rasse = $a_userdata[$i][3] - 1;
             $schlachter = $atter[$i][4] - $atter_zer[$i][4];
-            //schauen wievie max. recycelt werden kann, berechnet sich aus den schiffspunkten f�r schlachtschiffe mal einen wert x
+            //schauen wievie max. recycelt werden kann, berechnet sich aus den schiffspunkten für schlachtschiffe mal einen wert x
             $maxrecmenge = $schlachter * $unit[$rasse][4][4] * 6;
 
             //schauen wieviel rohstoffe von zerst�rten schiffen existieren
@@ -1099,6 +1098,7 @@ for ($c = 0; $c < $z; $c++) {
     }
     //die gesamtzerst�rten schiffe auf die einzelnen flotten verteilen und die erfahrungspunkte berechnen
     for ($i = 0;$i < $anz_deffer;$i++) {
+        $deffer_exp[$i]=0;
         $rasse = $d_userdata[$i][3] - 1;
         for ($j = 0; $j < $sv_anz_schiffe; $j++) {
             if ($deffer[$i][$j] > 0) {
@@ -1905,7 +1905,7 @@ for ($c = 0; $c < $z; $c++) {
         $kb_daten_spieler['recycling2'] = $atter_rec[$i][1];
 
         echo '<br>Out: '.$atterstring.'<br>Out: '.$defferstring.'<br>Out: '.$spielerstring.'<br>Out: '.$datenstring;
-        echo '<br>L�nge: '.strlen($atterststring.$defferstring.$spielerstring.$datenstring);
+        echo '<br>Länge: '.strlen($atterstring.$defferstring.$spielerstring.$datenstring);
 
         ///////////////////////////////////////////////////////
         // Kopfgeld aussetzen
@@ -2051,7 +2051,11 @@ for ($c = 0; $c < $z; $c++) {
         unset($kb_daten_spieler);
 
         //insg
-        for ($s = 0;$s < $sv_anz_schiffe;$s++) {
+        for ($s = 0;$s < $sv_anz_schiffe; $s++) {
+            if(!isset($deffer_kbsum[0][$s])) {
+                $deffer_kbsum[0][$s] = 0;
+            }
+
             $deffer_kbsum[0][$s] += $deffer[$i][$s];
         }
 
@@ -2123,7 +2127,6 @@ for ($c = 0; $c < $z; $c++) {
         if ($i == $anz_heimatflotten - 1) {
             //insg
             for ($s = 0;$s < $sv_anz_schiffe;$s++) {
-                //$spielerstring=$spielerstring.$deffer_kbsum[0][$s].';';
                 $kb_einheiten_spieler[0][$s] = $deffer_kbsum[0][$s];
             }
 

@@ -7,10 +7,10 @@ include "cache/lastmtick.tmp";
 
 $mes1='';
 $mes2='';
-if($newtrans==1){
+if(isset($newtrans) && $newtrans==1){
 	$mes1='<a href="hyperfunk.php?l=new">'.$resline_lang['hyperfunk'].'</a>';
 }
-if($newnews==1){
+if(isset($newnews) && $newnews==1){
 	$mes2='<a href="sysnews.php">'.$resline_lang['nachricht'].'</a>';
 }
 
@@ -232,14 +232,13 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	echo '<div id="resscore" rel="tooltip" title="'.$resline_lang['restipscore'].'<br>'.$resline_lang['restipscoredesc'].'<br>'.$resline_lang['restipehscore'].': '.number_format($ehscore, 0,"",".").'<br>Executor-Punkte: '.number_format($pve_score, 0,"",".").'">'.number_format($punkte, 0,"",".").'</div>';
 
 	//hyperfunk
-	//$newtrans=1;
-	if ($newtrans==1){
+	if (isset($newtrans) && $newtrans==1){
 		echo '<a href="hyperfunk.php?l=new" rel="tooltip" title="'.$resline_lang['restipnewhyper'].'<br>'.$resline_lang['restipnewhyperdesc'].'"><div id="reshyper"></div></a>';
 	}
 
 	//nachrichten
 	//$newnews=1;
-	if ($newnews==1){
+	if (isset($newnews) && $newnews==1){
 		echo '<a href="sysnews.php" rel="tooltip" title="'.$resline_lang['restipnewnews'].'<br>'.$resline_lang['restipnewnewsdesc'].'"><div id="resnews"></div></a>';
 	}
 

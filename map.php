@@ -51,8 +51,7 @@ $player_std_pos[10] = array(1,2);
 $player_std_pos[11] = array(3,2);
 
 
-//kopfgeldprozentsatz kann nicht h�her als kollektorklaurate sein
-//if($sv_bounty_rate>$sv_kollie_klaurate)$sv_bounty_rate=$sv_kollie_klaurate;
+$rangnamen = array("Der Erhabene", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
 
 if ($row["status"] == 1) {
     $ownally = $row["allytag"];
@@ -90,6 +89,8 @@ $maxcol = $row['maxcol'];
   <script>
     var ownSector = <?php echo ($ownsector > 1) ? $ownsector : 3; ?>;
   </script>
+  <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+  <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 </head>
 <body>
 
@@ -99,7 +100,7 @@ $maxcol = $row['maxcol'];
 <?php
 //links oben spielname
 echo '<div id="gamename" style="top:40000px; left:40000px;">die ewigen</div>';
-echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.' '.$sv_server_tag.'</div>';    
+echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.' '.$sv_server_tag.'</div>';
 
 
 $sector_width = 1300;
@@ -384,21 +385,21 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
             //rang
             ////////////////////////////////////////////////////////////////////////
-            $rang = "<img src='".$ums_gpfad.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
+            $userRang = 'Rang: '.$rangnamen[$row['rang']];
 
             ////////////////////////////////////////////////////////////////////////
             // Titel
-            ////////////////////////////////////////////////////////////////////////            
+            ////////////////////////////////////////////////////////////////////////
 
-            $userTitle='';
-            if($row['owner_id'] > 0) {
-                $sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
-                $db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
-                if(mysqli_num_rows($db_datenx) > 0){
-                    while ($rowx = mysqli_fetch_assoc($db_datenx)){
-                        $userTitle.=$rowx['title'].'<br>';
+            $userTitle = '';
+            if ($row['owner_id'] > 0) {
+                $sql = "SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
+                $db_datenx = mysqli_query($GLOBALS['dbi_ls'], $sql);
+                if (mysqli_num_rows($db_datenx) > 0) {
+                    while ($rowx = mysqli_fetch_assoc($db_datenx)) {
+                        $userTitle .= $rowx['title'].'<br>';
                     }
-                }            
+                }
             }
 
             ////////////////////////////////////////////////////////////////////////
@@ -437,9 +438,9 @@ foreach ($sectorList as $sf) {
                         $playerstatus = $scandaten[$i]['ps'];
                         $allytagscan = $scandaten[$i]['allytag'];
 
-                        if($playerstatus == 1) {
+                        if ($playerstatus == 1) {
                             $playerStatusClass = ' player-actions-secret-info-friend';
-                        } elseif($playerstatus == 2) {
+                        } elseif ($playerstatus == 2) {
                             $playerStatusClass = ' player-actions-secret-info-enemy';
                         }
 
@@ -531,7 +532,7 @@ foreach ($sectorList as $sf) {
 				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
-				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')<br>'.$userTitle.'"">';
+				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')<br>'.$userRang.'<br>'.$userTitle.'"">';
 
 
             ////////////////////////////////////////////////////////////////////////
@@ -539,7 +540,7 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
 
             $output .= '<div class="player-name">
-				<a href="details.php?se='.$sector.'&sy='.$row['system'].'" target="h" class="'.$playercsstag.'">'.$playername.$osown.'</a>'.$showallytag.'</div>';
+				<a href="details.php?se='.$sector.'&sy='.$row['system'].'" target="h" class="'.$playercsstag.' word-break">'.$playername.$osown.'</a>'.$showallytag.'</div>';
 
             ////////////////////////////////////////////////////////////////////////
             //punkte
@@ -646,13 +647,13 @@ foreach ($sectorList as $sf) {
             $sektorinfo .= ' '.$infostr.' freier Sektor';
             $sektorinfo .= '</span>';
         }
-        
+
         // Neue Struktur mit verbessertem Design
         echo '<div class="sector-header">'.$sektorinfo.'</div>';
         echo '<div class="sector-content">';
 
-        $artstr='';
-        $basestr='';
+        $artstr = '';
+        $basestr = '';
         if ($anz > 0) {
             //Artefakte im Sektor
             $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [$sf]);
@@ -686,7 +687,7 @@ foreach ($sectorList as $sf) {
             }
 
             if ($artstr != '') {
-                $artstr='<div style="text-align: center;">'.$artstr.'</div>';
+                $artstr = '<div style="text-align: center;">'.$artstr.'</div>';
             }
 
             //bild von der sternenbasis anzeigen
@@ -744,7 +745,7 @@ foreach ($sectorList as $sf) {
                     $basestr = '&nbsp;';
                 }
 
-                $basestr='<div class="sector-base">'.$basestr.$artstr.'</div>';
+                $basestr = '<div class="sector-base">'.$basestr.$artstr.'</div>';
 
             }
         }
@@ -753,12 +754,12 @@ foreach ($sectorList as $sf) {
         if ($basestr != '') {
             echo $basestr;
         }
-        
+
         // Spieler in verbesserter Darstellung
         echo '<div class="sector-players">';
         echo $output;
         echo '</div>'; // sector-players
-        
+
         echo '</div>'; // sector-content
     }
     echo '</div>';//sektor ende
@@ -1111,37 +1112,43 @@ echo $output;
     saveMapState();
   }
 
-  // Zentrieren auf Bildschirmmitte
-  function centerMap() {
+// Zentrieren auf eigenen Sektor
+function centerMap() {
     const vw = viewport.clientWidth;
     const vh = viewport.clientHeight;
     
-    // Versuche auf sector_1 zu zentrieren
+    // Versuche auf eigenen Sektor zu zentrieren
     const targetElement = document.getElementById('sector_'+ownSector);
     const containerElement = document.getElementById('sectorcontainer');
     
     if (targetElement && containerElement) {
-      // Berechne absolute Position
-      const containerX = parseFloat(containerElement.style.left) || 0;
-      const containerY = parseFloat(containerElement.style.top) || 0;
-      
-      // sector_1 ist der zweite Sektor (Index 1), also bei Y-Position 0 im Container
-      const elementX = containerX;
-      const elementY = containerY; // sector_1 ist der erste angezeigte Sektor
-      
-      // Element in der Bildschirmmitte positionieren
-      offsetX = (vw / 2) - (elementX * zoom) - (600 * zoom); // 600 = halbe Sektorbreite
-      offsetY = (vh / 2) - (elementY * zoom) - (75 * zoom);  // 75 = halbe Sektorhöhe
-      
-      console.log('Zentriert auf sector_1');
+        // Position des Containers aus dem CSS-Style auslesen
+        const containerX = parseFloat(containerElement.style.left) || 0;
+        const containerY = parseFloat(containerElement.style.top) || 0;
+        
+        // Position des Ziel-Sektors innerhalb des Containers
+        const targetOffsetTop = targetElement.offsetTop;
+        
+        // Absolute Position des Zielsektors auf der Karte (ohne Transform)
+        const absoluteX = containerX;
+        const absoluteY = containerY + targetOffsetTop;
+        
+        // Sektor in der Bildschirmmitte positionieren
+        // Formel: viewport_mitte = absolute_position * zoom + offset + sektor_mitte
+        // Nach offset auflösen: offset = viewport_mitte - absolute_position * zoom - sektor_mitte
+        offsetX = (vw / 2) - (absoluteX * zoom) - (650 * zoom); // 650 = halbe Sektorbreite
+        offsetY = (vh / 2) - (absoluteY * zoom) - (75 * zoom);  // 75 = halbe Sektorhöhe
+        
+        //console.log('Zentriert auf sector_' + ownSector + ' - Container:', containerX, containerY, 'Target Offset:', targetOffsetTop, 'Absolute:', absoluteX, absoluteY);
     } else {
-      // Fallback: Standard-Zentrierung
-      console.log('sector_1 oder sectorcontainer nicht gefunden - verwende Standard-Zentrierung');
-      offsetX = (vw - mapWidth * zoom) / 2;
-      offsetY = (vh - mapHeight * zoom) / 2;
+        // Fallback: Standard-Zentrierung
+        console.log('sector_' + ownSector + ' oder sectorcontainer nicht gefunden - verwende Standard-Zentrierung');
+        offsetX = (vw - mapWidth * zoom) / 2;
+        offsetY = (vh - mapHeight * zoom) / 2;
     }
     update();
-  }
+}
+
 
   // Initial Laden: Erst gespeicherte Position laden, dann zentrieren falls nichts gespeichert
   if (!loadMapState()) {

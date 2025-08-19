@@ -13,11 +13,11 @@ include 'functions.php';
 	<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 
-	<link rel="stylesheet" href="js/jquery-ui.min-1.12.0.css">
+	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
 	<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-desktop.css');?>">
 
 <?php
-//include "cssinclude.php";
+include "cssinclude.php";
 ?>
 </head>
 <body style="margin: 0; padding:0; color: #FFFFFF;">
@@ -115,7 +115,7 @@ if(setLock($_SESSION['ums_user_id'])){
 
 	$flag_ang_big_iframe=true;
 
-	include "cssinclude.php";
+	//include "cssinclude.php";
 	
 	$deactivate_touch_menu=0;
 	if($_SESSION['ums_mobi']==1 && $tech_anordnung==0){

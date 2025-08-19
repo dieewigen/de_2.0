@@ -137,13 +137,10 @@ echo '<form action="sector.php" name="secform" method="POST">';
 echo '<table><tr align="center"><td>';
 
 if($_SESSION['ums_mobi']==1){
-	echo '<a style="float:left;" href="sector.php?sf='.($sf-2).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; width: 80px; margin-top: 5px;">&lt;-2</div></a>';
 	echo '<a style="float:left;" href="sector.php?sf='.($sf-1).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;">&lt;</div></a>';
 	echo '<input class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;" type="text" name="sf" value="'.$sf.'" size="4" maxlength="5" autocomplete="off">';
 	echo '<a class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;" href="javascript:document.secform.submit();">OK</a>';
 	echo '<a style="float:left;" href="sector.php?sf='.($sf+1).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;">&gt;</div></a>';
-	echo '<a style="float:left;" href="sector.php?sf='.($sf+2).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;">+2 &gt;</div></a>';	
-	
 }else{
 	echo '<a href="sector.php?sf='.($sf-2).'" class="secbutton1"></a><a href="sector.php?sf='.($sf-1).'" class="secbutton2">&nbsp;</a><span class="secbutton3"><input type="text" name="sf" value="'.$sf.'" size="4" maxlength="5" class="secbutton3" autocomplete="off"></span><a href="javascript:document.secform.submit();" class="secbutton4"></a><a href="sector.php?sf='.($sf+1).'" class="secbutton5"></a><a href="sector.php?sf='.($sf+2).'" class="secbutton6"></a>';	
 }

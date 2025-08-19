@@ -7,8 +7,9 @@ include 'inc/lang/'.$sv_server_lang.'_botcheck.lang.php';
 $givenocredit = 1;
 include 'inccon.php';
 
+$ums_user_id = $_SESSION['ums_user_id'] ?? -1;
+
 if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
-	$ums_user_id = $_SESSION['ums_user_id'] ?? -1;
     //$_SESSION['ums_one_way_bot_protection']=0;
     //die sessionzeit aktualisieren
     $_SESSION['ums_session_start'] = time();
@@ -83,7 +84,7 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
         $time = strftime("%Y-%m-%d %H:%M:%S");
         $comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$ums_user_id]);
         $rowz = mysqli_fetch_array($comment);
-        $eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht. Botgrafik zu oft falsch gel�st. \n$time";
+        $eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht. Botgrafik zu oft falsch gelöst. \n$time";
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $ums_user_id]);
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2, points=0 WHERE user_id=?", [$ums_user_id]);
 

@@ -44,16 +44,16 @@ $GLOBALS['duration_factor']=1-($artbonus_duration/100);
 <html>
 <head>
 <title>Systeminformationen</title>
-<meta charset="utf-8"/>
-<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 <?php 
 include "cssinclude.php";
 ?>
+<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 </head>
 <body>
 <?php 
 
 $GLOBALS['ally_fundbuero_level']=0;
+$GLOBALS['allyid']=-1;
 if(!empty($pd['allytag']) && $pd['ally_status']==1){
 	$GLOBALS['allyid']=getAllyIDByAllytag($pd['allytag']);
 

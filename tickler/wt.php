@@ -178,9 +178,6 @@ if ($doetick == 1) {
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET votetimer=votetimer-1 WHERE votetimer>0", []);
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET votecounter=votecounter-1 WHERE votecounter>0", []);
 
-    //archäologische events durchführen
-    //include "wt_archeology.php";
-
     //manage map data
     include_once "wt_manage_map.php";
 

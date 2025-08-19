@@ -47,8 +47,8 @@ function formatString($string)
 include "resline.php";
 include ("ally/ally.menu.inc.php");
 
-$allytag=$_REQUEST['allytag'];
-$allyid=$_REQUEST['allyid'];
+$allytag=$_REQUEST['allytag'] ?? '';
+$allyid=$_REQUEST['allyid'] ?? '';
 
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT * FROM de_allys WHERE id=? OR allytag=? LIMIT 0,1",

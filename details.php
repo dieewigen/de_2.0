@@ -20,6 +20,9 @@ if($row['status']!=1){
 $se=intval($_REQUEST['se']);
 $sy=intval($_REQUEST['sy']);
 
+if(!isset($zuser_id)) $zuser_id = 0;
+if(!isset($zowner_id)) $zowner_id = 0;
+
 //wenn ein spielername �bergeben wird, dann anhand dessen die koordinaten und die user_id ermitteln
 if(isset($_REQUEST['sn'])){
 	
@@ -377,14 +380,14 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 // Chat-Ignore verwalten
 ////////////////////////////////////////////////////////
 //m�chte man einen Eintrag l�schen
-$del_ignore=intval($_REQUEST['del_ignore']);
+$del_ignore = isset($_REQUEST['del_ignore']) ? intval($_REQUEST['del_ignore']) : 0;
 if($del_ignore>0){
 	mysqli_execute_query($GLOBALS['dbi_ls'],
 	  "DELETE FROM de_chat_ignore WHERE id=? AND owner_id=?",
 	  [$del_ignore, $_SESSION['ums_owner_id']]);
 }
 
-if($_REQUEST['sn']){
+if(isset($_REQUEST['sn']) && $_REQUEST['sn']!==''){
 	//unterscheiden zwischen Spieler auf eigenem Server und Spieler auf anderem Server
 	echo '<form action="details.php" method="post">';
 	if(!empty($_REQUEST['sn'])){
