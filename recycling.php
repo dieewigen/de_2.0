@@ -115,7 +115,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 		for($i=81;$i<=90;$i++){
 			$einheiten[$i]=$row['e'.$i];
 		}
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='$_SESSION['ums_user_id']'");
+		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."'");
 		$row = mysqli_fetch_array($db_daten);
 		for($i=100;$i<=104;$i++){
 			$einheiten[$i]=$row['e'.$i];
@@ -159,7 +159,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 								$tech_ticks=1;
 							}
 							mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES 
-							($_SESSION['ums_user_id'], $rec_target, $target_amount, $tech_ticks, $score, 1)");
+							(".$_SESSION['ums_user_id'].", $rec_target, $target_amount, $tech_ticks, $score, 1)");
 						}
 					}
 				}
@@ -188,7 +188,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 						$score=$target_amount*$techscore[$rec_target];
 						if($target_amount>0){
 							//die türme abziehen
-							$sql="UPDATE de_user_data SET e".$i."=e".$i."-".$rec_amount." WHERE user_id='$_SESSION['ums_user_id']'";
+							$sql="UPDATE de_user_data SET e".$i."=e".$i."-".$rec_amount." WHERE user_id='".$_SESSION['ums_user_id']."'";
 							mysqli_query($GLOBALS['dbi'],$sql);
 
 							//bauauftrag hinterlegen
@@ -205,7 +205,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 							if($tech_ticks<1){
 								$tech_ticks=1;
 							}
-							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES ($_SESSION['ums_user_id'], $rec_target, $target_amount, $tech_ticks, $score, 1)";
+							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES (".$_SESSION['ums_user_id'].", $rec_target, $target_amount, $tech_ticks, $score, 1)";
 							//echo $sql;
 							mysqli_query($GLOBALS['dbi'],$sql);
 						}
@@ -316,7 +316,7 @@ if(!hasTech($pt,129)){
 	echo '<tr class="cell"><td><b>Name</b></td><td align="center"><b>vorhanden</b></td><td align="center"><b>Recyclingmenge</b></td><td align="center"><b>Zieleinheit</td></tr>';
 	
 	//einheiten aus der db lesen
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='$_SESSION['ums_user_id']'");
+	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."'");
 	$row = mysqli_fetch_array($db_daten);
 	for($i=100;$i<=104;$i++){
 		echo '<tr class="cell">
@@ -336,7 +336,7 @@ if(!hasTech($pt,129)){
 	
 //zeige aktive bauauftr�ge an
 $result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build` 
-	WHERE user_id='$_SESSION['ums_user_id']' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
+	WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
 $num = mysqli_num_rows($result);
 if ($num>0){
 	echo '<tr class="cell1"><td colspan="4"><b>Aktive Bauauftr&auml;ge:</b></td></tr>';
