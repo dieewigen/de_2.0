@@ -7,7 +7,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -51,7 +51,7 @@ if($delallyid1 && $delallyid2 && ($isleader || $iscoleader)){
 		"SELECT count(*) as count FROM de_ally_partner, de_allys 
 		 WHERE ally_id_1=? AND ally_id_2=? AND ((ally_id_1=id) OR (ally_id_2=id)) 
 		 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
-		[$delallyid1, $delallyid2, $ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+		[$delallyid1, $delallyid2, $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 	$alreadyinXallys = $row['count'];
 	if ($alreadyinXallys == 0)
@@ -78,7 +78,7 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT id FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
-		[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+		[$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 	$allyid = $row['id'];
 
@@ -140,7 +140,7 @@ else {
 			"SELECT ally_id_1, ally_id_2 FROM de_allys, de_ally_partner 
 			 WHERE ((ally_id_1=id) OR (ally_id_2=id)) 
 			 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
-			[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+			[$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
   	else
 		$result = mysqli_execute_query($GLOBALS['dbi'],
 			"SELECT ally_id_1, ally_id_2 FROM de_allys, de_ally_partner 
@@ -203,7 +203,7 @@ else {
 			"SELECT antrag, ally_id_partner FROM de_ally_buendniss_antrag, de_allys 
 			 WHERE ally_id_antragsteller=id 
 			 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
-			[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+			[$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($result);
 		$laufenderantrag = $row['antrag'] ?? '';
 		$selected = $row['ally_id_partner'] ?? '';

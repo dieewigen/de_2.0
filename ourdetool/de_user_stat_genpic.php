@@ -2,8 +2,8 @@
 include "../inccon.php";
 include "../inc/sv.inc.php";
 
-$ums_user_id=$uid;
-$ums_rasse=1;
+$_SESSION['ums_user_id']=$uid;
+$_SESSION['ums_rasse']=1;
 
 // Stelle sicher, dass eine Datenbankverbindung vorhanden ist
 if (!isset($GLOBALS['dbi'])) {
@@ -13,7 +13,7 @@ if (!isset($GLOBALS['dbi'])) {
 //daten laden mit prepared statement
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT sector, allytag FROM de_user_data WHERE user_id = ?", 
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 $row = mysqli_fetch_array($result, MYSQLI_BOTH);
 $sector=$row["sector"];$allytag=$row["allytag"];
@@ -37,17 +37,17 @@ $typ = isset($_GET["typ"]) ? (int)$_GET["typ"] : 1;
 if($typ == 1) {
     $result = mysqli_execute_query($GLOBALS['dbi'], 
         "SELECT score FROM de_user_stat WHERE user_id = ? ORDER BY datum ASC", 
-        [$ums_user_id]
+        [$_SESSION['ums_user_id']]
     );
 } elseif($typ == 2) {
     $result = mysqli_execute_query($GLOBALS['dbi'], 
         "SELECT col FROM de_user_stat WHERE user_id = ? ORDER BY datum ASC", 
-        [$ums_user_id]
+        [$_SESSION['ums_user_id']]
     );
 } elseif($typ == 3) {
     $result = mysqli_execute_query($GLOBALS['dbi'], 
         "SELECT cybexp FROM de_user_stat WHERE user_id = ? ORDER BY datum ASC", 
-        [$ums_user_id]
+        [$_SESSION['ums_user_id']]
     );
 //sektor
 } elseif($typ == 11) {
@@ -116,7 +116,7 @@ $farben[] = array (  51, 153, 255);
 $farben[] = array ( 166, 166, 166);
 $farben[] = array ( 222,  57,  57);
 $farben[] = array (  57, 162,  54);
-$color=ImageColorAllocate ($im, $farben[$ums_rasse-1][0], $farben[$ums_rasse-1][1], $farben[$ums_rasse-1][2]);
+$color=ImageColorAllocate ($im, $farben[$_SESSION['ums_rasse']-1][0], $farben[$_SESSION['ums_rasse']-1][1], $farben[$_SESSION['ums_rasse']-1][2]);
 
 //statistik zeichnen
 $x1=51;

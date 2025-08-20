@@ -6,7 +6,7 @@ include_once('functions.php');
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_id 
      FROM de_user_data WHERE user_id=?", 
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];$ally_id=$row['ally_id'];
@@ -33,7 +33,7 @@ else
 	{
 		$result = mysqli_execute_query($GLOBALS['dbi'], 
             "SELECT id FROM de_allys WHERE leaderid=?", 
-            [$ums_user_id]);
+            [$_SESSION['ums_user_id']]);
 		if ($row = mysqli_fetch_array($result))
 		{
 			$allyid = $row['id'];
@@ -72,7 +72,7 @@ else
 		}
 		mysqli_execute_query($GLOBALS['dbi'], 
             "DELETE FROM de_allys WHERE leaderid=?",
-            [$ums_user_id]);
+            [$_SESSION['ums_user_id']]);
 		mysqli_execute_query($GLOBALS['dbi'],
             "DELETE FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
             [$allyid, $allyid]);

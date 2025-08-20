@@ -1111,9 +1111,9 @@ function sf($name, $arrOpt, $selected, $class = "", $jsHandler = '')
 
 function showeinheit_ang($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $tech_ticks, $vorhanden, $bg, $tooltipid, $has_tech, $item_kosten = '')
 {
-    global $ums_gpfad, $ums_rasse, $tooltips;
+    global $tooltips;
 
-    $tooltip = '<img src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
@@ -1580,7 +1580,7 @@ function getfleetlevel($exp)
 
 function showtech($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildgtime, $buildgnr, $techs, $typ, $verbtime, $bg, $cancancel)
 {
-    global $ums_rasse, $functions, $_SESSION;
+    global $functions;
 
     echo '<tr valign="middle" align="center" height="25">';
     echo '<td class="'.$bg.'" height="25"><div align="left"><b>&nbsp;</b><a href="help.php?t='.$gebnr.'" class="link">'.$techname."</a></div></td>";
@@ -1634,9 +1634,9 @@ function showtech($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildgt
 
 function showtech2($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildgtime, $buildgnr, $techs, $typ, $verbtime, $bg, $cancancel)
 {
-    global $ums_rasse, $functions, $sv_link, $ums_gpfad;
+    global $functions, $sv_link;
 
-    $tooltip = '<img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_'.$gebnr.'.jpg" border="0">';
+    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_'.$gebnr.'.jpg" border="0">';
 
     echo '<tr valign="middle" align="center" height="25">';
 
@@ -1645,7 +1645,7 @@ function showtech2($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildg
     echo '
 	<table border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td width="75"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t='.$gebnr.'" target="_blank">'.$tooltip.'</a></td>
+		<td width="75"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t='.$gebnr.'" target="_blank">'.$tooltip.'</a></td>
 		<td width="145" align="center"><a href="help.php?t='.$gebnr.'" class="link">'.$techname.'</a></td>
 	</tr>
 	</table>';
@@ -1701,9 +1701,9 @@ function showtech2($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildg
 
 function showeinheit($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $tech_ticks, $vorhanden, $bg, $tooltipid)
 {
-    global $ums_gpfad, $ums_rasse, $tooltips;
+    global $tooltips;
 
-    $tooltip = '<img src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
@@ -1726,9 +1726,9 @@ function showeinheit($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $te
 
 function showeinheit2($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $tech_ticks, $vorhanden, $bg, $tooltipid)
 {
-    global $ums_gpfad, $ums_rasse, $sv_link, $tooltips;
+    global $sv_link, $tooltips;
 
-    $tooltip = '<img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_'.$tech_id.'.jpg" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_'.$tech_id.'.jpg" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     echo '<td align="left">';
@@ -1736,7 +1736,7 @@ function showeinheit2($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $t
     echo '
 	<table border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td width="75"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t='.$tech_id.'" target="_blank">'.$tooltip.'</a></td>
+		<td width="75"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t='.$tech_id.'" target="_blank">'.$tooltip.'</a></td>
 		<td class="'.$bg.'" width="108" align="center"><a href="help.php?t='.$tech_id.'" class="link">'.$techname.'</a></td>
 	</tr>
 	</table>';
@@ -1807,9 +1807,9 @@ function get_fleet_ground_speed($ez, $rasse, $uid)
     $spec3 = $row['spec3'];
 
     if ($spec3 == 2) {
-        $ums_rasse = $rasse;
-        for ($i = 0;$i < count($schiffsdaten[$ums_rasse]);$i++) {
-            $schiffsdaten[$ums_rasse - 1][$i][1] = floor($schiffsdaten[$ums_rasse - 1][$i][1] * 1.2);
+        $_SESSION['ums_rasse'] = $rasse;
+        for ($i = 0;$i < count($schiffsdaten[$_SESSION['ums_rasse']]);$i++) {
+            $schiffsdaten[$_SESSION['ums_rasse'] - 1][$i][1] = floor($schiffsdaten[$_SESSION['ums_rasse'] - 1][$i][1] * 1.2);
         }
     }
 
@@ -1952,7 +1952,7 @@ function get_fleet_ground_speed($ez, $rasse, $uid)
     for($x=0;$x<$sv_anz_schiffe;$x++)
     {
         //reisezeit aus dem schiffsdaten-array holen
-        $reisez[$x] = $sv_schiffsdaten[$ums_rasse][$x][0];
+        $reisez[$x] = $sv_schiffsdaten[$_SESSION['ums_rasse']][$x][0];
     }
     //reisezeitberechnung grundreisezeit
     $z1 = 0;
@@ -1963,16 +1963,16 @@ function get_fleet_ground_speed($ez, $rasse, $uid)
     // [0] = ID des Feldes f�r Nissen [1] = ID des Feldes f�r Bomber [2] = N�tiger Platz f�r Nissen [3] = N�tige Platz f�r Bomber
     $tragbars[0] = 0;
     $tragbars[1] = 5;
-    $tragbars[2] = $sv_schiffsdaten[$ums_rasse-1][0][2];
-    $tragbars[3] = $sv_schiffsdaten[$ums_rasse-1][5][2];
+    $tragbars[2] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][0][2];
+    $tragbars[3] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][5][2];
 
     //vorhandene transportkapazit�t
     $tragers[0] = 3;
     $tragers[0] = 4;
     $tragers[0] = 7;
-    $tragers[0] = $sv_schiffsdaten[$ums_rasse-1][3][1];
-    $tragers[0] = $sv_schiffsdaten[$ums_rasse-1][4][1];
-    $tragers[0] = $sv_schiffsdaten[$ums_rasse-1][7][1];
+    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][3][1];
+    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][4][1];
+    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][7][1];
 
      for ($x=0; $x <= $anzs; $x++)
      {

@@ -4,7 +4,7 @@ include 'inc/lang/'.$sv_server_lang.'_userdetails.lang.php';
 include 'functions.php';
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04,  restyp05, score, sector, `system`, newtrans, newnews FROM de_user_data WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];$restyp05=$row["restyp05"];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -61,14 +61,14 @@ if($_REQUEST['save']){
 	
 	
 	$sql = "UPDATE de_user_info SET ud_all=?, ud_sector=?, ud_ally=? WHERE user_id=?";
-	mysqli_execute_query($GLOBALS['dbi'], $sql, [$ud_all, $ud_sector, $ud_ally, $ums_user_id]);
+	mysqli_execute_query($GLOBALS['dbi'], $sql, [$ud_all, $ud_sector, $ud_ally, $_SESSION['ums_user_id']]);
 
 	echo '<div class="info_box text3">'.$userdetails_lang['msg_3'].'</div><br><br>';
 }
 
 //Lesen aus der DB
 $sql = "SELECT * FROM de_user_info WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 
 $ud_all=$row['ud_all'];

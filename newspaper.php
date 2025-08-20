@@ -4,7 +4,7 @@ include 'functions.php';
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
   "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves FROM de_user_data WHERE user_id=?",
-  [$ums_user_id]);
+  [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];$techs=$row["techs"];
@@ -65,7 +65,7 @@ if($action!="archiv"){
 if($_REQUEST['feedback']){
 	echo '<div class="info_box text3">Vielen Dank, das Feedback wurde gespeichert.</div><br>';
 	$sendto=$GLOBALS['env_admin_email'];
-	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$ums_user_id.' '.$ums_spielername;
+	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$_SESSION['ums_user_id'].' '.$_SESSION['ums_spielername'];
 	$text=str_replace('\r\n',"\r\n",$_REQUEST['feedback']);
 	$sendfrom='FROM: '.$GLOBALS['env_admin_email'];
 	@mail($sendto, $betreff, $text, $sendfrom);

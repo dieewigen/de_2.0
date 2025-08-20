@@ -44,7 +44,7 @@ $maxtick = $row["tick"];
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=22 AND user_id='$ums_user_id'");
+$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=22 AND user_id='".$_SESSION['ums_user_id']."';");
 $artbonus_auktion = 0;
 while ($row = mysqli_fetch_array($db_daten)) {
     $artbonus_auktion = $artbonus_auktion + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
@@ -84,14 +84,14 @@ if (!hasTech($pt, 4)) {
     $content .= rahmen_oben('Fehlende Technologie', false);
     $content .= '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     $content .= '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=4" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_4.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=4" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_4.jpg" border="0"></a></td>
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
 	</tr>';
     $content .= '</table>';
     $content .= rahmen_unten(false);
 } else {
 
-    if (setLock($ums_user_id)) {
+    if (setLock($_SESSION['ums_user_id'])) {
 
         $content .= '<div class="info_box">Nach dem Start der Auktion sinkt 1.000 Wirtschaftsticks lang der Preis. Auktionen, die man selbst gestartet hat, haben einen Nachlass von '.$nachlass.'%.</div><br>';
 
@@ -162,6 +162,7 @@ if (!hasTech($pt, 4)) {
             }
 
             //selbst erstellte Auktion?
+            $nachlass_str='';
             if ($creator) {
                 $reduzierung_in_prozent = ($nachlass + $artbonus_auktion) / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
@@ -169,7 +170,9 @@ if (!hasTech($pt, 4)) {
             } else {
                 $reduzierung_in_prozent = $artbonus_auktion / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
-                $nachlass_str = ' / '.number_format($artbonus_auktion, 2, ",", ".").' % Preisnachlass';
+                if($reduzierung_in_prozent > 0){
+                    $nachlass_str = ' / <span style="color: #00FF00;">'.number_format($artbonus_auktion, 2, ",", ".").' % Preisnachlass</span>';
+                }
             }
 
             switch ($cost[0]) {
@@ -273,7 +276,7 @@ if (!hasTech($pt, 4)) {
                     }
 
                     $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.$ums_gpfad.'g/arte'.$artid.'.gif"></div>';
+                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.$_SESSION['ums_gpfad'].'g/arte'.$artid.'.gif"></div>';
                     $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.$ua_name[$reward[1] - 1].$tradesystemscore_str.'</div>';
                     $artikel .= '</div>';
                     break;
@@ -406,7 +409,7 @@ if (!hasTech($pt, 4)) {
         $content .= rahmen_unten(false);
 
         //transaktionsende
-        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {

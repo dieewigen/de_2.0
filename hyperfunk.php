@@ -4,7 +4,7 @@ include('inc/lang/'.$sv_server_lang.'_hyperfunk.lang.php');
 require_once('lib/phpmailer/class.phpmailer.php');
 require_once('lib/phpmailer/class.smtp.php');
 
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, `system` FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, `system` FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -20,7 +20,7 @@ $sector = $asec;
 $system = $asys;
 
 if ($newtrans == 1) { //wenn einen neue nachricht vorlag, den indikator wieder auf 0 setzen
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans = 0 WHERE user_id=?", [$ums_user_id]);
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 }
 $newtrans = 0;
 
@@ -340,7 +340,7 @@ if (isset($_POST['antbut'])) {
 
     //test auf comsperre
     $akttime = date("Y-m-d H:i:s", time());
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$ums_user_id]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     if ($row['com_sperre'] > $akttime) {
         $sperrtime = strtotime($row['com_sperre']);
@@ -370,10 +370,10 @@ if (isset($_POST['antbut'])) {
 
                     //include('outputlib.php');
 
-                    mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $ums_user_id, $asec, $asys, $ums_spielername, $time, $betreff, $nachricht]);
-                    mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $ums_user_id, $asec, $asys, $ums_spielername, $time, $betreff, $nachricht]);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
 
-                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans = 1 WHERE user_id=? and user_id!=?", [$uid, $ums_user_id]);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans = 1 WHERE user_id=? and user_id!=?", [$uid, $_SESSION['ums_user_id']]);
 
                     echo insertmessage($hyperfunk_lang['msg_2'], "g", $hyperfunk_lang['systemnachricht']);
 
@@ -419,7 +419,7 @@ if ($sekmsg && $asec != 1) {
 
     //test auf comsperre
     $akttime = date("Y-m-d H:i:s", time());
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$ums_user_id]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     if ($row['com_sperre'] > $akttime) {
         $sperrtime = strtotime($row['com_sperre']);
@@ -436,13 +436,13 @@ if ($sekmsg && $asec != 1) {
             $numignore = mysqli_num_rows($db_ignore);
 
             if ($numignore == 0) {
-                mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans=1 where user_id=? and user_id!=?", [$row['user_id'], $ums_user_id]);
-                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$row['user_id'], $ums_user_id, $asec, $asys, $ums_spielername, $time, 'Sektorrundmail: '.$betreff, $nachricht]);
+                mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans=1 where user_id=? and user_id!=?", [$row['user_id'], $_SESSION['ums_user_id']]);
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$row['user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Sektorrundmail: '.$betreff, $nachricht]);
             } else {
                 $igmsg++;
             }
         }
-        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$ums_user_id, $ums_user_id, $asec, $asys, $ums_spielername, $time, 'Sektorrundmail: '.$betreff, $nachricht]);
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Sektorrundmail: '.$betreff, $nachricht]);
 
 
         if ($igmsg == 0) {
@@ -480,7 +480,7 @@ if (isset($_POST['allimsg'])) {
 
     //test auf comsperre
     $akttime = date("Y-m-d H:i:s", time());
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$ums_user_id]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     if ($row['com_sperre'] > $akttime) {
         $sperrtime = strtotime($row['com_sperre']);
@@ -488,7 +488,7 @@ if (isset($_POST['allimsg'])) {
     } elseif ($nachricht == "") {
         echo insertmessage($hyperfunk_lang['msg_1'], "r", $hyperfunk_lang['systemnachricht']);
     } else {
-        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_array($holalli);
         $alli = $row['allytag'];
         $hfnforward = mysqli_execute_query($GLOBALS['dbi'], "SELECT hfn_forwarding FROM de_allys WHERE allytag=?", [$alli]);
@@ -503,14 +503,14 @@ if (isset($_POST['allimsg'])) {
                 $numignore = mysqli_num_rows($db_ignore);
 
                 if ($numignore == 0) {
-                    mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans = 1 where user_id = ? and user_id!=?", [$rowa['user_id'], $ums_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$rowa['user_id'], $ums_user_id, $asec, $asys, $ums_spielername, $time, 'Allianzrundmail: '.$betreff, $nachricht]);
+                    mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans = 1 where user_id = ? and user_id!=?", [$rowa['user_id'], $_SESSION['ums_user_id']]);
+                    mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$rowa['user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
                 } else {
                     $igmsg++;
                 }
 
             }
-            mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$ums_user_id, $ums_user_id, $asec, $asys, $ums_spielername, $time, 'Allianzrundmail: '.$betreff, $nachricht]);
+            mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
             if ($igmsg == 0) {
                 echo insertmessage($hyperfunk_lang['msg_9'], "g", $hyperfunk_lang['systemnachricht']);
             } else {
@@ -519,7 +519,7 @@ if (isset($_POST['allimsg'])) {
 
         } else {
 
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_usr_ally (allytag, absender, fromsec, fromsys, fromnic, time, betreff, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [$row['allytag'], $ums_user_id, $asec, $asys, $ums_spielername, $time, 'Allianzrundmail: '.$betreff, $nachricht]);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_usr_ally (allytag, absender, fromsec, fromsys, fromnic, time, betreff, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [$row['allytag'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
 
             $holleader = mysqli_execute_query($GLOBALS['dbi'], "SELECT leaderid,  coleaderid1,  coleaderid2 FROM de_allys WHERE allytag=?", [$row['allytag']]);
             $rowleader = mysqli_fetch_array($holleader);
@@ -541,7 +541,7 @@ if (isset($_POST['allimsg'])) {
 }
 // Insert fuer die Freunde
 if (isset($_POST['freundemsg'])) {
-    $db_freunde = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? AND status=1", [$ums_user_id]);
+    $db_freunde = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? AND status=1", [$_SESSION['ums_user_id']]);
 
     $time = date("YmdHis");
 
@@ -590,8 +590,8 @@ if (isset($_POST['freundemsg'])) {
 
                 if ($numignore == 0) {
                     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans = 1 where user_id=?", [$uid]);
-                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $ums_user_id, $asec, $asys, $ums_spielername, $time, $betreff, $nachricht]);
-                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $ums_user_id, $asec, $asys, $ums_spielername, $time, $betreff, $nachricht]);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
+                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
                 } else {
                     $igmsg++;
                 }
@@ -614,7 +614,7 @@ if (isset($_POST['freundemsg'])) {
 if ($action == "del") {//nachricht l&ouml;schen
     $id = intval($_REQUEST['id']);
 
-    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE (id=? AND empfaenger=? AND sender=0) or (id=? AND absender=? AND sender=1)", [$id, $ums_user_id, $id, $ums_user_id]);
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE (id=? AND empfaenger=? AND sender=0) or (id=? AND absender=? AND sender=1)", [$id, $_SESSION['ums_user_id'], $id, $_SESSION['ums_user_id']]);
 
     echo insertmessage($hyperfunk_lang['msg_14'], "r", $hyperfunk_lang['systemnachricht']);
 
@@ -650,17 +650,17 @@ if ($action == "da" and ($l == "e" or $l == "a" or $l == "r")) {
     
     // Eingang
     if ($action == "da" and $l == "e") {
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 and gelesen=1", [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 and gelesen=1", [$_SESSION['ums_user_id']]);
         echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_15'] . '</td>';
     }
     // Ausgang
     if ($action == "da" and $l == "a") {
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE absender=? and sender=1 and archiv=0", [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE absender=? and sender=1 and archiv=0", [$_SESSION['ums_user_id']]);
         echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_16'] . '</td>';
     }
     // Archiv
     if ($action == "da" and $l == "r") {
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$_SESSION['ums_user_id']]);
         echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_17'] . '</td>';
     }
 
@@ -679,7 +679,7 @@ if ($action == "da" and ($l == "e" or $l == "a" or $l == "r")) {
 if ($action == "arc") {
     $id = intval($_REQUEST['id']);
 
-    $db_archiv = mysqli_execute_query($GLOBALS['dbi'], "SELECT archiv FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$ums_user_id]);
+    $db_archiv = mysqli_execute_query($GLOBALS['dbi'], "SELECT archiv FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$_SESSION['ums_user_id']]);
     $num = mysqli_num_rows($db_archiv);
 
     if ($ums_premium == 1) {
@@ -693,7 +693,7 @@ if ($action == "arc") {
         $sy = (int)$sy;
         //if(!preg_match("/^[0-9]*$/i", $t))$t='';
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET archiv=1, absender=?, time=time WHERE fromsec=? AND fromsys=? AND id=? AND empfaenger=? AND sender=0", [$ums_user_id, $se, $sy, $id, $ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET archiv=1, absender=?, time=time WHERE fromsec=? AND fromsys=? AND id=? AND empfaenger=? AND sender=0", [$_SESSION['ums_user_id'], $se, $sy, $id, $_SESSION['ums_user_id']]);
 
         echo insertmessage($hyperfunk_lang['msg_18'], "g", $hyperfunk_lang['systemnachricht']);
     } else {
@@ -737,18 +737,18 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
 
     if ($action == "eingang"  || $action == "") {
         if ($l == "new") {
-            $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 and gelesen=0 ORDER BY time DESC", [$ums_user_id]);
+            $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 and gelesen=0 ORDER BY time DESC", [$_SESSION['ums_user_id']]);
         } else {
-            $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 ORDER BY time DESC", [$ums_user_id]);
+            $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 ORDER BY time DESC", [$_SESSION['ums_user_id']]);
         }
         //nachrichten als gelesen markieren
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET time=time, gelesen = 1 WHERE empfaenger=? and sender=0 and archiv=0", [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET time=time, gelesen = 1 WHERE empfaenger=? and sender=0 and archiv=0", [$_SESSION['ums_user_id']]);
     } elseif ($action == "ausgang") {
-        $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE absender=? and sender='1' ORDER BY time DESC", [$ums_user_id]);
+        $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE absender=? and sender='1' ORDER BY time DESC", [$_SESSION['ums_user_id']]);
         //nachrichten als gelesen markieren
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET time=time, gelesen = 1 WHERE absender=? AND sender=1", [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET time=time, gelesen = 1 WHERE absender=? AND sender=1", [$_SESSION['ums_user_id']]);
     } elseif ($action == "archiv") {
-        $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and archiv='1' ORDER BY time DESC", [$ums_user_id]);
+        $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE empfaenger=? and archiv='1' ORDER BY time DESC", [$_SESSION['ums_user_id']]);
     }
 
     $anzahl = mysqli_num_rows($db_tfn);
@@ -791,7 +791,7 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
 
         if ($l != "new") {
             if ($row['gelesen'] == "0") {
-                $neuemsg = '<img src="' . $ums_gpfad . 'g/hfn/DENeu.gif" alt="'.$hyperfunk_lang['logo_neue_hfn'].'">';
+                $neuemsg = '<img src="' . $_SESSION['ums_gpfad'] . 'g/hfn/DENeu.gif" alt="'.$hyperfunk_lang['logo_neue_hfn'].'">';
             } else {
                 $neuemsg = "&nbsp;";
             }
@@ -958,7 +958,7 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
     $id = intval($_REQUEST['id'] ?? -1);
 
     if ($action == "freunde") {
-        $db_friends = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$ums_user_id]);
+        $db_friends = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
         $num = mysqli_num_rows($db_friends);
         if ($num == "0") {
             $check = 0;
@@ -966,7 +966,7 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
     }
 
     if ($action == "alli") {
-        $db_alli = mysqli_execute_query($GLOBALS['dbi'], "SELECT status FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+        $db_alli = mysqli_execute_query($GLOBALS['dbi'], "SELECT status FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $rowalli = mysqli_fetch_array($db_alli);
         if ($rowalli['status'] == "0") {
             $allicheck = 0;
@@ -976,7 +976,7 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
     if ($allicheck == "1") {
         if ($check == "1") {
             if ($action == "ant" or $action == "weiter") {
-                $anttfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE (id=? AND empfaenger=?) or (id=? AND absender=? AND sender=1)", [$id, $ums_user_id, $id, $ums_user_id]);
+                $anttfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE (id=? AND empfaenger=?) or (id=? AND absender=? AND sender=1)", [$id, $_SESSION['ums_user_id'], $id, $_SESSION['ums_user_id']]);
                 $rowtfn = mysqli_fetch_array($anttfn);
 
                 $rowtfn['text'] = str_replace("<br />", " ", $rowtfn['text']);
@@ -1133,13 +1133,13 @@ if (isset($_POST['friendbtn'])) {
     $db_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
     $numcheck = mysqli_num_rows($db_check);
 
-    $db_buddy_exist_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_hfn_buddy_ignore WHERE sector=? AND `system`=? and status=1 and user_id=?", [$sector, $system, $ums_user_id]);
+    $db_buddy_exist_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_hfn_buddy_ignore WHERE sector=? AND `system`=? and status=1 and user_id=?", [$sector, $system, $_SESSION['ums_user_id']]);
     $buddy_exist_check = mysqli_num_rows($db_buddy_exist_check);
 
     if ($buddy_exist_check >= 1) {
         echo insertmessage($hyperfunk_lang['msg_22'], "r", $hyperfunk_lang['systemnachricht']);
     } elseif ($numcheck == 1) {
-        $db_buddy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$ums_user_id]);
+        $db_buddy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
         $num = mysqli_num_rows($db_buddy);
 
         if ($ums_premium == 1) {
@@ -1152,7 +1152,7 @@ if (isset($_POST['friendbtn'])) {
             $buddyname = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
             $rowbuddy = mysqli_fetch_array($buddyname);
 
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES (?, ?, ?, ?, 1)", [$ums_user_id, $sector, $system, $rowbuddy['spielername']]);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES (?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $sector, $system, $rowbuddy['spielername']]);
 
             echo insertmessage($hyperfunk_lang['msg_23'], "g", $hyperfunk_lang['systemnachricht']);
         } else {
@@ -1172,7 +1172,7 @@ if (isset($_POST['ignorebtn'])) {
     $db_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
     $numcheck = mysqli_num_rows($db_check);
 
-    $db_buddy_exist_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_hfn_buddy_ignore WHERE sector=? AND `system`=? and status=2 and user_id=?", [$sector, $system, $ums_user_id]);
+    $db_buddy_exist_check = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_hfn_buddy_ignore WHERE sector=? AND `system`=? and status=2 and user_id=?", [$sector, $system, $_SESSION['ums_user_id']]);
     $buddy_exist_check = mysqli_num_rows($db_buddy_exist_check);
 
     if ($buddy_exist_check >= 1) {
@@ -1180,7 +1180,7 @@ if (isset($_POST['ignorebtn'])) {
     } elseif ($numcheck == 1) {
 
 
-        $db_enem = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$ums_user_id]);
+        $db_enem = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$_SESSION['ums_user_id']]);
         $num = mysqli_num_rows($db_enem);
 
 
@@ -1194,7 +1194,7 @@ if (isset($_POST['ignorebtn'])) {
             $ignorename = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
             $rowignore = mysqli_fetch_array($ignorename);
 
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES (?, ?, ?, ?, 2)", [$ums_user_id, $sector, $system, $rowignore['spielername']]);
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_buddy_ignore (user_id, sector, `system`, name, status) VALUES (?, ?, ?, ?, 2)", [$_SESSION['ums_user_id'], $sector, $system, $rowignore['spielername']]);
 
             echo insertmessage($hyperfunk_lang['msg_26'], "g", $hyperfunk_lang['systemnachricht']);
         } else {
@@ -1211,7 +1211,7 @@ if ($action == "delbuddy") {
     $sector = (int)$se;
     $system = (int)$sy;
 
-    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=1", [$ums_user_id, $sector, $system]);
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=1", [$_SESSION['ums_user_id'], $sector, $system]);
 
     echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
 
@@ -1222,7 +1222,7 @@ if ($action == "delene") {
     $sector = (int)$se;
     $system = (int)$sy;
 
-    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=2", [$ums_user_id, $sector, $system]);
+    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=2", [$_SESSION['ums_user_id'], $sector, $system]);
 
     echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
 
@@ -1244,7 +1244,7 @@ if ($action == "optionen") {
 
 
     <?php
-        $db_friends = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$ums_user_id]);
+        $db_friends = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
 
     $num = mysqli_num_rows($db_friends);
 
@@ -1294,7 +1294,7 @@ if ($action == "optionen") {
 </tr>
 
     <?php
-    $db_enemy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$ums_user_id]);
+    $db_enemy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$_SESSION['ums_user_id']]);
 
     $nume = mysqli_num_rows($db_enemy);
 
@@ -1360,7 +1360,7 @@ switch ($action) {
 
     default:
         @$time = strftime("%Y%m%d%H%M%S");
-        @$param = "Der folgende Spieler $ums_spielername ($asec:$asys)[UserID:$ums_user_id] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $action";
+        @$param = "Der folgende Spieler ".$_SESSION['ums_spielername']." ($asec:$asys)[UserID:".$_SESSION['ums_user_id']."] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $action";
         @mail_smpt($GLOBALS['env_admin_email'], "Scriptkiddi auf Server $sv_server_name am Werk.", $param);
         break;
 }
@@ -1374,7 +1374,7 @@ switch ($l) {
 
     default:
         @$time = strftime("%Y%m%d%H%M%S");
-        @$para = "Der folgende Spieler $ums_spielername ($asec:$asys)[UserID:$ums_user_id] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $l";
+        @$para = "Der folgende Spieler ".$_SESSION['ums_spielername']." ($asec:$asys)[UserID:".$_SESSION['ums_user_id']."] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $l";
         @mail_smtp($GLOBALS['env_admin_email'], "Scriptkiddi auf Server $sv_server_name am Werk.", $para);
         break;
 }

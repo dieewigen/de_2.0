@@ -38,7 +38,7 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==0){
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -48,7 +48,7 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==1){
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -62,7 +62,7 @@ switch($_SESSION['helperid']){
     if($helper_progress==2)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -74,7 +74,7 @@ switch($_SESSION['helperid']){
     if($helper_progress==3)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -89,7 +89,7 @@ switch($_SESSION['helperid']){
     if($helper_progress==4)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -99,7 +99,7 @@ switch($_SESSION['helperid']){
     
     if($helper_progress==5){
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
@@ -110,15 +110,15 @@ switch($_SESSION['helperid']){
     if($helper_progress==6)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
   case 7:
-    if($ums_rasse==1)$helper_hs='Konstruktionszentrum';
-    elseif($ums_rasse==2)$helper_hs='Werkstatt';
-    elseif($ums_rasse==3)$helper_hs='Zentralbau';
-    elseif($ums_rasse==4)$helper_hs='Kleiner Stock';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Konstruktionszentrum';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Werkstatt';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Zentralbau';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Kleiner Stock';
     $helper_msg='Kommen wir nun zur ersten Aufgabe f&uuml;r Dich. Gehe links im Men&uuml; auf den Punkt Technologien -> Geb&auml;ude und erteile den Bauauftrag f&uuml;r: <b>'.$helper_hs.'</b><br><br>Die Rohstoffe f&szlig;r das Geb&auml;ude werden abgezogen und Du siehst unter der Rohstoffleiste das Geb&auml;ude, das im Bau ist.<br><br>Bei "Fertigstellungszeitpunkt Echtzeit" findest Du den Zeitpunkt der Fertigstellung des Geb&auml;udes.<br><br>Bis das Geb&auml;ude fertig ist, kannst Dich ja einmal links durch das Men&uuml; klicken, um eine kleine &Uuml;bersicht zu bekommen.<br><br>';
     $helper_picid=8;
     
@@ -128,7 +128,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,1))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -143,15 +143,15 @@ switch($_SESSION['helperid']){
     if($helper_progress==8)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
   case 9:
-    if($ums_rasse==1)$helper_hs='Kollektorenfabrik';
-    elseif($ums_rasse==2)$helper_hs='Sonnenschildfabrik';
-    elseif($ums_rasse==3)$helper_hs='Zentrum der Wandler';
-    elseif($ums_rasse==4)$helper_hs='Arbeiterwabe';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Kollektorenfabrik';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Sonnenschildfabrik';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Zentrum der Wandler';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterwabe';
     $helper_msg='Baue, um damit Kollektoren produzieren zu k&ouml;nnen, als n&auml;chstes folgendes Geb&auml;ude: '.$helper_hs.'<br><br>Die Kollektoren sind Deine wichtigste Energiequelle und wecken schnell die Gier der anderen Spieler. Wichtig ist eine ausgewogene Anzahl der Kollektoren zu Deinen Schiffen und Verteidungsanlagen.';
     $helper_picid=10;
     
@@ -161,16 +161,16 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,7))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;    
   case 10:
-    if($ums_rasse==1)$helper_hs='Materieumwandler M';
-    elseif($ums_rasse==2)$helper_hs='Raffinerie M';
-    elseif($ums_rasse==3)$helper_hs='Wandlerkammer M';
-    elseif($ums_rasse==4)$helper_hs='Arbeiterlager M';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Materieumwandler M';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Raffinerie M';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Wandlerkammer M';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterlager M';
     $helper_msg='Gut gemacht, jetzt fehlt nur noch ein Energie-Materie-Wandler. Baue als n&auml;chstes folgendes Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Die Kollektoren sind Deine wichtigste Energiequelle und wecken schnell die Gier der anderen Spieler. Wichtig ist eine ausgewogene Anzahl der Kollektoren zu Deinen Schiffen und Verteidungsanlagen.<br><br>Gehe jetzt links auf den Punkt Ressourcen und baue 17 Kollektoren.<br><br>Damit kommst Du raus aus Sektor 1 und in einen Spielersektor. Bei dem Umzug kannst Du kurz ausgeloggt werden. Logge Dich nach dem Umzug einfach wieder ein.';
     $helper_picid=11;
     
@@ -178,16 +178,16 @@ switch($_SESSION['helperid']){
       //test ob das geb�ude fertig ist
       if(hasTech($pt,14) AND $helper_col>0){
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;
   case 11:
-    if($ums_rasse==1)$helper_hs='Forschungszentrum';
-    elseif($ums_rasse==2)$helper_hs='Alchemielabor';
-    elseif($ums_rasse==3)$helper_hs='Kammer der Evolution';
-    elseif($ums_rasse==4)$helper_hs='Netzwerk des Denkens';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Forschungszentrum';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Alchemielabor';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Kammer der Evolution';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Netzwerk des Denkens';
     $helper_msg='Gut, jetzt bekommst Du bei jedem Wirtschaftstick mehr Multiplex.<br><br>Um bessere Einheiten und Geb&auml;ude bauen zu k&ouml;nnen, ben&ouml;tigt Du die passenden Forschungen daf&uuml;r. Um forschen zu k&ouml;nnen, ben&ouml;tigst du folgendes Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Baue jetzt dieses Geb&auml;ude.';
     $helper_picid=1;
     
@@ -197,23 +197,23 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,8))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;
   case 12:
-    if($ums_rasse==1)$helper_hs='Transmitterfeld';
-    elseif($ums_rasse==2)$helper_hs='Dimensionsfeld';
-    elseif($ums_rasse==3)$helper_hs='Netzevolution';
-    elseif($ums_rasse==4)$helper_hs='Transwabenfeld';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Transmitterfeld';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Dimensionsfeld';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Netzevolution';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Transwabenfeld';
     
     $helper_msg='Jetzt ist es soweit, Deine erste Forschung steht an. Forschungen und der Geb&auml;udebau laufen parallel. Gehe links im Men&uuml; auf Technologien -> Forschung und starte dort folgende Forschung: <b>'.$helper_hs.'</b><br><br>Diese Forschung ist eine der Grundlagen f&uuml;r den Handel und den Geheimdienst.';
 
-    if($ums_rasse==1)$helper_hs='Materieumwandler D,I,E';
-    elseif($ums_rasse==2)$helper_hs='Raffinerie D,I,E';
-    elseif($ums_rasse==3)$helper_hs='Wandlerkammer D,I,E';
-    elseif($ums_rasse==4)$helper_hs='Arbeiterlager D,I,E';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Materieumwandler D,I,E';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Raffinerie D,I,E';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Wandlerkammer D,I,E';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterlager D,I,E';
     $helper_msg.='<br><br>Neben Multiplex ben&ouml;tigst Du noch Dyharra, Iradium und Eternium. Baue daf&uuml;r auch noch die passenden Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Wenn Du mehr als einen Energie-Materie-Wander hast, kannst Du unter Ressourcen beim Energieverteilungsschl&uuml;ssel festlegen wie viel Prozent der Energie in den jeweiligen Rohstoff umgewandelt werden soll.';
     
     
@@ -225,16 +225,16 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,65) AND hasTech($pt,14))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;    
   case 13:
-    if($ums_rasse==1)$helper_hs='Planetare B&ouml;rse und Erweitertes Konstruktionszentrum';
-    elseif($ums_rasse==2)$helper_hs='Planetarer Markt und Erweiterte Werkstatt';
-    elseif($ums_rasse==3)$helper_hs='Platz des Sektortausches und Gro&szlig;er Zentralbau';
-    elseif($ums_rasse==4)$helper_hs='Planetare Handelswabe und Stock';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Planetare B&ouml;rse und Erweitertes Konstruktionszentrum';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Planetarer Markt und Erweiterte Werkstatt';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Platz des Sektortausches und Gro&szlig;er Zentralbau';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Planetare Handelswabe und Stock';
     $helper_msg='Sehr gut, du verf&uuml;gst jetzt &uuml;ber eine gute Grundproduktion aller Rohstoffe.<br><br>Der n&auml;chste Schritt ist die Anbindung Deines Sonnensystems an das intergalaktische Handelssystem um den planetaren Rohstoffertrag zu erh&ouml;hen. Baue dazu zuerst folgende Geb&auml;ude als Grundlage: <b>'.$helper_hs.'</b><br><br>Damit erh&auml;ltst Du die Voraussetzung f&uuml;r gr&ouml;&szlig;ere Geb&auml;ude und die M&ouml;glichkeit Rohstoffe f&uuml;r die Sektorgeb&auml;ude Deines Sektors zu spenden. Baue Dich aber erstmal auf, bevor Du Rohstoffe spendest.';
    
     $helper_picid=3;
@@ -245,16 +245,16 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,3) AND hasTech($pt,2))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;
   case 14:
-    if($ums_rasse==1)$helper_hs='Weltraumhandelsgilde';
-    elseif($ums_rasse==2)$helper_hs='Galaktische Handelszunft';
-    elseif($ums_rasse==3)$helper_hs='Platz des Raumtausches';
-    elseif($ums_rasse==4)$helper_hs='Handelswabe des Universums';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Weltraumhandelsgilde';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Galaktische Handelszunft';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Platz des Raumtausches';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Handelswabe des Universums';
     $helper_msg='Mit dem n&auml;chsten Geb&auml;ude erschlie&szlig;t Du Dir das Handelssystem, &uuml;ber das Du mit anderen Spielern Raumschiffe und Rohstoffe handeln kannst.<br><br>Durch den Handel steigt gleichzeitig der Planetaren Rohstoffertrag stark an, was der Energie von 47 Kollektoren entspricht.<br><br>Baue jetzt folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
     $helper_picid=4;
@@ -265,16 +265,16 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,14))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;
   case 15:
-    if($ums_rasse==1)$helper_hs='Raumwerft';
-    elseif($ums_rasse==2)$helper_hs='Raumschmiede';
-    elseif($ums_rasse==3)$helper_hs='Schwarmstock';
-    elseif($ums_rasse==4)$helper_hs='Drohnenwabe';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Raumwerft';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Raumschmiede';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Schwarmstock';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Drohnenwabe';
     $helper_msg='Bevor wir die Wirtschaft weiter st&auml;rken, sollten wir uns um den milit&auml;rischen Bereich k&uuml;mmern, denn die Kollektoren ben&ouml;tigen einen guten Schutz.<br><br>Baue daher folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
     $helper_picid=5;
@@ -285,7 +285,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,13))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -298,15 +298,15 @@ switch($_SESSION['helperid']){
     if($helper_progress==16)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
   case 17:
-    if($ums_rasse==1)$helper_hs='Hochleistungsumwandler M,D';
-    elseif($ums_rasse==2)$helper_hs='gr. Raffinerie M,D';
-    elseif($ums_rasse==3)$helper_hs='Gro&szlig;e Wandlerkammer M,D';
-    elseif($ums_rasse==4)$helper_hs='Arbeitergrosslager M,D';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Hochleistungsumwandler M,D';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='gr. Raffinerie M,D';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Gro&szlig;e Wandlerkammer M,D';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeitergrosslager M,D';
     $helper_msg='Aufbauend auf den kleinen Materie-Energie-Wandlern gibt es noch die gro&szlig;en Ausf&uuml;hrungen, die doppelt soviel Materie aus der gleichen Energiemenge gewinnen k&ouml;nnen. Baue daher die besseren Umwandler f&uuml;r Multiplex und Dyharra. Die weiteren Umwandler kannst Du direkt, oder auch sp&auml;ter bauen, wenn Dein Rohstoffbedarf f&uuml;r Iradium und Eternium ansteigt.<br><br>Baue folgende Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
     $helper_picid=7;
@@ -317,16 +317,16 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,18) AND hasTech($pt,19))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
   break;
   case 18:
-    if($ums_rasse==1)$helper_hs='Weltraumscanner, Tachyonscanner, Neutronenscanner';
-    elseif($ums_rasse==2)$helper_hs='Weltraumsonar, Elektronensonar, Photonensonar';
-    elseif($ums_rasse==3)$helper_hs='Kammer des Raumblickes, Erweiterung des Raumblickes, Kammer des Tiefraumblickes';
-    elseif($ums_rasse==4)$helper_hs='Augen der Arbeiterin, Augen der Drohne, Augen der Koenigin';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Weltraumscanner, Tachyonscanner, Neutronenscanner';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Weltraumsonar, Elektronensonar, Photonensonar';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Kammer des Raumblickes, Erweiterung des Raumblickes, Kammer des Tiefraumblickes';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Augen der Arbeiterin, Augen der Drohne, Augen der Koenigin';
     $helper_msg='Je mehr Kollektoren Du hast, desto eher wirst Du angegriffen. Um die Angreifer rechtzeitig zu sehen, ben&ouml;tigst Du passende Scanner. Bauer daher folgende Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Mit jedem Geb&auml;ude steigt die Chance die Angreifer zu entdecken. Wenn Du alle Geb&auml;ude hast, dann wird auch jede angreifende Flotte angezeigt. Flotten die Dich, oder jemanden aus Deinem Sektor angreifen werden f&uuml;r alle Sektormitglieder links unter dem Punkt Sektorstatus angezeigt.<br><br>Im Sektorstatus siehst Du auch die Bewegungen der Flotten Deiner Sektormitspieler.';
    
     $helper_picid=8;
@@ -337,7 +337,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,10) AND hasTech($pt,11) AND hasTech($pt,12))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -345,10 +345,10 @@ switch($_SESSION['helperid']){
 
   
   case 19:
-    if($ums_rasse==1)$helper_hs='Geheimdienst, Tarnfeld,Fusionsantrieb und Ionenantrieb';
-    elseif($ums_rasse==2)$helper_hs='Spionageabteilung, Dimensionsverschiebung, Magmaantrieb und Impulsantrieb';
-    elseif($ums_rasse==3)$helper_hs='Zentrum der Unterwanderung, Schattenfeld, Trochanterd&uuml;se und Femurd&uuml;se';
-    elseif($ums_rasse==4)$helper_hs='Aufkl&auml;rerwabe, Schwarzfeld, Strukturfl&uuml;gel und Chitinfl&uuml;gel';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Geheimdienst, Tarnfeld,Fusionsantrieb und Ionenantrieb';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Spionageabteilung, Dimensionsverschiebung, Magmaantrieb und Impulsantrieb';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Zentrum der Unterwanderung, Schattenfeld, Trochanterd&uuml;se und Femurd&uuml;se';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Aufkl&auml;rerwabe, Schwarzfeld, Strukturfl&uuml;gel und Chitinfl&uuml;gel';
   
     $helper_msg='Ein weiterer wichtiger Punkt ist der Geheimdienst. Dort kann man durch Sonden und Agenten Informationen &uuml;ber andere Spieler in Erfahrung bringen.<br><br>
     Sonden bringen ein paar Grundinformationen, wie den Onlinestatus, die Rasse und die Anzahl der Einheiten/Geb&auml;ude/Rohstoffe.<br><br>
@@ -362,7 +362,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,9) AND hasTech($pt,66) AND hasTech($pt,62))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -379,16 +379,16 @@ switch($_SESSION['helperid']){
     if($helper_progress==20)
     {
       $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-      mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+      mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
       $helper_progress++;
     }
   break;
   
   case 21:
-    if($ums_rasse==1)$helper_hs='Recyclotron';
-    elseif($ums_rasse==2)$helper_hs='Schrottschmelze';
-    elseif($ums_rasse==3)$helper_hs='Bau der Verwertung';
-    elseif($ums_rasse==4)$helper_hs='Extraktorwabe';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Recyclotron';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Schrottschmelze';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Bau der Verwertung';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Extraktorwabe';
   
     $helper_msg='Zur&uuml;ck zu den K&auml;mpfen, wenn Du angegriffen wirst und Schiffe verlierst, entsteht viel Raumschrott. Mit den passenen Anlagen kann dieser recycelt werden. Baue daher folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
@@ -400,17 +400,17 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,6))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
     break;
 
   case 22:
-    if($ums_rasse==1)$helper_hs='Artefaktzentrum';
-    elseif($ums_rasse==2)$helper_hs='Artefakthort';
-    elseif($ums_rasse==3)$helper_hs='Artefaktbau';
-    elseif($ums_rasse==4)$helper_hs='Artefaktstock';
+    if($_SESSION['ums_rasse']==1)$helper_hs='Artefaktzentrum';
+    elseif($_SESSION['ums_rasse']==2)$helper_hs='Artefakthort';
+    elseif($_SESSION['ums_rasse']==3)$helper_hs='Artefaktbau';
+    elseif($_SESSION['ums_rasse']==4)$helper_hs='Artefaktstock';
   
     $helper_msg='Des Weiteren gibt es viele unterschiedliche Artefakte, die Dir helfen k&ouml;nnen. Du kannst sie auf Missionen, als t&auml;glichen Allianzbonus, bei K&auml;mpfen gegen die NPC-Gegner oder im Schwarzmarkt erhalten. Bauher daher folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
@@ -422,7 +422,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,28))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -439,7 +439,7 @@ switch($_SESSION['helperid']){
       if(hasTech($pt,6) AND 1==2)
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
@@ -456,7 +456,7 @@ if($helper_dontshow==0)
   rahmen_oben('Fluxurion der Berater');
 
   echo '<div class="cell" style="width: 570px; height: 256px; font-size: 14px; position: relative;">';
-  echo '<div style="float: left;"><img src="'.$ums_gpfad.'g/berater'.$helper_picid.'.png" border="0"></div>';
+  echo '<div style="float: left;"><img src="'.$_SESSION['ums_gpfad'].'g/berater'.$helper_picid.'.png" border="0"></div>';
   echo $helper_msg;
 
   //zur�ck/weiter-buttons

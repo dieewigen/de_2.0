@@ -54,14 +54,14 @@ if (!isset($sv_comserver_roundtyp)) {
 if ($sv_comserver == 1 and $sv_comserver_roundtyp == 1) {
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET tick=tick+2500000, sm_rboost=0, restyp01=restyp01+9000000000,
 restyp02=restyp02+4500000000, restyp03=restyp03+1000000000, restyp04=restyp04+500000000, restyp05=restyp05+100000, col=col+10000 
-WHERE user_id=? AND tick<1000000", [$ums_user_id]);
+WHERE user_id=? AND tick<1000000", [$_SESSION['ums_user_id']]);
 }
 
 //logincounter zurücksetzen
-mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$ums_user_id]);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -116,13 +116,13 @@ if ($status == 0) {
     $allytag = ' ';
 }
 
-if ($ums_rasse == 1) {
+if ($_SESSION['ums_rasse'] == 1) {
     $rasse = 'Ewiger';
-} elseif ($ums_rasse == 2) {
+} elseif ($_SESSION['ums_rasse'] == 2) {
     $rasse = 'Ishtar';
-} elseif ($ums_rasse == 3) {
+} elseif ($_SESSION['ums_rasse'] == 3) {
     $rasse = 'K&#180;Tharr';
-} elseif ($ums_rasse == 4) {
+} elseif ($_SESSION['ums_rasse'] == 4) {
     $rasse = 'Z&#180;tah-ara';
 }
 
@@ -140,7 +140,7 @@ include "resline.php";
 
 //test auf com-sperre
 $akttime = date("Y-m-d H:i:s", time());
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 if ($row['com_sperre'] > $akttime) {
     $sperrtime = strtotime($row['com_sperre']);
@@ -398,12 +398,12 @@ for ($j = 0;$j <= 6;$j++) {
                 $rca = '<table width="531" border="0" cellpadding="0" cellspacing="0">';
                 $rca .= '<tr height="9" title="'.$atip.'">';
                 //linke grafik
-                $rca .= '<td width="5" style="background-image:url('.$ums_gpfad.'g/rc'.$sc1.'.gif)"></td>';
+                $rca .= '<td width="5" style="background-image:url(gp/g/rc'.$sc1.'.gif)"></td>';
                 //mittelteil
-                $rca .= '<td width="'.$sb1.'" style="background-image:url('.$ums_gpfad.'g/rc'.$sc2.'.gif); background-repeat: repeat-x;"></td>';
-                $rca .= '<td width="'.$sb2.'" style="background-image:url('.$ums_gpfad.'g/rc'.$sc3.'.gif); background-repeat: repeat-x;"></td>';
+                $rca .= '<td width="'.$sb1.'" style="background-image:url(gp/g/rc'.$sc2.'.gif); background-repeat: repeat-x;"></td>';
+                $rca .= '<td width="'.$sb2.'" style="background-image:url(gp/g/rc'.$sc3.'.gif); background-repeat: repeat-x;"></td>';
                 //rechte grafik
-                $rca .= '<td width="6" style="background-image:url('.$ums_gpfad.'g/rc'.$sc4.'.gif)"></td>';
+                $rca .= '<td width="6" style="background-image:url(gp/g/rc'.$sc4.'.gif)"></td>';
                 $rca .= '</tr>';
                 $rca .= '</table>';
             }
@@ -428,14 +428,14 @@ for ($j = 0;$j <= 6;$j++) {
 
 
             if ($sv_comserver == 1) {
-                $hs = '<div style="border: 1px solid #666666; background-image:url('.$ums_gpfad.'g/bgpic4.jpg); color: #FFFFFF; padding: 5px;">';
+                $hs = '<div style="border: 1px solid #666666; background-image:url(gp/g/bgpic4.jpg); color: #FFFFFF; padding: 5px;">';
 
                 $hs .= '<h1>Willkommen auf dem Community Server</h1>';
                 //info
-                $hs .= '<a href="optionscomserver.php?showhelp=1"><img id="comserv1" title="Community Server&Auf diesem Server bestimmen die Spieler die Regeln.<br><br>Klicke um mehr Informationen zu erhalten." src="'.$ums_gpfad.'g/symbol14.png" width="48px" height="48px"></a>';
+                $hs .= '<a href="optionscomserver.php?showhelp=1"><img id="comserv1" title="Community Server&Auf diesem Server bestimmen die Spieler die Regeln.<br><br>Klicke um mehr Informationen zu erhalten." src="gp/g/symbol14.png" width="48px" height="48px"></a>';
                 //server konfigurieren
 
-                $hs .= '<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="'.$ums_gpfad.'g/symbol15.png" width="48px" height="48px"></a>';
+                $hs .= '<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="gp/g/symbol15.png" width="48px" height="48px"></a>';
                 $hs .= '</div><br>';
 
                 echo($hs);
@@ -494,13 +494,13 @@ for ($j = 0;$j <= 6;$j++) {
        <table width="100%" border="0" cellpadding="0" cellspacing="1">
        <tr align="left">
        <td width="140" class="cell">'.$ov_lang['accountid'].'</td>
-       <td width="140" class="cell" align="center">'.$sv_server_tag.$ums_user_id.'</td>
+       <td width="140" class="cell" align="center">'.$sv_server_tag.$_SESSION['ums_user_id'].'</td>
        <td width="140" class="cell1">'.$ov_lang['rundenpunkte'].'</td>
        <td width="140" class="cell1" align="center">'.$rundenpunkte.'</td>
 	   </tr>
        <tr align="left">
        <td class="cell">'.$ov_lang['name'].'</td>
-       <td class="cell" align="center">'.$ums_spielername.'</td>
+       <td class="cell" align="center">'.$_SESSION['ums_spielername'].'</td>
 	   <td class="cell1">'.$ov_lang['allianz'].'</td>
        <td class="cell1" align="center">'.$allytag.'</td>
 	   </tr>
@@ -583,10 +583,10 @@ for ($j = 0;$j <= 6;$j++) {
             $ec[88] = 0;
             $ec[89] = 0;
             $ec[90] = 0;
-            $fid0 = $ums_user_id.'-0';
-            $fid1 = $ums_user_id.'-1';
-            $fid2 = $ums_user_id.'-2';
-            $fid3 = $ums_user_id.'-3';
+            $fid0 = $_SESSION['ums_user_id'].'-0';
+            $fid1 = $_SESSION['ums_user_id'].'-1';
+            $fid2 = $_SESSION['ums_user_id'].'-2';
+            $fid3 = $_SESSION['ums_user_id'].'-3';
             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87,e88,e89,e90 FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
             while ($row = mysqli_fetch_array($db_daten)) {
                 $ec[81] += $row['e81'];
@@ -607,7 +607,7 @@ for ($j = 0;$j <= 6;$j++) {
             $ik = 0;
             $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id");
             while ($row = mysqli_fetch_array($db_daten)) {
-                $schiffe[$ik][0] = getTechNameByRasse($row["tech_name"], $ums_rasse);
+                $schiffe[$ik][0] = getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']);
                 $schiffe[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
                 $ik++;
             }
@@ -620,7 +620,7 @@ for ($j = 0;$j <= 6;$j++) {
             $ec[103] = 0;
             $ec[104] = 0;
 
-            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
             $row = mysqli_fetch_array($db_daten);
             $ec[100] = $row['e100'];
             $ec[101] = $row['e101'];
@@ -634,7 +634,7 @@ for ($j = 0;$j <= 6;$j++) {
             $ik = 0;
             $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id");
             while ($row = mysqli_fetch_array($db_daten)) {
-                $defense[$ik][0] = getTechNameByRasse($row["tech_name"], $ums_rasse);
+                $defense[$ik][0] = getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']);
                 $defense[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
                 $ik++;
             }
@@ -803,13 +803,13 @@ for ($j = 0;$j <= 6;$j++) {
             echo('<tr align="center"><td width="50" class="cell">'.$ov_lang['stufe'].'</td><td width="510" class="cell">'.$ov_lang['aufgabe'].'</td></tr>');
 
             //alle errungenschaften auslesen
-            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$ums_user_id]);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$_SESSION['ums_user_id']]);
             $num = mysqli_num_rows($db_daten);
             //wenn es noch keinen datensatz gibt, diesen anlegen
             if ($num == 0) {
-                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_achievement (user_id) VALUES (?)", [$ums_user_id]);
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_achievement (user_id) VALUES (?)", [$_SESSION['ums_user_id']]);
                 //jetzt nochmal auslesen
-                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$ums_user_id]);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$_SESSION['ums_user_id']]);
             }
             //errungenschaften laden
             $ac_daten = mysqli_fetch_array($db_daten);
@@ -868,7 +868,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $ac_table_field = 'ac2';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards2;
-                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS anzahl FROM de_user_getcol WHERE user_id = '$ums_user_id' AND colanz>0");
+                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS anzahl FROM de_user_getcol WHERE user_id = '".$_SESSION['ums_user_id']."' AND colanz>0");
                         $rowx = mysqli_fetch_array($db_datenx);
                         $zielwert = $rowx['anzahl'];
                         $do_calc = 1;
@@ -929,7 +929,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards8;
 
-                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_artefact WHERE user_id = '$ums_user_id'");
+                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_artefact WHERE user_id = '".$_SESSION['ums_user_id']."'");
                         $rowx = mysqli_fetch_array($db_datenx);
                         $zielwert = $rowx['anzahl'];
 
@@ -944,10 +944,10 @@ for ($j = 0;$j <= 6;$j++) {
                         //die anzahl der artefakte in den basisschiffen auslesen
                         $zielwert = 0;
                         //flottendaten auslesen
-                        $fid0 = $ums_user_id.'-0';
-                        $fid1 = $ums_user_id.'-1';
-                        $fid2 = $ums_user_id.'-2';
-                        $fid3 = $ums_user_id.'-3';
+                        $fid0 = $_SESSION['ums_user_id'].'-0';
+                        $fid1 = $_SESSION['ums_user_id'].'-1';
+                        $fid2 = $_SESSION['ums_user_id'].'-2';
+                        $fid3 = $_SESSION['ums_user_id'].'-3';
                         $einheiten_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
                         while ($row = mysqli_fetch_array($einheiten_daten)) { //jeder gefundene datensatz wird geprueft
                             if ($row["artlvl1"] > 0) {
@@ -978,7 +978,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards10;
 
-                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT ((spend01+spend02*2+spend03*3+spend04*4)/10+spend05*1000) AS wert FROM de_user_data WHERE user_id = '$ums_user_id'");
+                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT ((spend01+spend02*2+spend03*3+spend04*4)/10+spend05*1000) AS wert FROM de_user_data WHERE user_id = '".$_SESSION['ums_user_id']."'");
                         $rowx = mysqli_fetch_array($db_datenx);
                         $zielwert = $rowx['wert'];
 
@@ -1119,8 +1119,8 @@ for ($j = 0;$j <= 6;$j++) {
                                 //nachricht f�r jede gutschrift hinterlegen
                                 $time = strftime("%Y%m%d%H%M%S");
                                 $news = $ov_lang['errungenschaftenbonus'].' ('.$text1.' - '.$ov_lang['stufe'].' '.$ac_akt.'): '.number_format($rewards[$i][1], 0, "", ".").' M';
-                                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, ?)", [$ums_user_id, $time, $news]);
-                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$ums_user_id]);
+                                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, ?)", [$_SESSION['ums_user_id'], $time, $news]);
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
                             }
                         }
                     }
@@ -1166,12 +1166,12 @@ for ($j = 0;$j <= 6;$j++) {
                     $rca = '<table width="500" border="0" cellpadding="0" cellspacing="0">';
                     $rca .= '<tr height="9">';
                     //linke grafik
-                    $rca .= '<td width="5" style="background-image:url('.$ums_gpfad.'g/rc'.$sc1.'.gif)"></td>';
+                    $rca .= '<td width="5" style="background-image:url(gp/g/rc'.$sc1.'.gif)"></td>';
                     //mittelteil
-                    $rca .= '<td width="'.$sb1.'" style="background-image:url('.$ums_gpfad.'g/rc'.$sc2.'.gif); background-repeat: repeat-x;"></td>';
-                    $rca .= '<td width="'.$sb2.'" style="background-image:url('.$ums_gpfad.'g/rc'.$sc3.'.gif); background-repeat: repeat-x;"></td>';
+                    $rca .= '<td width="'.$sb1.'" style="background-image:url(gp/g/rc'.$sc2.'.gif); background-repeat: repeat-x;"></td>';
+                    $rca .= '<td width="'.$sb2.'" style="background-image:url(gp/g/rc'.$sc3.'.gif); background-repeat: repeat-x;"></td>';
                     //rechte grafik
-                    $rca .= '<td width="6" style="background-image:url('.$ums_gpfad.'g/rc'.$sc4.'.gif)"></td>';
+                    $rca .= '<td width="6" style="background-image:url(gp/g/rc'.$sc4.'.gif)"></td>';
                     $rca .= '</tr>';
                     $rca .= '</table>';
 
@@ -1199,7 +1199,7 @@ for ($j = 0;$j <= 6;$j++) {
                     $rca = '-';
                 }
                 //ac_akt updaten
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_achievement SET {$ac_table_field}=? WHERE user_id=?", [$ac_akt, $ums_user_id]);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_achievement SET {$ac_table_field}=? WHERE user_id=?", [$ac_akt, $_SESSION['ums_user_id']]);
 
                 //ziele ausgeben ausgeben
                 if ($c1 == 0) {
@@ -1239,7 +1239,7 @@ for ($j = 0;$j <= 6;$j++) {
             echo($output);
 
             //belohnungen mit einem mal in der db gutschreiben
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ? WHERE user_id = ?", [$ac_belohnung, $ums_user_id]);
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ? WHERE user_id = ?", [$ac_belohnung, $_SESSION['ums_user_id']]);
             //echo ($ac_belohnung);
 
             echo('</table>');

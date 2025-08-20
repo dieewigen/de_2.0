@@ -8,7 +8,7 @@ $db_daten = mysqli_execute_query(
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01 = $row['restyp01'];
@@ -37,7 +37,7 @@ include('ally/ally.menu.inc.php');
 $allys = mysqli_execute_query(
     $GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid=?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 
 if (mysqli_num_rows($allys) < 1) {
@@ -46,7 +46,7 @@ if (mysqli_num_rows($allys) < 1) {
     $result = mysqli_execute_query(
         $GLOBALS['dbi'],
         "SELECT * FROM de_allys WHERE leaderid=?",
-        [$ums_user_id]
+        [$_SESSION['ums_user_id']]
     );
     $row = mysqli_fetch_assoc($result);
 
@@ -70,7 +70,7 @@ if (mysqli_num_rows($allys) < 1) {
         mysqli_execute_query(
             $GLOBALS['dbi'],
             "UPDATE de_user_data SET status=1 WHERE user_id=?",
-            [$ums_user_id]
+            [$_SESSION['ums_user_id']]
         );
 
         mysqli_execute_query(

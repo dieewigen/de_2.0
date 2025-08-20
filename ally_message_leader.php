@@ -7,7 +7,7 @@ $db_daten = mysqli_execute_query(
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01 = $row['restyp01'];
@@ -62,7 +62,7 @@ if ($text) {
             $GLOBALS['dbi'],
             "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) 
 			 VALUES (?, ?, 0, 0, ?, ?, ?, ?, 0)",
-            [$row['leaderid'], $ums_user_id, $allytag.' Leader', $time, $betreff, $text]
+            [$row['leaderid'], $_SESSION['ums_user_id'], $allytag.' Leader', $time, $betreff, $text]
         );
     }
 

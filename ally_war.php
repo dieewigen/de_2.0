@@ -11,7 +11,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
@@ -35,7 +35,7 @@ if($isleader || $iscoleader)
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT id FROM de_allys 
 		 WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
-		[$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+		[$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 	$allyid = $row["id"];
 }
@@ -44,7 +44,7 @@ else
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT id FROM de_allys ally, de_user_data user 
 		 WHERE ally.allytag=user.allytag AND user_id=?",
-		[$ums_user_id]);
+		[$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 	$allyid = $row["id"];
 }

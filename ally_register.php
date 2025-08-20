@@ -7,7 +7,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];$allytag=$row['allytag'];
@@ -31,7 +31,7 @@ if($allytag==''){
 	rahmen_oben($allyregister_lang['newreg']);
 ?>
 <form name="register" method="POST" action="ally_register2.php">
-<input type="hidden" name="leaderid" value="<?php echo $ums_user_id?>">
+<input type="hidden" name="leaderid" value="<?php echo $_SESSION['ums_user_id']?>">
   <table border="0" class="cell" width="574" cellspacing="0" cellpadding="0">
   	<tr>
   		<td colspan="2"><br></td>

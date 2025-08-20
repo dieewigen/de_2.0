@@ -3,7 +3,7 @@ include "../inccon.php";
 include "../inc/sv.inc.php";
 include "../inc/lang/1_statistics.lang.php";
 
-$ums_user_id=$uid;
+$_SESSION['ums_user_id']=$uid;
 
 // Stelle sicher, dass eine Datenbankverbindung vorhanden ist
 if (!isset($GLOBALS['dbi'])) {
@@ -15,7 +15,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews, status 
      FROM de_user_data 
      WHERE user_id = ?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 
 if (!$result || mysqli_num_rows($result) == 0) {
@@ -65,7 +65,7 @@ if($_REQUEST["mp"]==1)
   //daten auslesen mit prepared statement
   $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT * FROM de_user_stat WHERE user_id = ? ORDER BY datum DESC", 
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
   );
 
   //daten ausgeben

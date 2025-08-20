@@ -47,7 +47,7 @@ function fk2frachter($fk, $ship_fk){
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=11 AND user_id='$ums_user_id'");
+$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=11 AND user_id='".$_SESSION['ums_user_id']."';");
 $artbonus_duration=0;
 while($row = mysqli_fetch_array($db_daten)){
 	$artbonus_duration=$artbonus_duration+$ua_werte[$row["id"]-1][$row["level"]-1][0];
@@ -352,7 +352,7 @@ if(!hasTech($pt,29)){
 	$content.='
 	<table width="572" border="0" cellpadding="0" cellspacing="0">
 		<tr align="left" class="cell">
-			<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=29" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_29.jpg" border="0"></a></td>
+			<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=29" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_29.jpg" border="0"></a></td>
 			<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 		</tr>
 	</table>';
@@ -372,7 +372,7 @@ if(!hasTech($pt,29)){
 	}
 
 	//Missionen anzeigen
-	$content.=rahmen_oben('Missionen <img style="margin-bottom: 2px;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br>Eingesetzte Agenten sind während der Mission nicht verfügbar. Nach der Beendiung der Mission werden diese jedoch wieder zurückerstattet.">',false);
+	$content.=rahmen_oben('Missionen <img style="margin-bottom: 2px;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br>Eingesetzte Agenten sind während der Mission nicht verfügbar. Nach der Beendiung der Mission werden diese jedoch wieder zurückerstattet.">',false);
 	$content.='<div style="width: 572px;">';
 
 	///////////////////////////////////////////////////////////

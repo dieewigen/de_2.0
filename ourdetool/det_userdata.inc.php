@@ -43,7 +43,7 @@ fclose($userfile);
 if ($det_userlevel>$file_userlevel) die ('<font color="#FF0000"><b><br>Du hast nicht den n&ouml;tigen Userlevel f�r diese Seite.');
 
 //speichern der aktion
-//if ($ums_user_id>0) //post und get-variablen mitloggen
+//if ($_SESSION['ums_user_id']>0) //post und get-variablen mitloggen
 //{
 $datenstring='';
 $variableSets = array(

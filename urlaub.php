@@ -11,8 +11,8 @@ top.location.href=self.location;
 <head>
 <title><?=$urlaub_lang['title']?></title>
 <?php
-//$ums_rasse=1;
-//$ums_gpfad=$sv_image_server_list[0];
+//$_SESSION['ums_rasse']=1;
+//$_SESSION['ums_gpfad']=$sv_image_server_list[0];
 //include "cssinclude.php";
 ?>
 <link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type="text/css">

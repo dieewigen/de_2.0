@@ -4,7 +4,7 @@ include 'inc/lang/'.$sv_server_lang.'_toplist.lang.php';
 include "functions.php";
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];$restyp05=$row["restyp05"];
 $punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -296,12 +296,12 @@ function showmenu($menuid, $menupos){
 echo '<div class="cell" style="width: 600px;">';
 echo '<table border="0" cellpadding="0" cellspacing="2" width="500">';
 echo '<tr align="center">';
-echo '<td width="50%"><a href="toplist.php?s=1"><img src="'.$ums_gpfad.'g/'.$sv_server_lang.'_tl1.gif" border="0"></a></td>';
-echo '<td width="50%"><a href="toplist.php?&s=2"><img src="'.$ums_gpfad.'g/'.$sv_server_lang.'_tl2.gif" border="0"></a></td>';
+echo '<td width="50%"><a href="toplist.php?s=1"><img src="'.$_SESSION['ums_gpfad'].'g/'.$sv_server_lang.'_tl1.gif" border="0"></a></td>';
+echo '<td width="50%"><a href="toplist.php?&s=2"><img src="'.$_SESSION['ums_gpfad'].'g/'.$sv_server_lang.'_tl2.gif" border="0"></a></td>';
 echo '</tr>';
 echo '<tr align="center">';
-echo '<td><a href="toplist.php?&s=3"><img src="'.$ums_gpfad.'g/'.$sv_server_lang.'_tl3.gif" border="0"></a></td>';
-echo '<td><a href="toplist.php?&s=4"><img src="'.$ums_gpfad.'g/'.$sv_server_lang.'_tl4.gif" border="0"></a></td>';
+echo '<td><a href="toplist.php?&s=3"><img src="'.$_SESSION['ums_gpfad'].'g/'.$sv_server_lang.'_tl3.gif" border="0"></a></td>';
+echo '<td><a href="toplist.php?&s=4"><img src="'.$_SESSION['ums_gpfad'].'g/'.$sv_server_lang.'_tl4.gif" border="0"></a></td>';
 echo '</tr>';
 echo '</table>';
 echo '</div><br>';
@@ -315,7 +315,7 @@ $s = $_REQUEST["s"] ?? 1;
 if ($s==1){
 	echo '<script language="JavaScript">
 	<!--
-	var gpfad="'.$ums_gpfad.'";
+	var gpfad="'.$_SESSION['ums_gpfad'].'";
 	//-->
 	</script>';
 	

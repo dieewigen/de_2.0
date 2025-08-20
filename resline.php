@@ -92,7 +92,7 @@ if(!$flag_ang_big_iframe){
 ///////////////////////////////////////////////////////
 
 //resline-daten laden
-$db_datenresline=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$db_datenresline=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $rowresline = mysqli_fetch_array($db_datenresline);
 
 $ehscore=$rowresline["ehscore"];
@@ -245,7 +245,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	//dailyallygif
 	if($resline_dailyallygift==1){
 		echo '<div id="resdailyallygift"><a href="ally_dailygift.php" title="'.$resline_lang['dailyallygift'].'<br>'.$resline_lang['dailyallygiftdesc'].'">
-		<img src="'.$ums_gpfad.'g/symbol1.png" width="100%" height="100%"></a></div>';
+		<img src="'.$_SESSION['ums_gpfad'].'g/symbol1.png" width="100%" height="100%"></a></div>';
 	}
 	echo '</div>';
 

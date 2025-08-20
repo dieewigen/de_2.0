@@ -16,7 +16,7 @@ include_once('functions.php');
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data WHERE user_id = ?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 $row = $db_daten->fetch_assoc();
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
@@ -37,7 +37,7 @@ include('lib/basefunctions.lib.php');
 //Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
 $allys = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
-    [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+    [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]
 );
 
 if($allys->num_rows < 1)
@@ -49,7 +49,7 @@ else
 	//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
 	$result = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT id, allytag FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
-        [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]
+        [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]
     );
     $row = $result->fetch_assoc();
     $clanid = $row['id'];

@@ -26,8 +26,8 @@ if(!isset($_COOKIE["loginhelp"])){
 }
 
 $fehlermsg='';
-$ums_gpfad='';
-$ums_rasse=1;
+$_SESSION['ums_gpfad']='';
+$_SESSION['ums_rasse']=1;
 
 $gamename='Die Ewigen';
 
@@ -126,7 +126,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		//logincheck, wie oft wurde bereits die grafikaufgabe falsch eingegeben
 		$summe_fehleingaben = $row["points"]+1;
 		//spielerdaten aus der de_login uns sv.inc.php in die session packen
-		$ums_user_id=$row["user_id"];
+		$_SESSION['ums_user_id']=$row["user_id"];
 		$_SESSION['ums_user_id']=$row["user_id"];
 		$ums_nic=$row["nic"];
 		$ums_servid=$sv_servid;
@@ -135,15 +135,15 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		//$ums_one_way_bot_protection=0;
 
 		//spielerdaten aus de_user_data holen und in die session packen
-		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]) OR die(mysqli_error($GLOBALS['dbi']));
 		$row = mysqli_fetch_array($result);
 
 		$techs=$row["techs"];
 		//$_SESSION["ums_chatoff"]=$row["chatoff"];
 		$_SESSION["ums_chatoff"]=0;
 		//$_SESSION["ums_chatoffallg"]=$row["chatoffallg"];
-		$ums_spielername=$row["spielername"];
-		$ums_rasse=$row["rasse"];
+		$_SESSION['ums_spielername']=$row["spielername"];
+		$_SESSION['ums_rasse']=$row["rasse"];
 		$ums_premium=$row["premium"];
 		
 		if(isset($_REQUEST['mobi'])){
@@ -178,14 +178,14 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		//////////////////////////////////////////////////////////////////////
 		//spielerdaten aus de_user_info holen und in die session packen
 		//////////////////////////////////////////////////////////////////////
-		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT submit, gpfad FROM de_user_info WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT submit, gpfad FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]) OR die(mysqli_error($GLOBALS['dbi']));
 		$row = mysqli_fetch_array($result);
 		$ums_submit=$row["submit"];
-		$ums_gpfad=$row["gpfad"];
-		if(($ums_gpfad=='')||($_REQUEST['grapa']=="off"))$ums_gpfad=$sv_image_server;
+		$_SESSION['ums_gpfad']=$row["gpfad"];
+		if(($_SESSION['ums_gpfad']=='')||($_REQUEST['grapa']=="off"))$_SESSION['ums_gpfad']=$sv_image_server;
 
 		//vote
-		$schonabgestimmt=mysqli_execute_query($GLOBALS['dbi'], "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?", [$ums_user_id]) OR die(mysqli_error($GLOBALS['dbi']));
+		$schonabgestimmt=mysqli_execute_query($GLOBALS['dbi'], "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?", [$_SESSION['ums_user_id']]) OR die(mysqli_error($GLOBALS['dbi']));
 		$i=0;
 		$gevotetevotes = array();
 		while($rew = mysqli_fetch_array($schonabgestimmt))
@@ -196,7 +196,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		$i=0;
 		$votevorhanden=0;
 
-		$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_vote_umfragen.id, de_vote_umfragen.frage,de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id", [$ums_user_id]);
+		$db_umfrage=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_vote_umfragen.id, de_vote_umfragen.frage,de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id", [$_SESSION['ums_user_id']]);
 		while($row = mysqli_fetch_array($db_umfrage)){
 			$i=0;
 			while($i<=count($gevotetevotes)+1){
@@ -218,18 +218,18 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		}
 
 		//die ganzen sessionvariablen definieren
-		$_SESSION['ums_user_id']=$ums_user_id;
+		$_SESSION['ums_user_id']=$_SESSION['ums_user_id'];
 		$_SESSION['ums_nic']=$ums_nic;
-		$_SESSION['ums_spielername']=$ums_spielername;
+		$_SESSION['ums_spielername']=$_SESSION['ums_spielername'];
 		$_SESSION['ums_user_ip'] = $_SERVER['REMOTE_ADDR'];
 
 		$_SESSION['ums_servid']=$ums_servid;
 		$_SESSION['ums_zeitstempel']=$ums_zeitstempel;
 		$_SESSION['ums_session_start']=$ums_session_start;
-		$_SESSION['ums_rasse']=$ums_rasse;
+		$_SESSION['ums_rasse']=$_SESSION['ums_rasse'];
 
 		$_SESSION['ums_submit']=$ums_submit;
-		$_SESSION['ums_gpfad']=$ums_gpfad;
+		$_SESSION['ums_gpfad']=$_SESSION['ums_gpfad'];
 		$_SESSION['ums_vote']=$ums_vote;
 		$_SESSION['ums_premium']=$ums_premium;
 		//$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;
@@ -252,12 +252,12 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 
 		if($num==1 AND $_REQUEST["loginkey"]=='')//er hat das alternative pw benutzt
 		{
-		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET pass=newpass WHERE user_id=?", [$ums_user_id]);
-		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET newpass='' WHERE user_id=?", [$ums_user_id]);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET pass=newpass WHERE user_id=?", [$_SESSION['ums_user_id']]);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET newpass='' WHERE user_id=?", [$_SESSION['ums_user_id']]);
 		}
 
 		//testen ob er �ber den loginkey reingekommen ist
-		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND loginkey=?", [$ums_user_id, $_REQUEST['loginkey']]) OR die(mysqli_error($GLOBALS['dbi']));
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_login WHERE user_id=? AND loginkey=?", [$_SESSION['ums_user_id'], $_REQUEST['loginkey']]) OR die(mysqli_error($GLOBALS['dbi']));
 		$num = mysqli_num_rows($result);
 
 		if($num==1 AND $_REQUEST['loginkey']!='')//er hat den loginkey benutzt
@@ -276,7 +276,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		  }        
 
 		  //if (($_SESSION['ums_session_start']+$sv_session_lifetime)<time())$_SESSION['ums_one_way_bot_protection']=1;
-		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET loginkey='', loginkeytime=0, loginkeyip='' WHERE user_id=?", [$ums_user_id]);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET loginkey='', loginkeytime=0, loginkeyip='' WHERE user_id=?", [$_SESSION['ums_user_id']]);
 		}
 
 		//$ergebnis = $_SESSION['loginzahl'];
@@ -288,13 +288,13 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		//loginzeit und ip aktualisieren
 		//ip loggen
 		$ip=getenv("REMOTE_ADDR");
-		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=NOW(), last_ip=?, logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id=?", [$ip, $ums_user_id]);
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=NOW(), last_ip=?, logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id=?", [$ip, $_SESSION['ums_user_id']]);
 		$loginhelpstr=$_COOKIE["loginhelp"];
 			
 		$ip_adresse=$_SERVER['REMOTE_ADDR'];
 		$parts=explode(".",$ip_adresse);
 		$ip_adresse=$parts[0].'.x.'.$parts[2].'.'.$parts[3];
-		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp) VALUES(?,?,NOW(), ?, ?)", [$ums_user_id, $ip_adresse, $_SERVER['HTTP_USER_AGENT'], $loginhelpstr]);
+		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp) VALUES(?,?,NOW(), ?, ?)", [$_SESSION['ums_user_id'], $ip_adresse, $_SERVER['HTTP_USER_AGENT'], $loginhelpstr]);
 
 		//Logout anzeige für den title
 		$sekundenbiszumlogout=($_SESSION['ums_session_start']+$sv_session_lifetime)-time();
@@ -419,7 +419,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		}
 		else
 		{
-		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = points + 1 WHERE user_id=?", [$ums_user_id]);
+		  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = points + 1 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
 		  //zahl wurde falsch eingegeben, session wieder killen und neu anlegen
 		  session_destroy();
@@ -429,11 +429,11 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 		  {
 			$fehlermsg=$index_lang[falschesergebnisgesperrt];
 			$time=strftime("%Y-%m-%d %H:%M:%S");
-			$comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$ums_user_id]);
+			$comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]);
 			$rowz = mysqli_fetch_array($comment);
 			$eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht �ber das Login-Script! \n$time";
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $ums_user_id]);
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2 WHERE user_id=?", [$ums_user_id]);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $_SESSION['ums_user_id']]);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=2 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 		  }
 		  else $fehlermsg=$index_lang[falschezahl];
 		}*/
@@ -465,10 +465,10 @@ top.location.href=self.location;
 </script>
 <title><?php echo $gamename?> - <?php echo $index_lang['login']?></title>
 <?php
-$save_ums_rasse=$ums_rasse;
-$save_ums_gpfad=$ums_gpfad;
-$ums_rasse=1;
-$ums_gpfad=$sv_image_server;
+$save_ums_rasse=$_SESSION['ums_rasse'];
+$save_ums_gpfad=$_SESSION['ums_gpfad'];
+$_SESSION['ums_rasse']=1;
+$_SESSION['ums_gpfad']=$sv_image_server;
 //include "cssinclude.php";
 echo '<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -477,8 +477,8 @@ echo '<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type=
 -->
 </style>';
 
-$ums_rasse=$save_ums_rasse;
-$ums_gpfad=$save_ums_gpfad;
+$_SESSION['ums_rasse']=$save_ums_rasse;
+$_SESSION['ums_gpfad']=$save_ums_gpfad;
 echo '<script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
 ?>
 <meta http-equiv="expires" content="0">

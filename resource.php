@@ -134,7 +134,7 @@ $keye = $hv[3];
 
 //anzahl der kollektoren, die im bau sind ermitteln
 $anzahl = 0;
-$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80", [$ums_user_id]);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80", [$_SESSION['ums_user_id']]);
 while ($row2 = mysqli_fetch_assoc($result)) { //jeder gefundene datensatz wird geprueft
     $anzahl = $anzahl + $row2["anzahl"];
 }
@@ -175,7 +175,7 @@ if ($num == 1) {
 //Tausch durchführen
 if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) && hasTech($pt, 4) && $ally_has_notfallkonverter) {
     //transaktionsbeginn
-    if (setLock($ums_user_id)) {
+    if (setLock($_SESSION['ums_user_id'])) {
         //zielrohstoff auslesen
         $res_target = intval($_REQUEST['rh_v1']);
         if ($res_target < 1 || $res_target > 4) {
@@ -194,7 +194,7 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
         //test ob quelle und ziel unterschiedlich sind
         if ($res_target != $res_source) {
             //aktuellen rohstoffstand auslesen
-            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
             $row = mysqli_fetch_assoc($db_daten);
             $hasres[1] = $row['restyp01'];
             $hasres[2] = $row['restyp02'];
@@ -243,11 +243,11 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET 
 					restyp0$res_source=restyp0$res_source-?, 
 					restyp0$res_target=restyp0$res_target+?,  
-					spend0$res_source=spend0$res_source+? WHERE user_id=?", [$res_cost, $res_get, $steueranteil_sektor, $ums_user_id]);
+					spend0$res_source=spend0$res_source+? WHERE user_id=?", [$res_cost, $res_get, $steueranteil_sektor, $_SESSION['ums_user_id']]);
 
 
                     //aktuellen rohstoffwert für die resline auslesen
-                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
                     $row = mysqli_fetch_assoc($db_daten);
                     $restyp01 = $row['restyp01'];
                     $restyp02 = $row['restyp02'];
@@ -263,7 +263,7 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
         }
 
         //transaktionsende
-        $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -344,7 +344,7 @@ if (!empty($e_t1) || !empty($e_t2) || !empty($e_t3) || !empty($e_t4)) {
                 $keyd = $e_t2;
                 $keyi = $e_t3;
                 $keye = $e_t4;
-                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET ekey = ? WHERE user_id = ?", [$newkey, $ums_user_id]);
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET ekey = ? WHERE user_id = ?", [$newkey, $_SESSION['ums_user_id']]);
                 //keys aktualisieren
                 $hv = explode(";", $newkey);
                 $keym = $hv[0];
@@ -483,7 +483,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
     $ttr = intval($_POST["ttr"]);
 
     //transaktionsbeginn
-    if (setLock($ums_user_id)) {
+    if (setLock($_SESSION['ums_user_id'])) {
 
         if (validDigit($mtr) && validDigit($dtr) && validDigit($itr) && validDigit($etr) && validDigit($ttr)) {//alle werte sind ok
             //hat man auch soviele rohstoffe?
@@ -510,7 +510,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 				restyp03 = restyp03 - ?, restyp04 = restyp04 - ?, restyp05 = restyp05 - ?,
 				spend01 = spend01 + ?, spend02 = spend02 + ?, spend03 = spend03 + ?,
 				spend04 = spend04 + ?, spend05 = spend05 + ? WHERE user_id = ?", 
-                [$mtr, $dtr, $itr, $etr, $ttr, $mtr, $dtr, $itr, $etr, $ttr, $ums_user_id]);
+                [$mtr, $dtr, $itr, $etr, $ttr, $mtr, $dtr, $itr, $etr, $ttr, $_SESSION['ums_user_id']]);
 
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, restyp03 = restyp03 + ?, restyp04 = restyp04 + ?, restyp05 = restyp05 + ? WHERE sec_id = ?", 
                 [$mtr, $dtr, $itr, $etr, $ttr, $sector]);
@@ -529,7 +529,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
                         $row_uid = mysqli_fetch_assoc($db_daten);
                         $uid = $row_uid['user_id'];
                         $time = date("YmdHis");
-                        $nachricht = $resource_lang['sekeinzahlung'].$ums_spielername.': '.number_format($mtr, 0, "", ".").' M -- '.number_format($dtr, 0, "", ".").' D -- '.number_format($itr, 0, "", ".").' I -- '.number_format($etr, 0, "", ".").' E -- '.number_format($ttr, 0, "", ".").' T';
+                        $nachricht = $resource_lang['sekeinzahlung'].$_SESSION['ums_spielername'].': '.number_format($mtr, 0, "", ".").' M -- '.number_format($dtr, 0, "", ".").' D -- '.number_format($itr, 0, "", ".").' I -- '.number_format($etr, 0, "", ".").' E -- '.number_format($ttr, 0, "", ".").' T';
                         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 7, ?, ?)", [$uid, $time, $nachricht]);
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
                     }
@@ -539,11 +539,11 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
             }
         }
         //transaktionsende
-        $erg = releaseLock($ums_user_id); //L&ouml;sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            print($resource_lang['releaselock'].$ums_user_id.$resource_lang['releaselock2']."<br><br><br>");
+            print($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']."<br><br><br>");
         }
     }// if setlock-ende
     else {
@@ -560,15 +560,15 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 if (isset($_POST["b_col"])) {
     $b_col = intval($_POST["b_col"]);
     //transaktionsbeginn
-    if (setLock($ums_user_id)) {
+    if (setLock($_SESSION['ums_user_id'])) {
         //nochmal vorher die rohstoffe auslesen
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_assoc($db_daten);
         $restyp01 = $row['restyp01'];
         $restyp02 = $row['restyp02'];
         $restyp03 = $row['restyp03'];
         $restyp04 = $row['restyp04'];
-        $restyp05 = $row[4];
+        $restyp05 = $row['restyp05'];
         $gr01 = $restyp01;
         $gr02 = $restyp02;
         $gr03 = $restyp03;
@@ -602,13 +602,13 @@ if (isset($_POST["b_col"])) {
                     $restyp04 = $gr04;
                 } else {
                     //gibt $z kollektoren in auftrag
-                    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$ums_user_id]);
+                    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$_SESSION['ums_user_id']]);
                     $row = mysqli_fetch_assoc($result);
                     if ($z > 0) {
                         if ($row['anzahl'] == 0) { //es gibt keine kollektoren mit 4 ticks laenge in der queue
-                            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 80, ?, 4)", [$ums_user_id, $z]);
+                            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 80, ?, 4)", [$_SESSION['ums_user_id'], $z]);
                         } else {
-                            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_build SET anzahl = anzahl + ? WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$z, $ums_user_id]);
+                            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_build SET anzahl = anzahl + ? WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$z, $_SESSION['ums_user_id']]);
                         }
                         //test auf allyaufgabe
                         if ($ownally != '') {
@@ -622,23 +622,23 @@ if (isset($_POST["b_col"])) {
                         }
                     }
                     //anzahl der gebauen kollektoren mitloggen
-                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col_build = col_build + ? WHERE user_id = ?", [$z, $ums_user_id]);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col_build = col_build + ? WHERE user_id = ?", [$z, $_SESSION['ums_user_id']]);
 
                     //aktualisiert die rohstoffe
                     $gr01 = $gr01 - $restyp01;
                     $gr02 = $gr02 - $restyp02;
-                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 - ?, restyp02 = restyp02 - ? WHERE user_id = ?", [$gr01, $gr02, $ums_user_id]);
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 - ?, restyp02 = restyp02 - ? WHERE user_id = ?", [$gr01, $gr02, $_SESSION['ums_user_id']]);
                     $anzahl = $anzahl + $z;
                     //echo "Sonnenkollektoren in Auftrag gegeben: ".$z."<br>";
                 }
             }
         }
         //transaktionsende
-        $erg = releaseLock($ums_user_id); //L&ouml;sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            print($resource_lang['releaselock'].$ums_user_id.$resource_lang['releaselock2']."<br><br><br>");
+            print($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']."<br><br><br>");
         }
     }// if setlock-ende
     else {
@@ -662,7 +662,7 @@ if (isset($trademsg) && !empty($trademsg)) {
 
 //k�nnen Kollektoren gebaut werden?
 if (!hasTech($pt, 7)) {
-    $techcheck = "SELECT tech_name FROM de_tech_data".$ums_rasse." WHERE tech_id=7";
+    $techcheck = "SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=7";
     $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
     $row_techcheck = mysqli_fetch_assoc($db_tech);
 
@@ -670,7 +670,7 @@ if (!hasTech($pt, 7)) {
     rahmen_oben($resource_lang['fehlendesgebaeude']);
     echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=7" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_7.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=7" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_7.jpg" border="0"></a></td>
 	<td valign="top">'.$resource_lang['gebaeudeinfo'].': '.$row_techcheck['tech_name'].'</td>
 	</tr>';
     echo '</table>';
@@ -696,7 +696,7 @@ if (!hasTech($pt, 7)) {
 <?php
       $bg = 'cell';
     echo '<tr valign="middle" align="center" height="20">';
-    echo '<td rowspan="3" class="cell"><img src="'.$ums_gpfad.'g/kollie.gif" border="0" alt="'.$resource_lang['kolli'].'"></td>';
+    echo '<td rowspan="3" class="cell"><img src="'.$_SESSION['ums_gpfad'].'g/kollie.gif" border="0" alt="'.$resource_lang['kolli'].'"></td>';
     echo '<td class="'.$bg.'"><b>'.$resource_lang['vorhandenekollis'].'</b>:</td>';
     echo '<td class="'.$bg.'"><b>'.number_format($col, 0, "", ".").' ('.number_format($anzahl, 0, "", ".").$resource_lang['imbau'].')</b></td>';
     echo '</tr>';
@@ -762,7 +762,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($ea, 0, "", ".").' ('.number_format($col, 0, "", ".").' '.$resource_lang['kollis'].')</td>';
 echo '</tr>';
 
@@ -775,7 +775,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe2'].'"> + '.$resource_lang['sekartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe2'].'"> + '.$resource_lang['sekartibonus'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($sartefaktenergie, 0, "", ".").' ('.number_format($sartefakt, 2, ",", ".").' %)</td>';
 echo '</tr>';
 
@@ -788,7 +788,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($kartefaktenergie, 0, "", ".").' ('.$resource_lang['kriegsartefakte'].': '.$kartefakt.')</td>';
 echo '</tr>';
 
@@ -796,7 +796,7 @@ echo '</tr>';
 /*
 $bg='cell1';
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe3'].'"> + '.$resource_lang[eftaartibonus].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe3'].'"> + '.$resource_lang[eftaartibonus].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($eartefaktenergie, 0,"",".").' ('.$resource_lang[eftaartefakte].': '.$eartefakt.')</td>';
 echo '</tr>';
   */
@@ -804,8 +804,8 @@ echo '</tr>';
 /*
   $bg='cell';
   echo '<tr valign="middle" align="center" height="25">';
-  echo '<td class="'.$bg.'">+ Ablyon DEvolution Rassenbonus <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="Die Rohstoffe berechnen sich nach dem Rundenalter (Wirtschaftsicks) und der Sektorherrschaft der eigenen Rasse auf dem Ablyon DEvolution-Server."></td>';
-  echo '<td class="'.$bg.'" colspan=4>'.number_format($adebonus, 0,"",".").' (Herrschaft: '.number_format($prozente[$ums_rasse-1], 2,",",".").'%)</td>';
+  echo '<td class="'.$bg.'">+ Ablyon DEvolution Rassenbonus <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Die Rohstoffe berechnen sich nach dem Rundenalter (Wirtschaftsicks) und der Sektorherrschaft der eigenen Rasse auf dem Ablyon DEvolution-Server."></td>';
+  echo '<td class="'.$bg.'" colspan=4>'.number_format($adebonus, 0,"",".").' (Herrschaft: '.number_format($prozente[$_SESSION['ums_rasse']-1], 2,",",".").'%)</td>';
   echo '</tr>';
  */
 
@@ -871,7 +871,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe7'].'"> '.$resource_lang['energieschluessel'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe7'].'"> '.$resource_lang['energieschluessel'].'</td>';
 echo '<td class="'.$bg.'">'.$st[0].'</td>';
 echo '<td class="'.$bg.'">'.$st[1].'</td>';
 echo '<td class="'.$bg.'">'.$st[2].'</td>';
@@ -895,7 +895,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieveteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt."> '.$resource_lang['energieinput'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieveteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt."> '.$resource_lang['energieinput'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($em, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ed, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ei, 0, "", ".")."</td>";
@@ -911,7 +911,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe8'].'"> '.$resource_lang['umwandlungsverh'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe8'].'"> '.$resource_lang['umwandlungsverh'].'</td>';
 echo '<td class="'.$bg.'">'.$emvm.':1</td>';
 echo '<td class="'.$bg.'">'.$emvd.':1</td>';
 echo '<td class="'.$bg.'">'.$emvi.':1</td>';
@@ -927,7 +927,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde."> '.$resource_lang['materieoutput'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde."> '.$resource_lang['materieoutput'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($rm, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($rd, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ri, 0, "", ".")."</td>";
@@ -947,7 +947,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" 
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" 
 		border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe9'].'<br><br>Aus dem aktiven Dienst entlassene Geheimagenten ('.
       number_format($agent_lost, 0, "", ".").') werden als Zollkontrolleure eingesetzt und sorgen f&uuml;r ein zus&auml;tzliches Einkommen.<br>
 		Grundwert: '.
@@ -987,7 +987,7 @@ $resges[3] += $zolle;
 /*
   if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
   echo '<tr valign="middle" align="center" height="25">';
-  echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="Handel&Einkommen aus Handelsrouten"> + Handel</td>';
+  echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Handel&Einkommen aus Handelsrouten"> + Handel</td>';
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[0], 0,"",".")."</td>";
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[1], 0,"",".")."</td>";
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[2], 0,"",".")."</td>";
@@ -1008,7 +1008,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe10'].'"> '.$resource_lang['plussekartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe10'].'"> '.$resource_lang['plussekartibonus'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($sa_grund[0], 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($sa_grund[1], 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($sa_grund[2], 0, "", ".")."</td>";
@@ -1055,7 +1055,7 @@ echo '</tr>';
 // rohstoffhandel - eingabemöglichkeit
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-rahmen_oben('Allianz-Notfallrohstoffkonverter <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" 
+rahmen_oben('Allianz-Notfallrohstoffkonverter <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
 title="Hier k&ouml;nnen Rohstoffe umgewandelt werden.&Verlustleistung: '.($handelssteuersatz).'%'.'">');
 
 echo '<div class="cell" style="width: 560px; text-align: center;">';
@@ -1126,7 +1126,7 @@ if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlu
 	<td width="20px">&nbsp;</td>
 	<td align="center">'.$resource_lang['uebersichtseklager'].'</td>
 	<td width="20px"><img style="vertical-align: middle;" src="'.
-        $ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$resource_lang['sektorkosten'].'&'.$btipstr.'"></td>
+        $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['sektorkosten'].'&'.$btipstr.'"></td>
 	</tr></table>
 	
 	</td>';

@@ -9,7 +9,7 @@ include "issectork.php";
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id=?", 
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];
 $restyp05=$row["restyp05"];$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];
@@ -411,7 +411,7 @@ $prodanz=$_POST['prodanz'] ?? 0;
 if ($prod)//ja, es wurde ein button gedrueckt
 {
   //transaktionsbeginn
-  if (setLock($ums_user_id))
+  if (setLock($_SESSION['ums_user_id']))
   {
     $prodanz=(int)$prodanz;
     if($techs[122]==1 AND $prodanz>=1)
@@ -475,14 +475,14 @@ if ($prod)//ja, es wurde ein button gedrueckt
     }
 
     //transaktionsende
-    $erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+    $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
     if ($erg)
     {
         //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
     }
     else
     {
-        print("Datensatz Nr. ".$ums_user_id." konnte nicht entsperrt werden!<br><br><br>");
+        print("Datensatz Nr. ".$_SESSION['ums_user_id']." konnte nicht entsperrt werden!<br><br><br>");
     }
   }// if setlock-ende
   else echo '<br><font color="#FF0000">'.$bkmenu_lang['transactionactive'].'</font><br><br>';
@@ -860,7 +860,7 @@ echo '</table>';
 rahmen_unten();
 
 
-echo '<input type="image" src="'.$ums_gpfad.'g/e.gif" style="width:0; height=0; border:0px;">';
+echo '<input type="image" src="'.$_SESSION['ums_gpfad'].'g/e.gif" style="width:0; height=0; border:0px;">';
 echo '</form>';
 echo '<form action="bkmenu.php" method="post">';
 

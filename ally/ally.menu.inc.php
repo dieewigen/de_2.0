@@ -14,11 +14,11 @@ $leader_pages = [
 
 $leaderpage = in_array($script_name, $leader_pages);
 
-$allys=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys where leaderid=?", [$ums_user_id]);
+$allys=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys where leaderid=?", [$_SESSION['ums_user_id']]);
 
 // Analog zum Feststellen der Leaderbefugnis wird auch für die beiden Coleader eine Abfrage
 // durchgeführt.
-$coleader=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys where coleaderid1=? OR coleaderid2=? OR coleaderid3=?", [$ums_user_id, $ums_user_id, $ums_user_id]);
+$coleader=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys where coleaderid1=? OR coleaderid2=? OR coleaderid3=?", [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 // wird an dieser Stelle ein Resultset mit einem Datensatz zur�ckgegeben, ist der eingeloggte User
 // ein Co-Leader der Allianz
 // ------------------------ �nderung Ende ---------------------------------------
@@ -36,7 +36,7 @@ elseif (mysqli_num_rows($coleader)>=1){
 	$iscoleader = true;  //Hinzugef�gt von Ascendant (01.09.2002)
 	$ismember = false;
 }else{
-	$hatereineally = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(*) as cnt FROM de_user_data WHERE user_id=? and status=1", [$ums_user_id]);
+	$hatereineally = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(*) as cnt FROM de_user_data WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($hatereineally);
 	if($row['cnt']==0){
 		print_NOBODY_ally_bar();
@@ -78,7 +78,7 @@ function has_position($position, $allytag, $userid){
 
 function print_LEADER_ally_bar()
 {
-	global $ums_gpfad, $ums_rasse, $allymenu_lang;
+	global $allymenu_lang;
 	print("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"cell\">
 				<tr align=\"center\">
 					<td><a href=\"allymain.php\" class=\"btn\">".$allymenu_lang['allgemein']."</a></td>
@@ -113,7 +113,7 @@ function print_LEADER_ally_bar()
 // Ausgabe des Allianzenmen�s f�r Co-Leader
 function print_COLEADER_ally_bar()
 {
-	global $ums_gpfad, $ums_rasse, $allymenu_lang;
+	global $allymenu_lang;
 	print("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"cell\">
 				<tr align=\"center\">
 					<td><a href=\"allymain.php\" class=\"btn\">".$allymenu_lang['allgemein']."</a></td>
@@ -145,7 +145,7 @@ function print_COLEADER_ally_bar()
 
 function print_MEMBER_ally_bar()
 {
-	global $ums_gpfad, $ums_rasse, $allymenu_lang;
+	global $allymenu_lang;
 	print("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"cell\">
 				<tr align=\"center\">
 					<td><a href=\"allymain.php\" class=\"btn\">".$allymenu_lang['allgemein']."</a></td>
@@ -169,7 +169,7 @@ function print_MEMBER_ally_bar()
 }
 
 function print_NOBODY_ally_bar(){
-	global $db, $ums_gpfad, $ums_rasse, $allymenu_lang, $ums_user_id, $ums_spielername;
+	global $allymenu_lang;
 	print("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"cell\">
 				<tr align=\"center\">
 				<td><a href=\"ally_register.php\" class=\"btn\">".$allymenu_lang['gruenden']."</a></td>
@@ -178,7 +178,7 @@ function print_NOBODY_ally_bar(){
 			</table>");
 	
 	//�berpr�fen ob evtl. ein allianzantrag vorliegt und diesen anzeigen/stornieren
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_ally_antrag WHERE user_id=?", [$ums_user_id]);
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_ally_antrag WHERE user_id=?", [$_SESSION['ums_user_id']]);
 	$num = mysqli_num_rows($db_daten);
 	if ($num>0)//man hat sich beworben
 	{
@@ -201,24 +201,24 @@ function print_NOBODY_ally_bar(){
 				$coleaderid2=$row['coleaderid2'];
 				$coleaderid3=$row['coleaderid3'];
 			
-				notifyUser($leaderid, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$ums_spielername, "6");
-				if($coleaderid1>0)notifyUser($coleaderid1, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$ums_spielername, "6");
-				if($coleaderid2>0)notifyUser($coleaderid2, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$ums_spielername, "6");
-				if($coleaderid3>0)notifyUser($coleaderid3, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$ums_spielername, "6");
+				notifyUser($leaderid, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
+				if($coleaderid1>0)notifyUser($coleaderid1, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
+				if($coleaderid2>0)notifyUser($coleaderid2, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
+				if($coleaderid3>0)notifyUser($coleaderid3, 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
 			}
 			
 			//tronic gutschreiben
-			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'", [$ums_user_id]);
+			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'", [$_SESSION['ums_user_id']]);
 			$row = mysqli_fetch_array($db_daten);
 			$tronic=$row['amount'];
 			$transactionid=$row['id'];
 			
-			if($tronic>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $ums_user_id]);
+			if($tronic>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $_SESSION['ums_user_id']]);
 			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_transactions WHERE id = ?", [$transactionid]);
 			
 			//bewerbung aus der db l�schen
-			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET allytag='', status=0 WHERE user_id = ?", [$ums_user_id]);
-			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_ally_antrag WHERE user_id = ?", [$ums_user_id]);
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET allytag='', status=0 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
+			mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_ally_antrag WHERE user_id = ?", [$_SESSION['ums_user_id']]);
 			
 			//info anzeigen
 			echo '<div class="info_box text1">Die Bewerbung wurde zur&uuml;ckgezogen.';
@@ -243,17 +243,17 @@ function print_NOBODY_ally_bar(){
 			else //allianz existiert nicht mehr
 			{
 				//tronic gutschreiben
-				$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'", [$ums_user_id]);
+				$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'", [$_SESSION['ums_user_id']]);
 				$row = mysqli_fetch_array($db_daten);
 				$tronic=$row['amount'];
 				$transactionid=$row['id'];
 				
-				if($tronic>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $ums_user_id]);
+				if($tronic>0)mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $_SESSION['ums_user_id']]);
 				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_transactions WHERE id = ?", [$transactionid]);
 				
 				//bewerbung aus der db l�schen
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET allytag='', status=0 WHERE user_id = ?", [$ums_user_id]);
-				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_ally_antrag WHERE user_id = ?", [$ums_user_id]);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET allytag='', status=0 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
+				mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_ally_antrag WHERE user_id = ?", [$_SESSION['ums_user_id']]);
 			}
 		}
 	

@@ -10,11 +10,11 @@ $action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
 // User-Daten holen
 $sql = "SELECT submit FROM de_user_info WHERE user_id=?";
-$db_daten_vote = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten_vote = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row_vote = mysqli_fetch_assoc($db_daten_vote);
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, tick FROM de_user_data WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 
 $restyp01 = $row["restyp01"];
@@ -32,7 +32,7 @@ $system = $row['system'];
 // Newtrans zurücksetzen
 if ($newtrans == 1) {
     $sql = "UPDATE de_user_data SET newtrans = 0 WHERE user_id=?";
-    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 }
 $newtrans = 0;
 
@@ -54,7 +54,7 @@ $newtrans = 0;
 if (!empty($subform)) {
 
     $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=? AND vote_id=?";
-    $db_check = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $id]);
+    $db_check = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id]);
     
     $sql = "SELECT id, status FROM de_vote_umfragen WHERE id=?";
     $vote_aktiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
@@ -65,7 +65,7 @@ if (!empty($subform)) {
         if ($vote != "0" && $vote != "") {
             echo '<h2>'.$vote_lang['msg_3'].'</h2>';
             $sql = "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)";
-            mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id, $id, $vote]);
+            mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id, $vote]);
             $_SESSION['ums_vote'] = 0;
         } else {
             echo $vote_lang['msg_4'];
@@ -88,7 +88,7 @@ if ($action == "" || $action == "uebersicht") {
 
 <?php
     $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?";
-    $schonabgestimmt = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    $schonabgestimmt = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
     $gevotetevotes = [];
     while ($rew = mysqli_fetch_assoc($schonabgestimmt)) {
         $gevotetevotes[] = $rew['vote_id'];
@@ -96,7 +96,7 @@ if ($action == "" || $action == "uebersicht") {
 
     $votevorhanden = 0;
     $sql = "SELECT de_vote_umfragen.id, de_vote_umfragen.frage, de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id";
-    $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+    $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 
     while ($row = mysqli_fetch_assoc($db_umfrage)) {
         if (!in_array($row['id'], $gevotetevotes)) {
@@ -186,7 +186,7 @@ elseif ($action == "show") {
             $prozente = ($stimmen[0] > 0) ? number_format(($anzahl * 100) / $stimmen[0], 2, ",", ".") : '0,00';
             echo '<tr class="cell">
     <td height="25">&nbsp;'.utf8_encode_fix($antworten[$i]).'</td>
-    <td>&nbsp;<img src="'.$ums_gpfad.'g/vote/l'.$farbe.'.gif" border="0"><img src="'.$ums_gpfad.'g/vote/m'.$farbe.'.gif" border="0" width="'.$prozente.'" height="9"><img src="'.$ums_gpfad.'g/vote/r'.$farbe.'.gif"></td>
+    <td>&nbsp;<img src="'.$_SESSION['ums_gpfad'].'g/vote/l'.$farbe.'.gif" border="0"><img src="'.$_SESSION['ums_gpfad'].'g/vote/m'.$farbe.'.gif" border="0" width="'.$prozente.'" height="9"><img src="'.$_SESSION['ums_gpfad'].'g/vote/r'.$farbe.'.gif"></td>
     <td width="40" nowrap>&nbsp;'.$anzahl.'</td>
     <td width="50" nowrap>&nbsp;'.$prozente.'%</td></tr>';
 
@@ -208,7 +208,7 @@ elseif ($action == "show") {
     } else {
         echo "<h1>".$vote_lang['msg_7']."</h1>";
         @$time = strftime("%Y-%m-%d %H:%M:%S");
-        @$para = "Master Guardian, Spieler $ums_spielername ($asec:$asys)[UserID:$ums_user_id] hat am $zeit versucht, alte Umfragen aufzurufen.";
+        @$para = "Master Guardian, Spieler $_SESSION['ums_spielername'] ($asec:$asys)[UserID:$_SESSION['ums_user_id']] hat am $zeit versucht, alte Umfragen aufzurufen.";
     }
 }
 

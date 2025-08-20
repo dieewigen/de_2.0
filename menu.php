@@ -6,13 +6,6 @@ include 'inc/lang/'.$sv_server_lang.'_menu.lang.php';
 include 'inc/'.$sv_server_lang.'_links.inc.php';
 include 'functions.php';
 
-if ($ums_gpfad != '') {
-    $url = $ums_gpfad.'g/m/';
-}
-if ($ums_gpfad != '') {
-    $bgurl = $ums_gpfad.'g/';
-}
-
 //test auf mobile version
 if ($_SESSION['ums_mobi'] == 1) {
 
@@ -201,7 +194,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 	<title>Menu</title><title><?php echo $menu_lang['title']?></title>
 <?php
 
-echo '<link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'m'.$_SESSION['ums_rasse'].'.css"><link rel="stylesheet" type="text/css" href="'.$ums_gpfad.'f'.$_SESSION['ums_rasse'].'.css">';
+echo '<link rel="stylesheet" type="text/css" href="gp/m'.$_SESSION['ums_rasse'].'.css">
+<link rel="stylesheet" type="text/css" href="gp/f'.$_SESSION['ums_rasse'].'.css">';
 
 ?>
 <script>

@@ -26,7 +26,7 @@ if($sv_debug!=1 AND $_REQUEST['unityeditor']!=1){
 // wenn man im unity-editor ist, dann erh�lt man die user_id 1
 if($sv_debug==1 AND $_REQUEST['unityeditor']==1){
 	$_SESSION['ums_user_id']=1;
-	$ums_user_id=$_SESSION['ums_user_id'];
+	$_SESSION['ums_user_id']=$_SESSION['ums_user_id'];
 }
 
 //db_user_data komplett auslesen
@@ -97,7 +97,7 @@ if(isset($_REQUEST['getsectordata'])){
 	//owner id auslesen
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT owner_id FROM de_login WHERE user_id=?",
-		[$ums_user_id]);
+		[$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($db_daten);
 	$owner_id=intval($row["owner_id"]);
 
@@ -202,7 +202,7 @@ if(isset($_REQUEST['getsectordata'])){
 			unset($scandaten);
 			$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 				"SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?",
-				[$ums_user_id]);
+				[$_SESSION['ums_user_id']]);
 			$index=0;
 			while($row = mysqli_fetch_assoc($db_daten))
 			{
@@ -392,10 +392,10 @@ if(isset($_REQUEST['getsectordata'])){
 
 
 				if($knowrasse==1){
-					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
-					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.($ums_gpfad ?? '').'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
+					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
+					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
 					$senddata[$sf][$system]['rasse']=$row['rasse'];
 				}else{
 					$senddata[$sf][$system]['rasse']=-1;
@@ -519,7 +519,7 @@ if(isset($_REQUEST['getsectordata'])){
 
 				$atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
 
-				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.($ums_gpfad ?? '').'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
+				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.($_SESSION['ums_gpfad'] ?? '').'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
 				$c++;
 			}
 

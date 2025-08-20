@@ -7,7 +7,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
             newtrans, newnews, allytag, ally_tronic 
      FROM de_user_data WHERE user_id=?", 
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -16,13 +16,13 @@ $t_level = $row["ally_tronic"];
 
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT COUNT(*) as count FROM de_allys WHERE leaderid=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $count = mysqli_fetch_assoc($result);
 $isleader = ($count['count'] >= 1);
 
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT COUNT(*) as count FROM de_allys WHERE coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
-    [$ums_user_id, $ums_user_id, $ums_user_id]);
+    [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 $count = mysqli_fetch_assoc($result);
 $iscoleader = ($count['count'] >= 1);
 ?>
@@ -45,7 +45,7 @@ $t_transfer=intval($_POST['t_transfer'] ?? 0);
 if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 	mysqli_execute_query($GLOBALS['dbi'], 
 	    "UPDATE de_user_data SET ally_tronic=ally_tronic+?, restyp05=restyp05-? WHERE user_id=?",
-	    [$t_transfer, $t_transfer, $ums_user_id]);
+	    [$t_transfer, $t_transfer, $_SESSION['ums_user_id']]);
 	mysqli_execute_query($GLOBALS['dbi'], 
 	    "UPDATE de_allys SET t_depot=t_depot+? WHERE allytag=?",
 	    [$t_transfer, $allytag]);
@@ -54,7 +54,7 @@ if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 	    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
 	            newtrans, newnews, allytag, ally_tronic 
 	     FROM de_user_data WHERE user_id=?",
-	    [$ums_user_id]);
+	    [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_array($result);
 	$restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 	$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -88,10 +88,10 @@ if (isset($memberid) && $memberid > 0)
 				$gemahnt_name = $m_data["spielername"];
 				notifyUser($memberid, $allyfinance_lang['msg_7'], 6);
 				$message = "$allyfinance_lang[msg_8_1] $gemahnt_name $allyfinance_lang[msg_8_2]";
-				notifyUser($ums_user_id, "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
+				notifyUser($_SESSION['ums_user_id'], "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
 				$result = mysqli_execute_query($GLOBALS['dbi'], 
 				    "SELECT newtrans, newnews FROM de_user_data WHERE user_id=?",
-				    [$ums_user_id]);
+				    [$_SESSION['ums_user_id']]);
 				$row = mysqli_fetch_array($result);$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 			}
 			else
@@ -115,7 +115,7 @@ include ("ally/ally.menu.inc.php");
 if (strlen($message) > 0)
 {
 	print("<br><table width=600 class=\"cell\"><tr>");
-	print("<td width=30 align=left valign=top><img src=\"".$ums_gpfad."g/trade/".$ums_rasse."_arz.gif\" alt=Information border=0> </td><td align=left><font size=1> $message</font><br>");
+	print("<td width=30 align=left valign=top><img src=\"".$_SESSION['ums_gpfad']."g/trade/".$_SESSION['ums_rasse']."_arz.gif\" alt=Information border=0> </td><td align=left><font size=1> $message</font><br>");
 	print("</td></tr></table>");
 }
 
@@ -126,13 +126,13 @@ if($isleader || $iscoleader)
 {
         $result = mysqli_execute_query($GLOBALS['dbi'], 
             "SELECT * FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
-            [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+            [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 }
 else
 {
         $result = mysqli_execute_query($GLOBALS['dbi'], 
             "SELECT ally.* FROM de_allys ally, de_user_data user WHERE user.allytag=ally.allytag AND user.user_id=?",
-            [$ums_user_id]);
+            [$_SESSION['ums_user_id']]);
 }
 $row = mysqli_fetch_assoc($result);
 $clanid = $row["id"];
@@ -146,7 +146,7 @@ $t_depot = $row["t_depot"];
 $tronic_zahlungsziel = $row["tronic_zahlungsziel"];
 
 print('<div align="center" class="cell" style="width: 600px;"><table width="100%" class="cell">');
-print('<tr><td><h2>'.$allyfinance_lang['welcome'].', '.$ums_spielername.'</h2></td></tr>');
+print('<tr><td><h2>'.$allyfinance_lang['welcome'].', '.$_SESSION['ums_spielername'].'</h2></td></tr>');
 print('<tr><td><hr></td></tr>');
 print('<tr><td>'.$allyfinance_lang['aktuellerstand'].': '.$t_depot.' '.$allyfinance_lang['tronic'].'</strong></td></tr>');
 print('<tr><td><hr></td></tr>');

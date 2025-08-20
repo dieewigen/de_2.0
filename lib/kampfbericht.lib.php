@@ -60,8 +60,8 @@ function showkampfberichtBG($data){
 	return $content;
 }
 
-function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $schiffspunkte){
-	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $ums_rasse, $sv_server_lang;
+function showkampfberichtV0($text,$rasse, $spielername, $sector, $system, $schiffspunkte){
+	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $sv_server_lang;
 
 	$rassenklassen[0] = array ('k1', 'k2');
 	$rassenklassen[1] = array ('k3', 'k4');
@@ -94,14 +94,14 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
 	$srec2=$kbd[$grundindex+4];
 
 	//eigenen spielername fett darstellen
-	if($ums_rasse==1)$rflag='E';
-	elseif($ums_rasse==2)$rflag='I';
-	elseif($ums_rasse==3)$rflag='K';
-	elseif($ums_rasse==4)$rflag='Z';
-	elseif($ums_rasse==5)$rflag='D';
+	if($_SESSION['ums_rasse']==1)$rflag='E';
+	elseif($_SESSION['ums_rasse']==2)$rflag='I';
+	elseif($_SESSION['ums_rasse']==3)$rflag='K';
+	elseif($_SESSION['ums_rasse']==4)$rflag='Z';
+	elseif($_SESSION['ums_rasse']==5)$rflag='D';
 
 
-	$username=$ums_spielername.' ['.$rflag.']('.$sector.':'.$system.')';
+	$username=$_SESSION['ums_spielername'].' ['.$rflag.']('.$sector.':'.$system.')';
 	$atterliste=str_replace($username, '<b>'.$username.'</b>', $atterliste);
 	$defferliste=str_replace($username, '<b>'.$username.'</b>', $defferliste);
 
@@ -392,9 +392,9 @@ function showkampfberichtV0($text,$rasse,$ums_spielername, $sector, $system, $sc
 	return($kbstring);
 }
 
-function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $schiffspunkte){
+function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schiffspunkte){
 
-	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $ums_rasse, $sv_server_lang, $sv_oscar;
+	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $sv_server_lang, $sv_oscar;
 
 	$rassenklassen[0] = array ('k1', 'k2');
 	$rassenklassen[1] = array ('k3', 'k4');
@@ -435,14 +435,14 @@ function showkampfberichtV1($text,$rasse,$ums_spielername, $sector, $system, $sc
 	$kg_set_04      = isset($daten_spieler['kg_set_04']) ? (int)$daten_spieler['kg_set_04'] : 0;
 
 	//eigenen spielername fett darstellen
-	if($ums_rasse==1)$rflag='E';
-	elseif($ums_rasse==2)$rflag='I';
-	elseif($ums_rasse==3)$rflag='K';
-	elseif($ums_rasse==4)$rflag='Z';
-	elseif($ums_rasse==5)$rflag='D';
+	if($_SESSION['ums_rasse']==1)$rflag='E';
+	elseif($_SESSION['ums_rasse']==2)$rflag='I';
+	elseif($_SESSION['ums_rasse']==3)$rflag='K';
+	elseif($_SESSION['ums_rasse']==4)$rflag='Z';
+	elseif($_SESSION['ums_rasse']==5)$rflag='D';
 
 
-	$username=$ums_spielername.' ['.$rflag.']('.$sector.':'.$system.')';
+	$username=$_SESSION['ums_spielername'].' ['.$rflag.']('.$sector.':'.$system.')';
 	$atterliste=str_replace($username, '<b>'.$username.'</b>', $atterliste);
 	$defferliste=str_replace($username, '<b>'.$username.'</b>', $defferliste);
 

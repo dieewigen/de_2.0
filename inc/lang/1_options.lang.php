@@ -64,8 +64,6 @@ $options_lang['spielername']='Spielername';
 $options_lang['spielernamedesc']='Spielername&Sollte der Name in der neuen Runde nicht richtig angezeigt werden, dann logge dich bitte aus und wieder ein.';
 $options_lang['title']='Optionen';
 $options_lang['uebernommen']='Die Einstellungen wurden übernommen.';
-$options_lang['umodezuwenigcredits1']='Der Urlaubsmodus kleiner als 3 Tage kostet';
-$options_lang['umodezuwenigcredits2']='Credits, die Du leider nicht besitzt.';
 $options_lang['umodefehler1']='Der Wert der Urlaubstage ist nicht korrekt.';
 $options_lang['umodefehler2']='Das Passwort ist nicht korrekt.';
 $options_lang['umodefehler3']='Du wirst angegriffen. Bestätige bitte, dass Du wirklich in den Urlaubsmodus gehen möchtest. Es ist danach nicht mehr möglich, dass neue Flotten (Angreifer und Verteidiger) Dein System anfliegen. Flotten die unterwegs sind fliegen weiter.';
@@ -78,7 +76,6 @@ $options_lang['smreminder']='Schwarzmarkt-Reminder<br>(Der kleinste wert ist 15,
 $options_lang['sounddeaktivieren']='Sound deaktivieren';
 $options_lang['transparenz']='Transparenz';
 $options_lang['umodeinfo1']='Um den Account in den Urlaubsmodus zu versetzen einfach die Anzahl der Urlaubstage (min. 1, max. 21) und das Passwort eingeben und dann mit "Urlaubsmodus aktivieren" bestätigen.';
-$options_lang['umodeinfo2']='(Ein Urlaubsmodus der kürzer als 3 Tage ist kostet 150 Credits, wobei die Credits sofort abgezogen werden. Ein späteres "freikaufen" ist vor Ablauf von 3 Tagen nicht möglich. Ab 3 Tagen ist der Urlaubsmodus jedoch kostenlos.)';
 $options_lang['urlaubstage']='Urlaubstage';
 $options_lang['urlaubsmodusaktivieren']='Urlaubsmodus aktivieren';
 ?>

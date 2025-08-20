@@ -7,7 +7,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, ally_tronic 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
@@ -16,7 +16,7 @@ $t_level = $row['ally_tronic'];
 
 $allys = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT * FROM de_allys WHERE leaderid=?", 
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 if(mysqli_num_rows($allys)>=1)
 {
 	$isleader = true;
@@ -45,12 +45,12 @@ include('ally/ally.menu.inc.php');
 if (strlen($message) > 0)
 {
 	print('<table width=600 class="cellu"><tr>');
-	print('<td width="30" align="left" valign="top"><img src="'.$ums_gpfad.'g/trade/'.$ums_rasse.'_arz.gif" alt="Information" border="0"> </td><td align="left"><font size="1">'.$message.'</font><br>');
+	print('<td width="30" align="left" valign="top"><img src="'.$_SESSION['ums_gpfad'].'g/trade/'.$_SESSION['ums_rasse'].'_arz.gif" alt="Information" border="0"> </td><td align="left"><font size="1">'.$message.'</font><br>');
 	print('</td></tr></table>');
 }
 
 print('<div align=center class="cellu" style="width: 600px;"><table width="100%">');
-print('<tr><td><h2>'.$allysearch_lang['msg_1'].', '.$ums_spielername.'</h2></td></tr>');
+print('<tr><td><h2>'.$allysearch_lang['msg_1'].', '.$_SESSION['ums_spielername'].'</h2></td></tr>');
 print('<tr><td><hr></td></tr>');
 
 print('

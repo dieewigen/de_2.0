@@ -62,7 +62,7 @@ if ($techs[4] == 0) {
 }
 
 //owner id auslesen
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id=?", [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT owner_id FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $owner_id = intval($row["owner_id"]);
 
@@ -133,8 +133,8 @@ if ($rzadd == 0) {
 $sektorinfo = '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
 if (!empty($sf)) {
     //hinweistext für npc-sektoren
-    $npchint = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
-            $sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($ums_user_id).'<br>'.$sec_lang['npsecinfo3'].
+    $npchint = '<img src="'.$_SESSION['ums_gpfad'].'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
+            $sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($_SESSION['ums_user_id']).'<br>'.$sec_lang['npsecinfo3'].
             '<br>'.$sec_lang['npsecinfo4'].
             $sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze * 100, 2, ",", ".").' / '.
             number_format($col_angriffsgrenze_final * 100, 2, ",", ".").'%'.
@@ -167,7 +167,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
     $output .= '<div style="left: '.$alienpos_x.'px; top: '.$alienpos_y.'px; position: absolute; width: 98px; height: 104px; 
 		border: 0px solid #cd02d9; color: #FFFFFF; font-size: 14px;
-		background: url('.$ums_gpfad.'g/s/p'.$planet_id.'.png);
+		background: url('.$_SESSION['ums_gpfad'].'g/s/p'.$planet_id.'.png);
 		background-size: 90% auto;
 		background-position: 5px 0px;
 		background-repeat: no-repeat;
@@ -266,7 +266,7 @@ foreach ($sectorList as $sf) {
 
         //die scandaten des spielers auslesen
         unset($scandaten);
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?", [$ums_user_id]);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $index = 0;
         while ($row = mysqli_fetch_array($db_daten)) {
             $scandaten[$index]['zuser_id'] = $row['zuser_id'];
@@ -457,16 +457,16 @@ foreach ($sectorList as $sf) {
             $planet_id = 0;
             if ($knowrasse == 1) {
                 if ($row['rasse'] == 1) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
                 }
                 if ($row['rasse'] == 2) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
                 }
                 if ($row['rasse'] == 3) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceK.png" title="K´Tharr" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K´Tharr" width="16px" height="16px">';
                 }
                 if ($row['rasse'] == 4) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.$ums_gpfad.'g/r/raceZ.png" title="Z´tah-ara" width="16px" height="16px">';
+                    $rasse = '<img style="margin-bottom: -4px" src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z´tah-ara" width="16px" height="16px">';
                 }
                 $planet_id = $row['rasse'];
             }
@@ -528,7 +528,7 @@ foreach ($sectorList as $sf) {
             }
 
             $output .= '<div class="player-card" style="
-				background: url('.$ums_gpfad.'g/derassenlogo'.$planet_id.'.png);
+				background: url('.$_SESSION['ums_gpfad'].'g/derassenlogo'.$planet_id.'.png);
 				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
@@ -617,7 +617,7 @@ foreach ($sectorList as $sf) {
         $rec_bonus = number_format($rec_bonus, 2, ",", ".").'%';
 
         if ($anz > 0) {
-            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="'.
+            $infostr = '<img src="'.$_SESSION['ums_gpfad'].'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="'.
             $sec_lang['angriffsgrenze'].': '.$sec_angriffsgrenze.' / '.number_format($col_angriffsgrenze_final * 100, 2, ",", ".").'%<br>'.
             $sec_lang['kollektoren'].': '.number_format($gescol, 0, "", ".").'<br>'.
             $sec_lang['kollektorendurchschnitt'].': '.number_format($gescol / $anz, 2, ",", ".").'<br>'.
@@ -628,7 +628,7 @@ foreach ($sectorList as $sf) {
             $sec_lang['recyclingbonus'].': '.$rec_bonus.'<br>'.
             $sec_lang['sektorartefakthaltezeit'].': '.number_format($sec_data['arthold'], 0, "", ".").'">';
         } else {
-            $infostr = '<img src="'.$ums_gpfad.'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="freier Sektor">';
+            $infostr = '<img src="'.$_SESSION['ums_gpfad'].'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="freier Sektor">';
         }
 
         if ($anz > 0) {
@@ -680,7 +680,7 @@ foreach ($sectorList as $sf) {
 
                 $artstr .= '
                 <a href="help.php?a=1" target="_blank" title="'.umlaut($atip[$c]).'">
-                    <img src="'.$ums_gpfad.'g/sa'.$row["picid"].'.gif" style="width: 25px; height: 25px;">
+                    <img src="'.$_SESSION['ums_gpfad'].'g/sa'.$row["picid"].'.gif" style="width: 25px; height: 25px;">
                 </a>';
 
                 $c++;
@@ -739,7 +739,7 @@ foreach ($sectorList as $sf) {
                 }
 
                 $stip = 'Sektorraumbasis'.$srbstr;
-                $basestr = '<a href="'.$ums_gpfad.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.$ums_gpfad.'g/'.$bn.'" name="sb" title="'.$stip.'" style="width: 100%; height: auto;"></a>';
+                $basestr = '<a href="'.$_SESSION['ums_gpfad'].'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.$_SESSION['ums_gpfad'].'g/'.$bn.'" name="sb" title="'.$stip.'" style="width: 100%; height: auto;"></a>';
                 //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen
                 if ($bed == '000') {
                     $basestr = '&nbsp;';
@@ -884,10 +884,10 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
         //immer sichtbare Systeme haben einen Sonderstatus
         if (in_array($row['id'], $immer_sichtbare_systeme)) {
-            $bg_image = $ums_gpfad.'g/s/sym3.png';
+            $bg_image = $_SESSION['ums_gpfad'].'g/s/sym3.png';
 
         } else {
-            $bg_image = $ums_gpfad.'g/s/p'.$planet_id.'.png';
+            $bg_image = $_SESSION['ums_gpfad'].'g/s/p'.$planet_id.'.png';
 
             $planet_id++;
             if ($planet_id > 20) {

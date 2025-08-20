@@ -14,7 +14,7 @@ include('lib/map_system_defs.inc.php');
 $production_lang['klassennamen']=array('J&auml;ger','Jagdboot','Zerst&ouml;rer','Kreuzer','Schlachtschiff','Bomber','Transmitterschiff','Tr&auml;ger',
 'Frachter','Titan','Orbitalj&auml;ger-Basis','Flugk&ouml;rper-Plattform','Energiegeschoss-Plattform','Materiegeschoss-Plattform','Hochenergiegeschoss-Plattform');
 
-//$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, techs, newtrans, newnews, design3 AS design, sc2, spec1, spec3 FROM de_user_data WHERE user_id='$ums_user_id'");
+//$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, techs, newtrans, newnews, design3 AS design, sc2, spec1, spec3 FROM de_user_data WHERE user_id='$_SESSION['ums_user_id']'");
 //$row = mysqli_fetch_array($db_daten);
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
 $pd=loadPlayerData($_SESSION['ums_user_id']);
@@ -38,15 +38,15 @@ $maxtick = $row['tick'];
 
 //spezialisierung trägerkapazität
 if($spec3==2){
-	for($i=0;$i<count($sv_schiffsdaten[$ums_rasse]);$i++){
-		$sv_schiffsdaten[$ums_rasse-1][$i][1]= floor($sv_schiffsdaten[$ums_rasse-1][$i][1] * 1.2);
+	for($i=0;$i<count($sv_schiffsdaten[$_SESSION['ums_rasse']]);$i++){
+		$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$i][1]= floor($sv_schiffsdaten[$_SESSION['ums_rasse']-1][$i][1] * 1.2);
 	}	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=1 AND user_id='$ums_user_id'");
+$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=1 AND user_id='".$_SESSION['ums_user_id']."';");
 $artbonus_fleet=0;
 while($row = mysqli_fetch_array($db_daten)){
   $artbonus_fleet=$artbonus_fleet+$ua_werte[$row['id']-1][$row['level']-1][0];
@@ -56,7 +56,7 @@ if($artbonus_fleet>5){
 	$artbonus_fleet=5;
 }
 
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE (id=2 OR id=8 OR id=9) AND user_id=?", [$ums_user_id]);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE (id=2 OR id=8 OR id=9) AND user_id=?", [$_SESSION['ums_user_id']]);
 $artbonus_def=0;$artbonus2=0;$artbonus3=0;
 while($row = mysqli_fetch_array($db_daten)){
   if($row['id']==2)$artbonus_def=$artbonus_def+$ua_werte[$row['id']-1][$row['level']-1][0];
@@ -77,7 +77,7 @@ include 'lib/defenseboni.lib.php';
 if($spec1==1)$defense_bonus_buildtime+=50;
 
 //namen des planetaren schildes aus der db auslesen
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data{$ums_rasse} WHERE tech_id=24", []);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data{$_SESSION['ums_rasse']} WHERE tech_id=24", []);
 $row = mysqli_fetch_array($db_daten);
 $ps_name=$row['tech_name'];
 
@@ -107,7 +107,7 @@ if($maxtick<$mysc2+$sv_sabotage[8][0] AND $mysc2>$sv_sabotage[8][0])$sabotage=1;
 /*
 if($_REQUEST["setdesign"]){
   $design=intval($_REQUEST["setdesign"]);
-  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET design3=? WHERE user_id = ?", [$design, $ums_user_id]);	
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET design3=? WHERE user_id = ?", [$design, $_SESSION['ums_user_id']]);	
 }*/
 
 
@@ -143,29 +143,29 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	
 	if($i<100){
 		//reisezeit
-		$zstr.='<br><br>'.$production_lang['reisezeit'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][0];
+		$zstr.='<br><br>'.$production_lang['reisezeit'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][0];
 		//transportkapazität
-		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][1]>0)$zstr.='<br>'.$production_lang['kapazitaet1'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][1];
+		if ($sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][1]>0)$zstr.='<br>'.$production_lang['kapazitaet1'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][1];
 		//ben. transportkapazität
-		if ($sv_schiffsdaten[$ums_rasse-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang['kapazitaet2'].': '.$sv_schiffsdaten[$ums_rasse-1][$unit_index][2];
+		if ($sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang['kapazitaet2'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][2];
 		//frachtkapazität
-		if (isset($unit[$ums_rasse-1][$unit_index]['fk']) && $unit[$ums_rasse-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$ums_rasse-1][$unit_index]['fk'];
+		if (isset($unit[$_SESSION['ums_rasse']-1][$unit_index]['fk']) && $unit[$_SESSION['ums_rasse']-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$_SESSION['ums_rasse']-1][$unit_index]['fk'];
 	}
 
 	//waffenarten
 	//konventionell
-	if($unit[$ums_rasse-1][$unit_index][2]>0)$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
+	if($unit[$_SESSION['ums_rasse']-1][$unit_index][2]>0)$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
 	 else $wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
 	$zstr.='<br><br><font color=#9D4B15>'.$production_lang['waffengattung1'].':</font> '.$wv;
 
 	//klassenziel
-	if($unit[$ums_rasse-1][$unit_index][2]>0){
+	if($unit[$_SESSION['ums_rasse']-1][$unit_index][2]>0){
 	  $zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][0]].'</font>';
 	  $zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][2]].'</font>';
 	}
 
 	//emp
-	if($unit[$ums_rasse-1][$unit_index][3]>0){
+	if($unit[$_SESSION['ums_rasse']-1][$unit_index][3]>0){
 		$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
 	}else{
 		$wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
@@ -173,7 +173,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	$zstr.='<br><br><font color=#15629D>'.$production_lang['waffengattung2'].':</font> '.$wv;
 
 	//klassenziel
-	if($unit[$ums_rasse-1][$unit_index][3]>0){
+	if($unit[$_SESSION['ums_rasse']-1][$unit_index][3]>0){
 		$zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][0]].'</font>';
 		$zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][2]].'</font>';
 	}
@@ -195,14 +195,14 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 <?php
 echo '<script type="text/javascript">var abf='.$artbonus_fleet.';var abd='.$artbonus_def.';var ab=0;</script>';
-echo '<script src="js/produktion'.$ums_rasse.'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$ums_rasse.'.js').'" type="text/javascript"></script>';
+echo '<script src="js/produktion'.$_SESSION['ums_rasse'].'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$_SESSION['ums_rasse'].'.js').'" type="text/javascript"></script>';
 ?>
 </head>
 <body>
 <?php
 if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 	//transaktionsbeginn
-	if (setLock($ums_user_id)){
+	if (setLock($_SESSION['ums_user_id'])){
 		//$need_storage_res=array();
 		//nochmal die vorandenen Rohstoffe laden
 		$row=loadPlayerData($_SESSION['ums_user_id']);
@@ -311,7 +311,7 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 					}
 					
 					$buildscore=$z*$tech_score;
-					mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score) VALUES ($ums_user_id, $i, $z, $tech_ticks, $buildscore)");
+					mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score) VALUES (".$_SESSION['ums_user_id'].", $i, $z, $tech_ticks, $buildscore)");
 				}
 			}
 		}
@@ -323,14 +323,14 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 		$gr05=$gr05-$restyp05;
 		mysqli_query($GLOBALS['dbi'],"update de_user_data set restyp01 = restyp01 - $gr01,
 		 restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03,
-		 restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE user_id = '$ums_user_id'");
+		 restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE user_id = '".$_SESSION['ums_user_id']."';");
 
 		//transaktionsende
-		$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+		$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
 		if ($erg){
 			  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{
-			print($production_lang['releaselock'].$ums_user_id.$production_lang['releaselock2']."<br><br><br>");
+			print($production_lang['releaselock'].$_SESSION['ums_user_id'].$production_lang['releaselock2']."<br><br><br>");
 		}
 	}// if setlock-ende
 	else echo '<br><font color="#FF0000">'.$production_lang['releaselock3'].'</font><br><br>';
@@ -343,13 +343,13 @@ include "resline.php";
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
 echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.$ums_gpfad.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$ums_gpfad.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
+<a href="production.php" title="Einheitenproduktion"><img src="'.$_SESSION['ums_gpfad'].'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
+<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$_SESSION['ums_gpfad'].'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
 if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems != 1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.$ums_gpfad.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
+	echo '<a href="specialship.php" title="Basisstern"><img src="'.$_SESSION['ums_gpfad'].'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
 }
 echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$ums_gpfad.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
+<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$_SESSION['ums_gpfad'].'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
 ';
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
@@ -364,7 +364,7 @@ if($sabotage==1){
 
 /*
 if ($techs[13]==0){
-	$techcheck="SELECT tech_name FROM de_tech_data".$ums_rasse." WHERE tech_id=13";
+	$techcheck="SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=13";
 	$db_tech=mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
 	$row_techcheck = mysqli_fetch_array($db_tech);
 
@@ -374,7 +374,7 @@ if ($techs[13]==0){
 	rahmen_oben($production_lang[fehlendesgebaeude]);
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$ums_rasse.'&t=13" target="_blank"><img src="'.$ums_gpfad.'g/t/'.$ums_rasse.'_13.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
 	<td valign="top">'.$production_lang[gebaeudeinfo].': '.$row_techcheck[tech_name].'</td>
 	</tr>';
 	echo '</table>';
@@ -425,7 +425,7 @@ echo '<tr valign="middle" align="center" height="25"><td class="cell1" height="2
 //Einheiten zählen
 /////////////////////////////////////////////////////////////////////////////
 $ec=array();
-$fid0=$ums_user_id.'-0';$fid1=$ums_user_id.'-1';$fid2=$ums_user_id.'-2';$fid3=$ums_user_id.'-3';
+$fid0=$_SESSION['ums_user_id'].'-0';$fid1=$_SESSION['ums_user_id'].'-1';$fid2=$_SESSION['ums_user_id'].'-2';$fid3=$_SESSION['ums_user_id'].'-3';
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
 while($row = mysqli_fetch_array($db_daten)){
 	for ($i=81;$i<=90;$i++){
@@ -478,7 +478,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	//zwischen Flotte und Verteidigung eine Zeile einf�gen
 	if($row['tech_id']==100){
 		echo '<tr valign="middle" align="center" height="25"><td class="'.$bg.'" height="25" colspan="9" align="left"><b>
-		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0" title="'.$defstatus.'">
+		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$defstatus.'">
 		&nbsp;-&nbsp;Baukostenreduzierung: '.number_format($artbonus_def, 2,",",".").'% (max. 5,00%)</b></td></tr>';
 		if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
 	}
@@ -561,7 +561,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 
 //zeige aktive bauauftr�ge an
-//$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_build.anzahl, de_user_build.verbzeit, de_tech_data{$ums_rasse}.tech_name, de_tech_data{$ums_rasse}.score FROM de_user_build LEFT JOIN de_tech_data{$ums_rasse} ON(de_user_build.tech_id = de_tech_data{$ums_rasse}.tech_id) WHERE user_id=? AND de_user_build.tech_id > 80 AND de_user_build.tech_id < 110 ORDER BY de_user_build.verbzeit ASC", [$ums_user_id]);
+//$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_build.anzahl, de_user_build.verbzeit, de_tech_data{$_SESSION['ums_rasse']}.tech_name, de_tech_data{$_SESSION['ums_rasse']}.score FROM de_user_build LEFT JOIN de_tech_data{$_SESSION['ums_rasse']} ON(de_user_build.tech_id = de_tech_data{$_SESSION['ums_rasse']}.tech_id) WHERE user_id=? AND de_user_build.tech_id > 80 AND de_user_build.tech_id < 110 ORDER BY de_user_build.verbzeit ASC", [$_SESSION['ums_user_id']]);
 /*
 unset($technames);
 $techselect='<option value="0">Bitte w&auml;hlen</option>';
@@ -579,7 +579,7 @@ while($row = mysqli_fetch_array($db_daten)){
 }
 
 $result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build` 
-	WHERE user_id='$ums_user_id' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
+	WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
 $num = mysqli_num_rows($result);
 if ($num>0){
 	echo '</td><td width="13" class="rr">&nbsp;</td></tr></table>
@@ -665,7 +665,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 	//möchte man ein Item bauen?
 	if(isset($_REQUEST['build_item']) && $sabotage==0){
-		if (setLock($ums_user_id)){
+		if (setLock($_SESSION['ums_user_id'])){
 			for($i=0;$i<200;$i++){
 				if(isset($_POST['item_id_'.$i]) && $_POST['item_id_'.$i]>0){
 					//item_id auswerten
@@ -764,7 +764,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 							$item_build_id=10000+$item_id;
 								
-							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, factory_id, factory_used_capacity) VALUES ($ums_user_id, $item_build_id, $z, $tech_ticks, $factory_id, $factory_used_capacity)";
+							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, factory_id, factory_used_capacity) VALUES (".$_SESSION['ums_user_id'].", $item_build_id, $z, $tech_ticks, $factory_id, $factory_used_capacity)";
 							//echo $sql;
 							mysqli_query($GLOBALS['dbi'],$sql);
 						}
@@ -776,7 +776,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 
 			//transaktionsende
-			$erg = releaseLock($ums_user_id); //L�sen des Locks und Ergebnisabfrage
+			$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
 			if ($erg){
 				//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			}else{
@@ -808,7 +808,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 			//die genutze Kapazität aus der DB holen
 
-			echo '<div style="flex-grow: 1; font-size: 16px;"><img src="'.$ums_gpfad.'g/r/'.$GLOBALS['map_buildings'][$g]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$g]['name'].'"> '.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $GLOBALS['map_buildings'][$g]['factory_id'])).'/'.intval($max).'</div>';
+			echo '<div style="flex-grow: 1; font-size: 16px;"><img src="'.$_SESSION['ums_gpfad'].'g/r/'.$GLOBALS['map_buildings'][$g]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$g]['name'].'"> '.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $GLOBALS['map_buildings'][$g]['factory_id'])).'/'.intval($max).'</div>';
 		}
 	}
 
@@ -845,7 +845,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 					$values=explode("x", $einzel);
 					$factory_id=str_replace("P", "", $values[0]);
 
-					$fabrikkosten.='<br>'.$values[1].' <img src="'.$ums_gpfad.'g/r/'.$factory_id.'_g.gif">';
+					$fabrikkosten.='<br>'.$values[1].' <img src="'.$_SESSION['ums_gpfad'].'g/r/'.$factory_id.'_g.gif">';
 				}
 			}
 

@@ -20,7 +20,7 @@ include_once 'functions.php';
 $result = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status 
      FROM de_user_data WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -83,7 +83,7 @@ if($num==1)
 	print("<br>");
 	rahmen_oben('Allianzinformationen');
 	echo '<div align="center"><table width="574px">';
-	//print("<tr class=\"cell\"><td><h2>$allydetail_lang[willkommen], $ums_spielername</h2></td></tr>");
+	//print("<tr class=\"cell\"><td><h2>$allydetail_lang[willkommen], $_SESSION['ums_spielername']</h2></td></tr>");
 	print("<tr><td>
 			<table border=\"0\" width=\"100%\" cellspacing=\"1\" cellpadding=\"0\">
 	    		<tr>

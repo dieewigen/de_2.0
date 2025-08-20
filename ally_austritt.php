@@ -8,7 +8,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
             newtrans, newnews, allytag, spielername 
      FROM de_user_data WHERE user_id = ?",
-    [$ums_user_id]
+    [$_SESSION['ums_user_id']]
 );
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
@@ -35,7 +35,7 @@ if($a == 1)
 {
 	$result_user = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT allytag FROM de_user_data WHERE user_id = ?",
-        [$ums_user_id]
+        [$_SESSION['ums_user_id']]
     );
     $row = mysqli_fetch_assoc($result_user);
     $clantag = $row["allytag"];
@@ -51,7 +51,7 @@ if($a == 1)
     $coleaderid3 = $row["coleaderid3"];
 
 	//Falls ein aktiver Leader die Allianz verlassen will, wird ein Fehler ausgegeben
-	if ($leaderid == $ums_user_id)
+	if ($leaderid == $_SESSION['ums_user_id'])
 	{
 		print($allyaustritt_lang['msg_1']);
 	}
@@ -64,25 +64,25 @@ if($a == 1)
                  SET ally_id = 0, allytag = '', status = 0, 
                      restyp05 = restyp05 - ?, ally_tronic = '0' 
                  WHERE user_id = ?",
-                [$leave_fee, $ums_user_id]
+                [$leave_fee, $_SESSION['ums_user_id']]
             );
             
             //Falls ein Co-Leader die Allianz verläßt, wird die Anderung im Allianzdatensatz eingetragen
-            if($coleaderid1 == $ums_user_id)
+            if($coleaderid1 == $_SESSION['ums_user_id'])
             {
                 mysqli_execute_query($GLOBALS['dbi'],
                     "UPDATE de_allys SET coleaderid1 = -1 WHERE allytag = ?",
                     [$clantag]
                 );
             }
-            elseif($coleaderid2 == $ums_user_id)
+            elseif($coleaderid2 == $_SESSION['ums_user_id'])
             {
                 mysqli_execute_query($GLOBALS['dbi'],
                     "UPDATE de_allys SET coleaderid2 = -1 WHERE allytag = ?",
                     [$clantag]
                 );
             }
-            elseif($coleaderid3 == $ums_user_id)
+            elseif($coleaderid3 == $_SESSION['ums_user_id'])
             {
                 mysqli_execute_query($GLOBALS['dbi'],
                     "UPDATE de_allys SET coleaderid3 = -1 WHERE allytag = ?",

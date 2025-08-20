@@ -14,7 +14,7 @@ $ehlockfaktor = 4;
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
   "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tick, score, sector, `system`, newtrans, newnews, allytag, hide_secpics, nrrasse, nrspielername, ovopt, credits, chatoff, chatoffallg, chatoffglobal, helper, trade_reminder, patime FROM de_user_data WHERE user_id=?", 
-  [$ums_user_id]);
+  [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01 = $row['restyp01'];
 $restyp02 = $row['restyp02'];
@@ -43,7 +43,7 @@ $trade_reminder = $row['trade_reminder'];
 //owner id auslesen
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
   "SELECT owner_id FROM de_login WHERE user_id=?", 
-  [$ums_user_id]);
+  [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $owner_id = intval($row['owner_id']);
 
@@ -64,7 +64,7 @@ if (isset($_POST['donr'])) {
         } else {
             $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
               "SELECT user_id FROM de_user_data WHERE (spielername=? OR nrspielername=?) AND spielername!=?", 
-              [$spielername, $spielername, $ums_spielername]);
+              [$spielername, $spielername, $_SESSION['ums_spielername']]);
             $vorhanden = mysqli_num_rows($db_daten);
             if ($vorhanden > 0) {
                 $errmsg .= '<br>'.$options_lang['fehler5'];
@@ -96,7 +96,7 @@ if (isset($_POST['donr'])) {
     if ($errmsg == '') {
         mysqli_execute_query($GLOBALS['dbi'], 
           "UPDATE de_user_data SET nrspielername=?, nrrasse=? WHERE user_id=?", 
-          [$spielername, $gewrasse, $ums_user_id]);
+          [$spielername, $gewrasse, $_SESSION['ums_user_id']]);
         $nrrasse = $gewrasse;
         $nrspielername = $spielername;
     }
@@ -112,7 +112,7 @@ if (isset($_POST['graop'])) {
 
         mysqli_execute_query($GLOBALS['dbi'], 
           "UPDATE de_user_data SET chatoff=?, chatoffallg=?, chatoffglobal=?, helper=?, trade_reminder=? WHERE user_id=?", 
-          [$chat, $chatallg, $chatglobal, $helper, $traderem, $ums_user_id]);
+          [$chat, $chatallg, $chatglobal, $helper, $traderem, $_SESSION['ums_user_id']]);
         $errmsg .= $options_lang['uebernommen'];
         $chatoff = $chat;
         $chatoffallg = $chatallg;
@@ -132,7 +132,7 @@ if ($delacc) { //account l�schen
 
     $db_datenx = mysqli_execute_query($GLOBALS['dbi'], 
       "SELECT * FROM de_login WHERE user_id=?", 
-      [$ums_user_id]);
+      [$_SESSION['ums_user_id']]);
     $rowx = mysqli_fetch_assoc($db_datenx);
 
     $passwordOK = false;
@@ -145,10 +145,10 @@ if ($delacc) { //account l�schen
             //�berpr�fen ob man evtl. allianzleader ist, da ist es notwendig den posten aufzugeben
             $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
               "SELECT * FROM de_allys WHERE leaderid=?", 
-              [$ums_user_id]);
+              [$_SESSION['ums_user_id']]);
             $num = mysqli_num_rows($db_daten);
             if ($num == 0) {//man ist kein leader
-                $uid = $ums_user_id;
+                $uid = $_SESSION['ums_user_id'];
 
                 //3 tage umode und dann killen, wenn er sich nicht mehr einloggt
                 $urltage = 3;
@@ -168,7 +168,7 @@ if ($delacc) { //account l�schen
                 //mail an den accountinhaber schicken
                 $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
                   "SELECT reg_mail FROM de_login WHERE user_id=?", 
-                  [$ums_user_id]);
+                  [$_SESSION['ums_user_id']]);
                 $row = mysqli_fetch_assoc($db_daten);
                 $reg_mail = $row['reg_mail'];
                 @mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: noreply@die-ewigen.com');
@@ -186,19 +186,8 @@ if ($delacc) { //account l�schen
     }
 }
 
-function writetocreditlog($clog)
-{
-    global $ums_user_id;
-    $datum = date("Y-m-d H:i:s", time());
-    $ip = getenv("REMOTE_ADDR");
-    $clog = "Zeit: $datum\nIP: $ip\n".$clog."\n--------------------------------------\n";
-    $fp = fopen("cache/creditlogs/$ums_user_id.txt", "a");
-    fputs($fp, $clog);
-    fclose($fp);
-}
-
 //Logout anzeige
-$sekundenbiszumlogout = ($ums_session_start + $sv_session_lifetime) - time();
+$sekundenbiszumlogout = ($_SESSION['ums_session_start'] + $sv_session_lifetime) - time();
 $restminuten = floor($sekundenbiszumlogout / 60);
 $restsekunden = $sekundenbiszumlogout - ($restminuten * 60);
 $color='';
@@ -261,7 +250,7 @@ if ($urlacc) { //account in urlaubsmodus versetzen
     $urlpass = $_POST['urlpass'];
     $db_datenx = mysqli_execute_query($GLOBALS['dbi'], 
       "SELECT * FROM de_login WHERE user_id=?", 
-      [$ums_user_id]);
+      [$_SESSION['ums_user_id']]);
     $rowx = mysqli_fetch_assoc($db_datenx);
 
     $passwordOK = false;
@@ -271,13 +260,7 @@ if ($urlacc) { //account in urlaubsmodus versetzen
 
     if ($passwordOK) { //oldpass ist korrekt
         $urltage = intval($_POST['urltage']);
-        if ($urltage >= 1 and $urltage <= 21) {
-            //schauen ob es credits kostet und man genug davon hat
-            $creditkosten = 150;
-            if ($credits < $creditkosten and $urltage < 3) {
-                //zu wenig credits für umode
-                $errmsg .= '<table width=600><tr><td class="ccr">'.$options_lang['umodezuwenigcredits1'].' '.$creditkosten.' '.$options_lang['umodezuwenigcredits2'].'</table>';
-            }
+        if ($urltage >= 3 and $urltage <= 21) {
             //schauen ob der account angegriffen wird
             if ($_POST['attumodecheck'] == 1) {
                 $gea = '&nbsp;';
@@ -285,14 +268,7 @@ if ($urlacc) { //account in urlaubsmodus versetzen
             if ($gea == '&nbsp;') {
                 //wenn keine fehler vorliegen, dann umode setzen
                 if ($errmsg == '') {
-                    //schauen ob es credits kostet
-                    if ($urltage < 3) {
-                        mysqli_execute_query($GLOBALS['dbi'], 
-                          "UPDATE de_user_data SET credits=credits-? WHERE user_id=?", 
-                          [$creditkosten, $ums_user_id]);
-                        writetocreditlog("Urlaubsmodus");
-                    }
-                    $uid = $ums_user_id;
+                    $uid = $_SESSION['ums_user_id'];
                     $tis = time() + 86400 * $urltage;
                     $datum = date("Y-m-d H:i:s", $tis);
 
@@ -501,7 +477,7 @@ echo '
 </tr>
 <tr align="center">
 <td height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang['spielername'].' <img title="'.$options_lang['spielernamedesc'].'" style="vertical-align: middle;" src="'.$ums_gpfad.'g/'.$ums_rasse.'_hilfe.gif" border="0">
+<td>'.$options_lang['spielername'].' <img title="'.$options_lang['spielernamedesc'].'" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
 </td>
 <td><input type="text" name="spielername" size="20" maxlength="20" value="'.$nrspielername.'"></td>
 <td class="rr">&nbsp;</td>
@@ -568,7 +544,6 @@ echo '
 <td width="13" height="37" class="rl">&nbsp;</td>
 <td width="560">'.$options_lang['accountloescheninfo1'];
 
-//if ($ums_premium>0)echo '<br><font color="#FFFF00">'.$options_lang[accountloescheninfo2].'</font>';
 echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks * $ehlockfaktor, 0, "", ".").'</font>';
 
 echo '
@@ -621,8 +596,7 @@ echo '
 </tr>
 <tr align="center">
 <td width="13" height="37" class="rl">&nbsp;</td>
-<td width="560">'.$options_lang['umodeinfo1'].'
-<font color="00FF00"><br>'.$options_lang['umodeinfo2'].'</font>';
+<td width="560">'.$options_lang['umodeinfo1'];
 echo '<br><font color="#FFFF00">'.$options_lang['accountloescheninfo3'].' '.number_format($sv_benticks * $ehlockfaktor, 0, "", ".").'</font>';
 //�berpr�fen ob man angegriffen wird
 if ($showattumode == 1) {

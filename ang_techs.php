@@ -818,7 +818,7 @@ if(setLock($_SESSION['ums_user_id'])){
 	';
 
 
-	$erg = releaseLock($ums_user_id); //L&ouml;sen des Locks und Ergebnisabfrage
+	$erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
 	if ($erg){
 		  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 	}else{

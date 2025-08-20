@@ -20,7 +20,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
             newtrans, newnews, allytag 
      FROM de_user_data WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];
@@ -41,7 +41,7 @@ include('resline.php');
 include('ally/ally.menu.inc.php');
 
 $full_access = false;
-if (has_position("leaderid", $allytag, $ums_user_id) || has_position("coleaderid1", $allytag, $ums_user_id) || has_position("coleaderid2", $allytag, $ums_user_id) || has_position("coleaderid3", $allytag, $ums_user_id) || has_position("fleetcommander1", $allytag, $ums_user_id) || has_position("fleetcommander2", $allytag, $ums_user_id)){
+if (has_position("leaderid", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid1", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid2", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid3", $allytag, $_SESSION['ums_user_id']) || has_position("fleetcommander1", $allytag, $_SESSION['ums_user_id']) || has_position("fleetcommander2", $allytag, $_SESSION['ums_user_id'])){
 	$full_access = true;
 }
 
@@ -95,13 +95,13 @@ for ($i=0; $i<$numrows;$i++){
 
     $rasse='';
     if ($values['rasse'] == 1) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
     } elseif ($values['rasse'] == 2) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
     } elseif ($values['rasse'] == 3) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
     } elseif ($values['rasse'] == 4) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
     }	
 
     $fleet_gesamt = 0;

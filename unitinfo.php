@@ -5,7 +5,7 @@ include "functions.php";
 include "tickler/kt_einheitendaten.php";
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, techs, newtrans, newnews, design3 AS design, sc2, spec1, spec3 FROM de_user_data WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"];$restyp04=$row["restyp04"];
 $restyp05=$row["restyp05"];$punkte=$row["score"];$techs=$row["techs"];
@@ -24,13 +24,13 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 include "resline.php";
 
 echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.$ums_gpfad.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$ums_gpfad.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
+<a href="production.php" title="Einheitenproduktion"><img src="'.$_SESSION['ums_gpfad'].'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
+<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$_SESSION['ums_gpfad'].'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
 if($sv_deactivate_vsystems ?? 0 !=1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.$ums_gpfad.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
+	echo '<a href="specialship.php" title="Basisstern"><img src="'.$_SESSION['ums_gpfad'].'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
 }
 echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$ums_gpfad.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
+<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$_SESSION['ums_gpfad'].'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
 ';
 
 
@@ -85,10 +85,10 @@ for($i=81;$i<=104;$i++){
 		echo '
 			<tr class="'.$bg.'">
 				<td></td>
-				<td><img src="'.$ums_gpfad.'g/derassenlogo1.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.$ums_gpfad.'g/derassenlogo2.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.$ums_gpfad.'g/derassenlogo3.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.$ums_gpfad.'g/derassenlogo4.png" border="0" width="16px" heigth="16px"></td>
+				<td><img src="'.$_SESSION['ums_gpfad'].'g/derassenlogo1.png" border="0" width="16px" heigth="16px"></td>
+				<td><img src="'.$_SESSION['ums_gpfad'].'g/derassenlogo2.png" border="0" width="16px" heigth="16px"></td>
+				<td><img src="'.$_SESSION['ums_gpfad'].'g/derassenlogo3.png" border="0" width="16px" heigth="16px"></td>
+				<td><img src="'.$_SESSION['ums_gpfad'].'g/derassenlogo4.png" border="0" width="16px" heigth="16px"></td>
 			</tr>';
 		
 		//Punkte

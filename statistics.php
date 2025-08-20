@@ -4,7 +4,7 @@ include "inc/lang/".$sv_server_lang."_statistics.lang.php";
 include "functions.php";
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, status FROM de_user_data WHERE user_id=?";
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];
 $restyp05=$row['restyp05'];$punkte=$row['score'];$newtrans=$row['newtrans'];$newnews=$row['newnews'];
@@ -51,7 +51,7 @@ if($_REQUEST['mp']==1)
   
   //daten auslesen
   $sql = "SELECT * FROM de_user_stat WHERE user_id=? ORDER BY datum DESC LIMIT 7";
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 
 
   //daten ausgeben
@@ -84,7 +84,7 @@ if($_REQUEST['mp']==1)
   
   //kollektoren die dir gestohlen worden sind
   $sql = "SELECT SUM(CASE WHEN colanz < 0 THEN colanz * -1 ELSE colanz END) AS colanz FROM de_user_getcol WHERE zuser_id=?";
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
   
   $row = mysqli_fetch_assoc($db_daten);
   rahmen_oben($stat_lang['verlorenekollektoren'].' ('.number_format($row['colanz'], 0, ',' ,'.').')');
@@ -92,7 +92,7 @@ if($_REQUEST['mp']==1)
   echo '<table width="580px">';
   echo '<tr align="center" class="cell"><td>Zeitpunkt</td><td>Kollektoren</td><td>Spielername</td></tr>';
   $sql = "SELECT * FROM de_user_getcol WHERE zuser_id=?";
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
   while($row = mysqli_fetch_assoc($db_daten)){
     $time=date("Y-m-d H:i:s", $row['time']);
   	//spielername des diebes
@@ -114,14 +114,14 @@ if($_REQUEST['mp']==1)
   
   //kollektoren die du erobert hast
   $sql = "SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id=? AND colanz>0";
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
   $row = mysqli_fetch_assoc($db_daten);
   rahmen_oben($stat_lang['erobertekollektoren'].' ('.number_format($row['colanz'], 0, ',' ,'.').')');
   
   echo '<table width="580px">';
   echo '<tr align="center" class="cell"><td>Zeitpunkt</td><td>Kollektoren</td><td>Spielername</td></tr>';
   $sql = "SELECT * FROM de_user_getcol WHERE user_id=?";
-  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ums_user_id]);
+  $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
   while($row = mysqli_fetch_assoc($db_daten))
   {
     $time=date("Y-m-d H:i:s", $row['time']);
@@ -174,7 +174,7 @@ elseif($_REQUEST['mp']==2)
   $sql="SELECT * FROM de_news_sector WHERE sector=? ORDER BY wt DESC";
   $db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
   
-  if($ums_user_id==1){
+  if($_SESSION['ums_user_id']==1){
 	  //echo $sql;
   }
  

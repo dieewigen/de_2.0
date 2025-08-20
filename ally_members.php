@@ -110,13 +110,13 @@ while ($data = mysqli_fetch_assoc($result)) {
 
     $rasse='';
     if ($data['rasse'] == 1) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
     } elseif ($data['rasse'] == 2) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
     } elseif ($data['rasse'] == 3) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
     } elseif ($data['rasse'] == 4) {
-        $rasse='<img src="'.$ums_gpfad.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
     }
 
 

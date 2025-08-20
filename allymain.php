@@ -5,7 +5,7 @@ include('lib/basefunctions.lib.php');
 include('inc/allyjobs.inc.php');
 include_once('functions.php');
 
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id=?", [$ums_user_id]);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
@@ -103,10 +103,10 @@ if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.in
 
 if($isleader || $iscoleader){
         $query = "SELECT * FROM de_allys where leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?";
-        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id, $ums_user_id, $ums_user_id, $ums_user_id]);
+        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 }else{
         $query = "SELECT * FROM de_allys ally, de_user_data user where user.allytag=ally.allytag and user.user_id=?";
-        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$ums_user_id]);
+        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
 }
 $row_result = mysqli_fetch_assoc($result);
 $clanid 		= $row_result["id"];
@@ -271,7 +271,7 @@ $rundensiegartefatke=number_format($questpoints, 0,"",".").' (Platz: '.$platz.')
   
 
 echo '<table width="100%">';
-//print("<tr><td><h2>$allyallymain_lang[msg_4], $ums_spielername</h2></td></tr>");
+//print("<tr><td><h2>$allyallymain_lang[msg_4], $_SESSION['ums_spielername']</h2></td></tr>");
 //print("<tr><td><hr></td></tr>");
 
 echo '<tr><td>
@@ -299,7 +299,7 @@ if($dailyallygift==1){
 echo '
       	<td height="32">Geworbene-Spieler-Bonus:</td>
       	<td height="32" colspan="3">
-    		<a href="ally_dailygift.php"><img src="'.$ums_gpfad.'g/'.$grafikname.'" border="0"></a>
+    		<a href="ally_dailygift.php"><img src="'.$_SESSION['ums_gpfad'].'g/'.$grafikname.'" border="0"></a>
  			
   			  	
 	  	</td>

@@ -5,7 +5,7 @@ include "inc/lang/".$sv_server_lang."_help.lang.php";
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
   "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans FROM de_user_data WHERE user_id=?",
-  [$ums_user_id]);
+  [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01 = $row['restyp01'];
 $restyp02 = $row['restyp02'];
@@ -32,7 +32,7 @@ include "resline.php";?><br>
 if (isset($_GET["t"])) {
     $t = intval($_GET["t"]);
     $db_daten = mysqli_execute_query($GLOBALS['dbi'],
-      "SELECT tech_name, des FROM de_tech_data$ums_rasse WHERE tech_id=?",
+      "SELECT tech_name, des FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?",
       [$t]);
     $row = mysqli_fetch_assoc($db_daten);
     $tech_name = $row["tech_name"];

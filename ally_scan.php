@@ -17,7 +17,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, spielername 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
@@ -40,7 +40,7 @@ $scancost = 200;
 $full_access = false;
 $result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT allytag FROM de_user_data WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($result);
 $clankuerzel = $row["allytag"];
 
@@ -63,7 +63,7 @@ if($bldg<1)
 
 //$source = createScanList($clankuerzel);
 
-if (has_position("leaderid", $clankuerzel, $ums_user_id) || has_position("coleaderid1", $clankuerzel, $ums_user_id) || has_position("coleaderid2", $clankuerzel, $ums_user_id) || has_position("coleaderid3", $clankuerzel, $ums_user_id) || has_position("tacticalofficer1", $clankuerzel, $ums_user_id) || has_position("leaderid", $clankuerzel, $ums_user_id))
+if (has_position("leaderid", $clankuerzel, $_SESSION['ums_user_id']) || has_position("coleaderid1", $clankuerzel, $_SESSION['ums_user_id']) || has_position("coleaderid2", $clankuerzel, $_SESSION['ums_user_id']) || has_position("coleaderid3", $clankuerzel, $_SESSION['ums_user_id']) || has_position("tacticalofficer1", $clankuerzel, $_SESSION['ums_user_id']) || has_position("leaderid", $clankuerzel, $_SESSION['ums_user_id']))
 {
 	$full_access = true;
 }

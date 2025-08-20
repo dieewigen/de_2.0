@@ -24,7 +24,7 @@ if(isset($_REQUEST['changechatchannel'])){
 	if($newchannel==2){
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 			"SELECT chatoffallg FROM de_user_data WHERE user_id=?",
-			[$ums_user_id]);
+			[$_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($db_daten);
 
 		if($row['chatoffallg']==1)$newchannel=$_SESSION["de_chat_inputchannel"];
@@ -34,7 +34,7 @@ if(isset($_REQUEST['changechatchannel'])){
 	if($newchannel==3){
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 			"SELECT chatoffglobal FROM de_user_data WHERE user_id=?",
-			[$ums_user_id]);
+			[$_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($db_daten);
 
 		if($row['chatoffglobal']==1)$newchannel=$_SESSION["de_chat_inputchannel"];
@@ -45,7 +45,7 @@ if(isset($_REQUEST['changechatchannel'])){
 	{
 	  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT allytag, status FROM de_user_data WHERE user_id=?",
-		[$ums_user_id]);
+		[$_SESSION['ums_user_id']]);
 	  $row = mysqli_fetch_assoc($db_daten);
 
 	  if($row['allytag']=='' OR $row['status']==0)$newchannel=$_SESSION["de_chat_inputchannel"];
@@ -93,7 +93,7 @@ if(isset($_REQUEST['chatinsert'])){
 	  //db updaten
 	  mysqli_execute_query($GLOBALS['dbi'],
 	    "UPDATE de_user_data SET chatclear=? WHERE user_id = ?",
-	    [$time, $ums_user_id]);
+	    [$time, $_SESSION['ums_user_id']]);
 	  $chat_message='';
 	  $return=1;
 	}
@@ -103,11 +103,11 @@ if(isset($_REQUEST['chatinsert'])){
 	if($channeltyp==0){//sektor
 		$db_daten=mysqli_execute_query($GLOBALS['dbi'],
 		  "SELECT sector, chatclear, chatoffallg FROM de_user_data WHERE user_id=?",
-		  [$ums_user_id]);
+		  [$_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($db_daten);
 		$channel=$row['sector'];
 	}elseif($channeltyp==1){//allianz
-		$channel=get_player_allyid($ums_user_id);
+		$channel=get_player_allyid($_SESSION['ums_user_id']);
 	}elseif($channeltyp==2){//allgemein
 		$channel=0;
 	}elseif($channeltyp==3){//global
@@ -118,14 +118,14 @@ if(isset($_REQUEST['chatinsert'])){
 	$akttime=date("Y-m-d H:i:s",time());
 	$db_daten=mysqli_execute_query($GLOBALS['dbi'],
 	  "SELECT com_sperre FROM de_login WHERE user_id=?",
-	  [$ums_user_id]);
+	  [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($db_daten);
 	if($row['com_sperre']>$akttime){
 		$chat_message='';
 	}
 	
 	if($chat_message!=''){
-		insert_chat_msg($channel, $channeltyp, $ums_spielername, $chat_message);
+		insert_chat_msg($channel, $channeltyp, $_SESSION['ums_spielername'], $chat_message);
 	}
 
 
@@ -155,7 +155,7 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	//spielerdaten auslesen
 	$db_daten=mysqli_execute_query($GLOBALS['dbi'],
 	  "SELECT sector, chatclear, chatoffallg, chatoffglobal FROM de_user_data WHERE user_id=?",
-	  [$ums_user_id]);
+	  [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($db_daten);
 	$cleartime=$row['chatclear'];
 	$sector=$row['sector'];
@@ -168,7 +168,7 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 
 	//Allianz
 	//allyid herausfinden
-	$allyid=get_player_allyid($ums_user_id);
+	$allyid=get_player_allyid($_SESSION['ums_user_id']);
 	//sql-befehl f�r allychat und b�ndnispartner
 	if($allyid>0){
 		//eigene ally

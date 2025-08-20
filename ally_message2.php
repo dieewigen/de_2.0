@@ -7,7 +7,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag 
      FROM de_user_data 
      WHERE user_id=?",
-    [$ums_user_id]);
+    [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $restyp01 = $row['restyp01'];
 $restyp02 = $row['restyp02'];
@@ -36,7 +36,7 @@ if ($text) {
 
     $allys = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT id FROM de_allys WHERE leaderid=?",
-        [$ums_user_id]);
+        [$_SESSION['ums_user_id']]);
 
     if (mysqli_num_rows($allys) < 1) {
         $resource = mysqli_execute_query($GLOBALS['dbi'],
@@ -52,7 +52,7 @@ if ($text) {
         mysqli_execute_query($GLOBALS['dbi'],
             "INSERT INTO de_user_trans (user_id, fromsec, fromsys, fromnic, time, betreff, text) 
              VALUES (?, ?, ?, ?, NOW(), ?, ?)",
-            [$row['user_id'], $sector, $system, $ums_spielername, $betreff, $text]);
+            [$row['user_id'], $sector, $system, $_SESSION['ums_spielername'], $betreff, $text]);
     }
 
     echo $allymessagezwei_lang[msg_1];
