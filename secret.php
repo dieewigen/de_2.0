@@ -1025,6 +1025,8 @@ if (!hasTech($pt, 9)) {
                 $ok = 2;
             }
 
+            //$ok= 1; //debug
+
             //überprüfen auf sabotagemöglichkeit
             if ($ok == 2) {
                 echo '<div class="info_box text2">'.$secret_lang['einsatzfehlerhaft'].'</div><br>';
@@ -1463,7 +1465,7 @@ if (!hasTech($pt, 9)) {
                                 $gespunkte += $ec * $unit[$rasse - 1][$row["tech_id"] - 90][4];
 
                                 echo '<tr>';
-                                echo '<td class="cc" width="70%" align="left">'.utf8_encode(getTechNameByRasse($row["tech_name"], $zrasse))."</td>";
+                                echo '<td class="cc" width="70%" align="left">'.getTechNameByRasse($row["tech_name"], $zrasse)."</td>";
                                 echo '<td class="cc" width="30%" align="right">'.number_format($ec, 0, "", ".")."</td>";
                                 echo '</tr>';
 
@@ -1517,7 +1519,7 @@ if (!hasTech($pt, 9)) {
                                         echo '<td class="cl">'.$time.'</td>';
                                         echo '</tr>';
                                         echo '<tr>';
-                                        echo '<td class="cc">'.utf8_encode(showkampfberichtV1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte)).'</td>';
+                                        echo '<td class="cc">'.showkampfberichtV1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte).'</td>';
                                         echo '</tr>';
                                         break;
                                     case 70:
@@ -1525,7 +1527,7 @@ if (!hasTech($pt, 9)) {
                                         echo '<td class="cl">'.$time.'</td>';
                                         echo '</tr>';
                                         echo '<tr>';
-                                        echo '<td class="cc">'.utf8_encode(showkampfberichtBG($row["text"])).'</td>';
+                                        echo '<td class="cc">'.showkampfberichtBG($row["text"]).'</td>';
                                         echo '</tr>';
                                         break;
                                     default:
@@ -1952,15 +1954,15 @@ if (!hasTech($pt, 9)) {
                 //Scanhistorie anlegen
                 if ($scanhistory == "") {
                     $entry = $copy_zsec2.':'.$copy_zsys2.':'.$zname.'|';
-                    $entry = utf8_decode($entry);
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET scanhistory=? WHERE user_id = ?", [$entry, $_SESSION['ums_user_id']]);
                 } else { //Scanhistorie updaten
                     $drin = 0;
                     $i = 0;
-                    $einsaetze = array(array(),);
+                    $einsaetze = array(array());
                     // Einträge zerlegen; leere Elemente entfernen um Warnungen zu vermeiden
                     $scanhis = array_filter(explode("|", $scanhistory), 'strlen');
                     while ($i < Count($scanhis)) {
+                        $daten = explode(":", $scanhis[$i]); // FIX: $daten aus $scanhis[$i] extrahieren
                         // Sicherstellen, dass fehlende Teile nicht zu Undefined-Index-Warnungen führen
                         $einsaetze[$i][0] = $daten[0] ?? '';
                         $einsaetze[$i][1] = $daten[1] ?? '';
@@ -1971,19 +1973,22 @@ if (!hasTech($pt, 9)) {
                     while ($i < Count($einsaetze)) {
                         if (($einsaetze[$i][0] == $copy_zsec2) && ($einsaetze[$i][1] == $copy_zsys2)) {
                             $drin = 1;
+                            break; // Wenn gefunden, Schleife verlassen
                         }
                         $i++;
                     }
-                    $entry = $copy_zsec2.':'.$copy_zsys2.':'.$zname.'|';
-                    $i = 0;
+                    
                     if ($drin == "0") {
-                        while ($i < Count($einsaetze) - 1) {
-                            if ($i < 4) {
-                                $entry = $entry.''.$einsaetze[$i][0].':'.$einsaetze[$i][1].':'.$einsaetze[$i][2].'|';
+                        // Neue Entry an den Anfang setzen
+                        $entry = $copy_zsec2.':'.$copy_zsys2.':'.$zname.'|';
+                        // Alte Einträge bis maximal 4 weitere hinzufügen
+                        $i = 0;
+                        while ($i < Count($einsaetze) && $i < 4) {
+                            if (!empty($einsaetze[$i][0])) { // Nur gültige Einträge hinzufügen
+                                $entry = $entry.$einsaetze[$i][0].':'.$einsaetze[$i][1].':'.$einsaetze[$i][2].'|';
                             }
                             $i++;
                         }
-                        $entry = utf8_decode($entry);
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET scanhistory=? WHERE user_id = ?", [$entry, $_SESSION['ums_user_id']]);
                     }
                 }

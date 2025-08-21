@@ -480,36 +480,41 @@ echo "<a href=sysnews.php?a=d onclick=\"return confirm('".$sn_lang["deletewarnin
 
 function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
 {
+    $mail = new PHPMailer\PHPMailer\PHPMailer();
 
-
-    $email_subject = $betreff; // The Subject of the email
-
-    require_once 'lib/phpmailer/class.phpmailer.php';
-    require_once 'lib/phpmailer/class.smtp.php';
-
-    $mail = new PHPMailer();
-
-    $mail->IsHTML(true);
     $mail->isSMTP();
+    $mail->smtpConnect([
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        ]
+    ]);
+    $mail->SMTPDebug = 0;
+    $mail->Debugoutput = 'html';
     $mail->Host = $GLOBALS['env_mail_server'];
+    $mail->Port = 587;
+    $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     $mail->SMTPAuth = true;
     $mail->Username = $GLOBALS['env_mail_user'];
     $mail->Password = $GLOBALS['env_mail_password'];
-    $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
+    $mail->IsHTML(true);
 
     $mail->setFrom('noreply@die-ewigen.com', 'Die Ewigen');
     //Set an alternative reply-to address
     $mail->addReplyTo('noreply@die-ewigen.com', 'Die Ewigen');
     //Set who the message is to be sent to
-    $mail->addAddress($an, '');
+    $mail->addAddress($an);
     //Set the subject line
-    $mail->Subject = $email_subject;
+    $mail->Subject = $betreff;
     $mail->Body = $text;
 
     $mail->AddStringAttachment($att_content, $dateiname, 'base64', 'text/html');
 
-
-    $mail->send();
+    if (!$mail->send()) {
+        echo 'Mailer Error: ' . $mail->ErrorInfo;
+        return false;
+    }
+    return true;
 }
 ?>

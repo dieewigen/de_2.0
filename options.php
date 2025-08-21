@@ -1,8 +1,8 @@
 <?php
 include('inc/header.inc.php');
 include('outputlib.php');
-require_once('lib/phpmailer/class.phpmailer.php');
-require_once('lib/phpmailer/class.smtp.php');
+//require_once('lib/phpmailer/class.phpmailer.php');
+//require_once('lib/phpmailer/class.smtp.php');
 include('functions.php');
 include('inc/lang/'.$sv_server_lang.'_options.lang.php');
 
@@ -159,7 +159,7 @@ if ($delacc) { //account l�schen
                   "UPDATE de_login SET last_login=?, status=3, inaktmail=1, delmode=1 WHERE user_id=?", 
                   [$datum, $uid]);
 
-                //ehlock, damit man f�r eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
+                //ehlock, damit man für eine bestimmte zeitspanne vom eh-kampf ausgeschlossen ist
                 $newtick = $maxtick + ($sv_benticks * $ehlockfaktor);
                 mysqli_execute_query($GLOBALS['dbi'], 
                   "UPDATE de_user_data SET ehlock=? WHERE user_id=?", 

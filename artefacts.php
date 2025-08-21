@@ -776,7 +776,7 @@ if (!hasTech($pt, 28)) {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$_SESSION['ums_user_id']]);
     $anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
     $ac = 0;
-    unset($artefacts);
+    $artefacts= array();
     while ($row = mysqli_fetch_array($db_daten)) {
         //title/tooltip festlegen
         $title = $ua_name[$row["id"] - 1].'&'.$ua_desc[$row["id"] - 1];
@@ -973,7 +973,7 @@ if (!hasTech($pt, 28)) {
     rahmen_unten();
 }
 
-echo '<script language="javascript">';
+echo '<script>';
 $data = array('a' => $artefacts);
 echo 'var a = '.json_encode($artefacts).';';
 ?>

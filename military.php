@@ -13,6 +13,14 @@ if(!isset($db) && isset($GLOBALS['dbi'])){
 	$db = $GLOBALS['dbi'];
 }
 
+if(isset($_GET['se'])){
+	$se = $_GET['se'];
+}
+
+if(isset($_GET['sy'])){
+	$sy = $_GET['sy'];
+}
+
 //Check ob die Missionen zu Ende sind
 checkMissionEnd();
 
@@ -69,9 +77,9 @@ if (isset($_POST['befehle'])){
 	$zsysf3=isset($_POST['zsysf3']) ? (int)$_POST['zsysf3'] : 0;
 
   //sektor 1 unangreifbar machen und man kann auch nicht aus sektor 1 angegriffen werden
-  if($zsecf1==1 OR $sector==1)$zsecf1='-1';
-  if($zsecf2==1 OR $sector==1)$zsecf2='-1';
-  if($zsecf3==1 OR $sector==1)$zsecf3='-1';
+  if($zsecf1==1 || $sector==1)$zsecf1='-1';
+  if($zsecf2==1 || $sector==1)$zsecf2='-1';
+  if($zsecf3==1 || $sector==1)$zsecf3='-1';
   /*
     Aktionen
     0: Verteidigung des Heimatsystems

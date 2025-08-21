@@ -17,13 +17,13 @@ if($row['status']!=1){
 }
 
 //***************************************
-$se=intval($_REQUEST['se']);
-$sy=intval($_REQUEST['sy']);
+$se=intval($_REQUEST['se'] ?? 0);
+$sy=intval($_REQUEST['sy'] ?? 0);
 
 if(!isset($zuser_id)) $zuser_id = 0;
 if(!isset($zowner_id)) $zowner_id = 0;
 
-//wenn ein spielername �bergeben wird, dann anhand dessen die koordinaten und die user_id ermitteln
+//wenn ein spielername übergeben wird, dann anhand dessen die koordinaten und die user_id ermitteln
 if(isset($_REQUEST['sn'])){
 	
 	$sn=$_REQUEST['sn'];

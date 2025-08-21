@@ -18,8 +18,8 @@ if ($sv_comserver == 1) {
     include_once $directory.'inc/svcomserver.inc.php';
 }
 
-include_once $directory.'lib/phpmailer/class.phpmailer.php';
-include_once $directory.'lib/phpmailer/class.smtp.php';
+//include_once $directory.'lib/phpmailer/class.phpmailer.php';
+//include_once $directory.'lib/phpmailer/class.smtp.php';
 
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
@@ -142,9 +142,8 @@ if ($doetick == 1) {
     }
 
     //////////////////////////////////////////////////////////
-    //EWIGE RUNDE - Kollektoren aus Sektor 1 transferieren
+    // Kollektoren aus Sektor 1 transferieren
     //////////////////////////////////////////////////////////
-    //if($sv_ewige_runde==1){
     //gibt es einen spieler in sektor 1 mit mehr als X Kollektoren?
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_user_data` LEFT JOIN `de_login` ON(de_login.user_id=de_user_data.user_id) WHERE de_user_data.sector=1 AND de_user_data.col>25 AND de_login.status=3 AND de_login.delmode=2 ORDER BY de_user_data.col DESC LIMIT 1", []);
     $num = mysqli_num_rows($db_daten);
@@ -172,7 +171,6 @@ if ($doetick == 1) {
             echo 'Kollektortransfer von '.$row['user_id'].' an '.$rowx['user_id'];
         }
     }
-    //}
 
     //votetimer für den sektor um 1 verringern
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET votetimer=votetimer-1 WHERE votetimer>0", []);

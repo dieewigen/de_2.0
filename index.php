@@ -1,20 +1,12 @@
 <?php
 session_start();
+include 'inc/sv.inc.php';
+include 'inc/lang/'.$sv_server_lang.'_index.lang.php';
+include 'inc/'.$sv_server_lang.'_links.inc.php';
+include 'functions.php';
+require_once 'vendor/autoload.php';
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: ".gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-
-
-include('inc/sv.inc.php');
-include('inc/lang/'.$sv_server_lang.'_index.lang.php');
-include('inc/'.$sv_server_lang.'_links.inc.php');
-include('functions.php');
-
-require_once('lib/mobiledetect/Mobile_Detect.php');
-$detect = new Mobile_Detect;
+$detect = new \Detection\MobileDetect;
 
 //cookie als loginhilfe setzen
 if(!isset($_COOKIE["loginhelp"])){
@@ -35,28 +27,16 @@ $gamename='Die Ewigen';
 if(isset($_REQUEST['logout'])){
   session_destroy();
   session_start();
-
-  if($sv_efta_in_de==1 AND $sv_sou_in_de==1){
-    include('inc/session.inc.php');
-  }else{
-    header("Location: index.php");
-  }
+  header("Location: index.php");
 }
 
 //wenn kein server gefunden wurde einfach den ersten eintragen
 $sv_image_server=$sv_image_server_list[0];
 
-//wenn pass und loginname gepostet werden, dann versuchen den account einzuloggen
 //login ist jetzt auch über den loginkey möglich, dieser ist jedoch nur 5 minuten gültig
-//if((isset($_POST['nic'], $_POST['pass']) AND $_POST['nic'] !='' AND $_POST['pass'] !='') OR (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!='')){
 if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 	//db connect herstellen
 	include('inccon.php');
-	
-	/*
-	if(isset($_POST['nic'])) { $nic = SecureValue($_POST['nic']); }else $nic = '';
-	if(isset($_POST['pass'])) { $pass = SecureValue($_POST['pass']); }else $pass = '';
-	*/
 
 	if(isset($_REQUEST['loginkey'])){
 		$_REQUEST['loginkey'] = SecureValue($_REQUEST['loginkey']);
@@ -164,7 +144,7 @@ if(isset($_REQUEST['loginkey']) && $_REQUEST['loginkey']!=''){
 
 		}else{
 			
-			if($detect->isMobile() || $detect->isTablet()){//mobile
+			if($detect->isMobile() || $detect->isTablet()){
 				$value=1;
 			}else{//desktop
 				$value=0;

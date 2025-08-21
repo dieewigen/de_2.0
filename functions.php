@@ -1,4 +1,5 @@
 <?php
+require_once 'vendor/autoload.php';
 
 function createTitleForUser($ownerId, $title){
 
@@ -2094,7 +2095,7 @@ function reumlaut($fieldname)
 function mail_smtp($empfaenger, $subject, $body, $absender = 'noreply@die-ewigen.com')
 {
     //Create a new PHPMailer instance
-    $mail = new PHPMailer();
+    $mail = new PHPMailer\PHPMailer\PHPMailer();
     //Tell PHPMailer to use SMTP
     $mail->isSMTP();
     $mail->smtpConnect([

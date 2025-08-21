@@ -174,13 +174,10 @@ if($system!=issectorcommander()){
 
 echo '<form action="bkmenu.php" method="post">';
 
-function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
+function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 	global $bkmenu_lang;
-	$sector=(int)$sector;
-	$zsec=(int)$zsec;
-	$akttyp=(int)$akttyp;
-	$aktzeit=(int)$aktzeit;
-	//teste ob die flotte bereit ist befehle zu bekommen
+
+  //teste ob die flotte bereit ist befehle zu bekommen
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT aktion, e2 FROM de_sector WHERE sec_id = ?",
 		[$ownsector]);
@@ -260,7 +257,7 @@ function attdef($ownsector, $zsec, $db, $akttyp, $aktzeit){
 	if ($rz==0) echo $bkmenu_lang['fehlerflottenbefehle'];
 }
 
-function recall($ownsector, $db){
+function recall($ownsector){
 	global $bkmenu_lang;
 	//erstmal die daten der flotte holen und sichern
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
@@ -340,13 +337,13 @@ if(!empty($befehle)){
     case 0: //keine neuen befehle
       break;
     case 1: //heimkehr
-      recall($sector, $db);
+      recall($sector);
       break;
     case 2: //angreifen
-      attdef($sector, $zsecf1, $db, 1, 0);
+      attdef($sector, $zsecf1, 1, 0);
       break;
     default: //verteidigen
-      attdef($sector, $zsecf1, $db, 2, $af1-2);
+      attdef($sector, $zsecf1, 2, $af1-2);
       break;
   }//switch af1 ende
 }

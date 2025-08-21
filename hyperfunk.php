@@ -1,8 +1,8 @@
 <?php
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_hyperfunk.lang.php');
-require_once('lib/phpmailer/class.phpmailer.php');
-require_once('lib/phpmailer/class.smtp.php');
+//require_once('lib/phpmailer/class.phpmailer.php');
+//require_once('lib/phpmailer/class.smtp.php');
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, `system` FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
@@ -1333,50 +1333,6 @@ if ($action == "optionen") {
 </table>
 </form>
 <?php
-}
-
-//Check gegen Scriptkiddies
-
-switch ($action) {
-    case "delene":break;
-    case "delbuddy":break;
-    case "optionen":break;
-
-
-    case "alli":break;
-    case "freunde":break;
-    case "arc":break;
-    case "da":break;
-    case "del":break;
-
-    case "ant":break;
-    case "weiter":break;
-    case "ausgang":break;
-    case "eingang":break;
-    case "sektor":break;
-    case "archiv":break;
-    case "spieler":break;
-    case "":break;
-
-    default:
-        @$time = strftime("%Y%m%d%H%M%S");
-        @$param = "Der folgende Spieler ".$_SESSION['ums_spielername']." ($asec:$asys)[UserID:".$_SESSION['ums_user_id']."] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $action";
-        @mail_smpt($GLOBALS['env_admin_email'], "Scriptkiddi auf Server $sv_server_name am Werk.", $param);
-        break;
-}
-
-switch ($l) {
-    case "e":break;
-    case "a":break;
-    case "r":break;
-    case "new":break;
-    case "":break;
-
-    default:
-        @$time = strftime("%Y%m%d%H%M%S");
-        @$para = "Der folgende Spieler ".$_SESSION['ums_spielername']." ($asec:$asys)[UserID:".$_SESSION['ums_user_id']."] hat am $zeit an den Parametern rumgespielt. \n\n\n Der Parameter lautet: \n $l";
-        @mail_smtp($GLOBALS['env_admin_email'], "Scriptkiddi auf Server $sv_server_name am Werk.", $para);
-        break;
 }
 ?>
 <br><br>

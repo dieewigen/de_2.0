@@ -1,0 +1,19 @@
+{
+    "name": "dieewigen/de2",
+    "description": "Die Ewigen 2.0",
+    "require": {
+        "phpmailer/phpmailer": "^6.10",
+        "mobiledetect/mobiledetectlib": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dieewigen\\De2\\": "lib/"
+        }
+    },
+    "authors": [
+        {
+            "name": "git",
+            "email": "issomad@die-ewigen.com"
+        }
+    ]
+}
