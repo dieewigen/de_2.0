@@ -22,8 +22,7 @@ Voraussetzung: MySQL / MariaDB Datenbanksystem installiert
 
 Extrem viele der Spiel-Parameter können in den files in https://github.com/dieewigen/de_2.0/tree/master/inc gesetzt werden.
 
-Insbesondere für für eine laufenden Server ist es aber wichtig die Datenbank Zugangsdaten und Adressen zu setzen dies ist in inc/env.inc.sample.php zu machen.
-
+Insbesondere für für eine laufenden Server ist es aber wichtig die Datenbank Zugangsdaten und Adressen zu setzen dies ist in inc/env.inc.php zu machen, eine Beispieldatei findet man unter inc/env.inc.sample.php.
 
 
 ### Generiere Accounts
@@ -57,3 +56,21 @@ Man kann sich an tickler/wt_auto_reset.php orientieren
 	- Editor um die initiale Karte des VS - Vergessenen Systeme Spieles zu erstellen 
 	https://github.com/dieewigen/vs_starmap_editor
 
+
+## Nutzung von composer
+### Composer Dependencies installieren:###
+   ```bash
+   composer install
+   ```
+### Was passiert bei der Installation
+
+- Alle in `composer.json` definierten Pakete werden heruntergeladen
+- Das `vendor/` Verzeichnis wird erstellt
+- Der Autoloader wird generiert (`vendor/autoload.php`)
+
+### Bibliotheken aktualisieren
+
+Um alle Pakete auf die neuesten Versionen zu aktualisieren:
+```bash
+composer update
+```
