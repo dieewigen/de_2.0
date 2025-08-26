@@ -23,9 +23,8 @@ if ($row['status']==1) $ownally = $row['allytag'];
 <title>Allianzprojekte</title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-<div style="text-align: center;">
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 //stelle die ressourcenleiste dar
 include('resline.php');
 include('ally/ally.menu.inc.php');

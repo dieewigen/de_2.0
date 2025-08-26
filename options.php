@@ -125,7 +125,7 @@ if (isset($_POST['graop'])) {
 }
 
 $delacc = $_POST['delacc'] ?? false;
-if ($delacc) { //account l�schen
+if ($delacc) { //account löschen
     $delpass = $_POST['delpass'];
     $delcheck1 = $_POST['delcheck1'];
     $delcheck2 = $_POST['delcheck2'];
@@ -202,8 +202,8 @@ $logoutmsg = '<font '.$color.'>'.$restminuten.' '.$options_lang['logountmin'].' 
 <title><?php echo $options_lang['title'];?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 //stelle die ressourcenleiste dar
 include('resline.php');

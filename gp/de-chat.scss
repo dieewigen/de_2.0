@@ -60,6 +60,10 @@ $themes: (
   color: #fff;
 }
 
+#chatcontent{
+  font-size: 16px;
+}
+
 // Mobile Layout (flex-basiert)
 html, body.mobile { height: 100%; }
 body.mobile {
@@ -97,6 +101,7 @@ body.mobile #chatheader {
   text-align: center;
   box-sizing: border-box;
 }
+
 body.mobile #chatcontent {
   flex: 1 1 auto;
   min-height: 0;

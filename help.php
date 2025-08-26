@@ -25,8 +25,8 @@ include "functions.php";
 <title><?php echo $help_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
-<?//stelle die ressourcenleiste dar
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include "resline.php";?><br>
 <?php
 if (isset($_GET["t"])) {

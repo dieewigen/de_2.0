@@ -61,11 +61,8 @@ function insertmessage($message,$color){
 <?php include "cssinclude.php"; ?>
 <META http-equiv=Content-Type content="text/html; charset=windows-1252">
 </head>
-<body>
-
-<font face="tahoma" style="font-size:8pt;">
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include('resline.php');
 $leaderpage = true;
 include('ally/ally.menu.inc.php');

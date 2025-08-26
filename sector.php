@@ -59,21 +59,11 @@ $maxcol=$row['maxcol'];
 <title>Sektor</title>
 <?php include "cssinclude.php";
 echo '
-<style type="text/css">
-.user_title {
-	display: inline-block;
-	background-color: rgb(250, 184, 233);
-	width: 10px;
-	height: 10px;
-	margin-left: 5px;
-	transform: rotate(45deg);
-}
-</style>.
 </head>';
 if($_SESSION['ums_mobi']==1){
-	echo '<body>';
+	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 }else{
-	echo '<body onload="javascript:document.secform.sf.focus();document.secform.sf.select();">';
+	echo '<body onload="javascript:document.secform.sf.focus();document.secform.sf.select();" class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 }
 
 //stelle die ressourcenleiste dar

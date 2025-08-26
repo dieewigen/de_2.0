@@ -1,0 +1,1268 @@
+@use 'sass:map';
+
+// CSS Reset
+
+// Basisboxmodell auf alle Elemente anwenden
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+// Standard-Margins entfernen
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+	margin: 0;
+}
+
+// Grundschrift und Hintergrund
+body {
+	min-height: 100vh;
+	line-height: 1.3;
+	font-family: sans-serif;
+	background-color: #fff;
+	color: #000;
+}
+
+// Bilder & Medien skalierbar machen
+img,
+picture,
+video,
+canvas,
+svg {
+	display: inline-block;
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+// Formulare vereinheitlichen
+input,
+button,
+textarea,
+select {
+	font: inherit;
+}
+
+// Überscroll-Effekte vermeiden
+html:focus-within {
+	scroll-behavior: smooth;
+}
+
+// ------------------------------------------------------------
+// Theme System für Desktop & Mobile (rasse1-rasse4)
+// Verwendung:
+//   <body class="theme-rasse1">            // Standard-Theme
+//   <body class="theme-rasse1 mobile">     // Mobile Variante
+//   <body class="theme-rasse1 desktop">    // Desktop Variante mit speziellem Styling
+// ------------------------------------------------------------
+
+// Konfiguration: Button-Bilder, Farben und Desktop-spezifische Werte je Theme
+$themes: (
+	rasse1: (color: #3399FF,
+		btn-image: 'm/1_btn.png',
+		btn-width: 118px,
+		btn-height: 17px,
+		btn-color: #FFFFFF,
+		hyper-image: 'm/1_hyper.png',
+		news-image: 'm/1_news.png',
+		desktop-bg-image: 'g/bgr1_1.jpg',
+		scroll-arrow: #5A5AC8,
+		scroll-3dlight: #232369,
+		cell1-image: 'g/cellblue.png',
+		resmain-bg: 'g/resl/1_top.png',
+		resmain-color: #0bbfff,
+		resmain-width: 598px,
+		resleddef-bg: 'g/resl/1_leddef.png',
+		resledatt-bg: 'g/resl/1_ledatt.gif',
+		reshyper-bg: 'g/resl/1_hyper.png',
+		reshyper-top: 87px,
+		reshyper-height: 24px,
+		resnews-bg: 'g/resl/1_news.png',
+		resnews-top: 87px,
+		resnews-height: 24px,
+		chat2bg-image: 'g/bgr1_1.jpg',
+		rand-suffix: '_b',
+		rand-ro-suffix: '_b',
+		mobilebtn-bg: #3399FF,
+		secbutton-prefix: '1'
+	),
+	rasse2: (color: #A6A6A6,
+		btn-image: 'm/2_btn.png',
+		btn-width: 121px,
+		btn-height: 18px,
+		btn-color: #89d0d9,
+		hyper-image: 'm/2_hyper.png',
+		news-image: 'm/2_news.png',
+		desktop-bg-image: 'g/bgr2_1.jpg',
+		scroll-arrow: #969696,
+		scroll-3dlight: #505050,
+		cell1-image: 'g/celltuerkis.png',
+		resmain-bg: 'g/resl/2_top.png',
+		resmain-color: #89d0d9,
+		resmain-width: 598px,
+		resleddef-bg: 'g/resl/2_leddef.png',
+		resledatt-bg: 'g/resl/2_ledatt.gif',
+		reshyper-bg: 'g/resl/2_hyper.png',
+		reshyper-top: 98px,
+		reshyper-height: 24px,
+		resnews-bg: 'g/resl/2_news.png',
+		resnews-top: 98px,
+		resnews-height: 24px,
+		chat2bg-image: 'g/bgr2_1.jpg',
+		rand-suffix: '',
+		rand-ro-suffix: '',
+		mobilebtn-bg: #A6A6A6,
+		secbutton-prefix: '2'
+	),
+	rasse3: (color: #DE3939,
+		btn-image: 'm/3_btn.png',
+		btn-width: 120px,
+		btn-height: 18px,
+		btn-color: #FFFFFF,
+		hyper-image: 'm/3_hyper.png',
+		news-image: 'm/3_news.png',
+		desktop-bg-image: 'g/bgr3_1.jpg',
+		scroll-arrow: #FF6666,
+		scroll-3dlight: #990000,
+		cell1-image: 'g/cellred.png',
+		resmain-bg: 'g/resl/3_top.png',
+		resmain-color: #ffffff,
+		resmain-width: 599px,
+		resleddef-bg: 'g/resl/3_leddef.png',
+		resledatt-bg: 'g/resl/3_ledatt.gif',
+		reshyper-bg: 'g/resl/3_hyper.png',
+		reshyper-top: 98px,
+		reshyper-height: 23px,
+		resnews-bg: 'g/resl/3_news.png',
+		resnews-top: 98px,
+		resnews-height: 23px,
+		chat2bg-image: 'g/bgr3_1.jpg',
+		rand-suffix: '_r',
+		rand-ro-suffix: '_ro',
+		mobilebtn-bg: #DE3939,
+		secbutton-prefix: '3'
+	),
+	rasse4: (color: #ED951E,
+		btn-image: 'm/4_btn.png',
+		btn-width: 118px,
+		btn-height: 17px,
+		btn-color: #ed951e,
+		hyper-image: 'm/4_hyper.png',
+		news-image: 'm/4_news.png',
+		desktop-bg-image: 'g/bgr4_1.jpg',
+		scroll-arrow: #FFCC66,
+		scroll-3dlight: #CC7700,
+		cell1-image: 'g/cellgreen.png',
+		resmain-bg: 'g/resl/4_top.png',
+		resmain-color: #ffffff,
+		resmain-width: 600px,
+		resleddef-bg: 'g/resl/4_leddef.png',
+		resledatt-bg: 'g/resl/4_ledatt.gif',
+		reshyper-bg: 'g/resl/4_hyper.png',
+		reshyper-top: 98px,
+		reshyper-height: 23px,
+		resnews-bg: 'g/resl/4_news.png',
+		resnews-top: 98px,
+		resnews-height: 23px,
+		chat2bg-image: 'g/bgr4_1.jpg',
+		rand-suffix: '_g',
+		rand-ro-suffix: '_g',
+		mobilebtn-bg: #ED951E,
+		secbutton-prefix: '4'
+	)
+);
+
+// Gemeinsame Styles für alle Themes
+.cellbg {
+	background: url(g/cellblack.png) repeat;
+	color: #fff;
+}
+
+// Gemeinsame Basis-Elemente
+img {
+	border: none;
+}
+
+th {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	background-color: #D3DCE3;
+}
+
+td {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 14px;
+}
+
+form {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 14px;
+}
+
+h1 {
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 22px;
+	font-weight: normal;
+}
+
+// Info Box
+.info_box {
+	overflow: hidden;
+	width: 592px;
+	border: 1px solid #2f2f2f;
+	background: url(g/cellblack.png) repeat;
+	text-align: center;
+	padding: 10px;
+}
+
+// Text-Alignment-Klassen
+.tal {
+	text-align: left;
+}
+
+.tar {
+	text-align: right;
+}
+
+.tac {
+	text-align: center;
+}
+
+// Text-Color-Klassen
+.tc1 {
+	color: #ffffff;
+}
+
+.tc2 {
+	color: #ff0000;
+}
+
+.tc3 {
+	color: #00ff00;
+}
+
+.tc4 {
+	color: #FDFB59;
+}
+
+// Text-Size-Klassen
+.ts1 {
+	font-size: 11px;
+}
+
+.ts2 {
+	font-size: 14px;
+}
+
+// Gemeinsame Zell-Klassen
+.ccg {
+	font-weight: normal;
+	text-align: center;
+	background: url(g/cellblack.png) repeat;
+	color: #28FF50;
+}
+
+.ccr {
+	font-weight: normal;
+	text-align: center;
+	background: url(g/cellblack.png) repeat;
+	color: #FF2828;
+}
+
+.ccy {
+	font-weight: normal;
+	text-align: center;
+	background: url(g/cellblack.png) repeat;
+	color: #FDFB59;
+}
+
+.tl,
+.tc,
+.tr {
+	font-weight: normal;
+	background: url(g/cellblack.png) repeat;
+	color: #E0E0E0;
+}
+
+.tl {
+	text-align: left;
+}
+
+.tc {
+	text-align: center;
+}
+
+.tr {
+	text-align: right;
+}
+
+.cell {
+	background: url(g/cellblack.png) repeat;
+	color: #ffffff;
+	font-size: 11px;
+}
+
+.cellu {
+	background: url(g/cellblack.png) repeat;
+	color: #ffffff;
+	font-size: 15px;
+}
+
+.link:link,
+.link:visited,
+.link:hover {
+	color: #ffffff;
+	font-size: 11px;
+}
+
+// Rand-Klassen (werden jetzt theme-spezifisch in den Theme-Regeln definiert)
+
+// K-Klassen (gemeinsame Styles)
+.k3,
+.k4 {
+	font-size: 11px;
+	font-family: Tahoma;
+	color: #000000;
+	border-color: #606060;
+}
+
+.k3 {
+	background-color: #969696;
+}
+
+.k4 {
+	background-color: #BABABA;
+}
+
+.k5,
+.k6 {
+	font-size: 11px;
+	font-family: Tahoma;
+	color: #FFB0B0;
+	border-color: #606060;
+}
+
+.k5 {
+	background-color: #640404;
+}
+
+.k6 {
+	background-color: #920606;
+}
+
+.k7,
+.k8 {
+	font-size: 11px;
+	font-family: Tahoma;
+	color: #ED951E;
+	border-color: #606060;
+}
+
+.k7 {
+	background-color: #304802;
+}
+
+.k8 {
+	background-color: #3A5C02;
+}
+
+.k9,
+.k10 {
+	font-size: 11px;
+	font-family: Tahoma;
+	color: #FFFF40;
+	border-color: #606060;
+}
+
+.k9 {
+	background-color: #710272;
+}
+
+.k10 {
+	background-color: #7A048C;
+}
+
+// Weitere gemeinsame Klassen
+.text1 {
+	color: #ffffff;
+	font-size: 11px;
+}
+
+.text2 {
+	color: #ff0000;
+	font-size: 14px;
+}
+
+.text3 {
+	color: #00ff00;
+	font-size: 14px;
+}
+
+.fett {
+	font-weight: bold;
+}
+
+.ov_skinfo {
+	overflow: hidden;
+	width: 560px;
+}
+
+.bgpic1 {
+	background: url(g/bgpic1.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 265px;
+	height: 130px;
+}
+
+.bgpic2 {
+	background: url(g/bgpic2.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 265px;
+	height: 130px;
+}
+
+.bgpic3 {
+	background: url(g/cellblack.png) repeat;
+	width: 560px;
+	height: 235px;
+}
+
+.bgpic4 {
+	background: url(g/bgpic4.png);
+	width: 500px;
+	height: 500px;
+}
+
+.menu_box {
+	overflow: hidden;
+	width: 600px;
+	border: 1px solid #2f2f2f;
+}
+
+// Menu-System
+#menu {
+	background: #1f1f1f;
+	float: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+#menu li {
+	float: left;
+	font: 67.5% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+#menu a {
+	background: #1f1f1f url("g/seperator.gif") bottom right no-repeat;
+	color: #ccc;
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 6px 12px;
+	text-decoration: none;
+}
+
+// Resource-System (Theme-spezifische Anpassungen in den Themes)
+#resmain {
+	font-family: Arial, helvetica, geneva, sans-serif;
+	font-size: 11px;
+	width: 598px;
+	height: 129px;
+	position: relative;
+	z-index: 10;
+}
+
+// Resource-System Elemente
+#restyp1,
+#restyp2,
+#restyp3,
+#restyp4,
+#restyp5 {
+	width: 75px;
+	height: 65px;
+	position: absolute;
+	top: 12px;
+	z-index: 11;
+	text-align: center;
+	vertical-align: top;
+}
+
+#restyp1 {
+	left: 35px;
+}
+
+#restyp2 {
+	left: 125px;
+}
+
+#restyp3 {
+	left: 215px;
+}
+
+#restyp4 {
+	left: 305px;
+}
+
+#restyp5 {
+	left: 395px;
+}
+
+#resscore,
+#rescredits {
+	width: 75px;
+	height: 11px;
+	position: absolute;
+	top: 98px;
+	z-index: 11;
+	text-align: center;
+}
+
+#resscore {
+	left: 185px;
+}
+
+#rescredits {
+	left: 370px;
+}
+
+#resclock1,
+#resclock2,
+#resclock3 {
+	width: 37px;
+	height: 11px;
+	position: absolute;
+	left: 537px;
+	z-index: 11;
+	text-align: center;
+}
+
+#resclock1 {
+	top: 13px;
+}
+
+#resclock2 {
+	top: 35px;
+}
+
+#resclock3 {
+	top: 57px;
+}
+
+#resdef,
+#resatt {
+	width: 75px;
+	height: 11px;
+	position: absolute;
+	left: 35px;
+	z-index: 11;
+	text-align: center;
+}
+
+#resdef {
+	top: 86px;
+}
+
+#resatt {
+	top: 106px;
+}
+
+#resleddef,
+#resledatt {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	left: 7px;
+	z-index: 11;
+}
+
+#resleddef {
+	top: 84px;
+}
+
+#resledatt {
+	top: 104px;
+}
+
+#resdailyallygift {
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	top: 88px;
+	left: 458px;
+	cursor: pointer;
+	z-index: 11;
+}
+
+// Chat Background-Elemente
+#chat2bg {
+	background-position: -620px -16px;
+	background-repeat: repeat;
+	height: 100%;
+}
+
+#chat3bg {
+	background-image: url(g/bg.gif);
+	background-repeat: repeat;
+}
+
+// Tooltip-System
+#tooltip {
+	padding: 5px;
+	position: absolute;
+	z-index: 3000;
+	border: 1px solid #CCCCCC;
+	background-color: #000000;
+	opacity: 1.00;
+	
+
+	h3 {
+		margin: 0;
+		font-weight: bold;
+		font-size: 15px;
+	}
+
+	.div {
+		margin: 0;
+		font-weight: normal;
+		font-size: 16px;
+	}
+
+}
+
+#tooltip.design1 {
+	font-family: Arial;
+	opacity: 1.00;
+	color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+}
+
+#tooltip.design1 div {
+	text-align: left;
+}
+
+#tt {
+	text-align: left;
+	color: #FFFFFF;
+	background: #222222;
+	position: absolute;
+	z-index: 100;
+	padding: 15px;
+	font-size: 13px;
+}
+
+#tt:after {
+	width: 0;
+	height: 0;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid #222222;
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: -10px;
+	margin-left: -10px;
+}
+
+#tt.top:after {
+	border-top-color: transparent;
+	border-bottom: 10px solid #222222;
+	top: -20px;
+	bottom: auto;
+}
+
+#tt.left:after {
+	left: 10px;
+	margin: 0;
+}
+
+#tt.right:after {
+	right: 10px;
+	left: auto;
+	margin: 0;
+}
+
+// Desktop Layout Basics (übernommen aus de-desktop.scss)
+html,
+body {
+	width: 100%;
+	height: 100%;
+	font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
+	font-size: 16px !important;
+}
+
+.font1 {
+	font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
+}
+
+.mt10 {
+	margin-top: 10px;
+}
+
+.mb10 {
+	margin-bottom: 10px;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.uppercase {
+	text-transform: uppercase;
+}
+
+.text_red {
+	color: #EE0000;
+}
+
+.invisible {
+	display: none;
+}
+
+// Button Styles
+.btn,
+a.btn:link,
+a.btn:visited {
+	padding-top: 0px;
+	text-align: center;
+	background-repeat: no-repeat;
+	margin-top: 3px;
+	margin-left: 5px;
+	margin-right: 5px;
+	z-index: 20;
+	display: inline-block;
+	text-decoration: none;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+// Tech Styles
+.tech {
+	position: relative;
+	width: 220px;
+	border-radius: 5px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	margin-right: 5px;
+}
+
+.tech_einspaltig {
+	position: relative;
+	width: 99.5%;
+	border-radius: 5px;
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+
+.tech_bg0 {
+	position: absolute;
+	background: url(g/w1c1r1.png) left top no-repeat, url(g/w1c1r3.png) right bottom no-repeat;
+	background-size: 16px, 16px;
+	background-color: rgba(0, 191, 255, 0.3);
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+
+.tech_bg1 {
+	position: absolute;
+	background: url(g/w1c2r1.png) left top no-repeat, url(g/w1c2r3.png) right bottom no-repeat;
+	background-size: 16px, 16px;
+	background-color: rgba(122, 197, 210, 0.3);
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+
+.tech_bg2 {
+	position: absolute;
+	background: url(g/w1c3r1.png) left top no-repeat, url(g/w1c3r3.png) right bottom no-repeat;
+	background-size: 16px, 16px;
+	background-color: rgba(238, 130, 238, 0.3);
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+
+.tech_bg3 {
+	position: absolute;
+	background: url(g/w1c4r1.png) left top no-repeat, url(g/w1c4r3.png) right bottom no-repeat;
+	background-size: 16px, 16px;
+	background-color: rgba(127, 255, 212, 0.4);
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+
+.tech_name {
+	position: relative;
+	word-wrap: break-word;
+	padding: 15px;
+	z-index: 20;
+	color: #FFFFFF;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.tech_name_grey {
+	position: relative;
+	word-wrap: break-word;
+	padding: 15px;
+	z-index: 20;
+	color: #AAAAAA;
+	font-size: 14px;
+}
+
+.user_title {
+	display: inline-block;
+	background-color: rgb(250, 184, 233);
+	width: 10px;
+	height: 10px;
+	margin-left: 5px;
+	transform: rotate(45deg);
+}
+
+// Mobile Layout
+body.mobile {
+	height: 100vh;
+	height: 100dvh;
+	min-height: 100dvh;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	background-color: #000;
+}
+
+// Theme-Generator für rasse1-rasse4
+@each $name, $cfg in $themes {
+	$col: map.get($cfg, color);
+	$btn-img: map.get($cfg, btn-image);
+	$btn-w: map.get($cfg, btn-width);
+	$btn-h: map.get($cfg, btn-height);
+	$btn-col: map.get($cfg, btn-color);
+	$bg-img: map.get($cfg, desktop-bg-image);
+	$scroll-arrow: map.get($cfg, scroll-arrow);
+	$scroll-3d: map.get($cfg, scroll-3dlight);
+	$cell1-img: map.get($cfg, cell1-image);
+	$resmain-bg: map.get($cfg, resmain-bg);
+	$resmain-col: map.get($cfg, resmain-color);
+	$resmain-width: map.get($cfg, resmain-width);
+	$resleddef-bg: map.get($cfg, resleddef-bg);
+	$resledatt-bg: map.get($cfg, resledatt-bg);
+	$reshyper-bg: map.get($cfg, reshyper-bg);
+	$reshyper-top: map.get($cfg, reshyper-top);
+	$reshyper-height: map.get($cfg, reshyper-height);
+	$resnews-bg: map.get($cfg, resnews-bg);
+	$resnews-top: map.get($cfg, resnews-top);
+	$resnews-height: map.get($cfg, resnews-height);
+	$chat2bg-img: map.get($cfg, chat2bg-image);
+	$rand-suffix: map.get($cfg, rand-suffix);
+	$rand-ro-suffix: map.get($cfg, rand-ro-suffix);
+	$mobilebtn-bg: map.get($cfg, mobilebtn-bg);
+	$secbutton-prefix: map.get($cfg, secbutton-prefix);
+
+	// Basis-Theme (funktioniert für mobile und desktop)
+	body.theme-#{$name} {
+		color: $col;
+		font-family: helvetica, arial, geneva, sans-serif;
+		font-size: 10px;
+
+		// Links
+		a,
+		a:link,
+		a:visited {
+			font-family: arial, geneva, helvetica, sans-serif;
+			font-size: 14px;
+			color: $col;
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: $col;
+			text-decoration: underline;
+		}
+
+		// Button-Styling spezifisch für jede Rasse
+		.btn,
+		a.btn:link,
+		a.btn:visited {
+			background: url(g/#{$btn-img});
+			width: $btn-w;
+			height: $btn-h;
+			color: $btn-col;
+			padding-top: 0px;
+			text-align: center;
+			background-repeat: no-repeat;
+			margin-top: 3px;
+			z-index: 20;
+			display: block;
+			text-decoration: none;
+			cursor: pointer;
+			font-size: 14px;
+		}
+
+		// Zusätzliche Button-Varianten
+		a.btn2:link,
+		a.btn2:visited {
+			font-size: 11px;
+			font-family: Tahoma;
+			color: $col;
+			background-color: #000000;
+			border: 1px solid $col;
+			padding: 1px 4px 1px 4px;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		// SecButton-Klassen
+		a.secbutton1 {
+			background: url(g/secbutton/#{$secbutton-prefix}_2backbtnnl.gif);
+			width: 36px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+		a.secbutton1:hover {
+			background: url(g/secbutton/#{$secbutton-prefix}_2backbtnlo.gif);
+			width: 36px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+
+		a.secbutton2 {
+			background: url(g/secbutton/#{$secbutton-prefix}_1backbtnnl.gif);
+			width: 17px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+		a.secbutton2:hover {
+			background: url(g/secbutton/#{$secbutton-prefix}_1backbtnlo.gif);
+			width: 17px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+
+		.secbutton3 {
+			background: url(g/secbutton/#{$secbutton-prefix}_seknrnl.gif);
+			width: 49px;
+			height: 20px;
+			float: left;
+		}
+		input.secbutton3 {
+			color: #000000;
+			font-size: 14px;
+			width: 47px;
+			height: 18px;
+			text-align: center;
+			border: none;
+			float: left;
+		}
+
+		a.secbutton4 {
+			background: url(g/secbutton/#{$secbutton-prefix}_okbtnnl.gif);
+			width: 42px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+		a.secbutton4:hover {
+			background: url(g/secbutton/#{$secbutton-prefix}_okbtnlo.gif);
+			width: 42px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+
+		a.secbutton5 {
+			background: url(g/secbutton/#{$secbutton-prefix}_1forbtnnl.gif);
+			width: 18px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+		a.secbutton5:hover {
+			background: url(g/secbutton/#{$secbutton-prefix}_1forbtnlo.gif);
+			width: 18px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+
+		a.secbutton6 {
+			background: url(g/secbutton/#{$secbutton-prefix}_2forbtnnl.gif);
+			width: 38px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+		a.secbutton6:hover {
+			background: url(g/secbutton/#{$secbutton-prefix}_2forbtnlo.gif);
+			width: 38px;
+			height: 20px;
+			display: block;
+			float: left;
+		}
+
+		// Formulareingaben
+		input {
+			font-size: 11px;
+			font-family: Tahoma;
+			color: $col;
+			background-color: #000000;
+			border: 1px solid $col;
+		}
+
+		input.c {
+			border: none;
+		}
+
+		// Textarea-Styling
+		textarea {
+			scrollbar-face-color: #000000;
+			scrollbar-shadow-color: #000000;
+			scrollbar-highlight-color: #333333;
+			scrollbar-3dlight-color: $scroll-3d;
+			scrollbar-darkshadow-color: #333333;
+			scrollbar-track-color: #000000;
+			scrollbar-arrow-color: $scroll-arrow;
+			border: 1px solid $col;
+			background-color: #414141;
+			color: $col;
+		}
+
+		// Spezielle Input-Klassen
+		input.mil1 {
+			font-size: 14px;
+			width: 80px;
+			background-color: #202020;
+			text-align: center;
+			border: 1px solid #{if($name == 'rasse1', '#143D66', if($name == 'rasse2', '#4C4C4C', if($name == 'rasse3', '#660000', '#4C5C02')))};
+		}
+
+		input.mil2 {
+			font-size: 14px;
+			width: 80px;
+			background-color: #000000;
+			text-align: center;
+			border: 1px solid $col;
+		}
+
+		// Select und Option-Styling
+		option {
+			border: 1px solid $col;
+			color: $col;
+			background-color: #202020;
+		}
+
+		select {
+			background: url(g/cellblack.png) repeat;
+			color: $col;
+		}
+
+		// HR-Styling
+		hr {
+			color: $col;
+			size: 1px;
+		}
+
+		// Zell-Klassen mit Theme-Farben
+		.c,
+		.cl,
+		.cc,
+		.cr {
+			font-weight: normal;
+			background: url(g/cellblack.png) repeat;
+			color: $col;
+		}
+
+		.cl {
+			text-align: left;
+		}
+
+		.cc {
+			text-align: center;
+		}
+
+		.cr {
+			text-align: right;
+		}
+
+		// Theme-spezifische .cell1 Klasse
+		.cell1 {
+			background: url(#{$cell1-img}) repeat;
+			color: #ffffff;
+			font-size: 11px;
+		}
+
+		// Theme-spezifisches #resmain Background
+		#resmain {
+			background: url(#{$resmain-bg});
+			color: #{$resmain-col};
+			width: #{$resmain-width};
+		}
+
+		// Theme-spezifische Resource-LED Elemente
+		#resleddef {
+			background: url(#{$resleddef-bg});
+		}
+
+		#resledatt {
+			background: url(#{$resledatt-bg});
+		}
+
+		// Theme-spezifische Resource-Icons
+		#reshyper {
+			background: url(#{$reshyper-bg});
+			width: 42px;
+			height: #{$reshyper-height};
+			position: absolute;
+			top: #{$reshyper-top};
+			left: 500px;
+			cursor: pointer;
+			z-index: 11;
+		}
+
+		#resnews {
+			background: url(#{$resnews-bg});
+			width: 42px;
+			height: #{$resnews-height};
+			position: absolute;
+			top: #{$resnews-top};
+			left: 550px;
+			cursor: pointer;
+			z-index: 11;
+		}
+
+		// Theme-spezifischer Chat-Hintergrund
+		#chat2bg {
+			background-image: url(#{$chat2bg-img});
+		}
+
+		// Theme-spezifische Rand-Klassen
+		.ro {
+			background: url(g/rand_oben#{$rand-ro-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.rol {
+			background: url(g/rand_oben_l#{$rand-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.ror {
+			background: url(g/rand_oben_r#{$rand-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.rml {
+			background: url(g/rand_mitte_l#{$rand-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.rmr {
+			background: url(g/rand_mitte_r#{$rand-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.ru {
+			background: url(g/rand_unten#{$rand-ro-suffix}.png) repeat;
+			color: #ffffff;
+			font-weight: bold;
+		}
+
+		.rul {
+			background: url(g/rand_unten_l#{$rand-suffix}.png) repeat;
+		}
+
+		.rur {
+			background: url(g/rand_unten_r#{$rand-suffix}.png) repeat;
+		}
+
+		.rl {
+			background: url(g/rand_l#{$rand-suffix}.png) repeat;
+		}
+
+		.rr {
+			background: url(g/rand_r#{$rand-suffix}.png) repeat;
+		}
+
+		// Spezielle k-Klassen
+		.k1,
+		.k2 {
+			font-size: 11px;
+			font-family: Tahoma;
+			color: $col;
+			border-color: #606060;
+		}
+
+		.k1 {
+			background-color: #000000;
+		}
+
+		.k2 {
+			background: url(g/cellblack.png) repeat;
+		}
+	}
+
+	// Mobile-spezifische Anpassungen
+	body.theme-#{$name}.mobile {
+		background-color: #000;
+
+		// Mobile hat explizit A:hover definiert
+		a:hover {
+			font-family: arial, geneva, helvetica, sans-serif;
+			font-size: 14px;
+			text-decoration: underline;
+			color: $col;
+		}
+
+		// Mobile Button-Variante
+		a.btn:hover {
+			background: url(g/#{$btn-img});
+			width: $btn-w;
+			height: $btn-h;
+			color: $btn-col;
+			text-decoration: none;
+		}
+
+		// Mobile Button Klasse
+		.mobilebtn {
+			border: 1px solid #333333;
+			background-color: #{$mobilebtn-bg};
+			color: #FFFFFF !important;
+			font-size: 30px !important;
+			padding: 3px;
+		}
+	}
+
+	// Desktop-spezifische Anpassungen
+	body.theme-#{$name}.desktop {
+		background-image: url(#{$bg-img});
+		background-repeat: repeat;
+		background-attachment: fixed;
+	}
+}

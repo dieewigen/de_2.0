@@ -17,8 +17,10 @@ if ($row["status"]==1) $ownally = $row["allytag"];
 <title>Rangliste</title>
 <?php include "cssinclude.php";?>
 </head>
-<body>
-<?php //stelle die ressourcenleiste dar
+
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include "resline.php";
 
 

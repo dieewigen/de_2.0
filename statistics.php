@@ -17,9 +17,9 @@ $sector=$row['sector'];$system=$row['system'];$hasally=$row['status'];
 <title><?php echo $stat_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
 <?php
-//stelle die ressourcenleiste dar
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include "resline.php";
 if(!isset($_REQUEST['mp'])){
   $_REQUEST['mp']=1;

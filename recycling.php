@@ -236,8 +236,9 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 <title>Recycling</title>
 <?php include "cssinclude.php";?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include 'resline.php';
 
 echo '

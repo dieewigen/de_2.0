@@ -49,8 +49,9 @@ if ($transaction_result){
 <title><?php echo $allyjoin_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include('resline.php');
 include('ally/ally.menu.inc.php');
 

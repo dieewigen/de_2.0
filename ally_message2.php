@@ -28,8 +28,9 @@ $allytag = $row["allytag"];
 <title><?=$allymessagezwei_lang[title]?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include "resline.php";
 
 if ($text) {

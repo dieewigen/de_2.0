@@ -39,8 +39,9 @@ $freeartefactplaces = get_free_artefact_places($_SESSION['ums_user_id']);
 <script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 </head>
 <body>
-<div style="width: 600px; margin-left: auto; margin-right: auto;">
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+echo '<div style="width: 600px; margin-left: auto; margin-right: auto;">';
 
 $allyrelverbreitung_need = array(0, 1000, 2000, 3000, 4000, 5000);
 

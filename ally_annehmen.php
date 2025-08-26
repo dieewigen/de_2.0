@@ -17,18 +17,19 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 $allytag=$row["allytag"];
 
 // Parameter aus GET/POST abrufen und validieren
-$userid = isset($_GET['userid']) ? (int)$_GET['userid'] : (isset($_POST['userid']) ? (int)$_POST['userid'] : null);
-$allyid = isset($_GET['allyid']) ? (int)$_GET['allyid'] : (isset($_POST['allyid']) ? (int)$_POST['allyid'] : null);
+$userid = $_REQUEST['userid'] ?? 0;
+$allyid = $_REQUEST['allyid'] ?? 0;
 
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?=$allyablehnen_lang['title']?></title>
+<title><?php echo $allyablehnen_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');

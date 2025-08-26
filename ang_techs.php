@@ -20,10 +20,10 @@ include 'functions.php';
 include "cssinclude.php";
 ?>
 </head>
-<body style="margin: 0; padding:0; color: #FFFFFF;">
-	<div style="position: absolute; background-color: rgba(10,10,10,0.95); height: 100%; width: 100%; min-width: 100%; overflow:auto;">	
-		
 <?php
+echo '<body style="margin: 0; padding:0; color: #FFFFFF;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+echo '<div style="position: absolute; background-color: rgba(10,10,10,0.95); height: 100%; width: 100%; min-width: 100%; overflow:auto;">';
+
 $content='';
 
 if(!isset($sv_deactivate_vsystems)){

@@ -18,9 +18,8 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 <title><?php echo $allysettings_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 function formatString($string){
 	$allowed_tags="<br><i></i><b></b><strong></strong><u></u><ul></ul><li></li><p></p><font></font>";
 	$result = strip_tags($string, $allowed_tags);

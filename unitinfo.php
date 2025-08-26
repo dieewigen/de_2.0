@@ -20,6 +20,9 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 <head>
 <title>Einheiteninformationen</title>
 <?php include "cssinclude.php";
+
+echo '</head>';
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 //stelle die ressourcenleiste dar
 include "resline.php";
 

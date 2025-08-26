@@ -33,11 +33,10 @@ $allytag=$row['allytag'];
 <title><?php echo $allyfleet_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-
 <?php
-include('resline.php');
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
+include('resline.php');
 include('ally/ally.menu.inc.php');
 
 $full_access = false;

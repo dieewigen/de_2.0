@@ -43,11 +43,12 @@ $newtrans = 0;
 <title><?php echo $vote_lang['title']; ?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-
-<?php if ($bar == "yes") {
+<?php 
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+if ($bar == "yes") {
     include('resline.php');
-} ?>
+}
+?>
 
 <?php
 // Wenn Formular abgesendet wurde
@@ -205,11 +206,7 @@ elseif ($action == "show") {
 </table>
 
 <?php
-    } else {
-        echo "<h1>".$vote_lang['msg_7']."</h1>";
-        @$time = strftime("%Y-%m-%d %H:%M:%S");
-        @$para = "Master Guardian, Spieler $_SESSION['ums_spielername'] ($asec:$asys)[UserID:$_SESSION['ums_user_id']] hat am $zeit versucht, alte Umfragen aufzurufen.";
-    }
+    } 
 }
 
 // Abstimmen

@@ -17,9 +17,8 @@ $secmoves=$row["secmoves"];
 <title>News</title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
-<center>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include "resline.php";
 
 $id=isset($id)?(int)$id:-1;
@@ -148,6 +147,5 @@ else  //archiv
 <?php
 }
 ?>
-</center>
 </body>
 </html>

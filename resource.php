@@ -282,8 +282,9 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
 <title><?php echo $resource_lang['ressourcen']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
 <?php
+
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 ////////////////////////////////////////////////////////////
 // Sektorkasse/Sektorkosten

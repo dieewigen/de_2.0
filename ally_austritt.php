@@ -16,6 +16,9 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 $allytag=$row["allytag"];$username=$row["spielername"];
 $leave_fee = 25;
 
+// Parameter aus GET/POST abrufen und validieren
+$a = $_REQUEST['a'] ?? 0;
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -23,9 +26,8 @@ $leave_fee = 25;
 <title><?php echo $allyaustritt_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
 include('ally/ally.menu.inc.php');

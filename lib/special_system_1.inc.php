@@ -20,7 +20,7 @@ if ($fd['bldg_id'] == -1) {//Außenposten noch nicht vorhanden
 
     $fid = intval($_REQUEST['fid'] ?? 0);
 
-    if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'activate') {
+    if (($_REQUEST['action'] ?? '') === 'activate') {
         if ($fid == 0 && $fd['bldg_id'] == -1) {
             //Geb�ude in die DB packen
             setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, 0, 0, 1, 0);
@@ -49,7 +49,7 @@ if ($fd['bldg_id'] == -1) {//Außenposten noch nicht vorhanden
 
         //$content.='<br>B:'.print_r($fd,true);
 
-        if ($_REQUEST['action'] == 'activate') {
+        if (($_REQUEST['action'] ?? '') === 'activate') {
             if ($fid == $f && $fd['bldg_id'] == -1) {
                 //Gebäude in die DB packen
                 setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fid, 3, 1, 0);
@@ -73,7 +73,7 @@ if ($fd['bldg_id'] == -1) {//Außenposten noch nicht vorhanden
 
         //$content.='<br>B:'.print_r($fd,true);
 
-        if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'activate') {
+        if (($_REQUEST['action'] ?? '') === 'activate') {
             if ($fid == $f && $fd['bldg_id'] == -1) {
                 //Gebäude in die DB packen
                 setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fid, 13, 10, 0);

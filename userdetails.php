@@ -32,8 +32,9 @@ $sector=$row["sector"];$system=$row["system"];
 -->
 </style>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include "resline.php";
 
 if($_REQUEST['save']){

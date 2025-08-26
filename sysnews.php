@@ -474,9 +474,9 @@ echo "<a href=sysnews.php?a=d onclick=\"return confirm('".$sn_lang["deletewarnin
 </div>
 </form>
 <?php include "fooban.php"; ?>
-</body>
 </html>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
 {

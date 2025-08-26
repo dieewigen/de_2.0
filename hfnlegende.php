@@ -13,7 +13,9 @@ include 'inc/lang/'.$sv_server_lang.'_hfnlegende.lang.php';
 </style>
 <script>window.resizeTo(580,540);</script>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#FF0000" alink="#FF0000" vlink="#FF0000">
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+?>
 <center>
 <table bordercolor="#3399FF" width="570" class="tab">
 <tr class="cell">

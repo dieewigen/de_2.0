@@ -35,8 +35,8 @@ include "cssinclude.php";
 ?>
 <link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime('g/de-desktop.css');?>">
 </head>
-<body>
-<?php 
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 $content='';
 

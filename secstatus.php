@@ -108,8 +108,8 @@ function deirc(f,se,sy,a1,a2,a3) {
 //-->
 </script>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 //wurde ein button gedrueckt??
 //stelle die ressourcenleiste dar
@@ -975,6 +975,8 @@ for ($i = 0; $i < $fa; $i++) {
 $sql = "SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion<>0 AND sec_id=?";
 $flotten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 $fa = mysqli_num_rows($flotten);
+// Variablen initialisieren um Warnings zu vermeiden
+$zsys1 = 0;
 for ($i = 0; $i < $fa; $i++) {
     $row_sector = mysqli_fetch_assoc($flotten);
     $zsec1 = $row_sector["zielsec"];
@@ -1478,6 +1480,10 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                         $sc[$i][0][$j][6] = 0;
                     }
 
+
+                    if(!isset($sc[$i][0][$j][0])) {
+                        $sc[$i][0][$j][0] = 0;
+                    }
 
                     if ($sc[$i][0][$j][0] > 0) {
                         $sc[$i][0][$j][5] = $sc[$i][0][$j][1] / $sc[$i][0][$j][0];

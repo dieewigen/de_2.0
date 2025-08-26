@@ -12,12 +12,6 @@ if (isset($session_subdir) && $session_subdir == 1) {
 include_once $session_path."inc/lang/".$sv_server_lang."_session.lang.php";
 include_once $session_path."inc/".$sv_server_lang."_links.inc.php";
 
-if (isset($_SESSION['ums_user_id'])) {
-    $_SESSION['ums_user_id'] = $_SESSION['ums_user_id'];
-} else {
-    $_SESSION['ums_user_id'] = -1;
-}
-
 //wenn nötig, die get/post/request-daten restaurieren
 if (isset($_SESSION['restore_botcheck_data'])) {
     $_GET =		$_SESSION['save_get'];
@@ -30,123 +24,38 @@ if (isset($_SESSION['restore_botcheck_data'])) {
     unset($_SESSION['save_request']);
 }
 
-function fehlermsg($msg)
-{
-    global $thisisefta, $usestdtemplate;
-
+//schauen ob man eingeloggt ist
+if (!isset($_SESSION['ums_user_id'])) {
     echo '
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-  	<script>
-		if(top.frames.length > 0)
-		top.location.href=self.location;
+  	<head>
+  		<script>
+			if(top.frames.length > 0)
+			top.location.href=self.location;
 		</script>';
-    if ($usestdtemplate != 1) {
-        include "cssinclude.php";
-    }
-    echo '</head><body>';
-    echo $msg;
-    echo '</body></html>';
-}
 
-//schaue ob man eingeloggt ist
-if (!isset($_SESSION['ums_user_id'])) {
-    $usestdtemplate = 1;
+    include "cssinclude.php";
 
-    $topban_votebutton = '';
-
-    fehlermsg('
-	<link href="https://www.die-ewigen.com/default.css" rel="stylesheet" type="text/css">
-	<style type="text/css">
-	<!--
-		@import url("https://www.die-ewigen.com/layout.css");
-	-->
-	</style>
+    echo '
+		</head>';
+	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 	
-	<br><center>
+	echo '
+		<div style="width: 100%;">
+			<div class="info_box text3" style="margin: 30px auto 0 auto; font-size: 14px;">		
+				<div style="color: #FF0000; margin-bottom: 25px; margin-top: 20px;">
+					'.$session_lang['error1'].'
+				</div>
 
-	<table border="0" cellpadding="0" cellspacing="0" width="600">
+				<div style="color: #00FF00; margin-bottom: 20px;">
+					'.$session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a>
+				<div>
 
-	<tr align="center"><td colspan="4" align="center"><h1 id="title5">&nbsp;</h1></td></tr>
-
-	<tr align="center"><td><br><br>
-	<font size="2" color="FF0000">'.$session_lang['error1'].'<br><br><br><font color="00FF00">'.
-      $session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a><br><br><br><br><font size="1">
-	  <br><br><br><br>
-	</td></tr>
-	<tr align="center"><td><br><br>
-	'.$topban_votebutton.'<br><br><br><br><br>
-	</td></tr>
-
-	<tr>
-	<td><div class="hr1"><div><hr></div></div></td></tr>
-	</table>');
-    exit;
-}
-
-//'.$session_lang['error5'].' <a href="index.php">'.$session_lang['error4'].'</a>
-//speziallogging
-/*
-if($_SESSION['ums_user_id']==1840 OR $_SESSION['ums_user_id']==1){
-    $variableSets = array(
-    "Post:" => $_POST,
-    "Get:" => $_GET,
-    "Session:" => $_SESSION
-    // "Cookies:" => $HTTP_COOKIE_VARS,
-    // "Server:" => $HTTP_SERVER_VARS,
-    // "Environment:" => $HTTP_ENV_VARS
-    );
-
-    function printElementHtml2( $value, $key ) {
-        global $datenstring;
-
-        if(is_array($value)){
-            $datenstring.=$key. " => ".print_r($value,true)."\n";
-        }else{
-            $datenstring.=$key. " => ".$value."\n";
-        }
-
-
-        //echo $key . " => ";
-        //print_r( $value );
-        //echo "<br>";
-    }
-
-    foreach ( $variableSets as $setName => $variableSet ) {
-        if ( isset( $variableSet ) ) {
-            //echo "<br><br><hr size='1'>";
-            //echo "$setName<br>";
-            $datenstring.=$setName."\n";
-            array_walk( $variableSet, 'printElementHtml2' );
-        }
-    }
-
-    $datum=date("Y-m-d H:i:s",time());
-    $ip=getenv("REMOTE_ADDR");
-    $datenstring="Zeit: $datum\nIP: $ip\nDatei: $PHP_SELF\n".$datenstring."\n--------------------------------------\n";
-    $fp234=fopen("cache/logs/".$_SESSION['ums_user_id']."_slog.txt", "a");
-    fputs($fp234, $datenstring);
-    fclose($fp234);
-}
-//spezial logging - ende
-*/
-
-//ip-test
-/*if ($_SESSION['ums_user_ip']!=$_SERVER['REMOTE_ADDR'])
-{
-  fehlermsg('<br><center><font size="2" color="FF0000">IP-Fehler, deine IP stimmt nicht mit der Sitzungs-IP �berein.<br>Bitte logge dich neu ein:<br><br><a href="index.php">Login</a>');
-  session_destroy();
-  exit;
-}*/
-
-//schaue ob auch die richtige server-id verwendet wird
-if ($_SESSION['ums_servid'] != $sv_servid) {
-    fehlermsg('<br><center>
-  <font size="2" color="FF0000">'.$session_lang['error2'].'<br><br><font color="00FF00">'.
-    $session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a><br><br><br><font size="1">'.
-    $session_lang['error5'].' <a href="index.php">'.$session_lang['error4'].'</a>');
-    session_destroy();
+			</div>
+		</div>
+	</body>
+</html>';
     exit;
 }
 
@@ -170,7 +79,6 @@ if (!isset($eftachatbotdefensedisable)) {
 if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($eftachatbotdefensedisable != 1)) {
     echo '<!DOCTYPE html>
 <html lang="de">
-
 <head>';
 
     include "cssinclude.php";
@@ -187,7 +95,7 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
         @mail($GLOBALS['env_admin_email'], $sv_server_tag.'botaccesscounter '.$_SESSION['botaccesscounter'].' user_id '.$_SESSION['ums_user_id'], time(), 'FROM: '.$GLOBALS['env_admin_email']);
     }
 
-    //dateiname speichern um sp�ter darauf weiterleiten zu k�nnen
+    //dateiname speichern um später darauf weiterleiten zu können
     $_SESSION['ums_bot_protection_filename'] = $_SERVER['PHP_SELF'];
 
     //beim ersten erscheinen des Botschutzes die $_GET/$_POST/$_REQUEST-Daten zwischenspeichern
@@ -203,12 +111,15 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
     }
 
 	echo '<meta http-equiv="expires" content="0">
-	</head><body><script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>
+	</head>';
+	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+	echo '
+	<script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>
 	<div align="center">';
 
 	if ($GLOBALS['sv_ang'] == 1) {
 		echo '
-		<script type="text/javascript">
+		<script>
 		$( document ).ready(function() {
 			$("#iframe_main_container", window.parent.document).css("display", "");
 		});
@@ -235,7 +146,7 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 
 	for ($botschutz_c = 1;$botschutz_c <= 100;$botschutz_c++) {
 		echo '<a href="botcheck.php?nummer='.$botschutz_c.'">
-		<div style="float:left; width: 44px; 
+		<div style="float:left; width: 48px; 
 		border: 2px solid #666666; padding: 0px; margin-top: 3px; margin-left: 1px; margin-right: 1px; font-size: 26px; background-color: #111111; color: #FFFFFF; text-decoration: none; white-space:nowrap;
 		">'.$botschutz_c.'</div></a>';
 	}
@@ -251,7 +162,6 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 	</tr>
 	</table>
 	</body></html>';
-	exit();
+	exit;
 }
-
 

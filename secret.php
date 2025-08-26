@@ -240,8 +240,8 @@ function insertsonde(sec,sys)
 }
 </script>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 $zsec1 = isset($_REQUEST['zsec1']) ? $_REQUEST['zsec1'] : '';
 $zsys1 = isset($_REQUEST['zsys1']) ? $_REQUEST['zsys1'] : '';
@@ -1289,6 +1289,11 @@ if (!hasTech($pt, 9)) {
                                 echo '<td class="cc">'.number_format($schiffe[2][$row["tech_id"] - 81], 0, "", ".")."</td>";
                                 echo '<td class="cc">'.number_format($schiffe[3][$row["tech_id"] - 81], 0, "", ".")."</td>";
 
+                                if (!isset($fleetpoints[0])) $fleetpoints[0] = 0;
+                                if (!isset($fleetpoints[1])) $fleetpoints[1] = 0;
+                                if (!isset($fleetpoints[2])) $fleetpoints[2] = 0;
+                                if (!isset($fleetpoints[3])) $fleetpoints[3] = 0;
+
                                 $fleetpoints[0] += $schiffe[0][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
                                 $fleetpoints[1] += $schiffe[1][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
                                 $fleetpoints[2] += $schiffe[2][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
@@ -1300,12 +1305,12 @@ if (!hasTech($pt, 9)) {
                             //Flottenpunktewert
 
                             echo '<tr class="cc">
-				<td><i>'.$secret_lang['flottenpunktewert'].'</i></td>
-				<td>'.number_format($fleetpoints[0], 0, "", ".").'</td>
-				<td>'.number_format($fleetpoints[1], 0, "", ".").'</td>
-				<td>'.number_format($fleetpoints[2], 0, "", ".").'</td>
-				<td>'.number_format($fleetpoints[3], 0, "", ".").'</td>
-				</tr>';
+                            <td><i>'.$secret_lang['flottenpunktewert'].'</i></td>
+                            <td>'.number_format($fleetpoints[0], 0, "", ".").'</td>
+                            <td>'.number_format($fleetpoints[1], 0, "", ".").'</td>
+                            <td>'.number_format($fleetpoints[2], 0, "", ".").'</td>
+                            <td>'.number_format($fleetpoints[3], 0, "", ".").'</td>
+                            </tr>';
 
                             echo '</table>';
                             break;

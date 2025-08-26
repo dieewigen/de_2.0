@@ -19,9 +19,8 @@ $patime=$row['patime'];
 <title>Community Server</title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
-<div align="center">
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 //stelle die ressourcenleiste dar
 include "resline.php";

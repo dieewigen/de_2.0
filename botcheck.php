@@ -54,23 +54,6 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
     $_SESSION['ums_bot_protection_filename'] = str_replace('efta_ajaxrpc.php', 'eftamain.php', $_SESSION['ums_bot_protection_filename']);
 
     header("Location: ".$_SESSION['ums_bot_protection_filename']);
-
-    /*
-    echo '<html>
-    <head>
-    <meta http-equiv="refresh" content="0; URL=botcheck.php?logincheck=1">
-    </head>';
-
-   if($ums_premium==1)
-    echo '<script language="JavaScript">
-    <!--
-    top.genservertime(\''.$restminuten.'\',\''.$restsekunden.'\');
-    //-->
-    </script>';
-
-    echo ' <body>
-    </body>
-    </html>';*/
 } else { //botschutz falsch beantwortet
 
     //fehlercounter erh�hen
@@ -91,7 +74,8 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
         //Spieler informieren
         echo '<html><head>';
         include "cssinclude.php";
-        echo '</head><body>';
+        echo '</head>';
+        echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
         echo '<br><center><div class="info_box text2">Ihr Ergebnis war mehrfach nicht richtig und der Acounnt wurde aus Sicherheitsgr&uuml;nden gesperrt.<br><br>
   		Sie k&ouml;nnen in der Accountverwaltung unter dem Punkt Support Kontakt mit uns aufnehmen.</div>';
         echo '</body></html>';
@@ -102,7 +86,8 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
     //logout
     echo '<html><head>';
     include "cssinclude.php";
-    echo '</head><body>';
+    echo '</head>';
+    echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
     echo '<br><center><font size="2" color="FF0000">'.$botcheck_lang['error1'].'<br>'.$botcheck_lang['error2'].':<br><br><a href="index.php">Login</a>';
     echo '</body></html>';

@@ -12,8 +12,9 @@ $_SESSION['ums_gpfad']=$sv_image_server_list[0];
 include "cssinclude.php";
 ?>
 </head>
-<body>
-<center>
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+?>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
 <td width="13" height="37" class="rol">&nbsp;</td>

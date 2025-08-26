@@ -328,8 +328,8 @@ $md[$md_index]['ally_mission_counter_id']=2;
 include "cssinclude.php";
 ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 if(isset($sv_deactivate_missions) && $sv_deactivate_missions==1){
 	include "resline.php";

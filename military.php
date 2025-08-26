@@ -507,9 +507,9 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 echo '<script language="javascript" type="text/javascript" src="/js/military.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/military.js').'"></script>';
 ?>
 </head>
-<body>
 <?php
-//stelle die ressourcenleiste dar
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include "resline.php";
 if ($errmsg!='')echo $errmsg;
 

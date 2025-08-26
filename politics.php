@@ -266,10 +266,9 @@ document.getElementById("newstext").focus();
 }
 ?>
 </head>
-<body>
-<?php
 
-//stelle die ressourcenleiste dar
+<?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include "resline.php";
 echo '<form action="politics.php" method="post">';

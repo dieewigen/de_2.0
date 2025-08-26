@@ -145,9 +145,8 @@ $re=ceil($ee/$emve);
 <title>Basiskommandantenmen&uuml;</title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
 <?php
-
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 //stelle die ressourcenleiste dar
 
 include "resline.php";

@@ -45,9 +45,9 @@ if($row['ally_id'] > 0 && $row['status'] == 1){
 <title><?php echo $allycoleader_lang['title'];?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 /*
 	Die Function getSelect($leaderid, $select_name, $co, $ally) erzeugt die zur
 	Auswahl der Co-Leader benötigten Auswahlboxen. Der aktuell belegte Coleader

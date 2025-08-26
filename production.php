@@ -198,8 +198,9 @@ echo '<script type="text/javascript">var abf='.$artbonus_fleet.';var abd='.$artb
 echo '<script src="js/produktion'.$_SESSION['ums_rasse'].'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$_SESSION['ums_rasse'].'.js').'" type="text/javascript"></script>';
 ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 	//transaktionsbeginn
 	if (setLock($_SESSION['ums_user_id'])){

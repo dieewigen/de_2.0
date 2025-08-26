@@ -32,11 +32,9 @@ $allytag=$row["allytag"];$status=$row["status"];
 <title><?php echo $allydetail_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
-
-
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 function formatString($string)
 {
 	$allowed_tags="<br><i></i><b></b><strong></strong><u></u><ul></ul><li></li><p></p><font></font>";

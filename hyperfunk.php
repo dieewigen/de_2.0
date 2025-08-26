@@ -248,9 +248,9 @@ document.getElementById("nachricht").focus();
 }
 ?>
 </head>
-<body>
 <?php
-//stelle die ressourcenleiste dar
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 include('resline.php');
 // das Menu
 

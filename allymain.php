@@ -20,9 +20,8 @@ if ($row['status']==1) $ownally = $row['allytag'];else $ownally='';
 <title><?php echo $allyallymain_lang['title'];?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
-
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 /*
         Die Function getLink($user) erzeugt einen Hyperfunk-Link f&uuml;r den Benutzer mit der
         ID $user. Als Linktext wird der Name des Users angezeigt. Per Klick auf den

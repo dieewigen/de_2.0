@@ -226,8 +226,8 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
 <title>Artefakte</title>
 <?php include "cssinclude.php"; ?>
 </head>
-<body>
 <?php
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 //artefakt zerst�ren
 if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
     //transaktionsbeginn
