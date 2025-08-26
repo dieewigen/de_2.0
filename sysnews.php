@@ -56,9 +56,10 @@ echo '<title>'.$sn_lang['nachrichten'].'</title>';
 
 include "cssinclude.php"; ?>
 </head>
-<body>
-
 <?php
+
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
 //stelle die ressourcenleiste dar
 include "resline.php";
 
@@ -77,14 +78,18 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
     $mailbody = $sn_lang["mailhallo"];
     $mailbody .= str_replace('&ouml;', 'ö', $sn_lang["mailende"]);
 
+    $bodyTag = '<body class="theme-rasse'.$_SESSION['ums_rasse'].' mobile">';
+
+    $serverPath='https://'.$_SERVER['SERVER_NAME'].'/gp/';
+
     //html dateiinhalt
     $allenachrichten = '
 <html> 
 <head>
 <title>Die Ewigen - Mailservice</title>
-<link rel="stylesheet" type="text/css" href="'.$_SESSION['ums_gpfad'].'f'.$_SESSION['ums_rasse'].'.css">
+<link rel="stylesheet" type="text/css" href="'.$serverPath.'/de-main.css">
 </head>
-<body>
+'.$bodyTag.'
 <div align="center">
 <table border="0" cellpadding="0" cellspacing="0" style="background-color: #000000;">
 <tr height="37">
@@ -121,7 +126,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 $nachricht = $na[$werte[1]];
 
                 $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr>';
                 $allenachrichten .= '<td>'.$nachricht.'<br><br></td>';
@@ -129,7 +134,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 break;
             case 50:
                 $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr>';
                 $allenachrichten .= '<td>'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
@@ -137,7 +142,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 break;
             case 57:
                 $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr>';
                 $allenachrichten .= '<td>'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
@@ -145,7 +150,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 break;
             case 70: //Battleground
                 $allenachrichten .= '<tr style="text-align: left;">';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr style="text-align: left;">';
                 $allenachrichten .= '<td>'.showkampfberichtBG($row["text"]).'</td>';
@@ -157,7 +162,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                     $n = 50;
                 }
                 $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr>';
                 $allenachrichten .= '<td>'.$row["text"].'<br><br></td>';
@@ -193,7 +198,6 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
     //die nachrichten nach dem versand löschen
     $sql = "DELETE FROM de_user_news WHERE user_id=? AND seen=1";
     mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-
 }//mailnews ende
 
 
@@ -483,15 +487,9 @@ function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
     $mail = new PHPMailer\PHPMailer\PHPMailer();
 
     $mail->isSMTP();
-    $mail->smtpConnect([
-        'ssl' => [
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-        ]
-    ]);
-    $mail->SMTPDebug = 0;
+    $mail->SMTPDebug = 0; // SMTP-Debug auf 3 für maximalen Output
     $mail->Debugoutput = 'html';
+
     $mail->Host = $GLOBALS['env_mail_server'];
     $mail->Port = 587;
     $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
@@ -499,16 +497,10 @@ function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
     $mail->Username = $GLOBALS['env_mail_user'];
     $mail->Password = $GLOBALS['env_mail_password'];
     $mail->IsHTML(true);
-
     $mail->setFrom('noreply@die-ewigen.com', 'Die Ewigen');
-    //Set an alternative reply-to address
-    $mail->addReplyTo('noreply@die-ewigen.com', 'Die Ewigen');
-    //Set who the message is to be sent to
     $mail->addAddress($an);
-    //Set the subject line
     $mail->Subject = $betreff;
     $mail->Body = $text;
-
     $mail->AddStringAttachment($att_content, $dateiname, 'base64', 'text/html');
 
     if (!$mail->send()) {
@@ -516,5 +508,6 @@ function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
         return false;
     }
     return true;
+
 }
 ?>

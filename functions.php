@@ -2094,53 +2094,28 @@ function reumlaut($fieldname)
 
 function mail_smtp($empfaenger, $subject, $body, $absender = 'noreply@die-ewigen.com')
 {
-    //Create a new PHPMailer instance
     $mail = new PHPMailer\PHPMailer\PHPMailer();
-    //Tell PHPMailer to use SMTP
+
     $mail->isSMTP();
-    $mail->smtpConnect([
-        'ssl' => [
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-        ]
-    ]);
-    //Enable SMTP debugging
-    // 0 = off (for production use)
-    // 1 = client messages
-    // 2 = client and server messages
-    $mail->SMTPDebug = 0;
-    //Ask for HTML-friendly debug output
+    $mail->SMTPDebug = 0; // SMTP-Debug auf 3 für maximalen Output
     $mail->Debugoutput = 'html';
-    //Set the hostname of the mail server
+
     $mail->Host = $GLOBALS['env_mail_server'];
-    //Set the SMTP port number - likely to be 25, 465 or 587
     $mail->Port = 587;
-    //Whether to use SMTP authentication
+    $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     $mail->SMTPAuth = true;
-    //Username to use for SMTP authentication
     $mail->Username = $GLOBALS['env_mail_user'];
-    //Password to use for SMTP authentication
     $mail->Password = $GLOBALS['env_mail_password'];
-    //Set who the message is to be sent from
+    $mail->IsHTML(true);
     $mail->setFrom('noreply@die-ewigen.com', 'Die Ewigen');
-    //Set an alternative reply-to address
-    $mail->addReplyTo('noreply@die-ewigen.com', 'Die Ewigen');
+    
     //Set who the message is to be sent to
     $mail->addAddress($empfaenger, '');
     //Set the subject line
     $mail->Subject = $subject;
     $mail->IsHTML(true);
-    //Read an HTML message body from an external file, convert referenced images to embedded,
-    //convert HTML into a basic plain-text alternative body
-    //$mail->msgHTML($text);
-    //Replace the plain text body with one created manually
-    //$mail->AltBody = 'This is a plain-text message body';
-    //Attach an image file
-    //$mail->addAttachment('images/phpmailer_mini.png');
+    
     $mail->Body = $body;
-
-    //$mail->AddStringAttachment($att_content, $dateiname, 'base64', 'text/html');
 
 
     $mail->send();
