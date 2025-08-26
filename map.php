@@ -649,7 +649,17 @@ foreach ($sectorList as $sf) {
         }
 
         // Neue Struktur mit verbessertem Design
-        echo '<div class="sector-header">'.$sektorinfo.'</div>';
+        echo '<div class="sector-header" style="display: flex; justify-content: space-between; align-items: center;">';
+        echo '<div>'.$sektorinfo.'</div>';
+        
+        // Button für Sektorpolitik nur im eigenen Sektor anzeigen
+        if ($sf == $ownsector) {
+            echo '<div>';
+            echo '<a href="politics.php" target="h" class="button" style="background-color: #4CAF50; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px; display: inline-block;">Sektorpolitik</a>';
+            echo '</div>';
+        }
+        
+        echo '</div>';
         echo '<div class="sector-content">';
 
         $artstr = '';

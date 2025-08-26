@@ -52,8 +52,11 @@ $_SESSION['ic_last_refresh']=0;
 			<img src="g/derassenlogo'.$_SESSION['ums_rasse'].'.png" style="position: absolute; left: -31px; top: 0px; width: auto; height: 71px; cursor: pointer;" onclick="switch_iframe_main_container(\'overview.php\')">
 			<div class="dropdown-content" style="z-index: 200;">
 			
+				<span onclick="switch_iframe_main_container(\'sector.php\')" class="btn">'.$menu_lang['eintrag_12'].'</span>
+				<br>
 				<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>';
 
+		/*
 		if(!isset($sv_deactivate_efta) || $sv_deactivate_efta==0){
 			echo '<br><a href="eftaindex.php" target="_blank" class="btn">EFTA</a>';
 		}
@@ -61,6 +64,7 @@ $_SESSION['ic_last_refresh']=0;
 		if(!isset($sv_deactivate_sou) || $sv_deactivate_sou==0){
 			echo '<br><a href="sou_index.php" target="_blank" class="btn">EA</a>';
 		}
+		*/
 
 		//echo '<br><a href="'.$sv_link[2].'" target="_blank" class="btn">'.$menu_lang['eintrag_26'].'</a>';
 		echo '<br><a href="index.php?logout=1" class="btn">'.$menu_lang['eintrag_29'].'</a>';		
@@ -146,9 +150,7 @@ $_SESSION['ic_last_refresh']=0;
 		echo '<span onclick="switch_iframe_main_container(\'military.php\')" class="btn">Flotten</span>';
 		
 		echo '<span onclick="switch_iframe_main_container(\'secret.php\')" class="btn">'.$menu_lang['eintrag_11'].'</span>';
-
-		echo '<span onclick="switch_iframe_main_container(\'sector.php\')" class="btn">'.$menu_lang['eintrag_12'].'</span>';
-		
+	
 		echo '<span onclick="switch_iframe_main_container(\'allymain.php\')" class="btn">'.$menu_lang['eintrag_16'].'</span>';
 
 
