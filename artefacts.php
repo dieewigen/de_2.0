@@ -769,7 +769,7 @@ if (!hasTech($pt, 28)) {
     echo '</div>';
 
     //msg-area
-    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 58px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
+    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 64px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
     echo '</div>';
 
     //artefakte aus der db holen
@@ -797,7 +797,7 @@ if (!hasTech($pt, 28)) {
         }
         //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
 
-        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
+        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
         echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$_SESSION['ums_gpfad'].'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>';
         echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>';
         echo '</div>';
