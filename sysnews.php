@@ -291,7 +291,7 @@ if ($_GET["option"] == "7") {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
     $th2 = '<a href="sysnews.php?option=2"><font color="#00DF00">['.$sn_lang["kampf"].']</font></u></a>';
 } elseif ($_GET["option"] == "1") {
-    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=?";
+    $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
     $th1 = '<a href="sysnews.php?option=1"><font color="#00DF00">['.$sn_lang["alle"].']</font></a>';
 } elseif (empty($_GET["option"])) {

@@ -1279,7 +1279,7 @@ if (!hasTech($pt, 9)) {
                             echo '</tr>';
 
                             //lade einheitentypen
-                            unset($fleetpoints);
+                            $fleetpoints = array();
                             $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100");
                             while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
                                 echo '<tr>';

@@ -851,11 +851,12 @@ function recall($fleet_id, $sector, $system, $db){
 	//erstmal schauen, ob man sie �berhaupt zur�ckrufen kann
 	//if ($akttyp==1 OR $akttyp==2 OR $akttyp==4){//also wenn sie hinfliegt
 	if ($akttyp==1 OR $akttyp==2){//also wenn sie hinfliegt
-		if($spec5!=2){
-			$sql="UPDATE de_user_fleet set aktion = 3, zeit = GREATEST(0, gesrzeit - zeit), entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
-		}else{
-			$sql="UPDATE de_user_fleet set aktion = 3, zeit = GREATEST(0, gesrzeit - zeit - 1), entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
-		}
+        if($spec5!=2){
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = gesrzeit - zeit, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
+        }else{
+            // Saubere Lösung: Erst prüfen, dann berechnen
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = CASE WHEN gesrzeit > zeit THEN gesrzeit - zeit - 1 ELSE 0 END, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
+        }		
 
 		mysqli_query($GLOBALS['dbi'],$sql);
 		//echo $sql;

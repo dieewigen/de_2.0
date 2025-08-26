@@ -94,10 +94,9 @@ echo '
 -->
 </style>';
 
-
-if (!isset($action)) {
-    $action = "eingang";
-}
+$action = $_REQUEST['action'] ?? 'eingang';
+$se = $_REQUEST['se'] ?? '';
+$sy = $_REQUEST['sy'] ?? '';
 
 if ($action == "ant" || $action == "weiter" || $action == "spieler" || $action == "sektor" || $action == "freunde" || $action == "alli") {
     // Javascript, f&uuml;r die ueberpruefung, ob alle Felder ausgefuellt sind und um per klick den richtigen BB code in die Textarea einzufuegen

@@ -16,6 +16,10 @@ $restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03']
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];
 
+// Parameter aus GET/POST abrufen und validieren
+$userid = isset($_GET['userid']) ? (int)$_GET['userid'] : (isset($_POST['userid']) ? (int)$_POST['userid'] : null);
+$allyid = isset($_GET['allyid']) ? (int)$_GET['allyid'] : (isset($_POST['allyid']) ? (int)$_POST['allyid'] : null);
+
 ?>
 <!DOCTYPE HTML>
 <html>
