@@ -2,10 +2,10 @@
 
 // CSS Reset
 
-// Basisboxmodell auf alle Elemente anwenden
-*,
-*::before,
-*::after {
+// Basisboxmodell auf alle Elemente anwenden (außer Tabellen-Elemente)
+*:not(table):not(tr):not(td):not(th):not(col):not(colgroup),
+*:not(table):not(tr):not(td):not(th):not(col):not(colgroup)::before,
+*:not(table):not(tr):not(td):not(th):not(col):not(colgroup)::after {
 	box-sizing: border-box;
 }
 

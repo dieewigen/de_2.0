@@ -766,7 +766,7 @@ if(!empty($sec_btn) && $system==issectorcommander()){
 		  [$name, $sector]
 		);
 
-		if($issectorcommander() && $sector!=1)//nur wenn man sk ist kann man die steuer ändern
+		if(issectorcommander() && $sector!=1)//nur wenn man sk ist kann man die steuer ändern
 		{
 			if($sv_deactivate_vsystems!=1)
 				mysqli_execute_query($GLOBALS['dbi'],

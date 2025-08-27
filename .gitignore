@@ -1,6 +1,7 @@
 g/*.ttf
 g/*.otf
 cache/*.tmp
+cache/**/*.tmp
 cache/creditlogs/*.txt
 cache/toplist/*.tmp
 cache/overview/*.tmp

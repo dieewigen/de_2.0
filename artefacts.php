@@ -613,7 +613,8 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
 }//ende submit1
 
 
-//geb�udeupgrade
+//gebäudeupgrade
+$fehlermsg='';
 if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxlevel) {
     //transaktionsbeginn
     if (setLock($_SESSION['ums_user_id'])) {
@@ -704,7 +705,7 @@ if (!hasTech($pt, 28)) {
 
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
-    //artefakte/geb�ude darstellen
+    //artefakte/gebäude darstellen
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
@@ -728,7 +729,7 @@ if (!hasTech($pt, 28)) {
 
     rahmen_oben($ueberschrift);
 
-    $cssheight = 143 + (ceil($artbldglevel / 10) - 1) * 70;
+    $cssheight = 143 + (ceil(($artbldglevel + $ally_geb_bonus) / 10) -1) * 70;
 
     echo '<div class="cell" style="width: 576px; height: '.$cssheight.'px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
 
@@ -752,11 +753,8 @@ if (!hasTech($pt, 28)) {
         $title .= '<br>Zus&auml;tzliche Artefaktpl&auml;tze durch Allianzprojekte: '.$ally_geb_bonus;
     }
 
-    //<input type="submit" name="bupgrade" value="'.$artefacts_lang[zulevel].($artbldglevel+1).$artefacts_lang[zulevel2].'">'
-    //.$artefacts_lang[kosten].number_format($ausbaukosten, 0,",",".").$artefacts_lang[iradiumdauer].($ausbauzeit).'<br>';
-
     //Artefaktgebäude
-    echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
+    echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
     if ($showbldglink == 1) {
         echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
     }
@@ -769,7 +767,7 @@ if (!hasTech($pt, 28)) {
     echo '</div>';
 
     //msg-area
-    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 504px; height: 64px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
+    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 503px; height: 64px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
     echo '</div>';
 
     //artefakte aus der db holen
@@ -795,13 +793,13 @@ if (!hasTech($pt, 28)) {
                 $title .= '<br>'.$fc[0].($i + 1).': '.number_format($ua_werte[$row["id"] - 1][$i][0], 2, ",", ".").'%'.$fc[1];
             }
         }
-        //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
 
-        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-        echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.$_SESSION['ums_gpfad'].'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>';
-        echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>';
-        echo '</div>';
-        //daten f�r json zusammenfassen
+        echo '
+        <div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">
+            <span style="position: absolute; left: 0px; top: 0px;"><img src="'.$_SESSION['ums_gpfad'].'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>
+            <span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>
+        </div>';
+        //daten für json zusammenfassen
         $artefacts[$ac]['lid'] = $row['lid'];
         $artefacts[$ac]['id'] = $row['id'];
         $artefacts[$ac]['level'] = $row['level'];
@@ -810,13 +808,13 @@ if (!hasTech($pt, 28)) {
         $artefacts[$ac]['bs'] = $ua_bs[$row["id"] - 1] ?? 0;
         $artefacts[$ac]['select'] = 0;
 
-        //id-counter erh�hen
+        //id-counter erhöhen
         $ac++;
     }
 
     $title = 'Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
     for ($i = $ac;$i < $artbldglevel + $ally_geb_bonus;$i++) {
-        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
+        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
         echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
         echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artefacts_lang['frei'].'</span>';
         echo '</div>';
@@ -827,9 +825,7 @@ if (!hasTech($pt, 28)) {
     rahmen_unten();
 
     ///////////////////////////////////////////////////
-    ///////////////////////////////////////////////////
     // basisschiffe
-    ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
     //echo '<br>';
     $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen 3 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
@@ -937,10 +933,8 @@ if (!hasTech($pt, 28)) {
     if (isset($_REQUEST['showinfo']) && $_REQUEST['showinfo'] == 1) {
         echo '<b>Woher bekomme ich Artefakte?</b>
 		<br>- Du kannst diese durch Angriffe auf NPC-Systeme der DX61a23 bekommen.
-		<br>- Im Handel gibt es bei Lieferungen die Chance Artefakte zu bekommen.
-		<br>- Im Schwarzmarkt gibt es eine Auswahl von Artefakten, die zur Finanzierung von Die Ewigen dienen.
-		<br>- Beim t&auml;glichen Allianzgeschenk ist ein Artefakt enthalten.
-		<br>- Bei der wiederholbaren Mission "Das Basisraumschiffwrack"
+		<br>- Es gibt unter Missionen die Möglichkeit Artefakte zu erhalten.
+		<br>- Beim täglichen Allianzgeschenk ist ein Artefakt enthalten.
 		<br><br>
 		<b>Welche Artefakte gibt es?</b>';
         echo '<table width="100%">';
