@@ -178,7 +178,12 @@ function doBattleGround($bg)
                         $winner_id = letSpecialShipFight($player_id1, $player_id2, $player);
 
                         echo '<br>P1: '.$player[$player_id1]['spielername'];
-                        echo '<br>P2: '.$player[$player_id2]['spielername'];
+                        if($player_id2 > 0){
+                            echo '<br>P2: '.$player[$player_id2]['spielername'];
+                        }else{
+                            echo '<br>P2: kein Gegner';
+                        }
+
                         echo '<br>GE: '.$player[$winner_id]['spielername'];
 
                         echo '<br><br>';
@@ -263,6 +268,14 @@ function doBattleGround($bg)
                     $player_id1 = -1;
                     $max_score = -1;
                     for ($i = 0;$i < count($player);$i++) {
+                        if(!isset($allys[$i]['score'])){
+                            $allys[$i]['score'] = 0;
+                        }
+
+                        if(!isset($allys[$i]['runde'])){
+                            $allys[$i]['runde'] = -1;
+                        }
+
                         if ($allys[$i]['score'] > $max_score && $allys[$i]['runde'] < $runde) {
                             $player_id1 = $i;
                             $max_score = $allys[$i]['score'];
@@ -293,9 +306,9 @@ function doBattleGround($bg)
                     if ($player_id1 != -1 || $player_id2 != -1) {
                         $winner_id = letSpecialShipFight($player_id1, $player_id2, $allys);
 
-                        echo '<br>P1: '.$allys[$player_id1]['spielername'];
-                        echo '<br>P2: '.$allys[$player_id2]['spielername'];
-                        echo '<br>GE: '.$allys[$winner_id]['spielername'];
+                        echo '<br>P1: '.(isset($allys[$player_id1]['spielername']) ? $allys[$player_id1]['spielername'] : 'Kein Gegner');
+                        echo '<br>P2: '.(isset($allys[$player_id2]['spielername']) ? $allys[$player_id2]['spielername'] : 'Kein Gegner');
+                        echo '<br>GE: '.(isset($allys[$winner_id]['spielername']) ? $allys[$winner_id]['spielername'] : 'Kein Gegner');
 
                         echo '<br><br>';
 
@@ -303,11 +316,15 @@ function doBattleGround($bg)
                         $p2_ship_level = '';
 
                         if ($player_id1 > -1) {
-                            $p1_ship_level = '&nbsp;(Gesamtstufe '.$allys[$player_id1]['ship']->ship_level.')';
+                            if (isset($allys[$player_id1]['ship']) && $allys[$player_id1]['ship'] != null) {
+                                $p1_ship_level = '&nbsp;(Gesamtstufe '.$allys[$player_id1]['ship']->ship_level.')';
+                            }
                         }
 
                         if ($player_id2 > -1) {
-                            $p2_ship_level = '&nbsp;(Gesamtstufe '.$allys[$player_id2]['ship']->ship_level.')';
+                            if (isset($allys[$player_id2]['ship']) && $allys[$player_id2]['ship'] != null) {
+                                $p2_ship_level = '&nbsp;(Gesamtstufe '.$allys[$player_id2]['ship']->ship_level.')';
+                            }
                         }
 
 
@@ -316,16 +333,21 @@ function doBattleGround($bg)
                         }
 
                         //ergebnis speichern
-                        $fightresult[$runde][] = array(
-                            'winner_user_id' => $allys[$winner_id]['ally_id'],
-                            'user_id1' => $allys[$player_id1]['ally_id'],
-                            'user_id2' => $allys[$player_id2]['ally_id'],
-                            'spielername1' => $allys[$player_id1]['spielername'].$p1_ship_level,
-                            'spielername2' => $allys[$player_id2]['spielername'].$p2_ship_level,
-                            'gewinn' => $gewinn_text
-                        );
+                        $spielername1 = (isset($allys[$player_id1]['spielername']) ? $allys[$player_id1]['spielername'] : '').$p1_ship_level;
+                        $spielername2 = (isset($allys[$player_id2]['spielername']) ? $allys[$player_id2]['spielername'] : '').$p2_ship_level;
 
-                        if ($allys[$winner_id]['ally_id'] > 0) {
+                        if(!empty($spielername1) && !empty($spielername2)){
+                            $fightresult[$runde][] = array(
+                                'winner_user_id' => isset($allys[$winner_id]['ally_id']) ? $allys[$winner_id]['ally_id'] : 0,
+                                'user_id1' => isset($allys[$player_id1]['ally_id']) ? $allys[$player_id1]['ally_id'] : 0,
+                                'user_id2' => isset($allys[$player_id2]['ally_id']) ? $allys[$player_id2]['ally_id'] : 0,
+                                'spielername1' => $spielername1,
+                                'spielername2' => $spielername2,
+                                'gewinn' => $gewinn_text
+                            );
+                        }
+
+                        if (isset($allys[$winner_id]['ally_id']) && $allys[$winner_id]['ally_id'] > 0) {
 
                             if ($bg == 2) {
                                 echo '<br>C: BG2';
@@ -336,8 +358,6 @@ function doBattleGround($bg)
                                 //Quantenglimmer gutschreiben
                                 changeAllyStorageAmount($allys[$winner_id]['ally_id'], 13, 1, false);
                             }
-                            //echo $sql;
-                            //mysqli_query($GLOBALS['dbi'],$sql);
 
                         }
                     }
@@ -386,9 +406,22 @@ function letSpecialShipFight($player_id1, $player_id2, $player)
 
     //die();
 
-    $enm[0] = $player[$player_id1]['ship'];
-    $enm[1] = $player[$player_id2]['ship'];
+    // Überprüfung, ob die Spieler und ihre Schiffe existieren
+    $enm[0] = isset($player[$player_id1]['ship']) ? $player[$player_id1]['ship'] : null;
+    $enm[1] = isset($player[$player_id2]['ship']) ? $player[$player_id2]['ship'] : null;
 
+    // Überprüfung, ob die Schiffe existieren
+    if ($enm[0] == null || $enm[1] == null) {
+        // Falls ein Schiff null ist, automatisch den anderen Spieler gewinnen lassen
+        if ($enm[0] == null && $enm[1] != null) {
+            return $player_id2;
+        } elseif ($enm[1] == null && $enm[0] != null) {
+            return $player_id1;
+        } else {
+            // Beide Schiffe sind null - ersten Spieler gewinnen lassen (oder anderen Fallback)
+            return $player_id1;
+        }
+    }
 
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////

@@ -679,6 +679,8 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
 //stelle die ressourcenleiste dar
 include "resline.php";
 
+$artefacts = array();
+
 if (isset($errmsg) && $errmsg != '') {
     echo '<div class="info_box">'.$errmsg.'</div><br>';
 }
@@ -722,7 +724,7 @@ if (!hasTech($pt, 28)) {
 	<div style="display: flex;">
 		<div style="width: 145px;"></div>
 		<div style="flex-grow: 1;">'.$artefacts_lang['artefaktgebaeude'].' <img id="info" title="'.$title.'" style="vertical-align: middle; margin-top: -4px;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"></div>
-		<div style="width: 145px; text-align: right;"><img id="info" title="Palenium" style="vertical-align: middle; width: 16px; height: auto; margin-top: -4px;" src="g/item1.png" border="0"> '.number_format($palenium, 0, ",", ".").'&nbsp;</div>
+		<div style="width: 145px; text-align: right;"><img id="info" title="Palenium" style="vertical-align: middle; width: 16px; height: auto; margin-top: -4px;" src="gp/g/item1.png"  class="rounded-borders"> '.number_format($palenium, 0, ",", ".").'&nbsp;</div>
 		
 	</div>
 	';
@@ -774,7 +776,6 @@ if (!hasTech($pt, 28)) {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$_SESSION['ums_user_id']]);
     $anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
     $ac = 0;
-    $artefacts= array();
     while ($row = mysqli_fetch_array($db_daten)) {
         //title/tooltip festlegen
         $title = $ua_name[$row["id"] - 1].'&'.$ua_desc[$row["id"] - 1];

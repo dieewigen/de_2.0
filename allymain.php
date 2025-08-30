@@ -290,15 +290,15 @@ echo '<tr><td>
 	   		';
 
 if($dailyallygift==1){
-	$grafikname='symbol1.png';
+	$grafikname='icon15.png';
 }else{
- 	$grafikname='symbol2.png'; 
+ 	$grafikname='icon15_grey.png'; 
 }
 
 echo '
-      	<td height="32">Geworbene-Spieler-Bonus:</td>
+      	<td height="32">Täglicher Bonus:</td>
       	<td height="32" colspan="3">
-    		<a href="ally_dailygift.php"><img src="'.$_SESSION['ums_gpfad'].'g/'.$grafikname.'" border="0"></a>
+    		<a href="ally_dailygift.php"><img src="gp/g/'.$grafikname.'" style="width: 32px; height: 32px;" class="rounded-borders"></a>
  			
   			  	
 	  	</td>

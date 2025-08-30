@@ -358,7 +358,7 @@ if($num==1){
 			}
 			else{
 				if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){
-					echo '<a href="ally_bldg.php?build='.$i.'">';
+					echo '<a style="font-size: 10px;" href="ally_bldg.php?build='.$i.'">';
 				}
 
 				//////////////////////////////////////////

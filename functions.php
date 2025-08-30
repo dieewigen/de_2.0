@@ -40,18 +40,19 @@ function getInfocenter()
     $content = '';
     $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 
-    //$content.='<div class="red mb10">under construction</div>';
-
     /////////////////////////////////////////////////
     // Missionen
     /////////////////////////////////////////////////
-    $content .= '<div class="header">Missionen</div>';
+    $targetId='tb_infocenter_missions';
+    //$content .= '<div class="header">Missionen</div>';
     if (!hasTech($pt, 29)) {
         $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=29";
         $db_tech = mysqli_query($GLOBALS['dbi'], $techcheck);
         $row_techcheck = mysqli_fetch_array($db_tech);
 
-        $content .= '<div>Fehlende Technologie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'<div>';
+        //$content .= '<div>Fehlende Technologie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'<div>';
+        //Icon ausblenden
+        $content .= '$("#'.$targetId.'").hide();';
 
     } else {
         //die Missionsdatensätze auslesen
@@ -70,12 +71,26 @@ function getInfocenter()
         }
 
         if ($m_abholbereit > 0) {
-            $content .= '<div class="green">abholbereit: '.$m_abholbereit.'</div>';
+            //$content .= '<div class="green">abholbereit: '.$m_abholbereit.'</div>';
+            $content .= '$("#'.$targetId.'").show();';
+            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>abholbereit: '.$m_abholbereit.'");';
+            //pulsierende Klasse
+            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
         } else {
             if ($m_laufen == 0) {
-                $content .= '<div class="red">aktiv: 0</div>';
+                //Warnung, wenn keine Missionen laufen
+                //$content .= '<div class="red">aktiv: 0</div>';
+            $content .= '$("#'.$targetId.'").show();';
+            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: 0");';
+            //pulsierende Klasse
+            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';                
             } else {
-                $content .= '<div>aktiv: '.$m_laufen.'</div>';
+                //Hinweis wie viele Missionen laufen
+                //$content .= '<div>aktiv: '.$m_laufen.'</div>';
+            $content .= '$("#'.$targetId.'").show();';
+            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: '.$m_laufen.'");';
+            //keine pulsierende Klasse
+            $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';                
             }
 
         }
@@ -84,6 +99,8 @@ function getInfocenter()
     /////////////////////////////////////////////////
     // Technologien
     /////////////////////////////////////////////////
+    $targetId='tb_infocenter_technology';
+
     //zuerst checken ob man evtl. schon alle Techs hat, dann braucht man den Punkt gar nicht mehr anzeigen
     $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_tech_data WHERE tech_sort_id < 1000");
     $row = mysqli_fetch_array($db_daten);
@@ -91,29 +108,43 @@ function getInfocenter()
     $tech_anzahl = count($pt);
 
     if ($tech_anzahl < $tech_max) {
-        $content .= '<div class="header mt10">Technologien</div>';
+        //$content .= '<div class="header mt10">Technologien</div>';
         //wird aktuell etwas erforscht?
         $t_aktiv = 0;
         foreach ($pt as $tech) {
-
-
             if (is_array($tech) && $tech['time_finished'] > time()) {
                 $t_aktiv++;
             }
         }
 
         if ($t_aktiv > 0) {
-            $content .= '<div>aktiv: '.$t_aktiv.'</div>';
+            //anzeigen wie viel erforscht wird
+            //$content .= '<div>aktiv: '.$t_aktiv.'</div>';
+            $content .= '$("#'.$targetId.'").show();';
+            $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: '.$t_aktiv.'");';
+            //keine pulsierende Klasse
+            $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';
+
         } else {
-            $content .= '<div class="red">aktiv: 0</div>';
+            //Warnung, dass gerade nichts geforscht wird
+            //$content .= '<div class="red">aktiv: 0</div>';
+            $content .= '$("#'.$targetId.'").show();';
+            $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: 0");';
+            //pulsierende Klasse
+            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
         }
-
-        //$content.=count($pt).'/'.$tech_max;
-
-        //$content.=print_r($pt,true);
-
+    }else{
+        //alle Techs erforscht, Punkt nicht mehr anzeigen
+        $content .= '$("#'.$targetId.'").hide();';
     }
 
+    if(!empty($content)){
+        $content='
+        <script>
+        '.$content.';
+        </script>
+        ';
+    }
 
     return $content;
 }
@@ -270,7 +301,7 @@ function createAuction($uid)
 	reward='".serialize($reward)."'
 	";
 
-    error_log($sql, 0);
+    //error_log($sql, 0);
 
     mysqli_query($GLOBALS['dbi'], $sql);
 }

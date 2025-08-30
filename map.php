@@ -907,7 +907,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
         //$erforschte_systeme_koordinaten[$row['id']]=array($alienpos_x, $alienpos_y);
     } else {
-        $bg_image = 'g/de_vs_us.png';
+        $bg_image = 'gp/g/de_vs_us.png';
         $system_name = 'Unerforschtes System (#'.$row['id'].')';
     }
 
@@ -937,16 +937,6 @@ while ($row = mysqli_fetch_array($db_daten)) {
         for ($i = 0;$i < count($data->fields);$i++) {
 
             ///////////////////////////////////////////
-            //Rahmenfarbe definieren
-            ///////////////////////////////////////////
-            //Blocker
-            if (isset($data->fields[$i][1])) {
-                $border = 'border: 1px solid #FF0000;';
-            } else {
-                $border = '';
-            }
-
-            ///////////////////////////////////////////
             //Feld-Ressource anzeigen
             ///////////////////////////////////////////
             //Gebäudestufe bestimmen
@@ -968,7 +958,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
                     if ($filename_nr < 10) {
                         $filename_nr = '0'.$filename_nr;
                     }
-                    $output .= '<div style="text-align:center; margin-right: 1px; font-size: 10px; line-height: 10px;"><img style="width: 18px; box-sizing: border-box; border-radius: 5px;'.$border.'" src="g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+                    $output .= '<div style="text-align:center; margin-right: 1px; font-size: 10px; line-height: 10px;"><img style="width: 18px; box-sizing: border-box;" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
                 } else {
                     //außenposten
                     $output .= '
@@ -990,7 +980,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
 
                 } else {
-                    $output .= '<div title="keine Rohstoffe" style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;'.$border.'">-</div>';
+                    $output .= '<div title="keine Rohstoffe" class="rounded-borders" style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #666666; text-align: center; box-sizing: border-box;">-</div>';
                 }
 
 

@@ -154,7 +154,7 @@ $aktdate = date("d.m. H:i", $filetime);
 
 //ausgabe der einzelnen positionen
 
-//wenn sektor 1, dann info �ber startsektor
+//wenn sektor 1, dann info über startsektor
 
 if ($sector == 1 and $sv_deactivate_sec1moveout == 0) {
     $text = '
@@ -201,11 +201,10 @@ for ($j = 0;$j <= 6;$j++) {
             $ueberschrift = '
 			<table width="586" border="0" cellpadding="0" cellspacing="0">
 			<tr>
-			<td width="13" height="37" class="rml">&nbsp;</td>
-			<td width="560" align="center" class="ro"><div class="cellu">&Uuml;bersicht</div></td>
-			<td width="13" class="rmr">&nbsp;</td>
-			</tr>
-			';
+			<td width="13" height="37" class="rol">&nbsp;</td>
+			<td width="560" align="center" class="ro"><div class="cellu">Übersicht</div></td>
+			<td width="13" class="ror">&nbsp;</td>
+			</tr>';
 
             ///////////////////////////////////////////////////////////////
             //die rundencounteranzeige erstellen - anfang
@@ -217,10 +216,10 @@ for ($j = 0;$j <= 6;$j++) {
                 $maxtick = $row['tick'];
 
 
-                $rca = '<div class="fett text3">Das Ziel beim <a style="color: #00FF00; text-decoration: underline; font-size: 10pt;" href="http://forum.bgam.es/thread.php?threadid=23173" target="_blank">Hardcore-Rundenmodus</a> ist es als erster 5 Erhabenenteilsiege zu erreichen und somit zum vollwertigen ERHABENEN zu werden.</div>';
+                $rca = '<div class="fett text3">Das Ziel beim Hardcore-Rundenmodus ist es als erster 5 Erhabenenteilsiege zu erreichen und somit zum vollwertigen ERHABENEN zu werden.</div>';
 
                 //Top 3
-                //die ersten drei Pl�tze anzeigen
+                //die ersten drei Plätze anzeigen
                 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 AND (eh_siege>0 OR eh_counter>0) ORDER BY eh_siege DESC, eh_counter DESC LIMIT 3", []);
                 $num = mysqli_num_rows($db_daten);
                 if ($num > 0) {
@@ -303,11 +302,7 @@ for ($j = 0;$j <= 6;$j++) {
 
                 }
 
-
                 $rca .= '</div>';
-
-
-
 
             } else {
                 //normale runde
@@ -473,9 +468,9 @@ for ($j = 0;$j <= 6;$j++) {
                 $ueberschrift = '
          <table width="586" border="0" cellpadding="0" cellspacing="0">
          <tr>
-         <td width="13" height="37" class="rol">&nbsp;</td>
+         <td width="13" height="37" class="rml">&nbsp;</td>
          <td align="center" class="ro"><div class="cellu">'.$ov_lang['systemuebersicht'].'</div></td>
-         <td width="13" class="ror">&nbsp;</td>
+         <td width="13" class="rmr">&nbsp;</td>
          </tr>
          ';
             } else {

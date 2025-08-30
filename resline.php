@@ -245,7 +245,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	//dailyallygif
 	if($resline_dailyallygift==1){
 		echo '<div id="resdailyallygift"><a href="ally_dailygift.php" title="'.$resline_lang['dailyallygift'].'<br>'.$resline_lang['dailyallygiftdesc'].'">
-		<img src="'.$_SESSION['ums_gpfad'].'g/symbol1.png" width="100%" height="100%"></a></div>';
+		<img src="gp/g/icon15.png" class="rounded-borders" width="100%" height="100%"></a></div>';
 	}
 	echo '</div>';
 

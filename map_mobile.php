@@ -133,7 +133,7 @@ if(!hasTech($pt,25)){
 			<option value="10">10</option>
 		  </select>		  
 
-		  <img src="g/close_icon.png" style="height: 26px; width: auto; margin-left: 30px; margin-bottom: -7px;" onclick="vs_filter(0);" title="Filter zur&uuml;cksetzen">
+		  <img src="gp/g/close_icon.png" style="height: 26px; width: auto; margin-left: 30px; margin-bottom: -7px;" onclick="vs_filter(0);" title="Filter zur&uuml;cksetzen">
 		  <script>
 		  $(document).ready(function() {
 			vs_filter_init();
@@ -421,7 +421,7 @@ if(!hasTech($pt,25)){
 						if($filename_nr<10){
 							$filename_nr='0'.$filename_nr;
 						}
-						$output.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+						$output.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
 					}else{
 						//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
 						if(isset($bldg[$row['id']][$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'])){
@@ -434,7 +434,7 @@ if(!hasTech($pt,25)){
 
 
 						}else{
-							$output.='<div title="keine Rohstoffe" style="margin-left: 10px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; border-radius: 5px;'.$border.'">-</div>';
+							$output.='<div title="keine Rohstoffe" class="rounded-borders" style="margin-left: 10px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center;">-</div>';
 						}
 
 					}

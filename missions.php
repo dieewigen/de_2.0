@@ -743,8 +743,7 @@ if(!hasTech($pt,29)){
 							<div style="margin-right: 10px;"><a href="javascript: void(0)" onclick="show_mission(2)" class="btn">W-Handel</a></div>
 						</div>
 						
-
-						<span id="trade_menu" style="display: none">
+						<div id="trade_menu" style="display: none; margin-bottom: 10px;">
 							Ich ben&ouml;tige 
 							<select name="res_need" id="res_need" onchange="javascript: show_mission_trade();">
 								<option value="-1" selected>alles</option>
@@ -762,10 +761,8 @@ if(!hasTech($pt,29)){
 								<option value="2">Dyharra</option>
 								<option value="3">Iradium</option>
 								<option value="4">Eternium</option>
-							</select>.
-				
-
-						</span>
+							</select>
+						</div>
 					</div>
 
 					<script>

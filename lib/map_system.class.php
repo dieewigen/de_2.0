@@ -278,7 +278,7 @@ class map_system{
 					}
 					$content.='
 					<div style="text-align:center; font-size: 20px;">
-						<img style="width: 40px; border-radius: 5px;'.$border.'" src="g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">
+						<img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">
 						'.$stufeninfo.
 					'</div>';
 				}else{
@@ -362,7 +362,7 @@ class map_system{
 						<input name="id" value="'.$this->system_id.'" type="hidden">
 						<input name="fieldid" value="'.$i.'" type="hidden">
 						<input name="upgrade" value="1" type="hidden">
-						<img src="/g/icon12.png" style="width: 100%; height: 100%;" onclick="$(this).parents(\'form:first\').submit();">
+						<img src="gp/g/icon12.png" style="width: 100%; height: 100%;" onclick="$(this).parents(\'form:first\').submit();">
 					</form>			
 				</div>
 				';
@@ -1012,7 +1012,7 @@ class map_system{
 							if($filename_nr<10){
 								$filename_nr='0'.$filename_nr;
 							}
-							$content.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+							$content.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
 						}else{
 							$content.='<div title="keine Rohstoffe" style="margin-left: 10px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; border-radius: 5px;'.$border.'">-</div>';
 						}

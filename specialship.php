@@ -33,7 +33,6 @@ $max_kt = $row["kt"];
 <?php 
 include "cssinclude.php";
 ?>
-<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime('g/de-desktop.css');?>">
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';

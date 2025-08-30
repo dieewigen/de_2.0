@@ -23,7 +23,7 @@ if(hasTech($GLOBALS['pt'],145)){
 			$content.='<br><br>Auf dem Planeten befindet sich ein bisher unbekanntes Volk. Soll Kontakt aufgenommen werden?';
 	
 			//Test auf Aktion
-			if($_REQUEST['action']==1){
+			if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
 				//nächste Phase freischalten
 				$data['phase']++;
 				setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'],$this->system_id, $data);

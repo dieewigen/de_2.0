@@ -136,6 +136,11 @@ if ($dortick == 1) {
             $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$npc, $sv_free_startsectors, $maxsector]);
             $rowx = mysqli_fetch_array($rx);
             $sec = $rowx["sector"];
+
+            if(!isset($rowx["sector"])){
+                error_log('register_user.php: '.print_r($res, true), 0);
+            }
+
             if ($npc == 0) {
                 $sec = 1;
             }
@@ -161,6 +166,10 @@ if ($dortick == 1) {
 				//nur dem sektor zuweisen wenn npc/npcsektor oder pc/pcsektor
 				if ($npc == $npcsec[$secz]) {
 					for ($sysz = $sys;$sysz <= $maxsystem;$sysz++) {
+                        if(!isset($systeme[$secz][$sysz])){
+                            $systeme[$secz][$sysz] = 0;
+                        }
+
 						if ($systeme[$secz][$sysz] == 0) {
 							$gefunden = 1;
 						}
@@ -287,6 +296,10 @@ if ($dortick == 1) {
             //nur dem sektor zuweisen wenn npc/npcsektor oder pc/pcsektor
             if ($npc == $npcsec[$secz]) {
                 for ($sysz = $sys;$sysz <= $maxsystem;$sysz++) {//alle systeme von 1 x durchgehen und einen platz suchen
+                    if(!isset($systeme[$secz][$sysz])){
+                        $systeme[$secz][$sysz] = 0;
+                    }
+
                     if ($systeme[$secz][$sysz] == 0 and $secz != $herksec and $secz != $last_sector and $blocked_sec[$secz] == 0) {
                         $gefunden = 1;
                     }

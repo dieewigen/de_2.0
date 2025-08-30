@@ -12,6 +12,7 @@ $detect = new \Detection\MobileDetect();
 if (!isset($_COOKIE["loginhelp"])) {
     $time = time() + 32000000;
     $pwstring = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $loginhelpstr='';
     for ($i = 1; $i <= 32; $i++) {
         $loginhelpstr .= $pwstring[rand(0, strlen($pwstring) - 1)];
     }

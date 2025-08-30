@@ -248,7 +248,7 @@ if (window.Worker) {
 		}
 
 		if(e.data.infocenter!=''){
-			$('#ic', parent.document).html(e.data.infocenter);
+			$('#infocenter', parent.document).html(e.data.infocenter);
 		}
 
 	  //alert('Worker said: '+e.data);

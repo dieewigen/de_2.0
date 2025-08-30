@@ -43,7 +43,7 @@ $freeartefactplaces = get_free_artefact_places($_SESSION['ums_user_id']);
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 echo '<div style="width: 600px; margin-left: auto; margin-right: auto;">';
 
-$allyrelverbreitung_need = array(0, 1000, 2000, 3000, 4000, 5000);
+$allyrelverbreitung_need = array(0, 1000, 2000, 3000, 4000, 5000, 9999999);
 
 //überprüfen ob man in einer allianz ist
 if ($ally_id > 0 && $allystatus == 1) {

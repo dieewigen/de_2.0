@@ -390,11 +390,11 @@ echo '<div align="center">';
 <tr height="37px">
 <td width="13px"class="rol">&nbsp;</td>
 <td width="200px" class="ro">&nbsp;&nbsp;<?php echo $production_lang['einheit'];?>:</td>
-<td width="51px" align="center" class="ro"><img src="g/icon1.png" style="width: 20px; height: auto;" title="Multiplex"></td>
-<td width="51px" align="center" class="ro"><img src="g/icon2.png" style="width: 20px; height: auto;" title="Dyharra"></td>
-<td width="51px" align="center" class="ro"><img src="g/icon3.png" style="width: 20px; height: auto;" title="Iradium"></td>
-<td width="51px" align="center" class="ro"><img src="g/icon4.png" style="width: 20px; height: auto;" title="Eternium"></td>
-<td width="31px" align="center" class="ro"><img src="g/icon5.png" style="width: 20px; height: auto;" title="Tronic"></td>
+<td width="51px" align="center" class="ro"><img src="gp/g/icon1.png" class="rounded-borders" style="width: 20px; height: auto;" title="Multiplex"></td>
+<td width="51px" align="center" class="ro"><img src="gp/g/icon2.png" class="rounded-borders" style="width: 20px; height: auto;" title="Dyharra"></td>
+<td width="51px" align="center" class="ro"><img src="gp/g/icon3.png" class="rounded-borders" style="width: 20px; height: auto;" title="Iradium"></td>
+<td width="51px" align="center" class="ro"><img src="gp/g/icon4.png" class="rounded-borders" style="width: 20px; height: auto;" title="Eternium"></td>
+<td width="31px" align="center" class="ro"><img src="gp/g/icon5.png" class="rounded-borders" style="width: 20px; height: auto;" title="Tronic"></td>
 <td width="31px" align="center" class="ro"><?php echo $production_lang['wochen'];?></td>
 <td width="55px" align="center" class="ro"><?php echo $production_lang['stueck'];?></td>
 <td width="55px" align="center" class="ro"><?php echo $production_lang['bauen'];?></td>
@@ -819,12 +819,15 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 	$c1=1;
 	foreach ($ps as $item_id_product => $item) {
 		if(!empty($item['item_blueprint'])){
+
 			if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
 			
 			echo '<div class="'.$bg.'" style="padding: 10px;">';
 
 			//Item-Name
-			echo '<div class="fett">'.$item['item_name'].'</div>';
+			echo '<div><span class="fett">'.$item['item_name'].'</span> (Lager: '.number_format($ps[$item_id_product]['item_amount'], 0,",",".").')</div>';
+
+			echo '<div style="display: flex; margin-top: 10px;">';
 
 			//Item-Bestandteile/Voraussetzungen/Bauzeit
 			$parts=explode(";", $item['item_blueprint']);
@@ -846,23 +849,33 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 					$values=explode("x", $einzel);
 					$factory_id=str_replace("P", "", $values[0]);
 
-					$fabrikkosten.='<br>'.$values[1].' <img src="'.$_SESSION['ums_gpfad'].'g/r/'.$factory_id.'_g.gif">';
+					$fabrikkosten.='<br>'.$values[1].' <img src="'.$_SESSION['ums_gpfad'].'g/r/'.$factory_id.'_g.gif" style="width: auto; height: 16px;">';
 				}
 			}
 
-			//Baukosten
-			echo '<br>Baukosten pro St&uuml;ck: '.$baukosten;
+			//Spalte1 - Baukosten
+			echo '
+			<div style="width: 37%;">
+				Baukosten pro St&uuml;ck: '.$baukosten.'
+			</div>';
+			
+			//Spalte2 - Bauzeit und Fabrikkapazität
+			echo '
+			<div style="width: 43%;">
+				<div>Bauzeit: '.$bauzeit.'</div>
+				<div>Benötigte Fabrikkapazität pro Stück: '.$fabrikkosten.'</div>
+			</div>';
+					
+			//Spalte3 - Baumenge
+			echo '
+			<div style="width: 20%;">
+				<div>Baumenge: <input type="text" name="item_id_'.$item_id_product.'" value="" size="3" maxlength="9""></div>
+				<div>(Im Bau: '.intval(getItemBuildAmount($_SESSION['ums_user_id'], $item_id_product)).')</div>
+			</div>';
 
-			//Bauzeit
-			echo '<br><br>Bauzeit: '.$bauzeit;
-
-			//Benötigte Fabrikkapazität
-			echo '<br><br>Ben&ouml;tigte Fabrikkapazit&auml;t pro St&uuml;ck: '.$fabrikkosten;
-
-			//Baumenge
-			echo '<br><br>Baumenge: <input type="text" name="item_id_'.$item_id_product.'" value="" size="3" maxlength="9""> (Im Bau: '.intval(getItemBuildAmount($_SESSION['ums_user_id'], $item_id_product)).')';
-
-			echo '</div>';
+			echo '
+				</div>
+			</div>';
 		}
 	}
 

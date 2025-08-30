@@ -190,6 +190,7 @@ for ($c=0; $c<$num; $c++){
 	if ($destroyeddeffer>$sumdeffer)$destroyeddeffer=$sumdeffer;
 
 	//prozentualen verlust der angreifer berechnen
+	$vertdestroyedatter=0;
 	for ($i=0; $i<$anzatter; $i++){
 		if ($sumatter>0){
 			$atter[$i][1]=$atter[$i][0] / $sumatter;
@@ -200,6 +201,7 @@ for ($c=0; $c<$num; $c++){
 	}
 
 	//prozentualen verlust der verteidiger berechnen
+	$vertdestroyeddeffer=0;
 	for ($i=0; $i<$anzdeffer; $i++){
 		if ($sumdeffer>0){
 			$deffer[$i][1]=$deffer[$i][0] / $sumdeffer;

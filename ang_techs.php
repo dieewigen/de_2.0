@@ -14,8 +14,6 @@ include 'functions.php';
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 
 	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
-	<link rel="stylesheet" href="g/de-desktop.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/g/de-desktop.css');?>">
-
 <?php
 include "cssinclude.php";
 ?>
@@ -124,7 +122,7 @@ if(setLock($_SESSION['ums_user_id'])){
 
 	//close-button
 	if($_SESSION['ums_mobi']!=1 && $_SESSION['desktop_version']==0){
-		$content.='<img onclick="closeIframeMain();" src="g/close_icon.png" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
+		$content.='<img onclick="closeIframeMain();" src="gp/g/close_icon.png" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
 	}
 
 	$class='';
@@ -173,7 +171,7 @@ if(setLock($_SESSION['ums_user_id'])){
 	//Konfiguration und laufende Technologien
 	$content.='
 	<div style="display: flex; min-height: 32px; margin-top: 5px; margin-bottom: 8px;">
-		<div><img onclick="$(\'#tech_config\').toggleClass(\'invisible\');" src="g/button_config.png" style="margin-left: 8px; margin-right: 8px; height: 32px; width: auto; cursor: pointer;"></div>
+		<div><img onclick="$(\'#tech_config\').toggleClass(\'invisible\');" src="gp/g/button_config.png" style="margin-left: 8px; margin-right: 8px; height: 32px; width: auto; cursor: pointer;"></div>
 	';		
 
 	///////////////////////////////////////////////////////////////////
