@@ -14,7 +14,7 @@ if (!isset($_SESSION["de_chat_inputchannel"])) {
     $_SESSION["de_chat_inputchannel"] = 0;
 }
 
-$_SESSION['ums_mobi']=0;
+//$_SESSION['ums_mobi']=0;
 
 ?>
 <!DOCTYPE HTML>

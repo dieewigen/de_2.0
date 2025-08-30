@@ -368,7 +368,7 @@ if($show_helper==1 && !isset($apiDisableHelper)){
 /////////////////////////////////////////////////////////////
 // Mission-Reminder
 /////////////////////////////////////////////////////////////
-if($show_trade_reminder==1 && !$flag_ang_big_iframe){
+if($show_trade_reminder==1 && !$flag_ang_big_iframe && ($_SESSION['de_frameset'] || $_SESSION['ums_mobi']==1)){
 	include "lib/trade_reminder.inc.php";
 }
 
