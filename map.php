@@ -102,6 +102,111 @@ $maxcol = $row['maxcol'];
 echo '<div id="gamename" style="top:40000px; left:40000px;">die ewigen</div>';
 echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.' '.$sv_server_tag.'</div>';
 
+//rechts oben die struktur
+echo '<div style="position: absolute; top:40000px; right:40000px;">
+    <div style="
+        background: linear-gradient(45deg, #00ff41, #0099ff, #ff0080, #00ff41);
+        background-size: 400% 400%;
+        animation: sci-fi-border 3s ease-in-out infinite;
+        padding: 8px;
+        border-radius: 15px;
+        box-shadow: 
+            0 0 20px rgba(0, 255, 65, 0.5),
+            0 0 40px rgba(0, 153, 255, 0.3),
+            inset 0 0 20px rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    ">
+        <div style="
+            background: rgba(0, 20, 40, 0.9);
+            padding: 4px;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 255, 65, 0.8);
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    rgba(0, 255, 65, 0.3), 
+                    transparent
+                );
+                animation: scan-line 2s linear infinite;
+                pointer-events: none;
+            "></div>
+            
+            <a href="https://hilfe.die-ewigen.com/index.php?thread=de_de&post=68" target="_blank">
+                <img src="gp/g/die_struktur.jpg" style="
+                    width: 2028px; 
+                    height: 2028px; 
+                    border-radius: 8px;
+                    display: block;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform=\'scale(1.02)\'; this.style.filter=\'brightness(1.2) contrast(1.1)\';" 
+                   onmouseout="this.style.transform=\'scale(1)\'; this.style.filter=\'brightness(1) contrast(1)\';">
+            </a>
+            
+            <!-- Sci-Fi Corner Decorations -->
+            <div style="
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 30px;
+                height: 30px;
+                border-left: 3px solid #00ff41;
+                border-top: 3px solid #00ff41;
+                opacity: 0.8;
+            "></div>
+            <div style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                border-right: 3px solid #0099ff;
+                border-top: 3px solid #0099ff;
+                opacity: 0.8;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                width: 30px;
+                height: 30px;
+                border-left: 3px solid #ff0080;
+                border-bottom: 3px solid #ff0080;
+                opacity: 0.8;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                border-right: 3px solid #00ff41;
+                border-bottom: 3px solid #00ff41;
+                opacity: 0.8;
+            "></div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes sci-fi-border {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes scan-line {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+</style>';
 
 $sector_width = 1300;
 $sector_height = 150;

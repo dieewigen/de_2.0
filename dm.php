@@ -111,12 +111,12 @@ $_SESSION['ic_last_refresh']=0;
 		echo '<div onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 266px;" rel="tooltip"></div>';
 
 		//Hyperfunk
-		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php\')" src="g/hyper.png" style="cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Hyperfunknachrichten vor." rel="tooltip">';
-		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php?l=new\')" id="tb_hyper_img" src="g/'.$_SESSION['ums_rasse'].'_hyper.png" style="display: none;  cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="'.$resline_lang['restipnewhyperdesc'].'" rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php\')" src="gp/g/hyper.png" style="cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Hyperfunknachrichten vor." rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php?l=new\')" id="tb_hyper_img" src="gp/g/'.$_SESSION['ums_rasse'].'_hyper.png" style="display: none;  cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="'.$resline_lang['restipnewhyperdesc'].'" rel="tooltip">';
 		
 		//Nachrichten
-		echo '<img onclick="switch_iframe_main_container(\'sysnews.php\')" src="g/news.png" style="cursor: pointer; position: absolute; left: 490px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Nachrichten vor." rel="tooltip">';
-		echo '<img onclick="switch_iframe_main_container(\'sysnews.php\')" id="tb_news_img" src="g/'.$_SESSION['ums_rasse'].'_news.png" style="display: none; cursor: pointer; position: absolute; left: 490px; top: 36px; width: 40px; height: auto;" title="'.$resline_lang['restipnewnewsdesc'].'" rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'sysnews.php\')" src="gp/g/news.png" style="cursor: pointer; position: absolute; left: 490px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Nachrichten vor." rel="tooltip">';
+		echo '<img onclick="switch_iframe_main_container(\'sysnews.php\')" id="tb_news_img" src="gp/g/'.$_SESSION['ums_rasse'].'_news.png" style="display: none; cursor: pointer; position: absolute; left: 490px; top: 36px; width: 40px; height: auto;" title="'.$resline_lang['restipnewnewsdesc'].'" rel="tooltip">';
 		
 		//daily gift
 		echo '<img onclick="switch_iframe_main_container(\'ally_dailygift.php\')" id="tb_daily_img" src="gp/g/icon15.png" class="rounded-borders pulse-icon" style="display: none; cursor: pointer; position: absolute; left: 340px; top: 36px; width: 24px; height: auto;" title="'.$resline_lang['dailyallygiftdesc'].'" rel="tooltip">';
@@ -130,7 +130,7 @@ $_SESSION['ic_last_refresh']=0;
 
 		//serverzeit
 		echo '<div onclick="switch_iframe_main_container(\'sinfo.php\')" style="position: absolute; right: 31px; top:0; height:66px; width: 84px; cursor: pointer;">
-				<img src="g/tb_timedata.png" style="position: absolute; width: 100%; height: 100%;">
+				<img src="gp/g/tb_timedata.png" style="position: absolute; width: 100%; height: 100%;">
 				<div id="tb_time1" style="position: absolute; top: 1px; left: 34px;"></div>
 				<div id="tb_time2" style="position: absolute; top: 24px; left: 34px;"></div>
 				<div id="tb_time3" style="position: absolute; top: 47px; left: 34px;"></div>
