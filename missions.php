@@ -899,7 +899,7 @@ if(!hasTech($pt,29)){
 				if($md[$m]['typ']==1){
 					$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor'];
 					//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';
-					$belohnung_tradescore='<img src="g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
+					$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
 				}else{
 					$belohnung_tradescore='';
 				}
@@ -987,7 +987,7 @@ if(!hasTech($pt,29)){
 
 							$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor']*$p/100;
 							//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';					
-							$belohnung_tradescore='<img src="g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
+							$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
 
 
 							$kosten_fleet=generateMissionReward($md[$m]['cost'],$fleet_fk_percent);
@@ -1055,7 +1055,7 @@ if(!hasTech($pt,29)){
 
 							$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor'];
 							//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';					
-							$belohnung_tradescore='<img src="g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
+							$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
 
 
 							$kosten_fleet=generateMissionReward($md[$m]['cost'],100);

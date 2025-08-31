@@ -475,7 +475,7 @@ function generateMissionReward($reward, $percent = 100)
 
                     //Erfolgs-Nachricht
                     //$content.=$amount.' '.$resnamen[$restyp-1].'<br>';
-                    $content .= '<img src="g/'.$resimages[$restyp - 1].'" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$resnamen[$restyp - 1].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
+                    $content .= '<img src="gp/g/'.$resimages[$restyp - 1].'" class="rounded-borders" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$resnamen[$restyp - 1].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
 
                     break;
                     //Items
@@ -484,8 +484,8 @@ function generateMissionReward($reward, $percent = 100)
                     $amount = number_format(floor($reward[$i][2] * $percent), 0, "", ".");
 
                     //Erfolgs-Nachricht, Design je nach Existenz einer passenden Bilddatei
-                    if (file_exists('g/item'.$item_id.'.png')) {
-                        $content .= '<img src="g/item'.$item_id.'.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$GLOBALS['ps'][$item_id]['item_name'].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
+                    if (file_exists('gp/g/item'.$item_id.'.png')) {
+                        $content .= '<img src="gp/g/item'.$item_id.'.png" class="rounded-borders" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="'.$GLOBALS['ps'][$item_id]['item_name'].'"> <div style="display: inline-block; margin-bottom: 5px;">'.$amount.'</div><br>';
                     } else {
                         $content .= $amount.' '.$GLOBALS['ps'][$item_id]['item_name'].'<br>';
                     }
