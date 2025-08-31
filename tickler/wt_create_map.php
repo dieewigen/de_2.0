@@ -464,7 +464,7 @@ if($row['create_map_objects']==1){
 	$koord_min[5]=3;
 	$koord_max[5]=3;
 
-	/*				
+	/*		
 	$koord_min[1]=2;
 	$koord_max[1]=2;
 	$koord_min[2]=3;

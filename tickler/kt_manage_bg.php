@@ -206,15 +206,23 @@ function doBattleGround($bg)
                             $gewinn_text = '1 Kriegsartefakt';
                         }
 
+                        $spielername1='';
+                        if($player_id1 > 0){
+                            $spielername1 = $player[$player_id1]['spielername'];
+                        }
 
+                        $spielername2='';
+                        if($player_id2 > 0){
+                            $spielername2 = $player[$player_id2]['spielername'];
+                        }
 
                         //ergebnis speichern
                         $fightresult[$runde][] = array(
                             'winner_user_id' => $player[$winner_id]['user_id'],
                             'user_id1' => $player[$player_id1]['user_id'],
                             'user_id2' => $player[$player_id2]['user_id'],
-                            'spielername1' => $player[$player_id1]['spielername'].$p1_ship_level,
-                            'spielername2' => $player[$player_id2]['spielername'].$p2_ship_level,
+                            'spielername1' => $spielername1.$p1_ship_level,
+                            'spielername2' => $spielername2.$p2_ship_level,
                             'gewinn' => $gewinn_text
                         );
 

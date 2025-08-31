@@ -511,12 +511,12 @@ foreach ($sectorList as $sf) {
             //spielername, details, im sektor online
             ////////////////////////////////////////////////////////////////////////
             $playername = umlaut($row['spielername']);
-            if (strtotime($row["last_login"]) + 1800 > time() and $row["lstatus"] == 1) {
+            if (strtotime($row["last_login"]) + 1800 > time() && $row["lstatus"] == 1) {
                 $os = '&nbsp;*';
             } else {
                 $os = '';
             }
-            if ($ownsector == $sf and $secstatdisable == 0) {
+            if ($ownsector == $sf && $secstatdisable == 0) {
                 $osown = $os;
             } else {
                 $osown = '';

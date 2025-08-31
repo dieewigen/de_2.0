@@ -1458,7 +1458,7 @@ function getAllytagByAllyid($id)
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_allys WHERE id=?", [$id]);
     $row = mysqli_fetch_array($db_daten);
 
-    return $row['allytag'];
+    return $row['allytag'] ?? '';
 }
 
 function getAllyByID($ally_id)
