@@ -135,7 +135,7 @@ if ($dortick == 1) {
             $sql = "SELECT sector, count( `system` )  AS systeme FROM `de_user_data` WHERE npc=? AND sector > ? AND sector <= ? GROUP BY sector ORDER BY systeme ASC LIMIT 1";
             $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$npc, $sv_free_startsectors, $maxsector]);
             $rowx = mysqli_fetch_array($rx);
-            $sec = $rowx["sector"];
+            $sec = $rowx["sector"] ?? null;
 
             if(!isset($rowx["sector"])){
                 error_log('register_user.php: '.print_r($res, true), 0);

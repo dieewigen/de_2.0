@@ -289,7 +289,7 @@ $md[$md_index]['time']=27000*$duration_factor;
 $md[$md_index]['need_agents']=0;
 $md[$md_index]['storage_capacity']=$res_bezahlen*10;
 
-//Handel - 	 man zahlt Palenium und erhält Tronic
+//Handel - ARES - man zahlt Palenium und erhält Tronic
 $md_index++;
 $md[$md_index]['typ']=2;
 $md[$md_index]['subtyp']=1;//Ares
@@ -316,6 +316,8 @@ $md[$md_index]['need_agents']=0;
 $md[$md_index]['storage_capacity']=$res_bezahlen*10;
 $md[$md_index]['special_system_phase_need']=array(4,1);
 $md[$md_index]['ally_mission_counter_id']=2;
+
+//Handel - HADES - man zahlt Verteidigungsanlagen BNG 9000 und erhält Sektorkollektoren
 
 ?>
 <!DOCTYPE HTML>

@@ -147,7 +147,7 @@ if(!hasTech($pt,25)){
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////
 			$system_erreichbar=false;
 			//immer sichtbar?
-			if($system_daten['always_visible']==1){
+			if(isset($system_daten['always_visible']) && $system_daten['always_visible']==1){
 				$system_erreichbar=true;
 			}
 

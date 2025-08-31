@@ -2141,9 +2141,9 @@ for ($c = 0; $c < $z; $c++) {
 
         //erfahrungspunkte
         if(!isset($deffer_kbsum[3][1])) {
-            $deffer_kbsum[3][1] = '';
+            $deffer_kbsum[3][1] = 0;
         }
-        $deffer_kbsum[3][1] += $deffer_exp[$i].';';
+        $deffer_kbsum[3][1] += $deffer_exp[$i];
 
         //schlachterrecycling
         if(!isset($deffer_kbsum[3][3])) {
@@ -2249,6 +2249,10 @@ for ($c = 0; $c < $z; $c++) {
 
             //kriegsartefakte
             //$spielerstring=$spielerstring.$deffer_kbsum[3][2].';';
+
+            if(!isset($deffer_kbsum[3][4])) {
+                $deffer_kbsum[3][4] = 0;
+            }
 
             //schlachterrecycling
             $spielerstring = $spielerstring.$deffer_kbsum[3][3].';'.$deffer_kbsum[3][4].';';

@@ -14,7 +14,7 @@ $_SESSION['ic_last_refresh']=0;
 <html lang="de-de">
   <head>
     
-    <title><?php echo $sv_server_tag;?> Die Ewigen - Desktopversion</title>
+    <title><?php echo $sv_server_tag;?> - DIE EWIGEN - <?php echo $sv_server_name;?></title>
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="favicon.ico" />
 
