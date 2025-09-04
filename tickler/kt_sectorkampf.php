@@ -277,11 +277,11 @@ for ($c=0; $c<$num; $c++){
 		for ($i=0; $i<$anzdeffer; $i++){
 			//evtl. wachflotte und sektorflotte verdichten
 			$sec_id=$dsecid[$i];
-			if ($i==0 AND $dsecid[0]==$dsecid[1]){//beide gleicher sektor, d.h. man mu� verdichten
-				$eigeninsg=$deffer[$i][0]+$deffer[$i+1][0];
-				$eigenue=$eigeninsg-$deffer[$i][1]-$deffer[$i+1][1];
+			if ($i==0 AND isset($dsecid[1]) AND $dsecid[0]==$dsecid[1]){//beide gleicher sektor, d.h. man mu� verdichten
+				$eigeninsg=$deffer[$i][0]+(isset($deffer[$i+1][0]) ? $deffer[$i+1][0] : 0);
+				$eigenue=$eigeninsg-$deffer[$i][1]-(isset($deffer[$i+1][1]) ? $deffer[$i+1][1] : 0);
 				$subeinheiten1=$deffer[$i][1];
-				$subeinheiten2=$deffer[$i+1][1];
+				$subeinheiten2=isset($deffer[$i+1][1]) ? $deffer[$i+1][1] : 0;
 
 				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e1 = e1 - ?, e2 = e2 - ? WHERE sec_id = ?", [intval($subeinheiten1), intval($subeinheiten2), $sec_id]);
 				$i++;

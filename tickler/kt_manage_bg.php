@@ -207,12 +207,12 @@ function doBattleGround($bg)
                         }
 
                         $spielername1='';
-                        if($player_id1 > 0){
+                        if($player_id1 > -1){
                             $spielername1 = $player[$player_id1]['spielername'];
                         }
 
                         $spielername2='';
-                        if($player_id2 > 0){
+                        if($player_id2 > -1){
                             $spielername2 = $player[$player_id2]['spielername'];
                         }
 

@@ -81,13 +81,7 @@ mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET entdecktsec = 1 
 <head>
 <title><?php echo $ss_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
-<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 <script>
-<!--
-<?php
-//farben c0=schwarz, c1=koordinaten, c2=eta, c3=atter, c4=deffer
-//t=t+c0+"ETA:"+c2+" "+a1[j]+" "+c0+"INC:"+c3+" "+a1[j+1]+" "+c0+"DEF:"+c4+" "+a1[j+2]+" "+a1[j+3]+" "+c0+"DEF(3):"+c4+" "+a1[j+4]+" "+a1[j+5]+lb;
-?>
 function deirc(f,se,sy,a1,a2,a3) {
 	var lb="\n";
 	var t="<?php echo $ss_lang['systemstatusvon']?> "+se+":"+sy+lb;var j=0;
@@ -105,7 +99,6 @@ function deirc(f,se,sy,a1,a2,a3) {
 		document.getElementById("k"+se+"_"+sy).select();
 	}
 }
-//-->
 </script>
 </head>
 <?php

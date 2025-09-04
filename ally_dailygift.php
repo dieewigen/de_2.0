@@ -36,7 +36,6 @@ $freeartefactplaces = get_free_artefact_places($_SESSION['ums_user_id']);
 <head>
 <title><?php echo $allydailygift_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
-<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 </head>
 <body>
 <?php

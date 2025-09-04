@@ -3,7 +3,7 @@ include "inc/header.inc.php";
 include "lib/transaction.lib.php";
 include "functions.php";
 include 'inc/userartefact.inc.php';
-//include "lib/map_system.class.php";
+
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 
 $ps = loadPlayerStorage($_SESSION['ums_user_id']);
@@ -65,7 +65,6 @@ $tradescore = 10000;
 <?php
 include "cssinclude.php";
 ?>
-<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
@@ -193,7 +192,7 @@ if (!hasTech($pt, 4)) {
 
 
                     $preis .= '<div style="display: flex;">';
-                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$resnamen[$cost[1] - 1].'<br>Lagerbestand: '.number_format($pd['restyp0'.$cost[1]], 0, ",", ".").'"><img src="gp/g/icon'.$cost[1].'.png" style="width: 50px; height: auto;"></div>';
+                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$resnamen[$cost[1] - 1].'<br>Lagerbestand: '.number_format($pd['restyp0'.$cost[1]], 0, ",", ".").'"><img src="gp/g/icon'.$cost[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
                     $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$resnamen[$cost[1] - 1].'<br><span style="font-size: 10px;">WT: '.number_format($reduzierung, 0, ",", ".").$nachlass_str.'</span></div>';
                     $preis .= '</div>';
 
@@ -254,7 +253,7 @@ if (!hasTech($pt, 4)) {
                     }
 
                     $preis .= '<div style="display: flex;">';
-                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' Credits<br>Lagerbestand: '.number_format($pd['credits'], 0, ",", ".").'"><img src="gp/g/credits.gif" style="width: 50px; height: auto; margin-top: 11px;"></div>';
+                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' Credits<br>Lagerbestand: '.number_format($pd['credits'], 0, ",", ".").'"><img src="gp/g/credits.gif" class="rounded-borders" style="width: 50px; height: auto; margin-top: 11px;"></div>';
                     $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.number_format($amount, 0, ",", ".").' Credits<br><span style="font-size: 10px;">WT: '.number_format($reduzierung, 0, ",", ".").$nachlass_str.'</span></div>';
                     $preis .= '</div>';
 
@@ -298,7 +297,7 @@ if (!hasTech($pt, 4)) {
                     }
 
                     $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$resnamen[$reward[1] - 1].'"><img src="gp/g/icon'.$reward[1].'.png" style="width: 50px; height: auto;"></div>';
+                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$resnamen[$reward[1] - 1].'"><img src="gp/g/icon'.$reward[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
                     $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.number_format($reward[2], 0, ",", ".").' '.$resnamen[$reward[1] - 1].$tradesystemscore_str.'</div>';
                     $artikel .= '</div>';
 
@@ -314,7 +313,7 @@ if (!hasTech($pt, 4)) {
                         }
                     }
                     $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$ps[$reward[1]]['item_name'].'"><img src="gp/g/item'.$reward[1].'.png" style="width: 50px; height: auto;"></div>';
+                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$ps[$reward[1]]['item_name'].'"><img src="gp/g/item'.$reward[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
                     $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.number_format($reward[2], 0, ",", ".").' '.$ps[$reward[1]]['item_name'].$tradesystemscore_str.'</div>';
                     $artikel .= '</div>';
 

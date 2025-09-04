@@ -31,15 +31,16 @@ if($allytag!=''){
 }
 
 //leerzeichen entfernen
-$clanname = trim($_POST['clanname']);
-$clankuerzel = trim($_POST['clankuerzel']);
-$regierungsform = trim($_POST['regierungsform']);
-$allianzform = trim($_POST['allianzform']);
-$ausrichtung = trim($_POST['ausrichtung']);
-$hp = trim($_POST['hp']);
-$bio = trim($_POST['bio']);
+$clanname = trim($_POST['clanname'] ?? '');
+$clankuerzel = trim($_POST['clankuerzel'] ?? '');
+$regierungsform = trim($_POST['regierungsform'] ?? '');
+$allianzform = trim($_POST['allianzform'] ?? '');
+$ausrichtung = trim($_POST['ausrichtung'] ?? '');
+$hp = trim($_POST['hp'] ?? '');
+$bio = trim($_POST['bio'] ?? '');
 
 $eintragung=1;
+$errormessage = '';
 
 if($clanname==""){
 	$eintragung=0;
@@ -121,6 +122,12 @@ if($eintragung==1){
 		"SELECT MAX(memberlimit) AS max FROM de_allys");
 	$row = mysqli_fetch_assoc($db_daten);
 	$max=$row['max'];
+
+	// Gesamtanzahl der Benutzer ermitteln
+	$db_user_count = mysqli_execute_query($GLOBALS['dbi'], 
+		"SELECT COUNT(*) as user_count FROM de_user_data");
+	$user_row = mysqli_fetch_assoc($db_user_count);
+	$user = $user_row['user_count'];
 
 	$memberlimit=round(5+$user/20);
 	if($memberlimit<$max){

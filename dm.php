@@ -17,15 +17,11 @@ $_SESSION['ic_last_refresh']=0;
     <title><?php echo $sv_server_tag;?> - DIE EWIGEN - <?php echo $sv_server_name;?></title>
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="favicon.ico" />
-
-	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
 	<link rel="stylesheet" href="gp/de-main.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-main.css');?>">	
 	
 	<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
-	<script type="text/javascript" src="js/jquery-ui-1.14.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
-
 
   </head>
   <body class="template rasse<?php echo $_SESSION['ums_rasse'];?>">
@@ -40,8 +36,13 @@ $_SESSION['ic_last_refresh']=0;
 
 	<div id="iframe_main_container_big" style="position: absolute; display: none; width: 100%; height: calc(100% - 64px); left: 0px; top:64px; z-index: 100;"></div>
 	
-	<div id="chat_popup" title="Chat" style="overflow: hidden; height: 500px;">
-		<iframe src="chat.php" id="iframe_chat" name="c" height="100%" width="100%" frameBorder="0"></iframe>
+	<div id="chat_popup" style="position: fixed; bottom: 0; right: 0; width: <?php echo $chat_width; ?>px; height: <?php echo $chat_height; ?>px; z-index: 1000; overflow: hidden;">
+		<div id="chat_header" style="color: #FFFFFF; background: linear-gradient(to right, #222222, #303030); padding: 5px 10px; border-bottom: 1px solid #444444; font-weight: 500; user-select: none;">CHAT</div>
+		<iframe src="chat.php" id="iframe_chat" name="c" width="100%" frameBorder="0"></iframe>
+		<!-- Unsichtbare Resize-Bereiche -->
+		<div class="resize-handle resize-n" style="position: absolute; top: 0; left: 0; right: 0; height: 3px; cursor: n-resize;"></div>
+		<div class="resize-handle resize-w" style="position: absolute; top: 0; left: 0; bottom: 0; width: 3px; cursor: w-resize;"></div>
+		<div class="resize-handle resize-nw" style="position: absolute; top: 0; left: 0; width: 10px; height: 10px; cursor: nw-resize;"></div>
 	</div>
 	
 	<div id="topbar" style="z-index: 1000;">
@@ -54,22 +55,8 @@ $_SESSION['ic_last_refresh']=0;
 			
 				<span onclick="switch_iframe_main_container(\'sector.php\')" class="btn">'.$menu_lang['eintrag_12'].'</span>
 				<br>
-				<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>';
-
-		/*
-		if(!isset($sv_deactivate_efta) || $sv_deactivate_efta==0){
-			echo '<br><a href="eftaindex.php" target="_blank" class="btn">EFTA</a>';
-		}
-
-		if(!isset($sv_deactivate_sou) || $sv_deactivate_sou==0){
-			echo '<br><a href="sou_index.php" target="_blank" class="btn">EA</a>';
-		}
-		*/
-
-		//echo '<br><a href="'.$sv_link[2].'" target="_blank" class="btn">'.$menu_lang['eintrag_26'].'</a>';
-		echo '<br><a href="index.php?logout=1" class="btn">'.$menu_lang['eintrag_29'].'</a>';		
-		
-		echo '
+				<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>
+				<br><a href="index.php?logout=1" class="btn">'.$menu_lang['eintrag_29'].'</a>
 			</div>
 		</div>';		
 		
@@ -222,27 +209,103 @@ function setsize(){
 $(document).ready(function() {
 	setsize();
 
-	$("#chat_popup").dialog({
-		closeOnEscape: false,
-		width: <?php echo $chat_width; ?>,
-		height: <?php echo $chat_height; ?>,
-		draggable: false,	
-		open: function(event, ui) {
-			$(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-		},
-		resize: function(event, ui) {
-			setCookie('chat_width', $('.ui-dialog').css('width'));
-			setCookie('chat_height', $('.ui-dialog').css('height'));
+	// Chat-Popup Größe beim Laden setzen
+	var chatPopup = $('#chat_popup');
+	var iframe = $('#iframe_chat');
+	
+	// Größe aus PHP-Variablen setzen (falls Cookies vorhanden waren)
+	chatPopup.css({
+		width: '<?php echo $chat_width; ?>px',
+		height: '<?php echo $chat_height; ?>px'
+	});
+
+	// Robuste Resize-Funktionalität
+	var isResizing = false;
+	var resizeDirection = '';
+	var startX, startY, startWidth, startHeight;
+
+	// Resize-Handles
+	$('.resize-handle').on('mousedown', function(e) {
+		isResizing = true;
+		resizeDirection = $(this).attr('class').split(' ')[1];
+		
+		startX = e.clientX;
+		startY = e.clientY;
+		startWidth = chatPopup.width();
+		startHeight = chatPopup.height();
+		
+		// Iframe deaktivieren während Resize
+		iframe.css('pointer-events', 'none');
+		
+		// Overlay über gesamte Seite um Events zu fangen
+		if (!$('#resize-overlay').length) {
+			$('body').append('<div id="resize-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: ' + $(this).css('cursor') + ';"></div>');
+		}
+		
+		e.preventDefault();
+		e.stopPropagation();
+		$('body').css('user-select', 'none');
+	});
+
+	// Resize über Overlay
+	$(document).on('mousemove.chatresize', '#resize-overlay', function(e) {
+		if (!isResizing) return;
+		
+		var deltaX = startX - e.clientX;
+		var deltaY = startY - e.clientY;
+		
+		var newWidth = startWidth;
+		var newHeight = startHeight;
+		
+		if (resizeDirection === 'resize-w' || resizeDirection === 'resize-nw') {
+			newWidth = startWidth + deltaX;
+		}
+		if (resizeDirection === 'resize-n' || resizeDirection === 'resize-nw') {
+			newHeight = startHeight + deltaY;
+		}
+		
+		newWidth = Math.max(250, newWidth);
+		newHeight = Math.max(200, newHeight);
+		
+		chatPopup.css({
+			width: newWidth + 'px',
+			height: newHeight + 'px'
+		});
+	});
+
+	// Resize beenden
+	$(document).on('mouseup.chatresize', function() {
+		if (isResizing) {
+			isResizing = false;
+			resizeDirection = '';
+			
+			// Cleanup
+			$('#resize-overlay').remove();
+			iframe.css('pointer-events', '');
+			$('body').css('user-select', '');
+			
+			// Cookies speichern
+			setCookie('chat_width', chatPopup.width() + 'px');
+			setCookie('chat_height', chatPopup.height() + 'px');
 		}
 	});
-	$('#chat_popup').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}});
+
+	// Sicherheits-Cleanup bei Escape
+	$(document).on('keydown.chatresize', function(e) {
+		if (e.key === 'Escape' && isResizing) {
+			isResizing = false;
+			$('#resize-overlay').remove();
+			iframe.css('pointer-events', '');
+			$('body').css('user-select', '');
+		}
+	});
 });
 
 window.setInterval(function(){
 	$("#iframe_menu").contents().find("body").css("background-color", "transparent");
 	$("#iframe_menu").contents().find("body").css("background-image", "none");
 	$("#iframe_main").contents().find("body").css("background-color", "transparent");
-	$("#iframe_main").contents().find("body").css("background-image", "url(<?php echo $_SESSION['ums_gpfad'] ?>/g/cellblack.png)");
+	$("#iframe_main").contents().find("body").css("background-image", "url(gp/g/cellblack.png)");
 	$("#iframe_chat").contents().find("body").css("background-color", "transparent");
 	$("#iframe_chat").contents().find("body").css("background-image", "none");
 }, 100);

@@ -208,6 +208,8 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 
 		if ($ztechs[1]==1) $ok=1;else $ok=0;//wenn srb dann hinflug m�glich
 
+		$rz = 0; // Initialisierung der Variable $rz
+
 		if ($ok==1){
 			$rz=12;
 			//entfernungzuschlag

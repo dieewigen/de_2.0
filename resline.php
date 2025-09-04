@@ -338,6 +338,7 @@ if(!isset($GLOBALS['deactivate_old_design'])){
 	$GLOBALS['deactivate_old_design']=false;
 }
 
+/*
 if(!$flag_ang_big_iframe){
 	if($GLOBALS['deactivate_old_design']!==true){
 		echo '
@@ -357,7 +358,7 @@ if(!$flag_ang_big_iframe){
 		</script>';
 	}
 }
-
+*/
 /////////////////////////////////////////////////////////////
 // helper
 /////////////////////////////////////////////////////////////

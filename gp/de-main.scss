@@ -779,6 +779,35 @@ a.btn:visited {
 	font-size: 14px;
 }
 
+#chat_popup {
+	display: flex !important;
+	flex-direction: column !important;
+	background: transparent !important;
+	border-left: 1px solid #444 !important;
+}
+
+#chat_header {
+	border-top: 1px solid #444 !important;
+	flex-shrink: 0 !important;
+	padding-left: 8px;
+}
+#iframe_chat {
+	flex: 1 !important;
+	height: 100% !important;
+	border: none !important;
+	border-left: none !important;
+	margin: 0 !important;
+	padding: 0 0 0 2px !important;
+	display: block !important;
+	background: url(g/cellblack.png) repeat;
+}
+
+
+
+
+// Ende Desktop Layout Basics
+
+
 // General Classes
 .rounded-borders {
 	border-radius: 6px;
@@ -1370,12 +1399,98 @@ div.title {
 	font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
 }
 
-.mt10 {
-	margin-top: 10px;
+@for $i from 1 through 10 {
+	.mt#{$i} { margin-top: 1px * $i; }
+	.mb#{$i} { margin-bottom: 1px * $i; }
 }
 
-.mb10 {
-	margin-bottom: 10px;
+.mt15{
+  margin-top: 15px;
+}
+
+.mb15{
+  margin-bottom: 15px;
+}
+
+.mt18{
+  margin-top: 18px;
+}
+
+.mb18{
+  margin-bottom: 18px;
+}
+
+.mb19{
+  margin-bottom: 19px;
+}
+
+.mt20{
+  margin-top: 20px;
+}
+
+.mb20{
+  margin-bottom: 20px;
+}
+
+.mt25{
+  margin-top: 25px;
+}
+
+.mb25{
+  margin-bottom: 25px;
+}
+
+.mt30{
+  margin-top: 30px;
+}
+
+.mb30{
+  margin-bottom: 30px;
+}
+
+.mb35{
+	margin-bottom: 30px;
+}
+
+.mt40{
+  margin-top: 40px;
+}
+
+.mb40{
+  margin-bottom: 40px;
+}
+
+.mt50{
+  margin-top: 50px;
+}
+
+
+.mb50{
+  margin-bottom: 50px;
+}
+
+.mt60{
+  margin-top: 60px;
+}
+
+.mb60{
+  margin-bottom: 60px;
+}
+
+.mt80{
+  margin-top: 80px;
+}
+
+.mb80{
+  margin-bottom: 80px;
+}
+
+.mt100{
+  margin-top: 100px;
+}
+
+.mb100{
+  margin-bottom: 100px;
 }
 
 
@@ -1759,7 +1874,7 @@ a.btn2:hover {
 #tt.top:after {
 	border-top-color: transparent;
 	border-bottom: 10px solid #222222;
-	top: -20px;
+	top: -19px;
 	bottom: auto;
 }
 
@@ -1848,7 +1963,7 @@ a.btn2:hover {
 
 .ui-dialog.ui-widget .ui-dialog-content {
 	padding: 2px;
-	background: url(/g/cellblack.png) repeat;
+	background: url(g/cellblack.png) repeat;
 }
 
 .ui-corner-all,

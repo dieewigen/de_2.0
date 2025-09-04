@@ -8,15 +8,11 @@ include 'functions.php';
 <html>
 <head>
 	<title>Technologien</title>
-
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
-	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
-
 	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
 <?php
 include "cssinclude.php";
 ?>
+<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 </head>
 <?php
 echo '<body style="margin: 0; padding:0; color: #FFFFFF;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
@@ -128,7 +124,7 @@ if(setLock($_SESSION['ums_user_id'])){
 	$class='';
 
 	$content.='
-		<div id="tech_config" class="invisible" style="z-index: 100; position: fixed; top: 20px; left: 3px; background-color: #000000; width: 400px; border: 1px solid #EEEEEE; color: #EEEEEE; padding: 5px;">
+		<div id="tech_config" class="invisible" style="z-index: 100; position: fixed; top: 40px; left: 3px; background-color: #000000; width: 400px; border: 1px solid #EEEEEE; color: #EEEEEE; padding: 5px;">
 			<table style="width: 100%;">
 			<tr>
 				<td>Anordnung:</td>

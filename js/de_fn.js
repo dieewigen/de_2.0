@@ -3,7 +3,8 @@ $( document ).ready(function() {
 });
 
 function setTooltip(){
-    var targets = $( '[rel~=tooltip]' ),
+    //var targets = $( '[rel~=tooltip]' ),
+    var targets = $('[title]'),
         target  = false,
         tooltip = false,
         title   = false;
@@ -13,6 +14,9 @@ function setTooltip(){
     {
         target  = $( this );
         tip     = target.attr( 'title' );
+        if (tip) {
+            tip = tip.replace('&', '<br>');
+        }
         tooltip = $( '<div id="tt"></div>' );
  
         if( !tip || tip == '' )

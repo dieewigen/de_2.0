@@ -40,16 +40,16 @@ elseif ($_GET["typ"] == 11) {
 //allianz
 elseif ($_GET["typ"] == 21) {
     $sql = "SELECT score FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
 } elseif ($_GET["typ"] == 22) {
     $sql = "SELECT col FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
 } elseif ($_GET["typ"] == 23) {
     $sql = "SELECT platz FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
 } elseif ($_GET["typ"] == 24) {
     $sql = "SELECT member FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
 }
 
 $i = 0;

@@ -3,6 +3,7 @@
 session_start();
 $ergebnis = $_SESSION['loginzahl'] ?? -1;
 include "inc/sv.inc.php";
+include "inc/links.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_botcheck.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_index.lang.php';
 include 'inccon.php';
@@ -93,7 +94,7 @@ echo '<!DOCTYPE html>
     echo '</head>';
     echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-    echo '<br><center><div class="info_box text2">'.$botcheck_lang['error1'].'<br>'.$botcheck_lang['error2'].':<br><br><a href="index.php">Login</a></div>';
+    echo '<br><center><div class="info_box text2">'.$botcheck_lang['error1'].'<br>'.$botcheck_lang['error2'].':<br><br><a href="'.$sv_link[1].'">Login</a></div>';
     echo '</body></html>';
     @session_destroy();
     exit;

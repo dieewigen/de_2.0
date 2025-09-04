@@ -4,70 +4,92 @@ include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_details.lang.php';
 include 'functions.php';
 
-$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-  "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id=?",
-  [$_SESSION['ums_user_id']]);
+$db_daten = mysqli_execute_query(
+    $GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, `system`, newtrans, newnews, allytag, status FROM de_user_data WHERE user_id=?",
+    [$_SESSION['ums_user_id']]
+);
 $row = mysqli_fetch_assoc($db_daten);
-$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];$punkte=$row["score"];
-$newtrans=$row["newtrans"];$newnews=$row["newnews"];
-$allytag=$row["allytag"];$sector=$row["sector"];$system=$row["system"];
+$restyp01 = $row['restyp01'];
+$restyp02 = $row['restyp02'];
+$restyp03 = $row['restyp03'];
+$restyp04 = $row['restyp04'];
+$restyp05 = $row['restyp05'];
+$punkte = $row["score"];
+$newtrans = $row["newtrans"];
+$newnews = $row["newnews"];
+$allytag = $row["allytag"];
+$sector = $row["sector"];
+$system = $row["system"];
 
-if($row['status']!=1){
-	$allytag='';
+if ($row['status'] != 1) {
+    $allytag = '';
 }
 
 //***************************************
-$se=intval($_REQUEST['se'] ?? 0);
-$sy=intval($_REQUEST['sy'] ?? 0);
+$se = intval($_REQUEST['se'] ?? 0);
+$sy = intval($_REQUEST['sy'] ?? 0);
 
-if(!isset($zuser_id)) $zuser_id = 0;
-if(!isset($zowner_id)) $zowner_id = 0;
+if (!isset($zuser_id)) {
+    $zuser_id = 0;
+}
+if (!isset($zowner_id)) {
+    $zowner_id = 0;
+}
 
 //wenn ein spielername übergeben wird, dann anhand dessen die koordinaten und die user_id ermitteln
-if(isset($_REQUEST['sn'])){
-	
-	$sn=$_REQUEST['sn'];
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-	  "SELECT user_id, sector, `system` FROM de_user_data WHERE spielername=?",
-	  [$sn]);
-	$num = mysqli_num_rows($db_daten);
-	if($num==1){
-		$row = mysqli_fetch_assoc($db_daten);
-		$se=$row['sector'];
-		$sy=$row['system'];
-		$zuser_id=$row['user_id'];
-	}
-	if($zuser_id>0){
-		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-		  "SELECT owner_id FROM de_login WHERE user_id=?",
-		  [$zuser_id]);
-		$num = mysqli_num_rows($db_daten);
-		if($num==1){
-			$row = mysqli_fetch_assoc($db_daten);		
-			$zowner_id=$row['owner_id'];
-		}
-	}
+if (isset($_REQUEST['sn'])) {
+
+    $sn = $_REQUEST['sn'];
+    $db_daten = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT user_id, sector, `system` FROM de_user_data WHERE spielername=?",
+        [$sn]
+    );
+    $num = mysqli_num_rows($db_daten);
+    if ($num == 1) {
+        $row = mysqli_fetch_assoc($db_daten);
+        $se = $row['sector'];
+        $sy = $row['system'];
+        $zuser_id = $row['user_id'];
+    }
+    if ($zuser_id > 0) {
+        $db_daten = mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "SELECT owner_id FROM de_login WHERE user_id=?",
+            [$zuser_id]
+        );
+        $num = mysqli_num_rows($db_daten);
+        if ($num == 1) {
+            $row = mysqli_fetch_assoc($db_daten);
+            $zowner_id = $row['owner_id'];
+        }
+    }
 }
 
 //Analysieren der Koordinaten, um userid vom ZIEL herauszubekommen
-$db_da = mysqli_execute_query($GLOBALS['dbi'],
-  "SELECT user_id,allytag,sector,spielername,status FROM de_user_data WHERE sector=? AND `system`=?",
-  [$se, $sy]);
+$db_da = mysqli_execute_query(
+    $GLOBALS['dbi'],
+    "SELECT user_id,allytag,sector,spielername,status FROM de_user_data WHERE sector=? AND `system`=?",
+    [$se, $sy]
+);
 $rew = mysqli_fetch_assoc($db_da);
-if($rew['user_id']>0){
-	$zuser_id=$rew['user_id'];
+if ($rew['user_id'] > 0) {
+    $zuser_id = $rew['user_id'];
 }
 
 //ggf. noch die owner_id auslesen
-if($zuser_id>0 && $zowner_id<1){
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-	  "SELECT owner_id FROM de_login WHERE user_id=?",
-	  [$zuser_id]);
-	$num = mysqli_num_rows($db_daten);
-	if($num==1){
-		$row = mysqli_fetch_assoc($db_daten);		
-		$zowner_id=$row['owner_id'];
-	}
+if ($zuser_id > 0 && $zowner_id < 1) {
+    $db_daten = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT owner_id FROM de_login WHERE user_id=?",
+        [$zuser_id]
+    );
+    $num = mysqli_num_rows($db_daten);
+    if ($num == 1) {
+        $row = mysqli_fetch_assoc($db_daten);
+        $zowner_id = $row['owner_id'];
+    }
 }
 
 ?>
@@ -300,68 +322,69 @@ document.getElementById("nachricht").focus();
 </head>
 
 <?php
-echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi'] == 1) ? 'mobile' : 'desktop').'">';
 
 include "resline.php";
 
 //HF nur anzeigen, wenn es Spieler vom eigenen Server ist
-if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
-?>
+if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se > 0) {
+    ?>
 <br>
 <form action="hyperfunk.php" method="post">
 <table border="0" width="586" cellspacing="0" cellpadding="0">
-<tr>
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td class="ro" align="center" colspan="2"><?php echo $details_lang['hfnverfassen']?></td>
-<td width="13" height="37" class="ror">&nbsp;</td>
-</tr>
-<tr class="cell">
-<td width="13" height="37" class="rl">&nbsp;</td>
-<td width="100"><?php echo $details_lang['zielkoordinaten']?>:</td>
-<td>
-<input name="zielsek" tabindex="1" id="zielsek" size="4" style="border-style:solid;height:21;" value="<?php echo $se;?>"><input name="zielsys" tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" value="<?php echo $sy;?>">
-</td>
-<td width="13" height="37" class="rr">&nbsp;</td>
-</tr>
-<tr class="cell">
-<td width="13" height="37" class="rl">&nbsp;</td>
-<td width="100"><?php echo $details_lang['betreff']?>: </td>
-<td><input name="betreff" tabindex="3" size="30" style="border-style:solid;height:21;">
-</td>
-<td width="13" height="37" class="rr">&nbsp;</td>
-</tr>
+	<tr>
+		<td width="13" height="37" class="rol">&nbsp;</td>
+		<td class="ro" align="center" colspan="2"><?php echo $details_lang['hfnverfassen']?></td>
+		<td width="13" height="37" class="ror">&nbsp;</td>
+	</tr>
+	<tr class="cell">
+		<td width="13" height="37" class="rl">&nbsp;</td>
+		<td width="110px"><?php echo $details_lang['zielkoordinaten']?>:</td>
+		<td>
+			<input name="zielsek" tabindex="1" id="zielsek" size="4" style="border-style:solid;height:21;" value="<?php echo $se;?>"> <input name="zielsys" tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" value="<?php echo $sy;?>">
+		</td>
+		<td width="13" height="37" class="rr">&nbsp;</td>
+	</tr>
+	<tr class="cell">
+		<td width="13" height="37" class="rl">&nbsp;</td>
+		<td width="110px"><?php echo $details_lang['betreff']?>: </td>
+		<td><input name="betreff" tabindex="3" size="30" style="border-style:solid;height:21;">
+		</td>
+		<td width="13" height="37" class="rr">&nbsp;</td>
+	</tr>
+
+	<tr class="cell">
+		<td width="13" height="37" class="rl">&nbsp;</td>
+		<td colspan=2 align=center height="30px">
+
+		<input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
+		<input type="button" value="&nbsp;u&nbsp;"  onclick="init('under')">
+		<input type="button" value="&nbsp;i&nbsp;"  onclick="init('kursiv')">
+		<input type="button" value="<?php echo $details_lang['rot']?>"  onclick="init('rot')">
+		<input type="button" value="<?php echo $details_lang['gelb']?>"  onclick="init('gelb')">
+		<input type="button" value="<?php echo $details_lang['gruen']?>"  onclick="init('gruen')">
+		<input type="button" value="<?php echo $details_lang['weiss']?>"  onclick="init('weiss')">
+		<input type="button" value="<?php echo $details_lang['farbe']?>"  onclick="init('farbe')">
+		
+		<input type="button" value="<?php echo $details_lang['groesse']?>"  onclick="init('size')">
+		<input type="button" value="center"  onclick="init('center')">
+		<input type="button" value="pre"  onclick="init('pre')">
+		<input type="button" value="Link"  onclick="init('www')">
+		<input type="button" value="@"  onclick="init('mail')">
+		<input type="button" value="&nbsp;?&nbsp;"  onclick="hilfe()">
+		<input type="button" value="<?php echo $details_lang['leeren']?>"  onclick="leeren()">
+		</td>
+		<td width='13' height='37' class='rr'>&nbsp;</td>
+	</tr>
 
 <tr class="cell">
-              <td width='13' height='37' class='rl'>&nbsp;</td>
-              <td colspan=2 align=center height=50>
-
-              <input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
-              <input type="button" value="&nbsp;u&nbsp;"  onclick="init('under')">
-              <input type="button" value="&nbsp;i&nbsp;"  onclick="init('kursiv')">
-              <input type="button" value="<?php echo $details_lang['rot']?>"  onclick="init('rot')">
-              <input type="button" value="<?php echo $details_lang['gelb']?>"  onclick="init('gelb')">
-              <input type="button" value="<?php echo $details_lang['gruen']?>"  onclick="init('gruen')">
-              <input type="button" value="<?php echo $details_lang['weiss']?>"  onclick="init('weiss')">
-              <input type="button" value="<?php echo $details_lang['farbe']?>"  onclick="init('farbe')">
-              
-              <input type="button" value="<?php echo $details_lang['groesse']?>"  onclick="init('size')">
-              <input type="button" value="center"  onclick="init('center')">
-              <input type="button" value="pre"  onclick="init('pre')">
-              <input type="button" value="Link"  onclick="init('www')">
-              <input type="button" value="@"  onclick="init('mail')">
-              <input type="button" value="&nbsp;?&nbsp;"  onclick="hilfe()">
-              <input type="button" value="<?php echo $details_lang['leeren']?>"  onclick="leeren()">
-              </td>
-              <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-
-<tr>
 <td width="13" height="37" class="rl">&nbsp;</td>
-<td colspan="2" align="center"><textarea rows="15" cols="64" tabindex="4" name="nachricht" id="nachricht"></textarea></td>
+<td colspan="2" align="center">
+	<textarea rows="10" cols="64" tabindex="4" name="nachricht" id="nachricht"></textarea></td>
 <td width="13" height="37" class="rr">&nbsp;</td>
 </tr>
 
-<tr>
+<tr class="cell">
 <td width="13" height="37" class="rl">&nbsp;</td>
 <td colspan="2" align=center><input type="button" value="<?php echo $details_lang['laengepruefen']?>" onClick="check()"> <input type="submit" tabindex="5" onclick="return zeichenundsmiliecheck()" name="antbut" value="<?php echo $details_lang['hfnabsenden']?>"></td>
 <td width="13" height="37" class="rr">&nbsp;</td>
@@ -383,234 +406,248 @@ if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se>0){
 ////////////////////////////////////////////////////////
 //m�chte man einen Eintrag l�schen
 $del_ignore = isset($_REQUEST['del_ignore']) ? intval($_REQUEST['del_ignore']) : 0;
-if($del_ignore>0){
-	mysqli_execute_query($GLOBALS['dbi_ls'],
-	  "DELETE FROM de_chat_ignore WHERE id=? AND owner_id=?",
-	  [$del_ignore, $_SESSION['ums_owner_id']]);
+if ($del_ignore > 0) {
+    mysqli_execute_query(
+        $GLOBALS['dbi_ls'],
+        "DELETE FROM de_chat_ignore WHERE id=? AND owner_id=?",
+        [$del_ignore, $_SESSION['ums_owner_id']]
+    );
 }
 
-if(isset($_REQUEST['sn']) && $_REQUEST['sn']!==''){
-	//unterscheiden zwischen Spieler auf eigenem Server und Spieler auf anderem Server
-	echo '<form action="details.php" method="post">';
-	if(!empty($_REQUEST['sn'])){
-		echo '<input type="hidden" name="sn" value="'.$_REQUEST['sn'].'">';
-	}
-	if(!empty($_REQUEST['ctyp'])){
-		echo '<input type="hidden" name="ctyp" value="'.$_REQUEST['ctyp'].'">';
-	}
-	if(!empty($_REQUEST['cid'])){
-		echo '<input type="hidden" name="cid" value="'.$_REQUEST['cid'].'">';
-	}
+if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
+    //unterscheiden zwischen Spieler auf eigenem Server und Spieler auf anderem Server
+    echo '<form action="details.php" method="post">';
+    if (!empty($_REQUEST['sn'])) {
+        echo '<input type="hidden" name="sn" value="'.$_REQUEST['sn'].'">';
+    }
+    if (!empty($_REQUEST['ctyp'])) {
+        echo '<input type="hidden" name="ctyp" value="'.$_REQUEST['ctyp'].'">';
+    }
+    if (!empty($_REQUEST['cid'])) {
+        echo '<input type="hidden" name="cid" value="'.$_REQUEST['cid'].'">';
+    }
 
-	rahmen_oben('Verwaltung von Spielern die im Chat ignoriert werden');
-	if(isset($_REQUEST['ctyp']) && isset($_REQUEST['cid'])){//anderer server
-		//aus dem Chat die dazugeh�rige owner_id holen
-		$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
-		  "SELECT * FROM de_chat_msg WHERE id=? AND channeltyp=?",
-		  [intval($_REQUEST['cid']), intval($_REQUEST['ctyp'])]);
-		$num = mysqli_num_rows($db_daten);
-		if($num==1){	
-			$row = mysqli_fetch_assoc($db_daten);
-			$zowner_id=$row['owner_id'];
-			echo '<div class="cell" style="width: 560px; text-align: center;">';
+    rahmen_oben('Verwaltung von Spielern die im Chat ignoriert werden');
+    if (isset($_REQUEST['ctyp']) && isset($_REQUEST['cid'])) {//anderer server
+        //aus dem Chat die dazugeh�rige owner_id holen
+        $db_daten = mysqli_execute_query(
+            $GLOBALS['dbi_ls'],
+            "SELECT * FROM de_chat_msg WHERE id=? AND channeltyp=?",
+            [intval($_REQUEST['cid']), intval($_REQUEST['ctyp'])]
+        );
+        $num = mysqli_num_rows($db_daten);
+        if ($num == 1) {
+            $row = mysqli_fetch_assoc($db_daten);
+            $zowner_id = $row['owner_id'];
+            echo '<div class="cell" style="width: 560px; text-align: center;">';
 
-			//man kann sich nicht selbst ignorieren
-			if($zowner_id!=$_SESSION['ums_owner_id']){
+            //man kann sich nicht selbst ignorieren
+            if ($zowner_id != $_SESSION['ums_owner_id']) {
 
-				//m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
-				if(isset($_REQUEST['ignore_add']) && $zowner_id>0){
-					$ignore_until=time()+(3600*24*intval($_REQUEST['ignore_time']));
-					$sql="INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
-						spielername='".($_REQUEST['ignore_name']??$_REQUEST['sn'])."';";
+                //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
+                if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
+                    $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
+                    $sql = "INSERT INTO de_chat_ignore SET owner_id='".$_SESSION['ums_owner_id']."', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
+						spielername='".($_REQUEST['ignore_name'] ?? $_REQUEST['sn'])."';";
 
-					mysqli_query($GLOBALS['dbi_ls'], $sql);
+                    mysqli_query($GLOBALS['dbi_ls'], $sql);
 
-				}		
+                }
 
-				//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-				$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
-				  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
-				  [$_SESSION['ums_owner_id'], $zowner_id, time()]);
-				$num = mysqli_num_rows($db_daten);
-
-
-				if($num==1){  // er steht schon drin
-					$row = mysqli_fetch_assoc($db_daten);
-					echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
-				}elseif($zowner_id>0){ //er steht noch nicht drin
-					echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-					echo '<input name="ignore_name" maxlength="20" value="'.$_REQUEST['sn'].'" autocomplete="off" type="text">';
-
-					echo '<br>Zeitdauer der Blockierung: ';
-
-					if(!isset($_REQUEST['ignore_time'])){
-						$_REQUEST['ignore_time']=30;
-					}
-
-					$ignore_times=array(2,10,20,30,60,90,180,360);
-
-					echo '<select name="ignore_time">';
-					for($i=0;$i<count($ignore_times);$i++){
-						if($ignore_times[$i]==$_REQUEST['ignore_time']){
-							$selected=' selected';
-						}else{
-							$selected='';
-						}
-
-						echo '<option value="'.$ignore_times[$i].'"'.$selected.'>'.$ignore_times[$i].' Tage</option>';
-					}
-					echo '</select>';
+                //�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
+                $db_daten = mysqli_execute_query(
+                    $GLOBALS['dbi_ls'],
+                    "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
+                    [$_SESSION['ums_owner_id'], $zowner_id, time()]
+                );
+                $num = mysqli_num_rows($db_daten);
 
 
-					echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
-				}else{
-					echo 'Es wurde kein Spieler ausgew&auml;hlt.';
-				}
+                if ($num == 1) {  // er steht schon drin
+                    $row = mysqli_fetch_assoc($db_daten);
+                    echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
+                } elseif ($zowner_id > 0) { //er steht noch nicht drin
+                    echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
+                    echo '<input name="ignore_name" maxlength="20" value="'.$_REQUEST['sn'].'" autocomplete="off" type="text">';
+
+                    echo '<br>Zeitdauer der Blockierung: ';
+
+                    if (!isset($_REQUEST['ignore_time'])) {
+                        $_REQUEST['ignore_time'] = 30;
+                    }
+
+                    $ignore_times = array(2,10,20,30,60,90,180,360);
+
+                    echo '<select name="ignore_time">';
+                    for ($i = 0;$i < count($ignore_times);$i++) {
+                        if ($ignore_times[$i] == $_REQUEST['ignore_time']) {
+                            $selected = ' selected';
+                        } else {
+                            $selected = '';
+                        }
+
+                        echo '<option value="'.$ignore_times[$i].'"'.$selected.'>'.$ignore_times[$i].' Tage</option>';
+                    }
+                    echo '</select>';
 
 
-			}else{
-				echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
-			}
-
-			echo '</div>';
-
-		}else{
-			echo '<div class="cell" style="width: 560px;">Der Spieler konnte nicht gefunden werden.</div>';
-		}
-
-	}else{//eigener Server
-		echo '<div class="cell" style="width: 560px; text-align: center;">';
-
-		//man kann sich nicht selbst ignorieren
-		if($zowner_id!=$_SESSION['ums_owner_id']){
-
-			//m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
-			if(isset($_REQUEST['ignore_add']) && $zowner_id>0){
-				$ignore_until=time()+(3600*24*intval($_REQUEST['ignore_time']));
-				$spielername = isset($_REQUEST['ignore_name']) ? $_REQUEST['ignore_name'] : $_REQUEST['sn'];
-				mysqli_execute_query($GLOBALS['dbi_ls'],
-				  "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
-				  [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]);
-			}		
-
-			//�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-			$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
-			  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
-			  [$_SESSION['ums_owner_id'], $zowner_id, time()]);
-			$num = mysqli_num_rows($db_daten);
+                    echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
+                } else {
+                    echo 'Es wurde kein Spieler ausgew&auml;hlt.';
+                }
 
 
-			if($num==1){  // er steht schon drin
-				$row = mysqli_fetch_assoc($db_daten);
-				echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
-			}elseif($zowner_id>0){ //er steht noch nicht drin
-				echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-				echo '<input name="ignore_name" maxlength="20" value="'.$_REQUEST['sn'].'" autocomplete="off" type="text">';
+            } else {
+                echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
+            }
 
-				echo '<br>Zeitdauer der Blockierung: ';
+            echo '</div>';
 
-				if(!isset($_REQUEST['ignore_time'])){
-					$_REQUEST['ignore_time']=30;
-				}
+        } else {
+            echo '<div class="cell" style="width: 560px;">Der Spieler konnte nicht gefunden werden.</div>';
+        }
 
-				$ignore_times=array(2,10,20,30,60,90,180,360);
+    } else {//eigener Server
+        echo '<div class="cell" style="width: 560px; text-align: center;">';
 
-				echo '<select name="ignore_time">';
-				for($i=0;$i<count($ignore_times);$i++){
-					if($ignore_times[$i]==$_REQUEST['ignore_time']){
-						$selected=' selected';
-					}else{
-						$selected='';
-					}
+        //man kann sich nicht selbst ignorieren
+        if ($zowner_id != $_SESSION['ums_owner_id']) {
 
-					echo '<option value="'.$ignore_times[$i].'"'.$selected.'>'.$ignore_times[$i].' Tage</option>';
-				}
-				echo '</select>';
+            //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
+            if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
+                $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
+                $spielername = isset($_REQUEST['ignore_name']) ? $_REQUEST['ignore_name'] : $_REQUEST['sn'];
+                mysqli_execute_query(
+                    $GLOBALS['dbi_ls'],
+                    "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
+                    [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]
+                );
+            }
+
+            //überprüfen ob der Spieler bereits auf der Ignore-Liste ist
+            $db_daten = mysqli_execute_query(
+                $GLOBALS['dbi_ls'],
+                "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
+                [$_SESSION['ums_owner_id'], $zowner_id, time()]
+            );
+            $num = mysqli_num_rows($db_daten);
 
 
-				echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
-			}else{
-				echo 'Es wurde kein Spieler ausgew&auml;hlt.';
-			}
+            if ($num == 1) {  // er steht schon drin
+                $row = mysqli_fetch_assoc($db_daten);
+                echo 'Dieser Spieler ('.$row['spielername'].') befindet sich aktuell auf der Chat-Ignore-Liste.';
+            } elseif ($zowner_id > 0) { //er steht noch nicht drin
+                echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
+                echo '<input name="ignore_name" maxlength="20" value="'.$_REQUEST['sn'].'" autocomplete="off" type="text">';
+
+                echo '<br>Zeitdauer der Blockierung: ';
+
+                if (!isset($_REQUEST['ignore_time'])) {
+                    $_REQUEST['ignore_time'] = 30;
+                }
+
+                $ignore_times = array(2,10,20,30,60,90,180,360);
+
+                echo '<select name="ignore_time">';
+                for ($i = 0;$i < count($ignore_times);$i++) {
+                    if ($ignore_times[$i] == $_REQUEST['ignore_time']) {
+                        $selected = ' selected';
+                    } else {
+                        $selected = '';
+                    }
+
+                    echo '<option value="'.$ignore_times[$i].'"'.$selected.'>'.$ignore_times[$i].' Tage</option>';
+                }
+                echo '</select>';
 
 
-		}else{
-			echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
-		}
+                echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
+            } else {
+                echo 'Es wurde kein Spieler ausgew&auml;hlt.';
+            }
 
-		echo '</div>';
-	}
-	//�berpr�fen ob der Spieler auf Ignore steht
-	rahmen_unten();
-	echo '</form>';
+
+        } else {
+            echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
+        }
+
+        echo '</div>';
+    }
+    //�berpr�fen ob der Spieler auf Ignore steht
+    rahmen_unten();
+    echo '</form>';
 }
 ////////////////////////////////////////////////////////
-// Eine Liste der im Chat ignorierten Spielern ausgeben 
+// Eine Liste der im Chat ignorierten Spielern ausgeben
 // darüber soll ebenfalls eine LÖschung möglich sein
 ////////////////////////////////////////////////////////
-$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
-  "SELECT * FROM de_chat_ignore WHERE owner_id=? AND ignore_until>?",
-  [$_SESSION['ums_owner_id'], time()]);
+$db_daten = mysqli_execute_query(
+    $GLOBALS['dbi_ls'],
+    "SELECT * FROM de_chat_ignore WHERE owner_id=? AND ignore_until>?",
+    [$_SESSION['ums_owner_id'], time()]
+);
 $num = mysqli_num_rows($db_daten);
-if($num>=1){
-	rahmen_oben('Folgende Spieler sind auf Deiner Chat-Ignore-Liste');
-	echo '<table class="cell" style="width: 560px;">';
-	echo '<tr style="font-weight: bold;"><td>Spielername</td><td>Blockiert bis</td><td>Aktion</td></tr>';
-	//aus dem Chat die dazugeh�rige owner_id holen
-	while($row = mysqli_fetch_assoc($db_daten)){
-		echo '
+if ($num >= 1) {
+    rahmen_oben('Folgende Spieler sind auf Deiner Chat-Ignore-Liste');
+    echo '<table class="cell" style="width: 560px;">';
+    echo '<tr style="font-weight: bold;"><td>Spielername</td><td>Blockiert bis</td><td>Aktion</td></tr>';
+    //aus dem Chat die dazugeh�rige owner_id holen
+    while ($row = mysqli_fetch_assoc($db_daten)) {
+        echo '
 		<tr>
 			<td>'.$row['spielername'].'</td>
-			<td>'.date("d.m.Y",$row['ignore_until']).'</td>
+			<td>'.date("d.m.Y", $row['ignore_until']).'</td>
 			<td><a href="details.php?del_ignore='.$row['id'].'">Eintrag l&ouml;schen</a></td>
 		</tr>';
-	}
-	echo '</table>';
-	rahmen_unten();
+    }
+    echo '</table>';
+    rahmen_unten();
 }
 ////////////////////////////////////////////////////////
 //Details nur anzeigen, wenn es der eigene Server ist
 ////////////////////////////////////////////////////////
-if(!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spielername"])){
+if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spielername"])) {
 
-	//in Sektor 1, darf man nicht die Details einsehen
-	if($sector==1){
-		exit();
-	}
-?>
+    //in Sektor 1, darf man nicht die Details einsehen
+    if ($sector == 1) {
+        exit();
+    }
+    ?>
 <table border="0"  cellspacing="0" cellpadding="0" width="400px">
 <?php
-//Anhand der Userid werden hier die Userdetails aus der DB ausgelesen.
-$db_daten=mysqli_execute_query($GLOBALS['dbi'],
-  "SELECT * FROM de_user_info WHERE user_id=?",
-  [$zuser_id]);
-$row = mysqli_fetch_assoc($db_daten);
+    //Anhand der Userid werden hier die Userdetails aus der DB ausgelesen.
+    $db_daten = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT * FROM de_user_info WHERE user_id=?",
+        [$zuser_id]
+    );
+    $row = mysqli_fetch_assoc($db_daten);
 
-$ud_all=$row['ud_all'];
-if($rew['sector']==$sector && $sector>1){
-	$ud_sector=$row['ud_sector'];
-}else{
-	$ud_sector='keine Zugriffsrechte';
-}
-if($rew['allytag']==$allytag && $rew['status']==1 && $allytag!=''){
-	$ud_ally=$row['ud_ally'];
-}else{
-	$ud_ally='keine Zugriffsrechte';
-}
+    $ud_all = $row['ud_all'];
+    if ($rew['sector'] == $sector && $sector > 1) {
+        $ud_sector = $row['ud_sector'];
+    } else {
+        $ud_sector = 'keine Zugriffsrechte';
+    }
+    if ($rew['allytag'] == $allytag && $rew['status'] == 1 && $allytag != '') {
+        $ud_ally = $row['ud_ally'];
+    } else {
+        $ud_ally = 'keine Zugriffsrechte';
+    }
 
-rahmen_oben($details_lang['detailsvon'].$rew["spielername"]);
-echo '<div class="cell" style="width: 550px;">';
-//alle
-echo 'Informationen f&uuml;r alle:<br>';
-echo '<textarea style="width: 100%; height: 200px;" readonly>'.$ud_all.'</textarea>';
-//sektor
-echo 'Sektorinformationen:<br>';
-echo '<textarea style="width: 100%; height: 200px;" readonly>'.$ud_sector.'</textarea>';
-//allianz/allianzpartner
-echo 'Allianzinformationen:<br>';
-echo '<textarea style="width: 100%; height: 200px;" readonly>'.$ud_ally.'</textarea>';
-echo '</div>';
-rahmen_unten();
+    rahmen_oben($details_lang['detailsvon'].$rew["spielername"]);
+    echo '<div class="cell" style="width: 560px;">';
+    //alle
+    echo '<div>Informationen für alle:</div>';
+    echo '<div class="mt4 mb15">'.htmlspecialchars($ud_all, ENT_QUOTES, 'UTF-8').'</div>';
+    //sektor
+    echo '<div>Sektorinformationen:</div>';
+    echo '<div class="mt4 mb15">'.htmlspecialchars($ud_sector, ENT_QUOTES, 'UTF-8').'</div>';
+    //allianz/allianzpartner
+    echo '<div>Allianzinformationen:</div>';
+    echo '<div class="mt4">'.htmlspecialchars($ud_ally, ENT_QUOTES, 'UTF-8').'</div>';
+    echo '</div>';
+    rahmen_unten();
 }
 echo '<br><br>';
 ?>

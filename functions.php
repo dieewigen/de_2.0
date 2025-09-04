@@ -142,6 +142,7 @@ function getInfocenter()
         $content='
         <script>
         '.$content.';
+        setTooltip();
         </script>
         ';
     }
@@ -1768,8 +1769,8 @@ function showeinheit2($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $t
     echo '
 	<table border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td width="75"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t='.$tech_id.'" target="_blank">'.$tooltip.'</a></td>
-		<td class="'.$bg.'" width="108" align="center"><a href="help.php?t='.$tech_id.'" class="link">'.$techname.'</a></td>
+		<td width="75px"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t='.$tech_id.'" target="_blank">'.$tooltip.'</a></td>
+		<td class="'.$bg.'" width="133px" align="center"><a href="help.php?t='.$tech_id.'" class="link">'.$techname.'</a></td>
 	</tr>
 	</table>';
     echo '</td>';
