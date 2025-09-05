@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetAttackNews;
 use DieEwigen\Api\Model\GetPlayerAttackInfo;
 use DieEwigen\Api\Model\GetTopPlayers;
