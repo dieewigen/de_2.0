@@ -578,7 +578,7 @@ while ($row = mysqli_fetch_array($res)) {
         //neuen sektor auslesen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, bk FROM de_sector WHERE techs LIKE 's1%' AND sec_id<>? AND npc=0 AND sec_id>1 ORDER BY RAND() LIMIT 0,1", [$artsec]);
         $rowx = mysqli_fetch_array($db_daten);
-        $zielsec = $rowx["sec_id"];
+        $zielsec = $rowx["sec_id"] ?? -1;
         //bk des zielsektors
         $zielbk = getSKSystemBySecID($zielsec);
 

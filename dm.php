@@ -9,6 +9,11 @@ unset($_SESSION["de_frameset"]);
 //zeigt an, dass die neue Desktopversion verwendet wird, wird z.B. für das Infocenter benötigt
 $_SESSION['new_desktop_version']=1;
 $_SESSION['ic_last_refresh']=0;
+
+//gibt es eine Chatgröße im Cookie?
+$chat_width=400;
+$chat_height=400;
+
 ?>
 <!doctype html>
 <html lang="de-de">
@@ -176,10 +181,6 @@ $_SESSION['ic_last_refresh']=0;
 
 		//go-home-Button
 		echo '<img onclick="reset_map()" style="width: 40px; height: auto; position: absolute; right: 6px; top: 124px; cursor: pointer;" src="gp/g/icon10.png" class="rounded-borders" title="zum Heimatsektor" rel="tooltip">';
-
-//gibt es eine Chatgröße im Cookie?
-$chat_width=400;
-$chat_height=400;
 
 if(isset($_COOKIE['chat_width'])){
 	$chat_width=str_replace("px", "", $_COOKIE['chat_width']);

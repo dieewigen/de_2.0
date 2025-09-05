@@ -22,6 +22,9 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include "resline.php";
 
 $id=isset($id)?(int)$id:-1;
+
+$action=$_REQUEST['action'] ?? '';
+
 //news anzeigen
 if($action!="archiv"){
 	$sel_news_show = mysqli_execute_query($GLOBALS['dbi'],

@@ -26,9 +26,7 @@ Insbesondere für für eine laufenden Server ist es aber wichtig die Datenbank Z
 
 
 ### Generiere Accounts
-NPC-Accounts kann man mit ki/generiereaccounts.php anlegen - wenn man dann in der DB in db_user_data manuell  npc auf 1 setzt und rasse auf 1-4 wird es ein normaler Spieleraccount
-
-
+Im Ordner ki ist das Script: generiereaccounts.php Dort die Anzahl von NPC 1 festlegen, die in Sektor 2 landen sollen. Wichtig ist dabei, dass in der sv.inc.php der Wert $sv_maxsystem groß genug ist um alle Aliens in Sektor 2 unterbringen zu können, sonst landet er in einer Endlosschleife.
 
 ### Tickscripts starten
 Die Ticks werden über cronjobs gesteuert, die jede Minute die shell scripts (.sh files) in https://github.com/dieewigen/de_2.0/tree/master/tickler/ aufrufen

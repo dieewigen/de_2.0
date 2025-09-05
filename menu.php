@@ -194,8 +194,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 	<title>Menu</title><title><?php echo $menu_lang['title']?></title>
 <?php
 
-echo '<link rel="stylesheet" type="text/css" href="gp/m'.$_SESSION['ums_rasse'].'.css">
-<link rel="stylesheet" type="text/css" href="gp/f'.$_SESSION['ums_rasse'].'.css">';
+
+echo '<link rel="stylesheet" type="text/css" href="gp/m'.$_SESSION['ums_rasse'].'.css">';
+//<link rel="stylesheet" type="text/css" href="gp/f'.$_SESSION['ums_rasse'].'.css">
 
 ?>
 <script>
