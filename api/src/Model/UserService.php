@@ -13,7 +13,7 @@ class UserService
      * @param string $userId the ums user id;
      * @return bool true if the user is a API user.
      */
-    public function isAPIUser(string $userId) :bool {
+    public function isAPIUser(int $userId) :bool {
         $stmt = mysqli_prepare($GLOBALS['dbi'],self::IS_API_USER_SQL);
         $stmt->bind_param("i", $userId);
         $stmt->execute();

@@ -30,124 +30,130 @@ if(!isset($_SESSION)){
 $input = trim(file_get_contents("php://input"));
 
 if (empty($input)) {
-    echo json_encode(['status' => 'error', 'message' => 'Leerer JSON-Body']);
+    header('HTTP/1.1 400 Bad Request');
+    echo json_encode(['message' => 'Leerer JSON-Body']);
     exit;
 }
 
 $data = json_decode($input, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    echo json_encode(['status' => 'error', 'message' => 'Ungültiges JSON: ' . json_last_error_msg()]);
+    header('HTTP/1.1 400 Bad Request');
+    echo json_encode(['message' => 'Ungültiges JSON: ' . json_last_error_msg()]);
     exit;
 }
 
 if(isset($data['action']) && !empty($data['action'])) {
-    
+    header('Content-Type: application/json');
+    try {
+        $userService = new UserService();
+        $userId = intval($data['user_id']);
+        switch ($data['action']) {
+            case 'getAllNpcUsers':
+                $userModel = new GetAllUsers();
+                $users = $userModel->getAllNpcUsers();
+                echo json_encode($users);
+                break;
 
-    switch ($data['action']) {
-        case 'getAllNpcUsers':
-            $userModel = new GetAllUsers();
-            $users = $userModel->getAllNpcUsers();
-            echo json_encode(['status' => 'success', 'data' => $users]);
-            break;
-
-        case 'getAllUsers':
-            $userModel = new GetAllUsers();
-            $users = $userModel->getAllUsers();
-            echo json_encode(['status' => 'success', 'data' => $users]);
-            break;
-
-            
-        case 'getUserFleet':
-            //is user_id valid
-            $userId = intval($data['user_id']);
-            $userService = new UserService();
-            if (!$userService->isAPIUser($userId)) {
-                echo json_encode(['status' => 'error', 'message' => 'Unberechtigter Zugriff']);
-                exit;
-            }
-
-            $userModel = new GetUserFleet();
-            $fleets = $userModel->getUserFleet($userId);
-            echo json_encode(['status' => 'success', 'data' => $fleets]);
-            break; 
-
-        case 'getSectorStatus':
-            //is user_id valid
-            $userId = intval($data['user_id']);
-            $userService = new UserService();
-            if (!$userService->isAPIUser($userId)) {
-                echo json_encode(['status' => 'error', 'message' => 'Unberechtigter Zugriff']);
-                exit;
-            }
-
-            $userModel = new GetSectorStatus();
-            $fleets = $userModel->getSectorStatus($userId);
-            echo json_encode(['status' => 'success', 'data' => $fleets]);
-            break;
-
-        case 'getServerData':
-            $serverModel = new GetServerData();
-            $data = $serverModel->getServerData();
-            echo json_encode(['status' => 'success', 'data' => $data]);
-            break;
-
-        case 'openPage':
-            //all fields are required
-            if (!isset($data['user_id']) || !isset($data['filename'])) {
-                echo json_encode(['status' => 'error', 'message' => 'Fehlende Parameter: user_id oder filename']);
-                exit;
-            }
-            //is user_id valid
-            $userId = intval($data['user_id']);
-            $userService = new UserService();
-            if (!$userService->isAPIUser($userId)) {
-                echo json_encode(['status' => 'error', 'message' => 'Unberechtigter Zugriff']);
-                exit;
-            }
-
-            //is filename valid
-            $validGameFilename = new ValidateGameFilename();
-            if(!$validGameFilename->isValid($data['filename'])) {
-                echo json_encode(['status' => 'error', 'message' => 'Ungültiger Dateiname']);
-                exit;
-            }
-
-            //open the page
-            $filePath = '../' . $data['filename'];
-            if (!file_exists($filePath)) {
-                echo json_encode(['status' => 'error', 'message' => 'Datei nicht gefunden ('.$filePath.')']);
-                exit;
-            }
-
-            chdir('../');
-            $eftachatbotdefensedisable=1;
-            $apiDisableHelper=1;
-            //SESSSION-Variable setzen
-            $_SESSION['ums_user_id'] = $userId;
-            $_SESSION['de_frameset'] = 1; // Setze die Frameset-Variable, um das Layout zu ändern
-            $_SESSION['ums_servid']=$sv_servid;
-            $_SESSION['ums_owner_id']=0;
-
-            //damit man die Scriptfunktionen ansprechen kann, werden die in requestData übergebenen Parameter in $_REQUEST hinterlegt
-            if (isset($data['requestData'])) {
-                foreach($data['requestData'] as $parameter => $value){
-                    $_REQUEST[$parameter]=$value;
-                    $_POST[$parameter]=$value;
-                    $_GET[$parameter]=$value;
+            case 'getAllUsers':
+                $userModel = new GetAllUsers();
+                $users = $userModel->getAllUsers();
+                echo json_encode(['status' => 'success', 'data' => $users]);
+                break;
+            case 'getUserFleet':
+                //is user_id valid
+                $userService = new UserService();
+                if (!$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
                 }
-            }
 
-            include_once $data['filename'];
-            
-            break;
+                $userModel = new GetUserFleet();
+                $fleets = $userModel->getUserFleet($userId);
+                echo json_encode($fleets);
+                break;
+            case 'getSectorStatus':
+                if (isset($userId) && !$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
 
-        default:
-            echo json_encode(['status' => 'error', 'message' => 'Unbekannte Aktion: ' . $data['action']]);
-            exit;
+                $userModel = new GetSectorStatus();
+                $fleets = $userModel->getSectorStatus($userId);
+                echo json_encode($fleets);
+                break;
+            case 'getServerData':
+                $serverModel = new GetServerData();
+                $data = $serverModel->getServerData();
+                echo json_encode($data);
+                break;
+            case 'openPage':
+                //all fields are required
+                if (!isset($userId) || !isset($data['filename'])) {
+                    header('HTTP/1.1 400 Bad Request');
+                    echo json_encode(['message' => 'Fehlende Parameter: user_id oder filename']);
+                    exit;
+                }
+                header('Content-Type: text/html');
+                //is user_id valid
+                if (!$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+
+                //is filename valid
+                $validGameFilename = new ValidateGameFilename();
+                if (!$validGameFilename->isValid($data['filename'])) {
+                    header('HTTP/1.1 400 Bad Request');
+                    echo json_encode(['message' => 'Ungültiger Dateiname']);
+                    exit;
+                }
+
+                //open the page
+                $filePath = '../' . $data['filename'];
+                if (!file_exists($filePath)) {
+                    header('HTTP/1.1 404 Not Found');
+                    echo json_encode(['message' => 'Datei nicht gefunden ('.$filePath.')']);
+                    exit;
+                }
+
+                chdir('../');
+                $eftachatbotdefensedisable = 1;
+                $apiDisableHelper = 1;
+                //SESSSION-Variable setzen
+                $_SESSION['ums_user_id'] = $userId;
+                $_SESSION['de_frameset'] = 1; // Setze die Frameset-Variable, um das Layout zu ändern
+                $_SESSION['ums_servid'] = $sv_servid;
+                $_SESSION['ums_owner_id'] = 0;
+
+                //damit man die Scriptfunktionen ansprechen kann, werden die in requestData übergebenen Parameter in $_REQUEST hinterlegt
+                if (isset($data['requestData'])) {
+                    foreach ($data['requestData'] as $parameter => $value) {
+                        $_REQUEST[$parameter] = $value;
+                        $_POST[$parameter] = $value;
+                        $_GET[$parameter] = $value;
+                    }
+                }
+
+                include_once $data['filename'];
+
+                break;
+
+            default:
+                header('HTTP/1.1 400 Bad Request');
+                echo json_encode(['message' => 'Unbekannte Aktion: ' . $data['action']]);
+                exit;
+        }
+    } catch (Exception $e) {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['message' => 'An technical error occurred']);
+        throw $e;
     }
 
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Keine Aktion angegeben']);
+    echo json_encode(['message' => 'Keine Aktion angegeben']);
     exit;
 }
 
