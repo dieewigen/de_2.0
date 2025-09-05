@@ -376,41 +376,59 @@ function create_daily_server_statistic()
 
 
     $row = mysqli_fetch_array($db_daten);
-    $active_player =		$row['active_player'];
-    $gesamt_score =		$row['gesamt_score'];
-    $max_score =			$row['max_score'];
-    $gesamt_eh_score =	$row['gesamt_eh_score'];
-    $max_eh_score =		$row['max_eh_score'];
-    $gesamt_col =		$row['gesamt_col'];
-    $max_col =			$row['max_col'];
-    $gesamt_agent =		$row['gesamt_agent'];
-    $max_agent =			$row['max_agent'];
-    $gesamt_agent_lost =	$row['gesamt_agent_lost'];
-    $max_agent_lost =	$row['max_agent_lost'];
-    $gesamt_col_build =	$row['gesamt_col_build'];
-    $max_col_build =		$row['max_col_build'];
-    $gesamt_kartefakt =	$row['gesamt_kartefakt'];
-    $max_kartefakt =		$row['max_kartefakt'];
+    
+    // Alle Werte auf 0 setzen falls NULL oder leer
+    $active_player = intval($row['active_player'] ?? 0);
+    $gesamt_score = intval($row['gesamt_score'] ?? 0);
+    $max_score = intval($row['max_score'] ?? 0);
+    $gesamt_eh_score = intval($row['gesamt_eh_score'] ?? 0);
+    $max_eh_score = intval($row['max_eh_score'] ?? 0);
+    $gesamt_col = intval($row['gesamt_col'] ?? 0);
+    $max_col = intval($row['max_col'] ?? 0);
+    $gesamt_agent = intval($row['gesamt_agent'] ?? 0);
+    $max_agent = intval($row['max_agent'] ?? 0);
+    $gesamt_agent_lost = intval($row['gesamt_agent_lost'] ?? 0);
+    $max_agent_lost = intval($row['max_agent_lost'] ?? 0);
+    $gesamt_col_build = intval($row['gesamt_col_build'] ?? 0);
+    $max_col_build = intval($row['max_col_build'] ?? 0);
+    $gesamt_kartefakt = intval($row['gesamt_kartefakt'] ?? 0);
+    $max_kartefakt = intval($row['max_kartefakt'] ?? 0);
 
-    $sql = "INSERT INTO de_server_stat SET 
-		datum=NOW()- INTERVAL 1 DAY,
-		active_player='$active_player',
-		gesamt_score='$gesamt_score',
-		max_score='$max_score',
-		gesamt_eh_score='$gesamt_eh_score',
-		max_eh_score='$max_eh_score',
-		gesamt_col='$gesamt_col',
-		max_col='$max_col',
-		gesamt_agent='$gesamt_agent',
-		max_agent='$max_agent',
-		gesamt_agent_lost='$gesamt_agent_lost',
-		max_agent_lost='$max_agent_lost',
-		gesamt_col_build='$gesamt_col_build',
-		max_col_build='$max_col_build',
-		gesamt_kartefakt='$gesamt_kartefakt',
-		max_kartefakt='$max_kartefakt'
-			";
-
-    //echo $sql;
-    mysqli_execute_query($GLOBALS['dbi'], $sql, []);
+    // Prepared Statement verwenden statt String-Interpolation
+    mysqli_execute_query($GLOBALS['dbi'], 
+        "INSERT INTO de_server_stat SET 
+            datum=NOW()- INTERVAL 1 DAY,
+            active_player=?,
+            gesamt_score=?,
+            max_score=?,
+            gesamt_eh_score=?,
+            max_eh_score=?,
+            gesamt_col=?,
+            max_col=?,
+            gesamt_agent=?,
+            max_agent=?,
+            gesamt_agent_lost=?,
+            max_agent_lost=?,
+            gesamt_col_build=?,
+            max_col_build=?,
+            gesamt_kartefakt=?,
+            max_kartefakt=?", 
+        [
+            $active_player,
+            $gesamt_score,
+            $max_score,
+            $gesamt_eh_score,
+            $max_eh_score,
+            $gesamt_col,
+            $max_col,
+            $gesamt_agent,
+            $max_agent,
+            $gesamt_agent_lost,
+            $max_agent_lost,
+            $gesamt_col_build,
+            $max_col_build,
+            $gesamt_kartefakt,
+            $max_kartefakt
+        ]
+    );
 }
