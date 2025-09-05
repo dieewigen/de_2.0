@@ -279,8 +279,8 @@ for ($c=0; $c<$num; $c++){
 			$sec_id=$dsecid[$i];
 			if ($i==0 AND isset($dsecid[1]) AND $dsecid[0]==$dsecid[1]){//beide gleicher sektor, d.h. man mu� verdichten
 				$eigeninsg=$deffer[$i][0]+(isset($deffer[$i+1][0]) ? $deffer[$i+1][0] : 0);
-				$eigenue=$eigeninsg-$deffer[$i][1]-(isset($deffer[$i+1][1]) ? $deffer[$i+1][1] : 0);
-				$subeinheiten1=$deffer[$i][1];
+				$eigenue=$eigeninsg-(isset($deffer[$i][1]) ? $deffer[$i][1] : 0)-(isset($deffer[$i+1][1]) ? $deffer[$i+1][1] : 0);
+				$subeinheiten1=isset($deffer[$i][1]) ? $deffer[$i][1] : 0;
 				$subeinheiten2=isset($deffer[$i+1][1]) ? $deffer[$i+1][1] : 0;
 
 				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e1 = e1 - ?, e2 = e2 - ? WHERE sec_id = ?", [intval($subeinheiten1), intval($subeinheiten2), $sec_id]);
@@ -288,8 +288,8 @@ for ($c=0; $c<$num; $c++){
 				create_bknachricht();
 			}else{
 				$eigeninsg=$deffer[$i][0];
-				$eigenue=$eigeninsg-$deffer[$i][1];
-				$subeinheiten=$deffer[$i][1];
+				$eigenue=$eigeninsg-(isset($deffer[$i][1]) ? $deffer[$i][1] : 0);
+				$subeinheiten=isset($deffer[$i][1]) ? $deffer[$i][1] : 0;
 				create_bknachricht();
 				if ($sec_id==$zsec)//kann nur die wachflotte sein, daher auch von dort abziehen
 				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET e1 = e1 - ? WHERE sec_id = ?", [intval($subeinheiten), $sec_id]);
