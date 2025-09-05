@@ -72,16 +72,17 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $fleets = $userModel->getUserFleet($userId);
                 echo json_encode($fleets);
                 break;
-            case 'getSectorStatus':
+            case 'getSecStatus':
+                include_once "../functions.php";
+                include_once "../tickler/kt_einheitendaten.php";
                 if (isset($userId) && !$userService->isAPIUser($userId)) {
                     header('HTTP/1.1 403 Forbidden');
                     echo json_encode(['message' => 'Unberechtigter Zugriff']);
                     exit;
                 }
-
-                $userModel = new GetSectorStatus();
-                $fleets = $userModel->getSectorStatus($userId);
-                echo json_encode($fleets);
+                $sectorStatus = new GetSectorStatus();
+                $status = $sectorStatus->getSectorStatus($userId);
+                echo json_encode($status);
                 break;
             case 'getServerData':
                 $serverModel = new GetServerData();
