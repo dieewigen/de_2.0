@@ -8,6 +8,7 @@ use DieEwigen\Api\Model\GetSectorStatus;
 use DieEwigen\Api\Model\GetServerData;
 use DieEwigen\Api\Model\GetActiveBuilds;
 use DieEwigen\Api\Model\UserService;
+use DieEwigen\Api\Model\UserTechs;
 use DieEwigen\Api\Model\ValidateGameFilename;
 
 define("PROJECT_ROOT_PATH", __DIR__ . "/");
@@ -55,6 +56,16 @@ if(isset($data['action']) && !empty($data['action'])) {
             case 'getAllNpcUsers':
                 $userModel = new GetAllUsers();
                 $users = $userModel->getAllNpcUsers();
+                echo json_encode($users);
+                break;
+            case 'getAvailableTechs':
+                if (isset($user_id) && !$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+                $userTechs = new UserTechs();
+                $users = $userTechs->getAvailableTechs($userId);
                 echo json_encode($users);
                 break;
             case 'getUserFleet':
