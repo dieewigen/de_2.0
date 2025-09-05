@@ -1,5 +1,5 @@
 <?php
-use DieEwigen\Api\Model\GetAllUsers;
+use DieEwigen\Api\Model\GetAttackNews;
 use DieEwigen\Api\Model\GetPlayerAttackInfo;
 use DieEwigen\Api\Model\GetTopPlayers;
 use DieEwigen\Api\Model\GetUserFleet;
@@ -119,6 +119,18 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $topList = new GetTopPlayers();
                 $result = $topList->getTopList($sortType);
                 echo json_encode($result);
+                break;
+            case 'getAttackNews':
+                $playerId = $data['player_id'];
+                if (isset($userId) && !$userService->isAPIUser($userId) && isset($playerId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+                $sortType = $data['sortType'] ?? 'score';
+                $attackNews = new GetAttackNews();
+                $attackNews = $attackNews->getAttackNews($playerId, $userId);
+                echo json_encode($attackNews);
                 break;
             case 'openPage':
                 //all fields are required
