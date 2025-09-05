@@ -1,5 +1,6 @@
 <?php
 use DieEwigen\Api\Model\GetAllUsers;
+use DieEwigen\Api\Model\GetTopPlayers;
 use DieEwigen\Api\Model\GetUserFleet;
 use DieEwigen\Api\Model\GetSectorStatus;
 use DieEwigen\Api\Model\GetServerData;
@@ -54,12 +55,6 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $users = $userModel->getAllNpcUsers();
                 echo json_encode($users);
                 break;
-
-            case 'getAllUsers':
-                $userModel = new GetAllUsers();
-                $users = $userModel->getAllUsers();
-                echo json_encode(['status' => 'success', 'data' => $users]);
-                break;
             case 'getUserFleet':
                 //is user_id valid
                 $userService = new UserService();
@@ -98,6 +93,12 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $serverModel = new GetServerData();
                 $data = $serverModel->getServerData();
                 echo json_encode($data);
+                break;
+            case 'getTopList':
+                $sortType = $data['sortType'] ?? 'score';
+                $topList = new GetTopPlayers();
+                $result = $topList->getTopList($sortType);
+                echo json_encode($result);
                 break;
             case 'openPage':
                 //all fields are required
