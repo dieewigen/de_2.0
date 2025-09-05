@@ -3,6 +3,7 @@ use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetUserFleet;
 use DieEwigen\Api\Model\GetSectorStatus;
 use DieEwigen\Api\Model\GetServerData;
+use DieEwigen\Api\Model\GetActiveBuilds;
 use DieEwigen\Api\Model\UserService;
 use DieEwigen\Api\Model\ValidateGameFilename;
 
@@ -83,6 +84,15 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $sectorStatus = new GetSectorStatus();
                 $status = $sectorStatus->getSectorStatus($userId);
                 echo json_encode($status);
+                break;
+            case 'getActiveBuilds':
+                if (isset($userId) && !$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+                $getActiveBuilds = new GetActiveBuilds();
+                echo json_encode($getActiveBuilds->getBuilds($userId));
                 break;
             case 'getServerData':
                 $serverModel = new GetServerData();
