@@ -647,8 +647,6 @@ echo'
 
 
 </table>
-</form>';
-
-
+</form>
 </body>
 </html>
