@@ -37,7 +37,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 include "resline.php";
 
-if($_REQUEST['save']){
+if(isset($_REQUEST['save'])){
 	//Schreiben in die DB
 	$ud_all=$_REQUEST['ud_all'];
 	$ud_all = str_replace('\r\n', "\r\n", $ud_all);
