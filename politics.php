@@ -1,7 +1,6 @@
 <?php
 include "inc/header.inc.php";
 include "inc/artefakt.inc.php";
-include "format_sammlung.php";
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include_once "functions.php";
 include "issectork.php";
@@ -1110,7 +1109,7 @@ $btip=$politics_lang['sektorkosten'].'&'.$btipstr;
 $bg='cell';
 echo '<tr height="30" align="center">';
 echo '<td class="'.$bg.'">'.$politics_lang["sumsekfleet"].': '.number_format($secfleet, 0,",",".").'</td>';
-echo '<td class="'.$bg.'">'.$politics_lang["sektorkosten"].': <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$btip.'"></td>';
+echo '<td class="'.$bg.'">'.$politics_lang["sektorkosten"].': <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$btip.'"></td>';
 echo '</tr>';    
 
 //sektorpasswort für die sphäre benötigt
