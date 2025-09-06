@@ -187,9 +187,6 @@ if($sv_ewige_runde==1){
 //wieviel man von dem kopfgeld bekommt
 $sv_bounty_rate=0.10;
 
-//community server
-$sv_comserver=0;
-
 //autoreset auf dem server?
 $sv_auto_reset=0;
 

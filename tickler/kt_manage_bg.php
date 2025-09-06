@@ -21,7 +21,7 @@ echo '<hr>';
 
 function doBattleGround($bg)
 {
-    global $bg_debug, $sv_comserver_roundtyp;
+    global $bg_debug;
 
     $play_typ = 0; //Spieler-BG
 
@@ -57,14 +57,6 @@ function doBattleGround($bg)
     $time_now = time();
     $sql = "SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_techs ON (de_user_techs.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_techs.tech_id=159 AND de_user_techs.time_finished<=? AND de_user_map_bldg.map_id=? AND de_user_map_bldg.bldg_time<=?;";
     $params = [$time_now, $map_id, $time_now];
-
-    //CDE-Battleground-Modus
-    if ($sv_comserver_roundtyp == 1) {
-        $sql = "SELECT * FROM de_login LEFT JOIN de_user_data ON (de_login.user_id=de_user_data.user_id) LEFT JOIN de_user_map_bldg ON (de_user_map_bldg.user_id=de_user_data.user_id) WHERE de_login.status=1 AND de_user_map_bldg.map_id=? AND de_user_map_bldg.bldg_time<=? GROUP BY de_user_data.user_id;";
-        $params = [$map_id, $time_now];
-    }
-
-    echo $sql;
 
     $db_data = mysqli_execute_query($GLOBALS['dbi'], $sql, $params);
     while ($row = mysqli_fetch_array($db_data)) {

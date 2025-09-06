@@ -9,7 +9,7 @@ include_once $directory."inc/sv.inc.php";
 //anzeige in der logdatei
 include_once "croninfo.inc.php";
 
-if($sv_debug==0 && $sv_comserver==0){
+if($sv_debug==0){
 	if(!in_array(intval(date("i")), $GLOBALS['wts'][date("G")])){
 		die('<br>KI: NO TICK TIME<br>');
 	}

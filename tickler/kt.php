@@ -2,14 +2,13 @@
 set_time_limit(120);
 $directory="../";
 include $directory."inc/sv.inc.php";
-if($sv_debug==0 && $sv_comserver==0){
+if($sv_debug==0){
 	if(!in_array(intval(date("i")), $GLOBALS['kts'][date("G")]) && $sv_debug!=1){
 		die('<br>KT: NO TICK TIME<br>');
 	}
 }
 
 include_once $directory."inccon.php";
-if($sv_comserver==1)include_once $directory.'inc/svcomserver.inc.php';
 include_once $directory."inc/schiffsdaten.inc.php";
 include_once $directory."inc/userartefact.inc.php";
 include_once $directory."functions.php";
@@ -44,8 +43,8 @@ if($sv_ewige_runde==1){
 	$row = mysqli_fetch_array($db_daten);
 	if($row["tick"]<=0)$ticks=1;else $ticks=$row["tick"];
 	
-	if ($ticks<2500000 OR $sv_comserver_roundtyp==1){
-		if($sv_comserver_roundtyp==1)$ticks-=2500000;//fix für community-server in der BR
+	if ($ticks<2500000){
+
 		//wenn die ticks kleiner als die maximale tickzahl sind, dann läuft die runde noch
 		if($ticks<$sv_winscore){
 

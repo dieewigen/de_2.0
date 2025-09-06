@@ -73,8 +73,8 @@ while ($row2 = mysqli_fetch_assoc($result)) { //jeder gefundene datensatz wird g
 ////////////////////////////////////////////////
 //grundertrag
 ////////////////////////////////////////////////
-//grundertragbonus f�r die BR, gibt es nie in der Ewigen Runde
-if (($maxtick > 2500000 && $sv_ewige_runde != 1 && $sv_hardcore != 1) || ($sv_comserver == 1 && (isset($sv_comserver_roundtyp) && $sv_comserver_roundtyp == 1))) {
+//Grundertragbonus für die BR, gibt es nie in der Ewigen Runde
+if (($maxtick > 2500000 && $sv_ewige_runde != 1 && $sv_hardcore != 1)) {
     $grundertragmultiplikator = 200;
 } else {
     $grundertragmultiplikator = 1;

@@ -46,17 +46,6 @@ if ($sv_server_tag == 'DDE') {
 
 }
 
-if (!isset($sv_comserver_roundtyp)) {
-    $sv_comserver_roundtyp = 0;
-}
-
-//rohstoffe für die battleround auf communityservern
-if ($sv_comserver == 1 and $sv_comserver_roundtyp == 1) {
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET tick=tick+2500000, sm_rboost=0, restyp01=restyp01+9000000000,
-restyp02=restyp02+4500000000, restyp03=restyp03+1000000000, restyp04=restyp04+500000000, restyp05=restyp05+100000, col=col+10000 
-WHERE user_id=? AND tick<1000000", [$_SESSION['ums_user_id']]);
-}
-
 //logincounter zurücksetzen
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
@@ -314,10 +303,7 @@ for ($j = 0;$j <= 6;$j++) {
                     $ticks = $row["tick"];
                 }
                 //$ticks=353333000;
-                if ($ticks < 2500000 or $sv_comserver_roundtyp == 1) {
-                    if ($sv_comserver_roundtyp == 1) {
-                        $ticks -= 2500000;
-                    }//fix für community-server in der BR
+                if ($ticks < 2500000) {
                     //wenn die ticks kleiner als die maximale tickzahl sind, dann l�uft die runde noch
                     if ($ticks < $sv_winscore) {
                         //spaltenbreite
@@ -417,27 +403,8 @@ for ($j = 0;$j <= 6;$j++) {
 		 </div>
 	   ');
 
-
-
-            if ($sv_comserver == 1) {
-                $hs = '<div style="border: 1px solid #666666; background-image:url(gp/g/bgpic4.jpg); color: #FFFFFF; padding: 5px;">';
-
-                $hs .= '<h1>Willkommen auf dem Community Server</h1>';
-                //info
-                $hs .= '<a href="optionscomserver.php?showhelp=1"><img id="comserv1" title="Community Server&Auf diesem Server bestimmen die Spieler die Regeln.<br><br>Klicke um mehr Informationen zu erhalten." src="gp/g/symbol14.png" width="48px" height="48px"></a>';
-                //server konfigurieren
-
-                $hs .= '<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="gp/g/symbol15.png" width="48px" height="48px"></a>';
-                $hs .= '</div><br>';
-
-                echo($hs);
-            }
-
             echo($rca.'<br>');
-            if ($sv_comserver != 1) {
-                echo('<a href="sinfo.php" target="h"><font color="lightgreen"> > > Informationen &uuml;ber den Server < < </a></font><br><br>');
-            }
-
+            echo('<a href="sinfo.php" target="h"><font color="lightgreen"> > > Informationen &uuml;ber den Server < < </a></font><br><br>');
             echo('
 		  <b style="font-size:14px;">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</b>
 		  	<div align="left">

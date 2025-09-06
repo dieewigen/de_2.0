@@ -1098,10 +1098,8 @@ function loadPlayerTechs($uid)
 
 function hasTech($pt, $tech_id)
 {
-    global $sv_comserver_roundtyp;
-
-    //Test auf Comserver-BR
-    if ($sv_comserver_roundtyp == 1 || $pt['npc'] == 2) {
+    //Test NPC2, die haben immer alle Techs
+    if ($pt['npc'] == 2) {
         return true;
     }
 

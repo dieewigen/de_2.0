@@ -13,9 +13,6 @@ $directory = "../";
 //include "../inccon.php";
 $disablegzip = 1;
 include $directory."inc/sv.inc.php";
-if ($sv_comserver == 1) {
-    include $directory.'inc/svcomserver.inc.php';
-}
 include $directory."inccon.php";
 
 echo '<html><head></head><body>';

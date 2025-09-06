@@ -4,17 +4,13 @@ $directory = '../';
 include_once $directory."inc/sv.inc.php";
 include_once $directory."inc/env.inc.php";
 //überprüfen ob es Zeit für den Tick ist
-if ($sv_debug == 0 && $sv_comserver == 0) {
+if ($sv_debug == 0) {
     if (!in_array(intval(date("i")), $GLOBALS['wts'][date("G")])) {
         die('<br>WT: NO TICK TIME<br>');
     }
 }
 
 include_once $directory."inccon.php";
-if ($sv_comserver == 1) {
-    include_once $directory.'inc/svcomserver.inc.php';
-}
-
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
@@ -498,7 +494,7 @@ if ($doetick == 1) {
             }
 
             //grundertragbonus für die BR, gibt es nie in der Ewigen Runde und nicht bei Hardcore
-            if ((($maxtick > 2500000 && $sv_ewige_runde != 1 && $sv_hardcore != 1) or ($sv_comserver == 1 and $sv_comserver_roundtyp == 1)) and $sector > 1) {
+            if ((($maxtick > 2500000 && $sv_ewige_runde != 1 && $sv_hardcore != 1)) and $sector > 1) {
                 $grundertragmultiplikator = 200;
             } else {
                 $grundertragmultiplikator = 1;
@@ -1618,15 +1614,10 @@ if ($doetick == 1) {
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
         $row = mysqli_fetch_array($db_daten);
         $maxtick = $row["tick"];
-        if ($maxtick < 2500000 or $sv_comserver_roundtyp == 1) {
+        if ($maxtick < 2500000) {
             //$sv_winscore wird in zukunft die rundendauer in ticks angeben
             $score = $maxtick;
 
-            if ($sv_comserver_roundtyp == 1) {
-                $sv_winscore += 2500000;//fix f�r community-server in der BR
-            }
-
-            //$sv_winscore=0;
             //////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////
             //rundenpunkte und creditgewinne beim start des eh-kampfes verteilen
@@ -1876,14 +1867,6 @@ if ($doetick == 1) {
             mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET doetick=1, domtick=1", []);
         }
     }
-
-    //beim communityserver ggf. das dazugehörige script einbinden
-    /*
-    //ist veraltet, müsste bei Bedarf überarbeitet werden
-    if ($sv_comserver == 1) {
-        include_once 'wt_comserver.php';
-    }
-    */
 
     //soll die Karte neu generiert werden?
     include_once 'wt_create_map.php';
