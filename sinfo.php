@@ -102,7 +102,7 @@ echo '</div>';
 rahmen_unten();
 
 
-include "fooban.php"; ?>
+
 </body>
 </html>
 

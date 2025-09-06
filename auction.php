@@ -437,6 +437,6 @@ echo $content;
 
 ?>
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

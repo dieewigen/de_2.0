@@ -852,8 +852,6 @@ else //einstellungsmöglichkeiten anzeigen
 
 }
 
-//include "fooban.php"; 
-
-?>
+//
 </body>
 </html>

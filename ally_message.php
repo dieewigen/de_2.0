@@ -288,6 +288,6 @@ echo '<input type=submit  style="background-color:#000000;border:1;border-color:
 ?>
 <br>
 <?php include('ally/ally.footer.inc.php'); ?>
-<?php include('fooban.php'); ?>
+
 </body>
 </html>

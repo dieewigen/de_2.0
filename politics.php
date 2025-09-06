@@ -1526,6 +1526,6 @@ if ($num>0){
 </div>
 </form>
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

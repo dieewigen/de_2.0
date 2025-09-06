@@ -355,6 +355,6 @@ if ($s==4){
 </div>
 
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

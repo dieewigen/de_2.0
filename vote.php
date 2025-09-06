@@ -244,6 +244,6 @@ elseif ($action == "abstimmen") {
 }
 ?>
 
-<?php include('fooban.php'); ?>
+
 </body>
 </html>

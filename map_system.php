@@ -273,6 +273,6 @@ if(!hasTech($pt,25)){
 	
 	
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

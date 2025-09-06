@@ -181,6 +181,6 @@ else echo '<div class="info_box text2">Diese Allianz konnte nicht gefunden werde
 ?>
 <br>
 <?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

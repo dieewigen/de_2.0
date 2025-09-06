@@ -376,6 +376,6 @@ if ($num>0){
 
 
 ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

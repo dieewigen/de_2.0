@@ -2515,6 +2515,6 @@ function sabotageallowed($zuid)
 ?>
 </div>
 </form>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

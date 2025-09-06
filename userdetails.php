@@ -109,6 +109,6 @@ echo '</form>';
 
 //Anzeigen der Daten in den Inputfeldern zum Editieren
 ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

@@ -96,6 +96,6 @@ if ($_GET["a"]) {
 }
 ?>
 <br><br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

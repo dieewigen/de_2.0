@@ -477,7 +477,7 @@ echo "<a href=sysnews.php?a=d onclick=\"return confirm('".$sn_lang["deletewarnin
 ?>
 </div>
 </form>
-<?php include "fooban.php"; ?>
+
 </html>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';

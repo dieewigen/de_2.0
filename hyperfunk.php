@@ -1338,6 +1338,6 @@ if ($action == "optionen") {
 }
 ?>
 <br><br>
-<?php include('fooban.php'); ?>
+
 </body>
 </html>

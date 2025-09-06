@@ -1273,7 +1273,7 @@ echo '</table>';
 
 rahmen_unten();
 
-include "fooban.php"; ?>
+
 <script>
 <?php
 echo 'var p='.($handelssteuersatz).';';

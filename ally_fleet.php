@@ -202,6 +202,6 @@ echo "</table>".
 ?>
 <br>
 <?php include("ally/ally.footer.inc.php") ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

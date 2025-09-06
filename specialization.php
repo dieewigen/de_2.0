@@ -214,6 +214,6 @@ N&auml;chster m&ouml;glicher Resetzeitpunkt: '.$verbtime.$resetlink.'
 </div><br>';
 
 ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

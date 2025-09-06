@@ -1238,6 +1238,6 @@ function calculate_ac_max($acs)
 }
 
 ?>
-<?php include "fooban.php";?>
+
 </body>
 </html>

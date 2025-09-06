@@ -471,6 +471,6 @@ if ($ally_id > 0 && $allystatus == 1) {
 ?>
 <br>
 </div>
-<?php include('fooban.php'); ?>
+
 </body>
 </html>

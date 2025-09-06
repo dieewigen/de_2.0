@@ -1392,6 +1392,6 @@ $("input").tooltip({
 	  });
 </script>
 </form>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

@@ -649,8 +649,6 @@ echo'
 </table>
 </form>';
 
-include "fooban.php";
 
-?>
 </body>
 </html>

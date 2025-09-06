@@ -403,6 +403,6 @@ besondere spielerartefakte
 ?>
 </div>
 <br>
-<?php include('fooban.php'); ?>
+
 </body>
 </html>

@@ -1648,6 +1648,6 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
 }
 ?>
 </div>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

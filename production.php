@@ -895,6 +895,6 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 ?>
 </div>
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

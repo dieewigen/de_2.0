@@ -719,6 +719,6 @@ if($sec_data['npc']==1){
 ?>
 </div>
 </form>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

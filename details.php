@@ -651,6 +651,6 @@ if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spiele
 }
 echo '<br><br>';
 ?>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>

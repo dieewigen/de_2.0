@@ -195,6 +195,6 @@ rahmen_unten();
 ?>
 </div>
 <br>
-<?php include "fooban.php"; ?>
+
 </body>
 </html>
