@@ -13,10 +13,14 @@ class GetServerData
 		$data=array();
 
 		$result = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_system;");
-		$row = mysqli_fetch_assoc($result);
-		$data['kt']=$row['kt'];
-		$data['wt']=$row['wt'];
-	
+        $row = mysqli_fetch_assoc($result);
+        $maxColsResult = mysqli_query($GLOBALS['dbi'], "SELECT max(col) AS max_cols, max(score) as max_score FROM de_user_data where npc != 2;");
+        $maxColsRow = mysqli_fetch_assoc($maxColsResult);
+        $data['kt']=$row['kt'];
+        $data['wt']=$row['wt'];
+        $data['max_cols']=$maxColsRow['max_cols'];
+        $data['max_score']=$maxColsRow['max_score'];
+
 		return $data;
 	}
 }

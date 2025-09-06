@@ -2,21 +2,21 @@ function updateNpcUI(data) {
     document.getElementById("target_npc_accounts").innerHTML = ""; // Tabelle leeren
 
     const dataList = document.getElementById("target_npc_accounts");
-    data.data.forEach(item => {
+    data.forEach(item => {
         let div = document.createElement("div");
-        div.textContent = `ID: ${item.user_id}, Name: ${item.spielername}, Sektor: ${item.sector}, System: ${item.system}, Punkte: ${item.score}, Kollektoren: ${item.col}`;
+        div.textContent = `ID: ${item.id}, Name: ${item.name}, Sektor: ${item.sector}, System: ${item.system}, Punkte: ${item.points}, Kollektoren: ${item.cols}`;
         dataList.appendChild(div);
         //Linkliste
         div = document.createElement("div");
-        div.innerHTML = `<span onclick="openPage(${item.user_id}, 'resource.php')">Ressourcen</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'resource.php', {b_col: 1})">baue einen Kollektor</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'sector.php')">Sektor</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'military.php')">Militär</span>`;
-        div.innerHTML+= ` - <span onclick="getUserFleet(${item.user_id})">Flotten</span>`;
-        div.innerHTML+= ` - <span onclick="getSectorStatus(${item.user_id})">Sektorstatus</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'missions.php')">Missionen</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'production.php')">Produktion</span>`;
-        div.innerHTML+= ` - <span onclick="openPage(${item.user_id}, 'hyperfunk.php')">Hyperfunk</span><br><br>`;
+        div.innerHTML = `<span onclick="openPage(${item.id}, 'resource.php')">Ressourcen</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'resource.php', {b_col: 1})">baue einen Kollektor</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'sector.php')">Sektor</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'military.php')">Militär</span>`;
+        div.innerHTML+= ` - <span onclick="getUserFleet(${item.id})">Flotten</span>`;
+        div.innerHTML+= ` - <span onclick="getSectorStatus(${item.id})">Sektorstatus</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'missions.php')">Missionen</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'production.php')">Produktion</span>`;
+        div.innerHTML+= ` - <span onclick="openPage(${item.id}, 'hyperfunk.php')">Hyperfunk</span><br><br>`;
         dataList.appendChild(div);
 
     });    
@@ -48,7 +48,7 @@ async function getUserFleet(userId) {
         },
         body: JSON.stringify({ action: 'getUserFleet', user_id: userId })
     });
-    
+
     const json = await response.json();
 
     document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
@@ -63,7 +63,7 @@ async function getSectorStatus(userId) {
         },
         body: JSON.stringify({ action: 'getSectorStatus', user_id: userId })
     });
-    
+
     const json = await response.json();
 
     document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
@@ -78,7 +78,7 @@ async function getServerData() {
         },
         body: JSON.stringify({ action: 'getServerData'})
     });
-    
+
     const json = await response.json();
 
     document.getElementById("target_json_output").innerText = JSON.stringify(json, null, 2);
