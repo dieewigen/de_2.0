@@ -103,7 +103,7 @@ if(isset($_REQUEST['level'])){
 
 //echo '<div class="info_box" style="font-size: 20px;">Dies sind die vorl�ufig geplanten Spezialisierungen. Vor Einbau wird um Feedback gebeten, damit diese ggf. noch angepa�t werden k�nnen. Bitte die Feedback-Funktion bei den News verwenden, oder im Forum im Spezialisierungen-Diskussionsthread posten.</div><br>';
 
-rahmen_oben('Spezialisierung <img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" title="Die einzelnen Spezialisierungen werden mit Hilfe von Errungenschaften freigeschaltet. Die Zahl gibt an wie viele Errungenschaften ben&ouml;tigt werden. Nach der Freischaltung kann eine von den jeweils drei Spezialisierungen gew&auml;hlt werden.">');
+rahmen_oben('Spezialisierung <img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" title="Die einzelnen Spezialisierungen werden mit Hilfe von Errungenschaften freigeschaltet. Die Zahl gibt an wie viele Errungenschaften ben&ouml;tigt werden. Nach der Freischaltung kann eine von den jeweils drei Spezialisierungen gew&auml;hlt werden.">');
 echo '<div class="bgpic3" style="width: 566px; height: 432px; position: relative;">';
 
 $specboni=array(2,2,10,1,10);
@@ -156,7 +156,7 @@ for($i=0;$i<5;$i++){
 	if($spec[$i]==1 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
 	if($spec[$i]==1){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
 	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[0].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.$_SESSION['ums_gpfad'].'g/symbol21.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
+	'.$link[0].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol21.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
 	<div title="'.$specdesc[0][$i].$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2; font-weight: bold; font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
 	'.$linkende.
 	'</div>';
@@ -166,7 +166,7 @@ for($i=0;$i<5;$i++){
 	if($spec[$i]==2 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
 	if($spec[$i]==2){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
 	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[1].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.$_SESSION['ums_gpfad'].'g/symbol22.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
+	'.$link[1].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol22.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
 	<div title="'.$specdesc[1][$i].$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2; font-weight: bold;  font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
 	'.$linkende.
 	'</div>';
@@ -183,7 +183,7 @@ for($i=0;$i<5;$i++){
 	if($spec[$i]==3 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
 	if($spec[$i]==3){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
 	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[2].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.$_SESSION['ums_gpfad'].'g/symbol23.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
+	'.$link[2].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol23.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
 	<div title="'.$specdesc[2][$i].$bonuswert.$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2;  font-weight: bold; font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
 	'.$linkende.
 	'</div>';

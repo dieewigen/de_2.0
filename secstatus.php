@@ -155,7 +155,7 @@ if ($_SESSION['ums_mobi'] == 1) {
 <td><div class="cell"><?php echo $ss_lang['status'];?></div></td>
 <td><div class="cell"><?php echo $ss_lang['zeit'];?></div></td>
 <td><div class="cell"><?php echo $ss_lang['schiffe'];?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
+<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
 <td><div class="cell"><?php echo $ss_lang['aktion'];?></div></td>
 </tr>
 
@@ -371,16 +371,16 @@ for ($i = 0; $i < $fa; $i++) {
 
     $rasse = '&nbsp;';
     if ($rasse_id == 1) {
-        $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+        $rasse = '<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
     }
     if ($rasse_id == 2) {
-        $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+        $rasse = '<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
     }
     if ($rasse_id == 3) {
-        $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+        $rasse = '<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
     }
     if ($rasse_id == 4) {
-        $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+        $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
     }
 
     //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
@@ -622,7 +622,7 @@ if (count($sc) > 0) {
         echo '<td width="100" class="tc"><b>'.$ss_lang['inc'].'</td>';
         echo '<td width="100" class="tc"><b>'.$ss_lang['def'].'</td>';
         //echo '<td width="90" class="tc"><b>'.$ss_lang['def'].'(3)</td>';
-        echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+        echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
         echo '<td width="80" class="tc"><b>'.$ss_lang['angreifer'].'</td>';
         echo '<td width="80" class="tc"><b>'.$ss_lang['verteidiger'].'</td>';
         echo '</tr>';
@@ -819,7 +819,7 @@ if (count($sc) > 0) {
 <td><div class="cell"><?php echo $ss_lang['status']?></div></td>
 <td><div class="cell"><?php echo $ss_lang['zeit']?></div></td>
 <td><div class="cell"><?php echo $ss_lang['schiffe']?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten werden mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
+<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten werden mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
 </tr>
 
 
@@ -1075,7 +1075,7 @@ if ($ownally != '') {
 <td><div class="cell"><?php echo $ss_lang['status'];?></div></td>
 <td><div class="cell"><?php echo $ss_lang['zeit'];?></div></td>
 <td><div class="cell"><?php echo $ss_lang['schiffe'];?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
+<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
 <td><div class="cell"><?php echo $ss_lang['aktion'];?></div></td>
 </tr>
 
@@ -1291,16 +1291,16 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
 
         $rasse = '&nbsp;';
         if ($rasse_id == 1) {
-            $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+            $rasse = '<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
         }
         if ($rasse_id == 2) {
-            $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+            $rasse = '<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
         }
         if ($rasse_id == 3) {
-            $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+            $rasse = '<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
         }
         if ($rasse_id == 4) {
-            $rasse = '<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+            $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
         }
 
         //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
@@ -1441,7 +1441,7 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             echo '<td width="100" class="tc"><b>'.$ss_lang['inc'].'</td>';
             echo '<td width="100" class="tc"><b>'.$ss_lang['def'].'</td>';
             //echo '<td width="90" class="tc"><b>'.$ss_lang['def'].'(3)</td>';
-            echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+            echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
             echo '<td width="80" class="tc"><b>'.$ss_lang['angreifer'].'</td>';
             echo '<td width="80" class="tc"><b>'.$ss_lang['verteidiger'].'</td>';
             echo '</tr>';

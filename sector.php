@@ -154,7 +154,7 @@ if($sf==666){
 	echo '
 	<div class="cell" style="display: flex; width: 597px; border: 1px solid #333333; padding: 4px; margin-bottom: 20px;">
     	<div style="background-color: #000000; width: 50px; height: 50px;">
-			<img src="'.$_SESSION['ums_gpfad'].'g/symbol12.png" border="0" title="Info">
+			<img src="'.'gp/'.'g/symbol12.png" border="0" title="Info">
 		</div>
     
 		<div style="flex-grow: 1; padding: 10px;">
@@ -229,7 +229,7 @@ if($sec_data['npc']==1){
     //hinweistext für npc-sektoren
 	echo '<div class="cell" style="position: relative; width: 590px; border: 1px solid #333333; padding: 4px;">';
     echo '<div style="background-color: #000000; width: 50px; height: 50px; position: relative; float: left;">
-      <img src="'.$_SESSION['ums_gpfad'].'g/symbol12.png" border="0" title="Info">
+      <img src="'.'gp/'.'g/symbol12.png" border="0" title="Info">
     </div>';    
     
     echo '<div style="width: 540px; height: 70px; position: relative;">'.
@@ -391,7 +391,7 @@ if($sec_data['npc']==1){
 		//rang
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
-    	$rang="<img src='".$_SESSION['ums_gpfad'].'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
+    	$rang="<img src='".'gp/'.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
 		$output.='<td class="cell tac">'.$rang.'</td>';
 		
 		
@@ -447,10 +447,10 @@ if($sec_data['npc']==1){
 		
 		if($knowrasse==1)
 		{
-			if($row['rasse']==1)$rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-			if($row['rasse']==2)$rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-			if($row['rasse']==3)$rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
-			if($row['rasse']==4)$rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+			if($row['rasse']==1)$rasse='<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+			if($row['rasse']==2)$rasse='<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+			if($row['rasse']==3)$rasse='<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+			if($row['rasse']==4)$rasse='<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
 		}
 		
 		$output.='<td class="cell tac">'.$rasse.'</td>';
@@ -553,7 +553,7 @@ if($sec_data['npc']==1){
 		////////////////////////////////////////////////////////////////////////
 		
 		$aktion='<a href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Sonde starten">S</a> <a href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'" title="Agenteneinsatz">A</a> <a href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">F</a> ';
-		$aktion.='<a href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'"><img src="'.$_SESSION['ums_gpfad'].'g/ps_'.$playerstatus.'.gif" border="0" title="Geheimdienstinformationen"></a>';
+		$aktion.='<a href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'"><img src="'.'gp/'.'g/ps_'.$playerstatus.'.gif" border="0" title="Geheimdienstinformationen"></a>';
 		
 		$output.='<td class="cell tac" style="font-size: 10pt;">'.$aktion.'</td>';
 		
@@ -635,7 +635,7 @@ if($sec_data['npc']==1){
       
     $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font>&'.$desc;
       
-    $artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.$_SESSION['ums_gpfad'].'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
+    $artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
     $c++;
   }
   if($artstr=='')$artstr='&nbsp;';
@@ -650,7 +650,7 @@ if($sec_data['npc']==1){
   	if($sec_data['techs'][5]>0)$srbstr.='<br>- '.$sec_lang['sekbldg4'];
   	
   	$stip = $sec_lang['sektorraumbasis'].'&'.$srbstr;
-    $basestr='<a href="'.$_SESSION['ums_gpfad'].'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.$_SESSION['ums_gpfad'].'g/'.$bn.'" name="sb" title="'.$stip.'"></a>';
+    $basestr='<a href="'.'gp/'.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.'gp/'.'g/'.$bn.'" name="sb" title="'.$stip.'"></a>';
     //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen
     if($bed=='000')$basestr='&nbsp;';
    }

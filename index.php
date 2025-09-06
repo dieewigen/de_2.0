@@ -21,7 +21,6 @@ if (!isset($_COOKIE["loginhelp"])) {
 }
 
 $fehlermsg = '';
-$_SESSION['ums_gpfad'] = '';
 $_SESSION['ums_rasse'] = 1;
 
 //wenn die variable logout gesetzt ist, dann ausloggen und session zerstören
@@ -163,10 +162,6 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT submit, gpfad FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]) or die(mysqli_error($GLOBALS['dbi']));
             $row = mysqli_fetch_array($result);
             $ums_submit = $row["submit"];
-            $_SESSION['ums_gpfad'] = $row["gpfad"];
-            if (($_SESSION['ums_gpfad'] == '') || ($_REQUEST['grapa'] == "off")) {
-                $_SESSION['ums_gpfad'] = $sv_image_server;
-            }
 
             //vote
             $schonabgestimmt = mysqli_execute_query($GLOBALS['dbi'], "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?", [$_SESSION['ums_user_id']]) or die(mysqli_error($GLOBALS['dbi']));
@@ -212,7 +207,6 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             $_SESSION['ums_rasse'] = $_SESSION['ums_rasse'];
 
             $_SESSION['ums_submit'] = $ums_submit;
-            $_SESSION['ums_gpfad'] = $_SESSION['ums_gpfad'];
             $_SESSION['ums_vote'] = $ums_vote;
             $_SESSION['ums_premium'] = $ums_premium;
             //$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;

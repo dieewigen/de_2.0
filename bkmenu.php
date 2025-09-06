@@ -858,7 +858,7 @@ echo '</table>';
 rahmen_unten();
 
 
-echo '<input type="image" src="'.$_SESSION['ums_gpfad'].'g/e.gif" style="width:0; height=0; border:0px;">';
+echo '<input type="image" src="'.'gp/'.'g/e.gif" style="width:0; height=0; border:0px;">';
 echo '</form>';
 echo '<form action="bkmenu.php" method="post">';
 

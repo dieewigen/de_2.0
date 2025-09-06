@@ -658,7 +658,7 @@ if (!hasTech($pt, 7)) {
     rahmen_oben($resource_lang['fehlendesgebaeude']);
     echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=7" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_7.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=7" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_7.jpg" border="0"></a></td>
 	<td valign="top">'.$resource_lang['gebaeudeinfo'].': '.$row_techcheck['tech_name'].'</td>
 	</tr>';
     echo '</table>';
@@ -684,7 +684,7 @@ if (!hasTech($pt, 7)) {
 <?php
       $bg = 'cell';
     echo '<tr valign="middle" align="center" height="20">';
-    echo '<td rowspan="3" class="cell"><img src="'.$_SESSION['ums_gpfad'].'g/kollie.gif" border="0" alt="'.$resource_lang['kolli'].'"></td>';
+    echo '<td rowspan="3" class="cell"><img src="'.'gp/'.'g/kollie.gif" border="0" alt="'.$resource_lang['kolli'].'"></td>';
     echo '<td class="'.$bg.'"><b>'.$resource_lang['vorhandenekollis'].'</b>:</td>';
     echo '<td class="'.$bg.'"><b>'.number_format($col, 0, "", ".").' ('.number_format($anzahl, 0, "", ".").$resource_lang['imbau'].')</b></td>';
     echo '</tr>';
@@ -750,7 +750,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($ea, 0, "", ".").' ('.number_format($col, 0, "", ".").' '.$resource_lang['kollis'].')</td>';
 echo '</tr>';
 
@@ -763,7 +763,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe2'].'"> + '.$resource_lang['sekartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe2'].'"> + '.$resource_lang['sekartibonus'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($sartefaktenergie, 0, "", ".").' ('.number_format($sartefakt, 2, ",", ".").' %)</td>';
 echo '</tr>';
 
@@ -776,7 +776,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($kartefaktenergie, 0, "", ".").' ('.$resource_lang['kriegsartefakte'].': '.$kartefakt.')</td>';
 echo '</tr>';
 
@@ -842,7 +842,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe7'].'"> '.$resource_lang['energieschluessel'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe7'].'"> '.$resource_lang['energieschluessel'].'</td>';
 echo '<td class="'.$bg.'">'.$st[0].'</td>';
 echo '<td class="'.$bg.'">'.$st[1].'</td>';
 echo '<td class="'.$bg.'">'.$st[2].'</td>';
@@ -866,7 +866,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieveteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt."> '.$resource_lang['energieinput'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieveteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt."> '.$resource_lang['energieinput'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($em, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ed, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ei, 0, "", ".")."</td>";
@@ -882,7 +882,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe8'].'"> '.$resource_lang['umwandlungsverh'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe8'].'"> '.$resource_lang['umwandlungsverh'].'</td>';
 echo '<td class="'.$bg.'">'.$emvm.':1</td>';
 echo '<td class="'.$bg.'">'.$emvd.':1</td>';
 echo '<td class="'.$bg.'">'.$emvi.':1</td>';
@@ -898,7 +898,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde."> '.$resource_lang['materieoutput'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde."> '.$resource_lang['materieoutput'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($rm, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($rd, 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($ri, 0, "", ".")."</td>";
@@ -918,7 +918,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" 
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" 
 		border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe9'].'<br><br>Aus dem aktiven Dienst entlassene Geheimagenten ('.
       number_format($agent_lost, 0, "", ".").') werden als Zollkontrolleure eingesetzt und sorgen f&uuml;r ein zus&auml;tzliches Einkommen.<br>
 		Grundwert: '.
@@ -958,7 +958,7 @@ $resges[3] += $zolle;
 /*
   if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
   echo '<tr valign="middle" align="center" height="25">';
-  echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Handel&Einkommen aus Handelsrouten"> + Handel</td>';
+  echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Handel&Einkommen aus Handelsrouten"> + Handel</td>';
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[0], 0,"",".")."</td>";
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[1], 0,"",".")."</td>";
   echo '<td class="'.$bg.'">'.number_format($ertrag_handel[2], 0,"",".")."</td>";
@@ -979,7 +979,7 @@ if ($c1 == 0) {
     $bg = 'cell';
 }
 echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe10'].'"> '.$resource_lang['plussekartibonus'].'</td>';
+echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe10'].'"> '.$resource_lang['plussekartibonus'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($sa_grund[0], 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($sa_grund[1], 0, "", ".")."</td>";
 echo '<td class="'.$bg.'">'.number_format($sa_grund[2], 0, "", ".")."</td>";
@@ -1026,7 +1026,7 @@ echo '</tr>';
 // rohstoffhandel - eingabemöglichkeit
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-rahmen_oben('Allianz-Notfallrohstoffkonverter <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
+rahmen_oben('Allianz-Notfallrohstoffkonverter <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
 title="Hier k&ouml;nnen Rohstoffe umgewandelt werden.&Verlustleistung: '.($handelssteuersatz).'%'.'">');
 
 echo '<div class="cell" style="width: 560px; text-align: center;">';
@@ -1097,7 +1097,7 @@ if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlu
 	<td width="20px">&nbsp;</td>
 	<td align="center">'.$resource_lang['uebersichtseklager'].'</td>
 	<td width="20px"><img style="vertical-align: middle;" src="'.
-        $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['sektorkosten'].'&'.$btipstr.'"></td>
+        'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['sektorkosten'].'&'.$btipstr.'"></td>
 	</tr></table>
 	
 	</td>';

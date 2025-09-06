@@ -354,7 +354,7 @@ if(!hasTech($pt,29)){
 	$content.='
 	<table width="572" border="0" cellpadding="0" cellspacing="0">
 		<tr align="left" class="cell">
-			<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=29" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_29.jpg" border="0"></a></td>
+			<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=29" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_29.jpg" border="0"></a></td>
 			<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 		</tr>
 	</table>';
@@ -374,7 +374,7 @@ if(!hasTech($pt,29)){
 	}
 
 	//Missionen anzeigen
-	$content.=rahmen_oben('Missionen <img style="margin-bottom: 2px;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br>Eingesetzte Agenten sind während der Mission nicht verfügbar. Nach der Beendiung der Mission werden diese jedoch wieder zurückerstattet.">',false);
+	$content.=rahmen_oben('Missionen <img style="margin-bottom: 2px;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br>Eingesetzte Agenten sind während der Mission nicht verfügbar. Nach der Beendiung der Mission werden diese jedoch wieder zurückerstattet.">',false);
 	$content.='<div style="width: 572px;">';
 
 	///////////////////////////////////////////////////////////

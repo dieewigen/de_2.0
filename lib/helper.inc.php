@@ -456,7 +456,7 @@ if($helper_dontshow==0)
   rahmen_oben('Fluxurion der Berater');
 
   echo '<div class="cell" style="width: 570px; height: 256px; font-size: 14px; position: relative;">';
-  echo '<div style="float: left;"><img src="'.$_SESSION['ums_gpfad'].'g/berater'.$helper_picid.'.png" border="0"></div>';
+  echo '<div style="float: left;"><img src="gp/g/berater'.$helper_picid.'.png" border="0"></div>';
   echo $helper_msg;
 
   //zur�ck/weiter-buttons

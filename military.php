@@ -917,7 +917,7 @@ if ($techs[13]==0 AND 1==2){
 	rahmen_oben($military_lang['fehlendesgebaeude']);
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
 	<td valign="top">'.$military_lang['gebaeudeinfo'].': '.$row_techcheck['tech_name'].'</td>
 	</tr>';
 	echo '</table>';
@@ -937,7 +937,7 @@ echo '
 <tr height="37">
 <td width="13" height="37" class="rol">&nbsp;</td>
 <td align="center" class="ro"><div class="cellu">'.$military_lang['fleetaufstellung'].' <img title="'.$ranginfo.'" src="'.
-  $_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></div></td>
+  'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></div></td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
 <tr>
@@ -971,10 +971,10 @@ echo '
   //echo '<table border="0" cellpadding="0" cellspacing="1" width="500" bgcolor="#000000">';
   echo '<tr align="center">';
   echo '<td class="tc">&nbsp;</td>';
-  echo '<td class="tc">'.$military_lang['heimatflotte'].' <img title="'.$flottentooltip[0].'" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
-  echo '<td class="tc">'.$military_lang['flotte1'].' <img title="'.$flottentooltip[1].'" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
-  echo '<td class="tc">'.$military_lang['flotte2'].' <img title="'.$flottentooltip[2].'" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
-  echo '<td class="tc">'.$military_lang['flotte3'].' <img title="'.$flottentooltip[3].'" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+  echo '<td class="tc">'.$military_lang['heimatflotte'].' <img title="'.$flottentooltip[0].'" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+  echo '<td class="tc">'.$military_lang['flotte1'].' <img title="'.$flottentooltip[1].'" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+  echo '<td class="tc">'.$military_lang['flotte2'].' <img title="'.$flottentooltip[2].'" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
+  echo '<td class="tc">'.$military_lang['flotte3'].' <img title="'.$flottentooltip[3].'" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
   echo '</tr>';
   //echo '</table>';
 
@@ -1026,7 +1026,7 @@ echo '
 
 	echo '<tr>';
 	//heimatflotte
-	echo '<td class="cl">&nbsp;<img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$mtip[$c1-1].'">&nbsp;'.getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'</td>';
+	echo '<td class="cl">&nbsp;<img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$mtip[$c1-1].'">&nbsp;'.getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'</td>';
 	echo '<td class="cc" id="m'.$c1.'_0">'.number_format($e0, 0,"",".").'</td>';
 	//flotte 1
 	if($fleet_a[1]!=0){$h1=number_format($e1, 0,"",".");$h2='style="display: none;"';}else{$h1='';$h2='';}

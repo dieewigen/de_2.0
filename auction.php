@@ -81,7 +81,7 @@ if (!hasTech($pt, 4)) {
     $content .= rahmen_oben('Fehlende Technologie', false);
     $content .= '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     $content .= '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=4" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_4.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=4" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_4.jpg" border="0"></a></td>
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
 	</tr>';
     $content .= '</table>';
@@ -281,7 +281,7 @@ if (!hasTech($pt, 4)) {
                     }
 
                     $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.$_SESSION['ums_gpfad'].'g/arte'.$artid.'.gif"></div>';
+                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.'gp/'.'g/arte'.$artid.'.gif"></div>';
                     $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.$ua_name[$reward[1] - 1].$tradesystemscore_str.'</div>';
                     $artikel .= '</div>';
                     break;

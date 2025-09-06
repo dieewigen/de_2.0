@@ -84,7 +84,7 @@ if(!hasTech($pt,25)){
 	rahmen_oben('Fehlende Technologie');
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=28" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_25.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=28" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_25.jpg" border="0"></a></td>
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 	</tr>';
 	echo '</table>';

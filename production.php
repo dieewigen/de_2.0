@@ -344,13 +344,13 @@ include "resline.php";
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
 echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.$_SESSION['ums_gpfad'].'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$_SESSION['ums_gpfad'].'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
+<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
+<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
 if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems != 1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.$_SESSION['ums_gpfad'].'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
+	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
 }
 echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$_SESSION['ums_gpfad'].'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
+<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
 ';
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
@@ -375,7 +375,7 @@ if ($techs[13]==0){
 	rahmen_oben($production_lang[fehlendesgebaeude]);
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
 	<td valign="top">'.$production_lang[gebaeudeinfo].': '.$row_techcheck[tech_name].'</td>
 	</tr>';
 	echo '</table>';
@@ -479,7 +479,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	//zwischen Flotte und Verteidigung eine Zeile einf�gen
 	if($row['tech_id']==100){
 		echo '<tr valign="middle" align="center" height="25"><td class="'.$bg.'" height="25" colspan="9" align="left"><b>
-		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$defstatus.'">
+		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$defstatus.'">
 		&nbsp;-&nbsp;Baukostenreduzierung: '.number_format($artbonus_def, 2,",",".").'% (max. 5,00%)</b></td></tr>';
 		if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
 	}
@@ -809,7 +809,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 			//die genutze Kapazität aus der DB holen
 
-			echo '<div style="flex-grow: 1; font-size: 16px;"><img src="'.$_SESSION['ums_gpfad'].'g/r/'.$GLOBALS['map_buildings'][$g]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$g]['name'].'"> '.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $GLOBALS['map_buildings'][$g]['factory_id'])).'/'.intval($max).'</div>';
+			echo '<div style="flex-grow: 1; font-size: 16px;"><img src="'.'gp/'.'g/r/'.$GLOBALS['map_buildings'][$g]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$g]['name'].'"> '.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $GLOBALS['map_buildings'][$g]['factory_id'])).'/'.intval($max).'</div>';
 		}
 	}
 
@@ -849,7 +849,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 					$values=explode("x", $einzel);
 					$factory_id=str_replace("P", "", $values[0]);
 
-					$fabrikkosten.='<br>'.$values[1].' <img src="'.$_SESSION['ums_gpfad'].'g/r/'.$factory_id.'_g.gif" style="width: auto; height: 16px;">';
+					$fabrikkosten.='<br>'.$values[1].' <img src="'.'gp/'.'g/r/'.$factory_id.'_g.gif" style="width: auto; height: 16px;">';
 				}
 			}
 

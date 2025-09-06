@@ -2,10 +2,6 @@
 //hier befinden sich alle globalen servervariablen
 //format: $sv_description=wert;
 
-//server auf dem die grafiken liegen
-$sv_image_server='';
-$sv_image_server_list[]='gp/';
-
 //gewinnpunktzahl
 $sv_winscore=33333;
 

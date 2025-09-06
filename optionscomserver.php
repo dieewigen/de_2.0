@@ -35,13 +35,13 @@ if($sv_comserver!=1)die('</body></html>');
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 
-$hs='<div style="width: 586px; border: 1px solid #666666; background-image:url('.$_SESSION['ums_gpfad'].'g/bgpic4.jpg); color: #FFFFFF; padding: 5px;">';
+$hs='<div style="width: 586px; border: 1px solid #666666; background-image:url('.'gp/'.'g/bgpic4.jpg); color: #FFFFFF; padding: 5px;">';
    
 //info
-$hs.='<a href="optionscomserver.php?showhelp=1"><img id="comserv1" title="Community Server&Auf diesem Server bestimmen die Spieler die Regeln.<br><br>Klicke um mehr Informationen zu erhalten." src="'.$_SESSION['ums_gpfad'].'g/symbol14.png" width="48px" height="48px"></a>';
+$hs.='<a href="optionscomserver.php?showhelp=1"><img id="comserv1" title="Community Server&Auf diesem Server bestimmen die Spieler die Regeln.<br><br>Klicke um mehr Informationen zu erhalten." src="'.'gp/'.'g/symbol14.png" width="48px" height="48px"></a>';
 //server konfigurieren
         
-$hs.='<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="'.$_SESSION['ums_gpfad'].'g/symbol15.png" width="48px" height="48px"></a>';
+$hs.='<a href="optionscomserver.php"><img id="comserv1" title="Community Server konfigurieren&Klicke um Deine Einstellungen zu w&auml;hlen."src="'.'gp/'.'g/symbol15.png" width="48px" height="48px"></a>';
 $hs.='</div><br>';
       
 echo ($hs);
@@ -456,7 +456,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Wirtschaftstick&Er wird immer zur vollen Stunde ausgef&uuml;hrt und dann, wie hier festgelegt, alle x Minuten bis zur n&auml;chsten vollen Stunde.
-  <br><br>Erlaubte Werte: 1 bis 15 (Standard: 3)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 15 (Standard: 3)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Alle wie viele Minuten soll der Wirtschaftstick ausgef&uuml;hrt werden?
   <br>Tageswert: '.$sv_comserver_wt.' - Aktuelle Abstimmung: '.$server_v1.' - Deine Wahl: <input type="number" min="1" max="15" name="v1" value="'.$playervalues['v1'].'" size="10" maxlength="10">   
   </div>';
@@ -465,7 +465,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kampftick&Er wird immer zur vollen Stunde ausgef&uuml;hrt und dann, wie hier festgelegt, alle x Minuten bis zur n&auml;chsten vollen Stunde.
-  <br><br>Erlaubte Werte: 1 bis 60 (Standard: 12)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 60 (Standard: 12)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Alle wie viele Minuten soll der Kampftick ausgef&uuml;hrt werden?
   <br>Tageswert: '.$sv_comserver_kt.' - Aktuelle Abstimmung: '.$server_v2.' - Deine Wahl: <input type="number" min="1" max="60" name="v2" value="'.$playervalues['v2'].'" size="10" maxlength="10">   
   </div>';  
@@ -474,7 +474,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Rundendauer&Sie wird in Wirtschaftsticks gemessen und sobald die Zeit um ist, beginnt die Erhabenenhaltezeit zu laufen.
-  <br><br>Erlaubte Werte: 5000 bis 70000 (Standard: 33333)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 5000 bis 70000 (Standard: 33333)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie viele Wirtschaftsticks soll die Runde laufen?
   <br>Tageswert: '.$sv_winscore.' - Aktuelle Abstimmung: '.$server_v3.' - Deine Wahl: <input type="number" min="5000" max="70000" name="v3" value="'.$playervalues['v3'].'" size="10" maxlength="10">   
   </div>';  
@@ -483,7 +483,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Erhabenenhaltezeit&Sie wird in Wirtschaftsticks gemessen und sobald die Zeit um ist, ist die Runde vorbei.
-  <br><br>Erlaubte Werte: 480 bis 2880 (Standard: 960)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 480 bis 2880 (Standard: 960)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie lang soll die Erhabenenhaltezeit sein?
   <br>Tageswert: '.$sv_benticks.' - Aktuelle Abstimmung: '.$server_v4.' - Deine Wahl: <input type="number" min="480" max="2880" name="v4" value="'.$playervalues['v4'].'" size="10" maxlength="10">   
   </div>';
@@ -492,7 +492,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Inaktivenentfernung&Inaktive Spieler werden nach der angegebenen Zeit in Sektor 1 verschoben.
-  <br><br>Erlaubte Werte: 3 bis 10 (Standard: 7)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 3 bis 10 (Standard: 7)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Nach wie vielen Tagen sollen inaktive Spieler in Sektor 1 verschoben werden?
   <br>Tageswert: '.$sv_inactiv_deldays.' - Aktuelle Abstimmung: '.$server_v5.' - Deine Wahl: <input type="number" min="3" max="10" name="v5" value="'.$playervalues['v5'].'" size="10" maxlength="10">   
   </div>';
@@ -501,7 +501,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Angriffspunktegrenze&<br>Bis zu diesem Prozentwert der eigenen Punkte kann man Ziele angreifen.<br>Diese Grenze kann durch den Handel manipuliert werden und ist somit umgehbar und nicht sicher.
-  <br><br>Erlaubte Werte: 10 bis 70 (Standard: 40)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 10 bis 70 (Standard: 40)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die Angriffspunktegrenze sein?
   <br>Tageswert: '.($sv_attgrenze*100).'% - Aktuelle Abstimmung: '.$server_v6.'% - Deine Wahl: <input type="number" min="10" max="70" name="v6" value="'.$playervalues['v6'].'" size="10" maxlength="10">%   
   </div>';
@@ -510,7 +510,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Sektorangriffsgrenzenmalus (Punkte)&<br>F&uuml;r Angriffe auf Sektoren die im Sektorranking unter dem des eigenen Sektors stehen gilt dieser Malus auf die Angriffspunktegrenze. Diese Prozente verteilen sich &uuml;ber alle vorhandenen Spielersektoren, w&auml;ren also bei einer Sektoranzahl von 100 und 20% gleich 0,2% pro Sektor.<br>Diese Grenze kann durch den Handel manipuliert werden und ist somit umgehbar und nicht sicher.
-  <br><br>Erlaubte Werte: 1 bis 40 (Standard: 20)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 40 (Standard: 20)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll der Sektorangriffsgrenzenmalus (Punkte) sein?
   <br>Tageswert: '.($sv_sector_attmalus*100).'% - Aktuelle Abstimmung: '.$server_v7.'% - Deine Wahl: <input type="number" min="1" max="40" name="v7" value="'.$playervalues['v7'].'" size="10" maxlength="10">%   
   </div>';  
@@ -520,7 +520,7 @@ else //einstellungsmöglichkeiten anzeigen
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Maximimale Angriffskollektorengrenze&<br>Bis zu diesem Prozentwert (kann nicht unter die minimale Angriffskollektorgrenze fallen) der eigenen Kollektoren kann man Kollektoren von Zielen erhalten.<br>
   Je weniger Kollektoren man hat, desto geringer f&auml;llt auch die Grenze f&uuml;r einen selbst aus. Formel: Eigene Kollektorzahl / gr&ouml;te Kollektorzahl eines Spielers * Maximalwert der Kollektorangriffsgrenze 
-  <br><br>Erlaubte Werte: 1 bis 70 (Standard: 35)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 70 (Standard: 35)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die Angriffskollektorengrenze maximal sein?
   <br>Tageswert: '.($sv_max_col_attgrenze*100).'% - Aktuelle Abstimmung: '.$server_v8.'% - Deine Wahl: <input type="number" min="1" max="70" name="v8" value="'.$playervalues['v8'].'" size="10" maxlength="10">%   
   </div>';  
@@ -530,7 +530,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Minimale Angriffskollektorengrenze&<br>Bis zu diesem Prozentwert der eigenen Kollektoren kann man Kollektoren von Zielen erhalten.<br>
-  <br><br>Erlaubte Werte: 1 bis 40 (Standard: 20)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 40 (Standard: 20)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die Angriffskollektorengrenze mindestens sein?
   <br>Tageswert: '.($sv_min_col_attgrenze*100).'% - Aktuelle Abstimmung: '.$server_v9.'% - Deine Wahl: <input type="number" min="1" max="40" name="v9" value="'.$playervalues['v9'].'" size="10" maxlength="10">%   
   </div>';  
@@ -539,7 +539,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Planetarer Schild&<br>Die T&uuml;rme erhalten die angegebenen Prozent mehr Stabilit&auml;t und es &uuml;berleben immer mindestens die angegebene Prozentzahl.<br>
-  <br><br>Erlaubte Werte: 1 bis 20 (Standard: 10)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 20 (Standard: 10)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die St&auml;rke des Planetaren Schildes sein?
   <br>Tageswert: '.$sv_ps_bonus.'% - Aktuelle Abstimmung: '.$server_v10.'% - Deine Wahl: <input type="number" min="1" max="20" name="v10" value="'.$playervalues['v10'].'" size="10" maxlength="10">%   
   </div>';  
@@ -548,7 +548,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Recyclotronertrag&<br>Der Prozentwert gibt an, wie viel der eigenen Flotte bei K&auml;mpfen im Heimatsystem recycelt werden kann. Der maximale Wert Recyclotrons mit allen Boni liegt bei 80%.<br>
-  <br><br>Erlaubte Werte: 1 bis 30 (Standard: 15)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 30 (Standard: 15)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die St&auml;rke des Recyclotrons ohne Weltraumhandelsgilde sein?
   <br>Tageswert: '.$sv_recyclotron_bonus.'% - Aktuelle Abstimmung: '.$server_v11.'% - Deine Wahl: <input type="number" min="1" max="30" name="v11" value="'.$playervalues['v11'].'" size="10" maxlength="10">%   
   </div>';  
@@ -557,7 +557,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Recyclotronertrag&<br>Der Prozentwert gibt an, wie viel der eigenen Flotte bei K&auml;mpfen im Heimatsystem recycelt werden kann. Dieser Wert kann nicht kleiner sein als der Wert ohne Weltraumhandelsgilde. Der maximale Wert des Recyclotrons mit allen Boni liegt bei 80%.<br>
-  <br><br>Erlaubte Werte: 1 bis 60 (Standard: 30)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 60 (Standard: 30)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll die St&auml;rke des Recyclotrons mit Weltraumhandelsgilde sein?
   <br>Tageswert: '.$sv_recyclotron_bonus_whg.'% - Aktuelle Abstimmung: '.$server_v12.'% - Deine Wahl: <input type="number" min="1" max="60" name="v12" value="'.$playervalues['v12'].'" size="10" maxlength="10">%   
   </div>';  
@@ -566,7 +566,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kollektoreroberungsrate&<br>Der Prozentwert gibt an, wie viele Kollektoren pro Angriffswelle erobert werden k&ouml;nnen.<br>
-  <br><br>Erlaubte Werte: 5 bis 25 (Standard: 15)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 5 bis 25 (Standard: 15)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie viel Prozent der Kollektoren sollen pro Angriff eroberbar sein?
   <br>Tageswert: '.($sv_kollie_klaurate*100).'% - Aktuelle Abstimmung: '.$server_v13.'% - Deine Wahl: <input type="number" min="5" max="25" name="v13" value="'.$playervalues['v13'].'" size="10" maxlength="10">%   
   </div>';
@@ -575,7 +575,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kollektorenergie&<br>Der Wert gibt an, wie viele Energie ein Kollektor pro Wirtschaftstick liefert.<br>
-  <br><br>Erlaubte Werte: 50 bis 150 (Standard: 100)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 50 bis 150 (Standard: 100)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll der Energieertrag eines Kollektors sein?
   <br>Tageswert: '.$sv_kollieertrag.' - Aktuelle Abstimmung: '.$server_v14.' - Deine Wahl: <input type="number" min="50" max="150" name="v14" value="'.$playervalues['v14'].'" size="10" maxlength="10">   
   </div>';
@@ -584,7 +584,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kollektorenergie-Premiumaccount&<br>Der Wert gibt an, wie viele Energie ein Kollektor pro Wirtschaftstick liefert, wenn der Spieler einen Premiumaccount hat. Der Wert kann nicht kleiner sein als der Wert ohne Premiumaccount.<br>
-  <br><br>Erlaubte Werte: 50 bis 165 (Standard: 105)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 50 bis 165 (Standard: 105)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll der Energieertrag eines Kollektors mit Premiumaccount sein?
   <br>Tageswert: '.$sv_kollieertrag_pa.' - Aktuelle Abstimmung: '.$server_v15.' - Deine Wahl: <input type="number" min="50" max="165" name="v15" value="'.$playervalues['v15'].'" size="10" maxlength="10">   
   </div>';  
@@ -593,7 +593,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kriegsartefaktenergie&<br>Der Wert gibt an, wie viele Energie ein Kriegsartefakt pro Wirtschaftstick liefert<br>
-  <br><br>Erlaubte Werte: 50 bis 150 (Standard: 100)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 50 bis 150 (Standard: 100)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie hoch soll der Energieertrag eines Kriegsartefakts sein?
   <br>Tageswert: '.$sv_kriegsartefaktertrag.' - Aktuelle Abstimmung: '.$server_v16.' - Deine Wahl: <input type="number" min="50" max="150" name="v16" value="'.$playervalues['v16'].'" size="10" maxlength="10">   
   </div>';
@@ -602,7 +602,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kriegsartefakte f&uuml;r Erfahrungspunkte bei K&auml;mpfen (Angreifer)&<br>Der Wert gibt an f&uuml;r wie viel Erfahrungspunkten bei K&auml;mpfen man jeweils ein Kriegsartefakt erh&auml;lt. Je kleiner der Wert, desto mehr Kriegsartefakte werden vergeben.<br>
-  <br><br>Erlaubte Werte: 3000 bis 7000 (Standard: 5000)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 3000 bis 7000 (Standard: 5000)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   F&uuml;r wie viele Erfahrungspunkte bei K&auml;mpfen soll es jeweils ein Kriegsartefakt f&uuml;r Angreifer geben?
   <br>Tageswert: '.$sv_kartefakt_exp_atter.' - Aktuelle Abstimmung: '.$server_v17.' - Deine Wahl: <input type="number" min="3000" max="7000" name="v17" value="'.$playervalues['v17'].'" size="10" maxlength="10">   
   </div>';  
@@ -611,7 +611,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Kriegsartefakte f&uuml;r Erfahrungspunkte bei K&auml;mpfen (Verteidiger)&<br>Der Wert gibt an f&uuml;r wie viel Erfahrungspunkten bei K&auml;mpfen man jeweils ein Kriegsartefakt erh&auml;lt. Je kleiner der Wert, desto mehr Kriegsartefakte werden vergeben.<br>
-  <br><br>Erlaubte Werte: 3000 bis 7000 (Standard: 4500)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 3000 bis 7000 (Standard: 4500)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   F&uuml;r wie viele Erfahrungspunkte bei K&auml;mpfen soll es jeweils ein Kriegsartefakt f&uuml;r Verteidiger geben?
   <br>Tageswert: '.$sv_kartefakt_exp_deffer.' - Aktuelle Abstimmung: '.$server_v18.' - Deine Wahl: <input type="number" min="3000" max="7000" name="v18" value="'.$playervalues['v18'].'" size="10" maxlength="10">   
   </div>';  
@@ -620,7 +620,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Paleniumlagermenge&<br>Der Wert gibt an wie viel Palenium man maximal lagern kann.<br>
-  <br><br>Erlaubte Werte: 10 bis 400 (Standard: 100)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 10 bis 400 (Standard: 100)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie gro&szlig; soll das Paleniumlager maximal sein?
   <br>Tageswert: '.$sv_max_palenium.' - Aktuelle Abstimmung: '.$server_v19.' - Deine Wahl: <input type="number" min="10" max="400" name="v19" value="'.$playervalues['v19'].'" size="10" maxlength="10">   
   </div>';
@@ -648,7 +648,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Rundenart (Normal oder Battleround)&In der normalen Runde baut und erforscht man alles und versucht gr&ouml;&szliger zu werden, in der Battleround starten alle Spieler mit tausenden von Kollektoren und extrem vielen Rohstoffen. Die Battleround ist auf den Kampf ausgerichtet.<br><br>
-  Erlaubte Werte: Normal oder Battleround (Standard: Normal)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  Erlaubte Werte: Normal oder Battleround (Standard: Normal)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Soll die n&auml;chste Runde eine normale Runde oder eine Battleround sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  
@@ -669,7 +669,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Sektorart (Zufalls- oder Wahlsektoren)&Bei Zufallssektoren werden die Spieler zuf&auml;llig einem Sektor zugewiesen, sobald sie aus Sektor 1 kommen. Bei Wahlsektoren kann ein Spieler einen Sektor gr&uuml;nden und dann dorthin weitere Spieler einladen.
-  <br>Erlaubte Werte: Zufall oder Wahl (Standard: Zufall)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: Zufall oder Wahl (Standard: Zufall)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie sollen in der n&auml;chsten Runde die Sektoren sein (Zufall oder Wahl)?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';
@@ -679,7 +679,7 @@ else //einstellungsmöglichkeiten anzeigen
   if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Sektorgr&ouml;&szlig;e&<br>Der Wert gibt an, wie viele Spieler sich in einem Sektor befinden k&ouml;nnen.<br>
-  <br><br>Erlaubte Werte: 1 bis 20 (Standard: 10)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br><br>Erlaubte Werte: 1 bis 20 (Standard: 10)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Wie soll die Sektorgr&ouml;&szlig;e sein?
   <br>Aktuelle Runde: '.$sv_maxsystem.' - Aktuelle Abstimmung: '.$server_v23.' - Deine Wahl: <input type="number" min="1" max="20" name="v23" value="'.$playervalues['v23'].'" size="10" maxlength="10">   
   </div>';
@@ -699,7 +699,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Handel&&Uuml;ber den Handel k&ouml;nnen Raumschiffe und Rohstoffe gehandelt werden. Dar&uuml;ber ist auch eine Manipulation der Angriffspunktegrenze m&ouml;glich.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Soll der Handel aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  
@@ -719,7 +719,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Bonuspunkte&&Uuuml;ber Bonuspunkte k&ouml;nnen verschiedenste Boni erhalten werden.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Sollen Bonuspunkte aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  
@@ -739,7 +739,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Geheimdienst&Er dient dazu andere Spieler auszuspionieren und zu sabotieren.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Soll der Geheimdienst aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  
@@ -759,7 +759,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Schwarzmarkt&Dort k&ouml;nnen Ingamevorteile gegen Credits erworben werden.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Soll der Schwarzmarkt aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';
@@ -779,7 +779,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Sektorartefakte&Sie geben einem Sektore bestimmte Vorteile.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Sollen Sektorartefakte aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';
@@ -799,7 +799,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Missionen&Dort k&ouml;nnen Missionen gestartet werden.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Sollen Missionen aktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  
@@ -819,7 +819,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Vergessene Systeme&Dort k&ouml;nnen Geb&auml;ude gebaut und Rohstoffe gefunden werden. Zus&auml;tzlich gibt es die Battlegrounds.
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Sollen die Vergessenen Systeme inaktiv sein?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';
@@ -839,7 +839,7 @@ else //einstellungsmöglichkeiten anzeigen
     </select>';  
   echo '<div style="width: 100%; padding: 5px;" class="'.$bg.'">
   <img title="Flottenpunkte im Sektorstatus&Sollen die Flottenpunkte im Sektorstatus ausgeblendet werden?
-  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+  <br>Erlaubte Werte: ja oder nein (Standard: ja)" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
   Sollen die Flottenpunkte im Sektorstatus ausgeblendet werden?
   <br>Aktuelle Runde: '.$rundentyp.' - Aktuelle Abstimmung: '.$rundenwahl.' - Deine Wahl: '.$dropdown.'   
   </div>';  

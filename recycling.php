@@ -242,13 +242,13 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include 'resline.php';
 
 echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.$_SESSION['ums_gpfad'].'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.$_SESSION['ums_gpfad'].'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
+<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
+<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
 if($sv_deactivate_vsystems!=1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.$_SESSION['ums_gpfad'].'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
+	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
 }
 echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.$_SESSION['ums_gpfad'].'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
+<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
 ';
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
@@ -272,7 +272,7 @@ if(!hasTech($pt,129)){
 	rahmen_oben('Fehlende Technologie');
 	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
 	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
 	</tr>';
 	echo '</table>';
@@ -287,7 +287,7 @@ if(!hasTech($pt,129)){
   	echo '<form action="recycling.php" method="POST">';
 	
 	//optische ausgabe
-	rahmen_oben('Recycling  <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
+	rahmen_oben('Recycling  <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
 	title="Informationen&Die Einheiten werden sofort in ihre Bestandteile zerlegt und der Bau der neuen Einheiten beginnt.<br><br>
 	Dabei tritt ein gewisser Schwund auf:<br>Abzug bei Einheiten der 
 	Heimatflotte: '.($fleetabzug*100).'%<br>Abzug bei Verteidigungseinheiten: '.($defabzug*100).'%<br><br>&Uuml;bersch&uuml;ssige Teile gehen verloren, also sollten m&ouml;glichst gro&szlig;e Mengen recycelt werden, da sonst der prozentuale Verlust zu gro&szlig; werden kann.<br><br>Titanen-Energiekerne werden nicht zur&uuml;ckerstattet.">');

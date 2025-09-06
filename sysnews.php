@@ -372,7 +372,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
             $nachricht = $na[$werte[1]];
 
             echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
             echo '</tr>';
             echo '<tr style="text-align: left;">';
             echo '<td>'.$nachricht.'<br><br></td>';
@@ -380,7 +380,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
             break;
         case 50:
             echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
             echo '</tr>';
             echo '<tr style="text-align: left;">';
             echo '<td>'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
@@ -388,7 +388,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
             break;
         case 57: //Kampfbericht V1
             echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
             echo '</tr>';
             echo '<tr style="text-align: left;">';
             echo '<td>'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
@@ -396,7 +396,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
             break;
         case 70: //Battleground
             echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
             echo '</tr>';
             echo '<tr style="text-align: left;">';
             echo '<td>'.showkampfberichtBG($row["text"]).'</td>';
@@ -408,7 +408,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
                 $n = 50;
             }
             echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
+            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
             echo '</tr>';
             echo '<tr style="text-align: left;">';
             echo '<td>'.$row["text"].'<br><br></td>';

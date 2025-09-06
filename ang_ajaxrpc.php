@@ -392,10 +392,10 @@ if(isset($_REQUEST['getsectordata'])){
 
 
 				if($knowrasse==1){
-					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
-					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.($_SESSION['ums_gpfad'] ?? '').'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
+					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
+					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
 					$senddata[$sf][$system]['rasse']=$row['rasse'];
 				}else{
 					$senddata[$sf][$system]['rasse']=-1;
@@ -519,7 +519,7 @@ if(isset($_REQUEST['getsectordata'])){
 
 				$atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
 
-				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.($_SESSION['ums_gpfad'] ?? '').'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
+				$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.('gp/' ?? '').'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
 				$c++;
 			}
 

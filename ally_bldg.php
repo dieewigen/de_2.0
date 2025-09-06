@@ -366,7 +366,7 @@ if($num==1){
 				//////////////////////////////////////////			
 
 				echo '<div id="bc'.$i.'" title="'.$title.'" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-				echo '<span style="position: absolute; left: 0px; top: 0px; height: 50px; width: 100%;"><img src="'.$_SESSION['ums_gpfad'].'g/'.$def_allybldg[$i]['grafikfile'].'" border="0" alt="'.$def_allybldg[$i]['name'].'" width="100%" height="100%"></span>';
+				echo '<span style="position: absolute; left: 0px; top: 0px; height: 50px; width: 100%;"><img src="'.'gp/'.'g/'.$def_allybldg[$i]['grafikfile'].'" border="0" alt="'.$def_allybldg[$i]['name'].'" width="100%" height="100%"></span>';
 				echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$def_allybldg[$i]['haslevel'].'/'.$def_allybldg[$i]['maxlevel'].'</span>';
 				echo '</div>';
 				if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){

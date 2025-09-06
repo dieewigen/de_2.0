@@ -94,13 +94,13 @@ for ($i=0; $i<$numrows;$i++){
 
     $rasse='';
     if ($values['rasse'] == 1) {
-        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+        $rasse='<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
     } elseif ($values['rasse'] == 2) {
-        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+        $rasse='<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
     } elseif ($values['rasse'] == 3) {
-        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+        $rasse='<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
     } elseif ($values['rasse'] == 4) {
-        $rasse='<img src="'.$_SESSION['ums_gpfad'].'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+        $rasse='<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
     }	
 
     $fleet_gesamt = 0;

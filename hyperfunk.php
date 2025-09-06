@@ -793,7 +793,7 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
 
         if ($l != "new") {
             if ($row['gelesen'] == "0") {
-                $neuemsg = '<img src="' . $_SESSION['ums_gpfad'] . 'g/hfn/DENeu.gif" alt="'.$hyperfunk_lang['logo_neue_hfn'].'">';
+                $neuemsg = '<img src="' . 'gp/' . 'g/hfn/DENeu.gif" alt="'.$hyperfunk_lang['logo_neue_hfn'].'">';
             } else {
                 $neuemsg = "&nbsp;";
             }

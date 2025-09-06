@@ -350,7 +350,7 @@ if (!hasTech($pt, 9)) {
     rahmen_oben('Fehlende Technologie');
     echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=9" target="_blank"><img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_9.jpg" border="0"></a></td>
+	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=9" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_9.jpg" border="0"></a></td>
 	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
 	</tr>';
     echo '</table>';
@@ -2046,7 +2046,7 @@ if (!hasTech($pt, 9)) {
 
         $bg = 'cell';
         echo '<tr align="center">';
-        echo '<td class="'.$bg.'">'.number_format($agent, 0, "", ".").' <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$secret_lang['boni'].'&'.$bstr.'"></td>';
+        echo '<td class="'.$bg.'">'.number_format($agent, 0, "", ".").' <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$secret_lang['boni'].'&'.$bstr.'"></td>';
         echo '<td class="'.$bg.'"><input type="text" name="az" value="'.$agenten_einsetzen.'" size="5" maxlength="10" autocomplete="off"></td>';
 
         echo '<td class="'.$bg.'"><select name="etyp" size="0" onChange="sei(this.options[this.selectedIndex].value)">';
@@ -2203,7 +2203,7 @@ if (!hasTech($pt, 9)) {
     '<table border="0" cellpadding="0" cellspacing="0">
 	<tr height="37">
 	<td width="13" height="37" class="rol">&nbsp;</td>
-	<td width="208" class="ro"><div class="cellu">&nbsp;&nbsp;'.$secret_lang['sondenundaggis'].': <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$buildstatus.'"></div></td>
+	<td width="208" class="ro"><div class="cellu">&nbsp;&nbsp;'.$secret_lang['sondenundaggis'].': <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$buildstatus.'"></div></td>
 	<td width="50" align="center" class="ro"><div class="cellu">M</div></td>
 	<td width="50" align="center" class="ro"><div class="cellu">D</div></td>
 	<td width="50" align="center" class="ro"><div class="cellu">I</div></td>

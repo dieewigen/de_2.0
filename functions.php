@@ -1146,7 +1146,7 @@ function showeinheit_ang($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05,
 {
     global $tooltips;
 
-    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
@@ -1669,7 +1669,7 @@ function showtech2($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildg
 {
     global $functions, $sv_link;
 
-    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_'.$gebnr.'.jpg" border="0">';
+    $tooltip = '<img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_'.$gebnr.'.jpg" border="0">';
 
     echo '<tr valign="middle" align="center" height="25">';
 
@@ -1736,7 +1736,7 @@ function showeinheit($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $te
 {
     global $tooltips;
 
-    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
@@ -1761,7 +1761,7 @@ function showeinheit2($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $t
 {
     global $sv_link, $tooltips;
 
-    $tooltip = '<img src="'.$_SESSION['ums_gpfad'].'g/t/'.$_SESSION['ums_rasse'].'_'.$tech_id.'.jpg" border="0" title="'.$tooltips[$tooltipid].'">';
+    $tooltip = '<img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_'.$tech_id.'.jpg" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
     echo '<td align="left">';

@@ -43,7 +43,7 @@ include('ally/ally.menu.inc.php');
 if (strlen($message) > 0)
 {
 	print('<table width=600 class="cellu"><tr>');
-	print('<td width="30" align="left" valign="top"><img src="'.$_SESSION['ums_gpfad'].'g/trade/'.$_SESSION['ums_rasse'].'_arz.gif" alt="Information" border="0"> </td><td align="left"><font size="1">'.$message.'</font><br>');
+	print('<td width="30" align="left" valign="top"><img src="'.'gp/'.'g/trade/'.$_SESSION['ums_rasse'].'_arz.gif" alt="Information" border="0"> </td><td align="left"><font size="1">'.$message.'</font><br>');
 	print('</td></tr></table>');
 }
 
