@@ -791,8 +791,6 @@ echo '</table>';
 echo '</form>';
 echo '<form action="info.php?uid='.$uid.'" method="post">';
 
-if ($de_user_data["sector"]!=0 OR $sv_efta_in_de==1 OR $sv_sou_in_de==1)//wenn account aktiv
-{
   echo '<select name="mail" size="1" style="width:130px;">
   <option value="'.$det_email.'">'.$det_username.'</option>';
   for ($i=0;$i<$det_anz;$i++)
@@ -800,15 +798,6 @@ if ($de_user_data["sector"]!=0 OR $sv_efta_in_de==1 OR $sv_sou_in_de==1)//wenn a
 
   echo '</select>
   <input type="Submit" name="infostomail" value="Userinfos anfordern" style="width:130px;">';
-}
-else
-{
-  if ($de_user_data["system"]==1)
-  {
-    echo '<br>Account aktivieren:<br>';
-    echo '<input type="Submit" name="activateaccount" value="Account aktivieren">&nbsp;&nbsp;&nbsp;';
-  }
-}
 
 
 }

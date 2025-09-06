@@ -39,20 +39,7 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
     //zur�ck auf die ursprungsdatei weiterleiten
     if ($_SESSION['ums_bot_protection_filename'] == '') {
         $_SESSION['ums_bot_protection_filename'] = 'overview.php';
-
-        //wenn nur efta aktiv ist, dann auch nur efta-inhalte anzeigen
-        if ($sv_efta_in_de == 0) {
-            $_SESSION['ums_bot_protection_filename'] = 'eftaindex.php';
-        }
-
-        //wenn nur sou aktiv ist, dann auch nur sou-inhalte anzeigen
-        if ($sv_sou_in_de == 0) {
-            $_SESSION['ums_bot_protection_filename'] = 'sou_main.php';
-        }
     }
-
-    //efta-ajax-rpc
-    //$_SESSION['ums_bot_protection_filename'] = str_replace('efta_ajaxrpc.php', 'eftamain.php', $_SESSION['ums_bot_protection_filename']);
 
     header("Location: ".$_SESSION['ums_bot_protection_filename']);
 } else { //botschutz falsch beantwortet

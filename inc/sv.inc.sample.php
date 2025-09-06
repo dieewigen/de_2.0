@@ -2,14 +2,10 @@
 //hier befinden sich alle globalen servervariablen
 //format: $sv_description=wert;
 
-//datenbankdefinitionen
-$sv_database_de="de2bugtest";
-$sv_database_sou="sou_server_main";
-
 //server auf dem die grafiken liegen
 $sv_image_server='';
-//$sv_image_server_list[]='http://grafik-de.bgam.es/degp3v2/';
-$sv_image_server_list[]='https://www.die-ewigen.com/degp3v2/';
+$sv_image_server_list[]='gp/';
+
 //gewinnpunktzahl
 $sv_winscore=33333;
 //$sv_winscore=15000;
@@ -30,8 +26,6 @@ $sv_oscar=1;
 //zu haltende ticks
 $sv_benticks=2;
 
-//maximalzahl der spieler
-$sv_maxuser=10000;
 
 //maximalzahl der sektoren
 $sv_maxsector=20;
@@ -232,12 +226,8 @@ $sv_payserver=0;
 //ist efta in de integriert
 $sv_efta_in_de=1;
 
-//ist sou in de integriert
-$sv_sou_in_de=1;
-
 //flags zur deaktivierung einzelner spielelemente
 $sv_deactivate_efta=0;
-$sv_deactivate_sou=0;
 $sv_deactivate_trade=0;
 $sv_deactivate_sec1moveout=0;
 $sv_deactivate_kiatt=1;

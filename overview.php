@@ -61,7 +61,7 @@ WHERE user_id=? AND tick<1000000", [$_SESSION['ums_user_id']]);
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, sou_user_id, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -90,7 +90,6 @@ $actpoints = $row["actpoints"];
 $rundenpunkte = $row["roundpoints"];
 $kartefakt = $row["kartefakt"];
 $kgget = $row["kgget"];
-$sou_user_id = $row["sou_user_id"];
 $geteacredits = $row["geteacredits"];
 $geteftabonus = $row["geteftabonus"];
 $npcartefact = $row['npcartefact'];
@@ -832,11 +831,9 @@ for ($j = 0;$j <= 6;$j++) {
                 }
 
                 //EA Bonus
-                //if($sv_deactivate_sou==1){
                 if ($ac == 12) {
                     $ac++;
                 }
-                //}
 
                 //handelsaufgabe killen
                 if ($sv_deactivate_trade == 1) {

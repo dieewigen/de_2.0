@@ -107,9 +107,9 @@ if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
     echo ';';
     echo $rpc_lang['serverspielerid'].': '.$sv_server_tag.$user_id.'<br>';
     echo $rpc_lang['spielername'].': '.urlencode($spielername).'<br>'; 
-    if($sv_sou_in_de!=0 AND $sv_efta_in_de!=0)echo $rpc_lang['punkte'].': '.number_format($row["score"], 0,"",".").'<br>';
-    if($sv_sou_in_de!=0 AND $sv_efta_in_de!=0)echo $rpc_lang['accountalter'].': '.number_format($row["tick"], 0,"",".").'<br>';
-    if($sv_sou_in_de!=0 AND $sv_efta_in_de!=0)echo $rpc_lang['allianz'].': '.urlencode($allytag).'<br>';
+    echo $rpc_lang['punkte'].': '.number_format($row["score"], 0,"",".").'<br>';
+    echo $rpc_lang['accountalter'].': '.number_format($row["tick"], 0,"",".").'<br>';
+    echo $rpc_lang['allianz'].': '.urlencode($allytag).'<br>';
     echo $rpc_lang['credits'].': '.number_format($row["credits"], 0,"",".").'<br>';
     
     if($accstatus!=3)echo $rpc_lang['lastactive'].': '.$last_login.'<br>';
@@ -300,9 +300,6 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
 
   //wenn soweit alles ok ist den account anlegen
   //de_login
-  //wenn efta/sou allein steht, dann ist der account direkt aktiv
-  //if($sv_efta_in_de==1 AND $sv_sou_in_de==1)$status=0;else $status=1;
-
   //der Account ist jetzt immer direkt aktiv
   $status=1;
 
@@ -328,42 +325,40 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '')", [$user_id, $vorname, $nachname, $strasse, $plz, $ort, $land, $telefon, $tag, $monat, $jahr, $geschl]);
 
-  if($sv_efta_in_de==1 AND $sv_sou_in_de==1)
-  {
-    //de_user_fleet
-    $fleet_id=$user_id.'-0';
-    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
+  //de_user_fleet
+  $fleet_id=$user_id.'-0';
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
-    $fleet_id=$user_id.'-1';
-    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
-    $fleet_id=$user_id.'-2';
-    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
+  $fleet_id=$user_id.'-1';
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
+  $fleet_id=$user_id.'-2';
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
 
-    $fleet_id=$user_id.'-3';
-    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
-   
-    $time=strftime("%Y%m%d%H%M%S");
-    //späteinsteigerhilfe, gilt nicht in der ewigen runde
-    if($sv_ewige_runde!=1){
-      //zuerst schauen wieviel ticks bereits vergangen sind
-      $db_daten  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
-      $row = mysqli_fetch_array($db_daten);
-      $maxtick=$row["tick"];
-      if($maxtick>1){
-        //fix f�r br
-        if($maxtick>40000)$maxtick=40000;
-        //rohstoffe berechnen
-        $m=round($sv_plan_grundertrag[0]*($maxtick-1)/5);
-        $d=round($sv_plan_grundertrag[1]*($maxtick-1)/5);
-        //rohstoffe gutschreiben und nachrichten auf new setzen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, newnews=1 WHERE user_id=?", [$m, $d, $user_id]);
-        //nachricht hinterlegen
-        $nachricht=$rpc_lang['spaet1'].number_format($maxtick, 0,"",".").$rpc_lang['spaet2'].
-        number_format($m, 0,"",".").$rpc_lang['spaet3'].number_format($d, 0,"",".").$rpc_lang['spaet4'];
-        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$user_id, $time, $nachricht]);
-      }
-	  }
+  $fleet_id=$user_id.'-3';
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
+  
+  $time=strftime("%Y%m%d%H%M%S");
+  //späteinsteigerhilfe, gilt nicht in der ewigen runde
+  if($sv_ewige_runde!=1){
+    //zuerst schauen wieviel ticks bereits vergangen sind
+    $db_daten  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
+    $row = mysqli_fetch_array($db_daten);
+    $maxtick=$row["tick"];
+    if($maxtick>1){
+      //fix f�r br
+      if($maxtick>40000)$maxtick=40000;
+      //rohstoffe berechnen
+      $m=round($sv_plan_grundertrag[0]*($maxtick-1)/5);
+      $d=round($sv_plan_grundertrag[1]*($maxtick-1)/5);
+      //rohstoffe gutschreiben und nachrichten auf new setzen
+      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, newnews=1 WHERE user_id=?", [$m, $d, $user_id]);
+      //nachricht hinterlegen
+      $nachricht=$rpc_lang['spaet1'].number_format($maxtick, 0,"",".").$rpc_lang['spaet2'].
+      number_format($m, 0,"",".").$rpc_lang['spaet3'].number_format($d, 0,"",".").$rpc_lang['spaet4'];
+      mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$user_id, $time, $nachricht]);
+    }
   }
+
 
   echo '1';
 }

@@ -1161,13 +1161,12 @@ if ($doetick == 1) {
         $datum = date("Y-m-d H:i:s", $tis);
         $time = strftime("%Y%m%d%H%M%S");
 
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system`, de_user_data.sou_user_id, de_user_data.efta_user_id FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", [$datum]);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system` FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", [$datum]);
 
         while ($row = mysqli_fetch_array($db_daten)) {
             $uid = $row["user_id"];
             $sector = $row["sector"];
             $system = $row["system"];
-            $sou_user_id = $row["sou_user_id"];
             $efta_user_id = $row["efta_user_id"];
             $delmode = $row["delmode"];
             $status = $row["status"];
@@ -1323,22 +1322,6 @@ if ($doetick == 1) {
                 //info in die sektorhistorie packen - der spieler verl��t den sektor
                 mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, '3', ?, ?)", [$maxtick, $sector, $spielername]);
 
-                //sou-daten l�schen
-                if ($sou_user_id > 0) {
-                    mysqli_select_db($GLOBALS['dbi'], $sv_database_sou);
-
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_ship_module WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_buffs WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_data WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_enm WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_hyper WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_politics WHERE user_id=? OR wahlstimme=?", [$sou_user_id, $sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_skill WHERE user_id=? OR wahlstimme=?", [$sou_user_id, $sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_systemhold WHERE user_id=?", [$sou_user_id]);
-                    mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM sou_user_tech_updates WHERE user_id=?", [$sou_user_id]);
-
-                    mysqli_select_db($GLOBALS['dbi'], $sv_database_de);
-                }
             }
         }
 
