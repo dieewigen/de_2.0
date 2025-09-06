@@ -18,12 +18,7 @@ if(!isset($_REQUEST["authcode"]) || $_REQUEST["authcode"]!=$GLOBALS['env_rpc_aut
 /////////////////////////////////////////////////////////////
 if(isset($_REQUEST["gettlscore"]) && $_REQUEST["gettlscore"]==1){
 	//zuerst die anzahl der aktiven spieler feststellen
-	//bei non-bezahlservern alle spieler werten, auf bezahlservern nur die pa-user
-	if($sv_payserver==0){
-		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1 ORDER BY score DESC", []);
-	}else{
-		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.premium=1 AND de_user_data.sector>1 ORDER BY score DESC", []);  	
-	}
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.owner_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.owner_id>0 AND de_login.status=1 AND de_user_data.npc=0 AND de_user_data.sector>1 ORDER BY score DESC", []);
 	
 	$anzspieler = mysqli_num_rows($db_daten);
 	//alle aktiven spieler erhalten punkte

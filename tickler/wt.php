@@ -68,22 +68,6 @@ if ($doetick == 1) {
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
-    // beim rundenstart (tick 1), die efta-transmitterquests entfernen
-    ///////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////
-    if ($maxtick == 1) {
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT efta_user_id FROM de_user_data WHERE efta_user_id>0", []);
-
-        while ($row = mysqli_fetch_array($db_daten)) {
-            $efta_user_id = $row["efta_user_id"];
-            //datensatz in efta l�schen
-            mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_quest WHERE typ=1 AND user_id=?", [$efta_user_id]);
-        }
-        //delete FROM de_cyborg_quest WHERE typ=1 AND user_id IN (select user_id from de_cyborg_data where sn_ext1='RDE' OR sn_ext1='QDE')
-    }
-
-    ///////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////
     // alle x ticks erhält eine allianz ein allianzartefakt
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
@@ -123,23 +107,22 @@ if ($doetick == 1) {
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status = 1 WHERE status = 3 AND ?>UNIX_TIMESTAMP(last_login) AND delmode=0", [$time]);
 
     //spieler umziehen, die zu gro� f�r den startsektor sind, au�er die funktion ist deaktiviert
-    if ($sv_deactivate_sec1moveout == 0) {
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.sector, de_user_data.`system` FROM de_login left join de_user_data 
-		on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND delmode=0 AND sector=1 AND (col>=10 OR score>=5000000)", []);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.sector, de_user_data.`system` FROM de_login left join de_user_data 
+    on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND delmode=0 AND sector=1 AND (col>=10 OR score>=5000000)", []);
 
-        $num = mysqli_num_rows($db_daten);
-        echo "<br>$num Spieler aus dem Startsektor geholt.<br>";
-        while ($row = mysqli_fetch_array($db_daten)) {
-            $uid = $row["user_id"];
-            $sector = $row["sector"];
-            $system = $row["system"];
+    $num = mysqli_num_rows($db_daten);
+    echo "<br>$num Spieler aus dem Startsektor geholt.<br>";
+    while ($row = mysqli_fetch_array($db_daten)) {
+        $uid = $row["user_id"];
+        $sector = $row["sector"];
+        $system = $row["system"];
 
-            //account in den umzugsmodus versetzen
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login set status = 4, savestatus=1 WHERE user_id = ?", [$uid]);
-            //umzug hinterlegen
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_sector_umzug set user_id=?, typ=0, sector=?, `system`=?", [$uid, $sector, $system]);
-        }
+        //account in den umzugsmodus versetzen
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login set status = 4, savestatus=1 WHERE user_id = ?", [$uid]);
+        //umzug hinterlegen
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_sector_umzug set user_id=?, typ=0, sector=?, `system`=?", [$uid, $sector, $system]);
     }
+
 
     //////////////////////////////////////////////////////////
     // Kollektoren aus Sektor 1 transferieren
@@ -371,7 +354,7 @@ if ($doetick == 1) {
     for ($rasse = 1; $rasse <= $sv_anz_rassen; $rasse++) {
         echo '<br>Rasse: '.$rasse;
 
-        $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.col, de_user_data.sector, de_user_data.agent, de_user_data.agent_lost, de_user_data.techs, de_user_data.ekey, de_user_data.e100, de_user_data.e101, de_user_data.e102, de_user_data.e103, de_user_data.e104,  de_user_data.tcount, de_user_data.zcount, de_user_data.eartefakt, de_user_data.kartefakt, de_user_data.dartefakt, de_user_data.tick , de_user_data.palenium, de_user_data.archi, de_user_data.npc, de_user_data.useefta, de_user_data.sc1, de_user_data.vs_auto_explore FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.rasse=?", [$rasse]);
+        $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.col, de_user_data.sector, de_user_data.agent, de_user_data.agent_lost, de_user_data.techs, de_user_data.ekey, de_user_data.e100, de_user_data.e101, de_user_data.e102, de_user_data.e103, de_user_data.e104,  de_user_data.tcount, de_user_data.zcount, de_user_data.eartefakt, de_user_data.kartefakt, de_user_data.dartefakt, de_user_data.tick , de_user_data.palenium, de_user_data.archi, de_user_data.npc, de_user_data.sc1, de_user_data.vs_auto_explore FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.rasse=?", [$rasse]);
         $num = mysqli_num_rows($res);
 
         //tronic-meldungen einbinden, damit man weiß wieviele man verwenden kann
@@ -403,7 +386,6 @@ if ($doetick == 1) {
             $palenium = $irow["palenium"];
             $archi   = $irow["archi"];
             $npc     = $irow["npc"];
-            //$useefta = $irow["useefta"];
             $mysc1   = $irow["sc1"];
             $vs_auto_explore = $irow["vs_auto_explore"];
 
@@ -416,8 +398,6 @@ if ($doetick == 1) {
             $keyi = $hv[2];
             $keye = $hv[3];
 
-            //wenn efta in benutzung ist noch den malus verrechnen
-            //if($useefta==1)$malus=$sv_efta_col_malus;else $malus=0;
             $malus = 0;
             $sabotagemalus = 0;
 
@@ -450,12 +430,7 @@ if ($doetick == 1) {
                 }
             }
 
-            //eftaartefakt
-            //$eartefaktenergie=floor($ea/10000*$eartefakt);
-            $eartefaktenergie = $sv_eftaartefaktertrag * $eartefakt;
-
             //kriegsartefakt
-            //$kartefaktenergie=floor($ea/1000*$kartefakt);
             $kartefaktenergie = $sv_kriegsartefaktertrag * $kartefakt;
 
             $dartefaktenergie = floor($ea / 100 * $dartefakt);
@@ -464,7 +439,7 @@ if ($doetick == 1) {
             //ade-rassenbonus
             $adebonus = 0;
 
-            $ea = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $paleniumenergie + $adebonus;
+            $ea = $ea + $kartefaktenergie + $dartefaktenergie + $paleniumenergie + $adebonus;
 
             //energieinput pro rohstoff
             $em = floor($ea / 100 * $keym);
@@ -1057,47 +1032,6 @@ if ($doetick == 1) {
         //db updaten
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET restyp01 = restyp01 + ?, restyp02 = restyp02 + ?, restyp03 = restyp03 + ?, restyp04 = restyp04 + ? WHERE sec_id=?", [$rm, $rd, $ri, $re, $sec_id]);
     }
-
-    //schauen ob ein geworbener soweit ist, dass der werber nen bonus erh�lt
-    /*
-    $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, tick, werberid FROM de_user_data WHERE tick >= 1000 AND score >= 1000000 AND werberid > 0", []);
-
-    while ($row = mysqli_fetch_array($db_daten))
-    {
-      $uid=$row["user_id"];
-      $werberid=$row["werberid"];
-      //beim geworbenen die werberid entfernen
-      mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET werberid = 0 WHERE user_id=?", [$uid]);
-      //beim werber ein diplomatieartefakt hinzuf�gen, bzw. credits gutschreiben
-      $db_datenx=mysqli_execute_query($GLOBALS['dbi'], "SELECT tick, dartefakt FROM de_user_data WHERE user_id=?", [$werberid]);
-      $rowx = mysqli_fetch_array($db_datenx);
-      if($rowx["dartefakt"]<$sv_max_dartefakt)
-      {
-        //diplomatieartefakt gutschreiben
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET dartefakt = dartefakt + 1, geworben=geworben+1 WHERE user_id=?", [$werberid]);
-        //nachricht an den account schicken
-        $time=strftime("%Y%m%d%H%M%S");
-        $text='F&uuml;r das Werben eines Spielers erhalten Sie ein Diplomatieartefakt.';
-        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 60, ?, ?)", [$werberid, $time, $text]);
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$werberid]);
-
-      }
-      else
-      {
-        //credits, aber nur dann, wenn der account des geworbenen 1000 ticks j�nger ist als der des werbers
-        if(($rowx["tick"]-$row["tick"])>=1000)
-        {
-          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits = credits + 10, geworben=geworben+1 WHERE user_id=?", [$werberid]);
-          //nachricht an den account schicken
-          $time=strftime("%Y%m%d%H%M%S");
-          $text='F&uuml;r das Werben eines Spielers erhalten Sie 10 Credits.';
-          mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 60, ?, ?)", [$werberid, $time, $text]);
-          mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$werberid]);
-        }
-      }
-    }
-    */
-
     echo date("d/m/Y - H:i:s");
 
     //sektorartefaktaktionen durchführen
@@ -1167,7 +1101,6 @@ if ($doetick == 1) {
             $uid = $row["user_id"];
             $sector = $row["sector"];
             $system = $row["system"];
-            $efta_user_id = $row["efta_user_id"];
             $delmode = $row["delmode"];
             $status = $row["status"];
             $spielername = $row["spielername"];
@@ -1299,15 +1232,6 @@ if ($doetick == 1) {
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? or (sector=? and `system`=?)", [$uid, $sector, $system]);
                 //statistik leeren
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_stat WHERE user_id=?", [$uid]);
-                //cyborg entfernen
-                /*
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_data WHERE user_id=?", [$efta_user_id]);
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_enm WHERE user_id=?", [$efta_user_id]);
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_flags WHERE user_id=?", [$efta_user_id]);
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_ht WHERE user_id=?", [$efta_user_id]);
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_item WHERE user_id=?", [$efta_user_id]);
-                mysqli_execute_query($eftadb, "DELETE FROM de_cyborg_quest WHERE user_id=?", [$efta_user_id]);
-                */
 
                 //dem sektor die kollektoren gutschreiben
                 if ($col > 75) {
@@ -1489,8 +1413,8 @@ if ($doetick == 1) {
 				spielername=nrspielername, rasse=nrrasse, sm_rboost=0, actpoints=0, palenium=0, sm_tronic=0, sm_kartefakt=0, sm_col=0, 
 				artbldglevel=30, sm_art1=0, sm_art2=0, sm_art3=0, sm_art4=0, sm_art5=0, sm_art6=0, sm_art7=0, sm_art8=0, sm_art9=0, sm_art10=0, 
 				sm_art11=0, sm_art12=0, sm_art13=0, sm_art14=0, sm_art15=0, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, npccol=0, archi=0, 
-				geworben=0, useefta=0, kg01=0, kg02=0, kg03=0, kg04=0, kgget=0, secatt=0, sc1=0, sc2=0, sc3=0, sc4=0, geteacredits=0, ehlock=0, 
-				eftagetlastartefact=0, ehscore=0, defenseexp=0, geteftabonus=0, secstatdisable=0, dailygift=1, dailyallygift=1, helperprogress=0, 
+				geworben=0, kg01=0, kg02=0, kg03=0, kg04=0, kgget=0, secatt=0, sc1=0, sc2=0, sc3=0, sc4=0, geteacredits=0, ehlock=0, 
+                ehscore=0, defenseexp=0, secstatdisable=0, dailygift=1, dailyallygift=1, helperprogress=0, 
 				npcartefact=0, specreset=0, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0, tradesystemscore=0, tradesystemtrades=0, tradesystem_mb_uid=0, 
 				tradesystem_mb_tick=0, lastpcatt=0, fleetscore=0,bgscore0=0, bgscore1=1, bgscore2=0, bgscore3=0, bgscore4=0 WHERE user_id='".$user_id."';";
 
@@ -1655,8 +1579,8 @@ if ($doetick == 1) {
 					spielername=nrspielername, rasse=nrrasse, sm_rboost=0, actpoints=0, palenium=0, sm_tronic=0, sm_kartefakt=0, sm_col=0, 
 					sm_art1=0, sm_art2=0, sm_art3=0, sm_art4=0, sm_art5=0, sm_art6=0, sm_art7=0, sm_art8=0, sm_art9=0, sm_art10=0, 
 					sm_art11=0, sm_art12=0, sm_art13=0, sm_art14=0, sm_art15=0, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, npccol=0, archi=0, 
-					geworben=0, useefta=0, kg01=0, kg02=0, kg03=0, kg04=0, kgget=0, secatt=0, sc1=0, sc2=0, sc3=0, sc4=0, geteacredits=0, ehlock=0, 
-					eftagetlastartefact=0, ehscore=0, defenseexp=0, geteftabonus=0, secstatdisable=0, dailygift=1, dailyallygift=1, helperprogress=0, 
+					geworben=0, kg01=0, kg02=0, kg03=0, kg04=0, kgget=0, secatt=0, sc1=0, sc2=0, sc3=0, sc4=0, geteacredits=0, ehlock=0, 
+					ehscore=0, defenseexp=0, secstatdisable=0, dailygift=1, dailyallygift=1, helperprogress=0, 
 					npcartefact=0, specreset=0, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0, tradesystemscore=0, tradesystemtrades=0, tradesystem_mb_uid=0, 
 					tradesystem_mb_tick=0, lastpcatt=0, fleetscore=0 WHERE user_id='".$user_id."';";
 
@@ -1728,62 +1652,6 @@ if ($doetick == 1) {
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET roundpoints=roundpoints+1 WHERE npc=0", []);
                 //die alphas bekommen zus�tzlich einen
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET roundpoints=roundpoints+1 WHERE rang=1 AND npc=0", []);
-
-                /*
-                //creditgewinne
-                //spieler mit den meisten punkten
-                echo '<hr>Punktecreditgewinne:<br>';
-                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0 ORDER BY score DESC LIMIT 3", []);
-                $platz = 0;
-                while ($row = mysqli_fetch_array($db_daten)) {
-                    //credits gutschreiben
-                    wt_change_credits($row["user_id"], $sv_credit_win[0][$platz], 'Creditgewinn '.($platz + 1).'. Platz Punkte');
-                    echo '<br>'.$row["user_id"];
-                    $platz++;
-                }
-
-                //spieler mit den meisten Executorpunkten
-                if ($sv_deactivate_trade == 0) {
-                    echo '<br><br>Executor-Creditgewinne:<br>';
-                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1  AND de_user_data.npc=0 ORDER BY pve_score DESC LIMIT 3", []);
-                    $platz = 0;
-                    while ($row = mysqli_fetch_array($db_daten)) {
-                        //credits gutschreiben
-                        wt_change_credits($row["user_id"], $sv_credit_win[1][$platz], 'Creditgewinn '.($platz + 1).'. Platz Executorpunkte');
-                        echo '<br>'.$row["user_id"];
-                        $platz++;
-                    }
-                }
-                */
-                /*
-                //erfolgreichster kopfgeldj�nger
-                echo '<br><br>Kopfgeldj�gercreditgewinne:<br>';
-                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 ORDER BY kgget DESC LIMIT 3", []);
-                $platz=0;
-                while($row = mysqli_fetch_array($db_daten))
-                {
-                  //credits gutschreiben
-                  wt_change_credits($row["user_id"], $sv_credit_win[2][$platz], 'Creditgewinn '.($platz+1).'. Platz Kopfgeldj�ger');
-                  echo '<br>'.$row["user_id"];
-                  $platz++;
-                }
-                */
-                //spieler mit der meisten cyborgerfahrung in efta
-                /*
-                if($sv_server_lang==1)
-                {
-                  echo '<br><br>EFTA-Creditgewinne:<br>';
-                  $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id FROM de_login LEFT JOIN de_cyborg_data ON(de_login.user_id = de_cyborg_data.user_id) WHERE de_login.status=1 ORDER BY exp DESC LIMIT 3", []);
-                  $platz=0;
-                  while($row = mysqli_fetch_array($db_daten))
-                  {
-                    //credits gutschreiben
-                    wt_change_credits($row["user_id"], $sv_credit_win[3][$platz], 'Creditgewinn '.($platz+1).'. Platz EFTA-Erfahrungspunkte');
-                    echo '<br>'.$row["user_id"];
-                    $platz++;
-                  }
-                }
-                */
             }
 
             //////////////////////////////////////////////////////////////////////
@@ -1805,16 +1673,7 @@ if ($doetick == 1) {
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET domtick=0, doetick=0", []);
                         $erhabenenstop = 1;
 
-                        /*
-                        //dem erhabenen die credits geben
-                        echo '<hr>Erhabenercreditgewinn:<br>';
-                        wt_change_credits($uid, $sv_credit_win[4][0], 'Creditgewinn Erhabener');
-                        echo '<br>'.$uid;
-                        */
-
-                        //mail an den detverteiler, wenn es ein bezahlserver ist
-                        //da pde-server wegfallen immer eine e-mail schicken
-                        //if($sv_pcs_id>0)
+                        //mail bei Rundenende
                         @mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei.', 'Die Runde auf '.$sv_server_tag.' ist vorbei.');
 
                         //die rundenpunkte verteilen
@@ -1922,13 +1781,6 @@ if ($doetick == 1) {
     //////////////////////////////////////////////////////////////////////
     include_once "wt_create_status.php";
 
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    //efta
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    //include_once "wt_efta.php";
-
     //rausvoten
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector_voteout SET ticks = ticks - 1", []);
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE ticks<=0", []);
@@ -2033,9 +1885,12 @@ if ($doetick == 1) {
     }
 
     //beim communityserver ggf. das dazugehörige script einbinden
+    /*
+    //ist veraltet, müsste bei Bedarf überarbeitet werden
     if ($sv_comserver == 1) {
         include_once 'wt_comserver.php';
     }
+    */
 
     //soll die Karte neu generiert werden?
     include_once 'wt_create_map.php';

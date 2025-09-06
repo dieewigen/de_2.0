@@ -21,7 +21,6 @@ $newtrans = $row["newtrans"];
 $newnews = $row["newnews"];
 $sector = $row["sector"];
 $system = $row["system"];
-$eartefakt = $row["eartefakt"];
 $kartefakt = $row["kartefakt"];
 $dartefakt = $row["dartefakt"];
 $palenium = $row["palenium"];
@@ -381,19 +380,7 @@ if ($maxtick < $mysc1 + $sv_sabotage[7][0] and $mysc1 > $sv_sabotage[7][0]) {
 }
 
 //gesamtenergie pro tick, energieausbeute
-/*
-if($ums_premium==0){
-    $ea=$col*($sv_kollieertrag-$malus-$sabotagemalus);
-}else{
-    $ea=$col*($sv_kollieertrag_pa-$malus-$sabotagemalus);
-}
-*/
-
 $ea = $col * ($sv_kollieertrag - $malus - $sabotagemalus);
-
-//eftaartefakt
-//$eartefaktenergie=floor($ea/10000*$eartefakt);
-$eartefaktenergie = $sv_eftaartefaktertrag * $eartefakt;
 
 //kriegsartefakt
 //$kartefaktenergie=floor($ea/1000*$kartefakt);
@@ -420,7 +407,7 @@ $maxcol = $row['maxcol'];
 $adebonus = 0;
 
 
-$eages = $ea + $eartefaktenergie + $kartefaktenergie + $dartefaktenergie + $sartefaktenergie + $paleniumenergie + $adebonus;
+$eages = $ea + $kartefaktenergie + $dartefaktenergie + $sartefaktenergie + $paleniumenergie + $adebonus;
 
 //energieinput pro rohstoff
 $em = floor($eages / 100 * $keym);
@@ -792,23 +779,6 @@ echo '<tr valign="middle" align="center" height="25">';
 echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
 echo '<td class="'.$bg.'" colspan=4>'.number_format($kartefaktenergie, 0, "", ".").' ('.$resource_lang['kriegsartefakte'].': '.$kartefakt.')</td>';
 echo '</tr>';
-
-//efta-artefaktenergie
-/*
-$bg='cell1';
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe3'].'"> + '.$resource_lang[eftaartibonus].'</td>';
-echo '<td class="'.$bg.'" colspan=4>'.number_format($eartefaktenergie, 0,"",".").' ('.$resource_lang[eftaartefakte].': '.$eartefakt.')</td>';
-echo '</tr>';
-  */
-//ade-rassenbonus
-/*
-  $bg='cell';
-  echo '<tr valign="middle" align="center" height="25">';
-  echo '<td class="'.$bg.'">+ Ablyon DEvolution Rassenbonus <img style="vertical-align: middle;" src="'.$_SESSION['ums_gpfad'].'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Die Rohstoffe berechnen sich nach dem Rundenalter (Wirtschaftsicks) und der Sektorherrschaft der eigenen Rasse auf dem Ablyon DEvolution-Server."></td>';
-  echo '<td class="'.$bg.'" colspan=4>'.number_format($adebonus, 0,"",".").' (Herrschaft: '.number_format($prozente[$_SESSION['ums_rasse']-1], 2,",",".").'%)</td>';
-  echo '</tr>';
- */
 
 //gesamtenergie
 if ($c1 == 0) {

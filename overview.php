@@ -61,7 +61,7 @@ WHERE user_id=? AND tick<1000000", [$_SESSION['ums_user_id']]);
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
-$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, geteacredits, geteftabonus, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, ehscore, tick, techs, sector, `system`, newtrans, newnews, allytag, col, col_build, agent, sonde, status, tradesystemscore, platz, rang, credits, actpoints, roundpoints, kartefakt, kgget, npcartefact, ally_tronic, eh_counter FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01 = $row[0];
 $restyp02 = $row[1];
@@ -90,8 +90,6 @@ $actpoints = $row["actpoints"];
 $rundenpunkte = $row["roundpoints"];
 $kartefakt = $row["kartefakt"];
 $kgget = $row["kgget"];
-$geteacredits = $row["geteacredits"];
-$geteftabonus = $row["geteftabonus"];
 $npcartefact = $row['npcartefact'];
 $ally_tronic = $row['ally_tronic'];
 $eh_counter = $row['eh_counter'];
@@ -155,7 +153,7 @@ $aktdate = date("d.m. H:i", $filetime);
 
 //wenn sektor 1, dann info über startsektor
 
-if ($sector == 1 and $sv_deactivate_sec1moveout == 0) {
+if ($sector == 1) {
     $text = '
 	<table width="586" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -815,32 +813,12 @@ for ($j = 0;$j <= 6;$j++) {
             $output = '';
             $c1 = 0;
             for ($ac = 0;$ac < $achievement_anz;$ac++) {
-                //der letzte eintrag ist immer die zusammenrechnung aller aufgaben
-                //if($ac==$achievement_anz-1)$ac=999;
 
-                //deaktivierte spielelemente auslassen
-                //efta jetzt immer entfernen
-                //if($sv_deactivate_efta==1){
-                if ($ac == 6) {
-                    $ac++;
-                }
-                //}
                 //kopfgeld killen
-                if ($ac == 11 && $sv_oscar == 1) {
+                if ($ac == 10 && $sv_oscar == 1) {
                     $ac++;
                 }
 
-                //EA Bonus
-                if ($ac == 12) {
-                    $ac++;
-                }
-
-                //handelsaufgabe killen
-                if ($sv_deactivate_trade == 1) {
-                    if ($ac == 13) {
-                        $ac++;
-                    }
-                }
 
                 $do_calc = 0;
                 $ac_akt = 0;
@@ -907,16 +885,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel6_1'];
                         $text2 = $ov_lang['ac_ziel6_2'];
                         break;
-                    case 6: //efta boni erhalten
-                        $ac_table_field = 'ac7';
-                        $ac_akt = $ac_daten[$ac_table_field];
-                        $rewards = $rewards7;
-                        $zielwert = $geteftabonus;
-                        $do_calc = 1;
-                        $text1 = $ov_lang['ac_ziel7_1'];
-                        $text2 = $ov_lang['ac_ziel7_2'];
-                        break;
-                    case 7: //artefakte im artefaktgeb�ude
+                    case 6: //artefakte im artefaktgeb�ude
                         $ac_table_field = 'ac8';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards8;
@@ -929,7 +898,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel8_1'];
                         $text2 = $ov_lang['ac_ziel8_2'];
                         break;
-                    case 8: //artefakte in den basisschiffen
+                    case 7: //artefakte in den basisschiffen
                         $ac_table_field = 'ac9';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards9;
@@ -965,7 +934,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel9_1'];
                         $text2 = $ov_lang['ac_ziel9_2'];
                         break;
-                    case 9: //sektorspenden
+                    case 8: //sektorspenden
                         $ac_table_field = 'ac10';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards10;
@@ -979,7 +948,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel10_1'];
                         $text2 = $ov_lang['ac_ziel10_2'];
                         break;
-                    case 10: //tronic der allianz spenden
+                    case 9: //tronic der allianz spenden
                         $ac_table_field = 'ac11';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards11;
@@ -990,7 +959,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = 'Erreiche den gew&uuml;nschten Tronic-Einzahlungsstatus bei Deiner Allianz';
                         $text2 = 'Den Wert kannst Du unter unter Allianz -> Finanzen einsehen und dort Tronic spenden. Du erh&auml;ltst Tronic per Zufall, &uuml;ber Artefakte, durch Missionen und im Handel.';
                         break;
-                    case 11: //kopfgeld erbeuten
+                    case 10: //kopfgeld erbeuten
                         $ac_table_field = 'ac12';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards12;
@@ -999,16 +968,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel12_1'];
                         $text2 = $ov_lang['ac_ziel12_2'];
                         break;
-                    case 12: //ea aktivit�t
-                        $ac_table_field = 'ac13';
-                        $ac_akt = $ac_daten[$ac_table_field];
-                        $rewards = $rewards13;
-                        $zielwert = $geteacredits;
-                        $do_calc = 1;
-                        $text1 = $ov_lang['ac_ziel13_1'];
-                        $text2 = $ov_lang['ac_ziel13_2'];
-                        break;
-                    case 13: //handelspunkte
+                    case 11: //handelspunkte
                         $ac_table_field = 'ac14';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards14;
@@ -1017,7 +977,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel14_1'];
                         $text2 = $ov_lang['ac_ziel14_2'];
                         break;
-                    case 14: //sektorartefakthaltezeit
+                    case 12: //sektorartefakthaltezeit
                         $ac_table_field = 'ac15';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards15;
@@ -1030,7 +990,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel15_1'];
                         $text2 = $ov_lang['ac_ziel15_2'];
                         break;
-                    case 15: //artefakte in npc-sektoren erobert
+                    case 13: //artefakte in npc-sektoren erobert
                         $ac_table_field = 'ac16';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards16;
@@ -1039,7 +999,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel16_1'];
                         $text2 = $ov_lang['ac_ziel16_2'];
                         break;
-                    case 16: //vergessene Systeme erkunden
+                    case 14: //vergessene Systeme erkunden
                         $ac_table_field = 'ac17';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards17;
@@ -1048,7 +1008,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel17_1'];
                         $text2 = $ov_lang['ac_ziel17_2'];
                         break;
-                    case 17: //vergessene Systeme: Gebäude Stufe 5 und höher
+                    case 15: //vergessene Systeme: Gebäude Stufe 5 und höher
                         $ac_table_field = 'ac18';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards18;
@@ -1061,7 +1021,7 @@ for ($j = 0;$j <= 6;$j++) {
                         $text1 = $ov_lang['ac_ziel18_1'];
                         $text2 = $ov_lang['ac_ziel18_2'];
                         break;
-                    case 18: //vergessene Systeme: Gebäude Stufe 10
+                    case 16: //vergessene Systeme: Gebäude Stufe 10
                         $ac_table_field = 'ac19';
                         $ac_akt = $ac_daten[$ac_table_field];
                         $rewards = $rewards19;
@@ -1074,19 +1034,6 @@ for ($j = 0;$j <= 6;$j++) {
                         $do_calc = 1;
                         $text1 = $ov_lang['ac_ziel19_1'];
                         $text2 = $ov_lang['ac_ziel19_2'];
-                        break;
-                    case 19: //Werbe neue Spieler
-                        $ac_table_field = 'ac20';
-                        $ac_akt = $ac_daten[$ac_table_field];
-                        $rewards = $rewards20;
-
-                        $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE sector>1 AND werberid='".$_SESSION['ums_owner_id']."';");
-                        $rowx = mysqli_fetch_array($db_datenx);
-                        $zielwert = $rowx['anzahl'];
-
-                        $do_calc = 1;
-                        $text1 = $ov_lang['ac_ziel20_1'];
-                        $text2 = $ov_lang['ac_ziel20_2'];
                         break;
                 }
 

@@ -8,7 +8,6 @@ $sv_image_server_list[]='gp/';
 
 //gewinnpunktzahl
 $sv_winscore=33333;
-//$sv_winscore=15000;
 
 //ewige runde?
 $sv_ewige_runde=0;
@@ -21,11 +20,10 @@ $sv_hardcore_need_wins=5;
 $sv_eh_counter=960;
 
 //100%-Schiffs/Turmrecycling-System?
-$sv_oscar=1;
+$sv_oscar=0;
 
 //zu haltende ticks
 $sv_benticks=2;
-
 
 //maximalzahl der sektoren
 $sv_maxsector=20;
@@ -57,10 +55,10 @@ $sv_attgrenze_whg_bonus=0.0;
 //sektorangriffsmalus in hundertsteln
 $sv_sector_attmalus=0.20;
 
-//maximale angriffsgrenze für kollektoren
+//maximale angriffsgrenze für Kollektoren
 $sv_max_col_attgrenze=0.35;
 
-//minimale angriffsgrenze f�r kollektoren
+//minimale angriffsgrenze für Kollektoren
 $sv_min_col_attgrenze=0.20;
 
 //sektoren anzeigen bis sektor
@@ -78,7 +76,7 @@ $sv_free_startsectors=1;
 //bei wieviel prozent leute beim rausvoten verschwinden
 $sv_voteoutgrenze=40;
 
-//maximal anzahl von sektorumz�gen
+//maximal anzahl von sektorumzügen
 $sv_max_secmoves=0;
 
 //minimumanzahl beim reggen eines privatsektors
@@ -87,7 +85,7 @@ $sv_min_user_per_regsector=4;
 //maximumanzahl beim reggen eines privatsektors
 $sv_max_user_per_regsector=6;
 
-//ab wo werden die regsektoren eingebaut
+//ab wo werden die Sphärensektoren eingebaut
 $sv_min_regsec=501;
 
 //server tag, z.b. nde sde usw.
@@ -110,16 +108,6 @@ $sv_anz_schiffe=10;
 $sv_anz_tuerme=5;
 $sv_anz_rassen=5;
 
-//Max Anzahl dir HFN's  im Archiv | Eintr�ge in der Buddy/Ignoreliste
-$sv_hf_buddie = 10;
-$sv_hf_ignore = 10;
-$sv_hf_archiv = 10;
-
-//s.o. im bezug auf premium accounts!
-$sv_hf_buddie_p = 20;
-$sv_hf_ignore_p = 20;
-$sv_hf_archiv_p = 20;
-
 //klaubare kollies
 $sv_kollie_klaurate=0.15;
 
@@ -128,8 +116,6 @@ $sv_kollieertrag=100;
 $sv_kollieertrag_pa=105;
 
 //planetarer grundertrag, mit und ohne gilde
-//$sv_plan_grundertrag = array (1000, 100, 0, 0);
-//$sv_plan_grundertrag_whg = array (4000, 500, 100, 50);
 $sv_plan_grundertrag = array (1000, 125, 75, 50);
 $sv_plan_grundertrag_whg = array (4000, 500, 200, 100);
 
@@ -138,14 +124,11 @@ $sv_plan_grundertrag_whg = array (4000, 500, 200, 100);
 //wahrscheinlichkeit, dass tronic verteilt wird pro tick
 $sv_globalw_tronic=15;
 
-//wahrscheinlichkeit, dass Zuf�lle verteilt werden pro tick
+//wahrscheinlichkeit, dass Zufälle verteilt werden pro tick
 $sv_globalw_zufall=15;
 
 //Anzahl der zu spielenden Ticks bevor die Zufallsereignisse beginnen
 $sv_global_start_zufall=2000;
-
-//Mod-Ids f�rs SK forum
-$mods = array(1);
 
 //lebenszeit der session in sekunden
 $sv_session_lifetime=3700;
@@ -154,16 +137,7 @@ $sv_session_lifetime=3700;
 //zeit f�r den aktivit�tsbonus in sekunden
 $sv_activetime=3600;
 
-//maximalzahl f�r diplomatieartefakte
-$sv_max_dartefakt=3;
-
-//preise für den schwarzmarkt
-$sv_sm_preisliste = array (50, 8, 10, 300, 175, 20, 5);
-
-//max palenium
-$sv_max_palenium=100;
-
-//id f�r das pcs
+//id für das pcs
 $sv_pcs_id=11;
 
 //das siegel von basranur: nach x ticks starten, ticklaufzeit, maxprozent
@@ -214,44 +188,8 @@ if($sv_ewige_runde==1){
 	$sv_zoellnerertrag=array(0.0125, 0.00625, 0.00417, 0.003125);
 }
 
-//energieertrag durch eftaartefakte
-$sv_eftaartefaktertrag=10;
-
 //wieviel man von dem kopfgeld bekommt
 $sv_bounty_rate=0.10;
-
-//ist es ein bezahlserver
-$sv_payserver=0;
-
-//ist efta in de integriert
-$sv_efta_in_de=1;
-
-//flags zur deaktivierung einzelner spielelemente
-$sv_deactivate_efta=0;
-$sv_deactivate_trade=0;
-$sv_deactivate_sec1moveout=0;
-$sv_deactivate_kiatt=1;
-
-//creditgewinne
-//punkte
-$sv_credit_win[0][0]=75;
-$sv_credit_win[0][1]=25;
-$sv_credit_win[0][2]=10;
-//executorpunkte
-$sv_credit_win[1][0]=75;
-$sv_credit_win[1][1]=25;
-$sv_credit_win[1][2]=10;
-//kopfgeldjäger
-$sv_credit_win[2][0]=0;
-$sv_credit_win[2][1]=0;
-$sv_credit_win[2][2]=0;
-//eftapunkte
-$sv_credit_win[3][0]=0;
-$sv_credit_win[3][1]=0;
-$sv_credit_win[3][2]=0;
-//erhabener
-$sv_credit_win[4][0]=200;
-
 
 //community server
 $sv_comserver=0;
@@ -265,7 +203,7 @@ $sv_hide_fp_in_secstatus=0;
 $sv_debug=1;
 
 //V-Systeme deaktivieren
-//$sv_deactivate_vsystems=1;
+$sv_deactivate_vsystems=0;
 
 $sv_max_alien_col=400;
 $sv_max_alien_col_typ=1;

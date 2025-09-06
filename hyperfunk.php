@@ -1,8 +1,11 @@
 <?php
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_hyperfunk.lang.php');
-//require_once('lib/phpmailer/class.phpmailer.php');
-//require_once('lib/phpmailer/class.smtp.php');
+
+//Max Anzahl dir HFN's  im Archiv | Eintr?ge in der Buddy/Ignoreliste
+$sv_hf_buddie_p = 20;
+$sv_hf_ignore_p = 20;
+$sv_hf_archiv_p = 20;
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, newtrans, newnews, sector, `system` FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);

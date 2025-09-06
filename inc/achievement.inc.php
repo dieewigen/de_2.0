@@ -115,18 +115,6 @@ for($index=0;$index<$stufen;$index++)
 	$max_achievement_points++;
 }
 
-
-
-//menge efta-boni erhalten
-$achievement_anz++;
-$stufen=round($sv_winscore/1440);
-$mbelohnung=10000000*$ac_prozent;
-for($index=0;$index<$stufen;$index++){
-	$rewards7[$index][0]=($index+1)*1; //zu erreichender wert
-	@$rewards7[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
-	if($sv_deactivate_efta==0)$max_achievement_points++;
-}
-
 //menge an artefakten im artefaktgebäude
 $achievement_anz++;
 $index=0;
@@ -342,18 +330,6 @@ for($index=0;$index<$stufen;$index++){
   @$rewards12[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
 }
 
-
-//ea-aktivität
-$achievement_anz++;
-$stufen=round($sv_winscore/1440);
-$mbelohnung=10000000*$ac_prozent;
-for($index=0;$index<$stufen;$index++){
-	$rewards13[$index][0]=($index+1)*1; //zu erreichender wert
-	@$rewards13[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
-	if($sv_deactivate_sou==0)$max_achievement_points++;
-}
-
-
 //handelspunkte
 $achievement_anz++;
 $stufen=round($sv_winscore/1440);
@@ -362,7 +338,7 @@ for($index=0;$index<$stufen;$index++)
 {
 	$rewards14[$index][0]=floor(($index+1)*800000*$GLOBALS['tech_build_time_faktor']); //zu erreichender wert
 	@$rewards14[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
-	if($sv_deactivate_trade==0)$max_achievement_points++;
+	$max_achievement_points++;
 }
 
 
