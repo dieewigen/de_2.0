@@ -1031,9 +1031,6 @@ if ($doetick == 1) {
         include_once "wt_artefakte.php";
     }
 
-    //spielerartefaktaktionen durchf�hren
-    include_once "wt_userartefacts.php";
-
     //Tick hochzählen
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET tick = tick + 1", []);
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET wt=wt+1", []);

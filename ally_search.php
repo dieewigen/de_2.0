@@ -144,8 +144,6 @@ if (isset($searchterm) && strlen($searchterm) > 0 && !($searchterm == " ")){
 
 ?>
 <br>
-<?php
-	include('ally/ally.footer.inc.php');
-	
+
 </body>
 </html>
