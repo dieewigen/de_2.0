@@ -3,7 +3,6 @@ include "inc/header.inc.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include_once "functions.php";
-include "issectork.php";
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, techs, sector, `system`, score, newtrans, newnews, secmoves, secatt 

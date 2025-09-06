@@ -3,7 +3,6 @@ $eftachatbotdefensedisable = 1;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
 include "functions.php";
-include "issectork.php";
 
 include 'lib/map_system_defs.inc.php';
 include "lib/map_system.class.php";

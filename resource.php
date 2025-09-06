@@ -5,7 +5,6 @@ include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_resource.lang.php';
 include 'inc/sabotage.inc.php';
 include "functions.php";
-include "issectork.php";
 
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 $pd = loadPlayerData($_SESSION['ums_user_id']);

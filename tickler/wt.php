@@ -1,8 +1,5 @@
 <?php
 set_time_limit(240);
-//$directory=str_replace("\\\\","/",$HTTP_SERVER_VARS["SCRIPT_FILENAME"]);
-//$directory=str_replace("/tickler/wt.php","/",$directory);
-//if ($directory=='')$directory='../';
 $directory = '../';
 include_once $directory."inc/sv.inc.php";
 include_once $directory."inc/env.inc.php";
@@ -18,9 +15,6 @@ if ($sv_comserver == 1) {
     include_once $directory.'inc/svcomserver.inc.php';
 }
 
-//include_once $directory.'lib/phpmailer/class.phpmailer.php';
-//include_once $directory.'lib/phpmailer/class.smtp.php';
-
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
@@ -29,7 +23,6 @@ include_once $directory."inc/allyjobs.inc.php";
 include_once $directory."lib/map_system_defs.inc.php";
 include_once $directory."lib/map_system.class.php";
 include_once $directory."functions.php";
-include_once $directory."issectork.php";
 include_once "kt_einheitendaten.php";
 
 //include $directory."cache/anz_user.tmp"; //$gesamtuser=anzahl, die in der datei steht

@@ -6,8 +6,6 @@ include 'inc/sv.inc.php';
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
 include 'inccon.php';
 include "functions.php";
-include "issectork.php";
-
 
 mt_srand((double)microtime()*10000);
 

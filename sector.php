@@ -2,7 +2,6 @@
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
 include "functions.php";
-include "issectork.php";
 
 $sql = "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, col, sector, `system`, newtrans, newnews, allytag, status, hide_secpics, platz, rang, secsort, secstatdisable FROM de_user_data WHERE user_id=?";
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);

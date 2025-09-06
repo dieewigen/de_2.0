@@ -5,7 +5,6 @@ include 'inc/lang/'.$sv_server_lang.'_bkmenu.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include 'functions.php';
-include "issectork.php";
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id=?", 

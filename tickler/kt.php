@@ -1,13 +1,5 @@
 <?php
-//anzeige in der logdatei
-//include "croninfo.inc.php";
-
 set_time_limit(120);
-/*
-$directory=str_replace("\\\\","/",$HTTP_SERVER_VARS["SCRIPT_FILENAME"]);
-$directory=str_replace("/tickler/kt.php","/",$directory);
-if ($directory=='')$directory='../';
-*/
 $directory="../";
 include $directory."inc/sv.inc.php";
 if($sv_debug==0 && $sv_comserver==0){
@@ -21,7 +13,6 @@ if($sv_comserver==1)include_once $directory.'inc/svcomserver.inc.php';
 include_once $directory."inc/schiffsdaten.inc.php";
 include_once $directory."inc/userartefact.inc.php";
 include_once $directory."functions.php";
-include_once $directory."issectork.php";
 include_once $directory."inc/lang/".$sv_server_lang."_kt.lang.php";
 include_once $directory."lib/special_ship.class.php";
 include_once $directory.'lib/bg_defs.inc.php';
