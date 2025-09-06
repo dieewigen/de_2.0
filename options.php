@@ -477,7 +477,7 @@ echo '
 </tr>
 <tr align="center">
 <td height="25" class="rl">&nbsp;</td>
-<td>'.$options_lang['spielername'].' <img title="'.$options_lang['spielernamedesc'].'" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
+<td>'.$options_lang['spielername'].' <img title="'.$options_lang['spielernamedesc'].'" style="vertical-align: middle;" src="gp/g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0">
 </td>
 <td><input type="text" name="spielername" size="20" maxlength="20" value="'.$nrspielername.'"></td>
 <td class="rr">&nbsp;</td>
@@ -645,8 +645,7 @@ echo'
 <br>
 <br>
 
-
 </table>
 </form>
 </body>
-</html>
+</html>';
