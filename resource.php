@@ -1272,7 +1272,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 echo '</table>';
 
 rahmen_unten();
-
+?>
 
 <script>
 <?php
