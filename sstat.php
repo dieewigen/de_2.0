@@ -8,7 +8,6 @@ include "inc/lang/".$sv_server_lang."_sstat.lang.php";
 <title><?php echo $sstat_lang['title']?></title>
 <?php
 $_SESSION['ums_rasse']=1;
-'gp/'=$sv_image_server_list[0];
 include "cssinclude.php";
 ?>
 </head>

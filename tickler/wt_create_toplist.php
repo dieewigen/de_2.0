@@ -1360,11 +1360,11 @@ while($row = mysqli_fetch_array($db_daten)){
   $row_score=mysqli_fetch_array($get_score);
 
   if($row["platz_last_day"]==$row["platz"])
-$grafik='<img border="0" src="'.$sv_image_server_list[0].'g/tl_constant.gif" width="11" height="11" title="unver&auml;ndert" alt="unver&auml;ndert">';
+$grafik='<img border="0" src="gp/g/tl_constant.gif" width="11" height="11" title="unver&auml;ndert" alt="unver&auml;ndert">';
   if($row["platz_last_day"]>$row["platz"])
-$grafik='<img border="0" src="'.$sv_image_server_list[0].'g/tl_up.gif" width="11" height="11" title="+'.($row['platz_last_day']-$row['platz']).'" alt="+'.($row['platz_last_day']-$row['platz']).'" >';
+$grafik='<img border="0" src="gp/g/tl_up.gif" width="11" height="11" title="+'.($row['platz_last_day']-$row['platz']).'" alt="+'.($row['platz_last_day']-$row['platz']).'" >';
   if($row["platz_last_day"]<$row["platz"])
-$grafik='<img border="0" src="'.$sv_image_server_list[0].'g/tl_down.gif" width="11" height="11" title="-'.($row['platz']-$row['platz_last_day']).'" alt="-'.($row['platz']-$row['platz_last_day']).'">';
+$grafik='<img border="0" src="gp/g/tl_down.gif" width="11" height="11" title="-'.($row['platz']-$row['platz_last_day']).'" alt="-'.($row['platz']-$row['platz_last_day']).'">';
 
   if ($row['name']=='') $row['name']='&nbsp';
   xecho ("<tr>");

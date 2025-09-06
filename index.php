@@ -30,9 +30,6 @@ if (isset($_REQUEST['logout'])) {
     header("Location: index.php");
 }
 
-//wenn kein server gefunden wurde einfach den ersten eintragen
-$sv_image_server = $sv_image_server_list[0];
-
 //login ist jetzt auch über den loginkey möglich, dieser ist jedoch nur 5 minuten gültig
 if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
     //db connect herstellen
