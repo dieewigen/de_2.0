@@ -32,31 +32,31 @@ $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromni
   while($row = mysqli_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
   {
 
-    $row[text] = str_replace(":)","<img src=\"../g/smilies/sm1.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":D","<img src=\"../g/smilies/sm2.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(";)","<img src=\"../g/smilies/sm3.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":x","<img src=\"../g/smilies/sm4.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":(","<img src=\"../g/smilies/sm5.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("x(","<img src=\"../g/smilies/sm6.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":p","<img src=\"../g/smilies/sm7.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(?)","<img src=\"../g/smilies/sm8.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(!)","<img src=\"../g/smilies/sm9.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":{","<img src=\"../g/smilies/sm10.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":}","<img src=\"../g/smilies/sm11.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":L","<img src=\"../g/smilies/sm12.gif\" alt=\"Smilie\">",$row[text]);
+    $row['text'] = str_replace(":)","<img src=\"../g/smilies/sm1.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":D","<img src=\"../g/smilies/sm2.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(";)","<img src=\"../g/smilies/sm3.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":x","<img src=\"../g/smilies/sm4.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":(","<img src=\"../g/smilies/sm5.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("x(","<img src=\"../g/smilies/sm6.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":p","<img src=\"../g/smilies/sm7.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("(?)","<img src=\"../g/smilies/sm8.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("(!)","<img src=\"../g/smilies/sm9.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":{","<img src=\"../g/smilies/sm10.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":}","<img src=\"../g/smilies/sm11.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":L","<img src=\"../g/smilies/sm12.gif\" alt=\"Smilie\">",$row['text']);
   
-    $row[text] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row[text]);
-    $row[text] = str_replace("[CROT]","<font color=\"#F10505\">",$row[text]);
-    $row[text] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row[text]);
-    $row[text] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row[text]);
+    $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);
+    $row['text'] = str_replace("[CROT]","<font color=\"#F10505\">",$row['text']);
+    $row['text'] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row['text']);
+    $row['text'] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row['text']);
 
 
-	$row[text] = nl2br($row[text]);
+	$row['text'] = nl2br($row['text']);
 
     echo '<table border="0" cellpadding="0" cellspacing="2" width="500" bgcolor="#000000">';
     echo '<tr>';
     echo '<td class="cl" width="40%">Absender: '.$row["fromsec"].":".$row["fromsys"].' - '.$row["fromnic"].'</td>';
-    $t=$row["time"];
+    $t=(string)$row["time"];
     $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
     echo '<td class="cr" width="60%">Zeit: '.$time.'</td>';
     echo '</tr>';
@@ -82,18 +82,18 @@ $db_tfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT empfaenger, time, betref
 
   while($row = mysqli_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
   {
-    $row[text] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row[text]);
-    $row[text] = str_replace("[CROT]","<font color=\"#F10505\">",$row[text]);
-    $row[text] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row[text]);
-    $row[text] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row[text]);
+    $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);
+    $row['text'] = str_replace("[CROT]","<font color=\"#F10505\">",$row['text']);
+    $row['text'] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row['text']);
+    $row['text'] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row['text']);
 
 
-	$row[text] = nl2br($row[text]);
+	$row['text'] = nl2br($row['text']);
 
     echo '<table border="0" cellpadding="0" cellspacing="2" width="500" bgcolor="#000000">';
     echo '<tr>';
-    echo '<td class="cl" width="40%">Empf&auml;nger: '.insertemp($row[empfaenger]).'</td>';
-    $t=$row["time"];
+    echo '<td class="cl" width="40%">Empf&auml;nger: '.insertemp($row['empfaenger']).'</td>';
+    $t=(string)$row["time"];
     $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
     echo '<td class="cr" width="60%">Zeit: '.$time.'</td>';
     echo '</tr>';
@@ -118,31 +118,31 @@ $db_tfn=mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromnic,
   while($row = mysqli_fetch_array($db_tfn)) //jeder gefundene datensatz wird ausgegeben
   {
 
-    $row[text] = str_replace(":)","<img src=\"../g/smilies/sm1.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":D","<img src=\"../g/smilies/sm2.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(";)","<img src=\"../g/smilies/sm3.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":x","<img src=\"../g/smilies/sm4.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":(","<img src=\"../g/smilies/sm5.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("x(","<img src=\"../g/smilies/sm6.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":p","<img src=\"../g/smilies/sm7.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(?)","<img src=\"../g/smilies/sm8.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace("(!)","<img src=\"../g/smilies/sm9.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":{","<img src=\"../g/smilies/sm10.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":}","<img src=\"../g/smilies/sm11.gif\" alt=\"Smilie\">",$row[text]);
-    $row[text] = str_replace(":L","<img src=\"../g/smilies/sm12.gif\" alt=\"Smilie\">",$row[text]);
+    $row['text'] = str_replace(":)","<img src=\"../g/smilies/sm1.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":D","<img src=\"../g/smilies/sm2.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(";)","<img src=\"../g/smilies/sm3.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":x","<img src=\"../g/smilies/sm4.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":(","<img src=\"../g/smilies/sm5.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("x(","<img src=\"../g/smilies/sm6.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":p","<img src=\"../g/smilies/sm7.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("(?)","<img src=\"../g/smilies/sm8.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace("(!)","<img src=\"../g/smilies/sm9.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":{","<img src=\"../g/smilies/sm10.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":}","<img src=\"../g/smilies/sm11.gif\" alt=\"Smilie\">",$row['text']);
+    $row['text'] = str_replace(":L","<img src=\"../g/smilies/sm12.gif\" alt=\"Smilie\">",$row['text']);
 
-    $row[text] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row[text]);
-    $row[text] = str_replace("[CROT]","<font color=\"#F10505\">",$row[text]);
-    $row[text] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row[text]);
-    $row[text] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row[text]);
+    $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);
+    $row['text'] = str_replace("[CROT]","<font color=\"#F10505\">",$row['text']);
+    $row['text'] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row['text']);
+    $row['text'] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row['text']);
 
 
-	$row[text] = nl2br($row[text]);
+	$row['text'] = nl2br($row['text']);
 
     echo '<table border="0" cellpadding="0" cellspacing="2" width="500" bgcolor="#000000">';
     echo '<tr>';
     echo '<td class="cl" width="40%">Absender: '.$row["fromsec"].":".$row["fromsys"].' - '.$row["fromnic"].'</td>';
-    $t=$row["time"];
+    $t=(string)$row["time"];
     $time=$t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
     echo '<td class="cr" width="60%">Zeit: '.$time.'</td>';
     echo '</tr>';
