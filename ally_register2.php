@@ -117,6 +117,7 @@ if($eintragung==1){
 	include('ally/allyfunctions.inc.php');
 	writeHistory($clankuerzel, $allyregisterzwei_lang['msg_8_1']." <i>".$clanname."</i> ".$allyregisterzwei_lang['msg_8_2']." <i>".$spielername."</i> ".$allyregisterzwei_lang['msg_8_3']);
 
+	/*	
 	//aktueller Maximalwert
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
 		"SELECT MAX(memberlimit) AS max FROM de_allys");
@@ -138,6 +139,7 @@ if($eintragung==1){
 	mysqli_execute_query($GLOBALS['dbi'], 
 		"UPDATE de_allys SET memberlimit=?", 
 		[$memberlimit]);
+	*/
 
 	include('ally/ally.menu.inc.php');
 
