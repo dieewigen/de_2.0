@@ -6,8 +6,8 @@ use DieEwigen\Api\Types\PlayerAttackInfo;
 
 class GetPlayerAttackInfo
 {
-    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, spielername, score, fleetscore, col, rasse FROM de_user_data where user_id = ?";
-    const string GET_PLAYER_INFO_BY_COORDS_SQL = "SELECT user_id, sector, `system`, spielername, score, fleetscore, col, rasse FROM de_user_data where sector = ? and  `system` = ?";
+    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, score, fleetscore, col, rasse FROM de_user_data where user_id = ?";
+    const string GET_PLAYER_INFO_BY_COORDS_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, rasse FROM de_user_data where sector = ? and  `system` = ?";
     const string GET_SEC_RANK_SQL = "SELECT platz FROM de_sector where sec_id = ?";
     const string GET_PlAYER_SECTORS_SQL = "SELECT sec_id FROM de_sector WHERE npc = 0 AND platz > 0";
     const string GET_MAX_COLLECTORS = "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc = 0";
@@ -22,7 +22,7 @@ class GetPlayerAttackInfo
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfo($playerId);
         $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $playerRow['sector'], $playerRow['col'], $playerRow['score']);
-        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['spielername'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
+        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
     }
 
     public function getPlayerAttackInfoByCoords(int $npcId, int $sector, int $system): PlayerAttackInfo
@@ -30,7 +30,7 @@ class GetPlayerAttackInfo
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfoByCoords($sector, $system);
         $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $playerRow['sector'], $playerRow['col'], $playerRow['score']);
-        return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['spielername'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
+        return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
     }
 
     public function getSectorRank(int $sector): int
