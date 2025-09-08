@@ -72,12 +72,9 @@ if (isset($_GET["a"]) && $_GET["a"] == "d") {//alle nachricht l&ouml;schen
 
 
 //////////////////////////////////////////////////
-// Nachrichten per E-Mail versenden
+// Nachrichten als HTML-Datei herunterladen
 //////////////////////////////////////////////////
 if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
-    $mailbody = $sn_lang["mailhallo"];
-    $mailbody .= str_replace('&ouml;', 'ö', $sn_lang["mailende"]);
-
     $bodyTag = '<body class="theme-rasse'.$_SESSION['ums_rasse'].' mobile">';
 
     $serverPath='https://'.$_SERVER['SERVER_NAME'].'/gp/';
@@ -86,15 +83,16 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
     $allenachrichten = '
 <html> 
 <head>
-<title>Die Ewigen - Mailservice</title>
+<title>Die Ewigen - Nachrichten Export</title>
 <link rel="stylesheet" type="text/css" href="'.$serverPath.'/de-main.css">
+<meta charset="UTF-8">
 </head>
 '.$bodyTag.'
 <div align="center">
 <table border="0" cellpadding="0" cellspacing="0" style="background-color: #000000;">
 <tr height="37">
 <td width="13" height="37" class="rol">&nbsp;</td>
-<td width="560" class="ro" align="center">Die Ewigen - Mailservice</td>
+<td width="560" class="ro" align="center">Die Ewigen - Nachrichten Export</td>
 <td width="13" class="ror">&nbsp;</td>
 </tr>
 <tr>
@@ -108,7 +106,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
     $query = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
     $hrstr='';
     while ($row = mysqli_fetch_assoc($query)) {
-        $t = $row["time"];
+        $t = (string)$row["time"];
         $n = $row["typ"];
         $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
 
@@ -157,7 +155,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 $allenachrichten .= '</tr>';
                 break;
             default:
-                //sektorkampfsymbol setzen, wenn n�tigt
+                //sektorkampfsymbol setzen, wenn nötigt
                 if ($n == 56) {
                     $n = 50;
                 }
@@ -183,21 +181,21 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 <td class="rur" width="13">&nbsp;</td>
 </tr>
 </table></div>
-</body></html>;';
+</body></html>';
 
-    // alles per email versenden
-    $filename = 'news'.date('Ymd', time()).'.html';
-    $sql = "SELECT reg_mail FROM de_login WHERE user_id=?";
-    $db_mail = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $rowmail = mysqli_fetch_assoc($db_mail);
-
-    //jetzt die e-mail versenden
-
-    sendmail_att($rowmail['reg_mail'], 'noreply@die-ewigen.com', $sn_lang["mailbetreff"], $mailbody, $filename, $allenachrichten);
-
-    //die nachrichten nach dem versand löschen
-    $sql = "DELETE FROM de_user_news WHERE user_id=? AND seen=1";
-    mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
+    // HTML-Datei zum Download bereitstellen
+    $filename = 'nachrichten_'.date('Ymd_His').'.html';
+    
+    // Header für Download setzen
+    header('Content-Type: text/html; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="'.$filename.'"');
+    header('Content-Length: ' . strlen($allenachrichten));
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Expires: 0');
+    
+    // HTML-Inhalt ausgeben und Script beenden
+    echo $allenachrichten;
+    exit();
 }//mailnews ende
 
 
@@ -443,13 +441,13 @@ echo '
 <table border="0" cellspacing="0" cellpadding="0" width="300">
 <tr>
 <td width="13" height="25" class="rol"></td>
-<td align=center height="35" colspan="2" class="ro"><div class="cell">'.$sn_lang["mailservice"].'</div></td>
+<td align=center height="35" colspan="2" class="ro"><div class="cell">Nachrichtenservice</div></td>
 <td width="13" height="25" class="ror"></td>
 </tr>
 
 <tr>
 <td width="13" height="25" class="rl">&nbsp;</td>
-<td align=center height="45" colspan="2" class="cell"><input type="submit" name="mailnews" value="'.$sn_lang["mailbutton"].'"';
+<td align=center height="45" colspan="2" class="cell"><input type="submit" name="mailnews" value="Nachrichten herunterladen"';
 
     $sql = "SELECT user_id FROM de_user_news WHERE user_id=?";
     $db_archiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
@@ -479,35 +477,3 @@ echo "<a href=sysnews.php?a=d onclick=\"return confirm('".$sn_lang["deletewarnin
 </form>
 
 </html>
-<?php
-echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-
-function sendmail_att($an, $from, $betreff, $text, $dateiname, $att_content)
-{
-    $mail = new PHPMailer\PHPMailer\PHPMailer();
-
-    $mail->isSMTP();
-    $mail->SMTPDebug = 0; // SMTP-Debug auf 3 für maximalen Output
-    $mail->Debugoutput = 'html';
-
-    $mail->Host = $GLOBALS['env_mail_server'];
-    $mail->Port = 587;
-    $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->SMTPAuth = true;
-    $mail->Username = $GLOBALS['env_mail_user'];
-    $mail->Password = $GLOBALS['env_mail_password'];
-    $mail->IsHTML(true);
-    $mail->setFrom('noreply@die-ewigen.com', 'Die Ewigen');
-    $mail->addAddress($an);
-    $mail->Subject = $betreff;
-    $mail->Body = $text;
-    $mail->AddStringAttachment($att_content, $dateiname, 'base64', 'text/html');
-
-    if (!$mail->send()) {
-        echo 'Mailer Error: ' . $mail->ErrorInfo;
-        return false;
-    }
-    return true;
-
-}
-?>
