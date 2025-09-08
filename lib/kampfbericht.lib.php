@@ -29,13 +29,13 @@ function showkampfberichtBG($data){
 			//Zeile in der man selbst ist hervorheben
 			$bg_color='none';
 			$parts=explode("&nbsp;",$kb[$runde][$p]['spielername1']);
-			if($parts[0]==$_SESSION['ums_spielername'] && !empty($parts[0])){
+			if($parts[0]==($_SESSION['ums_spielername'] ?? '') && !empty($parts[0])){
 				$css1.='font-weight: bold;';
 				$bg_color='#222222';
 			}
 			
 			$parts=explode("&nbsp;",$kb[$runde][$p]['spielername2']);
-			if($parts[0]==$_SESSION['ums_spielername'] && !empty($parts[0])){
+			if($parts[0]==($_SESSION['ums_spielername'] ?? '') && !empty($parts[0])){
 				$css2.='font-weight: bold;';
 				$bg_color='#222222';
 			}
@@ -435,14 +435,14 @@ function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schif
 	$kg_set_04      = isset($daten_spieler['kg_set_04']) ? (int)$daten_spieler['kg_set_04'] : 0;
 
 	//eigenen spielername fett darstellen
-	if($_SESSION['ums_rasse']==1)$rflag='E';
+	if(!isset($_SESSION['ums_rasse']) || $_SESSION['ums_rasse']==1)$rflag='E';
 	elseif($_SESSION['ums_rasse']==2)$rflag='I';
 	elseif($_SESSION['ums_rasse']==3)$rflag='K';
 	elseif($_SESSION['ums_rasse']==4)$rflag='Z';
 	elseif($_SESSION['ums_rasse']==5)$rflag='D';
 
 
-	$username=$_SESSION['ums_spielername'].' ['.$rflag.']('.$sector.':'.$system.')';
+	$username=($_SESSION['ums_spielername'] ?? '').' ['.$rflag.']('.$sector.':'.$system.')';
 	$atterliste=str_replace($username, '<b>'.$username.'</b>', $atterliste);
 	$defferliste=str_replace($username, '<b>'.$username.'</b>', $defferliste);
 
