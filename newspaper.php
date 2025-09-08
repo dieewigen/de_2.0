@@ -92,7 +92,7 @@ echo '<div class="cell" style="width: 575px;">';
 echo 'Wenn Du gerne Feedback zu diesem Beitrag geben m&ouml;chtest, so empfehlen wir daf&uuml;r das Forum. 
 Solltest Du Dich aber nicht trauen &ouml;ffentlich etwas zu schreiben, dann kannst Du auch dieses Feedback-Formular nutzen. Es werden auf jeden Fall alle Feedbacks gelesen.
 <br><br><font style="font-size: 20px; color: #FF0000;">Beachte bitte, dass auf Fragen nicht geantwortet werden kann, diese kannst 
-Du aber im Forum/IRC/Supportticket stellen.</font><br><br>Schreibe bitte m&ouml;glichst ausf&uuml;hrlich, damit man wei&szlig; was gemeint ist, ein einfaches "ist doof" wird zwar registriert, aber eine Begr&uuml;ndung fehlt. Des Weiteren werden keine Beleidigungen toleriert.
+Du aber im Discord stellen.</font><br><br>Schreibe bitte m&ouml;glichst ausf&uuml;hrlich, damit man wei&szlig; was gemeint ist, ein einfaches "ist doof" wird zwar registriert, aber eine Begr&uuml;ndung fehlt. Des Weiteren werden keine Beleidigungen toleriert.
  <br><br><font color="#00FF00">Meldungen zu Verst&ouml;&szlig;e gegen die Nutzungsbedingungen kannst Du in der Accountverwaltung unter dem Punkt "Support" melden.
  </font>
  
@@ -132,7 +132,7 @@ else  //archiv
 
      while($rew=mysqli_fetch_assoc($sel_news))
      {
-       $t=$rew['time'];
+       $t=(string)$rew['time'];
        $time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];
   echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew['id'].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode(umlaut($rew['betreff'])).'</a><br><br>';
      }

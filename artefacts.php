@@ -761,7 +761,7 @@ if (!hasTech($pt, 28)) {
         echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
     }
 
-    echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.'gp/'.'g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
+    echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
     echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artbldglevel.'/'.$maxlevel.'</span>';
     if ($showbldglink == 1) {
         echo '</a>';
@@ -797,7 +797,7 @@ if (!hasTech($pt, 28)) {
 
         echo '
         <div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">
-            <span style="position: absolute; left: 0px; top: 0px;"><img src="'.'gp/'.'g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>
+            <span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>
             <span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>
         </div>';
         //daten für json zusammenfassen
@@ -830,7 +830,7 @@ if (!hasTech($pt, 28)) {
     ///////////////////////////////////////////////////
     //echo '<br>';
     $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen 3 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
-    rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"> Basisschiffartefakte');
+    rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="gp/g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"> Basisschiffartefakte');
     echo '<div class="cell" style="width: 576px; height: 300px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
 
 
@@ -877,7 +877,7 @@ if (!hasTech($pt, 28)) {
                 //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
                 echo '<a href="artefacts.php?a=2&fid='.($flotte + 1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
                 echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-                echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="'.'gp/'.'g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace] - 1].'"></span>';
+                echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace] - 1].'"></span>';
                 echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace] - 1].'</span>';
                 echo '</div>';
                 echo '</a>';
@@ -953,7 +953,7 @@ if (!hasTech($pt, 28)) {
             echo '<tr class="'.$bg.'" align="center">
     	  <td align="left">
         	<div style="background-color: #000000; width: 50px; height: 50px;">
-        	<img src="'.'gp/'.'g/arte'.$ai.'.gif" border="0" title="'.$ua_name[$i].'">
+        	<img src="gp/g/arte'.$ai.'.gif" border="0" title="'.$ua_name[$i].'">
         	</div>
       	</td>
       	<td align="left"><u><b>'.$ua_name[$i].'</b></u><br>'.$ua_desc[$i].'</td></tr>';

@@ -13,38 +13,6 @@ include "functions.php";
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-/*
-if($sv_server_tag=='SDE'){
-
-    echo '
-    <div class="info_box text2" style="margin-bottom: 5px; margin-top: 10px; font-size: 18px; margin-left: auto; margin-right: auto; font-weight: bold;">
-    Die "Ewige Runde" hat einen eigenen Server erhalten, in der Accountverwaltung ist er unter "EDE" zu finden.
-    </div>';
-
-}
-
-if($sv_server_tag=='EDE'){
-
-    echo '
-    <div class="info_box text2" style="margin-bottom: 5px; margin-top: 10px; font-size: 18px; margin-left: auto; margin-right: auto; font-weight: bold;">
-    Der EDE-Server basiert auf einer duplizierten Datenbank von SDE vom 05.10.2015 15 Uhr.
-    <br>Tickstart: 18:00 Uhr (05.10.2015)
-    </div>';
-
-}
-*/
-
-if ($sv_server_tag == 'DDE') {
-
-    echo '
-	<div class="info_box text2" style="margin-bottom: 5px; margin-top: 10px; font-size: 14px; margin-left: auto; margin-right: auto;">
-	Der DDE-Server ist ein reiner Entwicklerserver und bietet keinen regul&auml;ren Spielbetrieb. 
-	Hier werden komplett neue/einschneidende Sachen ausprobiert, die nicht im normalen Spielablauf getestet werden k&ouml;nnen. Es kann jederzeit gro&szlig;e &Auml;nderungen/Resets geben.
-	Wer damit nicht klarkommen kann/will, sollte auf einem anderen Server spielen. Spieler welche die Entwicklung st&ouml;ren werden entfernt.
-	Ansonsten sind alle Spieler gerne gesehen, die hier testen und ggf. die Zukunft von DE mitgestalten m&ouml;chten.
-	</div>';
-
-}
 
 //logincounter zurücksetzen
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
