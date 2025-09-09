@@ -70,7 +70,7 @@ if($baukostenreduzierung>20)$baukostenreduzierung=20;
 $baukostenreduzierung=$baukostenreduzierung/100;
 
 
-//ggf. neuen verteilungsschl�sssel setzen
+//ggf. neuen Verteilungsschlüsssel setzen
 $fehlermsg='';
 $e_t1=isset($_POST["e_t1"]) ? intval($_POST["e_t1"]) : 0;
 $e_t2=isset($_POST["e_t2"]) ? intval($_POST["e_t2"]) : 0;
@@ -486,13 +486,7 @@ if ($prod)//ja, es wurde ein button gedrueckt
 
 }//submit ende
 
-//wurde ein button bau-gedrueckt??
-/*
-$t=0;$str='if ($b1)$t=1;';
-for ($i=120;$i<=129;$i++) $str = $str."elseif (\$b$i)\$t=$i;";
-eval($str);
-*/
-
+//wurde ein Gebäudebaubutton gedrueckt??
 if(isset($_REQUEST['ida'])){
 	$t=intval($_REQUEST['ida']);
 }else{
@@ -516,11 +510,11 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 		[$t]);
 	$row = mysqli_fetch_assoc($db_daten);
 	
-	$benrestyp01=floor($row[0]/$kostenfaktor);
-	$benrestyp02=floor($row[1]/$kostenfaktor);
-	$benrestyp03=floor($row[2]/$kostenfaktor);
-	$benrestyp04=floor($row[3]/$kostenfaktor);
-	$benrestyp05=floor($row[4]/$kostenfaktor);
+	$benrestyp01=floor($row['restyp01']/$kostenfaktor);
+	$benrestyp02=floor($row['restyp02']/$kostenfaktor);
+	$benrestyp03=floor($row['restyp03']/$kostenfaktor);
+	$benrestyp04=floor($row['restyp04']/$kostenfaktor);
+	$benrestyp05=floor($row['restyp05']/$kostenfaktor);
 
 	$tech_ticks=$row["tech_ticks"];$tech_vor=$row["tech_vor"];
 	
