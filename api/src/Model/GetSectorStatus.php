@@ -8,13 +8,14 @@ use DieEwigen\Api\Types\SystemFleetStatus;
 class GetSectorStatus
 {
     const string GET_SECTOR_STATUS_SQL = "SELECT dud_source.user_id AS s_user_id, dud_source.rasse, dud_target.user_id AS t_user_id,
-                                    duf.zielsys, duf.hsec, duf.hsys, duf.zeit, duf.fleetsize,
+                                    dud_source.ally_id AS s_allyId, dud_target.ally_id AS t_allyId,
+                                    duf.zielsec, duf.zielsys, duf.hsec, duf.hsys, duf.zeit, duf.fleetsize,
                                     duf.e81, duf.e82, duf.e83, duf.e83, duf.e84, duf.e85, duf.e86, duf.e87, duf.e88, 
                                     duf.e89, duf.e90, duf.aktion
                                    FROM de_user_fleet duf
                                    JOIN de_user_data dud_source on duf.hsec = dud_source.sector AND duf.hsys = dud_source.`system`
                                    JOIN de_user_data dud_target on duf.zielsec = dud_target.sector AND duf.zielsys = dud_target.`system`
-                                   WHERE zielsec = ?
+                                   WHERE (zielsec = ? OR (dud_target.ally_id != 0 AND dud_target.ally_id = ? AND dud_target.show_ally_secstatus > ?))
                                    AND entdecktsec = 1 AND (aktion = 1 OR aktion = 2)";
 
     /**
@@ -25,13 +26,15 @@ class GetSectorStatus
     public function getSectorStatus(int $userId) : array
     {
         $userService = new UserService();
-        $coordinates = $userService->getCoordinates($userId);
+        $requestingNpcData = $userService->getPlayerData($userId);
         $stmt = mysqli_prepare($GLOBALS['dbi'], self::GET_SECTOR_STATUS_SQL);
-        $stmt->bind_param("i", $coordinates[0]);
+        //bind sector and allyId of requesting player
+        $now = time();
+        $stmt->bind_param("iii", $requestingNpcData[0], $requestingNpcData[2], $now);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_BOTH);
         $groupedFleetsByTarget = $this->groupFleetByTarget($result);
-        return $this->createSystemStatus($groupedFleetsByTarget, $coordinates[0]);
+        return $this->createSystemStatus($groupedFleetsByTarget);
     }
 
     private function calculateFp($row): int
@@ -44,7 +47,7 @@ class GetSectorStatus
         return $fp;
     }
 
-    private function createSystemStatus($sectorFleetStatusRows, $targetSector): array
+    private function createSystemStatus($sectorFleetStatusRows): array
     {
         $systemStatus = array();
         foreach ($sectorFleetStatusRows as $targetStr => $systemFleetStatusRow) {
@@ -52,16 +55,17 @@ class GetSectorStatus
             $defendFleetRows = $this->filterByStatus($systemFleetStatusRow, 2);
             $attackFleets = array_map(array($this, 'createFleetStatus'), $attackFleetRows);
             $defendFleets = array_map(array($this, 'createFleetStatus'), $defendFleetRows);
-            $target = explode("-", $targetStr); //system-userId
-            $systemStatus[] = new SectorSystemStatus($targetSector, intval($target[0]), intval($target[1]),
-                $attackFleets, $defendFleets);
+            $target = explode("-", $targetStr); //combined key of the target system-userId-allyId-sector
+            $systemStatus[] = new SectorSystemStatus(intval($target[3]), intval($target[0]), intval($target[1]),
+                intval($target[2]), $attackFleets, $defendFleets);
         }
         return $systemStatus;
     }
 
     private function createFleetStatus($fleetRow): SystemFleetStatus
     {
-        return new SystemFleetStatus($fleetRow['s_user_id'], $fleetRow['hsec'], $fleetRow['hsys'], $fleetRow['zeit'],
+        return new SystemFleetStatus($fleetRow['s_user_id'], $fleetRow['hsec'], $fleetRow['hsys'],
+            $fleetRow['s_allyId'], $fleetRow['zeit'],
             $fleetRow['fleetsize'], $this->calculateFp($fleetRow));
 
     }
@@ -70,7 +74,7 @@ class GetSectorStatus
     {
         $result = array();
         foreach ($rows as $row) {
-            $result[$row['zielsys'] . '-' . $row['t_user_id']][] = $row;
+            $result[$row['zielsys'].'-'.$row['t_user_id'].'-'.$row['t_allyId'].'-'.$row['zielsec']][] = $row;
         }
         return $result;
     }

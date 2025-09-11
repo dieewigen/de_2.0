@@ -12,10 +12,11 @@ class PlayerAttackInfo implements JsonSerializable {
     private int $fleetPoints;
     private int $collectors;
     private int $race;
+    private int $allyId;
     private bool $canBeAttacked;
 
     public function __construct(int $id, int $sector, int $system, int $points, int $fleetPoints,
-                                int $collectors, int $race, bool $canBeAttacked)
+                                int $collectors, int $race, int $allyId, bool $canBeAttacked)
     {
         $this->id = $id;
         $this->sector = $sector;
@@ -24,6 +25,7 @@ class PlayerAttackInfo implements JsonSerializable {
         $this->fleetPoints = $fleetPoints;
         $this->collectors = $collectors;
         $this->race = $race;
+        $this->allyId = $allyId;
         $this->canBeAttacked = $canBeAttacked;
     }
 
@@ -31,6 +33,6 @@ class PlayerAttackInfo implements JsonSerializable {
     {
         return [ 'id' => $this->id, 'sector' => $this->sector, 'system' => $this->system,
             'points' => $this->points, 'fpoints' => $this->fleetPoints, 'cols' => $this->collectors,
-            'canBeAttacked' => $this->canBeAttacked, 'race' => $this->race];
+            'allyId' => $this->allyId, 'canBeAttacked' => $this->canBeAttacked, 'race' => $this->race];
     }
 }

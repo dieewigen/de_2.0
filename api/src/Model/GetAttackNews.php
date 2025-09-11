@@ -20,7 +20,7 @@ class GetAttackNews
     public function getAttackNews(int $playerId, int $npcId): array
     {
         $userService = new UserService();
-        $playerCoords = $userService->getCoordinates($playerId);
+        $playerCoords = $userService->getPlayerData($playerId);
         $playerCheckResult = mysqli_execute_query($GLOBALS['dbi'], $this::GET_FLEET_STATUS,["$npcId-%", $playerCoords[0], $playerCoords[1]]);
         $isAttackedByNpc = mysqli_num_rows($playerCheckResult);
         if ($isAttackedByNpc < 1) {

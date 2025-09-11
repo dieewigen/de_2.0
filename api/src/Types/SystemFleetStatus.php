@@ -8,11 +8,12 @@ class SystemFleetStatus implements JsonSerializable {
     private int $sourcePlayerId;
     private int $sourcePlayerSector;
     private int $sourcePlayerSystem;
+    private int $sourceAllyId;
     private int $eta;
     private int $amount;
     private int $fp;
 
-    public function __construct(int $sourcePlayerId, int $sourcePlayerSector, int $sourcePlayerSystem, int $eta,
+    public function __construct(int $sourcePlayerId, int $sourcePlayerSector, int $sourcePlayerSystem, int $sourceAllyId, int $eta,
                                 int $amount, int $fp)
     {
         $this->sourcePlayerId = $sourcePlayerId;
@@ -21,12 +22,13 @@ class SystemFleetStatus implements JsonSerializable {
         $this->eta = $eta;
         $this->amount = $amount;
         $this->fp = $fp;
+        $this->sourceAllyId = $sourceAllyId;
     }
 
     public function jsonSerialize(): array
     {
         return [ 'sPlayerId' => $this->sourcePlayerId, 'sPlayerSec' => $this->sourcePlayerSector,
-            'sPlayerSys' => $this->sourcePlayerSystem, 'eta' => $this->eta, 'amount' => $this->amount,
-            'fp' => $this->fp];
+            'sPlayerSys' => $this->sourcePlayerSystem,'sAllyId' => $this->sourceAllyId ,
+            'eta' => $this->eta, 'amount' => $this->amount, 'fp' => $this->fp];
     }
 }

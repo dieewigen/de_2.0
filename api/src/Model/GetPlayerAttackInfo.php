@@ -6,8 +6,8 @@ use DieEwigen\Api\Types\PlayerAttackInfo;
 
 class GetPlayerAttackInfo
 {
-    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, score, fleetscore, col, rasse FROM de_user_data where user_id = ?";
-    const string GET_PLAYER_INFO_BY_COORDS_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, rasse FROM de_user_data where sector = ? and  `system` = ?";
+    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, score, fleetscore, col, rasse, ally_id FROM de_user_data where user_id = ?";
+    const string GET_PLAYER_INFO_BY_COORDS_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, rasse, ally_id FROM de_user_data where sector = ? and  `system` = ?";
     const string GET_SEC_RANK_SQL = "SELECT platz FROM de_sector where sec_id = ?";
     const string GET_PlAYER_SECTORS_SQL = "SELECT sec_id FROM de_sector WHERE npc = 0 AND platz > 0";
     const string GET_MAX_COLLECTORS = "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc = 0";
@@ -21,16 +21,16 @@ class GetPlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfo($playerId);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $playerRow['sector'], $playerRow['col'], $playerRow['score']);
-        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'],$npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id']);
+        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
     }
 
     public function getPlayerAttackInfoByCoords(int $npcId, int $sector, int $system): PlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfoByCoords($sector, $system);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $playerRow['sector'], $playerRow['col'], $playerRow['score']);
-        return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $canBeAttacked);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id']);
+        return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
     }
 
     public function getSectorRank(int $sector): int
@@ -52,9 +52,13 @@ class GetPlayerAttackInfo
         }
     }
 
-    private function canBeAttacked(int $npcSector, int $npcCollectors, $npcPoints, int $playerSector, int $playerCollectors, int $playerPoints): bool
+    private function canBeAttacked(int $npcSector, int $npcCollectors, int $npcPoints, int $npcAlly,
+                                   int $playerSector, int $playerCollectors, int $playerPoints, int $playerAlly): bool
     {
         global $sv_sector_attmalus, $sv_attgrenze, $sv_attgrenze_whg_bonus, $sv_max_col_attgrenze, $sv_min_col_attgrenze;
+        if ($npcSector == $playerSector || $npcAlly != 0 && $npcAlly == $playerAlly) {
+            return false;
+        }
         $npcSectorRank = $this->getSectorRank($npcSector);
         $playerSectorRank = $this->getSectorRank($playerSector);
         $rankDifference = $npcSectorRank - $playerSectorRank;
