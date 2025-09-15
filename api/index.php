@@ -51,7 +51,7 @@ if(isset($data['action']) && !empty($data['action'])) {
     header('Content-Type: application/json');
     try {
         $userService = new UserService();
-        $userId = intval($data['user_id']);
+        $userId = intval($data['user_id'] ?? -1);
         switch ($data['action']) {
             case 'getAllNpcUsers':
                 $userModel = new GetAllUsers();
@@ -183,6 +183,10 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $_SESSION['de_frameset'] = 1; // Setze die Frameset-Variable, um das Layout zu ändern
                 $_SESSION['ums_servid'] = $sv_servid;
                 $_SESSION['ums_owner_id'] = 0;
+                $_SESSION['ums_session_start'] = time();
+                $_SESSION['ums_zeitstempel'] = time();
+                $_SESSION['ums_vote'] = 0;
+                $_SESSION['ums_rasse'] = -1;
 
                 //damit man die Scriptfunktionen ansprechen kann, werden die in requestData übergebenen Parameter in $_REQUEST hinterlegt
                 if (isset($data['requestData'])) {

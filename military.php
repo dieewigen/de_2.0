@@ -217,12 +217,9 @@ if (isset($_POST['verlegen'])){
 		for ($i=81; $i<=80+$sv_anz_schiffe; $i++){
 			str_replace(".","", $_POST['m".$i."_1'] ?? 0);
 
-			if($_POST['m'.$i.'_1']>0)$sa[$c][0]=(int)str_replace(".","",$_POST['m'.$i.'_1']);else $sa[$c][0]=0;
-			if($_POST['m'.$i.'_2']>0)$sa[$c][1]=(int)str_replace(".","",$_POST['m'.$i.'_2']);else $sa[$c][1]=0;
-			if($_POST['m'.$i.'_3']>0)$sa[$c][2]=(int)str_replace(".","",$_POST['m'.$i.'_3']);else $sa[$c][2]=0;
-			/*echo 'A:'.$_POST['m".$i."_1'].' - '.'B: '.$sa[$c][0].'<br>';
-			echo 'C:'.$_POST['m".$i."_2'].' - '.'D: '.$sa[$c][1].'<br>';
-			echo 'E:'.$_POST['m".$i."_3'].' - '.'F: '.$sa[$c][2].'<br><br>';*/
+			if(($_POST['m'.$i.'_1'] ?? 0)>0)$sa[$c][0]=(int)str_replace(".","",$_POST['m'.$i.'_1'] ?? 0);else $sa[$c][0]=0;
+			if(($_POST['m'.$i.'_2'] ?? 0)>0)$sa[$c][1]=(int)str_replace(".","",$_POST['m'.$i.'_2'] ?? 0);else $sa[$c][1]=0;
+			if(($_POST['m'.$i.'_3'] ?? 0)>0)$sa[$c][2]=(int)str_replace(".","",$_POST['m'.$i.'_3'] ?? 0);else $sa[$c][2]=0;
 			$c++;
 		}
 		//flottendaten laden

@@ -322,7 +322,7 @@ if(!empty($letsgo) && $sector>1){
 $getnewsec=isset($_REQUEST['getnewsec']) ?? '';
 if(!empty($getnewsec) && $secmoves<$sv_max_secmoves && $techs[26]=='1'){
 	//abfrage da die funktion  zum erstellen nur noch f�r premium accounts zul�ssig ist
-	if ($ums_premium>0 OR 1==1){
+	if (1==1){
 		//schauen ob derjenige schon einen sektor beantragt hat
 		$result1 = mysqli_execute_query($GLOBALS['dbi'], 
 			"SELECT user_id FROM de_sector_umzug WHERE user_id=?",

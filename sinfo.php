@@ -100,9 +100,7 @@ echo '</table>';
 echo '</div>';
 
 rahmen_unten();
-
-
+?>
 
 </body>
 </html>
-

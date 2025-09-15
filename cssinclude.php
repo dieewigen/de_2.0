@@ -18,17 +18,3 @@ echo '<link rel="stylesheet" type="text/css" href="gp/de-main.css?'.filemtime($_
 
 echo '<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>';
 echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js').'"></script>';
-
-/*
-if(isset($GLOBALS['deactivate_old_design']) && $GLOBALS['deactivate_old_design']==true){
-	echo '<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>';
-	echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js').'"></script>';
-}else{
-	echo '
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/jquery-migrate.min.js"></script>
-	<script type="text/javascript" src="js/jquery.dimensions.min.js"></script>
-	<script type="text/javascript" src="js/jquery.tooltip.min.js"></script>
-	';
-}
-*/

@@ -21,7 +21,7 @@ $secmoves=$row["secmoves"];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include "resline.php";
 
-$id=isset($id)?(int)$id:-1;
+$id=$_REQUEST['id'] ?? -1;
 
 $action=$_REQUEST['action'] ?? '';
 
@@ -38,12 +38,12 @@ if($action!="archiv"){
 	  [$id]);
 
 
-	$nachricht = utf8_encode(nl2br(umlaut($row['nachricht'])));
+	$nachricht = nl2br($row['nachricht']);
 	echo '<br>
 	<table border="0" cellspacing="0" cellpadding="0" width="600px">
 	<tr>
 	<td width="13" height="25" class="rol"></td>
-	<td align="center" height="35" class="ro"><div class="cellu">'.utf8_encode(umlaut($row['betreff'])).' (<a href="newspaper.php?action=archiv&typ='.utf8_encode($row['typ']).'">Archiv</a>)</td>
+	<td align="center" height="35" class="ro"><div class="cellu">'.$row['betreff'].' (<a href="newspaper.php?action=archiv&typ='.$row['typ'].'">Archiv</a>)</td>
 	<td width="13" height="25" class="ror"></td>
 	</tr>
 	<tr>
@@ -64,7 +64,7 @@ if($action!="archiv"){
 //////////////////////////////////////
 
 //e-mail senden
-if($_REQUEST['feedback']){
+if(isset($_REQUEST['feedback'])){
 	echo '<div class="info_box text3">Vielen Dank, das Feedback wurde gespeichert.</div><br>';
 	$sendto=$GLOBALS['env_admin_email'];
 	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$_SESSION['ums_user_id'].' '.$_SESSION['ums_spielername'];
@@ -77,7 +77,7 @@ echo '
 <script>
 function chkFeedback(){
 if(document.newspaper.feedback.value =="Trage hier bitte Dein Feedback ein."){
-alert("Gib bitte Dein Feedback ein, damit wir das Spiel weiter verbessern k�nnen!");
+alert("Gib bitte Dein Feedback ein, damit wir das Spiel weiter verbessern können!");
 document.newspaper.feedback.focus();
 return false;
 }
@@ -93,7 +93,7 @@ echo 'Wenn Du gerne Feedback zu diesem Beitrag geben m&ouml;chtest, so empfehlen
 Solltest Du Dich aber nicht trauen &ouml;ffentlich etwas zu schreiben, dann kannst Du auch dieses Feedback-Formular nutzen. Es werden auf jeden Fall alle Feedbacks gelesen.
 <br><br><font style="font-size: 20px; color: #FF0000;">Beachte bitte, dass auf Fragen nicht geantwortet werden kann, diese kannst 
 Du aber im Discord stellen.</font><br><br>Schreibe bitte m&ouml;glichst ausf&uuml;hrlich, damit man wei&szlig; was gemeint ist, ein einfaches "ist doof" wird zwar registriert, aber eine Begr&uuml;ndung fehlt. Des Weiteren werden keine Beleidigungen toleriert.
- <br><br><font color="#00FF00">Meldungen zu Verst&ouml;&szlig;e gegen die Nutzungsbedingungen kannst Du in der Accountverwaltung unter dem Punkt "Support" melden.
+ <br><br><font color="#00FF00">Meldungen zu Verst&ouml;&szlig;e gegen die Nutzungsbedingungen kannst Du im Discord melden.
  </font>
  
  ';

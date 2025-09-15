@@ -684,11 +684,7 @@ if ($action == "arc") {
     $db_archiv = mysqli_execute_query($GLOBALS['dbi'], "SELECT archiv FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$_SESSION['ums_user_id']]);
     $num = mysqli_num_rows($db_archiv);
 
-    if ($ums_premium == 1) {
-        $parchiv = $sv_hf_archiv_p;
-    } else {
-        $parchiv = $sv_hf_archiv;
-    }
+    $parchiv = $sv_hf_archiv_p;
 
     if ($num <= ($parchiv - 1)) {
         $se = (int)$se;
@@ -1144,11 +1140,7 @@ if (isset($_POST['friendbtn'])) {
         $db_buddy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
         $num = mysqli_num_rows($db_buddy);
 
-        if ($ums_premium == 1) {
-            $pbuddies = $sv_hf_buddie_p;
-        } else {
-            $pbuddies = $sv_hf_buddie;
-        }
+        $pbuddies = $sv_hf_buddie_p;
 
         if ($num <= ($pbuddies - 1)) {
             $buddyname = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);
@@ -1185,12 +1177,7 @@ if (isset($_POST['ignorebtn'])) {
         $db_enem = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$_SESSION['ums_user_id']]);
         $num = mysqli_num_rows($db_enem);
 
-
-        if ($ums_premium == 1) {
-            $pigno = $sv_hf_ignore_p;
-        } else {
-            $pigno = $sv_hf_ignore;
-        }
+        $pigno = $sv_hf_ignore_p;
 
         if ($num <= ($pigno - 1)) {
             $ignorename = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername FROM de_user_data WHERE sector=? AND `system`=?", [$sector, $system]);

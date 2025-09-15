@@ -7,6 +7,7 @@ require_once '../inc/env.inc.php';
     <head>
         <title>NPCX</title>
 	    <meta charset="UTF-8">
+		<base href="/">
 	    <script src="js/jquery-3.7.1.min.js"></script>
 		<script>
 			var env_api_key = '<?php echo $GLOBALS['env_api_key']; ?>';

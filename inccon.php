@@ -127,8 +127,6 @@ if (isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id'] > 0) {
     $user_accstatus = $row["status"];
     $ad_blocktime = $row["blocktime"];
     $ic_activetime = $row["activetime"];
-    $user_patime = $row["patime"];
-    $user_credits = $row["credits"];
     //rasse und spielername neu setzen, wenn nötig
     if ($row['rasse'] != $_SESSION['ums_rasse'] || $row['spielername'] != $_SESSION['ums_spielername']) {
         $_SESSION['ums_rasse'] = $row['rasse'];
@@ -141,13 +139,6 @@ if (isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id'] > 0) {
     if ($user_accstatus != 1) {
         session_destroy();
         header("Location: index.php");
-    }
-
-    //pa-status festlegen
-    if ($user_patime > time()) {
-        $ums_premium = 1;
-    } else {
-        $ums_premium = 0;
     }
 
     if (!isset($eftachatbotdefensedisable)) {

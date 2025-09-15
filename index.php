@@ -122,7 +122,6 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             //$_SESSION["ums_chatoffallg"]=$row["chatoffallg"];
             $_SESSION['ums_spielername'] = $row["spielername"];
             $_SESSION['ums_rasse'] = $row["rasse"];
-            $ums_premium = $row["premium"];
 
             if (isset($_REQUEST['mobi'])) {
                 $_SESSION['ums_mobi'] = intval($_REQUEST['mobi']);
@@ -205,8 +204,6 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
 
             $_SESSION['ums_submit'] = $ums_submit;
             $_SESSION['ums_vote'] = $ums_vote;
-            $_SESSION['ums_premium'] = $ums_premium;
-            //$_SESSION['ums_one_way_bot_protection']=$ums_one_way_bot_protection;
 
             //überprüfen ob es der 1. login ist, in dem fall den beitritt im allgemeinen chat hinterlegen
             $db_daten = mysqli_execute_query(

@@ -1594,7 +1594,7 @@ function centerMap() {
 <?php
 function wellenrechner($kol, $maxcol, $npcsec)
 {
-    global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $ums_premium, $sv_kollie_klaurate;
+    global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $sv_kollie_klaurate;
     $str = 'Kollektoren-Wellenrechner';
     $str .= "<table width=200px border=0 cellpadding=0 cellspacing=1><tr align=center><td width=15%>&nbsp</td><td width=17%>".$sec_lang['kollektoren']."</td></tr>";
     $str .= "<tr align=center><td>&nbsp;</td><td>".number_format($kol, 0, ',', '.')."</td></tr>";

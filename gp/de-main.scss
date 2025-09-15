@@ -464,7 +464,7 @@ h1 {
 .bgpic3 {
 	background: url(g/cellblack.png) repeat;
 	width: 560px;
-	height: 235px;
+	height: 200px;
 }
 
 .bgpic4 {
@@ -802,7 +802,185 @@ a.btn:visited {
 	background: url(g/cellblack.png) repeat;
 }
 
-
+#gameProgressBar {
+	@keyframes scan {
+		0% { left: -100px; }
+		100% { left: 100%; }
+	}
+	
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.8; }
+	}
+	
+	.scifi-progress-container {
+		width: 542px;
+		height: 24px;
+		background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+		border: 1px solid #4a9eff;
+		border-radius: 2px;
+		position: relative;
+		overflow: hidden;
+		box-shadow: 
+			inset 0 0 8px rgba(74, 158, 255, 0.2),
+			0 0 12px rgba(74, 158, 255, 0.1);
+	}
+	
+	.scifi-progress-container::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: repeating-linear-gradient(
+			90deg,
+			transparent,
+			transparent 3px,
+			rgba(74, 158, 255, 0.05) 3px,
+			rgba(74, 158, 255, 0.05) 6px
+		);
+		pointer-events: none;
+	}
+	
+	.scifi-progress-bar {
+		height: 100%;
+		transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		position: relative;
+		overflow: hidden;
+	}
+	
+	.progress-normal {
+		background: linear-gradient(90deg, 
+			#001844 0%, 
+			#0066cc 50%, 
+			#4a9eff 100%);
+		box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+	}
+	
+	.progress-medium {
+		background: linear-gradient(90deg, 
+			#442200 0%, 
+			#cc7700 50%, 
+			#ffaa44 100%);
+		box-shadow: 0 0 8px rgba(255, 170, 68, 0.3);
+	}
+	
+	.progress-high {
+		background: linear-gradient(90deg, 
+			#441122 0%, 
+			#cc4477 50%, 
+			#ff6699 100%);
+		box-shadow: 0 0 8px rgba(255, 102, 153, 0.3);
+		animation: pulse 4s infinite;
+	}
+	
+	.scifi-progress-bar::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: -100px;
+		width: 100px;
+		height: 100%;
+		background: linear-gradient(90deg, 
+			transparent, 
+			rgba(255, 255, 255, 0.2), 
+			transparent);
+		animation: scan 6s infinite linear;
+	}
+	
+	.scifi-corner {
+		position: absolute;
+		width: 6px;
+		height: 6px;
+		border: 1px solid #4a9eff;
+		background: #001844;
+		opacity: 0.7;
+	}
+	
+	.scifi-corner.top-left {
+		top: -3px;
+		left: -3px;
+		border-right: none;
+		border-bottom: none;
+	}
+	
+	.scifi-corner.top-right {
+		top: -3px;
+		right: -3px;
+		border-left: none;
+		border-bottom: none;
+	}
+	
+	.scifi-corner.bottom-left {
+		bottom: -3px;
+		left: -3px;
+		border-right: none;
+		border-top: none;
+	}
+	
+	.scifi-corner.bottom-right {
+		bottom: -3px;
+		right: -3px;
+		border-left: none;
+		border-top: none;
+	}
+	
+	.scifi-text {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: "Segoe UI", "Arial", sans-serif;
+		font-weight: bold;
+		font-size: 13px;
+		white-space: nowrap;
+		z-index: 15;
+		color: #ffffff;
+		text-transform: uppercase;
+		letter-spacing: 0.6px;
+		text-shadow: 
+			0 0 2px rgba(0, 0, 0, 1),
+			0 0 4px rgba(0, 0, 0, 0.9),
+			1px 1px 3px rgba(0, 0, 0, 1),
+			-1px -1px 3px rgba(0, 0, 0, 1),
+			0 0 6px rgba(0, 0, 0, 0.8);
+	}
+	
+	.progress-normal .scifi-text { 
+		text-shadow: 
+			0 0 2px rgba(0, 0, 0, 1),
+			0 0 4px rgba(0, 0, 0, 0.9),
+			1px 1px 3px rgba(0, 0, 0, 1),
+			-1px -1px 3px rgba(0, 0, 0, 1),
+			0 0 8px rgba(123, 179, 255, 0.6),
+			0 0 12px rgba(0, 0, 0, 0.8);
+	}
+	
+	.progress-medium .scifi-text { 
+		text-shadow: 
+			0 0 2px rgba(0, 0, 0, 1),
+			0 0 4px rgba(0, 0, 0, 0.9),
+			1px 1px 3px rgba(0, 0, 0, 1),
+			-1px -1px 3px rgba(0, 0, 0, 1),
+			0 0 8px rgba(255, 187, 119, 0.6),
+			0 0 12px rgba(0, 0, 0, 0.8);
+	}
+	
+	.progress-high .scifi-text { 
+		text-shadow: 
+			0 0 2px rgba(0, 0, 0, 1),
+			0 0 4px rgba(0, 0, 0, 0.9),
+			1px 1px 3px rgba(0, 0, 0, 1),
+			-1px -1px 3px rgba(0, 0, 0, 1),
+			0 0 8px rgba(255, 136, 187, 0.6),
+			0 0 12px rgba(0, 0, 0, 0.8);
+	}
+}
 
 
 // Ende Desktop Layout Basics

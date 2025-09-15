@@ -1436,7 +1436,7 @@ if (!hasTech($pt, 9)) {
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$uid]);
                             $row = mysqli_fetch_array($db_daten);
                             $str = '';
-                            for ($i = 100;$i <= 109;$i++) {
+                            for ($i = 100;$i <= 104;$i++) {
                                 $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
                             }
                             eval($str);
@@ -1447,8 +1447,9 @@ if (!hasTech($pt, 9)) {
                                 $save_uid = $savelist[$i];
 
                                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET dtime=UNIX_TIMESTAMP(),
-					e100='$row[e100]', e101='$row[e101]', e102='$row[e102]', e103='$row[e103]', e104='$row[e104]'
-					WHERE user_id='$save_uid' AND zuser_id='$uid'", $db);
+                                    e100=?, e101=?, e102=?, e103=?, e104=?
+                                    WHERE user_id=? AND zuser_id=?", 
+                                    [$row['e100'], $row['e101'], $row['e102'], $row['e103'], $row['e104'], $save_uid, $uid]);
                             }
 
                             //ueberschrift ausgeben
@@ -2454,7 +2455,7 @@ if (!hasTech($pt, 9)) {
 
 function sabotageallowed($zuid)
 {
-    global $ownsector, $ownally, $db;
+    global $ownsector, $ownally;
 
     $sabotageallowed = 1;
 

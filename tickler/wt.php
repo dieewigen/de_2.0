@@ -70,7 +70,7 @@ if ($doetick == 1) {
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
     //spieler außerhalb von Sektor 1
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_data WHERE npc=0 AND sector>1;");
+    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_data WHERE npc = 0 AND sector > 1;");
     $row = mysqli_fetch_array($db_daten);
     $user = $row['anzahl'];
 
@@ -382,10 +382,10 @@ if ($doetick == 1) {
 
             //ekey aufsplitten
             $hv = explode(";", $ekey);
-            $keym = $hv[0];
-            $keyd = $hv[1];
-            $keyi = $hv[2];
-            $keye = $hv[3];
+            $keym = (float)($hv[0] ?? 0);
+            $keyd = (float)($hv[1] ?? 0);
+            $keyi = (float)($hv[2] ?? 0);
+            $keye = (float)($hv[3] ?? 0);
 
             $malus = 0;
             $sabotagemalus = 0;
@@ -984,10 +984,10 @@ if ($doetick == 1) {
 
         //ekey aufsplitten
         $hv = explode(";", $ekey);
-        $keym = $hv[0];
-        $keyd = $hv[1];
-        $keyi = $hv[2];
-        $keye = $hv[3];
+        $keym = (float)($hv[0] ?? 0);
+        $keyd = (float)($hv[1] ?? 0);
+        $keyi = (float)($hv[2] ?? 0);
+        $keye = (float)($hv[3] ?? 0);
 
 
         //gesamtenergie pro tick, energieausbeute
