@@ -1,17 +1,9 @@
 <?php
-
 //anzeige in der logdatei
 include "croninfo.inc.php";
 
-$directory = str_replace("\\\\", "/", $_SERVER["SCRIPT_FILENAME"]);
-$directory = str_replace("/tickler/register_user.php", "/", $directory);
-if ($directory == '') {
-    $directory = '../';
-}
 $directory = "../";
 
-//include "../inccon.php";
-$disablegzip = 1;
 include $directory."inc/sv.inc.php";
 include $directory."inccon.php";
 
@@ -32,7 +24,7 @@ if ($dortick == 1) {
     //dortag setzen
     mysqli_execute_query($GLOBALS['dbi'], "update de_system set dortick=0", []);
 
-    //�berpr�fen ob ein reshuffle notwendig ist
+    //überprüfen ob ein reshuffle notwendig ist
     if ($reshuffle == 1) {
         reshuffle();
         mysqli_execute_query($GLOBALS['dbi'], "update de_system set reshuffle=0", []);
@@ -54,7 +46,7 @@ if ($dortick == 1) {
             $blocked_sec[$sec_id] = 0;
         }
     }
-    //gr��ten sektor in der db finden
+    //größten sektor in der db finden
     $maxsecindb = $sec_id;
 
     //zuerstmal alle belegten positionen auslesen
@@ -66,10 +58,10 @@ if ($dortick == 1) {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
+    // alle npc-sektoren als bewohnt setzen, damit wird 
+    // die erstauffüllung der sektoren ausgeklammert
     ////////////////////////////////////////////////////////////////////////////////////////
-    //alle npc-sektoren als bewohnt setzen, damit wird die erstauffüllung der sektoren ausgeklammert
-    ////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////
+    
     for ($i = 1;$i <= $maxsecindb;$i++) {
         if ($npcsec[$i] == 1) {
             $bewsector[$i] = 1;
@@ -86,26 +78,26 @@ if ($dortick == 1) {
     echo 'Freesectors: '.$freesectors.'<br>';
 
     //////////////////////////////////////////////////////////////////////////////
-    //Koordinaten 0:0, Spieler werden in Sektor 1 gepackt
+    //Koordinaten 0:0, Spieler werden in Sektor 1 gepackt, NPC direkt verteilt
     //////////////////////////////////////////////////////////////////////////////
 
     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername, npc FROM de_user_data WHERE sector=0 AND `system`=0", []);
     $num = mysqli_num_rows($result);
     while ($res = mysqli_fetch_array($result)) { //jeder gefundene datensatz wird geprueft
         $npc = $res["npc"];
-        //$spielername=$res["spielername"];
+
         //freie position ermitteln - anfang
         $gefunden = 0;
         $maxsector = $sv_maxsector;
         $maxsystem = $sv_maxsystem;
 
-        //wenn es ein pc ist, dann muß er in sektor 1
+        //wenn es ein menschlicher Spieler ist, dann muß er in Sektor 1
         if ($npc == 0) {
             $maxsector = 1;
             $maxsystem = 10000;
         }
 
-        //startsektor bestimmen
+        //Startsektor bestimmen
         if ($freesectors > 0 and $npc == 1) {
             //den x-ten freien platz nimmt man
             $xten = rand(1, $freesectors);
@@ -127,8 +119,33 @@ if ($dortick == 1) {
             $freesectors--;
             //echo ' - xten '.$xten.' - treffer '.$treffer.' - sec '.$sec.' - freesectors '.$freesectors;
 		}elseif ($npc == 2) {
-			$sec = 666;
-        } else { //keine freien sektoren mehr vorhanden, also einen sektor so suchen, am besten einen wo wenig drin sind
+            //die NPC Typ 2 kommen zuerst in Sektor 666 bis dort 10 Systeme belegt sind, dannach in die Spielersektoren
+            //Anzahl der Accounts in Sektor 666 zählen
+            $result666 = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_data WHERE sector=666", []);
+            $row666 = mysqli_fetch_array($result666);
+
+            if ($row666['anzahl'] < 10) {
+                $sec = 666;
+            } else {
+                $maxsystem = 500;
+                $maxsector = 42; // bei 200 NPC Typ 2 gibt es 5 Aliens pro Sektor bis Sektor 42 (Sektor 1 und 2 sind reserviert)
+
+                //passenden Spielersektor suchen
+                $sql = "SELECT s.sec_id AS sector, COUNT(d.user_id) AS systeme
+                        FROM de_sector s
+                        LEFT JOIN de_user_data d ON d.sector = s.sec_id AND d.npc = 2
+                        WHERE s.sec_id > ? AND s.sec_id <= ?
+                        GROUP BY s.sec_id
+                        ORDER BY systeme ASC, RAND()
+                        LIMIT 1";
+                $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sv_free_startsectors, $maxsector]);
+                $rowx = mysqli_fetch_array($rx);
+                $sec = $rowx['sector'] ?? null;
+
+                echo '<br>NPC2 Sektor: '.$sec;
+            }
+
+        } else { //keine leeren sektoren mehr vorhanden, also einen sektor so suchen, am besten einen wo wenig drin sind
             $sql = "SELECT sector, count( `system` )  AS systeme FROM `de_user_data` WHERE npc=? AND sector > ? AND sector <= ? GROUP BY sector ORDER BY systeme ASC LIMIT 1";
             $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$npc, $sv_free_startsectors, $maxsector]);
             $rowx = mysqli_fetch_array($rx);
@@ -145,8 +162,11 @@ if ($dortick == 1) {
         }
 
 
-        //den Sektor von oben her auffüllen
+        //den Sektor von oben her auffüllen, außer es ist ein NPC Typ 2, der fängt bei 11 an, wenn er außerhalb von 666 ist
         $sys = 1;
+        if($npc==2 && $sec!=666){
+            $sys=11;
+        }
 
 		if($sec == 666) {
 			$secz=666;
@@ -160,8 +180,8 @@ if ($dortick == 1) {
 			}
 		}else{
 			for ($secz = $sec;$secz <= $maxsector;$secz++) {
-				//nur dem sektor zuweisen wenn npc/npcsektor oder pc/pcsektor
-				if ($npc == $npcsec[$secz]) {
+				//nur dem sektor zuweisen wenn npc/npcsektor oder pc/pcsektor, außer NPC Typ 2 der kann in alle Sektoren
+				if ($npc == $npcsec[$secz] || $npc == 2) {
 					for ($sysz = $sys;$sysz <= $maxsystem;$sysz++) {
                         if(!isset($systeme[$secz][$sysz])){
                             $systeme[$secz][$sysz] = 0;
@@ -617,7 +637,7 @@ if ($dortick == 1) {
 
 function reshuffle()
 {
-    global $db, $sv_maxsector;
+    global $sv_maxsector;
 
     $daten = array();
     //alle pc-spieler �ber sektor 1 auslesen

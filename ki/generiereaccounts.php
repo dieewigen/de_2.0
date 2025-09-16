@@ -47,7 +47,7 @@ function generierespielername()
 
     $anzsilben = count($silben);
 
-    $name = '';
+    $name = 'DX*';
     //1. teil
     $csilben = rand(1, 4);
     for ($i = 1; $i <= $csilben; $i++) {
@@ -66,6 +66,10 @@ function generierespielername()
         }
         $name .= $suchsilbe;
     }
+
+    //Spielernamen auf 20 Zeichen kürzen
+    $name = substr($name, 0, 20);    
+
     return $name;
 }
 
