@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
+use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
+
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.registerzwei.lang.php';
 include 'functions.php';
@@ -117,29 +120,15 @@ if($eintragung==1){
 	include('ally/allyfunctions.inc.php');
 	writeHistory($clankuerzel, $allyregisterzwei_lang['msg_8_1']." <i>".$clanname."</i> ".$allyregisterzwei_lang['msg_8_2']." <i>".$spielername."</i> ".$allyregisterzwei_lang['msg_8_3']);
 
-	/*	
-	//aktueller Maximalwert
-	$db_daten = mysqli_execute_query($GLOBALS['dbi'], 
-		"SELECT MAX(memberlimit) AS max FROM de_allys");
-	$row = mysqli_fetch_assoc($db_daten);
-	$max=$row['max'];
-
-	// Gesamtanzahl der Benutzer ermitteln
-	$db_user_count = mysqli_execute_query($GLOBALS['dbi'], 
-		"SELECT COUNT(*) as user_count FROM de_user_data");
-	$user_row = mysqli_fetch_assoc($db_user_count);
-	$user = $user_row['user_count'];
-
-	$memberlimit=round(5+$user/20);
-	if($memberlimit<$max){
-		$memberlimit=$max;
-	}
-
-	//memberlimit in der DB hinterlegen
-	mysqli_execute_query($GLOBALS['dbi'], 
-		"UPDATE de_allys SET memberlimit=?", 
-		[$memberlimit]);
-	*/
+	// ally memberlimit anpassen
+    $allyService = new AllyMemberLimitCalc($GLOBALS['dbi']);
+    try {
+        $affected = $allyService->updateAlliesMemberLimit();
+        //echo "<br>Allianz-memberlimit aktualisiert, neues Limit: {$affected['memberlimit']}<br>";
+    } catch (\Throwable $e) {
+        // Logging oder Fallback
+        echo "<br>Fehler beim Aktualisieren des Allianz-Memberlimits: " . $e->getMessage() . "<br>";
+    }
 
 	include('ally/ally.menu.inc.php');
 

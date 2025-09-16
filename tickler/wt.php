@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
+use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
+
 set_time_limit(240);
 $directory = '../';
 include_once $directory."inc/sv.inc.php";
@@ -21,7 +24,6 @@ include_once $directory."lib/map_system.class.php";
 include_once $directory."functions.php";
 include_once "kt_einheitendaten.php";
 
-//include $directory."cache/anz_user.tmp"; //$gesamtuser=anzahl, die in der datei steht
 ?>
 <html>
 <head>
@@ -69,23 +71,14 @@ if ($doetick == 1) {
     // allianz-mitglieder-maximum bestimmen
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
-    //spieler außerhalb von Sektor 1
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_data WHERE npc = 0 AND sector > 1;");
-    $row = mysqli_fetch_array($db_daten);
-    $user = $row['anzahl'];
-
-    //aktueller Maximalwert
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT MAX(memberlimit) AS max FROM de_allys;");
-    $row = mysqli_fetch_array($db_daten);
-    $max = $row['max'];
-
-    $memberlimit = round(5 + $user / 20);
-    if ($memberlimit < $max) {
-        $memberlimit = $max;
+    $allyService = new AllyMemberLimitCalc($GLOBALS['dbi']);
+    try {
+        $affected = $allyService->updateAlliesMemberLimit();
+        echo "<br>Allianz-memberlimit aktualisiert, neues Limit: {$affected['memberlimit']}<br>";
+    } catch (\Throwable $e) {
+        // Logging oder Fallback
+        echo "<br>Fehler beim Aktualisieren des Allianz-Memberlimits: " . $e->getMessage() . "<br>";
     }
-
-    //memberlimit in der DB hinterlegen
-    mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET memberlimit='$memberlimit';");
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
@@ -1432,12 +1425,6 @@ if ($doetick == 1) {
                 //info in die sektorhistorie packen - spieler verläßt den sektor
                 mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, '3', ?, ?)", [$maxtick, $sector, $spielername]);
 
-                /*
-                echo '<hr>Erhabenercreditgewinn:<br>';
-                wt_change_credits($user_id, 50, 'Creditgewinn Erhabener');
-                echo '<br>'.$user_id;
-                */
-
                 //mail bzgl. EH
                 @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Ewige Runde: Neuer EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
 
@@ -1525,13 +1512,6 @@ if ($doetick == 1) {
                     //er hat gewonnen, server anhalten
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET domtick=0, doetick=0", []);
                     $erhabenenstop = 1;
-                    //dem erhabenen die credits geben
-                    /*
-                    echo '<hr>Erhabenercreditgewinn:<br>';
-                    wt_change_credits($user_id, 1000, 'Creditgewinn Erhabener');
-                    echo '<br>'.$user_id;
-                    */
-
 
                     //mail an den detverteiler, wenn es ein bezahlserver ist
                     //da pde-server wegfallen immer eine e-mail schicken
@@ -1588,12 +1568,6 @@ if ($doetick == 1) {
 
                     //info in die sektorhistorie packen - spieler verläßt den sektor
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, '3', ?, ?)", [$maxtick, $sector, $spielername]);
-
-                    /*
-                    echo '<hr>Erhabenercreditgewinn:<br>';
-                    wt_change_credits($user_id, 100, 'Creditgewinn Erhabenen-Teilsieg');
-                    echo '<br>'.$user_id;
-                    */
 
                     //mail bzgl. EH
                     @mail_smtp($GLOBALS['env_admin_email'], $sv_server_tag.' Hardcore: Neuer Teil-EH: user_id: '.$user_id.' - Spielername: '.$spielername, ' ');
@@ -1873,31 +1847,6 @@ if ($doetick == 1) {
 } else {
     echo '<br>Wirtschaftsticks deaktiviert.<br>';
 } //doetick
-
-function wt_change_credits($uid, $amount, $reason)
-{
-    /*
-    global $db;
-
-    //zuerst auslesen wieviel man hat
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT credits FROM de_user_data WHERE user_id=?", [$uid]);
-    $row = mysqli_fetch_array($db_daten);
-    $hascredits = $row["credits"];
-    //wert in der db �ndern
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $uid]);
-
-    //creditanzahl �ndern
-    $hascredits = $hascredits + $amount;
-
-    //die creditausgabe im billing-logfile hinterlegen
-    $datum = date("Y-m-d H:i:s", time());
-    $ip = getenv("REMOTE_ADDR");
-    $clog = "Zeit: $datum\nIP: $ip\n".$reason."- Neuer Creditstand: $hascredits ($amount)\n--------------------------------------\n";
-    $fp = fopen("../cache/creditlogs/$uid.txt", "a");
-    fputs($fp, $clog);
-    fclose($fp);
-    */
-}
 
 ?>
 </body>
