@@ -2940,6 +2940,8 @@ CREATE TABLE `de_system` (
   `create_map_objects` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE `de_system` CHANGE `lasttick` `lasttick` DATETIME NULL, CHANGE `lastmtick` `lastmtick` DATETIME NOT NULL;
+
 --
 -- Daten für Tabelle `de_system`
 --

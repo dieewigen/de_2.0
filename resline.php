@@ -5,6 +5,12 @@ include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
 include "cache/lasttick.tmp";
 include "cache/lastmtick.tmp";
 
+$tickResult=mysqli_execute_query($GLOBALS['dbi'], "SELECT lasttick, lastmtick FROM de_system LIMIT 1");
+$tickData=mysqli_fetch_assoc($tickResult);
+$lastWT = date('H:i', strtotime($tickData['lasttick']));
+$lastKT = date('H:i', strtotime($tickData['lastmtick']));
+
+
 $mes1='';
 $mes2='';
 if(isset($newtrans) && $newtrans==1){
@@ -206,8 +212,8 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 
 	//uhr
 	echo '<div id="resclock1" rel="tooltip" title="'.$resline_lang['restipservertime'].'<br>'.$resline_lang['restipservertimedesc'].'">'.date("H:i").'</div>';
-	echo '<div id="resclock2" rel="tooltip" title="'.$resline_lang['restipserveretick'].'<br>'.$resline_lang['restipserveretickdesc'].'">'.$lasttick.'</div>';
-	echo '<div id="resclock3" rel="tooltip" title="'.$resline_lang['restipservermtick'].'<br>'.$resline_lang['restipservermtickdesc'].'">'.$lastmtick.'</div>';
+	echo '<div id="resclock2" rel="tooltip" title="'.$resline_lang['restipserveretick'].'<br>'.$resline_lang['restipserveretickdesc'].'">'.$lastWT.'</div>';
+	echo '<div id="resclock3" rel="tooltip" title="'.$resline_lang['restipservermtick'].'<br>'.$resline_lang['restipservermtickdesc'].'">'.$lastKT.'</div>';
 
 	//anzahl atter/deffer
 	//$gevflag=1000000;$gev=1000000;$geaflag=1000000;$gea=1000000;
@@ -328,8 +334,8 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	
 	//serverzeiten
 	echo '$("#tb_time1", parent.document).html("'.date("H:i").'");';
-	echo '$("#tb_time2", parent.document).html("'.$lasttick.'");';
-	echo '$("#tb_time3", parent.document).html("'.$lastmtick.'");';
+	echo '$("#tb_time2", parent.document).html("'.$lastWT.'");';
+	echo '$("#tb_time3", parent.document).html("'.$lastKT.'");';
 	
 	echo '</script>';
 }

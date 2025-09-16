@@ -237,27 +237,8 @@ while ($sector_row = mysqli_fetch_assoc($res))
 include_once 'kt_manage_bg.php';
 
 //lege in der datenbank die zeit des letzten ticks ab
-$time=date("YmdHis");
-mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET lastmtick = ?", [$time]);
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET lastmtick = ?", [date("Y-m-d H:i:s")]);
 print '<br><br>Letzter Tick: '.date("d/m/Y - H:i:s");
-
-function xecho($str){
-	global $cachefile;
-	//echo $str;
-	if ($cachefile) fwrite ($cachefile, $str);
-}
-
-//erstelle datei mit der zeit des letzten kampf-ticks
-$filename = "../cache/lastmtick.tmp";
-
-$cachefile = fopen ($filename, 'w');
-
-$zeit=date("H:i");
-echo $zeit;
-xecho('<?php $lastmtick="'.$zeit.'";');
-
-xecho('?>');
-
 
 } else {
 	echo '<br>Kampfticks deaktiviert.<br>'; //doetick

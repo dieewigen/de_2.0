@@ -101,9 +101,6 @@ if(mysqli_num_rows($result)>0){
 if($eintragung==1){
 
 	//Ally in der DB hinterlegen
-	$clanname = utf8_decode($clanname);
-	$clankuerzel = utf8_decode($clankuerzel);
-	$bio = utf8_decode($bio);
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"INSERT INTO de_allys (allyname, allytag, regierungsform, allianzform, ausrichtung, leaderid, homepage, besonderheiten, leadermessage, bewerberinfo, discord_bot) 
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '', '')",
@@ -115,7 +112,7 @@ if($eintragung==1){
 	//beim Allyleader die entsprechenden Daten hinterlegen
 	mysqli_execute_query($GLOBALS['dbi'],
 		"UPDATE de_user_data SET ally_id=?, allytag=?, status=1 WHERE user_id=?",
-		[$ally_id, utf8_decode($clankuerzel), $_SESSION['ums_user_id']]);
+		[$ally_id, $clankuerzel, $_SESSION['ums_user_id']]);
 	
 	include('ally/allyfunctions.inc.php');
 	writeHistory($clankuerzel, $allyregisterzwei_lang['msg_8_1']." <i>".$clanname."</i> ".$allyregisterzwei_lang['msg_8_2']." <i>".$spielername."</i> ".$allyregisterzwei_lang['msg_8_3']);

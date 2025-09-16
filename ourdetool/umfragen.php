@@ -16,7 +16,6 @@ include "../inccon.php";
 </style>
 </head>
 <body>
-<center>
 <br><br>
 <div style="width:100%; font-size:40pt; color:#FF0000;font-family: Impact;
     filter:Glow(color=#00FF00, strength=12)">Umfragen</div>
@@ -69,8 +68,13 @@ if($action=="deak"){
 
 	$abgegebenestimmen = $abgegebenestimmen - count($antworten);
 
-	include("../cache/anz_user.tmp");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) FROM de_user_data WHERE npc=0 AND sector > 1", []);
 
+    $row = mysqli_fetch_array($db_daten);
+    $gesamtuser = $row[0];
+    if ($gesamtuser == 0) {
+        $gesamtuser = 1;
+    }	
 
 	$stimmen = $abgegebenestimmen .'|'.$gesamtuser;
 
@@ -167,7 +171,7 @@ if(isset($_REQUEST['subedit'])){
 	
 	echo "<h2>Umfrage editiert</h2>";
 
-	$action=edit;
+	$action='edit';
 }
 
 if($addant){
@@ -179,7 +183,7 @@ if($addant){
 	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET antworten=? WHERE id=?", [$antworten, $id]);
 	echo "<h2>weitere Antwort erfolgreich hinzugef&uuml;gt</h2>";
 
-	$action=edit;
+	$action='edit';
 }
 
 if($delvote)
@@ -642,7 +646,5 @@ if($action=="tendenz"){ // Start des tendenz-Blocks
 }
 ?>
 
-
-</center>
 </body>
 </html>

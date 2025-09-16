@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
+use DieEwigen\DE2\Model\Tick\TickSpendCollectorFromSector1;
 
 set_time_limit(240);
 $directory = '../';
@@ -88,12 +89,12 @@ if ($doetick == 1) {
     $time = time();
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status = 1 WHERE status = 3 AND ?>UNIX_TIMESTAMP(last_login) AND delmode=0", [$time]);
 
-    //spieler umziehen, die zu gro� f�r den startsektor sind, au�er die funktion ist deaktiviert
+    //Spieler umziehen, die zu groß für den Startsektor sind, außer die Funktion ist deaktiviert
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.sector, de_user_data.`system` FROM de_login left join de_user_data 
     on(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND delmode=0 AND sector=1 AND (col>=10 OR score>=5000000)", []);
 
     $num = mysqli_num_rows($db_daten);
-    echo "<br>$num Spieler aus dem Startsektor geholt.<br>";
+    echo "<br>$num Spieler aus Sektor geholt / den Umzug in der DB hinterlegt<br>";
     while ($row = mysqli_fetch_array($db_daten)) {
         $uid = $row["user_id"];
         $sector = $row["sector"];
@@ -109,33 +110,8 @@ if ($doetick == 1) {
     //////////////////////////////////////////////////////////
     // Kollektoren aus Sektor 1 transferieren
     //////////////////////////////////////////////////////////
-    //gibt es einen spieler in sektor 1 mit mehr als X Kollektoren?
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_user_data` LEFT JOIN `de_login` ON(de_login.user_id=de_user_data.user_id) WHERE de_user_data.sector=1 AND de_user_data.col>25 AND de_login.status=3 AND de_login.delmode=2 ORDER BY de_user_data.col DESC LIMIT 1", []);
-    $num = mysqli_num_rows($db_daten);
-    if ($num == 1) {
-        echo "<br>$num Spieler aus dem Startsektor geholt.<br>";
-        $row = mysqli_fetch_array($db_daten);
-
-        //Spieler mit den wenigsten Kollektoren suchen und ihm einen Kollektor �bertragen
-        $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_user_data` WHERE sector>1 AND npc=0 ORDER BY col ASC LIMIT 1", []);
-        $numx = mysqli_num_rows($db_datenx);
-        if ($numx == 1) {
-            echo "<br>$num Spieler aus dem Startsektor geholt.<br>";
-            $rowx = mysqli_fetch_array($db_datenx);
-
-            //abziehen und informieren
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col-1, newnews=1 WHERE user_id=?", [$row['user_id']]);
-            $time = strftime("%Y%m%d%H%M%S");
-            $msg = 'Du verlierst einen Kollektor an einen anderen Spieler au&szlig;erhalb von Sektor 1.';
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$row["user_id"], $time, $msg]);
-
-            //draupacken und informieren
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col+1, newnews=1 WHERE user_id=?", [$rowx['user_id']]);
-            $msg = 'Du erh&auml;ltst einen Kollektor von einem anderen Spieler aus Sektor 1.';
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$rowx["user_id"], $time, $msg]);
-            echo 'Kollektortransfer von '.$row['user_id'].' an '.$rowx['user_id'];
-        }
-    }
+    echo '<br>Kollektortransfer aus Sektor 1<br>';
+    print_r(new TickSpendCollectorFromSector1($GLOBALS['dbi'])->run());
 
     //votetimer für den sektor um 1 verringern
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET votetimer=votetimer-1 WHERE votetimer>0", []);
@@ -298,12 +274,10 @@ if ($doetick == 1) {
     }
 
     /////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////
     //Rohstoffe + Punkte(Gebaeude, Forschungen)
     //für jede rasse einzeln durchlaufen
     /////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////
-    //vorher alle bauauftr�ge bzgl. punkten auslesen
+    //vorher alle Bauaufträge bzgl. punkten auslesen
     unset($user_buildscore);
     //bauaufträge ohne recycling
     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, SUM(score) AS score FROM `de_user_build` WHERE recycling=0 GROUP BY user_id", []);
@@ -1675,68 +1649,17 @@ if ($doetick == 1) {
 
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
-    //lege in der datenbank die zeit des letzten ticks ab
+    //lege in der datenbank die zeit des letzten Wirtschafsticks ab
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
-
-    $time=date("YmdHis");
-
     $sql = "UPDATE de_system set lasttick = ?";
-    mysqli_execute_query($GLOBALS['dbi'], $sql, [$time]);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [date("Y-m-d H:i:s")]);
+
 
     //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    //lege in einer datei die zeit des letzten ticks ab
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    $filename = $directory."cache/lastedbtick.tmp";
-
-    $cachefile = fopen($filename, 'w');
-
-    xecho('<?php $t1='."'".$time."';");
-
-    xecho("?>");
-
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    //erstelle datei mit der useranzahl
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) FROM de_user_data", []);
-
-    $row = mysqli_fetch_array($db_daten);
-    $gesamtuser = $row[0];
-    if ($gesamtuser == 0) {
-        $gesamtuser = 1;
-    }
-
-    $filename = $directory."cache/anz_user.tmp";
-
-    $cachefile = fopen($filename, 'w');
-
-    xecho('<?php $gesamtuser='.$gesamtuser.';');
-
-    xecho('?>');
-
-    //erstelle datei mit der zeit des letzten wirtschaftsticks-ticks
-
-    $filename = $directory."cache/lasttick.tmp";
-
-    $cachefile = fopen($filename, 'w');
-
-    $zeit = date("H:i");
-    xecho('<?php $lasttick="'.$zeit.'";');
-
-    xecho('?>');
-
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    //erstelle die loginseiten-statistik
-    //////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
-    include_once "wt_create_status.php";
-
     //rausvoten
+    //////////////////////////////////////////////////////////////////////
+
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector_voteout SET ticks = ticks - 1", []);
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_voteout WHERE ticks<=0", []);
 
