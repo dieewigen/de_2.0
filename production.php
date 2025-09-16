@@ -354,6 +354,7 @@ echo'
 ';
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
+$emsg='';
 if($sabotage==1){
   $emsg.='<table width="600px"><tr><td class="ccr">';
   $emsg.=$production_lang['sabotage_aktiv'];

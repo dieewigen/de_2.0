@@ -840,7 +840,10 @@ if ($s==2){
 
 		echo '<br>';
 	}//Ende des Menus f&uuml;r die Sektorsteuer
-	else echo 'F&uuml;r diese Funktion wird das Sektorhandelszentrum ben&ouml;tigt.';
+	else {
+    echo 'F&uuml;r diese Funktion wird das Sektorhandelszentrum ben&ouml;tigt.';
+  }
+
 	}
 	?>
 	</div>
@@ -863,8 +866,9 @@ if ($s==2){
 	);
 	$anz1 = $result1->num_rows;
 	
-	if ($anz1==0) echo $politics_lang["msg_16"].'<br><br>';
-	else {
+	if ($anz1==0) {
+        //echo $politics_lang["msg_16"].'<br><br>';
+    } else {
 		if ($status!=1)  //ausgabe der spielerliste, wenn noch keine auswertung erfolgt ist.
 		{
 			$result = mysqli_execute_query($GLOBALS['dbi'],
@@ -902,7 +906,7 @@ if ($s==2){
 	//Menu f&uuml;r die Sektorsteuer mit Abfrage ob SekHandelsZentrum vorhanden ist
 }//skmenu ende
 
-//men� f�r den sektor, wie sk-wahl und vote f�r exilanden
+//menü für den sektor, wie sk-wahl und vote für exilanden
 if ($s==1 OR !isset($s)){
 echo '<table border="0" cellpadding="0" cellspacing="0">
 <tr align="center">
