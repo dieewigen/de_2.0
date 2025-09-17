@@ -349,7 +349,7 @@ echo'
     <div style="display: flex; width: 100%;" class="mt15 mb15">
         <div style="flex-grow: 1;"><a href="sinfo.php?" class="btn">Serverinfos</a></div>
         <div style="flex-grow: 1;"><a href="'.$sv_link[2].'" target="_blank" class="btn">Hilfe</a></div>
-        <div style="flex-grow: 1;"><a href="vote.php?bar=yes" class="btn">Umfragen</a></div>
+        <div style="flex-grow: 1;"><a href="vote_overview.php?bar=yes" class="btn">Umfragen</a></div>
         <div style="flex-grow: 1;"><a href="https://discord.gg/qBpCPx4" target="_blank" class="btn">DE-Discord</a></div>
     </div> 
 
