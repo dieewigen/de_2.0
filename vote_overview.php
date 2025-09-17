@@ -45,78 +45,13 @@ $newtrans = 0;
 </head>
 <?php 
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-if ($bar == "yes") {
-    include('resline.php');
-}
 
-// Wenn Formular abgesendet wurde
-if (!empty($subform)) {
-
-    $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=? AND vote_id=?";
-    $db_check = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id]);
-    
-    $sql = "SELECT id, status FROM de_vote_umfragen WHERE id=?";
-    $vote_aktiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
-    $aktiv = mysqli_fetch_assoc($vote_aktiv);
-    $menge = mysqli_num_rows($db_check);
-
-    if ($menge == 0 && $aktiv['status'] == 1) {
-        if ($vote != "0" && $vote != "") {
-            echo '<h2>'.$vote_lang['msg_3'].'</h2>';
-            $sql = "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)";
-            mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id, $vote]);
-            $_SESSION['ums_vote'] = 0;
-        } else {
-            echo $vote_lang['msg_4'];
-        }
-    } else {
-        echo '<h1>'.$vote_lang['msg_5'].'</h1>';
-    }
-}
+include('resline.php');
 
 // Übersicht anzeigen
 if ($action == "" || $action == "uebersicht") {
     ?>
-<br><br>
-<table border="0" cellpadding="0" cellspacing="0" width="500">
-<tr height="37" align="center">
-<td class="rol">&nbsp;</td>
-<td class="ro"><div class="cellu"><?php echo $vote_lang['aktuelleumfragen']; ?></div></td>
-<td class="ror">&nbsp;</td>
-</tr>
 
-<?php
-    $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=?";
-    $schonabgestimmt = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $gevotetevotes = [];
-    while ($rew = mysqli_fetch_assoc($schonabgestimmt)) {
-        $gevotetevotes[] = $rew['vote_id'];
-    }
-
-    $votevorhanden = 0;
-    $sql = "SELECT de_vote_umfragen.id, de_vote_umfragen.frage, de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id";
-    $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-
-    while ($row = mysqli_fetch_assoc($db_umfrage)) {
-        if (!in_array($row['id'], $gevotetevotes)) {
-            echo '<tr align="center"><td class="rl" width="13">&nbsp;</td>';
-            echo '<td class="cell"><a href="vote.php?action=abstimmen&id='.$row['id'].'">'.$row['frage'].'</a></td><td class="rr" width="13">&nbsp;</td></tr>';
-            $votevorhanden = 1;
-        }
-    }
-
-    if ($votevorhanden == 0) {
-        echo '<tr align="center"><td class="rl" width="13">&nbsp;</td><td><div class="cell">'.$vote_lang['msg_2'].'<br><a href="overview.php">weiter</a></div></td><td class="rr" width="13">&nbsp;</td></tr>';
-    }
-    ?>
-<tr height="20">
-<td class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-
-<br><br><br>
 <table border="0" cellpadding="0" cellspacing="0" width="500">
 <tr height="37" align="center">
 <td class="rol">&nbsp;</td>

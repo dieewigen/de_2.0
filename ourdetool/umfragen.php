@@ -31,6 +31,9 @@ include "../inccon.php";
 	<?php
 	include "det_userdata.inc.php";
 
+	$stimmengesamt=0;
+	$prozentegesamt=0;
+
 	// Sicherstellen, dass die Variable $action definiert ist
 	$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 	$id = isset($_REQUEST['id']) ? $_REQUEST['id'] : 0;
@@ -585,8 +588,6 @@ include "../inccon.php";
 							<td class="cell" cellspacing="2" align="center">Es haben bis jetzt
 
 								<?php
-
-								//include("../cache/anz_user.tmp");
 								$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=0 AND sector>1");
 								$gesamtuser = mysqli_num_rows($db_daten);
 
@@ -604,7 +605,7 @@ include "../inccon.php";
 								} // Ende der while($temp<(count($vorabstimmen))) Schleife
 								echo number_format((($abgegebenestimmen - count($antworten)) * 100) / $gesamtuser, 2, ",", ".") . "%";
 								?>
-								der Spieler an der Umfrage teilgenommen!</td>
+								der Spieler (<?php echo $gesamtuser;?>) an der Umfrage teilgenommen!</td>
 						</tr>
 
 						<tr height="25">
