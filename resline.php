@@ -1,15 +1,11 @@
 <?php
 include 'inc/lang/'.$sv_server_lang.'_resline.lang.php';
 
-//tickzeiten laden
-include "cache/lasttick.tmp";
-include "cache/lastmtick.tmp";
-
-$tickResult=mysqli_execute_query($GLOBALS['dbi'], "SELECT lasttick, lastmtick FROM de_system LIMIT 1");
-$tickData=mysqli_fetch_assoc($tickResult);
-$lastWT = date('H:i', strtotime($tickData['lasttick']));
-$lastKT = date('H:i', strtotime($tickData['lastmtick']));
-
+//de_system laden
+$deSystemResult=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system LIMIT 1");
+$deSystem=mysqli_fetch_assoc($deSystemResult);
+$lastWT = date('H:i', strtotime($deSystem['lasttick']));
+$lastKT = date('H:i', strtotime($deSystem['lastmtick']));
 
 $mes1='';
 $mes2='';

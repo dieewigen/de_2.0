@@ -2942,6 +2942,8 @@ CREATE TABLE `de_system` (
 
 ALTER TABLE `de_system` CHANGE `lasttick` `lasttick` DATETIME NULL, CHANGE `lastmtick` `lastmtick` DATETIME NOT NULL;
 
+ALTER TABLE `de_system` ADD `server_information` TEXT NOT NULL AFTER `create_map_objects`;
+
 --
 -- Daten für Tabelle `de_system`
 --
