@@ -25,6 +25,8 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 
+$a=$_REQUEST['a'] ?? -1;
+
 if(!$isleader){
 	echo $allydelete_lang['msg_1'];
 }

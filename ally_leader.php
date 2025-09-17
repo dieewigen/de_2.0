@@ -26,7 +26,7 @@ $system = $row['system'];
 <!DOCTYPE HTML>
 <html>
 <head>
-<title><?=$allyleader_lang['title']?></title>
+<title><?php echo $allyleader_lang['title']?></title>
 <?php include "cssinclude.php"; ?>
 </head>
 <?php
@@ -34,6 +34,9 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 include('resline.php');
 include('ally/ally.menu.inc.php');
+
+$userid = $_REQUEST['userid'] ?? -1;
+
 $allys = mysqli_execute_query(
     $GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid=?",
