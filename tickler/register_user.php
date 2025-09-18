@@ -138,7 +138,7 @@ if ($dortick == 1) {
                         GROUP BY s.sec_id
                         ORDER BY systeme ASC, RAND()
                         LIMIT 1";
-                $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sv_free_startsectors, $maxsector]);
+                $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sv_free_startsectors+1, $maxsector]);
                 $rowx = mysqli_fetch_array($rx);
                 $sec = $rowx['sector'] ?? null;
 
