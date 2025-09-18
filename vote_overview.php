@@ -65,7 +65,7 @@ if ($action == "" || $action == "uebersicht") {
     $db_alteumfragen = mysqli_execute_query($GLOBALS['dbi'], $sql);
 
     while ($row = mysqli_fetch_assoc($db_alteumfragen)) {
-        echo '<tr align="center"><td class="rl" width="13">&nbsp;</td><td><div class="cellu"><a href="vote.php?action=show&id='.$row['id'].'">'.$row['frage'].'</a></div></td><td class="rr" width="13">&nbsp;</td></tr>';
+        echo '<tr align="center"><td class="rl" width="13">&nbsp;</td><td><div class="cellu"><a href="vote_overview.php?action=show&id='.$row['id'].'">'.$row['frage'].'</a></div></td><td class="rr" width="13">&nbsp;</td></tr>';
         $alteumfragenvorhanden++;
     }
 
@@ -120,7 +120,7 @@ elseif ($action == "show") {
             $prozente = ($stimmen[0] > 0) ? number_format(($anzahl * 100) / $stimmen[0], 2, ",", ".") : '0,00';
             echo '<tr class="cell">
     <td height="25">&nbsp;'.$antworten[$i].'</td>
-    <td>&nbsp;<img src="'.'gp/'.'g/vote/l'.$farbe.'.gif" border="0"><img src="'.'gp/'.'g/vote/m'.$farbe.'.gif" border="0" width="'.$prozente.'" height="9"><img src="'.'gp/'.'g/vote/r'.$farbe.'.gif"></td>
+    <td style="white-space:nowrap">&nbsp;<img src="'.'gp/'.'g/vote/l'.$farbe.'.gif" border="0"><img src="'.'gp/'.'g/vote/m'.$farbe.'.gif" border="0" width="'.$prozente.'" height="9"><img src="'.'gp/'.'g/vote/r'.$farbe.'.gif"></td>
     <td width="40" nowrap>&nbsp;'.$anzahl.'</td>
     <td width="50" nowrap>&nbsp;'.$prozente.'%</td></tr>';
 
