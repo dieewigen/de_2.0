@@ -69,6 +69,7 @@ include "../inccon.php";
 
 		$z = 0;
 		$abgegebenestimmen = 0;
+		$db_ergebnisse='';
 		while ($z < count($endstimmen)) {
 			$db_ergebnisse = $db_ergebnisse . '|' . ($endstimmen[$z] - 1);
 			$abgegebenestimmen = $abgegebenestimmen + $endstimmen[$z];
