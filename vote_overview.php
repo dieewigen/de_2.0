@@ -61,7 +61,7 @@ if ($action == "" || $action == "uebersicht") {
 
 <?php
     $alteumfragenvorhanden = 0;
-    $sql = "SELECT id, frage FROM de_vote_umfragen WHERE status=2";
+    $sql = "SELECT id, frage FROM de_vote_umfragen WHERE status=2 ORDER BY id DESC";
     $db_alteumfragen = mysqli_execute_query($GLOBALS['dbi'], $sql);
 
     while ($row = mysqli_fetch_assoc($db_alteumfragen)) {
