@@ -396,13 +396,14 @@ if($sec_data['npc']==1){
 		
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
-		//spielername, geworben, details, im sektor online
+		//spielername, Spielertitel, details, im sektor online
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
     	$playername=utf8_encode_fix(umlaut($row['spielername']));
     	if(strtotime($row["last_click"])+1800 > time() AND $row["lstatus"]==1) $os=' *';else $os='';
     	if ($ownsector==$sf AND $secstatdisable==0) $osown=$os;else $osown='';
     	$csstag='tc1';
+		
 		$userTitle='';
 		$sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
 		$db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
