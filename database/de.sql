@@ -2944,6 +2944,8 @@ ALTER TABLE `de_system` CHANGE `lasttick` `lasttick` DATETIME NULL, CHANGE `last
 
 ALTER TABLE `de_system` ADD `server_information` TEXT NOT NULL AFTER `create_map_objects`;
 
+ALTER TABLE `de_system` ADD `structure_override_code` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL AFTER `server_information`;
+
 --
 -- Daten für Tabelle `de_system`
 --
