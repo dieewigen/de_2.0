@@ -22,7 +22,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include "resline.php";
 
 $id=$_REQUEST['id'] ?? -1;
-
+$typ=$_REQUEST['typ'] ?? 0;
 $action=$_REQUEST['action'] ?? '';
 
 //news anzeigen
