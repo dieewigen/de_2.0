@@ -1375,7 +1375,7 @@ for ($c = 0; $c < $z; $c++) {
         // der angreifer erhält ein zufälliges artefakt bei den npc
         /////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////
-        if ($npc == 1) {
+        if ($npc == 1 || $npc == 2) {
 
             //den größten angreifer bestimmen
             $biggestatter = 0;
@@ -1396,7 +1396,7 @@ for ($c = 0; $c < $z; $c++) {
                 //artefakt per zufall aussuchen
                 $ai = mt_rand(1, $ua_index + 1);
 
-                //artefakt dem spieler im geb�ude hinterlegen
+                //artefakt dem spieler im gebäude hinterlegen
                 mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES ('$uid', '$ai', '1')");
 
                 //artefakt info  für die news
