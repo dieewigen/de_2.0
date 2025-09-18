@@ -2,22 +2,9 @@
 include "../inc/sv.inc.php";
 include "../functions.php";
 include "../inc/env.inc.php";
-
-// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
-if (!isset($GLOBALS['dbi'])) {
-    $GLOBALS['dbi'] = mysqli_connect(
-        $GLOBALS['env_db_dieewigen_host'], 
-        $GLOBALS['env_db_dieewigen_user'], 
-        $GLOBALS['env_db_dieewigen_password'], 
-        $GLOBALS['env_db_dieewigen_database']
-    );
-    
-    if (!$GLOBALS['dbi']) {
-        die("Verbindung zur Datenbank konnte nicht hergestellt werden: " . mysqli_connect_error());
-    }
-}
+include "../inccon.php";
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!doctype html>
 <html>
 <head>
 <title>Admin - DE - News</title>

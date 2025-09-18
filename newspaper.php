@@ -134,7 +134,7 @@ else  //archiv
      {
        $t=(string)$rew['time'];
        $time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];
-  echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew['id'].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.utf8_encode(umlaut($rew['betreff'])).'</a><br><br>';
+  echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew['id'].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rew['betreff'].'</a><br><br>';
      }
      ?>
      </div></td>
