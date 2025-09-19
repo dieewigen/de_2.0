@@ -529,7 +529,6 @@ foreach ($sectorList as $sf) {
 
             $knowrasse = 0;
             $playerstatus = 0;
-            $rasse = '';
             $playerStatusClass = '';
             //hat man scandaten über die rasse/allianz?
             unset($allytagscan);
@@ -560,18 +559,6 @@ foreach ($sectorList as $sf) {
 
             $planet_id = 0;
             if ($knowrasse == 1) {
-                if ($row['rasse'] == 1) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-                }
-                if ($row['rasse'] == 2) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-                }
-                if ($row['rasse'] == 3) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.'gp/'.'g/r/raceK.png" title="K´Tharr" width="16px" height="16px">';
-                }
-                if ($row['rasse'] == 4) {
-                    $rasse = '<img style="margin-bottom: -4px" src="'.'gp/'.'g/r/raceZ.png" title="Z´tah-ara" width="16px" height="16px">';
-                }
                 $planet_id = $row['rasse'];
             }
 
@@ -632,7 +619,7 @@ foreach ($sectorList as $sf) {
             }
 
             $output .= '<div class="player-card" style="
-				background: url('.'gp/'.'g/derassenlogo'.$planet_id.'.png);
+				background: url(gp/g/derassenlogo'.$planet_id.'.png);
 				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
