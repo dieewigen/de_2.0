@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
 
 include "inc/header.inc.php";
