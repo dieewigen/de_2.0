@@ -382,6 +382,9 @@ for ($i = 0; $i < $fa; $i++) {
     if ($rasse_id == 4) {
         $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
     }
+    if ($rasse_id == 5) {
+        $rasse = '<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
+    }
 
     //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
     $fp = 0;
@@ -1302,6 +1305,10 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
         if ($rasse_id == 4) {
             $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
         }
+        if ($rasse_id == 5) {
+            $rasse = '<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
+        }
+
 
         //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
         $fp = 0;

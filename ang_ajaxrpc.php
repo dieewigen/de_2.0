@@ -390,10 +390,11 @@ if(isset($_REQUEST['getsectordata'])){
 
 
 				if($knowrasse==1){
-					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceK.png" title="K�Tharr" width="16px" height="16px">';
-					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="'.('gp/' ?? '').'g/r/raceZ.png" title="Z�tah-ara" width="16px" height="16px">';
+					if($row['rasse']==1)$rasse='<img style="margin-bottom: -4px" src="gp/g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
+					if($row['rasse']==2)$rasse='<img style="margin-bottom: -4px" src="gp/g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
+					if($row['rasse']==3)$rasse='<img style="margin-bottom: -4px" src="gp/g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
+					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="gp/g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+					if($row['rasse']==4)$rasse='<img style="margin-bottom: -4px" src="gp/g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
 					$senddata[$sf][$system]['rasse']=$row['rasse'];
 				}else{
 					$senddata[$sf][$system]['rasse']=-1;

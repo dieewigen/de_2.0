@@ -116,6 +116,8 @@ while ($data = mysqli_fetch_assoc($result)) {
         $rasse='<img src="gp/g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
     } elseif ($data['rasse'] == 4) {
         $rasse='<img src="gp/g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+    }elseif ($data['rasse'] == 5) {
+        $rasse='<img src="gp/g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
     }
 
 

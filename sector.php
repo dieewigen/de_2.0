@@ -451,6 +451,7 @@ if($sec_data['npc']==1){
 			if($row['rasse']==2)$rasse='<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
 			if($row['rasse']==3)$rasse='<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
 			if($row['rasse']==4)$rasse='<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+			if($row['rasse']==5)$rasse='<img src="'.'gp/'.'g/r/raceD.png" title="Z&#180;tah-ara" width="16px" height="16px">';
 		}
 		
 		$output.='<td class="cell tac">'.$rasse.'</td>';
