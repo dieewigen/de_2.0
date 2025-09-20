@@ -491,11 +491,11 @@ function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schif
   <table cellSpacing=0 cellPadding=2 width=555 border=1>
   <tr align="center">
   <td class="k1" width="15%"><b>'.$kbl_lang['angreifer'].':</b></td>
-  <td class="k1" width="85%">'.utf8_encode_fix($atterliste).'</td>
+  <td class="k1" width="85%">'.$atterliste.'</td>
   </tr>
   <tr align="center">
   <td class="k1"><b>'.$kbl_lang['verteidiger'].':</b></td>
-  <td class="k1">'.utf8_encode_fix($defferliste).'</td>
+  <td class="k1">'.$defferliste.'</td>
   </tr>
   <tr align="center">
 	<td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
