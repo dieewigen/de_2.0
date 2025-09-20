@@ -36,6 +36,8 @@ include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');
 
+$userid = $_GET['userid'] ?? 0;
+
 //Erweiterung des Querys auf Abfrage von Coleadern von Ascendant (05.09.2002)
 $allys = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
