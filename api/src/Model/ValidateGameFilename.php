@@ -13,7 +13,9 @@ class ValidateGameFilename
 		'missions.php',
 		'production.php',
 		'resource.php',
-		'sector.php'
+		'sector.php',
+		'secstatus.php',
+		'sysnews.php'		
 	);
 
     public function isValid($filename) :bool {
