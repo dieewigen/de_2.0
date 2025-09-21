@@ -8,12 +8,12 @@ require_once '../inc/env.inc.php';
         <title>NPCX</title>
 	    <meta charset="UTF-8">
 		<base href="/">
-	    <script src="js/jquery-3.7.1.min.js"></script>
+	    <script src="/npcx/js/jquery-3.7.1.min.js"></script>
 		<script>
 			var env_api_key = '<?php echo $GLOBALS['env_api_key']; ?>';
 		</script>		
-		<script src="js/npcx.js?time=<?php echo time()?>"></script>
-		<link rel="stylesheet" type="text/css" href="g/npcx.css?time=<?php echo time()?>">
+		<script src="/npcx/js/npcx.js?time=<?php echo time()?>"></script>
+		<link rel="stylesheet" type="text/css" href="/npcx/g/npcx.css?time=<?php echo time()?>">
     </head>
     <body>
         
