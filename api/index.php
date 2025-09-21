@@ -10,6 +10,7 @@ use DieEwigen\Api\Model\GetActiveBuilds;
 use DieEwigen\Api\Model\UserService;
 use DieEwigen\Api\Model\UserTechs;
 use DieEwigen\Api\Model\ValidateGameFilename;
+use DieEwigen\Api\Model\SetPlayerActivity;
 
 define("PROJECT_ROOT_PATH", __DIR__ . "/");
 require PROJECT_ROOT_PATH.'../inccon.php';
@@ -52,6 +53,13 @@ if(isset($data['action']) && !empty($data['action'])) {
     try {
         $userService = new UserService();
         $userId = intval($data['user_id'] ?? -1);
+
+        //set player activity if user_id is set and valid
+        if (isset($userId) && $userId > 0 && $userService->isAPIUser($userId)) {
+            $setPlayerActivity = new SetPlayerActivity();
+            $setPlayerActivity->setPlayerActivity($userId);
+        }
+
         switch ($data['action']) {
             case 'getAllNpcUsers':
                 $userModel = new GetAllUsers();
