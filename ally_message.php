@@ -69,6 +69,11 @@ include('ally/ally.menu.inc.php');
 
 $action=$_REQUEST['action'] ?? '';
 
+// Parameter für alle Aktionen definieren
+$se = $_REQUEST['se'] ?? 0;
+$sy = $_REQUEST['sy'] ?? 0;
+$t = $_REQUEST['t'] ?? '';
+
 if($action=="del"){//nachricht löschen
 	$se=(int)$se;
 	$sy=(int)$sy;
@@ -97,6 +102,11 @@ if ($ak || $deak){//HFNs direkt weiterleiten?
 }
 
 if($action=="fw"){
+	// Parameter validieren
+	$se=(int)$se;
+	$sy=(int)$sy;
+	if(!preg_match("/^[0-9]*$/i", $t))$t='';
+	
 	//$text=nl2br($_POST['text']);
 
 	$db_tfn = mysqli_execute_query($GLOBALS['dbi'],
