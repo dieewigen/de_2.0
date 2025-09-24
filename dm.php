@@ -89,18 +89,18 @@ $chat_height=400;
 		//Deffer
 		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img_grey" src="gp/g/icon6_grey.png" class="rounded-borders" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 36px; width: 24px; height: auto;" title="zum Sektorstatus" rel="tooltip">';
 		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer_img" src="gp/g/icon6.png" class="rounded-borders" style="display: none; cursor: pointer; position: absolute; left: 40px; top: 36px; width: 24px; height: auto;" title="Du wirst von diesen Einheiten verteidigt." rel="tooltip">';
-		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 66px;" title="zum Sektorstatus" rel="tooltip">&nbsp;</div>';
-		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer" class="topbar_textfield" style="color: rgba(40,112,53,1); display: none; cursor: pointer; top: 36px; left: 66px;" rel="tooltip"></div>';
+		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" class="topbar_textfield" style="cursor: pointer; top: 39px; left: 66px;" title="zum Sektorstatus" rel="tooltip">&nbsp;</div>';
+		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_deffer" class="topbar_textfield" style="color: rgba(40,112,53,1); display: none; cursor: pointer; top: 39px; left: 66px;" rel="tooltip"></div>';
 		
 		//Atter
 		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_atter_img_grey" src="gp/g/icon7_grey.png" class="rounded-borders" style="display: none; cursor: pointer; position: absolute; left: 140px; top: 36px; width: 24px; height: auto;" title="zum Sektorstatus" rel="tooltip">';
 		echo '<img onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_atter_img" src="gp/g/icon7.png" class="rounded-borders" style="animation: shake 0.5s; display: none; cursor: pointer; position: absolute; left: 140px; top: 36px; width: 24px; height: auto;" title="Du wirst von diesen Einheiten angegriffen." rel="tooltip">';
-		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 166px;" title="zum Sektorstatus" rel="tooltip">&nbsp;</div>';
-		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_atter" class="topbar_textfield" style="color: rgba(215,45,45,1); display: none; cursor: pointer; top: 36px; left: 166px;" rel="tooltip"></div>';
+		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" class="topbar_textfield" style="cursor: pointer; top: 39px; left: 166px;" title="zum Sektorstatus" rel="tooltip">&nbsp;</div>';
+		echo '<div onclick="switch_iframe_main_container(\'secstatus.php\')" id="tb_atter" class="topbar_textfield" style="color: rgba(215,45,45,1); display: none; cursor: pointer; top: 39px; left: 166px;" rel="tooltip"></div>';
 
 		//Punkte
 		echo '<img onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score_img" src="gp/g/icon8.png" class="rounded-borders" style="cursor: pointer;position: absolute; left: 240px; top: 36px; width: 24px; height: auto;" rel="tooltip">';
-		echo '<div onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score" class="topbar_textfield" style="cursor: pointer; top: 36px; left: 266px;" rel="tooltip"></div>';
+		echo '<div onclick="switch_iframe_main_container(\'toplist.php\')" id="tb_score" class="topbar_textfield" style="cursor: pointer; top: 39px; left: 266px;" rel="tooltip"></div>';
 
 		//Hyperfunk
 		echo '<img onclick="switch_iframe_main_container(\'hyperfunk.php\')" src="gp/g/hyper.png" style="cursor: pointer; position: absolute; left: 440px; top: 36px; width: 40px; height: auto;" title="Es liegen keine neuen Hyperfunknachrichten vor." rel="tooltip">';
