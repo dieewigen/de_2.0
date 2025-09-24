@@ -343,7 +343,7 @@ if($sec_data['npc']==1){
 	if($sf==1 && !isset($_REQUEST['showall'])){
 		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
 		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
-		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
+		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector=? ORDER BY $orderby ASC";
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
@@ -351,7 +351,7 @@ if($sec_data['npc']==1){
 		//alles anzeigen
 		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
 		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
-		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.werberid, 
+		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc, 
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector=? ORDER BY $orderby ASC";
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
@@ -390,7 +390,11 @@ if($sec_data['npc']==1){
 		//rang
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
-    	$rang="<img src='".'gp/'.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
+		$rang='';
+		if($row['npc']==0){
+			$rang="<img src='".'gp/'.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
+		}
+    	
 		$output.='<td class="cell tac">'.$rang.'</td>';
 		
 		
