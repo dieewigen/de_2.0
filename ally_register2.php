@@ -5,7 +5,6 @@ use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.registerzwei.lang.php';
 include 'functions.php';
-include('outputlib.php');
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, spielername 

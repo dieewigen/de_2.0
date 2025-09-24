@@ -10,9 +10,6 @@ $restyp01=$row["restyp01"];$restyp02=$row["restyp02"];$restyp03=$row["restyp03"]
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];
 $sector=$row["sector"];$system=$row["system"];
 
-//include "outputlib.php";
-
-//***************************************
 ?>
 <!doctype html>
 <html>

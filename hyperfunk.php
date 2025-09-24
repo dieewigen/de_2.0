@@ -370,8 +370,6 @@ if (isset($_POST['antbut'])) {
 
                     $time = strftime("%Y%m%d%H%M%S");
 
-                    //include('outputlib.php');
-
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
 
@@ -399,7 +397,6 @@ if ($sekmsg && $asec == 1) {
 if ($sekmsg && $asec != 1) {
     $time = date("YmdHis");
 
-    //include_once 'outputlib.php';
     $betreff = $_POST['betreff'];
     $betreff = str_replace('<', '&lt;', $betreff);
     $betreff = str_replace('>', '&gt;', $betreff);
@@ -460,7 +457,6 @@ if (isset($_POST['allimsg'])) {
 
     $time = date("YmdHis");
 
-    //include_once 'outputlib.php';
     $betreff = $_POST['betreff'];
     $betreff = str_replace('<', '&lt;', $betreff);
     $betreff = str_replace('>', '&gt;', $betreff);
@@ -548,8 +544,6 @@ if (isset($_POST['freundemsg'])) {
     $time = date("YmdHis");
 
     $anzahl_freunde = mysqli_num_rows($db_freunde);
-
-    //include_once 'outputlib.php';
 
     $betreff = $_REQUEST['betreff'];
     $betreff = str_replace('<', '&lt;', $betreff);

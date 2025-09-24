@@ -270,7 +270,6 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 include "resline.php";
 echo '<form action="politics.php" method="post">';
-include('outputlib.php');
 
 //SK - sekstat sichtbar
 if(isset($_REQUEST["do"]) && $_REQUEST["do"]==2 AND $system==issectorcommander()){

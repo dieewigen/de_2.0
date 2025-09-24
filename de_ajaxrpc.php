@@ -69,7 +69,6 @@ if(isset($_REQUEST['chatinsert'])){
 
 	//outputlib soll keine [tags] umschreiben
 	//$outputlib_dontchangetags=1;
-	//include_once('outputlib.php');
   
 	$chat_message=trim($_REQUEST['insert']);
 	$chat_message=htmlspecialchars($chat_message, ENT_QUOTES, 'UTF-8');
