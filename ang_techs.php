@@ -8,7 +8,6 @@ include 'functions.php';
 <html>
 <head>
 	<title>Technologien</title>
-	<link rel="stylesheet" href="js/jquery-ui-1.14.1/jquery-ui.min.css">
 <?php
 include "cssinclude.php";
 ?>
