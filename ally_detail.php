@@ -85,15 +85,15 @@ if($num==1)
 	print("<tr><td>
 			<table border=\"0\" width=\"100%\" cellspacing=\"1\" cellpadding=\"0\">
 	    		<tr>
-	      			<td width=100% height=21 colspan=2 class=\"cellu\"><h3>$allydetail_lang[info] ".utf8_encode($clanname)." ($clankuerzel):</h3></td>
+	      			<td width=100% height=21 colspan=2 class=\"cellu\"><h3>$allydetail_lang[info] ".$clanname." ($clankuerzel):</h3></td>
 	    		</tr>
 	    		<tr class=cl>
 	      			<td height=21>$allydetail_lang[allyname]:</td>
-	      			<td height=21><b>".utf8_encode($clanname)."</b></td>
+	      			<td height=21><b>".$clanname."</b></td>
 	    		</tr>
 	    		<tr class=cl>
 	      			<td height=21>$allydetail_lang[allytag]:</td>
-	      			<td height=21><b>".utf8_encode($clankuerzel)."</b></td>
+	      			<td height=21><b>".$clankuerzel."</b></td>
 	    		</tr>");
 	//allyleader inkl. hf-möglichkeit 
 	$result = mysqli_execute_query($GLOBALS['dbi'], 
@@ -125,7 +125,7 @@ if($num==1)
 	    		</tr>
 	 			<tr class=cl>
 	      			<td height=21>$allydetail_lang[politischeausrichtung]:</td>
-	      			<td height=21><b>".utf8_encode($ausrichtung)."</b></td>
+	      			<td height=21><b>".$ausrichtung."</b></td>
 	    		</tr>
 	    		<tr class=cl>
 	      			<td height=21>$allydetail_lang[mitglieder]:</td>
@@ -145,13 +145,13 @@ if($num==1)
 	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[allianzbiografie]:</h3></td>
 	    		</tr>
 	    		<tr>
-	      			<td class=cl height=21 colspan=2>".utf8_encode($bio)."</td>
+	      			<td class=cl height=21 colspan=2>".$bio."</td>
 	    		</tr>
 	    		<tr>
 	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[bewerberinfo]:</h3></td>
 	    		</tr>
 	    		<tr>
-	      			<td class=cl height=21 colspan=2>".utf8_encode($bewerberinfo)."</td>
+	      			<td class=cl height=21 colspan=2>".$bewerberinfo."</td>
 	    		</tr>
 	    		<tr>
 	      			<td height=21 colspan=2><hr></td>
