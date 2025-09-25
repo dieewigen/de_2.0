@@ -3,6 +3,7 @@ $eftachatbotdefensedisable = 1;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
 include "functions.php";
+include_once "inc/artefakt.inc.php";
 
 include 'lib/map_system_defs.inc.php';
 include "lib/map_system.class.php";
@@ -97,11 +98,42 @@ $maxcol = $row['maxcol'];
   <div id="map">
 
 <?php
-//links oben spielname
+//////////////////////////////////////////////////////////////////////////////
+//links oben Spielname, Servertag und Servername
+//////////////////////////////////////////////////////////////////////////////
 echo '<div id="gamename" style="top:40000px; left:40000px;">die ewigen</div>';
 echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.' '.$sv_server_tag.'</div>';
 
+//////////////////////////////////////////////////////////////////////////////
 //rechts oben die struktur
+//////////////////////////////////////////////////////////////////////////////
+//es werden die Sektorartefakte angezeigt die in Sektor -1 sind
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [-1]);
+$artstr = '';
+while ($row = mysqli_fetch_array($res)) {
+    //artefakttooltip bauen
+    $desc = $row["artdesc"];
+    $desc = str_replace("{WERT1}", number_format($sv_artefakt[$row["id"] - 1][0], 2, ",", "."), $desc);
+    $desc = str_replace("{WERT2}", number_format($sv_artefakt[$row["id"] - 1][1], 0, "", "."), $desc);
+    $desc = str_replace("{WERT3}", number_format($sv_artefakt[$row["id"] - 1][2], 0, "", "."), $desc);
+    $desc = str_replace("{WERT4}", number_format($sv_artefakt[$row["id"] - 1][3], 0, "", "."), $desc);
+    $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
+    $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
+
+
+    $atip = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
+
+    $artstr .= '
+    <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip).'">
+        <img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" style="width: 50px; height: 50px;">
+    </div>';
+}
+
+if(!empty($artstr)) {
+    $artstr = '<div style="position: absolute; bottom: 18px; left: 22px; display: flex; gap: 4px; z-index: 10;">'.$artstr.'</div>';
+}
+
+//die Struktur darstellen
 echo '<div style="position: absolute; top:40000px; right:40000px;">
     <div style="
         background: linear-gradient(45deg, #00ff41, #0099ff, #ff0080, #00ff41);
@@ -148,6 +180,7 @@ echo '<div style="position: absolute; top:40000px; right:40000px;">
                     transition: all 0.3s ease;
                 " onmouseover="this.style.transform=\'scale(1.02)\'; this.style.filter=\'brightness(1.2) contrast(1.1)\';" 
                    onmouseout="this.style.transform=\'scale(1)\'; this.style.filter=\'brightness(1) contrast(1)\';">
+                '.$artstr.'
             </a>
             
             <!-- Sci-Fi Corner Decorations -->
@@ -767,12 +800,6 @@ foreach ($sectorList as $sf) {
             //Artefakte im Sektor
             $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [$sf]);
             $artnum = mysqli_num_rows($res);
-            $c = 0;
-
-            if ($artnum > 0) {
-                include_once "inc/artefakt.inc.php";
-            }
-
 
             while ($row = mysqli_fetch_array($res)) {
                 //artefakttooltip bauen
@@ -785,14 +812,12 @@ foreach ($sectorList as $sf) {
                 $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
 
 
-                $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
+                $atip = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
 
                 $artstr .= '
-                <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip[$c]).'">
+                <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip).'">
                     <img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" style="width: 25px; height: 25px;">
                 </div>';
-
-                $c++;
             }
 
             if ($artstr != '') {
