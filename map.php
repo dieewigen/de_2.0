@@ -133,6 +133,114 @@ if(!empty($artstr)) {
     $artstr = '<div style="position: absolute; bottom: 18px; left: 22px; display: flex; gap: 4px; z-index: 10;">'.$artstr.'</div>';
 }
 
+//Ausgabe structure_override_code
+$structureOverrideCode = '';
+$deSystemResult=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system LIMIT 1");
+$deSystem=mysqli_fetch_assoc($deSystemResult);
+
+echo '
+<script>
+const socRaenge = ["alpha","beta","gamma","delta","epsilon","zeta","eta","theta","iota","kappa","lambda","my","ny","xi","omikron","pi","rho","sigma","tau","ypsilon","phi","chi","psi","omega"];
+const structureOverrideCode = [5,17,0,23,11,3,19,8,14,22,1,6,12,20,9,4,16,7,2,15,13,21,18,10,0,23,5,11,17,3,19,8,14,22,1,6,12,20,9,4,16,2];
+
+// HTML5 Audio Player für Greek Letters
+class GreekLetterPlayer {
+  constructor() {
+    this.audio = new Audio();
+    this.currentIndex = 0;
+    this.isPlaying = false;
+    this.playlist = this.buildPlaylist();
+    
+    console.log("GreekLetterPlayer initialized");
+    console.log("structureOverrideCode:", structureOverrideCode);
+    console.log("Playlist:", this.playlist);
+    
+    this.audio.addEventListener("ended", () => this.playNext());
+    this.audio.addEventListener("error", (e) => {
+      console.error("Audio error:", e);
+      console.error("Failed to load:", this.audio.src);
+    });
+    this.audio.addEventListener("loadstart", () => console.log("Loading:", this.audio.src));
+    this.audio.addEventListener("canplay", () => console.log("Can play:", this.audio.src));
+  }
+  
+  buildPlaylist() {
+    const playlist = structureOverrideCode.map(index => {
+      const filename = socRaenge[index] || "alpha"; // Fallback zu alpha
+      return `/sound/greek_letters/${filename}.mp3`;
+    });
+    
+    // Fallback wenn structureOverrideCode leer ist
+    if (playlist.length === 0) {
+      console.log("No structureOverrideCode found, using test playlist");
+      return ["/sound/greek_letters/alpha.mp3", "/sound/greek_letters/beta.mp3"];
+    }
+    
+    return playlist;
+  }
+  
+  play() {
+    console.log("Play button pressed");
+    console.log("Playlist length:", this.playlist.length);
+    
+    if (this.playlist.length === 0) {
+      console.log("No playlist available");
+      return;
+    }
+    
+    this.isPlaying = true;
+    this.currentIndex = 0;
+    this.loadAndPlay();
+  }
+  
+  stop() {
+    console.log("Stop button pressed");
+    this.isPlaying = false;
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.currentIndex = 0;
+  }
+  
+  playNext() {
+    console.log("Playing next track");
+    if (!this.isPlaying) return;
+    
+    this.currentIndex++;
+    if (this.currentIndex >= this.playlist.length) {
+      this.currentIndex = 0; // Loop zurück zum Anfang
+    }
+    
+    this.loadAndPlay();
+  }
+  
+  loadAndPlay() {
+    if (this.playlist[this.currentIndex]) {
+      console.log("Loading and playing:", this.playlist[this.currentIndex]);
+      this.audio.src = this.playlist[this.currentIndex];
+      this.audio.load();
+      
+      // User interaction ist erforderlich für autoplay
+      this.audio.play().then(() => {
+        console.log("Playback started successfully");
+      }).catch(e => {
+        console.error("Play error:", e);
+        console.error("This might be due to browser autoplay policy");
+        alert("Audio playback failed. This might be due to browser autoplay restrictions. Please interact with the page first.");
+      });
+    }
+  }
+  
+  getCurrentTrack() {
+    return this.playlist[this.currentIndex] || null;
+  }
+}
+
+// Globalen Player erstellen
+window.greekPlayer = new GreekLetterPlayer();
+
+</script>
+';
+
 //die Struktur darstellen
 echo '<div style="position: absolute; top:40000px; right:40000px;">
     <div style="
@@ -180,6 +288,9 @@ echo '<div style="position: absolute; top:40000px; right:40000px;">
                     transition: all 0.3s ease;
                 " onmouseover="this.style.transform=\'scale(1.02)\'; this.style.filter=\'brightness(1.2) contrast(1.1)\';" 
                    onmouseout="this.style.transform=\'scale(1)\'; this.style.filter=\'brightness(1) contrast(1)\';">
+                
+                
+
                 '.$artstr.'
             </a>
             
@@ -204,6 +315,12 @@ echo '<div style="position: absolute; top:40000px; right:40000px;">
                 border-top: 3px solid #0099ff;
                 opacity: 0.8;
             "></div>
+
+            <div id="greek-player-controls" style="position: absolute; top: 18px; right: 18px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 5px; color: white; font-family: Arial; font-size: 11px; z-index: 1000;">
+              <button onclick="window.greekPlayer.play()" style="margin-right: 3px; padding: 2px 6px; background: #3399FF; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 9px;">παίζω</button>
+              <button onclick="window.greekPlayer.stop()" style="padding: 2px 6px; background: #999999; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 9px;">σταμάτα</button>
+            </div>
+
             <div style="
                 position: absolute;
                 bottom: 10px;
