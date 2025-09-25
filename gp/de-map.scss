@@ -288,7 +288,7 @@ body {
 	flex-shrink: 0;
 }
 
-.player-actions a {
+.player-actions .action-link {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -303,6 +303,7 @@ body {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 	flex-shrink: 0;
 	flex-grow: 0;
+	cursor: pointer !important;
 
 	&:hover {
 		background: rgba(210, 210, 210, 0.4);

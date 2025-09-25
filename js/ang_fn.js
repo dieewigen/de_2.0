@@ -226,6 +226,7 @@ function switch_iframe_main_container(file){
 		$('#iframe_main_container', parent.document).html('<iframe src="'+file+'" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe>');
 		$('#iframe_main_container', parent.document).css('display','');
 		$('#iframe_main_container_big', parent.document).css('display','none');		
+		$('#iframe_main_container_closer', parent.document).css('display','');
 	}
 	
 	

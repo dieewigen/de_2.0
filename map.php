@@ -491,7 +491,7 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
             $userRang = '';
             if($row['npc']==0){
-                $userRang = 'Rang: '.$rangnamen[$row['rang']];
+                $userRang = '<br>Rang: '.$rangnamen[$row['rang']];
             }
 
             ////////////////////////////////////////////////////////////////////////
@@ -500,6 +500,7 @@ foreach ($sectorList as $sf) {
 
             $userTitle = '';
             if ($row['owner_id'] > 0) {
+                $userTitle = '<br>';
                 $sql = "SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
                 $db_datenx = mysqli_query($GLOBALS['dbi_ls'], $sql);
                 if (mysqli_num_rows($db_datenx) > 0) {
@@ -626,15 +627,19 @@ foreach ($sectorList as $sf) {
 				background-size: 95% auto;
 				background-position: 5px 0px;
 				background-repeat: no-repeat;
-				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')<br>'.$userRang.'<br>'.$userTitle.'"">';
+				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')'.$userRang.$userTitle.'"">';
 
 
             ////////////////////////////////////////////////////////////////////////
-            //Name / Rasse / Ally
+            //Name Ally
             ////////////////////////////////////////////////////////////////////////
 
-            $output .= '<div class="player-name">
-				<a href="details.php?se='.$sector.'&sy='.$row['system'].'" target="h" class="'.$playercsstag.' word-break">'.$playername.$osown.'</a>'.$showallytag.'</div>';
+            $output .= '
+            <div class="player-name">
+				<div onclick="switch_iframe_main_container(\'details.php?se='.$sector.'&sy='.$row['system'].'\')" class="'.$playercsstag.' word-break" style="cursor:pointer !important;">'.$playername.$osown.$showallytag.'</div>
+            </div>';
+
+            
 
             ////////////////////////////////////////////////////////////////////////
             //punkte
@@ -679,21 +684,21 @@ foreach ($sectorList as $sf) {
             ////////////////////////////////////////////////////////////////////////
 
             $aktion = '
-				<a target="h" href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Sonde starten">
+				<div onclick="switch_iframe_main_container(\'secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'\')" title="Sonde starten" class="action-link">
                     <div class="icon-sonde"></div>
-                </a>
+                </div>
 
-				<a target="h" href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'" title="Agenteneinsatz">
+				<div onclick="switch_iframe_main_container(\'secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'\')" class="action-link" title="Agenteneinsatz">
                     <div class="icon-agent"></div>
-                </a>
+                </div>
 
-				<a class="text1" target="h" href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">
+				<div onclick="switch_iframe_main_container(\'military.php?se='.$sector.'&sy='.$row['system'].'\')" class="action-link" title="Flotteneinsatz">
                     <div class="icon-fleet"></div>
-                </a>
+                </div>
 				
-                <a class="text1'.$playerStatusClass.'" target="h" href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Geheimdienstinformationen">
+                <div onclick="switch_iframe_main_container(\'secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'\')" class="action-link'.$playerStatusClass.'" title="Geheimdienstinformationen">
                     <div class="icon-secret-info"></div>
-                </a>';
+                </div>';
 
             $output .= '<div class="player-actions">'.$aktion.'</div>';
 
@@ -749,7 +754,7 @@ foreach ($sectorList as $sf) {
         // Button für Sektorpolitik nur im eigenen Sektor anzeigen
         if ($sf == $ownsector) {
             echo '<div>';
-            echo '<a href="politics.php" target="h" class="button" style="background-color: #4CAF50; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px; display: inline-block;">Sektorpolitik</a>';
+            echo '<div onclick="switch_iframe_main_container(\'politics.php\')" class="button" style="background-color: #4CAF50; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px; display: inline-block; cursor:pointer !important;">Sektorpolitik</div>';
             echo '</div>';
         }
         
@@ -783,9 +788,9 @@ foreach ($sectorList as $sf) {
                 $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
 
                 $artstr .= '
-                <a href="help.php?a=1" target="_blank" title="'.umlaut($atip[$c]).'">
+                <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip[$c]).'">
                     <img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" style="width: 25px; height: 25px;">
-                </a>';
+                </div>';
 
                 $c++;
             }
@@ -1188,6 +1193,7 @@ echo $output;
 
   // Drag State
   let isDragging = false;
+  let hasDragged = false; // Flag um zu tracken, ob tatsächlich gedraggt wurde
   let dragStartX = 0;
   let dragStartY = 0;
   let dragOriginX = 0;
@@ -1254,6 +1260,7 @@ function centerMap() {
   // Drag starten
   function startDrag(clientX, clientY) {
     isDragging = true;
+    hasDragged = false;
     dragStartX = clientX;
     dragStartY = clientY;
     dragOriginX = offsetX;
@@ -1271,6 +1278,11 @@ function centerMap() {
     const deltaX = clientX - lastMouseX;
     const deltaY = clientY - lastMouseY;
     
+    // Setze hasDragged auf true, wenn sich die Maus bewegt hat
+    if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+      hasDragged = true;
+    }
+    
     offsetX += deltaX;
     offsetY += deltaY;
     
@@ -1283,8 +1295,11 @@ function centerMap() {
 
   // Drag stoppen
   function stopDrag() {
+    const wasDragged = hasDragged;
     isDragging = false;
+    hasDragged = false;
     viewport.style.cursor = 'default';
+    return wasDragged; // Rückgabe ob tatsächlich gedraggt wurde
   }
 
   // Hilfsfunktionen für Touch
@@ -1303,13 +1318,8 @@ function centerMap() {
 
   // Maus-Events fürs Draggen - verbessert
   viewport.addEventListener('mousedown', (e) => {
-    // Nur linke Maustaste und nicht auf klickbare Elemente
+    // Nur linke Maustaste
     if (e.button !== 0) return;
-    
-    // Verhindere Dragging auf Links und Buttons
-    if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
-      return;
-    }
     
     e.preventDefault();
     startDrag(e.clientX, e.clientY);
@@ -1325,7 +1335,21 @@ function centerMap() {
   document.addEventListener('mouseup', (e) => {
     if (isDragging) {
       e.preventDefault();
-      stopDrag();
+      const wasDragged = stopDrag();
+      
+      // Wenn tatsächlich gedraggt wurde, click-Events für kurze Zeit blockieren
+      if (wasDragged) {
+        const clickBlocker = (clickEvent) => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          clickEvent.stopImmediatePropagation();
+        };
+        
+        document.addEventListener('click', clickBlocker, true);
+        setTimeout(() => {
+          document.removeEventListener('click', clickBlocker, true);
+        }, 10);
+      }
     }
   });
 
