@@ -1,17 +1,25 @@
 <?php
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php');
+include 'inc/lang/'.$sv_server_lang.'_ally.settings.lang.php';
 include('lib/basefunctions.lib.php');
 include('inc/allyjobs.inc.php');
 include_once('functions.php');
 
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, dailyallygift FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status, ally_id, dailyallygift FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($db_daten);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row['score'];
 $newtrans=$row['newtrans'];$newnews=$row['newnews'];$sector=$row['sector'];$system=$row['system'];
 $dailyallygift=$row['dailyallygift'];
 
-if ($row['status']==1) $ownally = $row['allytag'];else $ownally='';
+if ($row['status']==1) {
+	$ownally = $row['allytag'];
+	$own_ally_id = $row['ally_id'];
+}else{
+	$ownally='';
+	$own_ally_id = -1;
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -100,9 +108,38 @@ include('ally/ally.menu.inc.php');
 // Abfrage auf $iscoleader hinzugef&uuml;gt von Ascendant (01.09.2002)
 if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.inc.php"));
 
-if($isleader || $iscoleader){
-        $query = "SELECT * FROM de_allys where leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?";
-        $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
+if(($isleader || $iscoleader) && $own_ally_id >0){
+	if(isset($_POST['B1'])){ //Settings speichern
+		$hpurl=$_POST['hpurl'] ?? '';
+		$bio=$_POST['bio'] ?? '';
+		$openirc=$_POST['openirc'] ?? '';
+		$internirc=$_POST['internirc'] ?? '';
+		$metairc=$_POST['metairc'] ?? '';
+		$keywords=$_POST['keywords'] ?? '';
+		$leadermessage=$_POST['leadermessage'] ?? '';
+		$bewerberinfo=$_POST['bewerberinfo'] ?? '';
+		$showactivity=intval($_POST['showactivity'] ?? 0);
+		$discord_bot=trim($_POST['discord_bot'] ?? '');
+
+		mysqli_execute_query($GLOBALS['dbi'],
+		"UPDATE de_allys 
+		SET homepage=?, besonderheiten=?, openirc=?, internirc=?, metairc=?, 
+			keywords=?, leadermessage=?, bewerberinfo=?, public_activity=?, discord_bot=? 
+		WHERE id=?",
+		[$hpurl, $bio, $openirc, $internirc, $metairc, $keywords, $leadermessage, 
+		$bewerberinfo, $showactivity, $discord_bot, $own_ally_id]);
+
+		echo '<div class="info_box mt10 mb10">';
+
+		echo "$allysettings_lang[msg_1]!";
+
+		echo '</div>';
+	}
+
+	//Allianzdaten laden
+	$query = "SELECT * FROM de_allys where leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?";
+    $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
+
 }else{
         $query = "SELECT * FROM de_allys ally, de_user_data user where user.allytag=ally.allytag and user.user_id=?";
         $result = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
@@ -345,7 +382,7 @@ echo '<tr class="cl">
 			<td height="21" colspan="3"><b>'.utf8_encode_fix($partnerallianz).'</b></td>
 		</tr>
 		<tr class=cl>
-			<td height="21">'.$allyallymain_lang['homepage'].':</td>
+			<td height="21">Website:</td>
 			<td height="21" colspan="3"><b><a href="'.$homepageurl.'" target=_blank>'.$homepageurl.'</a></b></td>
 		</tr>
 		
@@ -457,18 +494,24 @@ echo '
     		<tr>
       			<td class="cl" height="21" colspan="2">'.utf8_encode_fix($bio).'</td>
     		</tr>
+			</table>
 ';
 
 if ($isleader || $iscoleader)
 {
 	echo '
+
+		<div onclick="$(this).hide();$(\'#allianzbearbeiten\').show();" class="btn mt10 mb10" style="margin-left: auto; margin-right: auto;">Daten bearbeiten</div>
+
+		<form method="POST" action="allymain.php">
+		<table id="allianzbearbeiten" border="0" width="100%" cellspacing="1" cellpadding="0" class="invisible">
 			<tr>
       			<td height="21" colspan="2"><hr></td>
     		</tr>
     		<tr>
       			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['changedaten'].':</h3></td>
     		</tr>
-			<form method="POST" action="ally_settings.php">
+			
 			<tr>
 				<td colspan="2">'.$allyallymain_lang['homepage'].':<br>
       			<input type="text" name="hpurl" size="50" maxlength="50" value="'.$homepageurl.'"></td>
@@ -515,15 +558,18 @@ if ($isleader || $iscoleader)
     			<td colspan="2">'.$allyallymain_lang['bewerberinfo'].':<br>
       			<textarea rows="10" name="bewerberinfo" cols="71">'.utf8_encode_fix($bewerberinfo).'</textarea></td>
     		</tr>
-    		<tr><td><br><br></td></tr>
+    		<tr><td><br></td></tr>
     		<tr>
-    			<td colspan="2"><input type="submit" value="'.$allyallymain_lang['abschicken'].'" name="B1"><input type="reset" value="'.$allyallymain_lang['zurueck'].'" name="B2"></td>
+    			<td colspan="2">
+					<input type="submit" value="speichern" name="B1">
+					<br><br>
+				</td>
     		</tr>
 			</form>
 	';
 }
 
-echo '</table></td></tr></table></div></div>';
+echo '</table></td></tr></table></div><br><br></div>';
 
 ?>
 <br>
