@@ -7,7 +7,6 @@ $leader_pages = [
     'ally_message_leader.php',
     'ally_leader.php', 
     'ally_coleader.php',
-    'ally_settings.php',
     'ally_kick.php',
     'ally_delete.php'
 ];
@@ -89,28 +88,20 @@ function print_LEADER_ally_bar()
 				<tr align=\"center\">
 					<td><a href=\"ally_partner.php\" class=\"btn\">".$allymenu_lang['buendnis']."</a></td>
 					<td><a href=\"ally_war.php\" class=\"btn\">".$allymenu_lang['krieg']."</a></td>
-					<td><a href=\"ally_message_leader.php\" class=\"btn\">".$allymenu_lang['hfleader']."</a></td>
-					<td><a href=\"ally_message.php\" class=\"btn\">".$allymenu_lang['hfmember']."</a></td>
-				</tr>
-				<tr align=\"center\">
 					<td><a href=\"ally_finance.php\" class=\"btn\">".$allymenu_lang['finanzen']."</td>
 					<td><a href=\"ally_history.php\" class=\"btn\">".$allymenu_lang['allianzhistory']."</a></td>
-					<td><a href=\"ally_search.php\" class=\"btn\">".$allymenu_lang['allianzsuche']."</a></td>
-					<td><a href=\"ally_delete.php\" class=\"btn\">".$allymenu_lang['loeschen']."</a></td>
+
 				</tr>
 				<tr align=\"center\">
 					<td><a href=\"ally_fleet.php\" class=\"btn\">".$allymenu_lang['allianzflotten']."</a></td>
 					<td><a href=\"ally_bldg.php\" class=\"btn\">Projekte</a></td>
-					<td></td>
+					<td><a href=\"ally_delete.php\" class=\"btn\">".$allymenu_lang['loeschen']."</a></td>
 					<td></td>
 				</tr>
 			</table>");
-
-			//<td><a href=\"ally_forum.php\" class=\"btn\">".$allymenu_lang[allianzforum]."</a></td>
 }
 
-// ------�nderung von Ascendant (01.09.2002) - Erweiterung f�r Co-Leader Funktionen------
-// Ausgabe des Allianzenmen�s f�r Co-Leader
+// Ausgabe des Allianzenmenüs für Co-Leader
 function print_COLEADER_ally_bar()
 {
 	global $allymenu_lang;
@@ -124,24 +115,17 @@ function print_COLEADER_ally_bar()
 				<tr align=\"center\">
 					<td><a href=\"ally_war.php\" class=\"btn\">".$allymenu_lang['krieg']."</a></td>
 					<td><a href=\"ally_austritt.php\" class=\"btn\">".$allymenu_lang['austreten']."</a></td>
-					<td><a href=\"ally_message.php\" class=\"btn\">".$allymenu_lang['hfmember']."</a></td>
-					<td><a href=\"ally_message_leader.php\" class=\"btn\">".$allymenu_lang['hfleader']."</a></td>
-				</tr>
-				<tr align=\"center\">
 					<td><a href=\"ally_finance.php\" class=\"btn\">".$allymenu_lang['finanzen']."</td>
 					<td><a href=\"ally_history.php\" class=\"btn\">".$allymenu_lang['allianzhistory']."</a></td>
-					<td><a href=\"ally_search.php\" class=\"btn\">".$allymenu_lang['allianzsuche']."</a></td>
-					<td><a href=\"ally_fleet.php\" class=\"btn\">".$allymenu_lang['allianzflotten']."</a></td>
 				</tr>
 				<tr align=\"center\">
 					<td><a href=\"ally_bldg.php\" class=\"btn\">Projekte</a></td>
-					<td></td>
+					<td><a href=\"ally_fleet.php\" class=\"btn\">".$allymenu_lang['allianzflotten']."</a></td>
 					<td></td>
 					<td></td>
 				</tr>
 			</table>");
 }
-// --------------------- �nderung Ende -------------------------------------------
 
 function print_MEMBER_ally_bar()
 {
@@ -157,11 +141,11 @@ function print_MEMBER_ally_bar()
 					<td><a href=\"ally_austritt.php\" class=\"btn\">".$allymenu_lang['austreten']."</a></td>
 					<td><a href=\"ally_finance.php\" class=\"btn\">".$allymenu_lang['finanzen']."</td>
 					<td><a href=\"ally_history.php\" class=\"btn\">".$allymenu_lang['allianzhistory']."</a></td>
-					<td><a href=\"ally_search.php\" class=\"btn\">".$allymenu_lang['allianzsuche']."</a></td>					
+					<td><a href=\"ally_fleet.php\" class=\"btn\">".$allymenu_lang['allianzflotten']."</a></td>
 				</tr>
 				<tr align=\"center\">
-					<td><a href=\"ally_fleet.php\" class=\"btn\">".$allymenu_lang['allianzflotten']."</a></td>
 					<td><a href=\"ally_bldg.php\" class=\"btn\">Projekte</a></td>
+					<td></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -173,7 +157,7 @@ function print_NOBODY_ally_bar(){
 	print("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"cell\">
 				<tr align=\"center\">
 				<td><a href=\"ally_register.php\" class=\"btn\">".$allymenu_lang['gruenden']."</a></td>
-				<td><a href=\"ally_search.php\" class=\"btn\">".$allymenu_lang['beitreten']."</a></td>
+				<td><a href=\"toplist.php?&s=3\" class=\"btn\">".$allymenu_lang['beitreten']."</a></td>
 			</tr>
 			</table>");
 	
