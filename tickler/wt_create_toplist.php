@@ -1315,9 +1315,9 @@ xecho('
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-//in der de_sector die pl�tze der sektoren eintragen
+//in der de_sector die Plätze der sektoren eintragen
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set platz=0, tempcol=0");
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, sum(score) as score, sum(col) AS col FROM de_user_data WHERE npc=0 AND sector>1 GROUP BY sector ORDER BY score DESC");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, sum(score) as score, sum(col) AS col FROM de_user_data WHERE (npc=0 OR npc=2) AND sector > 1 AND sector < 666 GROUP BY sector ORDER BY score DESC");
 $platz=1;
 while($row = mysqli_fetch_array($db_daten)){
     $sec=$row["sector"];
