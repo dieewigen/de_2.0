@@ -336,7 +336,7 @@ function doBattleGround($bg)
                         $spielername1 = (isset($allys[$player_id1]['spielername']) ? $allys[$player_id1]['spielername'] : '').$p1_ship_level;
                         $spielername2 = (isset($allys[$player_id2]['spielername']) ? $allys[$player_id2]['spielername'] : '').$p2_ship_level;
 
-                        if(!empty($spielername1) && !empty($spielername2)){
+                        if(!empty($spielername1) || !empty($spielername2)){
                             $fightresult[$runde][] = array(
                                 'winner_user_id' => isset($allys[$winner_id]['ally_id']) ? $allys[$winner_id]['ally_id'] : 0,
                                 'user_id1' => isset($allys[$player_id1]['ally_id']) ? $allys[$player_id1]['ally_id'] : 0,
