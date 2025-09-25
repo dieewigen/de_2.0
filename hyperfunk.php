@@ -791,7 +791,7 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
                                 } elseif ($row['fromsec'] == "0"  and $row['fromsys'] == "0") {
                                     $row['fromnic'] = str_replace("Leader", " ", $row['fromnic']);
                                     $row['fromnic'] = trim($row['fromnic']);
-                                    echo '<a href="ally_message_leader.php?select=' . $row['fromnic'] . '">' . $row['fromnic'] . ' ' . $hyperfunk_lang['leader'] . '</a>';
+                                    //echo '<a href="ally_message_leader.php?select=' . $row['fromnic'] . '">' . $row['fromnic'] . ' ' . $hyperfunk_lang['leader'] . '</a>';
                                 } else {
                                     echo '&nbsp;' . $row['fromsec'] . ':' . $row['fromsys'] . ' (' . $row['fromnic'] . ')';
                                 }
