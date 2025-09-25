@@ -109,9 +109,6 @@ if (isset($_POST['befehle'])){
     case 5: //verteidigen
       attdef($_SESSION['ums_user_id'].'-1', $sector, $system, $pt, $zsecf1, $zsysf1, $db, 2, $af1-2);
       break;
-    case 6: //arch�ologie
-      quest($_SESSION['ums_user_id'].'-1', $zsecf1, $zsysf1);
-      break;
   }//switch af1 ende
   //flotte 2
 	$af2=isset($_POST['af2']) ? intval($_POST['af2']) : 0;
@@ -133,9 +130,7 @@ if (isset($_POST['befehle'])){
     case 5: //verteidigen
       attdef($_SESSION['ums_user_id'].'-2', $sector, $system, $pt, $zsecf2, $zsysf2, $db, 2, $af2-2);
       break;
-    case 6: //arch�ologie
-      quest($_SESSION['ums_user_id'].'-2', $zsecf2, $zsysf2);
-      break;  }//switch af2 ende
+	}//switch af2 ende
   //flotte 3
 	$af3=isset($_POST['af3']) ? intval($_POST['af3']) : 0;
   switch($af3){
@@ -156,55 +151,8 @@ if (isset($_POST['befehle'])){
     case 5: //verteidigen
       attdef($_SESSION['ums_user_id'].'-3', $sector, $system, $pt, $zsecf3, $zsysf3, $db, 2, $af3-2);
       break;
-    case 6: //arch�ologie
-      quest($_SESSION['ums_user_id'].'-3', $zsecf3, $zsysf3);
-      break;  }//switch af3 ende
+	}//switch af3 ende
 }
-
-function quest($fleet_id, $zsec, $zsys){
-	global $db, $errmsg, $military_lang, $showfleettarget;
-
-	//teste ob die flotte bereit ist befehle zu bekommen
-	$sql="SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id = '$fleet_id'";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
-	$row = mysqli_fetch_array($db_daten);
-	$akt=$row['aktion'];
-	$schiffe=0;
-	//schauen ob schiffe in der flotte sind
-	for ($i=81;$i<=90;$i++){
-		$erg=$row['e'.$i];
-		if ($erg>0) $schiffe=1;
-	}
-
-	//echo $schiffe.':'.$akt;
-	if ($schiffe>0)$errmsg.='<table width=600><tr><td class="ccr">'.$military_lang['error'].'<br>'.$military_lang['error2'].'</td></tr></table>';
-	if ($akt<>0)$errmsg.='<table width=600><tr><td class="ccr">'.$military_lang['error3'].'</td></tr></table>';
-	if ($schiffe==0 and $akt==0){ //flotte kann befehle bekommen
-		//teste ob die koordinaten ok sind
-		//man kann die einheiten nur in npc-systeme schicken
-		$zsec=(int)$zsec;
-		$zsys=(int)$zsys;
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT user_id FROM de_user_data WHERE sector='$zsec' and system='$zsys' AND npc=1");
-		$num = mysqli_num_rows($db_daten);
-
-		if($num==1){//die koordinaten stimmen
-			//showfleetstatus auslesen
-			$hv=explode('-',$fleet_id);
-			$showft=$showfleettarget[$hv[1]-1];
-
-			//flotte auf die reise schicken
-			$aktzeit=0;
-			$akttyp=4;
-			$rz=5;
-			$sql="UPDATE de_user_fleet SET aktion = '$akttyp', zeit = '$rz', gesrzeit = '$rz', zielsys = '$zsys', zielsec='$zsec', entdeckt=0, showfleettarget='$showft', aktzeit = '$aktzeit', fleetsize = 0 WHERE user_id = '$fleet_id'";
-			mysqli_query($GLOBALS['dbi'],$sql);
-			//meldung dass alles ok ist
-			$errmsg.='<table width=600><tr><td class="ccg">'.$military_lang['fleetrausack'].'</td></tr></table>';
-		}
-		else $errmsg.='<table width=600><tr><td class="ccr">'.$military_lang['fleetrausnack'].'</td></tr></table>';
-	}
-}
-
 
 //schauen ob er die whg hat und dann die attgrenze anpassen
 if ($techs[4]==0)$sv_attgrenze_whg_bonus=0;
@@ -805,17 +753,10 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 					//wenn man ohne transen angreift, dann meldung ausgeben
 					if($akttyp==1 AND $ez[6]==0)
 					$errmsg.='<div class="info_box text2">'.$military_lang['notranseninfo'].'</div>';
-
-					//wenn man andere spieler angreift, handelsinfo
-					/*
-					  if($akttyp==1 AND $npc==0)
-					  {
-						  $errmsg.='<div class="info_box text2">Achtung: Angriffe auf andere Spieler wirken sich negativ auf den Handelsbonus aus.</div>';
-					  }
-					  */
-					  //showfleettarget auslesen
-					  $hv=explode('-',$fleet_id);
-					  $showft=$showfleettarget[$hv[1]-1];
+					
+					//showfleettarget auslesen
+					$hv=explode('-',$fleet_id);
+					$showft=$showfleettarget[$hv[1]-1];
 
 					//flotte losschicken
 					if ($aktzeit<1 OR $aktzeit>3)$aktzeit=0;
