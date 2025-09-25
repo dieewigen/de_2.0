@@ -73,15 +73,6 @@ function insertmessage($message, $color, $lang_systemnachricht)
     return $nachricht;
 }
 
-function insertemp($spieler)
-{
-    $empfa = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, spielername FROM de_user_data WHERE user_id=?", [$spieler]);
-    $rowemp = mysqli_fetch_array($empfa);
-
-    $namekoords = $rowemp[sector].':'.$rowemp['system'].' ('.$rowemp['spielername'].')';
-
-    return $namekoords;
-}
 ?>
 <!doctype html>
 <html>
@@ -486,54 +477,33 @@ if (isset($_POST['allimsg'])) {
     } elseif ($nachricht == "") {
         echo insertmessage($hyperfunk_lang['msg_1'], "r", $hyperfunk_lang['systemnachricht']);
     } else {
-        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT ally_id FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_array($holalli);
-        $alli = $row['allytag'];
-        $hfnforward = mysqli_execute_query($GLOBALS['dbi'], "SELECT hfn_forwarding FROM de_allys WHERE allytag=?", [$alli]);
-        $rowhfnforward = mysqli_fetch_array($hfnforward);
+        $ally_id = $row['ally_id'];
 
-        if ($rowhfnforward['hfn_forwarding'] == "1") {
-            $resource = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE allytag=? AND status=1", [$alli]);
-            $igmsg = 0;
-            while ($rowa = mysqli_fetch_array($resource)) {
+        $resource = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id = ? AND status=1", [$ally_id]);
+        $igmsg = 0;
+        while ($rowa = mysqli_fetch_array($resource)) {
 
-                $db_ignore = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_hfn_buddy_ignore WHERE user_id=? and `system`=? and sector=? and status=2", [$rowa['user_id'], $asys, $asec]);
-                $numignore = mysqli_num_rows($db_ignore);
+            $db_ignore = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_hfn_buddy_ignore WHERE user_id=? and `system`=? and sector=? and status=2", [$rowa['user_id'], $asys, $asec]);
+            $numignore = mysqli_num_rows($db_ignore);
 
-                if ($numignore == 0) {
-                    mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans = 1 where user_id = ? and user_id!=?", [$rowa['user_id'], $_SESSION['ums_user_id']]);
-                    mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$rowa['user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
-                } else {
-                    $igmsg++;
-                }
-
-            }
-            mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
-            if ($igmsg == 0) {
-                echo insertmessage($hyperfunk_lang['msg_9'], "g", $hyperfunk_lang['systemnachricht']);
+            if ($numignore == 0) {
+                mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newtrans = 1 where user_id = ? and user_id!=?", [$rowa['user_id'], $_SESSION['ums_user_id']]);
+                mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$rowa['user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
             } else {
-                echo insertmessage($hyperfunk_lang['msg_10'], "g", $hyperfunk_lang['systemnachricht']);
+                $igmsg++;
             }
 
-        } else {
-
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_hfn_usr_ally (allytag, absender, fromsec, fromsys, fromnic, time, betreff, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [$row['allytag'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
-
-            $holleader = mysqli_execute_query($GLOBALS['dbi'], "SELECT leaderid,  coleaderid1,  coleaderid2 FROM de_allys WHERE allytag=?", [$row['allytag']]);
-            $rowleader = mysqli_fetch_array($holleader);
-
-            mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set  newnews=1 where user_id=?", [$rowleader['leaderid']]);
-            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news(user_id ,typ,time,text,seen) VALUES (?, '6', ?, 'Eines ihrer Allianzmitglieder hat eine Allianzrundmail abgeschickt. Diese kann <a href=ally_message.php><b>hier</b></a> weitergeleitet werden.', 0)", [$rowleader['leaderid'], $time]);
-            if ($rowleader['coleaderid1'] != "-1") {
-                mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set  newnews=1 where user_id=?", [$rowleader['coleaderid1']]);
-                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news(user_id ,typ,time,text,seen) VALUES (?, '6', ?, 'Eines ihrer Allianzmitglieder hat eine Allianzrundmail abgeschickt. Diese kann <a href=ally_message.php><b>hier</b></a> weitergeleitet werden.', 0)", [$rowleader['coleaderid1'], $time]);
-            }
-            if ($rowleader['coleaderid2'] != "-1") {
-                mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set  newnews=1 where user_id=?", [$rowleader['coleaderid2']]);
-                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news(user_id ,typ,time,text,seen) VALUES (?, '6', ?, 'Eines ihrer Allianzmitglieder hat eine Allianzrundmail abgeschickt. Diese kann <a href=ally_message.php><b>hier</b></a> weitergeleitet werden.', 0)", [$rowleader['coleaderid2'], $time]);
-            }
-            echo insertmessage($hyperfunk_lang['msg_11'], "g", $hyperfunk_lang['systemnachricht']);
         }
+        mysqli_execute_query($GLOBALS['dbi'], "insert into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, 'Allianzrundmail: '.$betreff, $nachricht]);
+        if ($igmsg == 0) {
+            echo insertmessage($hyperfunk_lang['msg_9'], "g", $hyperfunk_lang['systemnachricht']);
+        } else {
+            echo insertmessage($hyperfunk_lang['msg_10'], "g", $hyperfunk_lang['systemnachricht']);
+        }
+
+
     }
 
 }
