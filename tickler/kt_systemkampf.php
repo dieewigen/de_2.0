@@ -1916,17 +1916,19 @@ for ($c = 0; $c < $z; $c++) {
 
                 }*/
 
-                if ($allyid > 0 and $npc == 0) {
+                //Statistik updaten
+                if ($allyid > 0 && $npc == 0) {
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET colstolen = colstolen + '".$atter_sk[$i]."' WHERE id='$allyid'");
                 }
-                if ($allyid > 0 and $npc == 1) {
+                if ($allyid > 0 && ($npc == 1 || $npc == 2)) {
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET colstolennpc = colstolennpc + '".$atter_sk[$i]."' WHERE id='$allyid'");
                 }
+
                 //allyaufgabe erbeute kollektoren allgemein gutschreiben
-                if ($allyid > 0 and $npc == 0) {
+                if ($allyid > 0 && $npc == 0) {
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=1");
                 }
-                if ($allyid > 0 and $npc == 1) {
+                if ($allyid > 0 && ($npc == 1 || $npc == 2)) {
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + '".$atter_sk[$i]."' WHERE id='$allyid' AND questtyp=3");
                 }
             } else { //die kollektoren werden vernichtet
