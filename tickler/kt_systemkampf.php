@@ -1899,8 +1899,7 @@ for ($c = 0; $c < $z; $c++) {
                 $col_angriffsgrenze_final = $sv_min_col_attgrenze;
             }
 
-            //if ($col*$col_angriffsgrenze_final<=$kollies OR $npc==1)//man erh�lt kollektoren
-            if ($col * $col_angriffsgrenze_final <= $kollies) {//man erh�lt kollektoren
+            if ($col * $col_angriffsgrenze_final <= $kollies) {//man erhält kollektoren
                 echo 'Kollektoren erbeutet.';
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col = col + '$atter_sk[$i]' WHERE user_id = '$uid'");
                 //fix für br, jeder kollektor gibt x M
