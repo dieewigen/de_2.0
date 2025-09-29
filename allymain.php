@@ -275,11 +275,11 @@ echo '
 	
 	<div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
 		<div style="position: relative; width: 128px; height: 128px; text-align: center; background-image: url(\'gp/g/mission_ares.png\'); background-size: cover; background-position: center;">
-			<div style="position:absolute; left:0; bottom:0; width: 100%; padding: 2px; text-align: center; background-color: rgba(0,0,0, 0.7);">ARES: '.$mission_counter[1].'</div>
+			<div style="position:absolute; left:0; bottom:0; width: 100%; padding: 2px; text-align: center; background-color: rgba(0,0,0, 0.5);">ARES: '.$mission_counter[1].'</div>
 		</div>
 		
 		<div style="position: relative; width: 128px; height: 128px; text-align: center; background-image: url(\'gp/g/mission_hephaistos.png\'); background-size: cover; background-position: center;">
-			<div style="position:absolute; left:0; bottom:0; width: 100%; padding: 2px; text-align: center; background-color: rgba(0,0,0, 0.7);">HEPHAISTOS: '.$mission_counter[2].'</div>
+			<div style="position:absolute; left:0; bottom:0; width: 100%; padding: 2px; text-align: center; background-color: rgba(0,0,0, 0.5);">HEPHAISTOS: '.$mission_counter[2].'</div>
 		</div>
 
 	</div>
