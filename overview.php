@@ -261,7 +261,20 @@ if ($sv_hardcore == 1) {
         if ($ticks < $sv_winscore) {
             //wieviel prozent der runde sind rum
             $p = $ticks / $sv_winscore;
+
+            //Datum des Start des EH-Kampfes berechnen
+            $verbleibendeWT = $sv_winscore - $ticks;
+            $anzahlWtProTag = 0;
+            for($i=0; $i<24; $i++) {
+                $anzahlWtProTag+=count($GLOBALS['wts'][$i]);
+            }
+
+            $ehkampfStartZeit=date("d.m. Y - H:i", time()+($verbleibendeWT/$anzahlWtProTag*60*60*24));
+            
+
+            //Tooltip bauen
             $ttip = $ov_lang['rundenfortschritt'].': '.number_format($ticks, 0, "", ".").'/'.number_format($sv_winscore, 0, "", ".").
+            '<br>Startzeitpunkt des Erhabenenkampfes ca.: '.$ehkampfStartZeit.
             '<br>'.$ov_lang['rundenhalteticks'].': '.number_format($sv_benticks, 0, "", ".").
             '<br><br>'.$ov_lang['rundeninfo1'].' '.$ov_lang['rundeninfo2'];
 

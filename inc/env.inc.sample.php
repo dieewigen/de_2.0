@@ -3,6 +3,7 @@
 
 //Admin-E-Mail-Adresse
 $GLOBALS['env_admin_email']='';
+$GLOBALS['env_noreply_email']='';
 
 //Forum
 $GLOBALS['env_db_forum_host']='';
