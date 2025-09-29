@@ -2058,7 +2058,7 @@ function reumlaut($fieldname)
 function mail_smtp($empfaenger, $subject, $body, $absender = '')
 {
     if(empty($absender)){
-        $absender = $GLOBALS['env_noreply_email'];
+        $absender = $GLOBALS['env_mail_noreply'];
     }
 
     $mail = new PHPMailer\PHPMailer\PHPMailer();
@@ -2074,7 +2074,7 @@ function mail_smtp($empfaenger, $subject, $body, $absender = '')
     $mail->Username = $GLOBALS['env_mail_user'];
     $mail->Password = $GLOBALS['env_mail_password'];
     $mail->IsHTML(true);
-    $mail->setFrom($GLOBALS['env_noreply_email'], 'Die Ewigen');
+    $mail->setFrom($GLOBALS['env_mail_noreply'], 'Die Ewigen');
     
     //Set who the message is to be sent to
     $mail->addAddress($empfaenger, '');

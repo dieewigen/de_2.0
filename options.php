@@ -170,7 +170,7 @@ if ($delacc) { //account löschen
                   [$_SESSION['ums_user_id']]);
                 $row = mysqli_fetch_assoc($db_daten);
                 $reg_mail = $row['reg_mail'];
-                @mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: '.$GLOBALS['env_noreply_email']);
+                @mail_smtp($reg_mail, $options_lang['emailgeloeschtbetreff'].' - '.$sv_server_name, $options_lang['emailgeloeschtbody'], 'FROM: '.$GLOBALS['env_mail_noreply']);
 
                 session_destroy();
                 header("Location: geloescht.php");

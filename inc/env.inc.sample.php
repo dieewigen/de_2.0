@@ -3,7 +3,6 @@
 
 //Admin-E-Mail-Adresse
 $GLOBALS['env_admin_email']='';
-$GLOBALS['env_noreply_email']='';
 
 //Forum
 $GLOBALS['env_db_forum_host']='';
@@ -48,5 +47,4 @@ $GLOBALS['webhooks']['xDE']=			'';
 $GLOBALS['env_rpc_authcode']='';
 
 // API Key for external services
-$GLOBALS['env_api_key']='
-?>
+$GLOBALS['env_api_key']='';

@@ -142,7 +142,7 @@ function SetMsg(NewMsg) {
      [$kommentartext, $uid]
    );
    
-   $det_email=$GLOBALS['env_noreply_email'];
+   $det_email=$GLOBALS['env_mail_noreply'];
    $emailtext=str_replace('\r\n',"\r\n", $emailtext);
    @mail($user_data["reg_mail"], 'Die Ewigen - Accountsperrung', utf8_encode($emailtext), 'FROM: '.$det_email);
 

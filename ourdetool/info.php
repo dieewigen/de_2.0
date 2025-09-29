@@ -157,7 +157,7 @@ if ($sendhyperfunk) {
 if ($sendmailregdaten) {
   $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.spielername, de_login.reg_mail FROM de_user_data, de_login WHERE de_user_data.user_id = ? AND de_login.user_id = ?", [$uid, $uid]);
   $mail_data = mysqli_fetch_array($result);
-  $det_email=$GLOBALS['env_noreply_email'];
+  $det_email=$GLOBALS['env_mail_noreply'];
   $emailtext = "Hallo, \r\n";
   $emailtext .= "dein Account bei Die-Ewigen (".$mail_data["spielername"].") wurde wegen der Angabe falscher Userdaten bei der Registrierung gesperrt. \r\n";
   $emailtext .= "Bitte erstelle in der Accountverwaltung ein Ticket mit den Daten (Vorname, Nachname, PLZ, Ort, Land).\r\n";
