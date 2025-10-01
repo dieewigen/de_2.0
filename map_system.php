@@ -91,7 +91,7 @@ if(!hasTech($pt,25)){
 	rahmen_unten();
 }else{
 	//welche ID will man sich ansehen?
-	$id=intval($_REQUEST['id']);
+	$id=intval($_REQUEST['id'] ?? 1);
 	if($id<1){
 		$id=1;
 	}
