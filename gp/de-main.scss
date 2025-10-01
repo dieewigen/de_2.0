@@ -248,9 +248,18 @@ h1 {
 	overflow: hidden;
 	width: 592px;
 	border: 1px solid #2f2f2f;
-	background: url(g/cellblack.png) repeat;
+	//background: url(g/cellblack.png) repeat;
+	background-color: rgba(0,0,0, 0.8);
 	text-align: center;
 	padding: 10px;
+}
+
+.font-size14{
+	font-size: 14px;
+}
+
+.font-size16{
+	font-size: 16px;
 }
 
 // Text-Alignment-Klassen
@@ -1941,6 +1950,67 @@ a.btn2:hover {
 	padding: 1px 4px 1px 4px;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+.npc{
+	.npc-details {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+		margin-top: 10px;
+		max-width: 600px;
+	
+		.npc-detail-card {
+			background: linear-gradient(145deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			border-radius: 6px;
+			padding: 8px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+			width: 290px;
+			height: 100%;
+			min-height: 140px;
+			display: flex;
+			flex-direction: column;
+
+			&:hover {
+				transform: scale(1.02);
+				box-shadow: 0 4px 12px rgba(195, 195, 195, 0.3);
+				border-color: rgba(255, 255, 255, 0.6);
+			}			
+			
+			&::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+			}
+
+			.header{
+				font-weight: bold;
+				font-size: 16px;
+				margin-bottom: 6px;
+				color: #FFFFFF;
+				text-align: center;
+			}
+
+			.detail-row {
+				display: flex;
+				align-items: center;
+				margin-bottom: 4px;
+
+				img {
+					margin-right: 6px;
+				}
+			}
+		}	
+	}
 }
 
 .dropdown-content {
