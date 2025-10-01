@@ -596,7 +596,7 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
     $kopfzeile .= '<div style="width: 90px; text-align: left;">'.$link_first.$link_lower.'</div>';
     $kopfzeile .= '
 	<div style="flex-grow: 1;">'.$sytem_name.' 
-		(#<input id="input_system_id"type="text" style="height: 12px; width: 24px; text-align: center;" value="'.$system_id.'">&nbsp;
+		(#<input id="input_system_id"type="text" style="height: 12px; width: 30px; text-align: center;" value="'.$system_id.'">&nbsp;
 		<span style="display: inline-block; width: 30px; cursor: pointer; height: 18px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;" onclick="location.href=\'map_system.php?id=\'+$(\'#input_system_id\').val()">OK</span>)
 		<a id="link_map" href="map_mobile.php#sysid'.$system_id.'" style="margin-right: 8px; display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;"'.$tooltip_map.'>&there4;</a>
 	</div>';
