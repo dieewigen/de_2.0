@@ -769,6 +769,9 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, factory_id, factory_used_capacity) VALUES (".$_SESSION['ums_user_id'].", $item_build_id, $z, $tech_ticks, $factory_id, $factory_used_capacity)";
 							//echo $sql;
 							mysqli_query($GLOBALS['dbi'],$sql);
+
+							//Lageranzahl neu laden, damit die Anzeige aktuell ist
+							$ps=loadPlayerStorage($_SESSION['ums_user_id']);
 						}
 					}
 				}
