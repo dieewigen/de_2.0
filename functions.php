@@ -46,14 +46,8 @@ function getInfocenter()
     $targetId='tb_infocenter_missions';
     //$content .= '<div class="header">Missionen</div>';
     if (!hasTech($pt, 29)) {
-        $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=29";
-        $db_tech = mysqli_query($GLOBALS['dbi'], $techcheck);
-        $row_techcheck = mysqli_fetch_array($db_tech);
-
-        //$content .= '<div>Fehlende Technologie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'<div>';
         //Icon ausblenden
         $content .= '$("#'.$targetId.'").hide();';
-
     } else {
         //die Missionsdatensätze auslesen
         $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".$_SESSION['ums_user_id'].";");
@@ -1907,115 +1901,6 @@ function get_fleet_ground_speed($ez, $rasse, $uid)
     }
 
     return($rz1);
-
-
-    /*
-    //anzahl der einheiten
-    $anzs=$sv_anz_schiffe;
-    //reisezeiten laden
-    for($x=0;$x<$sv_anz_schiffe;$x++)
-    {
-        //reisezeit aus dem schiffsdaten-array holen
-        $reisez[$x] = $sv_schiffsdaten[$_SESSION['ums_rasse']][$x][0];
-    }
-    //reisezeitberechnung grundreisezeit
-    $z1 = 0;
-    $z2 = 0;
-    $z3 = 0;
-
-    //ben�tigte transportkapazit�t
-    // [0] = ID des Feldes f�r Nissen [1] = ID des Feldes f�r Bomber [2] = N�tiger Platz f�r Nissen [3] = N�tige Platz f�r Bomber
-    $tragbars[0] = 0;
-    $tragbars[1] = 5;
-    $tragbars[2] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][0][2];
-    $tragbars[3] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][5][2];
-
-    //vorhandene transportkapazit�t
-    $tragers[0] = 3;
-    $tragers[0] = 4;
-    $tragers[0] = 7;
-    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][3][1];
-    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][4][1];
-    $tragers[0] = $sv_schiffsdaten[$_SESSION['ums_rasse']-1][7][1];
-
-     for ($x=0; $x <= $anzs; $x++)
-     {
-         for ($y=0; $y <= 2; $y++) {
-             if ($x == $tragers[$y])
-             {
-                 $trager[0] = $trager[0] + ($aktf[$x][0] * $tragers[$y+3]);
-                 $trager[1] = $trager[1] + ($aktf[$x][1] * $tragers[$y+3]);
-                 $trager[2] = $trager[2] + ($aktf[$x][2] * $tragers[$y+3]);
-             }
-
-             if ($y <= 1) {
-                 if ($x == $tragbars[y]) {
-                     $tragbar[0][$y] = $tragbar[0][$y] + ($aktf[$x][0] * $tragbars[$y+2]);
-                     $tragbar[1][$y] = $tragbar[1][$y] + ($aktf[$x][1] * $tragbars[$y+2]);
-                     $tragbar[2][$y] = $tragbar[2][$y] + ($aktf[$x][2] * $tragbars[$y+2]);
-                 }
-             }
-         }
-
-
-        //schauen ob man j�ger/bomber dabei hat
-        if (($tragbar[0] + $tragbar[1]) > 0)
-        {
-            if (($tragbar[0] + $tragbar[1]) <= $trager)
-            {
-                for ($x=0; $x <= $anzs; $x++)
-                {
-                    if ($aktf[$x] != 0)
-                    {
-                        if (($x != $tragbars[0]) && ($x != $tragbars[1]))
-                        {
-                            if ($reisez[$x][0] > $z1) { $z1 = $reisez[$x][0]; }
-                            //if ($reisez[$x][1] > $z2) { $z2 = $reisez[$x][1]; }
-                            //if ($reisez[$x][2] > $z3) { $z3 = $reisez[$x][2]; }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // Bomber werden als erstes in Tr�ger gesetzt, da l�ngere Reisezeit
-                if ($tragbar[1] > $trager) {
-                    // Bomber-Reisezeit, da mehr Bomber als Platz vorhanden
-                    $z1 = $reisez[$tragbars[1]][0];
-                    //$z2 = $reisez[$tragbars[1]][1];
-                    //$z3 = $reisez[$tragbars[1]][2];
-                }
-                else
-                {
-                    if (($tragbar[0] + $tragbar[1]) > $trager)
-                    {
-                        // Hornissen-Reisezeit, da mehr Hornissen als Platz vorhanden
-                        $z1 = $reisez[$tragbars[0]][0];
-                        //$z2 = $reisez[$tragbars[0]][1];
-                        //$z3 = $reisez[$tragbars[0]][2];
-                    }
-                }
-            }
-        }
-        else
-        {
-            for ($x=0; $x <= $anzs; $x++)
-            {
-                if ($aktf[$x] != 0)
-                {
-                    if (($x != $tragbars[0]) && ($x != $tragbars[1]))
-                    {
-                        if ($reisez[$x][0] > $z1) { $z1 = $reisez[$x][0]; }
-                        //if ($reisez[$x][1] > $z2) { $z2 = $reisez[$x][1]; }
-                        //if ($reisez[$x][2] > $z3) { $z3 = $reisez[$x][2]; }
-                    }
-                }
-            }
-        }
-
-    echo $z1;
-    $z1='-10';*/
-    return($z1);
 }
 
 function umlaut($fieldname)
