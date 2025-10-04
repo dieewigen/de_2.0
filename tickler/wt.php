@@ -113,6 +113,11 @@ if ($doetick == 1) {
     echo '<br>Kollektortransfer aus Sektor 1<br>';
     print_r(new TickSpendCollectorFromSector1($GLOBALS['dbi'])->run());
 
+    //Kollektoren an die NPC Typ 2 verteilen
+    if($rundenalter_wt % 60){
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set col=col+1 WHERE npc=2 ", []);
+    }
+    
     //////////////////////////////////////////////////////////
     //votetimer für den sektor um 1 verringern
     //////////////////////////////////////////////////////////
@@ -216,7 +221,6 @@ if ($doetick == 1) {
             $tech_name = getTechNameByRasse($row["tech_name"], $player_rasse);
             $msg = $wt_lang['gebaeudeausbau'].': '.$tech_name.'<br>'.$wt_lang['gebaeudelevel'].': '.$artbldglevel;
 
-            //$time = strftime("%Y%m%d%H%M%S");
             $time = date("YmdHis");
             mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 2, ?, ?)", [$uid, $time, $msg]);
 
