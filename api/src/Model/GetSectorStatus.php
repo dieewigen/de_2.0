@@ -2,6 +2,8 @@
 
 namespace DieEwigen\Api\Model;
 
+use DieEwigen\Api\Types\SectorFleet;
+use DieEwigen\Api\Types\SectorStatus;
 use DieEwigen\Api\Types\SectorSystemStatus;
 use DieEwigen\Api\Types\SystemFleetStatus;
 
@@ -18,12 +20,18 @@ class GetSectorStatus
                                    WHERE (zielsec = ? OR (dud_target.ally_id != 0 AND dud_target.ally_id = ? AND dud_target.show_ally_secstatus > ?))
                                    AND entdecktsec = 1 AND (aktion = 1 OR aktion = 2)";
 
+    const string GET_SECTOR_FLEETS_SQL = "SELECT duf.hsec, duf.hsys, duf.aktion, duf.zeit, duf.e81, duf.e82, duf.e83, duf.e83,
+                                   duf.e84, duf.e85, duf.e86, duf.e87, duf.e88, duf.e89, duf.e90, dud_source.rasse
+                                   FROM de_user_fleet duf
+                                   JOIN de_user_data dud_source on duf.hsec = dud_source.sector AND duf.hsys = dud_source.`system`
+                                   WHERE duf.hsec = ? AND (aktion = 1 OR aktion = 2 OR aktion = 3)";
+
     /**
      * Retrieves sector status from the database.
      *
-     * @return array the sector status array of given user, one item represent the status of one system.
+     * @return SectorStatus the sector status array of given user, one item represent the status of one system + sector member fleets.
      */
-    public function getSectorStatus(int $userId) : array
+    public function getSectorStatus(int $userId): SectorStatus
     {
         $userService = new UserService();
         $requestingNpcData = $userService->getPlayerData($userId);
@@ -34,7 +42,25 @@ class GetSectorStatus
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_BOTH);
         $groupedFleetsByTarget = $this->groupFleetByTarget($result);
-        return $this->createSystemStatus($groupedFleetsByTarget);
+        $systemStatus = $this->createSystemStatus($groupedFleetsByTarget);
+        //fetch outgoing and returning fleets from sector mates.
+        $secFleetsStmt = mysqli_prepare($GLOBALS['dbi'], self::GET_SECTOR_FLEETS_SQL);
+        $secFleetsStmt->bind_param("i", $requestingNpcData[0]);
+        $secFleetsStmt->execute();
+        $secFleetsResult = $secFleetsStmt->get_result()->fetch_all(MYSQLI_BOTH);
+        $sectorFleets = $this->createSectorFleets($secFleetsResult);
+        return new SectorStatus($systemStatus, $sectorFleets);
+    }
+
+    private function createSectorFleets($rows): array
+    {
+        $fleetStatuses = array();
+        foreach ($rows as $row) {
+            $fleetPoints = $this->calculateFp($row);
+            $fleetEntry = new SectorFleet($row['hsec'], $row['hsys'], $row['zeit'], $fleetPoints, $row['aktion']);
+            $fleetStatuses[] = $fleetEntry;
+        }
+        return $fleetStatuses;
     }
 
     private function calculateFp($row): int
@@ -51,7 +77,7 @@ class GetSectorStatus
     {
         $systemStatus = array();
         foreach ($sectorFleetStatusRows as $targetStr => $systemFleetStatusRow) {
-            $attackFleetRows =  $this->filterByStatus($systemFleetStatusRow, 1);
+            $attackFleetRows = $this->filterByStatus($systemFleetStatusRow, 1);
             $defendFleetRows = $this->filterByStatus($systemFleetStatusRow, 2);
             $attackFleets = array_map(array($this, 'createFleetStatus'), $attackFleetRows);
             $defendFleets = array_map(array($this, 'createFleetStatus'), $defendFleetRows);
