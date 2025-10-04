@@ -114,10 +114,10 @@ if ($doetick == 1) {
     print_r(new TickSpendCollectorFromSector1($GLOBALS['dbi'])->run());
 
     //Kollektoren an die NPC Typ 2 verteilen
-    if($rundenalter_wt % 60){
+    if($rundenalter_wt > 2000 && $rundenalter_wt % 60 == 0){
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set col=col+1 WHERE npc=2 ", []);
     }
-    
+
     //////////////////////////////////////////////////////////
     //votetimer für den sektor um 1 verringern
     //////////////////////////////////////////////////////////
