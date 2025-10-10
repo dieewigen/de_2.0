@@ -152,6 +152,23 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $attackNews = $attackNews->getAttackNews($playerId, $userId);
                 echo json_encode($attackNews);
                 break;
+            case 'getDefferFleet':
+                // Parameter validieren
+                if (!isset($userId) || !isset($data['target_sector']) || !isset($data['target_system'])) {
+                    header('HTTP/1.1 400 Bad Request');
+                    echo json_encode(['message' => 'Fehlende Parameter: user_id, target_sector, target_system']);
+                    exit;
+                }
+                
+                $zielSec = intval($data['target_sector']);
+                $zielSys = intval($data['target_system']);
+
+                include_once "../functions.php";
+                $userModel = new GetUserFleet();
+                $fleets = $userModel->getDefferFleet($userId, $zielSec, $zielSys);
+                echo json_encode($fleets);
+                break;
+
             case 'openPage':
                 //all fields are required
                 if (!isset($userId) || !isset($data['filename'])) {
