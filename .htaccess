@@ -1,0 +1,8 @@
+RewriteEngine On
+# echte Dateien/Verzeichnisse ausnehmen
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# alle nicht-existierenden .php Anfragen -> index.php?page=NAME (Querystring bleibt erhalten)
+RewriteRule ^(.+)\.php$ index.php?page=$1 [L,QSA]
