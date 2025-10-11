@@ -99,7 +99,7 @@ class GetPlayerAttackInfo
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
-        return $row;
+        return $row ?? [];
     }
 
     public function getPlayerInfoByCoords(int $sector, int $system): array
@@ -108,7 +108,7 @@ class GetPlayerAttackInfo
         $stmt->bind_param("ii", $sector, $system);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
-        return $row;
+        return $row ?? [];
     }
 
 }
