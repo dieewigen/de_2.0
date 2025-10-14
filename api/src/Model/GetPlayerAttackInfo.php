@@ -61,7 +61,7 @@ class GetPlayerAttackInfo
         }
         $npcSectorRank = $this->getSectorRank($npcSector);
         $playerSectorRank = $this->getSectorRank($playerSector);
-        $rankDifference = $npcSectorRank - $playerSectorRank;
+        $rankDifference =  $playerSectorRank - $npcSectorRank;
         if ($rankDifference < 0) {
             $rankDifference = 0;
         }
