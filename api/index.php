@@ -1,4 +1,6 @@
 <?php
+
+use DieEwigen\Api\Model\GetAlliances;
 use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetAttackNews;
 use DieEwigen\Api\Model\GetPlayerAttackInfo;
@@ -138,6 +140,11 @@ if(isset($data['action']) && !empty($data['action'])) {
                 $sortType = $data['sortType'] ?? 'score';
                 $topList = new GetTopPlayers();
                 $result = $topList->getTopList($sortType);
+                echo json_encode($result);
+                break;
+            case 'getAlliances':
+                $alliances = new GetAlliances();
+                $result = $alliances->getAlliances();
                 echo json_encode($result);
                 break;
             case 'getAttackNews':
