@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
 use DieEwigen\DE2\Model\Tick\TickSpendCollectorFromSector1;
+use DieEwigen\DE2\Model\Tick\TickGiveSecBuildingsToNPC2;
 
 set_time_limit(240);
 $directory = '../';
@@ -113,7 +114,20 @@ if ($doetick == 1) {
     echo '<br>Kollektortransfer aus Sektor 1<br>';
     print_r(new TickSpendCollectorFromSector1($GLOBALS['dbi'])->run());
 
+    //////////////////////////////////////////////////////////
+    // bei X Ticks überprüfen ob die Sektoren in den nur 
+    // NPC-Typ 2 sind alle Sektorgebäude bekommen
+    //////////////////////////////////////////////////////////
+    if($rundenalter_wt == 2000){
+        echo '<br>Sektorgebäude an Sektoren mit nur NPC Typ 2<br>';
+        $npc2SecBuildings = new TickGiveSecBuildingsToNPC2($GLOBALS['dbi']);
+        $result = $npc2SecBuildings->run();
+        print_r($result);
+    }
+
+    //////////////////////////////////////////////////////////
     //Kollektoren an die NPC Typ 2 verteilen
+    //////////////////////////////////////////////////////////
     if($rundenalter_wt > 2000 && $rundenalter_wt % 60 == 0){
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set col=col+1 WHERE npc=2 ", []);
     }
