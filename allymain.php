@@ -182,6 +182,11 @@ $leadermessage 	= formatString($row_result["leadermessage"]);
 $bewerberinfo 	= formatString($row_result["bewerberinfo"]);
 $publicactivity = $row_result["public_activity"];
 
+// Rohdaten für Textareas (ohne formatString, um Zeilenumbrüche zu erhalten)
+$bio_raw = $row_result["besonderheiten"];
+$leadermessage_raw = $row_result["leadermessage"];
+$bewerberinfo_raw = $row_result["bewerberinfo"];
+
 $mission_counter[1]=	$row_result["mission_counter_1"];
 $mission_counter[2]=	$row_result["mission_counter_2"];
 
@@ -318,7 +323,7 @@ echo '<tr><td>
     		</tr>
     		<tr class=cl>
       			<td height=21>Allianzname /-tag:</td>
-      			<td height=21 colspan="3"><b>'.utf8_encode_fix($clanname).' / '.utf8_encode_fix($clankuerzel).'</b></td>
+      			<td height=21 colspan="3"><b>'.htmlspecialchars($clanname, ENT_QUOTES, 'UTF-8').' / '.htmlspecialchars($clankuerzel, ENT_QUOTES, 'UTF-8').'</b></td>
     		</tr>
     		<tr class=cl>
     		</tr>
@@ -380,7 +385,7 @@ echo '<tr class="cl">
 		</tr>
 		<tr class=cl>
 			<td height="21">Partnerallianz:</td>
-			<td height="21" colspan="3"><b>'.utf8_encode_fix($partnerallianz).'</b></td>
+			<td height="21" colspan="3"><b>'.htmlspecialchars($partnerallianz, ENT_QUOTES, 'UTF-8').'</b></td>
 		</tr>
 		<tr class=cl>
 			<td height="21">Website:</td>
@@ -493,7 +498,7 @@ echo '
       			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzbiografie'].':</h3></td>
     		</tr>
     		<tr>
-      			<td class="cl" height="21" colspan="2">'.utf8_encode_fix($bio).'</td>
+      			<td class="cl" height="21" colspan="2">'.nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8')).'</td>
     		</tr>
 			</table>
 ';
@@ -549,15 +554,15 @@ if ($isleader || $iscoleader)
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['allianzbiografie'].':<br>
-      			<textarea rows="22" name="bio" cols="71">'.utf8_encode_fix($bio).'</textarea></td>
+      			<textarea rows="22" name="bio" cols="71">'.htmlspecialchars($bio_raw, ENT_QUOTES, 'UTF-8').'</textarea></td>
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['msgtoleader'].':<br>
-      			<textarea rows="10" name="leadermessage" cols="71">'.utf8_encode_fix($leadermessage).'</textarea></td>
+      			<textarea rows="10" name="leadermessage" cols="71">'.htmlspecialchars($leadermessage_raw, ENT_QUOTES, 'UTF-8').'</textarea></td>
     		</tr>
     		<tr>
     			<td colspan="2">'.$allyallymain_lang['bewerberinfo'].':<br>
-      			<textarea rows="10" name="bewerberinfo" cols="71">'.utf8_encode_fix($bewerberinfo).'</textarea></td>
+      			<textarea rows="10" name="bewerberinfo" cols="71">'.htmlspecialchars($bewerberinfo_raw, ENT_QUOTES, 'UTF-8').'</textarea></td>
     		</tr>
     		<tr><td><br></td></tr>
     		<tr>
