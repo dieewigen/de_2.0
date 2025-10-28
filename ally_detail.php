@@ -145,7 +145,7 @@ if($num==1)
 	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[allianzbiografie]:</h3></td>
 	    		</tr>
 	    		<tr>
-	      			<td class=cl height=21 colspan=2>".$bio."</td>
+	      			<td class=cl height=21 colspan=2>".nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8'))."</td>
 	    		</tr>
 	    		<tr>
 	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[bewerberinfo]:</h3></td>

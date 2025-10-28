@@ -17,6 +17,7 @@ $col_count=$row['col'];$npc=$row['npc'];
 $ally_id=intval($_REQUEST['ally_id']);
 $ally_data=getAllyByID($ally_id);
 $a_name=$ally_data['allyname'];
+$a_tag=$ally_data['allytag'];
 
 $t_tojoin = round(($col_count / 4) -1, 0);
 if ($t_tojoin < 0)
@@ -136,7 +137,7 @@ if($ok || $warnung || $npc==2){
 
 					$result = mysqli_execute_query($GLOBALS['dbi'],
 						$sql,
-						[$ally_id, $a_name, $_SESSION['ums_user_id']]);
+						[$ally_id, $a_tag, $_SESSION['ums_user_id']]);
 					echo $allyjoin_lang['msg_16'];
 					die();					
 				}
