@@ -25,4 +25,7 @@ $allyjoin_lang['msg_13_1']='Sie haben sich bereits bei der Allianz';
 $allyjoin_lang['msg_13_2']='beworben.<br><br>Bewerbungstext';
 $allyjoin_lang['msg_14_1']='Ich möchte Mitglied in der Allianz';
 $allyjoin_lang['msg_14_2']='werden.<br><br> Antragstext';
+$allyjoin_lang['msg_15']='Der Allianzleader ist kein NPC Typ 2.';
+$allyjoin_lang['msg_16']='Der Allianzbeitritt war erfolgreich.';
+
 ?>
