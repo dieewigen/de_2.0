@@ -16,7 +16,8 @@ class ValidateGameFilename
 		'sector.php',
 		'secstatus.php',
 		'ally_register2.php',
-		'ally_join.php'
+		'ally_join.php',
+		'sysnews.php'
 	);
 
     public function isValid($filename) :bool {
