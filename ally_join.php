@@ -80,6 +80,7 @@ if ($quit_script && $npc != 2){
 $ok=$_POST['ok'] ?? false;
 $warnung=$_POST['warnung'] ?? false;
 if($ok || $warnung || $npc==2){
+	$error=false;
 	if(!$warnung)	{
 		$result = mysqli_execute_query($GLOBALS['dbi'],
 			"SELECT * FROM de_user_data WHERE user_id=?",
@@ -96,8 +97,7 @@ if($ok || $warnung || $npc==2){
 		{
 			die("$allyjoin_lang[msg_4]");
 		}
-
-		$error=false;
+		
 		if($user_ally_id>0 AND $status==1)
 		{
 			$error=true;
