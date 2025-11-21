@@ -33,6 +33,16 @@ Scripter
 Sekhopper
 Spamer
 ExecutorKarlath
+
+UPDATE de_user_data 
+SET 
+    spielername = CONCAT('DX*', LEFT(spielername, 17)),
+    nrspielername = CONCAT('DX*', LEFT(nrspielername, 17))
+WHERE 
+    npc = 2 
+    AND sector < 666
+    AND (spielername NOT LIKE 'DX*%' OR nrspielername NOT LIKE 'DX*%');
+
 */
 
 function generierespielername()
