@@ -81,7 +81,7 @@ for($i=81;$i<=104;$i++){
 		//Klassenname
 		$c1=0;
 		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}		
-		echo '<tr class="'.$bg.'"><td colspan="5" style="font-weight: bold; font-size: 24px;">'.$klassenname[$unit_id].'</td></tr>';
+		echo '<tr class="'.$bg.'"><td colspan="6" style="font-weight: bold; font-size: 24px;">'.$klassenname[$unit_id].'</td></tr>';
 		
 		//�berschrift
 		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}		
@@ -92,6 +92,7 @@ for($i=81;$i<=104;$i++){
 				<td><img src="'.'gp/'.'g/derassenlogo2.png" border="0" width="16px" heigth="16px"></td>
 				<td><img src="'.'gp/'.'g/derassenlogo3.png" border="0" width="16px" heigth="16px"></td>
 				<td><img src="'.'gp/'.'g/derassenlogo4.png" border="0" width="16px" heigth="16px"></td>
+				<td><img src="'.'gp/'.'g/derassenlogo5.png" border="0" width="16px" heigth="16px"></td>
 			</tr>';
 		
 		//Punkte
@@ -103,6 +104,7 @@ for($i=81;$i<=104;$i++){
 				<td>'.number_format($unit[1][$unit_id][4], 0,",",".").'</td>
 				<td>'.number_format($unit[2][$unit_id][4], 0,",",".").'</td>
 				<td>'.number_format($unit[3][$unit_id][4], 0,",",".").'</td>
+				<td>'.number_format($unit[4][$unit_id][4], 0,",",".").'</td>
 			</tr>';
 		
 		//Trefferpunkte
@@ -114,6 +116,7 @@ for($i=81;$i<=104;$i++){
 				<td>'.number_format($unit[1][$unit_id][1], 0,",",".").'</td>
 				<td>'.number_format($unit[2][$unit_id][1], 0,",",".").'</td>
 				<td>'.number_format($unit[3][$unit_id][1], 0,",",".").'</td>
+				<td>'.number_format($unit[4][$unit_id][1], 0,",",".").'</td>
 			</tr>';
 
 		//EMP-Waffen
@@ -125,14 +128,15 @@ for($i=81;$i<=104;$i++){
 				<td>'.number_format($unit[1][$unit_id][3], 2,",",".").'</td>
 				<td>'.number_format($unit[2][$unit_id][3], 2,",",".").'</td>
 				<td>'.number_format($unit[3][$unit_id][3], 2,",",".").'</td>
+				<td>'.number_format($unit[4][$unit_id][3], 2,",",".").'</td>
 			</tr>';
 		
 		//Blockreihenfolge
-		if($unit[0][$unit_id][3]>0 || $unit[1][$unit_id][3]>0 || $unit[2][$unit_id][3]>0 || $unit[3][$unit_id][3]>0){
+		if($unit[0][$unit_id][3]>0 || $unit[1][$unit_id][3]>0 || $unit[2][$unit_id][3]>0 || $unit[3][$unit_id][3]>0 || $unit[4][$unit_id][3]>0){
 			echo '
 				<tr class="'.$bg.'" style="font-style:italic;">
 					<td colspan="3">Blockreihenfolge</td>
-					<td colspan="2">Effizienz</td>
+					<td colspan="3">Effizienz</td>
 				</tr>';		
 			$effizienz=100;
 			$jaegerwar=false;
@@ -142,7 +146,7 @@ for($i=81;$i<=104;$i++){
 					echo '
 						<tr class="'.$bg.'">
 							<td colspan="3">'.$klassenname[$blockmatrix[$unit_id][$x*2]].'</td>
-							<td colspan="2">'.number_format($effizienz, 0,",",".").'%</td>
+							<td colspan="3">'.number_format($effizienz, 0,",",".").'%</td>
 						</tr>';
 					if($blockmatrix[$unit_id][$x*2]==0){
 						$jaegerwar=true;
@@ -160,14 +164,15 @@ for($i=81;$i<=104;$i++){
 				<td>'.number_format($unit[1][$unit_id][2], 2,",",".").'</td>
 				<td>'.number_format($unit[2][$unit_id][2], 2,",",".").'</td>
 				<td>'.number_format($unit[3][$unit_id][2], 2,",",".").'</td>
+				<td>'.number_format($unit[4][$unit_id][2], 2,",",".").'</td>
 			</tr>';
 
 		//Angriffsreihenfolgen konv. Waffen
-		if($unit[0][$unit_id][2]>0 || $unit[1][$unit_id][2]>0 || $unit[2][$unit_id][2]>0 || $unit[3][$unit_id][2]>0){
+		if($unit[0][$unit_id][2]>0 || $unit[1][$unit_id][2]>0 || $unit[2][$unit_id][2]>0 || $unit[3][$unit_id][2]>0 || $unit[4][$unit_id][2]>0){
 			echo '
 				<tr class="'.$bg.'" style="font-style:italic;">
 					<td colspan="3">Angriffsreihenfolge</td>
-					<td colspan="2">Effizienz</td>
+					<td colspan="3">Effizienz</td>
 				</tr>';		
 			$effizienz=100;
 			$jaegerwar=false;
@@ -177,7 +182,7 @@ for($i=81;$i<=104;$i++){
 					echo '
 						<tr class="'.$bg.'">
 							<td colspan="3">'.$klassenname[$kampfmatrix[$unit_id][$x*2]].'</td>
-							<td colspan="2">'.number_format($effizienz, 0,",",".").'%</td>
+							<td colspan="3">'.number_format($effizienz, 0,",",".").'%</td>
 						</tr>';		
 				}
 				
