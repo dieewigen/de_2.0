@@ -173,8 +173,8 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             $db_umfrage = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_vote_umfragen.id, de_vote_umfragen.frage,de_vote_umfragen.startdatum FROM de_vote_umfragen, de_login WHERE de_vote_umfragen.status=1 AND UNIX_TIMESTAMP(de_login.register)<UNIX_TIMESTAMP(de_vote_umfragen.startdatum) AND de_login.user_id=? ORDER BY de_vote_umfragen.id", [$_SESSION['ums_user_id']]);
             while ($row = mysqli_fetch_array($db_umfrage)) {
                 $i = 0;
-                while ($i <= count($gevotetevotes) + 1) {
-                    if ($gevotetevotes[$i] == $row['id']) {
+                while ($i < count($gevotetevotes)) {
+                    if (isset($gevotetevotes[$i]) && $gevotetevotes[$i] == $row['id']) {
                         $schongestimmt = 1;
                     }
                     $i++;
