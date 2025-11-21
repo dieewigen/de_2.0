@@ -1001,11 +1001,6 @@ class map_system{
 						if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
 							//Gebäudestufe bestimmen
 							$stufeninfo='';
-
-							if(isset($row['id']) && $bldg[$row['id']][$i]>0){
-								$stufeninfo='<br>'.$bldg[$row['id']][$i];
-							}
-
 	
 							//Grafik bestimmen
 							$filename_nr=$this->fields[$i][0];
