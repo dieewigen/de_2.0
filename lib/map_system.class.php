@@ -1276,7 +1276,7 @@ class map_system{
 							$loot_msg=$amount.'x Credit';
 						break;
 
-						default;
+						default:
 							$content.='ERROR A28';
 						break;
 					}
