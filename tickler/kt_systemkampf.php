@@ -773,7 +773,7 @@ for ($c = 0; $c < $z; $c++) {
     //in der schleife alle einheitentypen durchgehen
     for ($i = 0; $i < ($sv_anz_schiffe + $sv_anz_tuerme); $i++) {
         //zuerst schauen ob es in der klasse schiffe gibt die blocken
-        //in npc-systemen k�nnen die angreifer nicht blocken
+        //in npc-systemen können die angreifer nicht blocken
         if ($npc == 0) {
             //angreifer schie�en
             //blockwert auslesen
