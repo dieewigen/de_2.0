@@ -128,7 +128,10 @@ if ($dortick == 1) {
                 $sec = 666;
             } else {
                 $maxsystem = 500;
-                $maxsector = 42; // bei 200 NPC Typ 2 gibt es 5 Aliens pro Sektor bis Sektor 42 (Sektor 1 und 2 sind reserviert)
+                
+                //TODO: über globale Variable steuerbar machen
+                //$maxsector = 42; // bei 200 NPC Typ 2 gibt es 5 Aliens pro Sektor bis Sektor 42 (Sektor 1 und 2 sind reserviert)
+                $maxsector = 69; // bei 200 NPC Typ 2 gibt es 3 Aliens pro Sektor bis Sektor 69 (Sektor 1 und 2 sind reserviert)
 
                 //passenden Spielersektor suchen
                 $sql = "SELECT s.sec_id AS sector, COUNT(d.user_id) AS systeme
