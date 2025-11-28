@@ -2003,7 +2003,11 @@ function issectorcommander() {
 		//alle stimmen zählen
 		for ($i = 1; $i <= $sv_maxsystem; $i++){
 			if(isset($su[$i][1])){
-				$ska[$su[$i][1]]++;
+                if(!isset($ska[$su[$i][1]])){
+                    $ska[$su[$i][1]]=0;
+                }
+				
+                $ska[$su[$i][1]]++;
 			}
 		}
 		//maximalwert suchen
