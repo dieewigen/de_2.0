@@ -4,19 +4,19 @@ include "../inc/sv.inc.php";
 include "det_userdata.inc.php";
 
 $uid=$_REQUEST['uid'];
-$sendhyperfunk = isset($_POST['sendhyperfunk']) ? $_POST['sendhyperfunk'] : false;
-$sendmailregdaten = isset($_POST['sendmailregdaten']) ? $_POST['sendmailregdaten'] : false;
-$activateaccount = isset($_POST['activateaccount']) ? $_POST['activateaccount'] : false;
-$stataktiv = isset($_POST['stataktiv']) ? $_POST['stataktiv'] : false;
-$statgesperrt = isset($_POST['statgesperrt']) ? $_POST['statgesperrt'] : false;
-$staturlaub = isset($_POST['staturlaub']) ? $_POST['staturlaub'] : false;
-$locktrade = isset($_POST['locktrade']) ? $_POST['locktrade'] : false;
-$unlocktrade = isset($_POST['unlocktrade']) ? $_POST['unlocktrade'] : false;
-$statbk = isset($_POST['statbk']) ? $_POST['statbk'] : false;
-$observationgo = isset($_POST['observationgo']) ? $_POST['observationgo'] : false;
-$kommentar = isset($_POST['kommentar']) ? $_POST['kommentar'] : false;
-$infostomail = isset($_POST['infostomail']) ? $_POST['infostomail'] : false;
-$mail = isset($_POST['mail']) ? $_POST['mail'] : "none";
+$sendhyperfunk = isset($_REQUEST['sendhyperfunk']) ? $_REQUEST['sendhyperfunk'] : false;
+$sendmailregdaten = isset($_REQUEST['sendmailregdaten']) ? $_REQUEST['sendmailregdaten'] : false;
+$activateaccount = isset($_REQUEST['activateaccount']) ? $_REQUEST['activateaccount'] : false;
+$stataktiv = isset($_REQUEST['stataktiv']) ? $_REQUEST['stataktiv'] : false;
+$statgesperrt = isset($_REQUEST['statgesperrt']) ? $_REQUEST['statgesperrt'] : false;
+$staturlaub = isset($_REQUEST['staturlaub']) ? $_REQUEST['staturlaub'] : false;
+$locktrade = isset($_REQUEST['locktrade']) ? $_REQUEST['locktrade'] : false;
+$unlocktrade = isset($_REQUEST['unlocktrade']) ? $_REQUEST['unlocktrade'] : false;
+$statbk = isset($_REQUEST['statbk']) ? $_REQUEST['statbk'] : false;
+$observationgo = isset($_REQUEST['observationgo']) ? $_REQUEST['observationgo'] : false;
+$kommentar = isset($_REQUEST['kommentar']) ? $_REQUEST['kommentar'] : false;
+$infostomail = isset($_REQUEST['infostomail']) ? $_REQUEST['infostomail'] : false;
+$mail = isset($_REQUEST['mail']) ? $_REQUEST['mail'] : "none";
 $savedata = 0; // Initialisiere $savedata
 
 // Initialisiere weitere Variablen aus Formulardaten
