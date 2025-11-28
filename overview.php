@@ -319,7 +319,7 @@ if ($sv_hardcore == 1) {
 
     // Text bestimmen: EH-Kampf, Battleround oder normale Rundenlaufzeit
     if (isset($isEhKampf) && $isEhKampf) {
-        $roundTimeText = 'ERHABENENKAMPF';
+        $roundTimeText = 'ERHABENENKAMPF ('.$winticks.')';
     } elseif (isset($isBattleround) && $isBattleround) {
         $roundTimeText = 'BATTLEROUND';
     } else {
