@@ -4,7 +4,7 @@ echo '<hr><br>AUTORESET';
 
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set tick=1, fixscore=0, score=0, restyp01=100000, restyp02=50000, restyp03=0, restyp04=0, restyp05=0, col=0, col_build=0, sonde=0, agent=0, agent_lost=0,
 techs='s0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000', 
-buildgnr=0, buildgtime=0, resnr=0, restime=0, ekey='100;0;0;0', newtrans=0, newnews=0, e100=0, e101=0, e102=0, e103=0, e104=0, tradescore=0, sells=0, allytag='', status=0, secmoves=0, votefor=0, secmoves=0, tcount=0, zcount=0, eartefakt=0, kartefakt=0, dartefakt=0, platz=1,
+buildgnr=0, buildgtime=0, resnr=0, restime=0, ekey='100;0;0;0', newtrans=0, newnews=0, e100=0, e101=0, e102=0, e103=0, e104=0, tradescore=0, sells=0, allytag='', status=0, ally_id=0, secmoves=0, votefor=0, secmoves=0, tcount=0, zcount=0, eartefakt=0, kartefakt=0, dartefakt=0, platz=1,
 rang=1, scanhistory='', platz_last_day=1, trade_sell_sum=0, trade_buy_sum=0, trade_forbidden=0, spielername=nrspielername, rasse=nrrasse,
 sm_rboost=0, actpoints=0, palenium=0, ally_tronic=0, sm_tronic=0, sm_kartefakt=0, sm_col=0, artbldglevel=1, 
 sm_art1=0, sm_art2=0, sm_art3=0, sm_art4=0, sm_art5=0, sm_art6=0, sm_art7=0, sm_art8=0, sm_art9=0, sm_art10=0, sm_art11=0, sm_art12=0, sm_art13=0, sm_art14=0, sm_art15=0, 
