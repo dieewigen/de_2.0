@@ -414,7 +414,16 @@ if($sec_data['npc']==1){
 		if(mysqli_num_rows($db_datenx) > 0){
 			
 			while ($rowx = mysqli_fetch_assoc($db_datenx)){
-				$userTitle.=$rowx['title'].'<br>';
+				$titleId=0; //Standardgrafik
+				if(strpos($rowx['title'], "ERHABEN")!==false){
+					$titleId=1;
+				}
+
+				$userTitle.='
+				<div style=\'display: flex; align-items: center;\'>
+					<div><img src=\'/gp/g/title'.$titleId.'.png\' style=\'width: 32px; height: auto; margin-right: 10px;\'></div>
+					<div>'.$rowx['title'].'</div>
+				</div>';
 			}
 			$userTitle='<div class="user_title" title="'.$userTitle.'"></div>';
 		}
