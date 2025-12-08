@@ -7,6 +7,7 @@ cache/toplist/*.tmp
 cache/overview/*.tmp
 cache/botcheck/*.txt
 ourdetool/logs/*.txt
+ourdetool/user/*.txt
 fonts/
 .gitignore
 .user.ini
