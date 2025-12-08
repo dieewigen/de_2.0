@@ -24,8 +24,6 @@ include_once $directory."inc/schiffsdaten.inc.php";
 
 echo '<html><head></head><body>';
 
-mt_srand((double)microtime()*10000);
-
 //Systemdaten
 $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system", []);
 $row = mysqli_fetch_array($result);

@@ -10,9 +10,9 @@ $cfgBadCharsE	= '`~!#$%^&*()+=[]{};\'\\:"|,/<>?, ';
 $cfgBadCharsR	= '`~!@#$%^&*()+=[]{};\'\\:"|,/<>?';
 
 $cfgHTPasswd[0][N] = '/var/.htpasswddetool';
-$cfgHTPasswd[0][D] = '[Geschützter Bereich] (Administration)';
+$cfgHTPasswd[0][D] = '[Geschï¿½tzter Bereich] (Administration)';
 //$cfgHTPasswd[1][N] = 'c:\pfad\zur\passwd\passwd2';
-//$cfgHTPasswd[1][D] = '[Geschützter Bereich] mehr bla bla bla (Administration)';
+//$cfgHTPasswd[1][D] = '[Geschï¿½tzter Bereich] mehr bla bla bla (Administration)';
 
 $showtext = "Anzeigen";
 $newusertext = "Neuer Benutzer";
@@ -20,7 +20,7 @@ $newusertext = "Neuer Benutzer";
 //$createhtaccesstext = ".htaccess erzeugen";
 $showuserlisttext = "Benutzerliste anzeigen";
 $edittext = "Bearbeiten";
-$deletetext = "Löschen";
+$deletetext = "Lï¿½schen";
 //$mainpagetext = "Hauptseite";
 
 
@@ -93,7 +93,7 @@ function init_passwd_file($filenum, $htfunction) {
     ht_error(".htpasswd ($filenum) file is not readable", $htfunction);
 
   if (!is_writeable($cfgHTPasswd[$filenum][N]))
-    ht_error(".htpasswd ($filenum) Datei ist schreibgeschützt / nicht schreibbar", $htfunction);
+    ht_error(".htpasswd ($filenum) Datei ist schreibgeschï¿½tzt / nicht schreibbar", $htfunction);
 }
 
 function read_passwd_file($filenum) {
@@ -118,10 +118,10 @@ function read_passwd_file($filenum) {
     ||	empty($fpData[0]) || empty($fpData[1]))
       continue;
 
-    $htpUser[$htpCount][username] = $fpData[0];
-    $htpUser[$htpCount][password] = $fpData[1];
-    $htpUser[$htpCount][realname] = $fpData[2];
-    $htpUser[$htpCount][email]    = $fpData[3];
+    $htpUser[$htpCount]['username'] = $fpData[0];
+    $htpUser[$htpCount]['password'] = $fpData[1];
+    $htpUser[$htpCount]['realname'] = $fpData[2];
+    $htpUser[$htpCount]['email']    = $fpData[3];
     $htpCount++;
   }
   fclose($fpHt);
@@ -133,13 +133,13 @@ function write_passwd_file($filenum) {
 
   init_passwd_file($filenum, "write_passwd_file");
 
-  if (($fpHt = fopen($cfgHTPasswd[$filenum][N], "w"))) {
+  if (($fpHt = fopen($cfgHTPasswd[$filenum]['N'], "w"))) {
     for ($i = 0; $i < count($htpUser); $i++) {
-      if (!empty($htpUser[$i][username]))
-        fwrite($fpHt, $htpUser[$i][username].":".
-		      $htpUser[$i][password].":".
-		      $htpUser[$i][realname].":".
-		      $htpUser[$i][email]."\n");
+      if (!empty($htpUser[$i]['username']))
+        fwrite($fpHt, $htpUser[$i]['username'].":".
+		      $htpUser[$i]['password'].":".
+		      $htpUser[$i]['realname'].":".
+		      $htpUser[$i]['email']."\n");
     }
     fclose($fpHt);
   }
@@ -156,14 +156,14 @@ function is_user($username) {
     return false;
 
   for ($i = 0; $i < count($htpUser); $i++) {
-    if ($htpUser[$i][username] == $username)
+    if ($htpUser[$i]['username'] == $username)
       return true;
   }
   return false;
 }
 
 function random() {
-  srand ((double) microtime() * 1000000);
+  srand ((float) microtime() * 1000000);
   return rand();
 }
 

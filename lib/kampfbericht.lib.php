@@ -148,7 +148,7 @@ function showkampfberichtV0($text,$rasse, $spielername, $sector, $system, $schif
   <td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
   '<br>'.$kbl_lang['admiralexp'].'<br>'.
   $kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
-  $rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b></td>
+  $rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((float)$srec1, 0,"",".").' M - '.number_format((float)$srec2, 0,"",".").' D</b></td>
   </tr>
   </table>
   <br>
@@ -479,10 +479,10 @@ function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schif
 	if($sv_oscar!=1){
 		if($kg_set_01>0 || $kg_set_02>0 || $kg_set_03>0 || $kg_set_04>0){
 			$kg_set_hinweis='<br><b>Ausgesetztes Kopfgeld: '
-				.number_format((double)$kg_set_01, 0,"","."). ' M '
-				.number_format((double)$kg_set_02, 0,"","."). ' D '
-				.number_format((double)$kg_set_03, 0,"","."). ' I '
-				.number_format((double)$kg_set_04, 0,"","."). ' E</b>';
+				.number_format((float)$kg_set_01, 0,"","."). ' M '
+				.number_format((float)$kg_set_02, 0,"","."). ' D '
+				.number_format((float)$kg_set_03, 0,"","."). ' I '
+				.number_format((float)$kg_set_04, 0,"","."). ' E</b>';
 		}
 	}
 	
@@ -501,7 +501,7 @@ function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schif
 	<td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
 	'<br>'.$kbl_lang['admiralexp'].'<br>'.
 	$kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
-	$rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((double)$srec1, 0,"",".").' M - '.number_format((double)$srec2, 0,"",".").' D</b>
+	$rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((float)$srec1, 0,"",".").' M - '.number_format((float)$srec2, 0,"",".").' D</b>
 	'.$kg_set_hinweis.'  
 	  </td>
   </tr>
