@@ -439,23 +439,23 @@ $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromni
   while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
 
-    /*
-    $row[text]=eregi_replace("\\[img\\]([^\\[]*)\\[/img\\]","<img src=\"\\1\" border=0>",$row[text]);
+    /* Converted eregi_replace -> preg_replace for PHP compatibility */
+    $row['text'] = preg_replace('/\[img\]([^\[]*)\[\/img\]/i', '<img src="$1" border=0>', $row['text']);
 
-    $row[text]= eregi_replace("\[b\]", "<b>",$row[text]);
-    $row[text]= eregi_replace("\[/b\]", "</b>",$row[text]);
+    $row['text'] = preg_replace('/\[b\]/i', '<b>', $row['text']);
+    $row['text'] = preg_replace('/\[\/b\]/i', '</b>', $row['text']);
 
-    $row[text]= eregi_replace("\[i\]", "<i>",$row[text]);
-    $row[text]= eregi_replace("\[/i\]", "</i>",$row[text]);
+    $row['text'] = preg_replace('/\[i\]/i', '<i>', $row['text']);
+    $row['text'] = preg_replace('/\[\/i\]/i', '</i>', $row['text']);
 
-    $row[text]= eregi_replace("\[u\]", "<u>",$row[text]);
-    $row[text]= eregi_replace("\[/u\]", "</u>",$row[text]);
+    $row['text'] = preg_replace('/\[u\]/i', '<u>', $row['text']);
+    $row['text'] = preg_replace('/\[\/u\]/i', '</u>', $row['text']);
 
-    $row[text]= eregi_replace("\[center\]", "<center>",$row[text]);
-    $row[text]= eregi_replace("\[/center\]", "</center>",$row[text]);
+    $row['text'] = preg_replace('/\[center\]/i', '<center>', $row['text']);
+    $row['text'] = preg_replace('/\[\/center\]/i', '</center>', $row['text']);
 
-    $row[text]= eregi_replace("\[pre\]", "<pre>",$row[text]);
-    $row[text]= eregi_replace("\[/pre\]", "</pre>",$row[text]);
+    $row['text'] = preg_replace('/\[pre\]/i', '<pre>', $row['text']);
+    $row['text'] = preg_replace('/\[\/pre\]/i', '</pre>', $row['text']);
 */
     $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);
     $row['text'] = str_replace("[CROT]","<font color=\"#F10505\">",$row['text']);
@@ -495,23 +495,23 @@ $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromni
 
   while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
-    /*
-    $row[text]=eregi_replace("\\[img\\]([^\\[]*)\\[/img\\]","<img src=\"\\1\" border=0>",$row[text]);
+    /* Converted eregi_replace -> preg_replace for PHP compatibility */
+    $row['text'] = preg_replace('/\[img\]([^\[]*)\[\/img\]/i', '<img src="$1" border=0>', $row['text']);
 
-    $row[text]= eregi_replace("\[b\]", "<b>",$row[text]);
-    $row[text]= eregi_replace("\[/b\]", "</b>",$row[text]);
+    $row['text'] = preg_replace('/\[b\]/i', '<b>', $row['text']);
+    $row['text'] = preg_replace('/\[\/b\]/i', '</b>', $row['text']);
 
-    $row[text]= eregi_replace("\[i\]", "<i>",$row[text]);
-    $row[text]= eregi_replace("\[/i\]", "</i>",$row[text]);
+    $row['text'] = preg_replace('/\[i\]/i', '<i>', $row['text']);
+    $row['text'] = preg_replace('/\[\/i\]/i', '</i>', $row['text']);
 
-    $row[text]= eregi_replace("\[u\]", "<u>",$row[text]);
-    $row[text]= eregi_replace("\[/u\]", "</u>",$row[text]);
+    $row['text'] = preg_replace('/\[u\]/i', '<u>', $row['text']);
+    $row['text'] = preg_replace('/\[\/u\]/i', '</u>', $row['text']);
 
-    $row[text]= eregi_replace("\[center\]", "<center>",$row[text]);
-    $row[text]= eregi_replace("\[/center\]", "</center>",$row[text]);
+    $row['text'] = preg_replace('/\[center\]/i', '<center>', $row['text']);
+    $row['text'] = preg_replace('/\[\/center\]/i', '</center>', $row['text']);
 
-    $row[text]= eregi_replace("\[pre\]", "<pre>",$row[text]);
-    $row[text]= eregi_replace("\[/pre\]", "</pre>",$row[text]);
+    $row['text'] = preg_replace('/\[pre\]/i', '<pre>', $row['text']);
+    $row['text'] = preg_replace('/\[\/pre\]/i', '</pre>', $row['text']);
     */
 
     $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);

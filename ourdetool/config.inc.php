@@ -27,11 +27,7 @@ $deletetext = "L�schen";
 $htpUser	= array();
 
 $version = explode(".", phpversion());
-if (intval($version[0]) < 5 && intval($version[1]) < 1) {
-  $_POST   = $HTTP_POST_VARS;
-  $_GET    = $HTTP_GET_VARS;
-  $_SERVER = $HTTP_SERVER_VARS;
-}
+// Legacy PHP (<5.1) fallback removed — using superglobals ($_POST, $_GET, $_SERVER).
 
 function is_valid_string($string) {
   global $cfgBadChars;

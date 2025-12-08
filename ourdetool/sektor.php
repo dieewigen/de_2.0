@@ -133,7 +133,7 @@ include "det_userdata.inc.php";
          $userids[$SKInfo["system"]] = $SKInfo["user_id"];
 
          $SKVotes .= $SKInfo["system"].' votes for '.$SKInfo["votefor"];
-         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"].'">l�schen</a>]'; }
+         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"].'">löschen</a>]'; }
          $SKVotes .= '<br>';
        }
        $SKVotes .= '</td></tr>';
@@ -142,8 +142,11 @@ include "det_userdata.inc.php";
          arsort ($Votes);
          reset ($Votes);
 
-         list ($Sys1, $Anz1) = each ($Votes);
-         list ($Sys2, $Anz2) = each ($Votes);
+         $keys = array_keys($Votes);
+         $Sys1 = isset($keys[0]) ? $keys[0] : null;
+         $Anz1 = ($Sys1 !== null) ? $Votes[$Sys1] : 0;
+         $Sys2 = isset($keys[1]) ? $keys[1] : null;
+         $Anz2 = ($Sys2 !== null) ? $Votes[$Sys2] : 0;
 
          if ($Anz1 > $Anz2) {
            if ($userids[$Sys1] == "") { echo '<tr><td>SK</td><td>[<font color="#FF0000">NA</font>] - '.$Anz1.' Vote(s)</td></tr>'; }
