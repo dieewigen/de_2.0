@@ -41,8 +41,7 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
         $_REQUEST['loginkey'] = '';
     }
 
-    $sql = "SELECT * FROM de_login WHERE loginkey='".$_REQUEST['loginkey']."' AND loginkeytime > UNIX_TIMESTAMP( ) - 600;";
-    $result = mysqli_execute_query($GLOBALS['dbi'], $sql, []) or die(mysqli_error($GLOBALS['dbi']));
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_login WHERE loginkey=? AND loginkeytime > UNIX_TIMESTAMP() - 600", [$_REQUEST['loginkey']]) or die(mysqli_error($GLOBALS['dbi']));
     $num = mysqli_num_rows($result);
 
     if ($num == 1) {
