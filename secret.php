@@ -80,18 +80,18 @@ for ($rasse = 1;$rasse <= 5;$rasse++) {
 //überprüfen ob die allianz-informationsphalanx verfügbar ist
 $ally_bldg2 = -1;
 if ($own_ally_id > 0) {
-    $result  = mysqli_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id='$own_ally_id'");
+    $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id=?", [$own_ally_id]);
     $row     = mysqli_fetch_array($result);
     $ally_bldg2 = $row["bldg2"];
 }
 
 //maximalen tick auslesen
-$result  = mysqli_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1");
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $maxroundtick = $row["tick"];
 
 //userartefakte auslesen
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=3 AND user_id='".$_SESSION['ums_user_id']."'");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=3 AND user_id=?", [$_SESSION['ums_user_id']]);
 $artbonusatt = 0;
 $artbonusdeff = 0;
 while ($row = mysqli_fetch_array($db_daten)) {
@@ -99,14 +99,14 @@ while ($row = mysqli_fetch_array($db_daten)) {
 }
 
 //userartefakte auslesen
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=4 AND user_id='".$_SESSION['ums_user_id']."'");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=4 AND user_id=?", [$_SESSION['ums_user_id']]);
 $artbonusdeff = 0;
 while ($row = mysqli_fetch_array($db_daten)) {
     $artbonusdeff = $artbonusdeff + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
 }
 
 //userartefakte auslesen
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=5 AND user_id='".$_SESSION['ums_user_id']."'");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=5 AND user_id=?", [$_SESSION['ums_user_id']]);
 $artbonusbuild = 0;
 while ($row = mysqli_fetch_array($db_daten)) {
     $artbonusbuild = $artbonusbuild + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
@@ -292,7 +292,7 @@ if (hasTech($pt, 9)) {
 
                     //gibt $z sonden/agenten in auftrag
                     if ($z > 0) {
-                        mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (".$_SESSION['ums_user_id'].", $i, $z, $tech_ticks)");
+                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, ?, ?, ?)", [$_SESSION['ums_user_id'], $i, $z, $tech_ticks]);
                         write2agentlog($_SESSION['ums_user_id'], 'build', $z);
                     }
                 }
@@ -303,9 +303,9 @@ if (hasTech($pt, 9)) {
             $gr02 = $gr02 - $restyp02;
             $gr03 = $gr03 - $restyp03;
             $gr04 = $gr04 - $restyp04;
-            mysqli_query($GLOBALS['dbi'], "update de_user_data set restyp01 = restyp01 - $gr01,
-			 restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03,
-			 restyp04 = restyp04 - $gr04 WHERE user_id = '".$_SESSION['ums_user_id']."'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 - ?, restyp02 = restyp02 - ?, restyp03 = restyp03 - ?, restyp04 = restyp04 - ? WHERE user_id = ?", [$gr01, $gr02, $gr03, $gr04, $_SESSION['ums_user_id']]);
+	
+	
 
             //transaktionsende
             $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
@@ -325,12 +325,6 @@ if (hasTech($pt, 9)) {
 //stelle die ressourcenleiste dar
 include "resline.php";
 
-/*
-for($i=1;$i<1000;$i++){
-    echo '<br>'.$i.':';
-    echo (2*pow(M_E, 0.04*$i))/(pow(M_E,0.04*$i)+100);
-}*/
-
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
 //geheimdienst deaktiviert?
@@ -342,7 +336,7 @@ if (isset($sv_deactivate_secret) && $sv_deactivate_secret == 1) {
 
 if (!hasTech($pt, 9)) {
     $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=9";
-    $db_tech = mysqli_query($GLOBALS['dbi'], $techcheck);
+    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
     $row_techcheck = mysqli_fetch_array($db_tech);
 
     //echo $secret_lang[eswirdeine].$row_techcheck[tech_name].$secret_lang[benoetigt];
@@ -390,13 +384,13 @@ if (!hasTech($pt, 9)) {
         }
 
         //zieluserid rausfinden
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id, spielername, rasse FROM de_user_data WHERE sector='$zsec1' and system='$zsys1'");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername, rasse FROM de_user_data WHERE sector=? AND `system`=?", [$zsec1, $zsys1]);
         $num = mysqli_num_rows($db_daten);
         if ($num == 1) {//die koordinaten stimmen, gib die daten aus
             $row = mysqli_fetch_array($db_daten);
             $uid = $row["user_id"]; //hole die user_id des users um die daten anfordern zu k�nnen
             //db updaten
-            mysqli_query($GLOBALS['dbi'], "UPDATE de_user_scan SET ps='$ps' WHERE user_id='".$_SESSION['ums_user_id']."' AND zuser_id='$uid'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET ps=? WHERE user_id=? AND zuser_id=?", [$ps, $_SESSION['ums_user_id'], $uid]);
             //nach dem update die scanhistory anzeigen
             $showscanhistory = 1;
         }
@@ -415,7 +409,7 @@ if (!hasTech($pt, 9)) {
         $zsec2 = $zsec1;
         $zsys2 = $zsys1;
         //user_id des ziels auslesen
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id, spielername, rasse FROM de_user_data WHERE sector='$zsec1' and system='$zsys1'");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername, rasse FROM de_user_data WHERE sector=? AND `system`=?", [$zsec1, $zsys1]);
         $num = mysqli_num_rows($db_daten);
         if ($num == 1) {//die koordinaten stimmen, gib die daten aus
             echo '<form action="secret.php" method="POST">';
@@ -425,11 +419,11 @@ if (!hasTech($pt, 9)) {
             $spielername = $row["spielername"];
             $zrasse = $row["rasse"];
             //scandaten aus der db holen
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_scan WHERE user_id='".$_SESSION['ums_user_id']."' AND zuser_id='$uid'");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_scan WHERE user_id=? AND zuser_id=?", [$_SESSION['ums_user_id'], $uid]);
             $num = mysqli_num_rows($db_daten);
             if ($num != 1) {//datensatz vorhanden, falls nicht einen anlegen und es nochmal versuchen
-                mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_scan SET user_id='".$_SESSION['ums_user_id']."', zuser_id='$uid'");
-                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_scan WHERE user_id='".$_SESSION['ums_user_id']."' AND zuser_id='$uid'");
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_scan (user_id, zuser_id) VALUES (?, ?)", [$_SESSION['ums_user_id'], $uid]);
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_scan WHERE user_id=? AND zuser_id=?", [$_SESSION['ums_user_id'], $uid]);
             }
             $row = mysqli_fetch_array($db_daten);
             //playerstatus
@@ -689,15 +683,15 @@ if (!hasTech($pt, 9)) {
 
             //überprüfen ob evtl. der schild des herakles vorhanden ist
             $herakles = 0;
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT sector FROM de_artefakt WHERE sector='$zsec1' AND id=22");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector FROM de_artefakt WHERE sector=? AND id=?", [$zsec1, 22]);
             if (mysqli_num_rows($db_daten) == 1) {
                 $herakles = 1;
             }
 
 
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id, col, score, e100, e101, e102, e103, e104, techs, rasse, spielername, restyp01, restyp02, restyp03, restyp04, restyp05, npc FROM de_user_data WHERE sector='$zsec1' and system='$zsys1'");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, col, score, e100, e101, e102, e103, e104, techs, rasse, spielername, restyp01, restyp02, restyp03, restyp04, restyp05, npc FROM de_user_data WHERE sector=? AND `system`=?", [$zsec1, $zsys1]);
             $num = mysqli_num_rows($db_daten);
-            if ($num == 1 and $herakles == 0) {//die koordinaten stimmen, gib die daten aus
+            if ($num == 1 && $herakles == 0) {//die koordinaten stimmen, gib die daten aus
                 $row = mysqli_fetch_array($db_daten);
                 //test auf npc
                 if ($row['npc'] == 0) {
@@ -730,7 +724,7 @@ if (!hasTech($pt, 9)) {
                     $fid1 = $uid.'-1';
                     $fid2 = $uid.'-2';
                     $fid3 = $uid.'-3';
-                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
                     $ec81 = 0;
                     $ec82 = 0;
                     $ec83 = 0;
@@ -756,12 +750,12 @@ if (!hasTech($pt, 9)) {
 
                     //schiffe im bau
                     $eimbau = 0;
-                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id=$uid");
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id=?", [$uid]);
                     while ($row = mysqli_fetch_array($db_daten)) {
                         $eimbau = $eimbau + $row["anzahl"];
                     }
                     //schauen ob der spieler in den letzten 12 stunden online war
-                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT last_login FROM de_login WHERE user_id='$uid'");
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT last_login FROM de_login WHERE user_id=?", [$uid]);
                     $row = mysqli_fetch_array($db_daten);
                     if (strtotime($row["last_login"]) + 43200 > time()) {
                         $isonline = $secret_lang['ja'];
@@ -781,7 +775,7 @@ if (!hasTech($pt, 9)) {
                     //////////////////////////////////////////////
                     //wenn man in einer allianz ist und das passende gebäude vorhanden ist, die daten an die allianzmitglieder weiterleiten
                     if ($own_ally_id > 0 and $ally_bldg2 > 0) {
-                        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id='$own_ally_id' AND status=1 AND user_id<>'".$_SESSION['ums_user_id']."'");
+                        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id=? AND status=1 AND user_id<>?", [$own_ally_id, $_SESSION['ums_user_id']]);
                         while ($row = mysqli_fetch_array($db_daten)) {
                             $savelist[] = $row['user_id'];
                         }
@@ -797,12 +791,12 @@ if (!hasTech($pt, 9)) {
                         $partner_ally_id = get_allyid_partner($own_ally_id);
                         if ($partner_ally_id > 0) {
                             //Gebäude Stufe vom Metapartner auslesen
-                            $result  = mysqli_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id='$partner_ally_id'");
+                            $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id=?", [$partner_ally_id]);
                             $row     = mysqli_fetch_array($result);
                             $partner_ally_bldg2 = $row["bldg2"];
 
                             if ($partner_ally_bldg2 > 1) {
-                                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id='$partner_ally_id' AND status=1");
+                                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id=? AND status=1", [$partner_ally_id]);
                                 while ($row = mysqli_fetch_array($db_daten)) {
                                     $savelist[] = $row['user_id'];
                                 }
@@ -816,18 +810,13 @@ if (!hasTech($pt, 9)) {
                     for ($i = 0;$i < count($savelist);$i++) {
                         $save_uid = $savelist[$i];
                         //schauen, ob es schon einen eintrag in der scanliste von dem spieler gibt
-                        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT rasse FROM de_user_scan WHERE user_id='$save_uid' AND zuser_id='$uid'");
+                        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT rasse FROM de_user_scan WHERE user_id=? AND zuser_id=?", [$save_uid, $uid]);
                         $scan_vorhanden = mysqli_num_rows($db_daten);
                         if ($scan_vorhanden == 0) {
                             //wenn es noch gar keinen scan gibt, dann muß einer in die db
-                            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_scan SET stime=UNIX_TIMESTAMP( ), score='$zpunkte', fleet='$zeinheiten', defense='$vertanz',
-					build='$eimbau', col='$zcol', buildings='$anzgeb' ,rasse='$zrasse',
-					restyp01='$zres[0]', restyp02='$zres[1]',restyp03='$zres[2]',restyp04='$zres[3]',restyp05='$zres[4]', user_id='$save_uid', zuser_id='$uid'");
+                            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_scan (stime, score, fleet, defense, build, col, buildings, rasse, restyp01, restyp02, restyp03, restyp04, restyp05, user_id, zuser_id) VALUES (UNIX_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$zpunkte, $zeinheiten, $vertanz, $eimbau, $zcol, $anzgeb, $zrasse, $zres[0], $zres[1], $zres[2], $zres[3], $zres[4], $save_uid, $uid]);
                         } else { //daten aktualisieren
-                            mysqli_query($GLOBALS['dbi'], "UPDATE de_user_scan SET stime=UNIX_TIMESTAMP( ), score='$zpunkte', fleet='$zeinheiten', defense='$vertanz',
-					build='$eimbau', col='$zcol', buildings='$anzgeb' ,rasse='$zrasse',
-					restyp01='$zres[0]', restyp02='$zres[1]',restyp03='$zres[2]',restyp04='$zres[3]',restyp05='$zres[4]'
-					WHERE user_id='$save_uid' AND zuser_id='$uid'");
+                            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET stime=UNIX_TIMESTAMP(), score=?, fleet=?, defense=?, build=?, col=?, buildings=?, rasse=?, restyp01=?, restyp02=?, restyp03=?, restyp04=?, restyp05=? WHERE user_id=? AND zuser_id=?", [$zpunkte, $zeinheiten, $vertanz, $eimbau, $zcol, $anzgeb, $zrasse, $zres[0], $zres[1], $zres[2], $zres[3], $zres[4], $save_uid, $uid]);
                         }
                     }
 
@@ -918,11 +907,11 @@ if (!hasTech($pt, 9)) {
                         //nachricht an den account schicken
                         $time = strftime("%Y%m%d%H%M%S");
                         $textscanner = $secret_lang['diescannerhaben'].$sector.$secret_lang['diescannerhaben2'];
-                        mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 4,'$time','$textscanner')");
-                        mysqli_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = $uid");
+                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 4, ?, ?)", [$uid, $time, $textscanner]);
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
                     }
                     //eine sonde abziehen
-                    mysqli_query($GLOBALS['dbi'], "UPDATE de_user_data SET sonde = sonde - 1 WHERE user_id = ".$_SESSION['ums_user_id']."");
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sonde = sonde - 1 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
                     $sonde = $sonde - 1;
                     $zsec2 = $zsec1;
                     $zsys2 = $zsys1;
@@ -958,7 +947,7 @@ if (!hasTech($pt, 9)) {
                 $az = $agent;
             }
 
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id, techs, agent, spielername, rasse, techs, npc, sc1, sc2, sc3, sc4, spec4 FROM de_user_data WHERE sector='$zsec2' and system='$zsys2'");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, techs, agent, spielername, rasse, techs, npc, sc1, sc2, sc3, sc4, spec4 FROM de_user_data WHERE sector=? AND `system`=?", [$zsec2, $zsys2]);
             $num = mysqli_num_rows($db_daten);
             $zk = $zsec2.':'.$zsys2;
             $ak = $sector.':'.$system;
@@ -1045,7 +1034,7 @@ if (!hasTech($pt, 9)) {
             if ($ok == 1) {//die koordinaten stimmen und es werden agenten geschickt
 
                 //artefaktabwehr des angegriffenen auslesen
-                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=4 AND user_id='$uid'");
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=4 AND user_id=?", [$uid]);
                 $zartbonusdeff = 0;
                 while ($row = mysqli_fetch_array($db_daten)) {
                     $zartbonusdeff = $zartbonusdeff + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
@@ -1150,7 +1139,7 @@ if (!hasTech($pt, 9)) {
 
                 //�berpr�fen ob das grab des ra im zielsector ist
                 if ($w > $sv_artefakt[20][5]) {
-                    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT sector FROM de_artefakt WHERE sector='$zsec2' AND id=21");
+                    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector FROM de_artefakt WHERE sector=? AND id=?", [$zsec2, 21]);
                     if (mysqli_num_rows($db_daten) == 1) {
                         $w = $sv_artefakt[20][5];
                     }
@@ -1167,7 +1156,7 @@ if (!hasTech($pt, 9)) {
                     //////////////////////////////////////////////
                     //wenn man in einer allianz ist und das passende gebäude vorhanden ist, die daten an die allianzmitglieder weiterleiten
                     if ($own_ally_id > 0 and $ally_bldg2 > 0) {
-                        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id='$own_ally_id' AND status=1 AND user_id<>'".$_SESSION['ums_user_id']."'");
+                        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id=? AND status=1 AND user_id<>?", [$own_ally_id, $_SESSION['ums_user_id']]);
                         while ($row = mysqli_fetch_array($db_daten)) {
                             $savelist[] = $row['user_id'];
                         }
@@ -1183,12 +1172,12 @@ if (!hasTech($pt, 9)) {
                         $partner_ally_id = get_allyid_partner($own_ally_id);
                         if ($partner_ally_id > 0) {
                             //Gebäude Stufe vom Metapartner auslesen
-                            $result  = mysqli_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id='$partner_ally_id'");
+                            $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT bldg2 FROM de_allys WHERE id=?", [$partner_ally_id]);
                             $row     = mysqli_fetch_array($result);
                             $partner_ally_bldg2 = $row["bldg2"];
 
                             if ($partner_ally_bldg2 > 1) {
-                                $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id='$partner_ally_id' AND status=1");
+                                $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id=? AND status=1", [$partner_ally_id]);
                                 while ($row = mysqli_fetch_array($db_daten)) {
                                     $savelist[] = $row['user_id'];
                                 }
@@ -1202,14 +1191,14 @@ if (!hasTech($pt, 9)) {
                     for ($i = 0;$i < count($savelist);$i++) {
                         $save_uid = $savelist[$i];
                         //schauen, ob es schon einen eintrag in der scanliste von dem spieler gibt
-                        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT allytag FROM de_user_scan WHERE user_id='$save_uid' AND zuser_id='$uid'");
+                        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_user_scan WHERE user_id=? AND zuser_id=?", [$save_uid, $uid]);
                         $scan_vorhanden = mysqli_num_rows($db_daten);
                         if ($scan_vorhanden == 0) {
                             //wenn es noch gar keinen scan gibt, dann mu� einer in die db
-                            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_scan SET user_id='$save_uid', zuser_id='$uid'");
+                            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_scan (user_id, zuser_id) VALUES (?, ?)", [$save_uid, $uid]);
                         }
                         //rasse im geheimdienstbericht hinterlegen, da man diese nach einem agenteneinsatz auf jeden fall kennt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_user_scan SET rasse='$rasse' WHERE user_id='$save_uid' AND zuser_id='$uid' AND rasse=0");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET rasse=? WHERE user_id=? AND zuser_id=? AND rasse=0", [$rasse, $save_uid, $uid]);
                     }
 
                     switch ($etyp) {
@@ -1219,7 +1208,7 @@ if (!hasTech($pt, 9)) {
                             $fid1 = $uid.'-1';
                             $fid2 = $uid.'-2';
                             $fid3 = $uid.'-3';
-                            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
                             $counter = 0;
                             $e81 = 0;
                             $e82 = 0;
@@ -1260,9 +1249,7 @@ if (!hasTech($pt, 9)) {
                             //die daten in de_user_scan hinterlegen
                             for ($i = 0;$i < count($savelist);$i++) {
                                 $save_uid = $savelist[$i];
-                                mysqli_query($GLOBALS['dbi'], "UPDATE de_user_scan SET ftime=UNIX_TIMESTAMP( ),
-					e81='$e81', e82='$e82', e83='$e83', e84='$e84', e85='$e85', e86='$e86', e87='$e87', e88='$e88', e89='$e89',e90='$e90'
-					WHERE user_id='$save_uid' AND zuser_id='$uid'");
+                                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET ftime=UNIX_TIMESTAMP(), e81=?, e82=?, e83=?, e84=?, e85=?, e86=?, e87=?, e88=?, e89=?, e90=? WHERE user_id=? AND zuser_id=?", [$e81, $e82, $e83, $e84, $e85, $e86, $e87, $e88, $e89, $e90, $save_uid, $uid]);
                             }
 
                             //ueberschrift ausgeben
@@ -1280,7 +1267,7 @@ if (!hasTech($pt, 9)) {
 
                             //lade einheitentypen
                             $fleetpoints = array();
-                            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100");
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100", []);
                             while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
                                 echo '<tr>';
                                 echo '<td class="cc">'.getTechNameByRasse($row["tech_name"], $zrasse)."</td>";
@@ -1328,7 +1315,7 @@ if (!hasTech($pt, 9)) {
                             $fid1 = $uid.'-1';
                             $fid2 = $uid.'-2';
                             $fid3 = $uid.'-3';
-                            $result = mysqli_query($GLOBALS['dbi'], "SELECT zielsec, zielsys, aktion, aktzeit, zeit, mission_time FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+                            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec, zielsys, aktion, aktzeit, zeit, mission_time FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
                             $ed_id = 0;
                             while ($row = mysqli_fetch_array($result)) {
                                 $einheiten_daten[$ed_id] = $row;
@@ -1581,7 +1568,7 @@ if (!hasTech($pt, 9)) {
                             echo '</tr>';
                             echo '</table>';
                             echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data ORDER BY tech_level");
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data ORDER BY tech_level", []);
                             while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird gepr�ft
                                 if (hasTech($zpt, $row["tech_id"])) {
                                     echo '<tr>';
