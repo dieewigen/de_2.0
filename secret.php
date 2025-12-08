@@ -1413,18 +1413,14 @@ if (!hasTech($pt, 9)) {
                             break;
                         case 2: //verteidigungsanlagen
                             //zaehle alle verteidigungsanlagen, die schon vorhanden sind - anfang
-                            $str = '';
-                            for ($i = 100;$i <= 109;$i++) {
-                                $str = $str."\$ec$i=0;";
+                            for ($i = 100; $i <= 109; $i++) {
+                                ${'ec'.$i} = 0;
                             }
-                            eval($str); //variablen -> ec100, ec101,...
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$uid]);
                             $row = mysqli_fetch_array($db_daten);
-                            $str = '';
-                            for ($i = 100;$i <= 104;$i++) {
-                                $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
+                            for ($i = 100; $i <= 109; $i++) {
+                                ${'ec'.$i} += $row["e$i"];
                             }
-                            eval($str);
                             //zaehle alle verteidigungsanlagen, die schon vorhanden sind - ende
 
                             //die daten in de_user_scan hinterlegen
