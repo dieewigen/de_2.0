@@ -295,10 +295,13 @@ echo '
         </td>
         <td align="center">
             <a href="hyperfunk.php?action=alli" class="btn">' . $hyperfunk_lang['allianz'] . '</a>
-        </td>
+        </td>';
+        /*
         <td align="center">
             <a href="hyperfunk.php?action=freunde" class="btn">' . $hyperfunk_lang['freunde'] . '</a>
         </td>
+        */ 
+echo '
         <td width="13" height="25" class="rr"></td>
     </tr>
     <tr>
@@ -508,6 +511,7 @@ if (isset($_POST['allimsg'])) {
 
 }
 // Insert fuer die Freunde
+/*
 if (isset($_POST['freundemsg'])) {
     $db_freunde = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system` FROM de_hfn_buddy_ignore WHERE user_id=? AND status=1", [$_SESSION['ums_user_id']]);
 
@@ -576,6 +580,7 @@ if (isset($_POST['freundemsg'])) {
 
     }
 }
+*/
 //Loeschen einzelner HFNs
 if ($action == "del") {//nachricht l&ouml;schen
     $id = intval($_REQUEST['id']);
