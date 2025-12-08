@@ -478,7 +478,6 @@ $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromni
 
   while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird ausgegeben
   {
-    /* Converted eregi_replace -> preg_replace for PHP compatibility */
     $row['text'] = preg_replace('/\[img\]([^\[]*)\[\/img\]/i', '<img src="$1" border=0>', $row['text']);
 
     $row['text'] = preg_replace('/\[b\]/i', '<b>', $row['text']);
@@ -495,20 +494,11 @@ $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT fromsec, fromsys, fromni
 
     $row['text'] = preg_replace('/\[pre\]/i', '<pre>', $row['text']);
     $row['text'] = preg_replace('/\[\/pre\]/i', '</pre>', $row['text']);
-    */
 
     $row['text'] = str_replace("[CGRUEN]","<font color=\"#28FF50\">",$row['text']);
     $row['text'] = str_replace("[CROT]","<font color=\"#F10505\">",$row['text']);
     $row['text'] = str_replace("[CW]","<font color=\"#FFFFFF\">",$row['text']);
     $row['text'] = str_replace("[CGELB]","<font color=\"#FDFB59\">",$row['text']);
-
-    /*
-    $row[text]=eregi_replace("\\[email\\]([^\\[]*)\\[/email\\]","<a href=\"mailto:\\1\">\\1</a>",$row[text]);
-    $row[text]=eregi_replace("\\[url\\]www.([^\\[]*)\\[/url\\]","<a href=\"http://www.\\1\" target=\"_blank\">\\1</a>",$row[text]);
-    $row[text]=eregi_replace("\\[url\\]([^\\[]*)\\[/url\\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$row[text]);
-    $row[text]=eregi_replace("\\[url=http://([^\\[]+)\\]([^\\[]*)\\[/url\\]","<a href=\"http://\\1\" target=\"_blank\">\\2</a>",$row[text]);
-    */
-
 
     $infos.= '<table border="0" cellpadding="0" cellspacing="2" width="500">';
     $infos.= '<tr>';
