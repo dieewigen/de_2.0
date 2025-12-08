@@ -246,11 +246,6 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		$sorted[]=$chatdata[$index];
 		array_splice($chatdata, $index, 1);
 	}
-
-	//$sorted = array_orderby($chatdata, 'timestamp', SORT_ASC);
-	/*
-	$sorted = array_msort($chatdata, array('timestamp'=>SORT_ASC));
-	*/
 	
 	////////////////////////////////////////////////////////////////
 	// Liste der Spieler laden, die man selbst ignoriert
@@ -355,22 +350,6 @@ function format_chat_output($row){
 	global 	$chat_sectorcolor, $chat_allycolor, $chat_allgemeincolor, $chat_globalcolor, $sv_server_tag;
 
 	$output='';
-
-	/*
-	$row["message"]=utf8_decode_fix($row["message"]);
-
-	$row["message"]=umlaut($row["message"]);
-
-	//Emoticons
-	$row["message"]=str_replace('%u', "\u", $row["message"]);
-	$row["message"] = preg_replace_callback('/\\\\u(d[89ab][0-9a-f]{2})\\\\u(d[c-f][0-9a-f]{2})/i', function ($matches) {
-		$first = $matches[1];
-		$second = $matches[2];
-		$value = ((eval("return 0x$first;") & 0x3ff) << 10) | (eval("return 0x$second;") & 0x3ff);
-		$value += 0x10000;
-		return "&#$value;";
-	}, $row["message"]);
-	*/
 
 	$zeit=date("H:i", $row["timestamp"]);
 	$datum=date("d.m.Y", $row["timestamp"]);

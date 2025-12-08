@@ -1189,54 +1189,6 @@ function formatMasseinheit($number, $precision = 2)
     return $result;
 }
 
-function array_msort($array, $cols)
-{
-    $colarr = array();
-    foreach ($cols as $col => $order) {
-        $colarr[$col] = array();
-        foreach ($array as $k => $row) {
-            $colarr[$col]['_'.$k] = strtolower($row[$col]);
-        }
-    }
-    $eval = 'array_multisort(';
-    foreach ($cols as $col => $order) {
-        $eval .= '$colarr[\''.$col.'\'],'.$order.',';
-    }
-    $eval = substr($eval, 0, -1).');';
-    eval($eval);
-    $ret = array();
-    foreach ($colarr as $col => $arr) {
-        foreach ($arr as $k => $v) {
-            $k = substr($k, 1);
-            if (!isset($ret[$k])) {
-                $ret[$k] = $array[$k];
-            }
-            $ret[$k][$col] = $array[$k][$col];
-        }
-    }
-    return $ret;
-
-}
-
-function array_orderby()
-{
-    //$sorted = array_orderby($data, 'volume', SORT_DESC, 'edition', SORT_ASC);
-    $args = func_get_args();
-    $data = array_shift($args);
-    foreach ($args as $n => $field) {
-        if (is_string($field)) {
-            $tmp = array();
-            foreach ($data as $key => $row) {
-                $tmp[$key] = $row[$field];
-            }
-            $args[$n] = $tmp;
-        }
-    }
-    $args[] = &$data;
-    call_user_func_array('array_multisort', $args);
-    return array_pop($args);
-}
-
 function SecureValue($value)
 {
     $value = htmlspecialchars(stripslashes($value), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
