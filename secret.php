@@ -736,11 +736,9 @@ if (!hasTech($pt, 9)) {
                     $ec89 = 0;
                     $ec90 = 0;
                     while ($row = mysqli_fetch_array($db_daten)) {
-                        $str = '';
-                        for ($i = 81;$i <= 90;$i++) {
-                            $str = $str."\$ec$i=\$ec$i+\$row[\"e$i\"];";
+                        for ($i = 81; $i <= 90; $i++) {
+                            ${"ec$i"} += $row["e$i"];
                         }
-                        eval($str); //variablen -> ec81, ec82...
                     }
                     $zeinheiten = $ec81 + $ec82 + $ec83 + $ec84 + $ec85 + $ec86 + $ec87 + $ec88 + $ec89 + $ec90;
                     //zaehle alle schiffe, die schon vorhanden sind - ende
@@ -1452,8 +1450,7 @@ if (!hasTech($pt, 9)) {
                             echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
                             $gespunkte = 0;
                             while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
-                                $str = '$ec=$ec'.$row["tech_id"].';';
-                                eval($str);
+                                $ec = ${'ec'.$row['tech_id']};
 
                                 $gespunkte += $ec * $unit[$rasse - 1][$row["tech_id"] - 90][4];
 
