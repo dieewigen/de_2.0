@@ -1190,58 +1190,6 @@ if ($action == "delene") {
 if ($action == "optionen") {
     ?>
 <br>
-<form action=hyperfunk.php?action=optionen method=post>
-<table border=0 cellspacing=0 cellpadding=0 width=300>
-<tr>
-<td width='13' height='25' class='rml'></td>
-<td align=center height='35' colspan=2 class='ro'><div class="cellu"><?php echo $hyperfunk_lang['meine_freunde']?></div></td>
-<td width='13' height='25' class='rmr'></td>
-</tr>
-
-
-
-    <?php
-        $db_friends = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=1", [$_SESSION['ums_user_id']]);
-
-    $num = mysqli_num_rows($db_friends);
-
-    $counter = 1;
-
-    if ($num == "0") {
-
-        echo '<tr><td width="13" class="rl" height="25"></td><td align="center" colspan="2" class="cell"><div class="cellu">'.$hyperfunk_lang['keine_freunde'].'</div></td><td width="13" height="25" class="rr"></td></tr>';
-
-    } else {
-        while ($rowf = mysqli_fetch_array($db_friends)) {
-            if ($counter == 1) {
-                echo '<tr><td width="13" class="rl" height="25"></td><td align="right" class="cell">'.$rowf['sector'].':'.$rowf['system'].'&nbsp;&nbsp;&nbsp;('.$rowf['name'].')&nbsp;&nbsp;&nbsp;</td><td class="cell">&nbsp;&nbsp;&nbsp;<a href="hyperfunk.php?se='.$rowf['sector'].'&sy='.$rowf['system'].'&action=delbuddy">'.$hyperfunk_lang['loeschen'].'</a></td><td width="13" height="25" class="rr"></td></tr>';
-                $counter = 0;
-            } else {
-                echo '<tr><td width="13" class="rl" height="25"></td><td align="right" class="cell1">'.$rowf['sector'].':'.$rowf['system'].'&nbsp;&nbsp;&nbsp;('.$rowf['name'].')&nbsp;&nbsp;&nbsp;</td><td class="cell1">&nbsp;&nbsp;&nbsp;<a href="hyperfunk.php?se='.$rowf['sector'].'&sy='.$rowf['system'].'&action=delbuddy">'.$hyperfunk_lang['loeschen'].'</a></td><td width="13" height="25" class="rr"></td></tr>';
-                $counter = 1;
-            }
-        }
-    }
-
-    ?>
-<tr>
-    <td width="13" class="rl" height="20"></td>
-    <td class="cell" align="right" width="120" height="30"><div class="fett"><?php echo $hyperfunk_lang['koordinaten']?>&nbsp;&nbsp;&nbsp;</div></td><td class="cell">&nbsp;&nbsp;&nbsp;<input type="text" name="freundsector" size="3" style="border-style:solid;height:21;">&nbsp;:&nbsp;<input type="text" name="freundsystem" size="2" style="border-style:solid;height:21;"></td>
-    <td width="13" height="20" class="rr"></td>
-</tr>
-<tr>
-    <td width='13' class='rl' height='25'></td>
-    <td colspan=2 align=center class=cell><input type="submit" name="friendbtn"  value="<?php echo $hyperfunk_lang['freund_adden']?>"></td>
-    <td width='13' height='25' class='rr'></td>
-</tr>
-<tr>
- <td width="13" class="rul">&nbsp;</td>
- <td colspan="2" class="ru">&nbsp;</td>
- <td width="13" class="rur">&nbsp;</td>
-</tr>
-</table>
-</form>
-<br>
 <form action="hyperfunk.php?action=optionen" method="post">
 <table border="0" cellspacing="0" cellpadding="0" width="300">
 <tr>
