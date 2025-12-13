@@ -216,6 +216,10 @@ $GLOBALS['tech_build_time_faktor']=1;
 
 $GLOBALS['sv_show_ally_secstatus']=3600;
 
+//NPC config
+$GLOBALS['sv_npc_base_url']= 'http://localhost:8880/de-api';
+$GLOBALS['sv_npc_api_key']= 'xxx';
+
 $GLOBALS['wts'][0]=array(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57);
 $GLOBALS['wts'][1]=array(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57);
 $GLOBALS['wts'][2]=array(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57);
