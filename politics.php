@@ -1,7 +1,14 @@
 <?php
+
+use DieEwigen\DE2\Model\Npc\FleetControl;
+use DieEwigen\DE2\Model\Npc\NPCBuildControl;
+use DieEwigen\DE2\Model\Npc\FleetRecycler;
+use DieEwigen\DE2\Model\Npc\Types\FleetPresetConfig;
+
 include "inc/header.inc.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/' . $sv_server_lang . '_politics.lang.php';
+include "lib/transaction.lib.php";
 include_once "functions.php";
 
 $db_daten = mysqli_execute_query(
@@ -831,6 +838,7 @@ if ($system == issectorcommander()) {
     echo '<tr align="center">';
     echo '<td><a href="politics.php?s=1" class="btn">' . $politics_lang["allgemein"] . '</a></td>';
     echo '<td><a href="politics.php?s=2" class="btn">SK-Politik</a></td>';
+    echo '<td><a href="politics.php?s=3" class="btn">'.$politics_lang['npc_config_page_btn'].'</a></td>';
     echo '<td><a href="bkmenu.php" class="btn">SK-Bau/Flotte</a></td>';
     echo '</tr>';
     echo '</table>';
@@ -964,6 +972,212 @@ if ($s == 2) {
     echo '<br><input type="Submit" name="sec_btn" value="' . $politics_lang["savesekinfos"] . '" onclick="return checklaenge()"><br><br>';
     //Menu f&uuml;r die Sektorsteuer mit Abfrage ob SekHandelsZentrum vorhanden ist
 } //skmenu ende
+
+if($s==3 && $system==issectorcommander()) {
+    if ($sectechs[6]!=1) {
+        echo '<div class="cell" style="color: red;">'.$politics_lang['npc_config_precondition_missing'].'</div>';
+        return;
+    }
+   $npc_mates =  mysqli_execute_query($GLOBALS['dbi'],
+        "SELECT user_id, spielername FROM de_user_data WHERE sector = ? and npc = 2 ORDER BY `system` ASC",
+        [$sector]
+    );
+	$npcControl = new NPCBuildControl();
+    $fleetControl = new FleetControl();
+    if (isset($_POST['action'])) {
+        $npcId = (int)$_POST['npc_id'];
+        // Überprüfen, ob $npcId in $npc_mates existiert
+        $npcIdExists = false;
+        while($npc = $npc_mates->fetch_assoc()) {
+            if ($npc['user_id'] == $npcId) {
+                $npcIdExists = true;
+                break;
+            }
+        }
+
+        if (!$npcIdExists) {
+            echo '<div class="cell" style="color: red;">Ungültiges Alien.</div>';
+            return;
+        }
+        $npc_mates->data_seek(0); // Ergebnis zurücksetzen
+         if ($_POST['action'] === 'save_npc_preset') {
+             $presetIdentifier = $_POST['fleet_preset'];
+             $recycling = isset($_POST['recycle_fleet']) && $_POST['recycle_fleet'] == 1;
+             try {
+                 // Execute local fleet recycling if enabled
+                 if ($recycling) {
+                     if ($fleetControl->isFleetHome($npcId) === false) {
+                         echo '<div class="cell" style="color: red;">'.$politics_lang['npc_rec_fleet_home_error'].'</div>';
+                         return;
+                     }
+                     $fleetControl->moveAllShipsToHomeFleet($npcId);
+                     if (setLock($npcId)) {
+                         try {
+                             $recycler = new FleetRecycler();
+                             $presetConfig = $npcControl->getShipBuildPresets($npc['user_id']);
+                             $presetArrayIndex = 0;
+                             foreach($presetConfig->getPresets() as $presetIndex => $preset) {
+                                 if ($preset->getId() === $presetIdentifier) {
+                                        $presetArrayIndex = $presetIndex;
+                                     break;
+                                 }
+                             }
+                             $targetPreset = $presetConfig->getPresets()[$presetArrayIndex];
+                             $result = $recycler->recycleFleetToPreset($npcId, $targetPreset);
+                         } catch (Exception $recycleException) {
+                             error_log("Fleet recycling error for NPC $npcId: " . $recycleException->getMessage());
+                             echo '<div class="cell" style="color: red;">'.$politics_lang['npc_rec_error'].'</div>';
+                             return;
+                         } finally {
+                             $erg = releaseLock($npcId);
+                             if (!$erg) {
+                                 print('Datensatz Nr. '.$npcId." konnte nicht entsperrt werden!<br><br><br>");
+                             }
+                         }
+                     } else {
+                         echo '<br><font color="#FF0000">Es ist zurzeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
+                     }
+                 }
+
+                 // Call external NPC API to update preset (existing logic)
+                 $npcControl->setShipBuildPreset($npcId, $presetIdentifier);
+                 echo '<div class="cell" style="color: green;">'.$politics_lang['npc_fleet_config_success'].'</div>';
+             } catch (Exception $e) {
+                 error_log($e->getMessage());
+                  echo '<div class="cell" style="color: red;">'.$politics_lang['npc_fleet_config_error'].'</div>';
+              }
+         } else if ($_POST['action'] === 'save_npc_max_fp') {
+            $maxFp = (int)$_POST['max_fp'];
+            try {
+                $npcControl->setMaxFleetPoints($npcId, $maxFp);
+                echo '<div class="cell" style="color: green;">'.$politics_lang['npc_fleet_max_config_success'].'</div>';
+            } catch (Exception $e) {
+                error_log($e->getMessage());
+                echo '<div class="cell" style="color: red;">'.$politics_lang['npc_fleet_max_config_error'].'</div>';
+            }
+        }
+    }
+    echo '<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;"><form></form>';
+
+    while($npc = $npc_mates->fetch_assoc()) {
+    ?>
+            <tr>
+                <td width="13" height="37" class="rol">&nbsp;</td>
+                <td width="550" align="center" class="ro">
+                    <div class="cellu"><?php echo htmlspecialchars($npc['spielername']); ?></div>
+                </td>
+                <td width="13" class="ror">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="13" height="25" class="rl">&nbsp;</td>
+                <td width="550">
+                    <form method="post" action="politics.php?s=3" name="npc_preset_form_<?php echo $npc['user_id']; ?>">
+                        <?php
+                            $presetConfig = new FleetPresetConfig(null, []);
+                            try {
+                                $presetConfig = $npcControl->getShipBuildPresets($npc['user_id']);
+                            } catch (Exception $e) {
+                                echo '<div class="cell" style="color: red;">'.$politics_lang['npc_fleet_config_load_error'].'</div>';
+                                error_log($e->getMessage());
+                                return;
+                            }
+                            $tooltipPresets = $politics_lang['npc_fleet_preset_hint'].' <br><br>';
+                            foreach($presetConfig->getPresets() as $presetIndex => $preset) {
+                                $shipRatios = $preset->getShipRatiosByName();
+                                $presetName = $presetConfig->getPresets()[$presetIndex]->getName();
+                                $tooltipPresets = $tooltipPresets.'<strong>' . htmlentities($presetName) . '</strong><br>';
+                                foreach($shipRatios as $shipId => $ratio) {
+                                    if ($ratio <= 0) {
+                                        continue;
+                                    }
+                                    $tooltipPresets = $tooltipPresets.htmlentities($shipId) . ': ' . htmlentities($ratio * 100) . '<br>';
+                                }
+                                $tooltipPresets = $tooltipPresets.'<br>';
+                            }
+                        ?>
+                        <div style="display: flex; align-items: center; gap: 55px; float: left; margin-bottom: 10px" class="cell">
+                            <input type="hidden" name="npc_id" value="<?php echo $npc['user_id']; ?>">
+                            <input type="hidden" name="action" value="save_npc_preset">
+                            <label for="fleet_preset_<?php echo $npc['user_id']; ?>"><?php echo $politics_lang['npc_fleet_preset_form_label'] ?>
+                                <img src="gp/g/<?php echo $_SESSION['ums_rasse'] ?>_hilfe.gif" alt="Info" style="width: 16px; height: 16px;" title="<?php echo $tooltipPresets ?>">
+                            </label>
+
+                            <select name="fleet_preset" id="fleet_preset_<?php echo $npc['user_id']; ?>" size="1" style="width: 140px">
+                                <?php
+                                echo '<option value="" disabled>'.$politics_lang['npc_fleet_preset_form_sel'].'</option>';
+                                foreach($presetConfig->getPresets() as $preset) {
+                                    if ($preset->getId() === $presetConfig->getCurrentPresetId()) {
+                                        echo '<option selected="selected" value="' . htmlspecialchars($preset->getId()) . '">' . htmlspecialchars($preset->getName()) . '</option>';
+                                    } else {
+                                        echo '<option value="' . htmlspecialchars($preset->getId()) . '">' . htmlspecialchars($preset->getName()) . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <div style="display: ; margin-left: -40px">
+                                 <?php
+                                    echo '<label for="recycle_fleet">'.$politics_lang['npc_rec_label'].'<label>';
+                                    if ($fleetControl->isFleetHome($npc['user_id'])) {
+                                        echo '<input type="checkbox" value="1" name="recycle_fleet">';
+                                    } else {
+                                        echo '<input type="checkbox" value="1" name="recycle_fleet" disabled title="'.$politics_lang['npc_rec_fleet_precondition'].'">';
+                                    }
+                                 ?>
+                            </div>
+                        </div>
+                        <input type="submit" name="save_npc_preset_<?php echo $npc['user_id']; ?>" value="Speichern" style="float: right;">
+                    </form>
+                </td>
+                <td width="13" class="rr">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="13" height="25" class="rl">&nbsp;</td>
+                <td width="550">
+                    <form method="post" action="politics.php?s=3" name="npc_max_fp_form_<?php echo $npc['user_id']; ?>">
+                        <?php
+                        $maxFp = null;
+                        try {
+                            $maxFp = $npcControl->getMaxFleetPoints($npc['user_id']);
+                        } catch (Exception $e) {
+                            echo '<div class="cell" style="color: red;">'.$politics_lang['npc_fleet_max_load_error'].'</div>';
+                            error_log($e->getMessage());
+                            return;
+                        }
+                        ?>
+                        <input type="hidden" name="npc_id" value="<?php echo $npc['user_id']; ?>">
+                        <input type="hidden" name="action" value="save_npc_max_fp">
+                        <div style="display: flex; align-items: center; gap: 45px; float: left" class="cell">
+                            <label for="max_fp_<?php echo $npc['user_id']; ?>"><?php echo $politics_lang['npc_fleet_max_label'] ?>
+                                <img src="gp/g/<?php echo $_SESSION['ums_rasse'] ?>_hilfe.gif"
+                                     alt="Info" style="width: 16px; height: 16px;"
+                                     title="<?php echo htmlspecialchars($politics_lang['npc_fleet_max_tooltip']); ?>">
+                            </label>
+                            <input style="width: 140px" type="range" min="-10" max="200" step="10" name="max_fp"
+                                   id="max_fp_<?php echo $npc['user_id']; ?>"
+                                   value="<?php echo $maxFp; ?>" size="10" maxlength="10"
+                                   oninput="this.nextElementSibling.innerText = this.value < 0 ?
+                                   '<?php echo $politics_lang['npc_fleet_max_no_limit'] ?>' :
+                                           this.value === '0' ?
+                                   '<?php echo $politics_lang['npc_fleet_max_disabled'] ?>' :
+                                           this.value +'%';">
+                            <span class="cell" style="margin-left: -30px"><?php echo $maxFp < 0 ?
+                                    $politics_lang['npc_fleet_max_no_limit'] :
+                                    ($maxFp === 0 ? $politics_lang['npc_fleet_max_disabled'] : $maxFp.'%'); ?></span>
+                        </div>
+                        <input type="submit" name="save_npc_max_fp_<?php echo $npc['user_id']; ?>" value="Speichern" style="float: right;">
+                    </form>
+                </td>
+                <td width="13" class="rr">&nbsp;</td>
+            </tr>
+    <?php
+    }
+    echo '<tr>';
+    echo '<td width="13" class="rul">&nbsp;</td>';
+    echo '<td class="ru">&nbsp;</td>';
+    echo '<td width="13" class="rur">&nbsp;</td>';
+    echo '</tr>';
+    echo '</table>';
+}
 
 //menü für den sektor, wie sk-wahl und vote für exilanden
 if ($s == 1 or !isset($s)) {
@@ -1140,7 +1354,7 @@ if ($s == 1 or !isset($s)) {
                 echo '<td width="550">';
                 echo '<table width="100%" border="0" cellpadding="0" cellspacing="1">';
 
-                //sektorsteuersatz/sektorkollektoren    
+                //sektorsteuersatz/sektorkollektoren
                 $bg = 'cell1';
                 echo '<tr height="30" align="center">';
                 echo '<td class="' . $bg . '">' . $politics_lang["sektorsteuersatz"] . ': ' . $ssteuer . '%</td>';

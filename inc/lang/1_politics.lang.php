@@ -150,4 +150,26 @@ $politics_lang['skmenu']='SK-Menü';
 $politics_lang['umfragen']='Umfragen';
 $politics_lang['votedescription']='Es können nur gesperrte Spieler gevotet werden.';
 $politics_lang['wahldessk']='Wahl des Sektorkommandanten (SK)';
+$politics_lang['npc_config_page_btn']='DX Botschaft';
+$politics_lang['npc_config_precondition_missing']='F&uuml;r diese Funktion wird die DX61a23-Kommunikationszentrale ben&ouml;tigt.';
+$politics_lang['npc_rec_fleet_home_error']='Die Flotte muss sich in der Heimatbasis befinden, um recycelt zu werden.';
+$politics_lang['npc_rec_error']='Fehler beim Recycling der Flotte.';
+$politics_lang['npc_fleet_config_success']='Voreinstellung erfolgreich gespeichert.';
+$politics_lang['npc_fleet_config_error']='Fehler beim Speichern der Flottenkonfiguration.';
+$politics_lang['npc_fleet_max_config_success']='Maximale Flottenpunkte erfolgreich gespeichert.';
+$politics_lang['npc_fleet_max_config_error']='Fehler beim Speichern der maximalen Flottenpunkte.';
+$politics_lang['npc_fleet_config_load_error']='Fehler beim Laden der Flotteneinstellung.';
+$politics_lang['npc_fleet_preset_hint']='Folgende Flottenverhältnisse  sind verfügbar:';
+$politics_lang['npc_fleet_preset_form_label']='Flotten-Voreinstellung:';
+$politics_lang['npc_fleet_preset_form_sel']='-- Bitte wählen --';
+$politics_lang['npc_rec_label']='Recycling';
+$politics_lang['npc_rec_fleet_precondition']='Die Flotte muss sich in der Heimatbasis befinden, um recycelt zu werden.';
+$politics_lang['npc_fleet_max_load_error']='Fehler beim Laden der maximal Flottenpunkte.';
+$politics_lang['npc_fleet_max_tooltip']='Legt das maximale FP-Limit für dieses Alien fest.<br>
+Das Limit bezieht sich prozentual auf den Punktedurchschnitt der Spieler im Sektor <br><br>
+Kein Limit bedeutet das Alien wächst so weit es die Ressourcen zulassen. <bR>
+Deaktiviert bedeutet kein Wachstum.';
+$politics_lang['npc_fleet_max_label']='Maximale Flottenpunkte:';
+$politics_lang['npc_fleet_max_no_limit']='kein limit';
+$politics_lang['npc_fleet_max_disabled']='deaktiviert';
 ?>
