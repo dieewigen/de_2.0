@@ -3247,6 +3247,8 @@ INSERT INTO `de_tech_data1` (`tech_id`, `tech_name`, `restyp01`, `restyp02`, `re
 (123, 'Sektorhandelszentrum', 150000, 75000, 75000, 150000, 30, 96, 142500, '120', 'Das Sektorhandelszentrum erleichtert den Sektorhandel.<br>Es ist eine Erweiterung zur Sektorbasis.', 'Sektorhandelszentrum', 'Das Sektorhandelszentrum erleichtert den Sektorhandel.<br>Es ist eine Erweiterung zur Sektorbasis.', '', ''),
 (124, 'Scannerphalanx', 600000, 1500000, 250000, 750000, 110, 96, 845000, '120', 'Die Scannerphalanx erm&ouml;glicht das Scannen von Sektorraumbasen und deren Flottenst&auml;rke.', 'Scannerphalanx', 'Die Scannerphalanx ermöglicht das Scannen von Sektorraumbasen und deren Flottenstärke.', '', '');
 
+
+INSERT INTO `de_tech_data1` (`tech_id`, `tech_name`, `restyp01`, `restyp02`, `restyp03`, `restyp04`, `restyp05`, `tech_ticks`, `score`, `tech_vor`, `des`, `tech_name1`, `des1`, `tech_name2`, `des2`) VALUES ('125', 'DX61a23-Kommunikationszentrale', '150000', '75000', '75000', '150000', '30', '96', '142500', '120', 'Die DX61a23-Kommunikationszentrale ermöglicht die Kontaktaufnahme und Abstimmung mit den DX61a23 im Sektor.', 'DX61a23-Kommunikationszentrale', 'Die DX61a23-Kommunikationszentrale ermöglicht die Kontaktaufnahme und Abstimmung mit den DX61a23 im Sektor.', '', '');
 -- --------------------------------------------------------
 
 --
