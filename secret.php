@@ -694,7 +694,7 @@ if (!hasTech($pt, 9)) {
             if ($num == 1 && $herakles == 0) {//die koordinaten stimmen, gib die daten aus
                 $row = mysqli_fetch_array($db_daten);
                 //test auf npc
-                if ($row['npc'] == 0) {
+                if ($row['npc'] == 0 || $row['npc'] == 2) {
                     $uid = $row["user_id"]; //hole die user_id des users um die daten anfordern zu k�nnen
                     $zpunkte = $row["score"];
                     $vertanz = $row["e100"] + $row["e101"] + $row["e102"] + $row["e103"] + $row["e104"];

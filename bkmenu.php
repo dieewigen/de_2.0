@@ -156,6 +156,7 @@ echo '<td><a href="politics.php?s=1" class="btn">'.$politics_lang["allgemein"].'
 
 if($system==issectorcommander()){
 	echo '<td><a href="politics.php?s=2" class="btn">SK-Politik</a></td>';
+    echo '<td><a href="politics.php?s=3" class="btn">'.$politics_lang['npc_config_page_btn'].'</a></td>';
 	echo '<td><a href="bkmenu.php" class="btn">SK-Bau/Flotte</a></td>';
 }
 

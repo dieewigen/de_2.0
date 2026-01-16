@@ -3,7 +3,9 @@
     "description": "Die Ewigen 2.0",
     "require": {
         "phpmailer/phpmailer": "^6.10",
-        "mobiledetect/mobiledetectlib": "^4.8"
+        "mobiledetect/mobiledetectlib": "^4.8",
+        "guzzlehttp/guzzle": "^7.10",
+        "ext-mysqli": "*"
     },
     "autoload": {
         "psr-4": {
