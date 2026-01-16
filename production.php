@@ -195,7 +195,12 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 
 <?php
 echo '<script type="text/javascript">var abf='.$artbonus_fleet.';var abd='.$artbonus_def.';var ab=0;</script>';
-echo '<script src="js/produktion'.$_SESSION['ums_rasse'].'.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$_SESSION['ums_rasse'].'.js').'" type="text/javascript"></script>';
+// Validierung der Rasse (1-4 erlaubt)
+$rasse = isset($_SESSION['ums_rasse']) && $_SESSION['ums_rasse'] >= 1 && $_SESSION['ums_rasse'] <= 4 ? $_SESSION['ums_rasse'] : 1;
+$js_file = $_SERVER['DOCUMENT_ROOT'].'/js/produktion'.$rasse.'.js';
+if (file_exists($js_file)) {
+    echo '<script src="js/produktion'.$rasse.'.js?'.filemtime($js_file).'" type="text/javascript"></script>';
+}
 ?>
 </head>
 <?php
