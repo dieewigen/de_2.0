@@ -18,52 +18,62 @@ switch($_SESSION['ums_rasse']){
 		<br>1 Kreuzer unterstützt 12 Jagdboote.
 		<br>1 Schlachtschiff unterstützt 28 Jagdboote.
 		<br>1 Träger unterstützt 43 Jagdboote.';
-		break;	
+		break;
 	case 3:
 		$production_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
 		<br>1 Kreuzer unterstützt 6 Jagdboote.
 		<br>1 Schlachtschiff unterstützt 14 Jagdboote.
 		<br>1 Träger unterstützt 26 Jagdboote.';
-		break;		
+		break;
 	case 4:
 		$production_lang['besonderheitjagdboot']='Besonderheit: Benötigt Unterstützung durch Kreuzer/Schlachtschiffe/Träger, sonst ist die Einheit geschwächt.
 		<br>1 Kreuzer unterstützt 12 Jagdboote.
 		<br>1 Schlachtschiff unterstützt 29 Jagdboote.
 		<br>1 Träger unterstützt 48 Jagdboote.';
-		break;		
+		break;
+	default:
+		$production_lang['besonderheitjagdboot']='';
+		break;
 }
 
 
 //besonderheit Kreuzer
+$production_lang['besonderheitkreuzer']='';
 switch($_SESSION['ums_rasse']){
 	case 1:
 		$production_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit Geleitschutz durch 8 Jäger, sonst ist die Einheit geschwächt.';
 		break;
 	case 2:
 		$production_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit Geleitschutz durch 8 Jäger, sonst ist die Einheit geschwächt.';
-		break;	
+		break;
 	case 3:
 		$production_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit Geleitschutz durch 7 Jäger, sonst ist die Einheit geschwächt.';
-		break;		
+		break;
 	case 4:
 		$production_lang['besonderheitkreuzer']='Besonderheit: Benötigt pro Einheit Geleitschutz durch 12 Jäger, sonst ist die Einheit geschwächt.';
-		break;		
+		break;
+	default:
+		$production_lang['besonderheitkreuzer']='';
+		break;
 }
 
 //besonderheit Schlachtschiff
 switch($_SESSION['ums_rasse']){
 	case 1:
-		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
+		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';
 		break;
 	case 2:
-		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
-		break;	
+		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 18 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';
+		break;
 	case 3:
-		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 14 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
-		break;		
+		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 14 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';
+		break;
 	case 4:
-		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 30 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';		
-		break;		
+		$production_lang['besonderheitschlachtschiff']='Besonderheit: 5 Zerstörer und 3 Kreuzer pro Schlachtschiff beschleunigen dieses um 1 KT.<br>Benötigt pro Einheit 30 Jäger als Geleitschutz , sonst ist die Einheit geschwächt.<br>Recycelt zerstörte eigene Jäger, Jagdboote und Bomber.';
+		break;
+	default:
+		$production_lang['besonderheitschlachtschiff']='';
+		break;
 }
 
 $production_lang['design']='Design';
@@ -96,4 +106,3 @@ $production_lang['waffengattung2']='EMP-Waffen';
 $production_lang['waffenvorhandenja']='ja';
 $production_lang['waffenvorhandennein']='nein';
 $production_lang['wochen']='WT';
-?>
