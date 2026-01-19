@@ -93,7 +93,7 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             $datum = date("Y-m-d H:i:s", time());
             $comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$row['user_id']]);
             $rowz = mysqli_fetch_array($comment);
-            $eintrag = "$rowz[kommentar]\n$datum Loginversuch Account Status 3(Umode/L&ouml;schmode)! $zstatus\n$time";
+            $eintrag = "$rowz[kommentar]\n$datum Loginversuch Account Status 3(Umode/L&ouml;schmode)! $zstatus\n$datum";
             mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET kommentar=? WHERE user_id=?", [$eintrag, $row['user_id']]);
 
 
