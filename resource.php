@@ -592,6 +592,9 @@ if (isset($_POST["b_col"])) {
                     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80 AND verbzeit=4", [$_SESSION['ums_user_id']]);
                     $row = mysqli_fetch_assoc($result);
                     if ($z > 0) {
+                        if(!isset($row['anzahl'])){
+                            $row['anzahl'] = 0;
+                        }
                         if ($row['anzahl'] == 0) { //es gibt keine kollektoren mit 4 ticks laenge in der queue
                             mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit) VALUES (?, 80, ?, 4)", [$_SESSION['ums_user_id'], $z]);
                         } else {
