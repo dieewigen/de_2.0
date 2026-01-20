@@ -8,6 +8,7 @@ cache/overview/*.tmp
 cache/botcheck/*.txt
 ourdetool/logs/*.txt
 ourdetool/user/*.txt
+tickler/logs/*
 fonts/
 .gitignore
 .user.ini
@@ -15,6 +16,7 @@ dieewigen.code-workspace
 inc/env.inc.php
 inc/sv.inc.php
 map_analyse.php
+composer.lock
 .claude
 claude.MD
 /vendor/
