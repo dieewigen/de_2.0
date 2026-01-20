@@ -48,9 +48,6 @@ function doBattleGround($bg)
     $row = mysqli_fetch_array($db_data);
     $map_id = $row['id'];
 
-    //$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=159";
-
-
     ////////////////////////////////////////////////////////////////
     //teilnehmende Spieler laden / special ships laden
     ////////////////////////////////////////////////////////////////
@@ -212,7 +209,7 @@ function doBattleGround($bg)
                         $fightresult[$runde][] = array(
                             'winner_user_id' => $player[$winner_id]['user_id'],
                             'user_id1' => $player[$player_id1]['user_id'],
-                            'user_id2' => $player[$player_id2]['user_id'],
+                            'user_id2' => $player_id2 > -1 ? $player[$player_id2]['user_id'] : -1,
                             'spielername1' => $spielername1.$p1_ship_level,
                             'spielername2' => $spielername2.$p2_ship_level,
                             'gewinn' => $gewinn_text
@@ -339,8 +336,8 @@ function doBattleGround($bg)
                         if(!empty($spielername1) || !empty($spielername2)){
                             $fightresult[$runde][] = array(
                                 'winner_user_id' => isset($allys[$winner_id]['ally_id']) ? $allys[$winner_id]['ally_id'] : 0,
-                                'user_id1' => isset($allys[$player_id1]['ally_id']) ? $allys[$player_id1]['ally_id'] : 0,
-                                'user_id2' => isset($allys[$player_id2]['ally_id']) ? $allys[$player_id2]['ally_id'] : 0,
+                                'user_id1' => ($player_id1 > -1 && isset($allys[$player_id1]['ally_id'])) ? $allys[$player_id1]['ally_id'] : -1,
+                                'user_id2' => ($player_id2 > -1 && isset($allys[$player_id2]['ally_id'])) ? $allys[$player_id2]['ally_id'] : -1,
                                 'spielername1' => $spielername1,
                                 'spielername2' => $spielername2,
                                 'gewinn' => $gewinn_text
