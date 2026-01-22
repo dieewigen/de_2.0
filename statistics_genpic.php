@@ -16,38 +16,41 @@ $rundenstart_datum = $rowx["rundenstart_datum"];
 //hintergund laden
 $im = imagecreatefrompng("lib/statvorl2.png");
 
+// Typ-Parameter auslesen und validieren
+$typ = isset($_GET["typ"]) ? (int)$_GET["typ"] : 0;
+
 //statistische daten auslesen
 //spieler
-if ($_GET["typ"] == 1) {
+if ($typ == 1) {
     $sql = "SELECT score FROM de_user_stat WHERE user_id=? AND datum>? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $rundenstart_datum]);
-} elseif ($_GET["typ"] == 2) {
+} elseif ($typ == 2) {
     $sql = "SELECT col FROM de_user_stat WHERE user_id=? AND datum>? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $rundenstart_datum]);
 }
 
 //sektor
-elseif ($_GET["typ"] == 11) {
+elseif ($typ == 11) {
     $sql = "SELECT score FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
-} elseif ($_GET["typ"] == 12) {
+} elseif ($typ == 12) {
     $sql = "SELECT col FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
-} elseif ($_GET["typ"] == 13) {
+} elseif ($typ == 13) {
     $sql = "SELECT platz FROM de_sector_stat WHERE sec_id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 }
 //allianz
-elseif ($_GET["typ"] == 21) {
+elseif ($typ == 21) {
     $sql = "SELECT score FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
-} elseif ($_GET["typ"] == 22) {
+} elseif ($typ == 22) {
     $sql = "SELECT col FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
-} elseif ($_GET["typ"] == 23) {
+} elseif ($typ == 23) {
     $sql = "SELECT platz FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
-} elseif ($_GET["typ"] == 24) {
+} elseif ($typ == 24) {
     $sql = "SELECT member FROM de_ally_stat WHERE id=? ORDER BY datum ASC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
 }
