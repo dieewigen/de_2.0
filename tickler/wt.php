@@ -530,7 +530,7 @@ if ($doetick == 1) {
                 $sqltcount = ', tcount = '.$r;
             } else {
                 //wenn der counter auf 1 ist, dann gibts tronic
-                if ($tcount == 1 and $npc == 0) {
+                if ($tcount == 1 && ($npc == 0 || $npc == 2)) {
                     //festellen wieviel tronic man bekommt
                     $r = mt_rand(1, 100);
                     if ($r <= 1) {
