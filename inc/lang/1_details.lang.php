@@ -43,4 +43,31 @@ $details_lang['irc']='I R C';
 $details_lang['motto']='Motto';
 $details_lang['sonstiges']='Sonstiges';
 $details_lang['ka']='Keine Angaben';
+
+// Alien dialog feature
+$details_lang['alien_dialog_link']       = 'Kommunikation beginnen';
+$details_lang['alien_dialog_back']       = '&larr; Zur&uuml;ck zur Alien-&Uuml;bersicht';
+$details_lang['alien_dialog_title']      = '&Uuml;BERSETZUNGS- / KONTAKTKANAL';
+$details_lang['alien_dialog_status_label'] = 'Status:';
+$details_lang['alien_dialog_conn_init']  = 'Verbindung wird aufgebaut …';
+$details_lang['alien_dialog_select']     = 'Anfrage ausw&auml;hlen:';
+$details_lang['alien_dialog_send']       = 'Transmission starten';
+$details_lang['alien_dialog_waiting']    = 'SIGNAL AUSSTEHEND';
+$details_lang['alien_dialog_waiting_msg']= 'Das Alien hat noch nicht geantwortet.';
+$details_lang['alien_dialog_poll']       = 'Antwort abrufen';
+$details_lang['alien_dialog_cancel']     = 'Anfrage abbrechen';
+$details_lang['alien_dialog_answered']   = 'ANTWORT EMPFANGEN';
+$details_lang['alien_dialog_question_label']          = 'Gesendete Anfrage:';
+$details_lang['alien_dialog_answer_encrypted_label']  = 'Eingehende &Uuml;bertragung:';
+$details_lang['alien_dialog_answer_label'] = 'Entschl&uuml;sselte Antwort:';
+$details_lang['alien_dialog_new']        = 'Neue Anfrage';
+$details_lang['alien_dialog_cancelled']  = 'ANFRAGE ABGEBROCHEN';
+$details_lang['alien_dialog_expired']    = 'SIGNAL ABGELAUFEN';
+$details_lang['alien_dialog_expired_msg']= 'Die Anfrage ist abgelaufen. Starte eine neue Übertragung.';
+$details_lang['alien_dialog_err_load']   = 'Kommunikationskanal konnte nicht initialisiert werden.';
+$details_lang['alien_dialog_err_send']   = 'Übertragung fehlgeschlagen.';
+$details_lang['alien_dialog_err_conflict']= 'Es läuft bereits eine offene Anfrage. Breche sie zuerst ab.';
+$details_lang['alien_dialog_err_session'] = 'Sitzung abgelaufen. Bitte lade die Seite neu.';
+$details_lang['alien_dialog_transmitting']= 'SIGNAL WIRD ÜBERTRAGEN …';
+$details_lang['alien_dialog_last_signal']= 'Letzte &Uuml;bertragung:';
 ?>

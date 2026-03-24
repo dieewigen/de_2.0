@@ -106,6 +106,161 @@ include "resline.php";
 //wenn es der eigene Sektor und ein NPC Typ 2 ist, dann NPC-Details aller NPC im Sektor anzeigen
 if ($se == $sector && $znpc == 2) {
 
+    // ---------------------------------------------------------------
+    // Single-Alien communication mode: ?dialog=1&se=X&sy=Y
+    // ---------------------------------------------------------------
+    $dialogMode = isset($_REQUEST['dialog']) && intval($_REQUEST['dialog']) === 1;
+
+    if ($dialogMode && $se > 0 && $sy > 0) {
+
+        // Resolve the single target Alien
+        $alienRow = null;
+        $alienDb  = mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "SELECT user_id, spielername, sector, `system`, score, col, kartefakt FROM de_user_data WHERE sector=? AND `system`=? AND npc=2",
+            [$se, $sy]
+        );
+        if ($alienDb) {
+            $alienRow = mysqli_fetch_assoc($alienDb);
+        }
+
+        if (!$alienRow) {
+            echo '<div class="info_box font-size16">Alien nicht gefunden.</div>';
+            die('</body></html>');
+        }
+
+        $alienId   = (int) $alienRow['user_id'];
+        $alienName = htmlspecialchars($alienRow['spielername'], ENT_QUOTES, 'UTF-8');
+
+        ?>
+        <script>
+        window.AlienDialogCfg = {
+            alienId: <?php echo $alienId; ?>,
+            strings: {
+                errLoad:      '<?php echo addslashes($details_lang['alien_dialog_err_load']); ?>',
+                connInit:     '<?php echo addslashes($details_lang['alien_dialog_conn_init']); ?>',
+                waiting:      '<?php echo addslashes($details_lang['alien_dialog_waiting']); ?>',
+                transmitting: '<?php echo addslashes($details_lang['alien_dialog_transmitting']); ?>',
+                answered:     '<?php echo addslashes($details_lang['alien_dialog_answered']); ?>',
+                expired:      '<?php echo addslashes($details_lang['alien_dialog_expired']); ?>',
+                expiredMsg:   '<?php echo addslashes($details_lang['alien_dialog_expired_msg']); ?>',
+                cancelled:    '<?php echo addslashes($details_lang['alien_dialog_cancelled']); ?>',
+                errConflict:  '<?php echo addslashes($details_lang['alien_dialog_err_conflict']); ?>',
+                errSend:      '<?php echo addslashes($details_lang['alien_dialog_err_send']); ?>',
+                errSession:   '<?php echo addslashes($details_lang['alien_dialog_err_session']); ?>'
+            }
+        };
+        </script>
+        <script src="js/de_alien_dialog.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_alien_dialog.js'); ?>"></script>
+
+        <div class="npc">
+            <div class="alien-dialog-wrapper">
+
+                <a href="details.php?se=<?php echo htmlspecialchars((string)$alienRow['sector'], ENT_QUOTES, 'UTF-8'); ?>&amp;sy=<?php echo htmlspecialchars((string)$alienRow['system'], ENT_QUOTES, 'UTF-8'); ?>" class="alien-dialog-back">
+                    <?php echo $details_lang['alien_dialog_back']; ?>
+                </a>
+
+                <div class="alien-dialog-layout">
+
+                    <!-- Top: Alien info bar -->
+                    <div class="alien-dialog-info-bar">
+                        <div class="alien-dialog-info-header">
+                            <span class="alien-dialog-info-name"><?php echo $alienName; ?></span>
+                            <span class="alien-dialog-info-coords">[<?php echo htmlspecialchars((string)$alienRow['sector'], ENT_QUOTES, 'UTF-8'); ?>:<?php echo htmlspecialchars((string)$alienRow['system'], ENT_QUOTES, 'UTF-8'); ?>]</span>
+                        </div>
+                        <div class="alien-dialog-info-stats">
+                            <div class="alien-dialog-info-stat">
+                                <img src="gp/g/icon8.png" class="rounded-borders" style="width:16px;height:auto;" title="Punkte">
+                                <span class="alien-dialog-info-stat-label">Punkte</span>
+                                <span class="alien-dialog-info-stat-value"><?php echo number_format((int)$alienRow['score'], 0, ',', '.'); ?></span>
+                            </div>
+                            <div class="alien-dialog-info-stat">
+                                <img src="gp/g/icon18.png" class="rounded-borders" style="width:16px;height:auto;" title="Kollektoren">
+                                <span class="alien-dialog-info-stat-label">Kollektoren</span>
+                                <span class="alien-dialog-info-stat-value"><?php echo number_format((int)$alienRow['col'], 0, ',', '.'); ?></span>
+                            </div>
+                            <div class="alien-dialog-info-stat">
+                                <img src="gp/g/icon17.png" class="rounded-borders" style="width:16px;height:auto;" title="Kriegsartefakte">
+                                <span class="alien-dialog-info-stat-label">Kriegsartefakte</span>
+                                <span class="alien-dialog-info-stat-value"><?php echo number_format((int)$alienRow['kartefakt'], 0, ',', '.'); ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom: Communication console -->
+                    <div class="alien-dialog-console">
+                        <div class="alien-dialog-console-title"><?php echo $details_lang['alien_dialog_title']; ?></div>
+
+                        <div class="alien-dialog-status-bar">
+                            <span class="alien-dialog-status-label"><?php echo $details_lang['alien_dialog_status_label']; ?></span>
+                            <span id="alien-status" class="alien-dialog-status-value">&hellip;</span>
+                        </div>
+
+                        <div id="alien-error" class="alien-dialog-error" style="display:none;"></div>
+
+                        <!-- View: select dialog type -->
+                        <div id="view-select" style="display:none;">
+                            <div class="alien-dialog-select-label"><?php echo $details_lang['alien_dialog_select']; ?></div>
+                            <select id="dialog-type-select" class="alien-dialog-select"></select>
+                            <div class="alien-dialog-actions">
+                                <button class="alien-dialog-btn" onclick="alienDialog.send()"><?php echo $details_lang['alien_dialog_send']; ?></button>
+                            </div>
+                        </div>
+
+                        <!-- View: transmitting (animation) -->
+                        <div id="view-transmitting" style="display:none;">
+                            <div class="alien-signal-box">
+                                <div class="alien-signal-label"><?php echo $details_lang['alien_dialog_last_signal']; ?></div>
+                                <div id="alien-signal-text" class="alien-signal-text"></div>
+                            </div>
+                        </div>
+
+                        <!-- View: waiting for NPC -->
+                        <div id="view-waiting" style="display:none;">
+                            <div class="alien-signal-box">
+                                <div class="alien-signal-label"><?php echo $details_lang['alien_dialog_last_signal']; ?></div>
+                                <div id="waiting-plain" class="alien-signal-plain"></div>
+                                <div id="waiting-signal" class="alien-signal-text alien-signal-frozen"></div>
+                            </div>
+                            <p class="alien-dialog-msg"><?php echo $details_lang['alien_dialog_waiting_msg']; ?></p>
+                            <div class="alien-dialog-actions">
+                                <button class="alien-dialog-btn" onclick="alienDialog.poll()"><?php echo $details_lang['alien_dialog_poll']; ?></button>
+                                <button class="alien-dialog-btn alien-dialog-btn--secondary" onclick="alienDialog.cancel()"><?php echo $details_lang['alien_dialog_cancel']; ?></button>
+                            </div>
+                        </div>
+
+                        <!-- View: answered / expired / cancelled -->
+                        <div id="view-answered" style="display:none;">
+                            <div class="alien-answer-box">
+                                <div class="alien-answer-label"><?php echo $details_lang['alien_dialog_question_label']; ?></div>
+                                <div id="answer-question" class="alien-signal-plain"></div>
+
+                                <div id="answer-encrypted-label" class="alien-answer-label" style="display:none;"><?php echo $details_lang['alien_dialog_answer_encrypted_label']; ?></div>
+                                <div id="answer-encrypted" class="alien-signal-text alien-answer-encrypted" style="display:none;"></div>
+
+                                <div class="alien-answer-label"><?php echo $details_lang['alien_dialog_answer_label']; ?></div>
+                                <div id="answer-text" class="alien-answer-text"></div>
+                            </div>
+                            <div class="alien-dialog-actions">
+                                <button class="alien-dialog-btn" onclick="alienDialog.newReq()"><?php echo $details_lang['alien_dialog_new']; ?></button>
+                            </div>
+                        </div>
+
+                        <!-- View: terminal scan lines (decorative overlay) -->
+                        <div id="view-terminal" class="alien-terminal-overlay" style="display:none;"></div>
+
+                    </div><!-- /.alien-dialog-console -->
+                </div><!-- /.alien-dialog-layout -->
+            </div><!-- /.alien-dialog-wrapper -->
+        </div><!-- /.npc -->
+        <?php
+        die('</body></html>');
+    }
+
+    // ---------------------------------------------------------------
+    // Default: Alien overview for the whole sector
+    // ---------------------------------------------------------------
+
     //alle NPC im Sektor auslesen
     $db_daten = mysqli_execute_query(
         $GLOBALS['dbi'],
@@ -131,8 +286,11 @@ if ($se == $sector && $znpc == 2) {
             <div class="detail-row">
                 <img src="gp/g/icon17.png" class="rounded-borders" style="width: 20px; height: auto;" title="Kriegsartefakte"> ' . number_format($row['kartefakt'], 0, ',', '.') . '
             </div>
-
-
+            <div class="alien-dialog-entry">
+                <a href="details.php?se=' . $row['sector'] . '&amp;sy=' . $row['system'] . '&amp;dialog=1" class="alien-dialog-link">'
+                    . $details_lang['alien_dialog_link'] .
+                '</a>
+            </div>
         </div>';
     }
 
