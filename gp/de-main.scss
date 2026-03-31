@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:color';
 
 @font-face {
 	font-family: 'Roboto';
@@ -2008,7 +2009,464 @@ a.btn2:hover {
 					margin-right: 6px;
 				}
 			}
+
+			// Entry link to communication mode, pinned to card bottom
+			.alien-dialog-entry {
+				margin-top: auto;
+				padding-top: 10px;
+				text-align: center;
+			}
 		}	
+	}
+
+	// ---------------------------------------------------------------
+	// Alien communication link on overview cards
+	// ---------------------------------------------------------------
+	.alien-dialog-link {
+		display: inline-block;
+		font-size: 11px;
+		letter-spacing: 0.05em;
+		color: #88ccff;
+		border: 1px solid rgba(136, 204, 255, 0.35);
+		border-radius: 3px;
+		padding: 3px 8px;
+		text-decoration: none;
+		transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+		&:hover {
+			background: rgba(136, 204, 255, 0.12);
+			color: #ccecff;
+			border-color: rgba(136, 204, 255, 0.7);
+		}
+	}
+
+	// ---------------------------------------------------------------
+	// Communication mode layout
+	// ---------------------------------------------------------------
+	.alien-dialog-wrapper {
+		width: 600px;
+		padding: 8px 0;
+	}
+
+	.alien-dialog-back {
+		display: inline-block;
+		font-size: 11px;
+		color: #88ccff;
+		text-decoration: none;
+		margin-bottom: 12px;
+		letter-spacing: 0.04em;
+		opacity: 0.8;
+		transition: opacity 0.2s;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	// ---------------------------------------------------------------
+	// NPC info bar — full-width horizontal banner above the console
+	// ---------------------------------------------------------------
+	.alien-dialog-info-bar {
+		background: linear-gradient(135deg, rgba(0, 0, 0, 0.92), rgba(30, 30, 30, 0.92));
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 6px;
+		padding: 12px 16px;
+		position: relative;
+		overflow: hidden;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+		box-sizing: border-box;
+		width: 100%;
+
+		// Top shimmer line
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+		}
+	}
+
+	.alien-dialog-info-header {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+		margin-bottom: 10px;
+	}
+
+	.alien-dialog-info-name {
+		font-size: 18px;
+		font-weight: bold;
+		color: #ffffff;
+		letter-spacing: 0.04em;
+	}
+
+	.alien-dialog-info-coords {
+		font-size: 12px;
+		color: rgba(200, 200, 200, 0.5);
+		letter-spacing: 0.06em;
+	}
+
+	.alien-dialog-info-stats {
+		display: flex;
+		gap: 20px;
+		flex-wrap: wrap;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		padding-top: 8px;
+	}
+
+	.alien-dialog-info-stat {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+
+		.alien-dialog-info-stat-label {
+			font-size: 11px;
+			color: rgba(180, 180, 180, 0.55);
+			letter-spacing: 0.05em;
+		}
+
+		.alien-dialog-info-stat-value {
+			font-size: 13px;
+			font-weight: bold;
+			color: #dddddd;
+		}
+	}
+
+	.alien-dialog-layout {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	// ---------------------------------------------------------------
+	// Communication console (right panel)
+	// ---------------------------------------------------------------
+	.alien-dialog-console {
+		width: 100%;
+		background: linear-gradient(160deg, rgba(0, 6, 18, 0.97), rgba(5, 20, 40, 0.97));
+		border: 1px solid rgba(60, 140, 220, 0.35);
+		border-radius: 6px;
+		padding: 12px 14px;
+		position: relative;
+		overflow: hidden;
+		box-shadow: 0 2px 12px rgba(0, 80, 180, 0.2), inset 0 0 30px rgba(0, 40, 100, 0.15);
+
+		// Faint scanline effect
+		&::after {
+			content: '';
+			pointer-events: none;
+			position: absolute;
+			inset: 0;
+			background: repeating-linear-gradient(
+				0deg,
+				transparent,
+				transparent 2px,
+				rgba(0, 0, 0, 0.06) 2px,
+				rgba(0, 0, 0, 0.06) 4px
+			);
+			z-index: 0;
+		}
+
+		// Keep content above scanlines
+		> * { position: relative; z-index: 1; }
+	}
+
+	.alien-dialog-console-title {
+		font-size: 10px;
+		letter-spacing: 0.15em;
+		color: rgba(136, 204, 255, 0.55);
+		text-transform: uppercase;
+		margin-bottom: 8px;
+		border-bottom: 1px solid rgba(60, 140, 220, 0.2);
+		padding-bottom: 6px;
+	}
+
+	.alien-dialog-status-bar {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-bottom: 12px;
+		font-size: 11px;
+	}
+
+	.alien-dialog-status-label {
+		color: rgba(136, 204, 255, 0.5);
+		letter-spacing: 0.06em;
+	}
+
+	.alien-dialog-status-value {
+		color: #aaddff;
+		font-weight: bold;
+		letter-spacing: 0.06em;
+	}
+
+	.alien-dialog-error {
+		font-size: 11px;
+		color: #ff8888;
+		margin-bottom: 8px;
+		padding: 4px 8px;
+		border: 1px solid rgba(255, 80, 80, 0.3);
+		border-radius: 3px;
+		background: rgba(100, 0, 0, 0.2);
+	}
+
+	// Request type selector
+	.alien-dialog-select-label {
+		font-size: 11px;
+		color: rgba(136, 204, 255, 0.6);
+		letter-spacing: 0.05em;
+		margin-bottom: 6px;
+	}
+
+	.alien-dialog-select {
+		display: block;
+		width: 100%;
+		background: rgba(0, 20, 50, 0.9);
+		color: #c8e8ff;
+		border: 1px solid rgba(60, 140, 220, 0.4);
+		border-radius: 3px;
+		padding: 5px 8px;
+		font-size: 12px;
+		font-family: inherit;
+		margin-bottom: 10px;
+		cursor: pointer;
+
+		&:focus {
+			outline: none;
+			border-color: rgba(136, 204, 255, 0.7);
+		}
+
+		option {
+			background: #050f20;
+		}
+	}
+
+	// Action buttons
+	.alien-dialog-actions {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-top: 10px;
+	}
+
+	.alien-dialog-btn {
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #c8e8ff;
+		background: rgba(20, 60, 120, 0.7);
+		border: 1px solid rgba(60, 140, 220, 0.5);
+		border-radius: 3px;
+		padding: 5px 12px;
+		cursor: pointer;
+		transition: background 0.2s, border-color 0.2s;
+
+		&:hover {
+			background: rgba(40, 100, 180, 0.8);
+			border-color: rgba(136, 204, 255, 0.8);
+		}
+
+		&--secondary {
+			color: rgba(200, 200, 200, 0.6);
+			background: rgba(10, 10, 20, 0.6);
+			border-color: rgba(120, 120, 140, 0.3);
+
+			&:hover {
+				color: #cccccc;
+				background: rgba(30, 30, 50, 0.7);
+				border-color: rgba(160, 160, 180, 0.5);
+			}
+		}
+	}
+
+	.alien-dialog-msg {
+		font-size: 12px;
+		color: rgba(180, 210, 240, 0.7);
+		margin: 6px 0 0;
+	}
+
+	// ---------------------------------------------------------------
+	// Signal / transmission animation panel
+	// ---------------------------------------------------------------
+	.alien-signal-box {
+		margin: 8px 0;
+		padding: 8px 10px;
+		border: 1px solid rgba(60, 140, 220, 0.25);
+		border-radius: 4px;
+		background: rgba(0, 10, 30, 0.6);
+	}
+
+	.alien-signal-label {
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(100, 160, 220, 0.45);
+		margin-bottom: 4px;
+	}
+
+	.alien-signal-text {
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 13px;
+		color: #70d4ff;
+		letter-spacing: 0.1em;
+		word-break: break-all;
+		min-height: 1.4em;
+		// Subtle pulsing glow while animating
+		animation: signal-pulse 1.4s ease-in-out infinite alternate;
+	}
+
+	.alien-signal-frozen {
+		// Static / frozen mid-scramble state — no pulse
+		animation: none;
+		color: rgba(100, 180, 220, 0.6);
+	}
+
+	@keyframes signal-pulse {
+		from { text-shadow: 0 0 4px rgba(112, 212, 255, 0.3); }
+		to   { text-shadow: 0 0 12px rgba(112, 212, 255, 0.9), 0 0 20px rgba(80, 180, 255, 0.4); }
+	}
+
+	// ---------------------------------------------------------------
+	// Answer panel
+	// ---------------------------------------------------------------
+	.alien-answer-box {
+		margin: 8px 0;
+		padding: 10px 12px;
+		border: 1px solid rgba(60, 200, 140, 0.25);
+		border-radius: 4px;
+		background: rgba(0, 15, 10, 0.6);
+	}
+
+	.alien-answer-label {
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(80, 200, 140, 0.5);
+		margin-bottom: 6px;
+	}
+
+	.alien-answer-text {
+		font-size: 13px;
+		color: #a0e8c8;
+		line-height: 1.5;
+	}
+
+	// Plain-text companion line — shows the human-readable label under the
+	// scrambled/frozen signal (waiting state) and above the answer (answered state)
+	.alien-signal-plain {
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 13px;
+		font-weight: bold;
+		color: rgba(100, 180, 220, 0.5);
+		letter-spacing: 0.08em;
+		margin-bottom: 4px;
+		min-height: 1.2em;
+	}
+
+	// Encrypted incoming transmission line inside the answer panel
+	// Green-tinted; animation is toggled on/off by JS during unscramble
+	.alien-answer-encrypted {
+		color: #70ffb0;
+		animation: none;
+		margin-bottom: 8px;
+	}
+}
+
+// ---------------------------------------------------------------
+// Alien dialog — per-race accent color overrides
+// The .npc block above uses hardcoded blue as default/fallback.
+// These overrides replace every accent with the player's race color.
+// Answer-panel green (#70ffb0 etc.) is intentionally NOT overridden
+// — it represents the alien's "voice", not the player's race.
+// ---------------------------------------------------------------
+@each $name, $cfg in $themes {
+	$col: map.get($cfg, color);
+
+	body.theme-#{$name} .npc {
+
+		.alien-dialog-link {
+			color: color.mix(white, $col, 30%);
+			border-color: rgba($col, 0.35);
+
+			&:hover {
+				background: rgba($col, 0.12);
+				color: color.mix(white, $col, 55%);
+				border-color: rgba($col, 0.7);
+			}
+		}
+
+		.alien-dialog-back {
+			color: color.mix(white, $col, 30%);
+		}
+
+		.alien-dialog-console {
+			border-color: rgba($col, 0.35);
+			box-shadow: 0 2px 12px rgba($col, 0.15), inset 0 0 30px rgba($col, 0.08);
+		}
+
+		.alien-dialog-console-title {
+			color: rgba(color.mix(white, $col, 50%), 0.75);
+			border-bottom-color: rgba($col, 0.2);
+		}
+
+		.alien-dialog-status-label {
+			color: rgba(color.mix(white, $col, 40%), 0.65);
+		}
+
+		.alien-dialog-status-value {
+			color: color.mix(white, $col, 20%);
+		}
+
+		.alien-dialog-select-label {
+			color: rgba(color.mix(white, $col, 40%), 0.75);
+		}
+
+		.alien-dialog-select {
+			color: color.mix(white, $col, 40%);
+			border-color: rgba($col, 0.4);
+
+			&:focus {
+				border-color: rgba($col, 0.7);
+			}
+		}
+
+		.alien-dialog-btn {
+			color: color.mix(white, $col, 40%);
+			background: rgba(color.mix(black, $col, 70%), 0.7);
+			border-color: rgba($col, 0.5);
+
+			&:hover {
+				background: rgba(color.mix(black, $col, 45%), 0.8);
+				border-color: rgba($col, 0.8);
+			}
+		}
+
+		.alien-dialog-msg {
+			color: rgba(color.mix(white, $col, 60%), 0.7);
+		}
+
+		.alien-signal-box {
+			border-color: rgba($col, 0.25);
+		}
+
+		.alien-signal-label {
+			color: rgba(color.mix(white, $col, 30%), 0.55);
+		}
+
+		.alien-signal-text {
+			color: color.mix(white, $col, 55%);
+		}
+
+		.alien-signal-frozen {
+			color: rgba($col, 0.6);
+		}
+
+		.alien-signal-plain {
+			color: rgba($col, 0.5);
+		}
 	}
 }
 
