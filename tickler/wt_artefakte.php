@@ -656,7 +656,7 @@ if ($maxtick >= 2000 and $srbanzahl >= 11) {
     //nach punkten
     //$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM `de_sector` WHERE npc=0 AND sec_id > 1 ORDER BY platz DESC LIMIT 10",$db);
     //nach kollektoren
-    $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM `de_sector` WHERE npc=0 AND sec_id > 1 AND platz>0 ORDER BY tempcol ASC LIMIT 5", []);
+    $result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM `de_sector` WHERE npc=0 AND sec_id > 1 AND platz>0 AND tempcol_player > 0 ORDER BY tempcol_player ASC LIMIT 5", []);
 
     for ($id = 16;$id <= 20;$id++) {
         $row = mysqli_fetch_array($result);
