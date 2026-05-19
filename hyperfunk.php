@@ -322,7 +322,7 @@ if (isset($_POST['antbut'])) {
     $nachricht = $_POST['nachricht'];
     $nachricht = str_replace('<', '&lt;', $nachricht);
     $nachricht = str_replace('>', '&gt;', $nachricht);
-    $nachricht = nl2br($nachricht);
+    //$nachricht = nl2br($nachricht);
     $nachricht = str_replace('\"', '&quot;', $nachricht);
     $nachricht = str_replace('\'', '&acute;', $nachricht);
     $nachricht = str_replace('script', 'schkript', $nachricht);
@@ -397,7 +397,7 @@ if ($sekmsg && $asec != 1) {
     $nachricht = $_POST['nachricht'];
     $nachricht = str_replace('<', '&lt;', $nachricht);
     $nachricht = str_replace('>', '&gt;', $nachricht);
-    $nachricht = nl2br($nachricht);
+    //$nachricht = nl2br($nachricht);
     $nachricht = str_replace('\"', '&quot;', $nachricht);
     $nachricht = str_replace('\'', '&acute;', $nachricht);
     $nachricht = str_replace('script', 'schkript', $nachricht);
@@ -457,7 +457,7 @@ if (isset($_POST['allimsg'])) {
     $nachricht = $_POST['nachricht'];
     $nachricht = str_replace('<', '&lt;', $nachricht);
     $nachricht = str_replace('>', '&gt;', $nachricht);
-    $nachricht = nl2br($nachricht);
+    //$nachricht = nl2br($nachricht);
     $nachricht = str_replace('\"', '&quot;', $nachricht);
     $nachricht = str_replace('\'', '&acute;', $nachricht);
     $nachricht = str_replace('script', 'schkript', $nachricht);
