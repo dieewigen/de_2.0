@@ -712,7 +712,8 @@ CREATE TABLE `de_sector` (
   `col` mediumint(8) UNSIGNED NOT NULL DEFAULT 0,
   `ekey` varchar(11) NOT NULL,
   `tempcol` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `arthold` mediumint(8) UNSIGNED NOT NULL DEFAULT 0
+  `arthold` mediumint(8) UNSIGNED NOT NULL DEFAULT 0,
+  `tempcol_player` int(10) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
