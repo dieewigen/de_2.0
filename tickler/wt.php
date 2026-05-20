@@ -128,12 +128,23 @@ if ($doetick == 1) {
     }
 
     //////////////////////////////////////////////////////////
-    //Kollektoren an die NPC Typ 2 verteilen
+    //Kollektoren und Agenten an die NPC Typ 2 verteilen
     //////////////////////////////////////////////////////////
     if($rundenalter_wt > 2000 && $rundenalter_wt % 60 == 0){
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set col=col+1 WHERE npc=2 ", []);
+        $agentenAnzahl=mt_rand(20,40);
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data set col=col+1, agent=agent+? WHERE npc=2 ", [$agentenAnzahl]);
     }
 
+    //////////////////////////////////////////////////////////
+    // Titaten-Energiekerne an NPC Typ 2 verteilen
+    //////////////////////////////////////////////////////////
+    if($rundenalter_wt > 2000 && $rundenalter_wt % 60 == 0){
+        $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=2", []);
+        while ($row = mysqli_fetch_array($res)) {
+            change_storage_amount($row['user_id'], mt_rand(1,2), false);
+        }
+    }
+  
     //////////////////////////////////////////////////////////
     //votetimer für den sektor um 1 verringern
     //////////////////////////////////////////////////////////
