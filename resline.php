@@ -309,7 +309,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 
 	//hyperfunk
 	//$newtrans=1;
-	if ($newtrans==1){
+	if (isset($newtrans) && $newtrans==1){
 		echo '$("#tb_hyper_img", parent.document).css("display","");';
 	}else{
 		echo '$("#tb_hyper_img", parent.document).css("display","none");';
@@ -317,7 +317,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 
 	//nachrichten
 	//$newnews=1;
-	if ($newnews==1){
+	if (isset($newnews) && $newnews==1){
 		echo '$("#tb_news_img", parent.document).css("display","");';
 	}else{
 		echo '$("#tb_news_img", parent.document).css("display","none");';
