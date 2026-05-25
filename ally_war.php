@@ -47,12 +47,10 @@ else
 	$row = mysqli_fetch_assoc($result);
 	$allyid = $row["id"];
 }
-
-if(isset($peaceto) && (isset($isleader) || isset($iscoleader)))
+$peaceto=$_GET['peaceto'];
+if(isset($peaceto) && ($isleader || $iscoleader))
 {
-	$result = mysqli_execute_query($GLOBALS['dbi'],
-		"SELECT id FROM de_allys WHERE allytag=?",
-		[$peaceto]);
+	$result = mysqli_execute_query($GLOBALS['dbi'],"SELECT id FROM de_allys WHERE allytag=?",[$peaceto]);
 	$row = mysqli_fetch_assoc($result);
 	$peaceto_id = $row["id"];
 
