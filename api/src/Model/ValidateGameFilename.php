@@ -19,7 +19,9 @@ class ValidateGameFilename
 		'ally_join.php',
 		'sysnews.php',
         'ally_war.php',
-        'ally_antrag.php'
+        'ally_antrag.php',
+        'ally_bldg.php',
+        'ally_finance.php'
 	);
 
     public function isValid($filename) :bool {
