@@ -12,8 +12,11 @@ class AllianceEntry implements JsonSerializable
     private bool $npcAlly;
     private int $openSlots;
     private int $leaderId;
+    private int $artefacts;
+    private int $tronics;
 
-    public function __construct(int $id, string $tag, string $name, bool $npcAlly, int $openSlots, int $leaderId)
+    public function __construct(int $id, string $tag, string $name, bool $npcAlly, int $openSlots, int $leaderId,
+                                int $artefacts, int $tronics)
     {
         $this->id = $id;
         $this->tag = $tag;
@@ -21,11 +24,14 @@ class AllianceEntry implements JsonSerializable
         $this->npcAlly = $npcAlly;
         $this->openSlots = $openSlots;
         $this->leaderId = $leaderId;
+        $this->artefacts = $artefacts;
+        $this->tronics = $tronics;
     }
 
     public function jsonSerialize(): array
     {
         return ['id' => $this->id, 'tag' => $this->tag, 'name' => $this->name,
-            'npcAlly' => $this->npcAlly, 'openSlots' => $this->openSlots, 'leaderId' => $this->leaderId];
+            'npcAlly' => $this->npcAlly, 'openSlots' => $this->openSlots, 'leaderId' => $this->leaderId,
+            'artefacts' => $this->artefacts, 'tronics' => $this->tronics];
     }
 }

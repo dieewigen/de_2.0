@@ -1,6 +1,7 @@
 <?php
 
 use DieEwigen\Api\Model\GetAlliances;
+use DieEwigen\Api\Model\GetAllianceRelations;
 use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetAttackNews;
 use DieEwigen\Api\Model\GetPlayerAttackInfo;
@@ -145,6 +146,11 @@ if(isset($data['action']) && !empty($data['action'])) {
             case 'getAlliances':
                 $alliances = new GetAlliances();
                 $result = $alliances->getAlliances();
+                echo json_encode($result);
+                break;
+            case 'getAllianceRelations':
+                $allianceRelations = new GetAllianceRelations();
+                $result = $allianceRelations->getAllianceRelations();
                 echo json_encode($result);
                 break;
             case 'getAttackNews':
