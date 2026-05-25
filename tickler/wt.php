@@ -141,7 +141,7 @@ if ($doetick == 1) {
     if($rundenalter_wt > 2000 && $rundenalter_wt % 60 == 0){
         $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE npc=2", []);
         while ($row = mysqli_fetch_array($res)) {
-            change_storage_amount($row['user_id'], mt_rand(1,2), false);
+            change_storage_amount($row['user_id'], 2, mt_rand(1,2), false);
         }
     }
   
