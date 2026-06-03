@@ -20,6 +20,9 @@ class ValidateGameFilename
 		'sysnews.php',
         'ally_war.php',
         'ally_antrag.php',
+        'ally_partner.php',
+        'ally_annehmen.php',
+        'ally_ablehnen.php',
         'ally_bldg.php',
         'ally_finance.php'
 	);
