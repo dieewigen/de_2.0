@@ -2,6 +2,7 @@
 
 use DieEwigen\Api\Model\GetAlliances;
 use DieEwigen\Api\Model\GetAllianceRelations;
+use DieEwigen\Api\Model\GetAlliancePartnerRequests;
 use DieEwigen\Api\Model\GetAllUsers;
 use DieEwigen\Api\Model\GetAttackNews;
 use DieEwigen\Api\Model\GetPlayerAttackInfo;
@@ -151,6 +152,16 @@ if(isset($data['action']) && !empty($data['action'])) {
             case 'getAllianceRelations':
                 $allianceRelations = new GetAllianceRelations();
                 $result = $allianceRelations->getAllianceRelations();
+                echo json_encode($result);
+                break;
+            case 'getAlliancePartnerRequests':
+                if (!$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+                $alliancePartnerRequests = new GetAlliancePartnerRequests();
+                $result = $alliancePartnerRequests->getRequests($userId);
                 echo json_encode($result);
                 break;
             case 'getAttackNews':
