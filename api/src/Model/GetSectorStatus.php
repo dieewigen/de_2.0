@@ -17,7 +17,7 @@ class GetSectorStatus
                                    FROM de_user_fleet duf
                                    JOIN de_user_data dud_source on duf.hsec = dud_source.sector AND duf.hsys = dud_source.`system`
                                    JOIN de_user_data dud_target on duf.zielsec = dud_target.sector AND duf.zielsys = dud_target.`system`
-                                   WHERE (zielsec = ? OR (dud_target.ally_id != 0 AND dud_target.ally_id = ? AND dud_target.show_ally_secstatus > ?))
+                                   WHERE (zielsec = ? OR (dud_target.ally_id != 0 AND (dud_target.ally_id = ? OR dud_target.ally_id = ?) AND dud_target.show_ally_secstatus > ?))
                                    AND entdecktsec = 1 AND (aktion = 1 OR aktion = 2)";
 
     const string GET_SECTOR_FLEETS_SQL = "SELECT duf.hsec, duf.hsys, duf.aktion, duf.zeit, duf.e81, duf.e82, duf.e83, duf.e83,
@@ -25,6 +25,8 @@ class GetSectorStatus
                                    FROM de_user_fleet duf
                                    JOIN de_user_data dud_source on duf.hsec = dud_source.sector AND duf.hsys = dud_source.`system`
                                    WHERE duf.hsec = ? AND (aktion = 1 OR aktion = 2 OR aktion = 3)";
+
+    const string GET_PARTNERSHIP = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?";
 
     /**
      * Retrieves sector status from the database.
@@ -35,10 +37,20 @@ class GetSectorStatus
     {
         $userService = new UserService();
         $requestingNpcData = $userService->getPlayerData($userId);
+
+        $allyId1 = $requestingNpcData[2];
+        $allyId2 = $requestingNpcData[2];
+        if ($requestingNpcData[2] > 0) {
+            $metaQuery = mysqli_execute_query($GLOBALS['dbi'], $this::GET_PARTNERSHIP,[$requestingNpcData[2], $requestingNpcData[2]]);
+            $result = $metaQuery->fetch_assoc();
+            $allyId1 = $result['ally_id_1'];
+            $allyId2 = $result['ally_id_2'];
+        }
+
         $stmt = mysqli_prepare($GLOBALS['dbi'], self::GET_SECTOR_STATUS_SQL);
         //bind sector and allyId of requesting player
         $now = time();
-        $stmt->bind_param("iii", $requestingNpcData[0], $requestingNpcData[2], $now);
+        $stmt->bind_param("iiii", $requestingNpcData[0], $allyId1, $allyId2, $now);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_BOTH);
         $groupedFleetsByTarget = $this->groupFleetByTarget($result);

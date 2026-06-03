@@ -11,6 +11,7 @@ class GetPlayerAttackInfo
     const string GET_SEC_RANK_SQL = "SELECT platz FROM de_sector where sec_id = ?";
     const string GET_PlAYER_SECTORS_SQL = "SELECT sec_id FROM de_sector WHERE npc = 0 AND platz > 0";
     const string GET_MAX_COLLECTORS = "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc = 0";
+    const string GET_PARTNERSHIP = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?";
 
     /**
      * Retrieves player info from the database.
@@ -21,7 +22,8 @@ class GetPlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfo($playerId);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'],$npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id']);
+        $metaPartnerId = $this->getMetaPartner($npcRow['ally_id']);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'],$npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id'], $metaPartnerId);
         return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
     }
 
@@ -53,10 +55,11 @@ class GetPlayerAttackInfo
     }
 
     private function canBeAttacked(int $npcSector, int $npcCollectors, int $npcPoints, int $npcAlly,
-                                   int $playerSector, int $playerCollectors, int $playerPoints, int $playerAlly): bool
+                                   int $playerSector, int $playerCollectors, int $playerPoints, int $playerAlly,
+                                   int $metaPartnerId): bool
     {
         global $sv_sector_attmalus, $sv_attgrenze, $sv_attgrenze_whg_bonus, $sv_max_col_attgrenze, $sv_min_col_attgrenze;
-        if ($npcSector == $playerSector || $npcAlly != 0 && $npcAlly == $playerAlly) {
+        if ($npcSector == $playerSector || $npcAlly != 0 && $npcAlly == $playerAlly && $playerAlly == $metaPartnerId) {
             return false;
         }
         $npcSectorRank = $this->getSectorRank($npcSector);
@@ -100,6 +103,22 @@ class GetPlayerAttackInfo
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         return $row ?? [];
+    }
+
+    public function getMetaPartner(int $allyId): int
+    {
+        $stmt = mysqli_prepare($GLOBALS['dbi'], self::GET_PARTNERSHIP);
+        $stmt->bind_param("ii", $allyId, $allyId);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        if ($row) {
+            if ($row['ally_id_1'] == $allyId) {
+                return $row['ally_id_2'];
+            } else {
+                return $row['ally_id_1'];
+            }
+        }
+        return 0;
     }
 
     public function getPlayerInfoByCoords(int $sector, int $system): array
