@@ -30,8 +30,9 @@ class GetPlayerAttackInfo
     public function getPlayerAttackInfoByCoords(int $npcId, int $sector, int $system): PlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
+        $metaPartnerId = $this->getMetaPartner($npcRow['ally_id']);
         $playerRow = $this->getPlayerInfoByCoords($sector, $system);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id']);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id'], $metaPartnerId);
         return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
     }
 
