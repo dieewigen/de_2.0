@@ -7,7 +7,7 @@ use DieEwigen\Api\Types\ToplistEntry;
 class GetTopPlayers
 {
 
-    const string GET_TOPLIST_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, ehscore, ally_id FROM de_user_data WHERE sector > 1";
+    const string GET_TOPLIST_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, ehscore, ally_id, status FROM de_user_data WHERE sector > 1";
 
     /**
      * Retrieve players from toplist.
@@ -28,9 +28,15 @@ class GetTopPlayers
         $rows = mysqli_fetch_all($result, MYSQLI_BOTH);
         $result = [];
         foreach ($rows as $row) {
+            $allyId = $this->getAllyId($row);
             $result[] = new ToplistEntry($row['user_id'], $row['score'], $row['fleetscore'], $row['col'], $row['ehscore'],
-            $row['sector'], $row['system'], $row['ally_id']);
+            $row['sector'], $row['system'], $allyId);
         }
         return $result;
+    }
+
+    private function getAllyId(array $playerRow): int
+    {
+        return $playerRow['status'] == 1 && $playerRow['ally_id'] > 0 ? $playerRow['ally_id'] : 0;
     }
 }
