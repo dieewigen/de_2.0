@@ -61,10 +61,10 @@ if ($ally_id > 0 && $allystatus == 1) {
         //transaktionsbeginn
         if (setLock($_SESSION["ums_user_id"])) {
             //auslesen ob er das geschenk schon bekommen hat
-            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT dailyallygift FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT dailyallygift, npc FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
             $row = mysqli_fetch_array($result);
             if ($row['dailyallygift'] == 1) {
-
+                $isPlayer = $row['npc'] == 0;
                 //in der db und session den bonus für den tag deaktivieren
                 $dailyallygift = 0;
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET dailyallygift=0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
@@ -113,8 +113,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         //Titanen-Energiekern
                         $amount = 1;
                         change_storage_amount($_SESSION['ums_user_id'], 2, $amount, false);
-
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
                         break;
 
                     case 1: // Rang 1
@@ -138,7 +139,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id='$ally_id'");
                         $bonusstr .= '<br>2 Allianzartefakte';
 
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
 
                         //Titanen-Energiekern
                         $amount = 2;
@@ -170,7 +173,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>2 Allianzartefakte';
 
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
 
                         //Titanen-Energiekern
                         $amount = 2;
@@ -202,7 +207,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id='$ally_id'");
                         $bonusstr .= '<br>3 Allianzartefakte';
 
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
 
                         //Titanen-Energiekern
                         $amount = 3;
@@ -234,7 +241,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id='$ally_id'");
                         $bonusstr .= '<br>3 Allianzartefakte';
 
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
 
                         //Titanen-Energiekern
                         $amount = 3;
@@ -266,7 +275,9 @@ if ($ally_id > 0 && $allystatus == 1) {
                         mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+4 WHERE id='$ally_id'");
                         $bonusstr .= '<br>4 Allianzartefakte';
 
-                        createAuction($_SESSION['ums_user_id']);
+                        if ($isPlayer) {
+                            createAuction($_SESSION['ums_user_id']);
+                        }
 
                         //Titanen-Energiekern
                         $amount = 4;

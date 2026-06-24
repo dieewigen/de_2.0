@@ -6,7 +6,7 @@ use DieEwigen\Api\Types\PlayerAttackInfo;
 
 class GetPlayerAttackInfo
 {
-    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, score, fleetscore, col, rasse, ally_id FROM de_user_data where user_id = ?";
+    const string GET_PLAYER_INFO_SQL = "SELECT sector, `system`, score, fleetscore, col, rasse, ally_id, status FROM de_user_data where user_id = ?";
     const string GET_PLAYER_INFO_BY_COORDS_SQL = "SELECT user_id, sector, `system`, score, fleetscore, col, rasse, ally_id FROM de_user_data where sector = ? and  `system` = ?";
     const string GET_SEC_RANK_SQL = "SELECT platz FROM de_sector where sec_id = ?";
     const string GET_PlAYER_SECTORS_SQL = "SELECT sec_id FROM de_sector WHERE npc = 0 AND platz > 0";
@@ -22,16 +22,21 @@ class GetPlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfo($playerId);
-        $metaPartnerId = $this->getMetaPartner($npcRow['ally_id']);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'],$npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id'], $metaPartnerId);
-        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
+        $playerAllyId = $this->getAllyId($playerRow);
+        $npcAllyId = $this->getAllyId($npcRow);
+        $metaPartnerId = $this->getMetaPartner($npcAllyId);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'],$npcAllyId, $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerAllyId, $metaPartnerId);
+        return new PlayerAttackInfo($playerId, $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerAllyId, $canBeAttacked);
     }
 
     public function getPlayerAttackInfoByCoords(int $npcId, int $sector, int $system): PlayerAttackInfo
     {
         $npcRow = $this->getPlayerInfo($npcId);
         $playerRow = $this->getPlayerInfoByCoords($sector, $system);
-        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $npcRow['ally_id'], $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerRow['ally_id']);
+        $playerAllyId = $this->getAllyId($playerRow);
+        $npcAllyId = $this->getAllyId($npcRow);
+        $metaPartnerId = $this->getMetaPartner($npcAllyId);
+        $canBeAttacked = $this->canBeAttacked($npcRow['sector'], $npcRow['col'], $npcRow['score'], $npcAllyId, $playerRow['sector'], $playerRow['col'], $playerRow['score'], $playerAllyId, $metaPartnerId);
         return new PlayerAttackInfo($playerRow['user_id'], $playerRow['sector'], $playerRow['system'], $playerRow['score'], $playerRow['fleetscore'], $playerRow['col'], $playerRow['rasse'], $playerRow['ally_id'], $canBeAttacked);
     }
 
@@ -42,6 +47,11 @@ class GetPlayerAttackInfo
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         return $row['platz'];
+    }
+
+    private function getAllyId(array $playerRow): int
+    {
+        return $playerRow['status'] == 1 && $playerRow['ally_id'] > 0 ? $playerRow['ally_id'] : 0;
     }
 
     private function getPlayerSectorCount(): int {
