@@ -43,8 +43,10 @@ class GetSectorStatus
         if ($requestingNpcData[2] > 0) {
             $metaQuery = mysqli_execute_query($GLOBALS['dbi'], $this::GET_PARTNERSHIP,[$requestingNpcData[2], $requestingNpcData[2]]);
             $result = $metaQuery->fetch_assoc();
-            $allyId1 = $result['ally_id_1'];
-            $allyId2 = $result['ally_id_2'];
+            if ($result !== null) {
+                $allyId1 = $result['ally_id_1'];
+                $allyId2 = $result['ally_id_2'];
+            }
         }
 
         $stmt = mysqli_prepare($GLOBALS['dbi'], self::GET_SECTOR_STATUS_SQL);
