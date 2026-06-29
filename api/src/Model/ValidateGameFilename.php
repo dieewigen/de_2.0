@@ -24,7 +24,8 @@ class ValidateGameFilename
         'ally_annehmen.php',
         'ally_ablehnen.php',
         'ally_bldg.php',
-        'ally_finance.php'
+        'ally_finance.php',
+		'ally_dailygift.php'
 	);
 
     public function isValid($filename) :bool {
