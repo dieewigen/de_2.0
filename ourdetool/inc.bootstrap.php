@@ -39,8 +39,9 @@ if (($_SERVER['SERVER_NAME'] ?? '') == 'xde.bgam.es') {
 }
 
 // Erforderlichen Level der aufgerufenen Seite aus <seite>.lvl lesen.
-// Fehlende .lvl-Datei = Level 0, d.h. nur für Level-0-Benutzer zugänglich.
-$det_lvlfile = __DIR__ . '/' . basename($_SERVER['SCRIPT_FILENAME'], '.php') . '.lvl';
+// Die .lvl-Datei liegt neben dem aufgerufenen Script (auch in Unterordnern
+// wie comparetool/). Fehlende .lvl-Datei = Level 0 (nur Level-0-Benutzer).
+$det_lvlfile = dirname($_SERVER['SCRIPT_FILENAME']) . '/' . basename($_SERVER['SCRIPT_FILENAME'], '.php') . '.lvl';
 $file_userlevel = is_file($det_lvlfile) ? (int)trim((string)file_get_contents($det_lvlfile)) : 0;
 if ($det_userlevel > $file_userlevel) {
     http_response_code(403);

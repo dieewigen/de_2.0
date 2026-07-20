@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+/*
+ * Schlanke Variante von all.css für die Einbettung ins Admintool-Layout:
+ * nur die Widget-Styles, die die Viewer-Ausgabe tatsächlich braucht
+ * (jQuery-UI-Dialog/Datepicker, Tablesorter, jTPS-Pagination).
+ *
+ * Die Importe layout/, menu/ und overlay/ aus all.css fehlen bewusst:
+ * layout.css stylt nackte Element-Selektoren (body, div, li, a:link …)
+ * und würde die Sidebar aus adm.css überschreiben; menu/overlay werden
+ * von der Viewer-Ausgabe nicht genutzt (ebenso detailContainer/iconBar).
+ * all.css bleibt für einen etwaigen Standalone-Betrieb unverändert.
+ */
+@import url("jq.ui/ui.all.css");
+
+@import url("jq.tablesorter/style.css");
+@import url("jq.tablesorter.override.css");
+
+@import url("jq.jTPS/jTPS.css");
+@import url("jq.jTPS.override.css");
+
+@import url("jq.ui.all.override.css");

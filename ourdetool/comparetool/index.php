@@ -1,17 +1,14 @@
 <?php
-//require 'det_userdata.inc.php';
-require '../../inc/sv.inc.php';
-
-#if(empty($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) != 'on' )
-#        header("Location: https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}") and exit();
 /**
- * Description of index
- *
- * @author Rainer Zerbe - rz.php-projects@i-it-s.de
-
- *
+ * Compare-Tool ("DE LogViewer by Corwin", Rainer Zerbe):
+ * vergleicht die geloggten Aktionen von bis zu fünf User-IDs
+ * in einer Tages-/Stundenübersicht aus der Logging-DB.
+ * Nutzt jQuery 1.3 / jQuery UI 1.7 aus jq/ – nicht auf modernes jQuery portieren.
  */
-define('DIRECT',1);
+require '../../inc/sv.inc.php';
+require '../det_userdata.inc.php';
+
+define('DIRECT', 1);
 
 require_once 'db.inc.php';
 require_once 'database.php';
@@ -19,178 +16,143 @@ require_once 'dbExtend.php';
 require_once 'logfile2database.php';
 require_once 'viewer.php';
 
-///////////////////////////////////////////////
-///////////////////////////////////////////////
-// festlegen wer überprüft werden soll
-///////////////////////////////////////////////
-///////////////////////////////////////////////
-if(isset($_REQUEST['userid1']) OR isset($_REQUEST['userid2']) OR isset($_REQUEST['userid3']) OR isset($_REQUEST['userid4']) OR isset($_REQUEST['userid5']) 
-OR isset($_REQUEST['dayOverview']) OR isset($_REQUEST['hourOverview'])){
+$uid1 = req_int('userid1');
+$uid2 = req_int('userid2');
+$uid3 = req_int('userid3');
+$uid4 = req_int('userid4');
+$uid5 = req_int('userid5');
 
-}else{
-	echo '<form action="index.php" method="POST" name="f">';
-	echo '<br>User-IDs eintragen: <br>';
-	echo '<input type="input" name="userid1" value="">';
-	echo '<br><input type="input" name="userid2" value="">';
-	echo '<br><input type="input" name="userid3" value="">';
-	echo '<br><input type="input" name="userid4" value="">';
-	echo '<br><input type="input" name="userid5" value="">';
-	echo '<br><input type="Submit" name="weiter" value="weiter">';
-	echo '</form>';
-	die();
+// AJAX-Fragmente (Tageszeile/Stundenansicht) vor jeglicher Layout-Ausgabe beantworten
+if (!empty($_GET['hourOverview'])) {
+    $v = new viewer($uid1, $uid2, $uid3, $uid4, $uid5);
+    die($v->getHourOverview($_GET['date'] ?? '', $_GET['hour'] ?? ''));
+}
+if (!empty($_GET['dayOverview'])) {
+    $v = new viewer($uid1, $uid2, $uid3, $uid4, $uid5);
+    die($v->getDayTableRow($_GET['date'] ?? ''));
 }
 
-$uid1=isset($_REQUEST['userid1']) ? intval($_REQUEST['userid1']) : 0;
-$uid2=isset($_REQUEST['userid2']) ? intval($_REQUEST['userid2']) : 0;
-$uid3=isset($_REQUEST['userid3']) ? intval($_REQUEST['userid3']) : 0;
-$uid4=isset($_REQUEST['userid4']) ? intval($_REQUEST['userid4']) : 0;
-$uid5=isset($_REQUEST['userid5']) ? intval($_REQUEST['userid5']) : 0;
+$hasids = isset($_REQUEST['userid1']) || isset($_REQUEST['userid2']) || isset($_REQUEST['userid3'])
+    || isset($_REQUEST['userid4']) || isset($_REQUEST['userid5']);
+
+$page_title = 'Compare-Tool';
+$active_nav = 'compare';
+$layout_base = '../';
+if ($hasids) {
+    $page_head_extra = <<<'HTML'
+<link rel="stylesheet" href="css/embed.css" media="print, projection, screen">
+<script src="jq/jquery-1.3.2.min.js"></script>
+<script src="jq/jquery-ui-1.7.custom.min.js"></script>
+<script src="jq/jquery.tablesorter.js"></script>
+<script src="jq/jTPS.js"></script>
+<script src="jq/jquery.jHelperTip.1.0.min.js"></script>
+HTML;
+}
+include "../inc.layout.top.php";
+
+if (!$hasids) {
+    // Eingabemaske (früher ein ungestyltes echo-Formular ohne <head>)
+    ?>
+<div class="card">
+  <h2>User-IDs vergleichen</h2>
+  <form action="index.php" method="post">
+    <p>
+      <input type="text" name="userid1" value="" placeholder="User-ID 1" autofocus><br><br>
+      <input type="text" name="userid2" value="" placeholder="User-ID 2"><br><br>
+      <input type="text" name="userid3" value="" placeholder="User-ID 3"><br><br>
+      <input type="text" name="userid4" value="" placeholder="User-ID 4"><br><br>
+      <input type="text" name="userid5" value="" placeholder="User-ID 5">
+    </p>
+    <button type="submit" name="weiter">weiter</button>
+  </form>
+  <p class="dim">Vergleicht die geloggten Aktionen der eingetragenen Accounts in einer Tages-/Stundenübersicht (Multi-Erkennung).</p>
+</div>
+<?php
+    include "../inc.layout.bottom.php";
+    exit;
+}
 
 $v = new viewer($uid1, $uid2, $uid3, $uid4, $uid5);
-
-if(isset($_GET['hourOverview']) && $_GET['hourOverview']) {
-    die( $v->getHourOverview(isset($_GET['date']) ? $_GET['date'] : '', isset($_GET['hour']) ? $_GET['hour'] : '') );
-}
-if(isset($_GET['dayOverview']) && $_GET['dayOverview']) {
-    die( $v->getDayTableRow(isset($_GET['date']) ? $_GET['date'] : '') );
-}    
-
-// hier die ID´s rein die im viewer selbst angezeigt werden sollen
-// wenn weniger, einfach entfernen
-
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-    <head>
-    
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>DE LogViewer by Corwin</title>
-        <link rel="stylesheet" href="css/all.css" type="text/css"
-              media="print, projection, screen" />
-        <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<style>
+    /* Widget-Styles aus css/embed.css auf das dunkle Layout abstimmen */
+    .jTPS { width: 100%; }
+    main table.jTPS tr.row0 > td { background: #1b222c; }
+    main table.jTPS tr.row1 > td { background: #232c38; }
+    #loading { display: none; }
+    #jHelperTipAttrContainer { border: 1px solid #30363d; background: #fff; color: #111; z-index: 1100; }
+</style>
+<script>
+    $(document).ready(function(){
+        $('.datepicker').datepicker({
+            dateFormat: 'yy-mm-dd',
+            monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+            monthNamesShort: ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+            changeMonth: true
+        });
 
-        <script type="text/javascript" src="jq/jquery-1.3.2.min.js"></script>
-        <script type="text/javascript" src="jq/jquery-ui-1.7.custom.min.js"></script>
-        <script type="text/javascript" src="jq/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="jq/jTPS.js"></script>
-        <script type="text/javascript" src="jq/jquery.jHelperTip.1.0.min.js"></script>
+        $('#dialog').dialog({
+            autoOpen: false,
+            width: 900,
+            height: 600,
+            modal: false,
+            stack: true,
+            title: 'Stundenansicht'
+        });
+    })
+    function loadHour(d,h) {
+        $('#loading').show();
+        $.get('?hourOverview=1&userid1=<?= $uid1 ?>&userid2=<?= $uid2 ?>&userid3=<?= $uid3 ?>&userid4=<?= $uid4 ?>&userid5=<?= $uid5 ?>&date='+d+'&hour='+h,function(d){
+            $('#loading').hide();
+            $('#hourTable').html(d);
+            $('#dialog').dialog('open');
+            $('.jTPS').jTPS({
+                perPages:['ALL'],
+                scrollStep:1,
+                scrollDelay:30,
+                fixedLayout:true
+            });
+            $(".tt").jHelperTip({
+                trigger: "hover",
+                source: "attribute",
+                attrName: "alt",
+                opacity: 0.8,
+                autoClose:true
+            });
+        });
+    }
+    function startLoadDay() {
+        $('#loading').show();
+        $.get('?dayOverview=1&userid1=<?= $uid1 ?>&userid2=<?= $uid2 ?>&userid3=<?= $uid3 ?>&userid4=<?= $uid4 ?>&userid5=<?= $uid5 ?>&date='+$('#day2load').val(),function(d){
+            $('#loading').hide();
+            $(d).appendTo('#daysTBody');
+            $('.jTPSdays').jTPS({
+                perPages:['ALL'],
+                scrollStep:1,
+                scrollDelay:30,
+                fixedLayout:true
+            });
+        });
+    }
+</script>
 
+<p>Untersuche folgende User-IDs: <strong><?= $uid1 ?>, <?= $uid2 ?>, <?= $uid3 ?>, <?= $uid4 ?>, <?= $uid5 ?></strong>
+&nbsp;&middot;&nbsp;<a href="index.php">andere IDs w&auml;hlen</a></p>
 
+<p>Datum in die Tages&uuml;bersicht
+<input type="text" name="addDate" class="datepicker" id="day2load">
+<button onclick="startLoadDay();">hinzuf&uuml;gen</button>
+<span id="loading"><img src="sandclock.gif" alt=""> Lade Daten, einen Moment Geduld bitte</span></p>
 
-        <script>
-            $(document).ready(function(){
-                $('.datepicker').datepicker({
+<table class="jTPSDays">
+    <thead><tr><th> Datum </th> <?php for ($h = 0; $h <= 23; $h++) { echo "<th>$h</th>"; } ?></tr></thead>
+    <tbody id="daysTBody">
+    </tbody>
+    <tfoot></tfoot>
+</table>
 
-                    dateFormat: 'yy-mm-dd',
-                    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-                    monthNamesShort: ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
-                    changeMonth: true
-                });
+<div id="dialog" title="">
+    <p id="hourTable">Daten werden gesichert</p>
+</div>
 
-                $('#dialog').dialog({
-                    autoOpen: false,
-                    width: 900,
-                    height: 600,
-                    modal:false,
-                    //                buttons: {},
-                    stack: true,
-                    title:'Stundenansicht'
-                } );
-
-
-            })
-            function loadHour(d,h) {
-                $('#loading').show();
-                $.get('?hourOverview=1&userid1=<?php echo $uid1?>&userid2=<?php echo $uid2?>&userid3=<?php echo $uid3?>&userid4=<?php echo $uid4?>&userid5=<?php echo $uid5?>&date='+d+'&hour='+h,function(d){
-                    $('#loading').hide();
-                    $('#hourTable').html(d);
-                    $('#dialog').dialog('open');
-                    $('.jTPS').jTPS({
-                        perPages:['ALL'],
-                        scrollStep:1,
-                        scrollDelay:30,
-                        fixedLayout:true
-                    });
-                    $(".tt").jHelperTip({
-                        trigger: "hover",
-                        source: "attribute",
-                        attrName: "alt",
-                        opacity: 0.8,
-                        autoClose:true
-                    });
-
-                });
-            }
-            function startLoadDay() {
-                $('#loading').show();
-                $.get('?dayOverview=1&userid1=<?php echo $uid1?>&userid2=<?php echo $uid2?>&userid3=<?php echo $uid3?>&userid4=<?php echo $uid4?>&userid5=<?php echo $uid5?>&date='+$('#day2load').val(),function(d){
-                    $('#loading').hide();
-                    $(d).appendTo('#daysTBody');
-                    $('.jTPSdays').jTPS({
-                        perPages:['ALL'],
-                        scrollStep:1,
-                        scrollDelay:30,
-                        fixedLayout:true
-                    });
-                });
-            }
-        </script>
-        <style>
-
-            .jTPS {
-                width:100%;
-
-            }
-            .jTPS tbody {
-                /*overflow:scroll;
-                height:500px;
-                padding-right:30px;*/
-            }
-            .jTPS thead {
-                /*width:780px;*/
-            }
-            .jTPS tr.row0 {
-                background:#CCCCCC;
-            }
-            .jTPS tr.row1 {
-                background:#EEE;
-            }
-            .jTPSDays tbody {
-                background:#fff;
-            }
-            #loading {
-                display:none;
-            }
-            #jHelperTipAttrContainer {
-                border:1px solid;
-                background:white;
-                z-index:1100;
-            }
-        </style>
-
-    </head>
-    <body leftmargin="0" topmargin="0" marginheight="0" marginwidth="0">
-    
- <?php    
-echo 'Untersuche folgende User-IDs: '.$uid1.','.$uid2.','.$uid3.','.$uid4.','.$uid5
-    ?>  
-        <br>Datum in die Tagesübersicht  <input type="text" name="addDate" class="datepicker" id="day2load"> <button onclick="startLoadDay();">hinzufügen</button><br>
-        <center><span id="loading"> <img src="sandclock.gif"> Lade Daten, ein Moment geduld bitte</span></center>
-        <table class="jTPSDays" border="0">
-            <thead><tr><th> Datum </th> <?php for($h=0;$h<=23;$h++) {echo "<th>$h</th>";}?></tr></thead>
-            <tbody id="daysTBody">
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-
-        <pre></pre>
-
-        <div id="dialog" title="">
-            <p id="hourTable">Daten werden gesichert</p>
-        </div>
-
-
-
-    </body>
-</html>
-
+<?php include "../inc.layout.bottom.php"; ?>

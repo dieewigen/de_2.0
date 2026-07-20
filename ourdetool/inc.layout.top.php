@@ -7,6 +7,8 @@
  *   $page_title      – Seitentitel (Plain-Text)
  *   $active_nav      – Nav-Schlüssel aus inc.nav.php (Default: per Script-Name)
  *   $page_head_extra – zusätzliches rohes HTML für den <head> (Scripte/Styles)
+ *   $layout_base     – Pfad-Präfix zum ourdetool-Root für Seiten in
+ *                      Unterordnern (z.B. '../' aus comparetool/)
  *
  * Abschluss der Seite mit include "inc.layout.bottom.php".
  */
@@ -17,6 +19,7 @@ $GLOBALS['__layout_t0'] = microtime(true);
 
 $nav_groups = include __DIR__ . '/inc.nav.php';
 $page_title = $page_title ?? 'Admintool';
+$layout_base = $layout_base ?? '';
 
 if (!isset($active_nav)) {
     $active_nav = '';
@@ -37,20 +40,20 @@ if (!isset($active_nav)) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= htmlspecialchars($page_title) ?> – DE Admintool</title>
-<link rel="stylesheet" href="adm.css">
-<script src="adm.js" defer></script>
+<link rel="stylesheet" href="<?= $layout_base ?>adm.css">
+<script src="<?= $layout_base ?>adm.js" defer></script>
 <?= $page_head_extra ?? '' ?>
 </head>
 <body>
 <div class="layout">
 <aside class="sidebar">
-  <div class="sidebar-brand"><a href="index.php">DE&nbsp;<span>Admintool</span></a></div>
+  <div class="sidebar-brand"><a href="<?= $layout_base ?>index.php">DE&nbsp;<span>Admintool</span></a></div>
   <nav class="sidebar-nav">
 <?php foreach ($nav_groups as $nav_group => $nav_items): ?>
     <div class="nav-group">
       <div class="nav-group-title"><?= $nav_group ?></div>
 <?php foreach ($nav_items as $nav_key => $nav_item): ?>
-      <a href="<?= $nav_item[0] ?>"<?= $nav_key === $active_nav ? ' class="active" aria-current="page"' : '' ?>><?= $nav_item[1] ?></a>
+      <a href="<?= $layout_base . $nav_item[0] ?>"<?= $nav_key === $active_nav ? ' class="active" aria-current="page"' : '' ?>><?= $nav_item[1] ?></a>
 <?php endforeach; ?>
     </div>
 <?php endforeach; ?>
