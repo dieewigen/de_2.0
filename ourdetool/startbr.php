@@ -1,57 +1,44 @@
 <?php
-include "../inc/sv.inc.php";
-include "../functions.php";
-include "../inc/env.inc.php";
-
-// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
-if (!isset($GLOBALS['dbi'])) {
-    $GLOBALS['dbi'] = mysqli_connect(
-        $GLOBALS['env_db_dieewigen_host'], 
-        $GLOBALS['env_db_dieewigen_user'], 
-        $GLOBALS['env_db_dieewigen_password'], 
-        $GLOBALS['env_db_dieewigen_database']
-    );
-}
-?>
-<html>
-<head>
-<?php include "cssinclude.php";?>
-</head>
-<body>
-<div align="center">
-<?php
-
+include "../inccon.php";
 include "det_userdata.inc.php";
 
-echo '<br><h4>Battleround starten</h4>';
+$page_title = 'Battleround starten';
+$active_nav = 'server';
+include "inc.layout.top.php";
+
+$doit = req_int('doit');
+
 echo '<div>&Uuml;ber diese Funktion werden die Rohstoffe/Werte für die BR gesetzt.</div>';
-echo '<div style="font-size: 20px; color: #FF0000;">ACHTUNG: Diese Funktion nur nach R&uuml;cksprache nutzen und dann auch nur einmalig aufrufen.</div>';
+echo '<div class="flash flash-danger">ACHTUNG: Diese Funktion nur nach R&uuml;cksprache nutzen und dann auch nur einmalig aufrufen.</div>';
 
-if(isset($_REQUEST['doit']) && $_REQUEST['doit']==1){
-	
-	$result = mysqli_execute_query($GLOBALS['dbi'],
-		"UPDATE de_user_data SET 
-			tick = tick + ?, 
-			sm_rboost = 0, 
-			restyp01 = restyp01 + ?, 
-			restyp02 = restyp02 + ?, 
-			restyp03 = restyp03 + ?, 
-			restyp04 = restyp04 + ?, 
-			restyp05 = restyp05 + ?, 
-			col = col + ? 
+if ($doit == 1) {
+    csrf_require();
+
+    $result = mysqli_execute_query($GLOBALS['dbi'],
+        "UPDATE de_user_data SET
+			tick = tick + ?,
+			sm_rboost = 0,
+			restyp01 = restyp01 + ?,
+			restyp02 = restyp02 + ?,
+			restyp03 = restyp03 + ?,
+			restyp04 = restyp04 + ?,
+			restyp05 = restyp05 + ?,
+			col = col + ?
 		WHERE npc = 0 AND sector > 1",
-		[2500000, 9000000000, 4500000000, 1000000000, 500000000, 100000, 10000]
-	);
+        [2500000, 9000000000, 4500000000, 1000000000, 500000000, 100000, 10000]
+    );
 
-	if ($result) {
-		echo 'Done. Ggf. m&uuml;ssen noch die Ticks gestartet werden.';
-	} else {
-		echo 'Fehler beim Ausführen der Abfrage: ' . mysqli_error($GLOBALS['dbi']);
-	}
-	
-}else echo '<br><br><a href="startbr.php?doit=1">BR starten</a>';
+    if ($result) {
+        echo '<div class="flash flash-ok">Done. Ggf. m&uuml;ssen noch die Ticks gestartet werden.</div>';
+    } else {
+        echo '<div class="flash flash-danger">Fehler beim Ausführen der Abfrage: ' . mysqli_error($GLOBALS['dbi']) . '</div>';
+    }
+} else {
+    echo '<form method="post" action="startbr.php" data-confirm="Battleround wirklich starten?">'
+        . csrf_field()
+        . '<input type="hidden" name="doit" value="1">'
+        . '<button type="submit" class="btn-danger">BR starten</button>'
+        . '</form>';
+}
 
-
-?>
-</body>
-</html>
+include "inc.layout.bottom.php";

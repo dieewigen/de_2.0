@@ -1,39 +1,28 @@
 <?php
-include "../inc/sv.inc.php";
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<title>Gleiche IP</title>
-<?php include "cssinclude.php";?>
-</head>
-<body>
-<?php
 include "det_userdata.inc.php";
 
+$id = req_str('id');
+if (!preg_match('/^[A-Za-z0-9_.-]+$/', $id)) {
+    die('Ungültige ID.');
+}
+
+$page_title = 'Adminlog';
+include "inc.layout.top.php";
+
 //zuerst schauen ob der user existiert
-$filename = 'user/'.$id.'.txt';
+$filename = 'user/' . $id . '.txt';
 if (file_exists($filename))
 {
-  $filename = 'logs/'.$id.'.txt';
+  $filename = 'logs/' . $id . '.txt';
   if (file_exists($filename))
   {
     //logdatei ausgeben
-    $filename = str_replace("://","a",$filename);
-    $filename = str_replace("php","a",$filename);
-    echo '<br><b>Logfile von '.$id.'</b><br><br>';
-    $fp = fopen($filename, 'rb');
-    while (!feof($fp))
-    {
-     $buffer = fread($fp, 1024);
-     $buffer = str_replace("\n","<br>",$buffer);
-     echo $buffer;
-    }
-    fclose($fp);
+    echo '<br><b>Logfile von ' . htmlspecialchars($id) . '</b><br><br>';
+    $buffer = (string)file_get_contents($filename);
+    echo str_replace("\n", "<br>", htmlspecialchars($buffer, ENT_QUOTES | ENT_SUBSTITUTE));
   }
   else echo "Zu dem User existiert keine Logdatei.";
 }
 else echo "Datei nicht gefunden.";
-?>
-</body>
-</html>
+
+include "inc.layout.bottom.php";

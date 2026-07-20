@@ -1,45 +1,36 @@
 <?php
-include "../inc/sv.inc.php";
+include "../inccon.php";
 include "../functions.php";
-include "../inc/env.inc.php";
-
-// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
-if (!isset($GLOBALS['dbi'])) {
-    $GLOBALS['dbi'] = mysqli_connect(
-        $GLOBALS['env_db_dieewigen_host'], 
-        $GLOBALS['env_db_dieewigen_user'], 
-        $GLOBALS['env_db_dieewigen_password'], 
-        $GLOBALS['env_db_dieewigen_database']
-    );
-}
-
 include "det_userdata.inc.php";
 
-echo '<html><head>';
-include "cssinclude.php";
-echo '</head><body>';
+$uid = req_int('uid');
 
-$uid=(int)$uid;
+$page_title = 'Chat';
+include "inc.layout.top.php";
+include "inc.usertoolbar.php";
 
-$chat_sectorcolor='#FFFFFF';
-$chat_allycolor='#00FF00';
-$chat_allgemeincolor='#4a91fc';
+$chat_sectorcolor = '#FFFFFF';
+$chat_allycolor = '#00FF00';
+$chat_allgemeincolor = '#4a91fc';
 
-$output='';
+$output = '';
 
-if(!isset($_SESSION['de_chat_lastaccess']))$_SESSION['de_chat_lastaccess']=0;
+if (!isset($_SESSION['de_chat_lastaccess'])) $_SESSION['de_chat_lastaccess'] = 0;
 
 //gültige zeichen
-$validchars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789?!+-/<>()[].,;_:"%&@=# ';
+$validchars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789?!+-/<>()[].,;_:"%&@=# ';
 
 //spielerdaten auslesen mit prepared statement
-$result = mysqli_execute_query($GLOBALS['dbi'],
+$result = mysqli_execute_query(
+  $GLOBALS['dbi'],
   "SELECT sector, chatclear, chatoffallg FROM de_user_data WHERE user_id = ?",
   [$uid]
 );
 
 if (!$result || mysqli_num_rows($result) == 0) {
-  die('Fehler beim Abrufen der Benutzerdaten');
+  echo '<div class="flash flash-danger">Fehler beim Abrufen der Benutzerdaten</div>';
+  include "inc.layout.bottom.php";
+  exit;
 }
 
 $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
@@ -47,91 +38,87 @@ $cleartime = 0;
 $sector = $row['sector'];
 $chatoffallg = 0;
 
-//sql-befehl zusammenbauen
-$sql="SELECT * FROM de_chat_msg WHERE ((channel=".$sector." AND channeltyp=0) ";
+//bedingungen für die channel-auswahl zusammenbauen (parametrisiert)
+$conds = ['(channel=? AND channeltyp=0)'];
+$params = [$sector];
 
 //allyid herausfinden
-$allyid=get_player_allyid($uid);
-//sql-befehl für allychat und bündnispartner
-if($allyid>0)
+$allyid = get_player_allyid($uid);
+//bedingungen für allychat und bündnispartner
+if ($allyid > 0)
 {
   //eigene ally
-  $sql.=" OR (channel=".$allyid." AND channeltyp=1)";
+  $conds[] = '(channel=? AND channeltyp=1)';
+  $params[] = $allyid;
   //test auf allianzbündnis um deren chat auch mit anzuzeigen
-  $result = mysqli_execute_query($GLOBALS['dbi'], 
-    "SELECT * FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?", 
+  $result = mysqli_execute_query(
+    $GLOBALS['dbi'],
+    "SELECT * FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?",
     [$allyid, $allyid]
   );
   $num = mysqli_num_rows($result);
 
-  if($num==1)
-  {  
+  if ($num == 1)
+  {
     $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
-    if($row['ally_id_1']==$allyid)$allyidpartner=$row['ally_id_2'];
-    else $allyidpartner=$row['ally_id_1'];
-    $sql.=" OR (channel=".$allyidpartner." AND channeltyp=1)";
+    if ($row['ally_id_1'] == $allyid) $allyidpartner = $row['ally_id_2'];
+    else $allyidpartner = $row['ally_id_1'];
+    $conds[] = '(channel=? AND channeltyp=1)';
+    $params[] = $allyidpartner;
   }
 }
 
 //allgemeiner channel
-if($chatoffallg==0)$sql.=' OR channeltyp=2';
+if ($chatoffallg == 0) $conds[] = 'channeltyp=2';
 
-$sql.=") AND timestamp > '".$cleartime."' AND timestamp > 0 ORDER BY timestamp ASC";
-
-//$output=$sql;
+$sql = "SELECT * FROM de_chat_msg WHERE (" . implode(' OR ', $conds) . ") AND timestamp > ? AND timestamp > 0 ORDER BY timestamp ASC";
+$params[] = $cleartime;
 
 //daten aus der db holen
-$result = mysqli_query($GLOBALS['dbi'], $sql);
+$result = mysqli_execute_query($GLOBALS['dbi'], $sql, $params);
 //ausgeben
-//$first=1;
 while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
 {
-  //if($first==1){$first=0;}else echo '<br>';
-  // Alternative zu strftime() und IntlDateFormatter
   $timestamp = $row["timestamp"];
   $dateTime = new DateTime("@$timestamp");
   $dateTime->setTimezone(new DateTimeZone('Europe/Berlin'));
-  
+
   $zeit = $dateTime->format('H:i');
   $datum = $dateTime->format('d.m.Y');
   //schauen ob es einen nachricht vom herold ist
-  if($row["spielername"]=='^Der Herold^')$row["spielername"]='<font color="#FDFB59">'.$row["spielername"].'</font>';
+  if ($row["spielername"] == '^Der Herold^') $row["spielername"] = '<font color="#FDFB59">' . $row["spielername"] . '</font>';
   //schauen ob es ein emote ist
-  if($row["message"][0]=='/' AND $row["message"][1]=='m' AND $row["message"][2]=='e')
+  if ($row["message"][0] == '/' AND $row["message"][1] == 'm' AND $row["message"][2] == 'e')
   {
-    if($row["channeltyp"]==0)$color=$chat_sectorcolor;elseif($row["channeltyp"]==1)$color=$chat_allycolor;elseif($row["channeltyp"]==2)$color=$chat_allgemeincolor;
+    if ($row["channeltyp"] == 0) $color = $chat_sectorcolor; elseif ($row["channeltyp"] == 1) $color = $chat_allycolor; elseif ($row["channeltyp"] == 2) $color = $chat_allgemeincolor;
     //me entfernen
-    $row["message"] = str_replace("/me","",$row["message"]);
-    $output.='<font color="'.$color.'" title="'.$datum.'">['.$zeit.']</font> <font color="#FF771D">'.$row["spielername"].' '.$row["message"].'</font>';
+    $row["message"] = str_replace("/me", "", $row["message"]);
+    $output .= '<font color="' . $color . '" title="' . $datum . '">[' . $zeit . ']</font> <font color="#FF771D">' . $row["spielername"] . ' ' . $row["message"] . '</font>';
   }
   else
   {
-   if($row["spielername"]!='')$spielername='<i>'.$row["spielername"].': </i>';else $spielername='';
-   if($row["channeltyp"]==0)$color=$chat_sectorcolor;elseif($row["channeltyp"]==1)$color=$chat_allycolor;elseif($row["channeltyp"]==2)$color=$chat_allgemeincolor;
-     $output.='<font color="'.$color.'" title="'.$datum.'">['.$zeit.']</font> <font color="'.$color.'">'.$spielername.'
-     </font><font color="'.$color.'">'.$row["message"].'</font>';
+   if ($row["spielername"] != '') $spielername = '<i>' . $row["spielername"] . ': </i>'; else $spielername = '';
+   if ($row["channeltyp"] == 0) $color = $chat_sectorcolor; elseif ($row["channeltyp"] == 1) $color = $chat_allycolor; elseif ($row["channeltyp"] == 2) $color = $chat_allgemeincolor;
+     $output .= '<font color="' . $color . '" title="' . $datum . '">[' . $zeit . ']</font> <font color="' . $color . '">' . $spielername . '
+     </font><font color="' . $color . '">' . $row["message"] . '</font>';
   }
-  $output.='<br>';
+  $output .= '<br>';
 }
 
 //den output auf sonderzeichen abchecken, die das js-system stören
-$output=umlaut($output);
-$ws='';
-for($i=0;$i<strlen($output);$i++)
+$output = umlaut($output);
+$ws = '';
+for ($i = 0; $i < strlen($output); $i++)
 {
-  if(strpos($validchars, $output[$i])===FALSE)
+  if (strpos($validchars, $output[$i]) === FALSE)
   {}
-  else 
+  else
   {
-    $ws.=$output[$i];
+    $ws .= $output[$i];
   }
 }
-$output=$ws;
-
-//chat wurde zum letzten mal ausgelesen
-//$_SESSION['de_chat_lastaccess']=time();  
+$output = $ws;
 
 echo $output;
-?>
-</body>
-</html>
+
+include "inc.layout.bottom.php";

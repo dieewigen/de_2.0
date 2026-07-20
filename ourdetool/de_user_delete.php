@@ -1,54 +1,51 @@
 <?php
-include "../inc/sv.inc.php";
-include "../functions.php";
-include "../inc/env.inc.php";
+include "../inccon.php";
+include "det_userdata.inc.php";
 
-// Stelle sicher, dass eine Datenbankverbindung vorhanden ist
-if (!isset($GLOBALS['dbi'])) {
-    $GLOBALS['dbi'] = mysqli_connect(
-        $GLOBALS['env_db_dieewigen_host'], 
-        $GLOBALS['env_db_dieewigen_user'], 
-        $GLOBALS['env_db_dieewigen_password'], 
-        $GLOBALS['env_db_dieewigen_database']
-    );
-}
-?>
+$uid = req_int('uid');
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<title>Suche</title>
-<?php include "cssinclude.php";?>
-</head>
-<body>
-<?php
-// Prüfe, ob die Variable existiert und gesetzt ist
-if(isset($_GET['delete']))
-{
-  $uid = isset($_GET['uid']) ? (int)$_GET['uid'] : 0;
-  
-  if($uid > 0) {
-    // Umwandlung der MySQL-Abfragen zu MySQLi mit prepared statements
-    mysqli_execute_query($GLOBALS['dbi'], 
-      "UPDATE de_login SET status=2, last_login='0000-00-00 00:00:00' WHERE user_id=?", 
-      [$uid]
-    );
-    
-    mysqli_execute_query($GLOBALS['dbi'], 
-      "UPDATE de_user_data SET premium=0 WHERE user_id=?", 
-      [$uid]
-    );
-    
-    die('<center><br>Der Spieler wurde dem Inaktivenscript zur Löschung übergeben.</body></html>');
-  } else {
-    echo '<center><br>Fehler: Keine gültige Benutzer-ID angegeben.</center>';
-  }
+// POST-Zweig: Löschung ausführen (mit CSRF-Schutz), Logik wie bisher
+$delete_done = false;
+$delete_error = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
+    csrf_require();
+
+    if ($uid > 0) {
+        mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "UPDATE de_login SET status=2, last_login='0000-00-00 00:00:00' WHERE user_id=?",
+            [$uid]
+        );
+
+        mysqli_execute_query(
+            $GLOBALS['dbi'],
+            "UPDATE de_user_data SET premium=0 WHERE user_id=?",
+            [$uid]
+        );
+
+        $delete_done = true;
+    } else {
+        $delete_error = true;
+    }
 }
-?>
-<form action="de_user_delete.php" method="get">
-<center>Durch das Bestätigen des Buttons wird der Spieler gelöscht. Voraussetzung für die Löschung ist ein aktives Inaktivenscript.<br><br>
-<input type="Submit" name="delete" value="Spieler löschen">
-<input type="hidden" name="uid" value="<?php echo isset($_GET['uid']) ? htmlspecialchars($_GET['uid']) : ''; ?>">
-</form>
-</body>
-</html>
+
+$page_title = 'Spieler löschen';
+$active_usertab = 'de_user_delete';
+include "inc.layout.top.php";
+include "inc.usertoolbar.php";
+
+if ($delete_done) {
+    echo '<div class="flash flash-ok">Der Spieler wurde dem Inaktivenscript zur L&ouml;schung &uuml;bergeben.</div>';
+} elseif ($delete_error) {
+    echo '<div class="flash flash-danger">Fehler: Keine g&uuml;ltige Benutzer-ID angegeben.</div>';
+} else {
+    // GET: Bestätigungsseite anzeigen
+    echo '<form action="de_user_delete.php" method="post" data-confirm="Spieler ' . $uid . ' wirklich l&ouml;schen?">';
+    echo csrf_field();
+    echo '<p>Durch das Best&auml;tigen des Buttons wird der Spieler gel&ouml;scht. Voraussetzung f&uuml;r die L&ouml;schung ist ein aktives Inaktivenscript.</p>';
+    echo '<input type="hidden" name="uid" value="' . $uid . '">';
+    echo '<button type="submit" name="delete" value="1" class="btn-danger">Spieler l&ouml;schen</button>';
+    echo '</form>';
+}
+
+include "inc.layout.bottom.php";

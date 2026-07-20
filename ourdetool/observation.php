@@ -1,52 +1,30 @@
 <?php
 include "../inccon.php";
-?>
-<html>
-<head>
-<title>Beobachtungsliste</title>
-<?php include "cssinclude.php";?>
-<style >
- body { scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333; scrollbar-3dlight-color: #8CA0B4;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;
-  scrollbar-arrow-color: #8CA0B4; padding: 0px; color: #3399FF; margin-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px;
-  font-family: helvetica, arial,geneva, sans-serif;  font-size: 10pt;}
- table { border: 1px solid #00366C; }
- td { font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; white-space: nowrap; border: 1px solid #00366C; }
- td.r { color: #ff0000; }
- a { color: #3399ff; text-decoration: underline }
- a:hover { color: #3399ff; text-decoration: none }
-</style>
-
-</head>
-<body>
-
-<?php
 include "det_userdata.inc.php";
 
-function getmicrotime()
-{
-    list($usec, $sec) = explode(" ", microtime());
-    return ((float)$usec + (float)$sec);
-}
+$uid = req_int('uid');
 
-$time_start = getmicrotime();
+$page_title = 'Beobachtungsliste';
+include "inc.layout.top.php";
 
-// Oberservation_tag entfernen
-if (isset($_GET['uid'])) {
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET observation_stat = 0 WHERE user_id = ?", [$_GET['uid']]);
+// Beobachtungs-Markierung entfernen
+if ($uid > 0) {
+    csrf_require();
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_info SET observation_stat = 0 WHERE user_id = ?", [$uid]);
 }
 
 // table start
 echo '
-  <form action="observation.php?" method="post">
-  <table border="1" cellspacing="1" cellpadding="1">
+  <table>
     <tr>
-      <td>Account-ID</td>
-      <td>Spielername</td>
-      <td>Koordinaten</td>
-      <td>Allianz-TAG</td>
-      <td>letzte IP</td>
-      <td>Status</td>
-      <td>Beobachter</td>
+      <th>Account-ID</th>
+      <th>Spielername</th>
+      <th>Koordinaten</th>
+      <th>Allianz-TAG</th>
+      <th>letzte IP</th>
+      <th>Status</th>
+      <th>Beobachter</th>
+      <th></th>
     </tr>
 ';
 
@@ -59,12 +37,14 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'], "
   ORDER BY A.observation_by, A.user_id");
 while ($de_user_data_obs = mysqli_fetch_assoc($db_daten)) {
     if (!$de_user_data_obs['allytag']) {
-        $de_user_data_obs['allytag'] = "&nbsp;";
+        $allytag = "&nbsp;";
+    } else {
+        $allytag = htmlspecialchars($de_user_data_obs['allytag']);
     }
     $de_login_db = mysqli_execute_query($GLOBALS['dbi'], "
-    SELECT status, last_ip  
-    FROM de_login 
-    WHERE user_id = ?  
+    SELECT status, last_ip
+    FROM de_login
+    WHERE user_id = ?
   ", [$de_user_data_obs['user_id']]);
     $data_de_login = mysqli_fetch_assoc($de_login_db);
     switch ($data_de_login['status']) {
@@ -86,14 +66,14 @@ while ($de_user_data_obs = mysqli_fetch_assoc($db_daten)) {
     }
     echo '
     <tr>
-      <td align="center"><a href="idinfo.php?UID='.$de_user_data_obs['user_id'].'" target="_blank">'.$de_user_data_obs['user_id'].'</a></td>
-      <td align="center"><a href="idinfo.php?UID='.$de_user_data_obs['user_id'].'" target="_blank">'.$de_user_data_obs['spielername'].'</a></td>
-      <td align="center">'.$de_user_data_obs['sector'].':'.$de_user_data_obs['system'].'</td>
-      <td align="center">'.$de_user_data_obs['allytag'].'</td>
-      <td align="right">'.$data_de_login['last_ip'].'</td>
-      <td align="center">'.$status.'</td>
-      <td align="center">'.$de_user_data_obs['observation_by'].'</td>
-      <td align="center"><a href="observation.php?uid='.$de_user_data_obs['user_id'].'">entfernen</a></td>
+      <td align="center"><a href="idinfo.php?UID=' . $de_user_data_obs['user_id'] . '" target="_blank" rel="noopener">' . $de_user_data_obs['user_id'] . '</a></td>
+      <td align="center"><a href="idinfo.php?UID=' . $de_user_data_obs['user_id'] . '" target="_blank" rel="noopener">' . htmlspecialchars((string)$de_user_data_obs['spielername']) . '</a></td>
+      <td align="center">' . $de_user_data_obs['sector'] . ':' . $de_user_data_obs['system'] . '</td>
+      <td align="center">' . $allytag . '</td>
+      <td class="num">' . htmlspecialchars((string)$data_de_login['last_ip']) . '</td>
+      <td align="center">' . $status . '</td>
+      <td align="center">' . htmlspecialchars((string)$de_user_data_obs['observation_by']) . '</td>
+      <td align="center"><a href="' . csrf_url('observation.php?uid=' . $de_user_data_obs['user_id']) . '" data-confirm="User ' . $de_user_data_obs['user_id'] . ' von der Beobachtungsliste entfernen?">entfernen</a></td>
     </tr>
   ';
 }
@@ -101,17 +81,6 @@ while ($de_user_data_obs = mysqli_fetch_assoc($db_daten)) {
 // table close
 echo '
   </table>
-  </form>
 ';
 
-
-
-$time_end = getmicrotime();
-$ltime = number_format($time_end - $time_start, 2, ".", "");
-
-?>
-
- <br>
- Seite in <?php echo $ltime; ?> Sekunden erstellt.
-</body>
-</html>
+include "inc.layout.bottom.php";

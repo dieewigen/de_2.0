@@ -1,0 +1,304 @@
+/* ============================================================
+   DE Admintool – zentrales Stylesheet (dunkles Theme)
+   Ersetzt f.css / m.css und alle seitenlokalen <style>-Blöcke.
+   Neutralisiert bewusst Legacy-HTML (bgcolor, <font>, align),
+   soweit es nicht semantisch gemeint ist.
+   ============================================================ */
+
+:root {
+    --bg: #0d1117;
+    --bg-panel: #161b22;
+    --bg-hover: #1f2733;
+    --bg-input: #10161d;
+    --border: #30363d;
+    --text: #d0d7de;
+    --text-dim: #8b949e;
+    --accent: #ff7e15;
+    --accent-soft: #ffa04d;
+    --danger: #f85149;
+    --ok: #3fb950;
+    --warn: #d29922;
+    --radius: 6px;
+    --font: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-color: var(--border) var(--bg); }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-soft); text-decoration: underline; }
+
+h1, h2, h3, h4 { color: var(--text); line-height: 1.25; }
+h2 { font-size: 16px; }
+h3, h4 { font-size: 14px; }
+
+hr { border: 0; border-top: 1px solid var(--border); }
+
+code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 4px;
+}
+
+img { max-width: 100%; }
+
+.dim { color: var(--text-dim); }
+.num { text-align: right; }
+.w320 { width: 320px; }
+
+/* ---------- Grundgerüst: Sidebar + Inhalt ---------- */
+
+.layout {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar-brand {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.sidebar-brand a { color: var(--text); text-decoration: none; }
+.sidebar-brand span { color: var(--accent); }
+
+.sidebar-nav { flex: 1 1 auto; padding: 8px 0; }
+
+.nav-group { margin-bottom: 14px; }
+
+.nav-group-title {
+    padding: 4px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+}
+
+.nav-group a {
+    display: block;
+    padding: 5px 16px 5px 13px;
+    border-left: 3px solid transparent;
+    color: var(--text);
+    text-decoration: none;
+}
+.nav-group a:hover { background: var(--bg-hover); text-decoration: none; }
+.nav-group a.active {
+    background: var(--bg-hover);
+    border-left-color: var(--accent);
+    color: var(--accent);
+}
+
+.sidebar-user {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.main {
+    padding: 18px 22px 30px;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.page-title {
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.render-time {
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+@media (max-width: 900px) {
+    .layout { display: block; }
+    .sidebar { position: static; height: auto; }
+    .sidebar-nav { display: flex; flex-wrap: wrap; gap: 0 18px; }
+}
+
+/* ---------- Tabellen (stylt auch Legacy-Markup mit) ---------- */
+
+main table {
+    border-collapse: collapse;
+    margin: 6px 0 14px;
+}
+
+/* Kein text-align auf td, damit Legacy-align-Attribute weiter greifen */
+main th, main td {
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    background: var(--bg-panel);
+    color: var(--text);
+    font-size: 13px;
+}
+
+main th { background: var(--bg-hover); font-weight: 600; text-align: left; }
+
+main tr:hover > td { background: var(--bg-hover); }
+
+/* Alte Hilfsklassen aus f.css & Co. im neuen Theme */
+main td.cell1 { background: #1b222c; }
+main td.cell2 { background: #232c38; }
+main td.r, .r { color: var(--danger); }
+
+/* ---------- Formulare ---------- */
+
+input, select, textarea, button {
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 8px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+input::placeholder { color: var(--text-dim); }
+
+textarea { width: min(100%, 640px); }
+
+button, input[type="submit" i], input[type="button" i] {
+    cursor: pointer;
+    background: var(--bg-hover);
+    border-color: var(--border);
+    font-weight: 600;
+}
+button:hover, input[type="submit" i]:hover, input[type="button" i]:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+form.inline { display: inline; margin: 0; }
+
+.btn-danger, button.btn-danger { color: var(--danger); }
+.btn-danger:hover, button.btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+.btn-xs { padding: 1px 6px; font-size: 11px; }
+
+/* ---------- Komponenten ---------- */
+
+.card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+}
+.card h2 { margin-top: 0; }
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+}
+
+.flash {
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
+}
+.flash-warn { border-left-color: var(--warn); }
+.flash-danger { border-left-color: var(--danger); }
+.flash-ok { border-left-color: var(--ok); }
+
+.badge {
+    display: inline-block;
+    padding: 0 7px;
+    margin-left: 6px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 11px;
+    line-height: 17px;
+    color: var(--text-dim);
+    vertical-align: 1px;
+}
+.badge-ok { color: var(--ok); border-color: var(--ok); }
+.badge-warn { color: var(--warn); border-color: var(--warn); }
+.badge-danger { color: var(--danger); border-color: var(--danger); }
+
+/* ---------- User-Toolbar (Ersatz für idinfo.php-Frameset) ---------- */
+
+.usertoolbar {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    margin-bottom: 16px;
+}
+
+.usersearch { display: flex; gap: 6px; align-items: center; }
+.usersearch input { width: min(100%, 320px); }
+
+.userident { margin-top: 8px; font-size: 14px; }
+
+.usertabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+.usertabs a {
+    padding: 3px 9px;
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 12.5px;
+}
+.usertabs a:hover { background: var(--bg-hover); text-decoration: none; }
+.usertabs a.active { background: var(--bg-hover); color: var(--accent); font-weight: 600; }
+
+.usersector { margin-top: 8px; font-size: 12px; color: var(--text-dim); }
+.usersector a { margin-right: 4px; }
+.usersector a.active { color: var(--text); font-weight: 700; }
+
+/* ---------- Aktivitäts-Zellen (de_user_stat.php) ---------- */
+
+td.act-none { background: #4a1b1b; }
+td.act-chat { background: #4a3510; }
+td.act-active { background: #1b3d20; }
+
+span.act-none { color: var(--danger); }
+span.act-chat { color: var(--warn); }
+span.act-active { color: var(--ok); }

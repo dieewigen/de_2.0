@@ -40,69 +40,62 @@ if ($skmes=='') $skmes='&nbsp;';
 return $skmes;
 }
 
+include "det_userdata.inc.php";
+
+$page_title = 'Sektor bearbeiten';
+$active_nav = 'sektor';
+include "inc.layout.top.php";
+
+$sektor = req_str('sektor');
+$delvote = req_str('delvote');
+$showsek = req_str('showsek');
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<title>Sektor bearbeiten</title>
-<?php include "cssinclude.php";?>
-<style >
- body { scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333; scrollbar-3dlight-color: #8CA0B4;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;
-  scrollbar-arrow-color: #8CA0B4; padding: 0px; color: #3399FF; margin-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px;
-  font-family: helvetica, arial,geneva, sans-serif;  font-size: 10pt;}
- table { border: 1px solid #00366C; }
- td { font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; white-space: nowrap; border: 1px solid #00366C; }
- a { color: #3399ff; text-decoration: underline }
- a:hover { color: #3399ff; text-decoration: none }
-</style>
-</head>
-<body>
-<center>
 <form method="post" action="sektor.php">
 Sektornummer oder Sektorname (%):
-<input type="text" name="sektor" size="15" value=""><br><br>
+<input type="text" name="sektor" size="15" value="">
 <input type="submit" name="search" value="Suchen">
 </form>
 
 <?php
-include "det_userdata.inc.php";
- if ($_REQUEST["savedata"]) {
-   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET name = ?, url = ? WHERE sec_id = ?", 
-                      [$_REQUEST["sektorname"], $_REQUEST["sektorbild"], $_REQUEST["savesek"]]);
-                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<font color="#FF0000">Error '.mysqli_errno($GLOBALS['dbi']).'</font>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
-   echo "Daten zu Sektor ".$_REQUEST["savesek"]." gespeichert.";
-   $showsek = $_REQUEST["savesek"];
+ if (isset($_REQUEST["savedata"])) {
+   csrf_require();
+   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET name = ?, url = ? WHERE sec_id = ?",
+                      [req_str('sektorname'), req_str('sektorbild'), req_str('savesek')]);
+                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<span class="r">Error '.mysqli_errno($GLOBALS['dbi']).'</span>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
+   echo "Daten zu Sektor ".htmlspecialchars(req_str('savesek'))." gespeichert.";
+   $showsek = req_str('savesek');
  }
 
- if ($_REQUEST["showskvotes"]) { $showsek = $_REQUEST["savesek"]; }
+ if (isset($_REQUEST["showskvotes"])) { $showsek = req_str('savesek'); }
 
- if ($_REQUEST["search"]) {
-   switch($_REQUEST["sektor"][0]){
+ if (isset($_REQUEST["search"])) {
+   switch($sektor !== '' ? $sektor[0] : ''){
      case '%':
        $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, name FROM de_sector WHERE name LIKE ?", ['%' . $sektor . '%']);
 
-       echo '<table border="0" cellpadding="5" cellspacing="0">';
-       echo '<tr><td>Sektor</td><td>Name</td><td>&nbsp;</td></tr>';
+       echo '<table cellpadding="5" cellspacing="0">';
+       echo '<tr><th>Sektor</th><th>Name</th><th>&nbsp;</th></tr>';
        while($SData = mysqli_fetch_assoc($DBData)) {
-         echo '<tr><td>'.$SData["sec_id"].'</td><td>'.$SData["name"].'</td><td><a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'">Anzeigen</a></td></tr>';
+         echo '<tr><td class="num">'.$SData["sec_id"].'</td><td>'.htmlspecialchars($SData["name"]).'</td><td><a href="sektor.php?showsek='.$SData["sec_id"].'">Anzeigen</a></td></tr>';
        }
        echo '</table><br><br>';
 
        $showsek = "";
        break;
      default:
-       $showsek = $_REQUEST["sektor"];
+       $showsek = $sektor;
        break;
    }
  }
 
- if ((isset($delvote)) AND ($delvote != "")) {
+ if ($delvote != "") {
+   csrf_require();
    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET votefor = 0 WHERE sector = ? AND system = ?", [$showsek, $delvote]);
-                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<font color="#FF0000">Error '.mysqli_errno($GLOBALS['dbi']).'</font>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
-   echo "Vote von ".$showsek.":".$delvote." gelöscht.";
+                         if (mysqli_errno($GLOBALS['dbi'])) { echo '<span class="r">Error '.mysqli_errno($GLOBALS['dbi']).'</span>: '.mysqli_error($GLOBALS['dbi']).'<br>'; }
+   echo "Vote von ".htmlspecialchars($showsek).":".htmlspecialchars($delvote)." gelöscht.";
  }
 
- if ((isset($showsek)) AND ($showsek != "")) {
+ if ($showsek != "") {
    if (is_numeric($showsek) == true) {
      $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT count(user_id) FROM de_user_data WHERE sector = ?", [$showsek]);
      $row = mysqli_fetch_row($result);
@@ -110,9 +103,10 @@ include "det_userdata.inc.php";
      if ($spieler > 0) {
        $DBData = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, name, url, bk, skmes, e1, e2 FROM de_sector WHERE sec_id = ?", [$showsek]);
 
-       echo '<form method="post" action="'.$PHP_SELF.'">';
-       echo '<input type="hidden" name="savesek" size="4" value="'.$showsek.'">';
-       echo '<table border="0" cellpadding="5" cellspacing="0">';
+       echo '<form method="post" action="sektor.php">';
+       echo csrf_field();
+       echo '<input type="hidden" name="savesek" size="4" value="'.htmlspecialchars($showsek).'">';
+       echo '<table cellpadding="5" cellspacing="0">';
        $SData = mysqli_fetch_assoc($DBData);
 
        echo '<tr><td>Sektor</td><td>'.$SData["sec_id"].'</td></tr>';
@@ -120,7 +114,7 @@ include "det_userdata.inc.php";
        echo '<tr><td>Sektorflotte Heimat</td><td>'.$SData["e1"].'</td></tr>';
        echo '<tr><td>Sektorflotte aktiv</td><td>'.$SData["e2"].'</td></tr>';
 
-       echo '<tr><td>Name</td><td><input type="text" name="sektorname" size="50" value="'.$SData["name"].'"></td></tr>';
+       echo '<tr><td>Name</td><td><input type="text" name="sektorname" size="50" value="'.htmlspecialchars((string)$SData["name"]).'"></td></tr>';
 
        $SKData = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername, votefor, system FROM de_user_data WHERE sector = ? ORDER BY system", [$SData["sec_id"]]);
        $SKVotes = '<tr><td>&nbsp;</td><td>';
@@ -133,7 +127,7 @@ include "det_userdata.inc.php";
          $userids[$SKInfo["system"]] = $SKInfo["user_id"];
 
          $SKVotes .= $SKInfo["system"].' votes for '.$SKInfo["votefor"];
-         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.$PHP_SELF.'?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"].'">löschen</a>]'; }
+         if ($SKInfo["votefor"] != 0) { $SKVotes .= ' [<a href="'.csrf_url('sektor.php?showsek='.$SData["sec_id"].'&delvote='.$SKInfo["system"]).'" data-confirm="Vote von System '.$SKInfo["system"].' wirklich löschen?">löschen</a>]'; }
          $SKVotes .= '<br>';
        }
        $SKVotes .= '</td></tr>';
@@ -149,24 +143,24 @@ include "det_userdata.inc.php";
          $Anz2 = ($Sys2 !== null) ? $Votes[$Sys2] : 0;
 
          if ($Anz1 > $Anz2) {
-           if ($userids[$Sys1] == "") { echo '<tr><td>SK</td><td>[<font color="#FF0000">NA</font>] - '.$Anz1.' Vote(s)</td></tr>'; }
-            else { echo '<tr><td>SK</td><td><a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank">'.$nicks[$Sys1].'</a></td></tr>'; }
+           if ($userids[$Sys1] == "") { echo '<tr><td>SK</td><td>[<span class="r">NA</span>] - '.$Anz1.' Vote(s)</td></tr>'; }
+            else { echo '<tr><td>SK</td><td><a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$nicks[$Sys1]).'</a></td></tr>'; }
          }
          elseif ($Anz1 == $Anz2) {
-           if (($userids[$Sys1] == "") AND ($userids[$Sys2] == "")) { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ [<font color="#FF0000">NA</font>] = [<font color="#FF0000">NA</font>] ]</td></tr>'; }
-           elseif ($userids[$Sys1] == "") { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ [<font color="#FF0000">NA</font>] = <a href="idinfo.php?UID='.$userids[$Sys2].'" target="_blank">'.$nicks[$Sys2].'</a> ]</td></tr>'; }
-           elseif ($userids[$Sys2] == "") { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ <a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank">'.$nicks[$Sys1].'</a> = [<font color="#FF0000">NA</font>] ]</td></tr>'; }
-           else { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ <a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank">'.$nicks[$Sys1].'</a> = <a href="idinfo.php?UID='.$userids[$Sys2].'" target="_blank">'.$nicks[$Sys2].'</a> ]</td></tr>'; }
+           if (($userids[$Sys1] == "") AND ($userids[$Sys2] == "")) { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ [<span class="r">NA</span>] = [<span class="r">NA</span>] ]</td></tr>'; }
+           elseif ($userids[$Sys1] == "") { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ [<span class="r">NA</span>] = <a href="idinfo.php?UID='.$userids[$Sys2].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$nicks[$Sys2]).'</a> ]</td></tr>'; }
+           elseif ($userids[$Sys2] == "") { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ <a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$nicks[$Sys1]).'</a> = [<span class="r">NA</span>] ]</td></tr>'; }
+           else { echo '<tr><td>SK</td><td>Votegleichstand [ '.$Anz1.' = '.$Anz2.' ] - [ <a href="idinfo.php?UID='.$userids[$Sys1].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$nicks[$Sys1]).'</a> = <a href="idinfo.php?UID='.$userids[$Sys2].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$nicks[$Sys2]).'</a> ]</td></tr>'; }
          }
        }
        else { echo '<tr><td>SK</td><td>---</td></tr>'; }
 
-       if ($_REQUEST["showskvotes"]) { echo $SKVotes; }
+       if (isset($_REQUEST["showskvotes"])) { echo $SKVotes; }
 
        $BKResult = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, spielername FROM de_user_data WHERE sector = ? AND system = ?", [$SData["sec_id"], $SData["bk"]]);
        $BKInfo = mysqli_fetch_assoc($BKResult);
        if ($BKInfo == false) { echo '<tr><td>BK</td><td>---</td></tr>'; }
-        else { echo '<tr><td>BK</td><td><a href="idinfo.php?UID='.$BKInfo["user_id"].'" target="_blank">'.$BKInfo["spielername"].'</a></td></tr>'; }
+        else { echo '<tr><td>BK</td><td><a href="idinfo.php?UID='.$BKInfo["user_id"].'" target="_blank" rel="noopener">'.htmlspecialchars((string)$BKInfo["spielername"]).'</a></td></tr>'; }
 
        echo '<tr><td colspan="2">Informationen vom SK</td></tr><tr><td colspan="2">'.skmesaufbereitung($SData["skmes"]).'</td></tr>';
 
@@ -182,9 +176,6 @@ include "det_userdata.inc.php";
    }
    else { echo "Fehlerhafte Sektorangabe!"; }
  }
- else { echo "Es wurde kein Sektor gew�hlt."; }
-?>
+ else { echo "Es wurde kein Sektor gewählt."; }
 
-</center>
-</body>
-</html>
+include "inc.layout.bottom.php";

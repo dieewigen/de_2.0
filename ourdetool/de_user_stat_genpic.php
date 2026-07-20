@@ -2,6 +2,7 @@
 include "../inccon.php";
 include "../inc/sv.inc.php";
 
+$uid = (int)($_GET['uid'] ?? 0);
 $_SESSION['ums_user_id']=$uid;
 $_SESSION['ums_rasse']=1;
 
@@ -27,7 +28,7 @@ $rowx = mysqli_fetch_array($resultx, MYSQLI_BOTH);
 $allyid = isset($rowx["id"]) ? $rowx["id"] : 0;
 
 //hintergund laden
-$im = imagecreatefrompng("lib/statvorl2.png");
+$im = imagecreatefrompng(__DIR__ . "/smilies/statvorl2.png");
 
 //statistische daten auslesen mit prepared statements
 $result = null;

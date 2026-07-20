@@ -1,282 +1,209 @@
 <?php
 include "../inccon.php";
-?>
-<html>
-<head>
-<title>Multiliste</title>
-<?php include "cssinclude.php";?>
-<style >
- body { scrollbar-face-color: #000000;scrollbar-shadow-color: #000000;scrollbar-highlight-color: #333333; scrollbar-3dlight-color: #8CA0B4;scrollbar-darkshadow-color: #333333;scrollbar-track-color: #000000;
-  scrollbar-arrow-color: #8CA0B4; padding: 0px; color: #3399FF; margin-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px;
-  font-family: helvetica, arial,geneva, sans-serif;  font-size: 10pt;}
- table { border: 1px solid #00366C; }
- td { font-family: helvetica, arial, geneva, sans-serif; font-size: 10pt; white-space: nowrap; border: 1px solid #00366C; }
- td.r { color: #ff0000; }
- a { color: #3399ff; text-decoration: underline }
- a:hover { color: #3399ff; text-decoration: none }
-</style>
-
-</head>
-<body>
-<?php
-
-$show_statistic=isset($_GET['statistic']) ? $_GET['statistic'] : 0;
-
-
-$okt=4;
-
 include "det_userdata.inc.php";
 
-$time_start = getmicrotime();
-$gesuser=0;
+$show_statistic = req_int('statistic');
+$tage = req_int('tage', 14);
 
-if($show_statistic==1 || $show_statistic==2){
-	//alle verdächtigen IP-Adressen auslesen, letzte IP
-	$sql="SELECT SUBSTRING_INDEX(last_ip, '.', ?) AS last_ip, COUNT(last_ip) 'zaehler' FROM de_login WHERE last_ip<>'127.0.0.1' GROUP BY SUBSTRING_INDEX(last_ip, '.', ?) ORDER BY `zaehler` DESC, `last_ip` ASC" ;
-	//echo $sql;
+$page_title = 'Multiliste';
+$active_nav = ($show_statistic >= 1 && $show_statistic <= 3) ? 'multi' . $show_statistic : 'multi1';
+include "inc.layout.top.php";
 
-	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$okt, $okt]);
+$okt = 4;
+$gesuser = 0;
 
-	
-
-	while($row = mysqli_fetch_assoc($db_daten)){
-		//echo '<br>'.$row['last_ip'].'/'.$row['zaehler'];
-		if (($row["zaehler"]>1)&&($row["last_ip"]<>'')){
-			$z=$row["zaehler"]; $ip=$row["last_ip"];
-			$ipz=$ip;
-			if ($ipz=='212.227.110.246') $ipz='!!! 1&1 !!!';
-			//kopf mit ip und anzahl
-			echo '<table border="0" cellpadding="2" cellspacing="0" width="200">';
-			echo '<tr>';
-			echo '<td align="center">IP: '.$ipz.' Anzahl: '.$z.'</td>';
-			echo '</tr>';
-			echo '</table>';
-
-			echo '<table border="0" cellpadding="2" cellspacing="0">';
-			echo '<tr>';
-			echo '<td width="50">UserID</td>';
-			echo '<td width="150">Name</td>';
-			echo '<td width="200">E-Mail</td>';
-			echo '<td width="150">Passwort</td>';
-			echo '<td width="140">Registriert</td>';
-			echo '<td width="140">Letzter Login</td>';
-			echo '<td width="70">Status</td>';
-			echo '<td width="40">Logins</td>';
-			echo '<td width="40">Sektor</td>';
-			echo '<td width="40">Ort</td>';
-			echo '<td width="40">IP</td>';
-			echo '</tr>';
-
-
-			$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.last_ip, de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) LEFT JOIN de_user_info ON(de_login.user_id = de_user_info.user_id) WHERE last_ip LIKE CONCAT(?, '%') ORDER BY pass", [$ip]);
-
-			$oldpass='';
-			while($user = mysqli_fetch_assoc($result)){
-				if ($oldpass==$user["pass"]) $str=' class="r"'; else $str='';
-				$oldpass=$user["pass"];
-
-				if ($user["status"]==0) $status='Inaktiv';
-				if ($user["status"]==1) $status='Aktiv';
-				if ($user["status"]==2) $status='Gesperrt';
-				if ($user["status"]==3) $status='Urlaub';
-
-				if($show_statistic==2) {
-					if ($user["status"]!=2) {
-						echo '<tr>';
-						echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
-						echo '<td>'.$user["nic"].'</td>';
-						echo '<td>'.$user["reg_mail"].'</td>';
-						echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
-						echo '<td>'.$user["register"].'</td>';
-						echo '<td>'.$user["last_login"].'</td>';
-						$status.=' <a href="de_set_user_status.php?uid='.$user["user_id"].'&status=2" target="setuserstatus">[S]</a>';
-						echo '<td>'.$status.'</td>';
-						echo '<td>'.$user["logins"].'</td>';
-						echo '<td>'.$user["sector"].'</td>';
-						echo '<td>'.$user["ort"].'</td>';
-						echo '<td>'.$user["last_ip"].'</td>';
-						echo '</tr>';
-						$gesuser++;
-					}
-				}
-				else {
-					echo '<tr>';
-					echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
-					echo '<td>'.$user["nic"].'</td>';
-					echo '<td>'.$user["reg_mail"].'</td>';
-					echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
-					echo '<td>'.$user["register"].'</td>';
-					echo '<td>'.$user["last_login"].'</td>';
-					$status.=' <a href="de_set_user_status.php?uid='.$user["user_id"].'&status=2" target="setuserstatus">[S]</a>';
-					echo '<td>'.$status.'</td>';
-					echo '<td>'.$user["logins"].'</td>';
-					echo '<td>'.$user["sector"].'</td>';
-					echo '<td>'.$user["ort"].'</td>';
-					echo '<td>'.$user["last_ip"].'</td>';
-					echo '</tr>';
-					$gesuser++;
-				}
-			}
-			echo '</table><br><br>';
-		}
-	}
-
-	echo 'Verd&auml;chtige: '.$gesuser;
-
-}elseif($show_statistic==3){
-	
-	$tage=isset($_GET['tage']) ? $_GET['tage'] : 14;
-	
-	//die IP-Adressen der letzten X Tage auswerten
-	$time=date("Y-m-d H:i:s", time()-3600*24*$tage);
-
-	//alle vorhandenen IP-Adressen in ein Array packen
-	$sql="SELECT * FROM de_user_ip WHERE time>? GROUP BY ip" ;
-	//echo '<br>'.$sql.'<br>';
-
-	$ip_adressen=array();
-
-	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time]);
-	while($row = mysqli_fetch_assoc($db_daten)){
-		$ip_adressen[]=$row['ip'];
-	}
-
-	//print_r($ip_adressen);
-
-	//für jede IP-Adresse überprüfen ob es mehrere user_id gibt, was normal nicht sein sollte
-
-	echo '<h1>IP-Adressen der letzten '.$tage.' Tage die in mehreren Accounts auftreten.</h1>';
-
-	$tage_array=array(3,7,14,30,50,100);
-
-	echo '<br>';
-	for($i=0;$i<count($tage_array); $i++){
-		
-		echo '<a href="multi.php?statistic=3&tage='.$tage_array[$i].'">'.$tage_array[$i].' Tage</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	}
-	echo '<br><br>';
-
-	for($i=0;$i<count($ip_adressen);$i++){
-		$ip=$ip_adressen[$i];
-
-		$sql="SELECT COUNT(DISTINCT user_id) AS anzahl FROM de_user_ip WHERE time>? AND ip=?;";
-		//echo '<br>'.$sql.'<br>';
-		$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
-		$rowx = mysqli_fetch_assoc($result);
-		$anzahl=$rowx['anzahl'];
-
-		if($rowx['anzahl']>1){
-
-			//die beteiligten Spieler ausgeben
-			$sql="SELECT * FROM de_user_ip LEFT JOIN de_login ON(de_user_ip.user_id=de_login.user_id) WHERE time>? AND ip=? GROUP BY de_user_ip.user_id;";
-			//echo '<br>'.$sql.'<br>';
-			$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
-	
-			echo '<table border="0" cellpadding="2" cellspacing="0" width="200">';
-			echo '<tr>';
-			echo '<td align="center">IP: '.$ip.' Anzahl: '.$anzahl.'</td>';
-			echo '</tr>';
-			echo '</table>';
-
-			echo '<table border="0" cellpadding="2" cellspacing="0">';
-			echo '<tr>';
-			echo '<td width="50">UserID</td>';
-			echo '<td width="150">Name</td>';
-			echo '<td width="200">E-Mail</td>';
-			echo '<td width="150">Passwort</td>';
-			echo '<td width="140">Registriert</td>';
-			echo '<td width="140">Letzter Login</td>';
-			echo '<td width="70">Status</td>';
-			echo '<td width="40">Logins</td>';
-			echo '</tr>';
-
-			$oldpass='';
-			while($user = mysqli_fetch_assoc($result)){
-				if ($oldpass==$user["pass"]) $str=' class="r"'; else $str='';
-				$oldpass=$user["pass"];
-
-				if ($user["status"]==0) $status='Inaktiv';
-				if ($user["status"]==1) $status='Aktiv';
-				if ($user["status"]==2) $status='Gesperrt';
-				if ($user["status"]==3) $status='Urlaub';
-
-				echo '<tr>';
-				echo '<td><a href="idinfo.php?UID='.$user["user_id"].'" target="_blank">'.$user["user_id"].'</a></td>';
-				echo '<td>'.$user["nic"].'</td>';
-				echo '<td>'.$user["reg_mail"].'</td>';
-				echo '<td'.$str.'>'.modpass($user["pass"]).'</td>';
-				echo '<td>'.$user["register"].'</td>';
-				echo '<td>'.$user["last_login"].'</td>';
-				$status.=' <a href="de_set_user_status.php?uid='.$user["user_id"].'&status=2" target="setuserstatus">[S]</a>';
-				echo '<td>'.$status.'</td>';
-				echo '<td>'.$user["logins"].'</td>';
-				echo '</tr>';
-			}
-			echo '</table><br>';
-
-			//eine Liste aller Logins 
-			echo '
-			<details>
-				<summary>Liste der Logins</summary>
-				<p>
-					<table border="0" cellpadding="2" cellspacing="0">
-						<tr>
-							<td width="50">UserID</td>
-							<td width="150">Zeit</td>
-							<td width="200">Browser</td>
-							<td width="150">Cookie</td>
-						</tr>
-			';
-
-			$sql="SELECT * FROM de_user_ip WHERE time>? AND ip=? ORDER BY time;";
-			//echo '<br>'.$sql.'<br>';
-			$result=mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
-			while($rowx = mysqli_fetch_assoc($result)){
-				echo '<tr>';
-
-				echo '<td>'.$rowx['user_id'].'</td>';
-				echo '<td>'.$rowx['time'].'</td>';
-				echo '<td>'.$rowx['browser'].'</td>';
-				echo '<td>'.$rowx['loginhelp'].'</td>';
-
-				echo '</tr>';
-			}
-						
-			  
-
-			echo '
-					</table>
-				</p>
-			</details>';
-			
-
-			echo '<br><br>';
-		}
-
-	}
-	
-	echo '<br><br>';
-
+function modpass($pass)
+{
+    $pass[0] = "*";
+    $pass[1] = "*";
+    $pass[2] = "*";
+    $pass[3] = "*";
+    return $pass;
 }
 
-$time_end = getmicrotime();
-$ltime = number_format($time_end - $time_start,2,".","");
+if ($show_statistic == 1 || $show_statistic == 2) {
+    //alle verdächtigen IP-Adressen auslesen, letzte IP
+    $sql = "SELECT SUBSTRING_INDEX(last_ip, '.', ?) AS last_ip, COUNT(last_ip) 'zaehler' FROM de_login WHERE last_ip<>'127.0.0.1' GROUP BY SUBSTRING_INDEX(last_ip, '.', ?) ORDER BY `zaehler` DESC, `last_ip` ASC";
 
-function modpass($pass){
-	$pass[0]="*";
-	$pass[1]="*";
-	$pass[2]="*";
-	$pass[3]="*";
-	return($pass);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$okt, $okt]);
+
+    while ($row = mysqli_fetch_assoc($db_daten)) {
+        if (($row["zaehler"] > 1) && ($row["last_ip"] <> '')) {
+            $z = $row["zaehler"];
+            $ip = $row["last_ip"];
+            $ipz = $ip;
+            if ($ipz == '212.227.110.246') {
+                $ipz = '!!! 1&1 !!!';
+            }
+            //kopf mit ip und anzahl
+            echo '<h3>IP: ' . htmlspecialchars($ipz) . ' Anzahl: ' . $z . '</h3>';
+
+            echo '<table>';
+            echo '<tr><th>UserID</th><th>Name</th><th>E-Mail</th><th>Passwort</th><th>Registriert</th><th>Letzter Login</th><th>Status</th><th>Logins</th><th>Sektor</th><th>Ort</th><th>IP</th></tr>';
+
+            $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.last_ip, de_login.user_id, de_login.nic, de_login.reg_mail, de_login.pass, de_login.register, de_login.last_login, de_login.logins, de_user_data.sector, de_login.status, de_user_info.ort FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) LEFT JOIN de_user_info ON(de_login.user_id = de_user_info.user_id) WHERE last_ip LIKE CONCAT(?, '%') ORDER BY pass", [$ip]);
+
+            $oldpass = '';
+            while ($user = mysqli_fetch_assoc($result)) {
+                if ($oldpass == $user["pass"]) {
+                    $str = ' class="r"';
+                } else {
+                    $str = '';
+                }
+                $oldpass = $user["pass"];
+
+                // statistic=2: gesperrte Accounts ausblenden
+                if ($show_statistic == 2 && $user["status"] == 2) {
+                    continue;
+                }
+
+                $status = match ((int)$user["status"]) {
+                    0 => 'Inaktiv',
+                    1 => 'Aktiv',
+                    2 => 'Gesperrt',
+                    3 => 'Urlaub',
+                    default => 'Status ' . (int)$user["status"],
+                };
+                $status .= ' <form class="inline" method="post" action="de_set_user_status.php" data-confirm="User ' . $user["user_id"] . ' wirklich sperren?">'
+                    . csrf_field()
+                    . '<input type="hidden" name="uid" value="' . $user["user_id"] . '">'
+                    . '<input type="hidden" name="status" value="2">'
+                    . '<input type="hidden" name="ret" value="' . htmlspecialchars($_SERVER['REQUEST_URI']) . '">'
+                    . '<button type="submit" class="btn-danger btn-xs" title="User sperren">[S]</button>'
+                    . '</form>';
+
+                echo '<tr>';
+                echo '<td><a href="idinfo.php?UID=' . $user["user_id"] . '" target="_blank" rel="noopener">' . $user["user_id"] . '</a></td>';
+                echo '<td>' . htmlspecialchars((string)$user["nic"]) . '</td>';
+                echo '<td>' . htmlspecialchars((string)$user["reg_mail"]) . '</td>';
+                echo '<td' . $str . '>' . modpass($user["pass"]) . '</td>';
+                echo '<td>' . $user["register"] . '</td>';
+                echo '<td>' . $user["last_login"] . '</td>';
+                echo '<td>' . $status . '</td>';
+                echo '<td class="num">' . $user["logins"] . '</td>';
+                echo '<td class="num">' . $user["sector"] . '</td>';
+                echo '<td>' . htmlspecialchars((string)$user["ort"]) . '</td>';
+                echo '<td>' . htmlspecialchars((string)$user["last_ip"]) . '</td>';
+                echo '</tr>';
+                $gesuser++;
+            }
+            echo '</table>';
+        }
+    }
+
+    echo 'Verd&auml;chtige: ' . $gesuser;
+} elseif ($show_statistic == 3) {
+    //die IP-Adressen der letzten X Tage auswerten
+    $time = date("Y-m-d H:i:s", time() - 3600 * 24 * $tage);
+
+    //alle vorhandenen IP-Adressen in ein Array packen
+    $sql = "SELECT * FROM de_user_ip WHERE time>? GROUP BY ip";
+
+    $ip_adressen = array();
+
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$time]);
+    while ($row = mysqli_fetch_assoc($db_daten)) {
+        $ip_adressen[] = $row['ip'];
+    }
+
+    //für jede IP-Adresse überprüfen ob es mehrere user_id gibt, was normal nicht sein sollte
+
+    echo '<h2>IP-Adressen der letzten ' . $tage . ' Tage die in mehreren Accounts auftreten.</h2>';
+
+    $tage_array = array(3, 7, 14, 30, 50, 100);
+
+    echo '<br>';
+    for ($i = 0; $i < count($tage_array); $i++) {
+        echo '<a href="multi.php?statistic=3&tage=' . $tage_array[$i] . '">' . $tage_array[$i] . ' Tage</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    }
+    echo '<br><br>';
+
+    for ($i = 0; $i < count($ip_adressen); $i++) {
+        $ip = $ip_adressen[$i];
+
+        $sql = "SELECT COUNT(DISTINCT user_id) AS anzahl FROM de_user_ip WHERE time>? AND ip=?;";
+        $result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
+        $rowx = mysqli_fetch_assoc($result);
+        $anzahl = $rowx['anzahl'];
+
+        if ($rowx['anzahl'] > 1) {
+            //die beteiligten Spieler ausgeben
+            $sql = "SELECT * FROM de_user_ip LEFT JOIN de_login ON(de_user_ip.user_id=de_login.user_id) WHERE time>? AND ip=? GROUP BY de_user_ip.user_id;";
+            $result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
+
+            echo '<h3>IP: ' . htmlspecialchars($ip) . ' Anzahl: ' . $anzahl . '</h3>';
+
+            echo '<table>';
+            echo '<tr><th>UserID</th><th>Name</th><th>E-Mail</th><th>Passwort</th><th>Registriert</th><th>Letzter Login</th><th>Status</th><th>Logins</th></tr>';
+
+            $oldpass = '';
+            while ($user = mysqli_fetch_assoc($result)) {
+                if ($oldpass == $user["pass"]) {
+                    $str = ' class="r"';
+                } else {
+                    $str = '';
+                }
+                $oldpass = $user["pass"];
+
+                $status = match ((int)$user["status"]) {
+                    0 => 'Inaktiv',
+                    1 => 'Aktiv',
+                    2 => 'Gesperrt',
+                    3 => 'Urlaub',
+                    default => 'Status ' . (int)$user["status"],
+                };
+                $status .= ' <form class="inline" method="post" action="de_set_user_status.php" data-confirm="User ' . $user["user_id"] . ' wirklich sperren?">'
+                    . csrf_field()
+                    . '<input type="hidden" name="uid" value="' . $user["user_id"] . '">'
+                    . '<input type="hidden" name="status" value="2">'
+                    . '<input type="hidden" name="ret" value="' . htmlspecialchars($_SERVER['REQUEST_URI']) . '">'
+                    . '<button type="submit" class="btn-danger btn-xs" title="User sperren">[S]</button>'
+                    . '</form>';
+
+                echo '<tr>';
+                echo '<td><a href="idinfo.php?UID=' . $user["user_id"] . '" target="_blank" rel="noopener">' . $user["user_id"] . '</a></td>';
+                echo '<td>' . htmlspecialchars((string)$user["nic"]) . '</td>';
+                echo '<td>' . htmlspecialchars((string)$user["reg_mail"]) . '</td>';
+                echo '<td' . $str . '>' . modpass($user["pass"]) . '</td>';
+                echo '<td>' . $user["register"] . '</td>';
+                echo '<td>' . $user["last_login"] . '</td>';
+                echo '<td>' . $status . '</td>';
+                echo '<td class="num">' . $user["logins"] . '</td>';
+                echo '</tr>';
+            }
+            echo '</table>';
+
+            //eine Liste aller Logins
+            echo '
+            <details>
+                <summary>Liste der Logins</summary>
+                <p>
+                    <table>
+                        <tr>
+                            <th>UserID</th>
+                            <th>Zeit</th>
+                            <th>Browser</th>
+                            <th>Cookie</th>
+                        </tr>
+            ';
+
+            $sql = "SELECT * FROM de_user_ip WHERE time>? AND ip=? ORDER BY time;";
+            $result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, $ip]);
+            while ($rowx = mysqli_fetch_assoc($result)) {
+                echo '<tr>';
+                echo '<td>' . $rowx['user_id'] . '</td>';
+                echo '<td>' . $rowx['time'] . '</td>';
+                echo '<td>' . htmlspecialchars((string)$rowx['browser']) . '</td>';
+                echo '<td>' . htmlspecialchars((string)$rowx['loginhelp']) . '</td>';
+                echo '</tr>';
+            }
+
+            echo '
+                    </table>
+                </p>
+            </details>';
+        }
+    }
 }
 
-function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime());
-  	return ((float)$usec + (float)$sec);
-}
-?>
-
- <br>
- Seite in <?php echo $ltime; ?> Sekunden erstellt.
-</body>
-</html>
+include "inc.layout.bottom.php";

@@ -1,20 +1,16 @@
 <?php
 include "../inccon.php";
-?>
-<html>
-<head>
-<?php include "cssinclude.php";?>
-</head>
-<body>
-<form action="de_server_tick.php" method="post">
-<div align="center">
-<?php
-
 include "det_userdata.inc.php";
 
-$sw = isset($_GET['sw']) ? (int)$_GET['sw'] : 0;
+$page_title = 'Tickeinstellungen';
+$active_nav = 'server';
+include "inc.layout.top.php";
+
+$sw = req_int('sw');
 
 if ($sw) {
+    csrf_require();
+
     $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT doetick, domtick, dodelinactiv, dodeloldtrade, trade_active, winid, winticks FROM de_system");
     $row = mysqli_fetch_assoc($result);
     $doetick = $row["doetick"];
@@ -22,7 +18,6 @@ if ($sw) {
     $trade_active = $row["trade_active"];
     $dodelinactiv = $row["dodelinactiv"];
     $dodeloldtrade = $row["dodeloldtrade"];
-
 
     switch ($sw) {
         case 1: //wirthschaft
@@ -72,37 +67,28 @@ $trade_active = $row["trade_active"];
 $winid = $row["winid"];
 $winticks = $row["winticks"];
 
-echo '<br><table cellpadding="3" cellspacing="4">';
-echo '<tr>';
-echo '<td width="300" align="center">Wirtschaftstick ('.$lwt.')</td>';
-if ($doetick == 1) {
-    $str = 'Aktiv';
-} else {
-    $str = 'Inaktiv';
+/** Status-Badge, als Link zum Umschalten der jeweiligen Funktion. */
+function tick_status_link(int $sw, $aktiv): string
+{
+    $badge = ($aktiv == 1)
+        ? '<span class="badge badge-ok">Aktiv</span>'
+        : '<span class="badge badge-danger">Inaktiv</span>';
+    return '<a href="' . csrf_url('de_server_tick.php?sw=' . $sw) . '" title="Umschalten">' . $badge . '</a>';
 }
-echo '<td width="100" align="center"><a href="'.$_SERVER['PHP_SELF'].'?sw=1">'.$str.'</a></td>';
+
+echo '<table>';
+echo '<tr><th>Funktion</th><th>Status</th></tr>';
+echo '<tr>';
+echo '<td>Wirtschaftstick ('.$lwt.')</td>';
+echo '<td>'.tick_status_link(1, $doetick).'</td>';
 echo '</tr>';
 echo '<tr>';
-echo '<td width="300" align="center">Milit&auml;rtick ('.$lmt.')</td>';
-if ($domtick == 1) {
-    $str = 'Aktiv';
-} else {
-    $str = 'Inaktiv';
-}
-echo '<td width="100" align="center"><a href="'.$_SERVER['PHP_SELF'].'?sw=2">'.$str.'</a></td>';
+echo '<td>Milit&auml;rtick ('.$lmt.')</td>';
+echo '<td>'.tick_status_link(2, $domtick).'</td>';
 echo '</tr>';
 echo '<tr>';
-echo '<td width="300" align="center">Inaktive L&ouml;schen</td>';
-if ($dodelinactiv == 1) {
-    $str = 'Aktiv';
-} else {
-    $str = 'Inaktiv';
-}
-echo '<td width="100" align="center"><a href="'.$_SERVER['PHP_SELF'].'?sw=3">'.$str.'</a></td>';
+echo '<td>Inaktive L&ouml;schen</td>';
+echo '<td>'.tick_status_link(3, $dodelinactiv).'</td>';
 echo '</tr></table>';
 
-
-?>
-</form>
-</body>
-</html>
+include "inc.layout.bottom.php";
