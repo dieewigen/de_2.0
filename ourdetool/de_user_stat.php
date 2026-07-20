@@ -1,14 +1,22 @@
 <?php
-include "../inccon.php";
-include "../inc/sv.inc.php";
-include "../inc/lang/1_statistics.lang.php";
 
-$_SESSION['ums_user_id']=$uid;
+include "../inc/sv.inc.php";
+include "../functions.php";
+include "../inc/env.inc.php";
 
 // Stelle sicher, dass eine Datenbankverbindung vorhanden ist
 if (!isset($GLOBALS['dbi'])) {
-    die('Keine Datenbankverbindung vorhanden');
+    $GLOBALS['dbi'] = mysqli_connect(
+        $GLOBALS['env_db_dieewigen_host'], 
+        $GLOBALS['env_db_dieewigen_user'], 
+        $GLOBALS['env_db_dieewigen_password'], 
+        $GLOBALS['env_db_dieewigen_database']
+    );
 }
+
+include "../inc/lang/1_statistics.lang.php";
+
+$_SESSION['ums_user_id']=intval($_GET['uid']);
 
 // Verwende prepared statement für die Abfrage der Spielerdaten
 $result = mysqli_execute_query($GLOBALS['dbi'], 
@@ -17,10 +25,6 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
      WHERE user_id = ?",
     [$_SESSION['ums_user_id']]
 );
-
-if (!$result || mysqli_num_rows($result) == 0) {
-    die('Fehler beim Abrufen der Benutzerdaten');
-}
 
 $row = mysqli_fetch_array($result, MYSQLI_BOTH);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];
