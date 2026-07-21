@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+/*
+ * Schlanke Variante von all.css für die Einbettung ins Admintool-Layout
+ * (gleiche Idee wie comparetool/css/embed.css): nur die jQuery-UI-Styles
+ * für die Tabs des Logviewers.
+ *
+ * Der Import von f.css fehlt bewusst: f.css ist das alte Globaltheme
+ * (body-Hintergrund bg_blue.gif, eigene Link-/Tabellenfarben) und würde
+ * das Sidebar-Design aus adm.css überschreiben. all.css bleibt für einen
+ * etwaigen Standalone-Betrieb unverändert.
+ */
+@import url("jq.ui/ui.all.css");
+@import url("jq.ui.all.override.css");

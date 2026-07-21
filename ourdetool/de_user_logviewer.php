@@ -86,7 +86,7 @@ $uid = $userID;
 
 // Legacy-Assets des Logviewers unverändert in den <head> übernehmen
 $page_head_extra = <<<'HTML'
-<link rel="stylesheet" type="text/css" href="logviewer/css/all.css">
+<link rel="stylesheet" type="text/css" href="logviewer/css/embed.css">
 <script type="text/javascript" src="logviewer/jq/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="logviewer/jq/jquery-ui-1.7.custom.min.js"></script>
 <script type="text/javascript" src="logviewer/jq/jquery.jHelperTip.1.0.min.js"></script>
@@ -264,7 +264,7 @@ try {
 
             </div>
 
-            <div id="logViewerTabs" style="float:left; width:90%; background:url(bg_blue.gif);">
+            <div id="logViewerTabs" style="float:left; width:90%;">
                 <ul>
                     <li><a href="#logs"><span>Logs</span></a></li>
                     <li><a href="#config"><span>Konfiguration</span></a></li>
