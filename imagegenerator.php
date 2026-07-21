@@ -9,145 +9,218 @@ include 'inc/lang/'.$sv_server_lang.'_imagegenerator.lang.php';
 
 
 $ix = 500;
-$iy = 125;
-$realy = 250;
-
-$multicolor = 0;
-$zahlmulticolor = 0;
+$iy = 160;
 
 /************************************************************
 *                                                           *
-*      Definition der Farbe und der Größe des Bildes        *
+*      Rechenaufgabe bestimmen (Ergebnis 1 bis 100)         *
 *                                                           *
 *************************************************************/
 
-//Bild erzeugen
-$image = imagecreate($ix, $iy);
-
-//hintergrundfarbe bestimmen
-//transparenz ist gew�nscht
-$backgroundcolor = imagecolorallocate($image, 0x00, 0x00, 0x00);
-//Hintergrundfarbe entfernen (transparent)
-imagecolortransparent($image, $backgroundcolor);
-
-//mt_srand((double)microtime()*10000);
-
-/************************************************************
-*                                                           *
-*           Array's mit Zahlen und Operatoren               *
-*                                                           *
-*************************************************************/
-//$zahl wird über die sprachdatei eingebunden
-/*
-$randomzwang=0;
-while($randomzwang<5)
+function imagegenerator_neue_aufgabe()
 {
-   $zahleins = mt_rand(1,100);
-   $randomzwang++;
+    do {
+        if (random_int(0, 1) == 1) {
+            //plus: beide operanden mindestens 1, ergebnis maximal 100
+            $ergebnis = random_int(2, 100);
+            $a = random_int(1, $ergebnis - 1);
+            $b = $ergebnis - $a;
+            $operator = 'plus';
+        } else {
+            //minus: a groesser b, ergebnis gleichverteilt 1 bis 99
+            $ergebnis = random_int(1, 99);
+            $b = random_int(1, 100 - $ergebnis);
+            $a = $ergebnis + $b;
+            $operator = 'minus';
+        }
+        //zwei sehr lange zahlwoerter zusammen passen nicht lesbar ins bild
+        $textlaenge = strlen($GLOBALS['zahl'][$a - 1]) + strlen($GLOBALS['zahl'][$b - 1]);
+    } while ($textlaenge > 26);
+
+    return array(
+        'a' => $a,
+        'operator' => $operator,
+        'b' => $b,
+        'ergebnis' => $ergebnis,
+        'seed' => random_int(0, mt_getrandmax()),
+    );
 }
-*/
-$zahleins = mt_rand(1, 100);
-$_SESSION['loginzahl'] = md5('night'.$zahleins.'fall');
 
-$zahleins = $zahl[$zahleins - 1];
-/************************************************************
-*                                                           *
-*                       Zahl                                *
-*                                                           *
-*************************************************************/
-
-$my = mt_rand(40, 60);
-$mx = mt_rand(5, 30);
-
-if (strlen($zahleins) < 10) {
-    $abstand = 35;
-    $mx += 80;
-} else {
-    $abstand = 28;
-}
-for ($i = 0;$i < strlen($zahleins);$i++) {
-    $groesse = mt_rand(25, 50);
-
-    //winkel bestimmen, rechts links von x bis y� negativ oder positiv
-    $winkel = mt_rand(5, 25);
-    if (mt_rand(1, 2) == 1) {
-        $winkel = $winkel * -1;
+//die aufgabe ist an die laufende abfrage (token aus session.inc.php) gebunden:
+//solange derselbe token aktiv ist, wird dieselbe aufgabe mit demselben seed
+//gerendert. so kann eine fremdseite die laufende abfrage nicht per bildabruf
+//ueberschreiben und mehrfachabrufe liefern keine neuen rausch-varianten
+//derselben aufgabe zum herausfiltern.
+if (isset($_SESSION['botcheck_token'])) {
+    if (!isset($_SESSION['botcheck_task'])) {
+        $aufgabe = imagegenerator_neue_aufgabe();
+        $_SESSION['botcheck_task'] = $aufgabe;
+        $_SESSION['botcheck_answer'] = $aufgabe['ergebnis'];
     }
-    $schriftart = mt_rand(0, 9);
-    $y = $my + mt_rand(1, 40);
+    $aufgabe = $_SESSION['botcheck_task'];
 
-    //$fontcolor=mt_rand(150,255);
-    //$demulticolor = ImageColorAllocate($image, $fontcolor, $fontcolor , $fontcolor);
-
-    $decolor = ImageColorAllocate($image, 200, 200, 200);
-
-    $schriftart = getcwd().'/fonts/font'.$schriftart.'.ttf';
-
-    imagettftext($image, $groesse, $winkel, $mx + ($i * $abstand), $y, -$decolor, $schriftart, $zahleins[$i]);
+    //ab hier laeuft das rendering deterministisch pro aufgabe
+    mt_srand($aufgabe['seed']);
+} else {
+    //keine aktive abfrage (z.b. direktaufruf): nur ein rauschbild ohne
+    //aufgabe ausliefern und nichts in die session schreiben
+    $aufgabe = null;
+    mt_srand(random_int(0, mt_getrandmax()));
 }
-
 
 /************************************************************
 *                                                           *
-*                       Rechteck                            *
+*      Bild anlegen: opaker dunkler Hintergrund             *
+*      (transparenz waere eine perfekte pixelmaske)         *
 *                                                           *
 *************************************************************/
+
+$image = imagecreatetruecolor($ix, $iy);
+$backgroundcolor = imagecolorallocate($image, 17, 17, 17);
+imagefilledrectangle($image, 0, 0, $ix - 1, $iy - 1, $backgroundcolor);
+
+/************************************************************
+*                                                           *
+*      Schriftzug: pro zeichen font, groesse, winkel        *
+*      und grauton, mit ueberlappung und versatz            *
+*                                                           *
+*************************************************************/
+
+function zeichne_zeile($bild, $text, $basislinie, $maxbreite)
+{
+    $laenge = strlen($text);
+
+    //pro zeichen font, groesse, winkel und grauton wuerfeln
+    $fonts = array();
+    $groessen = array();
+    $winkel = array();
+    $grau = array();
+    for ($i = 0; $i < $laenge; $i++) {
+        $fonts[$i] = getcwd().'/fonts/font'.mt_rand(0, 9).'.ttf';
+        $groessen[$i] = mt_rand(26, 36);
+        $w = mt_rand(3, 15);
+        $winkel[$i] = (mt_rand(1, 2) == 1) ? $w : -$w;
+        $grau[$i] = mt_rand(170, 225);
+    }
+
+    //breiten messen und die schriftgroesse an die bildbreite anpassen:
+    //kurze zeilen werden vergroessert, zu lange verkleinert
+    $nutzbreite = $maxbreite - 40;
+    $faktor = 1.0;
+    for ($pass = 0; $pass < 8; $pass++) {
+        $gesamt = 0;
+        $breiten = array();
+        for ($i = 0; $i < $laenge; $i++) {
+            $groesse = (int)round($groessen[$i] * $faktor);
+            if ($text[$i] == ' ') {
+                $breiten[$i] = (int)round($groesse * 0.6);
+            } else {
+                $box = imagettfbbox($groesse, 0, $fonts[$i], $text[$i]);
+                $breiten[$i] = abs($box[2] - $box[0]) + 2;
+            }
+            $gesamt += $breiten[$i];
+        }
+        if ($gesamt > $nutzbreite && $faktor > 0.45) {
+            $faktor -= 0.05;
+        } elseif ($gesamt < $nutzbreite * 0.55 && $faktor < 1.35) {
+            $faktor += 0.15;
+        } else {
+            break;
+        }
+    }
+
+    //zeichnen, zentriert, mit leichter ueberlappung der zeichen
+    $x = (int)(($maxbreite - $gesamt) / 2) + 10;
+    for ($i = 0; $i < $laenge; $i++) {
+        if ($text[$i] != ' ') {
+            $groesse = (int)round($groessen[$i] * $faktor);
+            $farbe = imagecolorallocate($bild, $grau[$i], $grau[$i], $grau[$i]);
+            imagettftext($bild, $groesse, $winkel[$i], $x, $basislinie + mt_rand(-5, 5), $farbe, $fonts[$i], $text[$i]);
+        }
+        $x += $breiten[$i] - mt_rand(1, 3);
+    }
+}
+
+if ($aufgabe !== null) {
+    //den operator auf die zeile setzen, die die zeilenlaengen besser ausbalanciert
+    $worta = $zahl[$aufgabe['a'] - 1];
+    $wortb = $zahl[$aufgabe['b'] - 1];
+    $wortop = $operator_wort[$aufgabe['operator']];
+    if (max(strlen($worta), strlen($wortop.' '.$wortb)) <= max(strlen($worta.' '.$wortop), strlen($wortb))) {
+        $zeile1 = $worta;
+        $zeile2 = $wortop.' '.$wortb;
+    } else {
+        $zeile1 = $worta.' '.$wortop;
+        $zeile2 = $wortb;
+    }
+
+    //zwischenbild fuer die schrift, wird wellenfoermig verzerrt uebernommen
+    $textbild = imagecreatetruecolor($ix, $iy);
+    imagefilledrectangle($textbild, 0, 0, $ix - 1, $iy - 1, imagecolorallocate($textbild, 17, 17, 17));
+
+    zeichne_zeile($textbild, $zeile1, 60 + mt_rand(-4, 4), $ix);
+    zeichne_zeile($textbild, $zeile2, 130 + mt_rand(-4, 4), $ix);
+
+    /********************************************************
+    *      Wellenfoermige Verzerrung des Schriftzugs        *
+    *********************************************************/
+    $amplitude = mt_rand(6, 9);
+    $wellenlaenge = mt_rand(120, 180);
+    $phase = mt_rand(0, 628) / 100;
+    for ($x = 0; $x < $ix; $x++) {
+        $dy = (int)round($amplitude * sin(2 * M_PI * $x / $wellenlaenge + $phase));
+        imagecopy($image, $textbild, $x, $dy, $x, 0, 1, $iy);
+    }
+}
+
+/************************************************************
+*                                                           *
+*      Stoergrafik: dicke linien und boegen durch die       *
+*      schrift, rechtecke, in wechselnden grautoenen        *
+*                                                           *
+*************************************************************/
+
+for ($k = 0; $k <= 3; $k++) {
+    $g = mt_rand(150, 225);
+    $decolor = imagecolorallocate($image, $g, $g, $g);
+    imagesetthickness($image, mt_rand(2, 3));
+    imageline($image, 0, mt_rand(20, $iy - 20), $ix, mt_rand(20, $iy - 20), $decolor);
+}
+
+for ($k = 0; $k <= 2; $k++) {
+    $g = mt_rand(150, 225);
+    $decolor = imagecolorallocate($image, $g, $g, $g);
+    imagesetthickness($image, 2);
+    imagearc($image, mt_rand(0, $ix), mt_rand(0, $iy), mt_rand(100, 400), mt_rand(60, 200), 0, 360, $decolor);
+}
 
 for ($k = 0; $k <= 4; $k++) {
-    $a = mt_rand(1, 250);
-    $b = mt_rand(1, 30);
-    $c = mt_rand(1, $ix);
-    $d = mt_rand(1, $iy);
-   
-    $decolor = ImageColorAllocate($image, 200, 200, 200);
-
-    imagerectangle($image, $a, $b, $c, $d, $decolor);
-}
-/************************************************************
-*                                                           *
-*                     Chaosgrafik                           *
-*                                                           *
-*************************************************************/
-for ($q = 0; $q <= 2; $q++) {
-    $e = mt_rand(1, $ix);
-    $f = mt_rand(1, $iy);
-    $g = mt_rand(1, $ix);
-    $h = mt_rand(1, $iy);
-    $i = mt_rand(1, $ix);
-    $j = mt_rand(1, $iy);
-    $k = mt_rand(1, $ix);
-    $l = mt_rand(1, $iy);
-    $m = mt_rand(1, $ix);
-    $n = mt_rand(1, $iy);
-    $o = mt_rand(1, $ix);
-    $p = mt_rand(1, $iy);
-
-    $decolor = ImageColorAllocate($image, 200, 200, 200);
-
-    $mess_p = array($e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p);
-    imagepolygon($image, $mess_p, $decolor);
+    $g = mt_rand(60, 200);
+    $decolor = imagecolorallocate($image, $g, $g, $g);
+    imagesetthickness($image, 1);
+    $ra = mt_rand(0, 250);
+    $rb = mt_rand(0, 60);
+    imagerectangle($image, $ra, $rb, $ra + mt_rand(30, 240), $rb + mt_rand(20, 90), $decolor);
 }
 
+imagesetthickness($image, 1);
 
 /************************************************************
 *                                                           *
-*                       Sterne/Pixel                              *
+*      Sterne/Pixel in hellen und dunklen toenen            *
 *                                                           *
 *************************************************************/
 
-for ($k = 0; $k <= 9500; $k++) {
-    //sterne in der farbe der schrift
-    $x = mt_rand(0, $ix);
-    $y = mt_rand(0, $iy);
-    ImageSetPixel($image, $x, $y, $decolor);
+for ($k = 0; $k <= 4000; $k++) {
+    //helle pixel in den grautoenen der schrift
+    $g = mt_rand(140, 210);
+    imagesetpixel($image, mt_rand(0, $ix - 1), mt_rand(0, $iy - 1), imagecolorallocate($image, $g, $g, $g));
 }
 
-for ($k = 0; $k <= 9000; $k++) {
-
-    //transparente sterne zum durchsieben
-    $x = mt_rand(0, $ix);
-    $y = mt_rand(0, $iy);
-    ImageSetPixel($image, $x, $y, $backgroundcolor);
+for ($k = 0; $k <= 3000; $k++) {
+    //dunkle pixel zum durchsieben der schrift
+    $g = mt_rand(10, 60);
+    imagesetpixel($image, mt_rand(0, $ix - 1), mt_rand(0, $iy - 1), imagecolorallocate($image, $g, $g, $g));
 }
 
 /************************************************************

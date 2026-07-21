@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-$ergebnis = $_SESSION['loginzahl'] ?? -1;
 include "inc/sv.inc.php";
 include "inc/links.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_botcheck.lang.php';
@@ -10,8 +9,70 @@ include 'inccon.php';
 
 $_SESSION['ums_user_id'] = $_SESSION['ums_user_id'] ?? -1;
 
-if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
-    //$_SESSION['ums_one_way_bot_protection']=0;
+//antwortfenster: schneller als $minsekunden schafft kein mensch (bild laden,
+//aufgabe lesen, rechnen, button suchen), aelter als $maxsekunden ist verfallen.
+//die produktionswerte koennen in der nicht versionierten sv.inc.php
+//abweichend gesetzt werden
+$minsekunden = $GLOBALS['sv_botcheck_minsec'] ?? 2;
+$maxsekunden = $GLOBALS['sv_botcheck_maxsec'] ?? 600;
+
+//ziel fuer alle redirects
+$ziel = $_SESSION['ums_bot_protection_filename'] ?? '';
+if ($ziel == '') {
+    $ziel = 'overview.php';
+}
+
+/************************************************************
+*                                                           *
+*   Token pruefen: aufrufe ohne gueltigen einmal-token      *
+*   (fremdseiten-aufruf/CSRF, doppelklick, veralteter       *
+*   tab, bild nie geladen) werden OHNE strafe               *
+*   zurueckgeleitet; die laufende abfrage bleibt dabei      *
+*   unangetastet.                                           *
+*                                                           *
+*************************************************************/
+
+$token = $_SESSION['botcheck_token'] ?? '';
+$uebergeben = $_REQUEST['t'] ?? '';
+
+//kein aktiver check, bild nie geladen (keine antwort in der session) oder
+//t ist kein string -> neutral. wichtig: leerer token darf nie gegen einen
+//leeren parameter "passen" (hash_equals('','') waere true)
+if ($token == '' || !isset($_SESSION['botcheck_answer']) || !is_string($uebergeben)) {
+    header("Location: ".$ziel);
+    exit;
+}
+
+//fremder oder alter token -> neutral, session NICHT anfassen, sonst koennte
+//eine fremdseite die laufende abfrage des spielers invalidieren
+if (!hash_equals($token, $uebergeben)) {
+    header("Location: ".$ziel);
+    exit;
+}
+
+//gueltiger versuch: aufgabe ist ab jetzt verbraucht (einmalgebrauch)
+$antwort = $_SESSION['botcheck_answer'];
+$pagetime = (int)($_SESSION['botcheck_page_time'] ?? 0);
+unset($_SESSION['botcheck_token']);
+unset($_SESSION['botcheck_answer']);
+unset($_SESSION['botcheck_task']);
+unset($_SESSION['botcheck_page_time']);
+
+//abgelaufene abfrage: keine strafe, es erscheint eine neue aufgabe
+$alter = time() - $pagetime;
+if ($alter > $maxsekunden) {
+    header("Location: ".$ziel);
+    exit;
+}
+
+//zu schnelle antworten sind ein botsignal: admin informieren und wie eine
+//falsche antwort behandeln
+$zuschnell = ($alter < $minsekunden);
+if ($zuschnell) {
+    @mail($GLOBALS['env_admin_email'], $sv_server_tag.'botcheck zu schnell ('.$alter.'s) user_id '.$_SESSION['ums_user_id'], time(), 'FROM: '.$GLOBALS['env_admin_email']);
+}
+
+if (!$zuschnell && (int)($_REQUEST['nummer'] ?? -1) === (int)$antwort) {
     //die sessionzeit aktualisieren
     $_SESSION['ums_session_start'] = time();
     //für den serverübergreifenden botschutz den wert in eine datei schreiben
@@ -20,39 +81,29 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
     fputs($botfile, $_SESSION['ums_session_start']);
     fclose($botfile);
 
-    //das ergebnis aus sicherheitsgr�nden l�schen
-    $_SESSION['loginzahl'] = md5(mt_rand(1000000, 2000000));
-
-    //den botaccess counter zur�cksetzen
+    //den botaccess counter zurücksetzen
     $_SESSION['botaccesscounter'] = 0;
 
-    //die Daten GET/POST/REQUEST zur�cksetzen
+    //die Daten GET/POST/REQUEST zurücksetzen
     $_SESSION['restore_botcheck_data'] = 1;
 
     //points zurücksetzen
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = 0 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
-    $sekundenbiszumlogout = ($_SESSION['ums_session_start'] + $sv_session_lifetime) - time();
-    $restminuten = floor($sekundenbiszumlogout / 60);
-    $restsekunden = $sekundenbiszumlogout - ($restminuten * 60);
-
-    //zur�ck auf die ursprungsdatei weiterleiten
-    if ($_SESSION['ums_bot_protection_filename'] == '') {
-        $_SESSION['ums_bot_protection_filename'] = 'overview.php';
-    }
-
-    header("Location: ".$_SESSION['ums_bot_protection_filename']);
+    //zurück auf die ursprungsdatei weiterleiten
+    header("Location: ".$ziel);
+    exit;
 } else { //botschutz falsch beantwortet
 
-    //fehlercounter erh�hen
+    //fehlercounter erhöhen
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET points = points + 1 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
-    //test ob man schon ie maximale fehleranzahl erreicht hat
+    //test ob man schon die maximale fehleranzahl erreicht hat
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT points FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     if (isset($row['points']) && $row['points'] >= 10) {
         $fehlermsg = $index_lang['falschesergebnisgesperrt'];
-        $time = strftime("%Y-%m-%d %H:%M:%S");
+        $time = date("Y-m-d H:i:s");
         $comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $rowz = mysqli_fetch_array($comment);
         $eintrag = "$rowz[kommentar]\nAutomatische Sperrung wegen Botverdacht. Botgrafik zu oft falsch gelöst. \n$time";
@@ -61,7 +112,7 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
 
         //Spieler informieren
         echo '<!DOCTYPE html>
-<html lang="de">        
+<html lang="de">
 <head>';
         include "cssinclude.php";
         echo '</head>';
@@ -75,7 +126,7 @@ if ($ergebnis == md5('night'.$_REQUEST['nummer'].'fall')) {
 
     //logout
 echo '<!DOCTYPE html>
-<html lang="de">        
+<html lang="de">
 <head>';
     include "cssinclude.php";
     echo '</head>';

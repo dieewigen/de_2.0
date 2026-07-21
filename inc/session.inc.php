@@ -96,7 +96,8 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
     }
 
     //dateiname speichern um später darauf weiterleiten zu können
-    $_SESSION['ums_bot_protection_filename'] = $_SERVER['PHP_SELF'];
+    //basename: PHP_SELF kann ueber PATH_INFO fremde zeichen enthalten (XSS/redirect)
+    $_SESSION['ums_bot_protection_filename'] = basename($_SERVER['PHP_SELF']);
 
     //beim ersten erscheinen des Botschutzes die $_GET/$_POST/$_REQUEST-Daten zwischenspeichern
     //unset($_SESSION['save_request']);
@@ -109,6 +110,14 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
     if (!isset($_SESSION['save_request'])) {
         $_SESSION['save_request'] =	$_REQUEST;
     }
+
+    //einmal-token fuer die antwort-links und zeitstempel der anzeige;
+    //eine evtl. vorher angezeigte aufgabe verfaellt beim neu-rendern,
+    //der imagegenerator erzeugt zum neuen token eine neue aufgabe
+    $_SESSION['botcheck_token'] = bin2hex(random_bytes(8));
+    $_SESSION['botcheck_page_time'] = time();
+    unset($_SESSION['botcheck_task']);
+    unset($_SESSION['botcheck_answer']);
 
 	echo '<meta http-equiv="expires" content="0">
 	</head>';
@@ -136,7 +145,7 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 	</tr>
 	<tr align="center">
 	<td height="25" class="rl">&nbsp;</td>
-	<td colspan="4"><a href="'.$_SESSION['ums_bot_protection_filename'].'"><img src="imagegenerator.php?dummy='.time().'" alt="Bild" border="0"></a></td>
+	<td colspan="4"><a href="'.htmlspecialchars($_SESSION['ums_bot_protection_filename']).'"><img src="imagegenerator.php?dummy='.$_SESSION['botcheck_token'].'" alt="Bild" border="0"></a></td>
 	<td class="rr">&nbsp;</td>
 	</tr>
 	<tr align="center">
@@ -145,8 +154,8 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 	<div style="width: 500px;">';
 
 	for ($botschutz_c = 1;$botschutz_c <= 100;$botschutz_c++) {
-		echo '<a href="botcheck.php?nummer='.$botschutz_c.'">
-		<div style="float:left; width: 48px; 
+		echo '<a href="botcheck.php?nummer='.$botschutz_c.'&t='.$_SESSION['botcheck_token'].'">
+		<div style="float:left; width: 48px;
 		border: 2px solid #666666; padding: 0px; margin-top: 3px; margin-left: 1px; margin-right: 1px; font-size: 26px; background-color: #111111; color: #FFFFFF; text-decoration: none; white-space:nowrap;
 		">'.$botschutz_c.'</div></a>';
 	}

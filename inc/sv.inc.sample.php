@@ -130,6 +130,11 @@ $GLOBALS['sv_global_start_zufall']=2000;
 $GLOBALS['sv_session_lifetime']=3700;
 //$GLOBALS['sv_session_lifetime']=20;
 
+//botschutz-antwortfenster in sekunden (optional, defaults stehen in botcheck.php:
+//schneller als minsec = botverdacht, aelter als maxsec = straffrei verfallen)
+//$GLOBALS['sv_botcheck_minsec']=2;
+//$GLOBALS['sv_botcheck_maxsec']=600;
+
 //zeit f�r den aktivit�tsbonus in sekunden
 $GLOBALS['sv_activetime']=3600;
 
