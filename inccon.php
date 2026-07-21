@@ -164,7 +164,14 @@ if (isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id'] > 0) {
     if ($eftachatbotdefensedisable != 1) { //kein chataufruf
         //update aus performancegründen nur alle 5 minuten
         if ($_SESSION["aktivitaet_time"] + 300 < time()) {
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_click=NOW(), last_ip=? WHERE user_id=? AND status=1", [$ip, $_SESSION['ums_user_id']]);
+            //bei aktiv beobachteten Usern (observation_stat = 1) wird die IP unmaskiert gespeichert
+            $last_ip = $ip;
+            $db_observation = mysqli_execute_query($GLOBALS['dbi'], "SELECT observation_stat FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]);
+            $row_observation = mysqli_fetch_array($db_observation);
+            if ($row_observation && $row_observation['observation_stat'] == 1) {
+                $last_ip = $_SERVER['REMOTE_ADDR'];
+            }
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_click=NOW(), last_ip=? WHERE user_id=? AND status=1", [$last_ip, $_SESSION['ums_user_id']]);
             $time = (int)date("H");
             $zeit = date("Y-m-d");
             mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_stat SET h{$time}='2' WHERE user_id=? AND datum=? AND h{$time}<'2'", [$_SESSION['ums_user_id'], $zeit]);

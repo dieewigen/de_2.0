@@ -253,13 +253,17 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
 
             //loginzeit und ip aktualisieren
             //ip loggen
-            $ip = getenv("REMOTE_ADDR");
-            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=NOW(), last_ip=?, logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id=?", [$ip, $_SESSION['ums_user_id']]);
+            //bei aktiv beobachteten Usern (observation_stat = 1) wird die IP unmaskiert gespeichert
+            $db_observation = mysqli_execute_query($GLOBALS['dbi'], "SELECT observation_stat FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]);
+            $row_observation = mysqli_fetch_array($db_observation);
+            $ip_adresse = $_SERVER['REMOTE_ADDR'];
+            if (!$row_observation || $row_observation['observation_stat'] != 1) {
+                $parts = explode(".", $ip_adresse);
+                $ip_adresse = $parts[0].'.x.'.($parts[2] ?? '?').'.'.($parts[3] ?? '?'); //IP anonymisieren, damit nicht jeder die IP sieht
+            }
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login=NOW(), last_ip=?, logins=logins+1, inaktmail = 0, delmode = 0 WHERE user_id=?", [$ip_adresse, $_SESSION['ums_user_id']]);
             $loginhelpstr = $_COOKIE["loginhelp"];
 
-            $ip_adresse = $_SERVER['REMOTE_ADDR'];
-            $parts = explode(".", $ip_adresse);
-            $ip_adresse = $parts[0].'.x.'.$parts[2].'.'.$parts[3];
             mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp) VALUES(?,?,NOW(), ?, ?)", [$_SESSION['ums_user_id'], $ip_adresse, $_SERVER['HTTP_USER_AGENT'], $loginhelpstr]);
 
             //Logout anzeige für den title
