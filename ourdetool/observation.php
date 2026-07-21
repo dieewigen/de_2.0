@@ -47,6 +47,15 @@ while ($de_user_data_obs = mysqli_fetch_assoc($db_daten)) {
     WHERE user_id = ?
   ", [$de_user_data_obs['user_id']]);
     $data_de_login = mysqli_fetch_assoc($de_login_db);
+
+    //unmaskierte IPs (gültige IP-Adresse, maskierte enthalten ".x.") zum Whois-Service verlinken
+    $last_ip = (string)$data_de_login['last_ip'];
+    if (filter_var($last_ip, FILTER_VALIDATE_IP)) {
+        $ip_anzeige = '<a href="https://www.whois.com/whois/' . htmlspecialchars($last_ip) . '" target="_blank" rel="noopener">' . htmlspecialchars($last_ip) . '</a>';
+    } else {
+        $ip_anzeige = htmlspecialchars($last_ip);
+    }
+
     switch ($data_de_login['status']) {
         case 0:
             $status = "vor Aktivierung";
@@ -70,7 +79,7 @@ while ($de_user_data_obs = mysqli_fetch_assoc($db_daten)) {
       <td align="center"><a href="idinfo.php?UID=' . $de_user_data_obs['user_id'] . '" target="_blank" rel="noopener">' . htmlspecialchars((string)$de_user_data_obs['spielername']) . '</a></td>
       <td align="center">' . $de_user_data_obs['sector'] . ':' . $de_user_data_obs['system'] . '</td>
       <td align="center">' . $allytag . '</td>
-      <td class="num">' . htmlspecialchars((string)$data_de_login['last_ip']) . '</td>
+      <td class="num">' . $ip_anzeige . '</td>
       <td align="center">' . $status . '</td>
       <td align="center">' . htmlspecialchars((string)$de_user_data_obs['observation_by']) . '</td>
       <td align="center"><a href="' . csrf_url('observation.php?uid=' . $de_user_data_obs['user_id']) . '" data-confirm="User ' . $de_user_data_obs['user_id'] . ' von der Beobachtungsliste entfernen?">entfernen</a></td>
