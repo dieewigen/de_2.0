@@ -19,23 +19,46 @@ $iy = 160;
 
 function imagegenerator_neue_aufgabe()
 {
+    //schwierigkeit: 1 = leicht (zweiter operand einstellig, kein zehneruebergang),
+    //2 = mittel (einstellig mit uebertrag), 3 = schwer (voller bereich bis 100).
+    //der produktionswert kann in der nicht versionierten sv.inc.php gesetzt werden
+    $schwierigkeit = $GLOBALS['sv_botcheck_schwierigkeit'] ?? 1;
+
     do {
-        if (random_int(0, 1) == 1) {
-            //plus: beide operanden mindestens 1, ergebnis maximal 100
-            $ergebnis = random_int(2, 100);
-            $a = random_int(1, $ergebnis - 1);
-            $b = $ergebnis - $a;
-            $operator = 'plus';
+        $operator = (random_int(0, 1) == 1) ? 'plus' : 'minus';
+
+        if ($schwierigkeit == 3) {
+            //voller bereich, ergebnis gleichverteilt
+            if ($operator == 'plus') {
+                $ergebnis = random_int(2, 100);
+                $a = random_int(1, $ergebnis - 1);
+                $b = $ergebnis - $a;
+            } else {
+                $ergebnis = random_int(1, 99);
+                $b = random_int(1, 100 - $ergebnis);
+                $a = $ergebnis + $b;
+            }
         } else {
-            //minus: a groesser b, ergebnis gleichverteilt 1 bis 99
-            $ergebnis = random_int(1, 99);
-            $b = random_int(1, 100 - $ergebnis);
-            $a = $ergebnis + $b;
-            $operator = 'minus';
+            //zweiter operand einstellig
+            $a = random_int(1, 99);
+            $b = random_int(1, 9);
+            $ergebnis = ($operator == 'plus') ? $a + $b : $a - $b;
         }
+
+        $gueltig = ($ergebnis >= 1 && $ergebnis <= 100);
+
+        //leicht: einerstellen muessen ohne zehneruebergang/borgen verrechenbar sein
+        if ($gueltig && $schwierigkeit == 1) {
+            if ($operator == 'plus') {
+                $gueltig = (($a % 10) + $b <= 9);
+            } else {
+                $gueltig = (($a % 10) >= $b);
+            }
+        }
+
         //zwei sehr lange zahlwoerter zusammen passen nicht lesbar ins bild
         $textlaenge = strlen($GLOBALS['zahl'][$a - 1]) + strlen($GLOBALS['zahl'][$b - 1]);
-    } while ($textlaenge > 26);
+    } while (!$gueltig || $textlaenge > 26);
 
     return array(
         'a' => $a,
@@ -98,7 +121,7 @@ function zeichne_zeile($bild, $text, $basislinie, $maxbreite)
     for ($i = 0; $i < $laenge; $i++) {
         $fonts[$i] = getcwd().'/fonts/font'.mt_rand(0, 9).'.ttf';
         $groessen[$i] = mt_rand(26, 36);
-        $w = mt_rand(3, 15);
+        $w = mt_rand(3, 12);
         $winkel[$i] = (mt_rand(1, 2) == 1) ? $w : -$w;
         $grau[$i] = mt_rand(170, 225);
     }
@@ -164,7 +187,7 @@ if ($aufgabe !== null) {
     /********************************************************
     *      Wellenfoermige Verzerrung des Schriftzugs        *
     *********************************************************/
-    $amplitude = mt_rand(6, 9);
+    $amplitude = mt_rand(4, 7);
     $wellenlaenge = mt_rand(120, 180);
     $phase = mt_rand(0, 628) / 100;
     for ($x = 0; $x < $ix; $x++) {
@@ -180,14 +203,14 @@ if ($aufgabe !== null) {
 *                                                           *
 *************************************************************/
 
-for ($k = 0; $k <= 3; $k++) {
+for ($k = 0; $k <= 2; $k++) {
     $g = mt_rand(150, 225);
     $decolor = imagecolorallocate($image, $g, $g, $g);
     imagesetthickness($image, mt_rand(2, 3));
     imageline($image, 0, mt_rand(20, $iy - 20), $ix, mt_rand(20, $iy - 20), $decolor);
 }
 
-for ($k = 0; $k <= 2; $k++) {
+for ($k = 0; $k <= 1; $k++) {
     $g = mt_rand(150, 225);
     $decolor = imagecolorallocate($image, $g, $g, $g);
     imagesetthickness($image, 2);
@@ -211,13 +234,13 @@ imagesetthickness($image, 1);
 *                                                           *
 *************************************************************/
 
-for ($k = 0; $k <= 4000; $k++) {
+for ($k = 0; $k <= 3000; $k++) {
     //helle pixel in den grautoenen der schrift
     $g = mt_rand(140, 210);
     imagesetpixel($image, mt_rand(0, $ix - 1), mt_rand(0, $iy - 1), imagecolorallocate($image, $g, $g, $g));
 }
 
-for ($k = 0; $k <= 3000; $k++) {
+for ($k = 0; $k <= 2200; $k++) {
     //dunkle pixel zum durchsieben der schrift
     $g = mt_rand(10, 60);
     imagesetpixel($image, mt_rand(0, $ix - 1), mt_rand(0, $iy - 1), imagecolorallocate($image, $g, $g, $g));

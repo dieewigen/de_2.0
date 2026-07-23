@@ -135,6 +135,10 @@ $GLOBALS['sv_session_lifetime']=3700;
 //$GLOBALS['sv_botcheck_minsec']=2;
 //$GLOBALS['sv_botcheck_maxsec']=600;
 
+//botschutz-schwierigkeit: 1=leicht (einstellig ohne zehneruebergang, default),
+//2=mittel (einstellig mit uebertrag), 3=schwer (voller bereich bis 100)
+//$GLOBALS['sv_botcheck_schwierigkeit']=1;
+
 //zeit f�r den aktivit�tsbonus in sekunden
 $GLOBALS['sv_activetime']=3600;
 
