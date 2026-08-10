@@ -1119,6 +1119,22 @@ function loadPlayerData($uid)
     return $data;
 }
 
+function isMetaOrAlly($ally_id1, $ally_id2): bool
+{
+    if ($ally_id1 > 0 && $ally_id2 > 0) {
+        if ($ally_id1 == $ally_id2) {
+            return true;
+        }
+        $sql = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = '$ally_id1' AND ally_id_2 = '$ally_id2' OR ally_id_1 = '$ally_id2' AND ally_id_2 = '$ally_id1' LIMIT 1;";
+        $query = mysqli_query($GLOBALS['dbi'], $sql);
+        $num = mysqli_num_rows($query);
+        if ($num > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function sf($name, $arrOpt, $selected, $class = "", $jsHandler = '')
 {
     $field = "<select name=\"$name\" id=\"$name\" class=\"$class\" $jsHandler>\n";

@@ -40,15 +40,19 @@ class NPCCommunication
      * Get all publicly available dialog types with their translated labels.
      * Labels are returned in the language matching the given locale (de or en).
      *
+     * @param string $playerId player ID of the human player requesting the dialog types
      * @param string $locale  BCP-47 locale string, e.g. 'de' or 'en'
      * @return array<array{type: string, label: string}>
      * @throws Exception
      */
-    public function getDialogTypes(string $locale = 'de'): array
+    public function getDialogTypes(string $playerId, string $locale = 'de'): array
     {
         try {
-            $res  = $this->client->request('GET', 'communication/v1/requests/dialog-types', [
+            $res  = $this->client->request('POST', 'communication/v1/requests/dialog-types', [
                 'headers' => ['Accept-Language' => $locale],
+                'json'    => [
+                    'playerId'   => $playerId
+                ],
             ]);
             $data = json_decode($res->getBody()->getContents(), true);
             return is_array($data) ? $data : [];
