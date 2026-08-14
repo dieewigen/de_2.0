@@ -129,7 +129,13 @@ try {
 
         // ----------------------------------------------------------
         case 'listDialogTypes':
-            $types = $npc->getDialogTypes(resolveLocale(), $playerId);
+            $npcId = isset($body['npcId']) ? (int) $body['npcId'] : 0;
+            if ($npcId <= 0) {
+                http_response_code(400);
+                echo json_encode(['ok' => false, 'error' => 'Missing npcId', 'code' => 'BAD_REQUEST']);
+                break;
+            }
+            $types = $npc->getDialogTypes($playerId, $npcId, resolveLocale());
             echo json_encode(['ok' => true, 'data' => $types]);
             break;
 
@@ -152,7 +158,7 @@ try {
             $npcSector = $npcInfo['sector'];
             $npcAllyId = $npcInfo['allyId'];
 
-            $availableTypes     = $npc->getDialogTypes(resolveLocale());
+            $availableTypes     = $npc->getDialogTypes($playerId, $npcId, resolveLocale());
             $allowedDialogTypes = array_column($availableTypes, 'type');
             if (!in_array($dialogType, $allowedDialogTypes, true)) {
                 http_response_code(400);
