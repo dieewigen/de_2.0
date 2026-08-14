@@ -130,7 +130,7 @@
             callback();
             return;
         }
-        bridge('listDialogTypes', {}, function (res) {
+        bridge('listDialogTypes', { npcId: alienId }, function (res) {
             if (res.ok && res.data) {
                 res.data.forEach(function (t) {
                     dialogTypeLabels[t.type] = t.label;
@@ -280,7 +280,7 @@
     function dispatchState(data) {
         if (!data) {
             // No existing request — load dialog types for selection
-            bridge('listDialogTypes', {}, function (res) {
+            bridge('listDialogTypes', { npcId: alienId }, function (res) {
                 if (!res.ok || !res.data || res.data.length === 0) {
                     showError(s.errLoad);
                     return;
@@ -298,7 +298,7 @@
             renderExpiredOrCancelled(st);
         } else {
             // Unknown state — show selector
-            bridge('listDialogTypes', {}, function (res) {
+            bridge('listDialogTypes', { npcId: alienId }, function (res) {
                 if (res.ok && res.data) renderSelect(res.data);
             });
         }
@@ -379,7 +379,7 @@
                 return;
             }
             // Reload dialog type selector for fresh request
-            bridge('listDialogTypes', {}, function (r) {
+            bridge('listDialogTypes', { npcId: alienId }, function (r) {
                 if (r.ok && r.data) renderSelect(r.data);
             });
         });
@@ -404,7 +404,7 @@
     function newRequest() {
         stopPolling();
         hideError();
-        bridge('listDialogTypes', {}, function (res) {
+        bridge('listDialogTypes', { npcId: alienId }, function (res) {
             if (res.ok && res.data) renderSelect(res.data);
         });
     }

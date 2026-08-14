@@ -1119,6 +1119,22 @@ function loadPlayerData($uid)
     return $data;
 }
 
+function isMetaOrAlly($ally_id1, $ally_id2): bool
+{
+    if ($ally_id1 > 0 && $ally_id2 > 0) {
+        if ($ally_id1 == $ally_id2) {
+            return true;
+        }
+        $sql = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = '$ally_id1' AND ally_id_2 = '$ally_id2' OR ally_id_1 = '$ally_id2' AND ally_id_2 = '$ally_id1' LIMIT 1;";
+        $query = mysqli_query($GLOBALS['dbi'], $sql);
+        $num = mysqli_num_rows($query);
+        if ($num > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function sf($name, $arrOpt, $selected, $class = "", $jsHandler = '')
 {
     $field = "<select name=\"$name\" id=\"$name\" class=\"$class\" $jsHandler>\n";
@@ -1187,6 +1203,54 @@ function formatMasseinheit($number, $precision = 2)
     $result = str_replace('.', ',', $result);
 
     return $result;
+}
+
+function array_msort($array, $cols)
+{
+    $colarr = array();
+    foreach ($cols as $col => $order) {
+        $colarr[$col] = array();
+        foreach ($array as $k => $row) {
+            $colarr[$col]['_'.$k] = strtolower($row[$col]);
+        }
+    }
+    $eval = 'array_multisort(';
+    foreach ($cols as $col => $order) {
+        $eval .= '$colarr[\''.$col.'\'],'.$order.',';
+    }
+    $eval = substr($eval, 0, -1).');';
+    eval($eval);
+    $ret = array();
+    foreach ($colarr as $col => $arr) {
+        foreach ($arr as $k => $v) {
+            $k = substr($k, 1);
+            if (!isset($ret[$k])) {
+                $ret[$k] = $array[$k];
+            }
+            $ret[$k][$col] = $array[$k][$col];
+        }
+    }
+    return $ret;
+
+}
+
+function array_orderby()
+{
+    //$sorted = array_orderby($data, 'volume', SORT_DESC, 'edition', SORT_ASC);
+    $args = func_get_args();
+    $data = array_shift($args);
+    foreach ($args as $n => $field) {
+        if (is_string($field)) {
+            $tmp = array();
+            foreach ($data as $key => $row) {
+                $tmp[$key] = $row[$field];
+            }
+            $args[$n] = $tmp;
+        }
+    }
+    $args[] = &$data;
+    call_user_func_array('array_multisort', $args);
+    return array_pop($args);
 }
 
 function SecureValue($value)

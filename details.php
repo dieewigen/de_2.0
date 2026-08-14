@@ -66,7 +66,7 @@ if (isset($_REQUEST['sn'])) {
 //Analysieren der Koordinaten, um userid vom ZIEL herauszubekommen
 $db_da = mysqli_execute_query(
     $GLOBALS['dbi'],
-    "SELECT user_id, allytag, sector, spielername, status, npc FROM de_user_data WHERE sector=? AND `system`=?",
+    "SELECT user_id, allytag, sector, spielername, status, npc, ally_id FROM de_user_data WHERE sector=? AND `system`=?",
     [$se, $sy]
 );
 $rew = mysqli_fetch_assoc($db_da);
@@ -74,6 +74,9 @@ if ($rew['user_id'] > 0) {
     $zuser_id = $rew['user_id'];
     $znpc = $rew['npc'];
 }
+//Meta or ally check
+$zallyId = $rew['ally_id'];
+$zIsMetaOrAlly = isMetaOrAlly($zallyId, $pd['ally_id']);
 
 //ggf. noch die owner_id auslesen
 if ($zuser_id > 0 && $zowner_id < 1) {
@@ -104,7 +107,7 @@ echo '<body class="theme-rasse' . $_SESSION['ums_rasse'] . ' ' . (($_SESSION['um
 include "resline.php";
 
 //wenn es der eigene Sektor und ein NPC Typ 2 ist, dann NPC-Details aller NPC im Sektor anzeigen
-if ($se == $sector && $znpc == 2) {
+if (($se == $sector || $zIsMetaOrAlly ) && $znpc == 2) {
 
     // ---------------------------------------------------------------
     // Single-Alien communication mode: ?dialog=1&se=X&sy=Y
@@ -271,6 +274,9 @@ if ($se == $sector && $znpc == 2) {
     $npcHTML='';
 
     while ($row = mysqli_fetch_assoc($db_daten)) {
+        if (!isMetaOrAlly($row['ally_id'], $pd['ally_id']) && $row['sector'] != $pd['sector']) {
+            continue;
+        }
         $npcHTML .= '
         <div class="npc-detail-card">
             <div class="header">

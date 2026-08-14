@@ -22,6 +22,7 @@ declare(strict_types=1);
 mb_internal_encoding('UTF-8');
 
 include 'inc/header.inc.php';
+include 'functions.php';
 
 // Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -56,26 +57,19 @@ function resolveLocale(): string
 }
 
 // ---------------------------------------------------------------
-// Helper: verify that the given npcId is actually an npc=2 account
-// in the same sector as the requesting player.
-// This is the same security rule as in details.php:107.
+// Helper: verify that the given NPC is either a meta or ally or sector mate of the requesting player.
 // ---------------------------------------------------------------
-function isValidSameSectorAlien(int $npcId, int $playerSector): bool
+function isSameSectorAllyOrMetaAlien(int $npcSector, int $playerSector, $npcAllyId, $playerAllyId): bool
 {
-    $result = mysqli_execute_query(
-        $GLOBALS['dbi'],
-        'SELECT user_id FROM de_user_data WHERE user_id=? AND npc=2 AND sector=?',
-        [$npcId, $playerSector]
-    );
-    return mysqli_num_rows($result) === 1;
+    return $npcSector === $playerSector || isMetaOrAlly($playerAllyId, $npcAllyId);
 }
 
 // ---------------------------------------------------------------
-// Load the requesting player's sector for security validation
+// Load the requesting player and npc for security validation
 // ---------------------------------------------------------------
 $playerData = mysqli_execute_query(
     $GLOBALS['dbi'],
-    'SELECT sector FROM de_user_data WHERE user_id=?',
+    'SELECT sector, ally_id FROM de_user_data WHERE user_id=?',
     [$playerId]
 );
 $playerRow = mysqli_fetch_assoc($playerData);
@@ -85,6 +79,7 @@ if (!$playerRow) {
     exit;
 }
 $playerSector = (int) $playerRow['sector'];
+$playerAllyId = (int) $playerRow['ally_id'];
 
 $npc = new NPCCommunication();
 
@@ -107,6 +102,26 @@ function sanitizeDialogResponse(?array $r): ?array
 }
 
 // ---------------------------------------------------------------
+// Helper: fetch NPC sector and ally_id from database
+// ---------------------------------------------------------------
+function getNpcSectorAndAlly(int $npcId): ?array
+{
+    $npcData = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        'SELECT sector, ally_id FROM de_user_data WHERE user_id=? AND npc=2',
+        [$npcId]
+    );
+    $npcRow = mysqli_fetch_assoc($npcData);
+    if (!$npcRow) {
+        return null;
+    }
+    return [
+        'sector' => (int) $npcRow['sector'],
+        'allyId' => (int) $npcRow['ally_id']
+    ];
+}
+
+// ---------------------------------------------------------------
 // Dispatch
 // ---------------------------------------------------------------
 try {
@@ -114,7 +129,13 @@ try {
 
         // ----------------------------------------------------------
         case 'listDialogTypes':
-            $types = $npc->getDialogTypes(resolveLocale());
+            $npcId = isset($body['npcId']) ? (int) $body['npcId'] : 0;
+            if ($npcId <= 0) {
+                http_response_code(400);
+                echo json_encode(['ok' => false, 'error' => 'Missing npcId', 'code' => 'BAD_REQUEST']);
+                break;
+            }
+            $types = $npc->getDialogTypes($playerId, $npcId, resolveLocale());
             echo json_encode(['ok' => true, 'data' => $types]);
             break;
 
@@ -128,8 +149,16 @@ try {
                 echo json_encode(['ok' => false, 'error' => 'Missing npcId or dialogType', 'code' => 'BAD_REQUEST']);
                 break;
             }
+            $npcInfo = getNpcSectorAndAlly($npcId);
+            if (!$npcInfo) {
+                http_response_code(403);
+                echo json_encode(['ok' => false, 'error' => 'Alien not found', 'code' => 'FORBIDDEN']);
+                exit;
+            }
+            $npcSector = $npcInfo['sector'];
+            $npcAllyId = $npcInfo['allyId'];
 
-            $availableTypes     = $npc->getDialogTypes(resolveLocale());
+            $availableTypes     = $npc->getDialogTypes($playerId, $npcId, resolveLocale());
             $allowedDialogTypes = array_column($availableTypes, 'type');
             if (!in_array($dialogType, $allowedDialogTypes, true)) {
                 http_response_code(400);
@@ -137,7 +166,7 @@ try {
                 break;
             }
 
-            if (!isValidSameSectorAlien($npcId, $playerSector)) {
+            if (!isSameSectorAllyOrMetaAlien($npcSector, $playerSector, $npcAllyId, $playerAllyId)) {
                 http_response_code(403);
                 echo json_encode(['ok' => false, 'error' => 'Invalid alien target', 'code' => 'FORBIDDEN']);
                 break;
@@ -167,7 +196,16 @@ try {
                 break;
             }
 
-            if (!isValidSameSectorAlien($npcId, $playerSector)) {
+            $npcInfo = getNpcSectorAndAlly($npcId);
+            if (!$npcInfo) {
+                http_response_code(403);
+                echo json_encode(['ok' => false, 'error' => 'Alien not found', 'code' => 'FORBIDDEN']);
+                exit;
+            }
+            $npcSector = $npcInfo['sector'];
+            $npcAllyId = $npcInfo['allyId'];
+
+            if (!isSameSectorAllyOrMetaAlien($npcSector, $playerSector, $npcAllyId, $playerAllyId)) {
                 http_response_code(403);
                 echo json_encode(['ok' => false, 'error' => 'Invalid alien target', 'code' => 'FORBIDDEN']);
                 break;
@@ -191,7 +229,16 @@ try {
                 break;
             }
 
-            if (!isValidSameSectorAlien($npcId, $playerSector)) {
+            $npcInfo = getNpcSectorAndAlly($npcId);
+            if (!$npcInfo) {
+                http_response_code(403);
+                echo json_encode(['ok' => false, 'error' => 'Alien not found', 'code' => 'FORBIDDEN']);
+                exit;
+            }
+            $npcSector = $npcInfo['sector'];
+            $npcAllyId = $npcInfo['allyId'];
+
+            if (!isSameSectorAllyOrMetaAlien($npcSector, $playerSector, $npcAllyId, $playerAllyId)) {
                 http_response_code(403);
                 echo json_encode(['ok' => false, 'error' => 'Invalid alien target', 'code' => 'FORBIDDEN']);
                 break;
