@@ -20,7 +20,7 @@ class GetSectorStatus
                                    WHERE (zielsec = ? OR (dud_target.ally_id != 0 AND (dud_target.ally_id = ? OR dud_target.ally_id = ?) AND dud_target.show_ally_secstatus > ?))
                                    AND entdecktsec = 1 AND (aktion = 1 OR aktion = 2)";
 
-    const string GET_SECTOR_FLEETS_SQL = "SELECT duf.hsec, duf.hsys, duf.aktion, duf.zeit, duf.e81, duf.e82, duf.e83, duf.e83,
+    const string GET_SECTOR_FLEETS_SQL = "SELECT duf.hsec, duf.hsys, duf.zielsec, duf.zielsys, duf.showfleettarget, duf.aktion, duf.zeit, duf.e81, duf.e82, duf.e83, duf.e83,
                                    duf.e84, duf.e85, duf.e86, duf.e87, duf.e88, duf.e89, duf.e90, dud_source.rasse
                                    FROM de_user_fleet duf
                                    JOIN de_user_data dud_source on duf.hsec = dud_source.sector AND duf.hsys = dud_source.`system`
@@ -71,7 +71,11 @@ class GetSectorStatus
         $fleetStatuses = array();
         foreach ($rows as $row) {
             $fleetPoints = $this->calculateFp($row);
-            $fleetEntry = new SectorFleet($row['hsec'], $row['hsys'], $row['zeit'], $fleetPoints, $row['aktion']);
+            if ($row['showfleettarget'] == 1) {
+                $fleetEntry = new SectorFleet($row['zielsec'], $row['zielsys'], $row['hsec'], $row['hsys'], $row['zeit'], $fleetPoints, $row['aktion']);
+            } else{
+                $fleetEntry = new SectorFleet(0, 0, $row['hsec'], $row['hsys'], $row['zeit'], $fleetPoints, $row['aktion']);
+            }
             $fleetStatuses[] = $fleetEntry;
         }
         return $fleetStatuses;
