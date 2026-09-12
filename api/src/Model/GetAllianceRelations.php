@@ -29,7 +29,8 @@ class GetAllianceRelations
             $wars[] = new AllianceWar(
                 (int)$row['ally_id_angreifer'],
                 (int)$row['ally_id_angegriffener'],
-                $row['friedensangebot'] != 0
+                $row['friedensangebot'] != 0,
+                $row['friedensangebot']
             );
         }
 
