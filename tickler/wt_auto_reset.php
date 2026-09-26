@@ -107,5 +107,15 @@ mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_techs`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_trade`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "ALTER TABLE `de_user_trade` AUTO_INCREMENT = 1;", []);
 
+use DieEwigen\DE2\Model\Npc\NPCServerControl;
+
+try {
+    $npcServerControl = new NPCServerControl();
+    $npcServerControl->resetRound();
+    echo "NPCs have been reset successfully.";
+} catch (\Exception $e) {
+    echo "Error resetting NPCs: " . $e->getMessage();
+}
+
 echo '<hr>';
 ?>

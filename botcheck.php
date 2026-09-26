@@ -7,7 +7,11 @@ include 'inc/lang/'.$sv_server_lang.'_botcheck.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_index.lang.php';
 include 'inccon.php';
 
-$_SESSION['ums_user_id'] = $_SESSION['ums_user_id'] ?? -1;
+if(!isset($_SESSION['ums_user_id'])) {
+    //wenn man nicht eingeloggt ist, dann zurueck auf die index.php, wo über session.inc.php ein neuer login erzwungen wird
+    header('Location: index.php');
+    exit;
+}
 
 //antwortfenster: schneller als $minsekunden schafft kein mensch (bild laden,
 //aufgabe lesen, rechnen, button suchen), aelter als $maxsekunden ist verfallen.
