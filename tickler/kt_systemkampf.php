@@ -318,6 +318,14 @@ for ($c = 0; $c < $z; $c++) {
     // Flotten des Angegriffenen Laden
     ///////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////
+
+    //Daten des Zielsystems direkt laden, damit npc/Name/Rasse nicht vom vorherigen Kampfsystem
+    //stehen bleiben, falls in der Flottenschleife keine Heimatflotte gefunden wird
+    $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT rasse, spielername, npc FROM de_user_data WHERE sector = ? AND `system` = ?", [$zsec, $zsys]);
+    $ziel_data = mysqli_fetch_array($result);
+    $npc = $ziel_data["npc"];
+    $spielername = $ziel_data["spielername"];
+
     $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90,
   komatt, komdef, hsec, hsys, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3, artid4, artlvl4, artid5, artlvl5, artid6, artlvl6
   FROM de_user_fleet where hsec = $zsec AND hsys = $zsys AND (aktion = 0 OR (aktion = 3 AND zeit = 1)) ORDER BY user_id");
@@ -334,8 +342,6 @@ for ($c = 0; $c < $z; $c++) {
         $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT rasse, spielername, npc, spec1, spec2, spec3, spec4, spec5 FROM de_user_data WHERE sector = '$rsec' and `system` = '$rsys'");
         $db_data = mysqli_fetch_array($result);
         $d_userdata[$anz_deffer][3] = $db_data["rasse"];
-        $spielername = $db_data["spielername"];
-        $npc = $db_data["npc"];
         $d_userdata[$anz_deffer]['spec1'] = $db_data['spec1'];
         $d_userdata[$anz_deffer]['spec2'] = $db_data['spec2'];
         $d_userdata[$anz_deffer]['spec3'] = $db_data['spec3'];
@@ -404,19 +410,19 @@ for ($c = 0; $c < $z; $c++) {
         }
         $anz_deffer++;
     }
-    if ($db_data["rasse"] == 1) {
+    if ($ziel_data["rasse"] == 1) {
         $rflag = 'E';
-    } elseif ($db_data["rasse"] == 2) {
+    } elseif ($ziel_data["rasse"] == 2) {
         $rflag = 'I';
-    } elseif ($db_data["rasse"] == 3) {
+    } elseif ($ziel_data["rasse"] == 3) {
         $rflag = 'K';
-    } elseif ($db_data["rasse"] == 4) {
+    } elseif ($ziel_data["rasse"] == 4) {
         $rflag = 'Z';
-    } elseif ($db_data["rasse"] == 5) {
+    } elseif ($ziel_data["rasse"] == 5) {
         $rflag = 'D';
     }
 
-    $defferliste = $spielername.' ['.$rflag.']('.$rsec.':'.$rsys.')';
+    $defferliste = $spielername.' ['.$rflag.']('.$zsec.':'.$zsys.')';
 
     ///////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////
