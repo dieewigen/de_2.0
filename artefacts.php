@@ -829,7 +829,7 @@ if (!hasTech($pt, 28)) {
     // basisschiffe
     ///////////////////////////////////////////////////
     //echo '<br>';
-    $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen 3 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
+    $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen je nach erforschten Artefaktpl&auml;tzen bis zu 6 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
     rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="gp/g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"> Basisschiffartefakte');
     echo '<div class="cell" style="width: 576px; height: 300px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
 

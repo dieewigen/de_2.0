@@ -869,7 +869,7 @@ class map_system{
 				}
 
 				if(in_array($this->system_typ,array(4))){//Battleground
-					$content.='Durch den Weltraumhafen hast Du Zugriff auf dieses Battleground-System.<br>&Uuml;ber den Men&uuml;punkt "Basisstern" sind weitere Aktionen m&ouml;glich.';
+					$content.='Durch den Weltraumhafen hast Du Zugriff auf dieses Battleground-System.<br>Deinen Basisstern erreichst Du auf der Produktionsseite &uuml;ber das Symbol "Basisstern".';
 				}
 
 			}

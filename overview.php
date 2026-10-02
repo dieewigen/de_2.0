@@ -833,7 +833,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             //$text1=$ov_lang['ac_ziel11_1'];
             //$text2=$ov_lang['ac_ziel11_2'];
             $text1 = 'Erreiche den gew&uuml;nschten Tronic-Einzahlungsstatus bei Deiner Allianz';
-            $text2 = 'Den Wert kannst Du unter unter Allianz -> Finanzen einsehen und dort Tronic spenden. Du erh&auml;ltst Tronic per Zufall, &uuml;ber Artefakte, durch Missionen und im Handel.';
+            $text2 = 'Den Wert kannst Du unter Allianz -> Finanzen einsehen und dort Tronic spenden. Du erh&auml;ltst Tronic per Zufall, &uuml;ber Artefakte, durch Missionen und in der Auktion.';
             break;
         case 10: //kopfgeld erbeuten
             $ac_table_field = 'ac12';

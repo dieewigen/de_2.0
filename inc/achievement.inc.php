@@ -372,6 +372,7 @@ if($sv_deactivate_vsystems==1){
 	$stufen=round($sv_winscore/1440);
 }
 $mbelohnung=1000000*$ac_prozent;
+$rewards17=array(); //bei deaktivierten V-Systemen gibt es keine Stufen, die Liste muss trotzdem existieren
 for($index=0;$index<$stufen;$index++){
 	$rewards17[$index][0]=100/$stufen*($index+1); //zu erreichender wert
 	@$rewards17[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
@@ -386,6 +387,7 @@ if($sv_deactivate_vsystems==1){
 	$stufen=round($sv_winscore/1440);
 }
 $mbelohnung=20000000*$ac_prozent;
+$rewards18=array();
 for($index=0;$index<$stufen;$index++){
 	$rewards18[$index][0]=1000/$stufen*($index+1); //zu erreichender wert
 	@$rewards18[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
@@ -400,6 +402,7 @@ if($sv_deactivate_vsystems==1){
 	$stufen=round($sv_winscore/1440);
 }
 $mbelohnung=40000000*$ac_prozent;
+$rewards19=array();
 for($index=0;$index<$stufen;$index++){
 	$rewards19[$index][0]=500/$stufen*($index+1); //zu erreichender wert
 	@$rewards19[$index][1]=round(($mbelohnung/($stufen+1))*($index+1)/($stufen/2)); //belohnung in M
