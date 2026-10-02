@@ -70,12 +70,13 @@ $db_da = mysqli_execute_query(
     [$se, $sy]
 );
 $rew = mysqli_fetch_assoc($db_da);
-if ($rew['user_id'] > 0) {
+$znpc = 0;
+if (($rew['user_id'] ?? 0) > 0) {
     $zuser_id = $rew['user_id'];
     $znpc = $rew['npc'];
 }
 //Meta or ally check
-$zallyId = $rew['ally_id'];
+$zallyId = $rew['ally_id'] ?? 0;
 $zIsMetaOrAlly = isMetaOrAlly($zallyId, $pd['ally_id']);
 
 //ggf. noch die owner_id auslesen

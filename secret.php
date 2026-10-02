@@ -258,7 +258,7 @@ if (hasTech($pt, 9)) {
         //transaktionsbeginn
         if (setLock($_SESSION['ums_user_id'])) {
             for ($i = 110; $i <= 111; $i++) {
-                $h = intval($_POST['b'.$i]);
+                $h = intval($_POST['b'.$i] ?? 0);
                 if ($h >= 1) { //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags
                     $tech_id = $i;
                     //baukosten
@@ -1199,6 +1199,7 @@ if (!hasTech($pt, 9)) {
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET rasse=? WHERE user_id=? AND zuser_id=? AND rasse=0", [$rasse, $save_uid, $uid]);
                     }
 
+                    $emsg = '';
                     switch ($etyp) {
                         case 0: //schiffsübersicht
                             //zaehle alle schiffe, die schon vorhanden sind - anfang

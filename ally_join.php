@@ -224,8 +224,8 @@ if($ok || $warnung || $npc==2){
 		[$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 
-	$antrag_allyname = $row["allyname"];
-	$antrag_antrag 	 = $row["antrag"];
+	$antrag_allyname = $row["allyname"] ?? '';
+	$antrag_antrag 	 = $row["antrag"] ?? '';
 
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT * FROM de_allys ORDER BY allyname ASC");

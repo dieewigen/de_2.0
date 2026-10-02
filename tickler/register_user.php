@@ -770,7 +770,7 @@ function reshuffle()
     //akti pro sektor
     $sektor_akti = array();
     foreach ($daten as $user) {
-        $sektor_akti[$user['sector']]['akti'] += $user['akti'];
+        $sektor_akti[$user['sector']]['akti'] = ($sektor_akti[$user['sector']]['akti'] ?? 0) + $user['akti'];
         //$sektor_akti[$user['sektor_aktuell']]['akti']+=$user['akti'];
 
         //echo '<br>Se: '.$user['sector'];

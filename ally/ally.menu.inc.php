@@ -170,7 +170,7 @@ function print_NOBODY_ally_bar(){
 		$ally_id=$row['ally_id'];
 		
 		//�berpr�fen ob man die bewerbung stornieren m�chte
-		if($_REQUEST['stornobewerbung'])
+		if(!empty($_REQUEST['stornobewerbung']))
 		{
 			//allianz informieren
 			$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$ally_id]);
