@@ -11,6 +11,7 @@ $rpc_lang['spaet4']=' Dyharra als Späteinsteigerbonus.';
 $rpc_lang['accountalter']='Accountalter';
 $rpc_lang['allianz']='Allianz';
 $rpc_lang['credits']='Credits';
+$rpc_lang['exilinfo']='Das System ruht im Exil in Sektor 1, Fluxurion haelt dort die Stellung bis zur Rueckkehr. Im Exil seit';
 $rpc_lang['lastactive']='Letzte Aktion';
 $rpc_lang['loeschinfo']='Der Account befindet sich bis zum folgenden Zeitpunkt im Loeschmodus und wird danach vom Wirtschaftstick entfernt, wobei ein Loginversuch den Loeschmodus in einen Urlaubsmodus umwandelt';
 $rpc_lang['punkte']='Punkte';

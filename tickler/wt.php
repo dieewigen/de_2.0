@@ -5,6 +5,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
 use DieEwigen\DE2\Model\Tick\TickSpendCollectorFromSector1;
 use DieEwigen\DE2\Model\Tick\TickGiveSecBuildingsToNPC2;
+use DieEwigen\DE2\Model\Tick\TickExileReports;
+use DieEwigen\DE2\Model\Exile\ExileService;
+use DieEwigen\DE2\Model\Exile\ExileMail;
 
 set_time_limit(240);
 $directory = '../';
@@ -21,6 +24,9 @@ include_once $directory."inccon.php";
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
+//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang und $sv_link müssen hier definiert sein
+include $directory."inc/lang/".$sv_server_lang."_exile.lang.php";
+include $directory."inc/".$sv_server_lang."_links.inc.php";
 include_once $directory."inc/sabotage.inc.php";
 include_once $directory."inc/allyjobs.inc.php";
 include_once $directory."lib/map_system_defs.inc.php";
@@ -1048,21 +1054,29 @@ if ($doetick == 1) {
     $datum = date("YmdHis", $tis);
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper where time < ? and archiv=0", [$datum]);
 
-    //inaktive accounts 24 stunden vor l�schung per mail benachrichtigen
-    //emaitext
-    $betreff = $wt_lang['inaktivenmailbetreff'].$sv_server_tag.' - '.$sv_server_name;
-    $emailtext = $wt_lang['inaktivenmailbody'];
+    //inaktive accounts 24 stunden vor dem Parken in Sektor 1 per mail benachrichtigen (Fluxurion der Berater)
+    $exileService = new ExileService($GLOBALS['dbi']);
+    $exileMail = new ExileMail($exile_lang, $sv_server_name, $sv_server_tag, $GLOBALS['sv_server_url'] ?? '', $sv_link[1]);
 
     $tis = time() - (86400 * ($sv_inactiv_deldays - 1));
     $datum = date("Y-m-d H:i:s", $tis);
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.reg_mail FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND inaktmail = 0 AND de_login.status=1", [$datum]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.reg_mail, de_user_data.spielername, de_user_data.col FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND inaktmail = 0 AND de_login.status=1", [$datum]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $uid = $row["user_id"];
-        $reg_mail = $row["reg_mail"];
 
-        @mail_smtp($reg_mail, $betreff, $emailtext);
+        $mail = $exileMail->render('vorab', ['name' => $row['spielername'], 'days' => $sv_inactiv_deldays - 1, 'col' => $row['col']]);
+        @$exileMail->send($row["reg_mail"], $mail);
         //damit er nur einmal die mail bekommt inaktmail auf 1 setzen
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET inaktmail = 1 WHERE user_id = ?", [$uid]);
+    }
+
+    //Lageberichte an Spieler im Exil, gedrosselt auf höchstens eine Mail pro Tick
+    //Fehler dürfen den Wirtschaftstick nicht aufhalten
+    echo '<br>Lageberichte aus Sektor 1<br>';
+    try {
+        print_r(new TickExileReports($GLOBALS['dbi'], $exileService, $exileMail)->run());
+    } catch (\Throwable $e) {
+        echo 'Fehler bei den Lageberichten: '.$e->getMessage();
     }
 
     //inaktive accounts l�schen
@@ -1083,10 +1097,11 @@ if ($doetick == 1) {
         $datum = date("Y-m-d H:i:s", $tis);
         $time = strftime("%Y%m%d%H%M%S");
 
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system` FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", [$datum]);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.reg_mail, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system` FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", [$datum]);
 
         while ($row = mysqli_fetch_array($db_daten)) {
             $uid = $row["user_id"];
+            $reg_mail = $row["reg_mail"];
             $sector = $row["sector"];
             $system = $row["system"];
             $delmode = $row["delmode"];
@@ -1108,6 +1123,13 @@ if ($doetick == 1) {
 
                 //den account danach in sektor 1 stecken
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=0, system=0, spend01=0, spend02=0, spend03=0, spend04=0, spend05=0, votefor=0, secstatdisable=0 WHERE user_id = ?", [$uid]);
+
+                //Exil-Akte anlegen, Fluxurion hält ab jetzt die Stellung (ungekappte Kollektorzahl)
+                try {
+                    $exileService->registerExile($uid, $sector, $col);
+                } catch (\Throwable $e) {
+                    echo 'Fehler beim Anlegen der Exil-Akte: '.$e->getMessage();
+                }
 
                 //dem sektor die kollektoren gutschreiben
                 if ($col > 75) {
@@ -1199,6 +1221,11 @@ if ($doetick == 1) {
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_info WHERE user_id=?", [$uid]);
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? or (sector=? and `system`=?)", [$uid, $sector, $system]);
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger = ?", [$uid]);
+                try {
+                    $exileService->deleteExile($uid);
+                } catch (\Throwable $e) {
+                    echo 'Fehler beim Löschen der Exil-Akte: '.$e->getMessage();
+                }
 
                 $fleet_id = $uid.'-0';
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_fleet WHERE user_id=?", [$fleet_id]);

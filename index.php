@@ -266,6 +266,14 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
 
             mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_ip (user_id,ip,time,browser, loginhelp) VALUES(?,?,NOW(), ?, ?)", [$_SESSION['ums_user_id'], $ip_adresse, $_SERVER['HTTP_USER_AGENT'], $loginhelpstr]);
 
+            //Rückkehr aus dem Exil in Sektor 1: Exilreserve übergeben, Allianz informieren
+            include_once 'inc/lang/'.$sv_server_lang.'_exile.lang.php';
+            try {
+                (new \DieEwigen\DE2\Model\Exile\ExileService($GLOBALS['dbi']))->processReturn((int)$_SESSION['ums_user_id'], $exile_lang);
+            } catch (\Throwable $e) {
+                error_log('Exil-Rueckkehr fehlgeschlagen: '.$e->getMessage());
+            }
+
             //Logout anzeige für den title
             $sekundenbiszumlogout = ($_SESSION['ums_session_start'] + $sv_session_lifetime) - time();
             $restminuten = floor($sekundenbiszumlogout / 60);

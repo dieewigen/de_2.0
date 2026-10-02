@@ -4,6 +4,7 @@ include('inc/header.inc.php');
 //require_once('lib/phpmailer/class.smtp.php');
 include('functions.php');
 include('inc/lang/'.$sv_server_lang.'_options.lang.php');
+include('inc/lang/'.$sv_server_lang.'_exile.lang.php');
 
 $errmsg = '';
 $getpamsg = '';
@@ -41,10 +42,11 @@ $trade_reminder = $row['trade_reminder'];
 
 //owner id auslesen
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], 
-  "SELECT owner_id FROM de_login WHERE user_id=?", 
+  "SELECT owner_id, lageberichte FROM de_login WHERE user_id=?", 
   [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($db_daten);
 $owner_id = intval($row['owner_id']);
+$lageberichte = intval($row['lageberichte']);
 
 //maximalen tick auslesen
 //$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data");
@@ -108,10 +110,14 @@ if (isset($_POST['graop'])) {
         $chatglobal = intval($_POST['chatglobal'] ?? 0);
         $helper = intval($_POST['helper'] ?? 0);
         $traderem = intval($_POST['traderem'] ?? 0);
+        $lageberichte = intval($_POST['lageberichte'] ?? 0) === 1 ? 1 : 0;
 
         mysqli_execute_query($GLOBALS['dbi'], 
           "UPDATE de_user_data SET chatoff=?, chatoffallg=?, chatoffglobal=?, helper=?, trade_reminder=? WHERE user_id=?", 
           [$chat, $chatallg, $chatglobal, $helper, $traderem, $_SESSION['ums_user_id']]);
+        mysqli_execute_query($GLOBALS['dbi'], 
+          "UPDATE de_login SET lageberichte=? WHERE user_id=?", 
+          [$lageberichte, $_SESSION['ums_user_id']]);
         $errmsg .= $options_lang['uebernommen'];
         $chatoff = $chat;
         $chatoffallg = $chatallg;
@@ -424,6 +430,17 @@ echo 'value="1"></td>
 <td>Missionshilfe aktivieren</td>
 <td><input type="Checkbox" name="traderem"';
 if ($trade_reminder == 1) {
+    echo "checked ";
+}
+echo 'value="1"></td>
+<td width="13" class="rr">&nbsp;</td>
+</tr>
+
+<tr align="center">
+<td width="13" height="25" class="rl">&nbsp;</td>
+<td>'.$exile_lang['option_lageberichte'].'</td>
+<td><input type="Checkbox" name="lageberichte"';
+if ($lageberichte == 1) {
     echo "checked ";
 }
 echo 'value="1"></td>

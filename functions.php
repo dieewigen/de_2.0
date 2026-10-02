@@ -1959,13 +1959,14 @@ function reumlaut($fieldname)
     return $fieldname;
 }
 
-function mail_smtp($empfaenger, $subject, $body, $absender = '')
+function mail_smtp($empfaenger, $subject, $body, $absender = '', array $headers = [])
 {
     if(empty($absender)){
         $absender = $GLOBALS['env_mail_noreply'];
     }
 
     $mail = new PHPMailer\PHPMailer\PHPMailer();
+    $mail->CharSet = PHPMailer\PHPMailer\PHPMailer::CHARSET_UTF8;
 
     $mail->isSMTP();
     $mail->SMTPDebug = 0; // SMTP-Debug auf 3 für maximalen Output
@@ -1988,8 +1989,12 @@ function mail_smtp($empfaenger, $subject, $body, $absender = '')
     
     $mail->Body = $body;
 
+    //zusätzliche Header, z. B. List-Unsubscribe
+    foreach ($headers as $name => $value) {
+        $mail->addCustomHeader($name, $value);
+    }
 
-    $mail->send();
+    return $mail->send();
 }
 function utf8_encode_fix($string)
 {

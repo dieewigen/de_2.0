@@ -31,6 +31,7 @@ $GLOBALS['env_db_dieewigen_database']='';
 $GLOBALS['env_mail_server']='';
 $GLOBALS['env_mail_user']='';
 $GLOBALS['env_mail_password']='';
+$GLOBALS['env_mail_noreply']='';
 
 //Discord Webhooks
 $GLOBALS['webhooks']=array();

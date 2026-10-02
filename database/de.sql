@@ -604,6 +604,9 @@ CREATE TABLE `de_login` (
   `cooperation` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Lageberichte von Fluxurion per E-Mail erwünscht (1) oder abbestellt (0)
+ALTER TABLE `de_login` ADD `lageberichte` TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER `delmode`;
+
 -- --------------------------------------------------------
 
 --
@@ -4230,6 +4233,44 @@ CREATE TABLE `de_user_data` (
   `bgscore4` int(11) NOT NULL DEFAULT 0,
   `vs_auto_explore` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_user_exile`
+-- Exil-Akte inaktiver Spieler, die in Sektor 1 geparkt wurden (Lageberichte, Exilreserve, Heimkehr)
+--
+
+CREATE TABLE `de_user_exile` (
+  `user_id` mediumint(9) NOT NULL,
+  `since` datetime NOT NULL,
+  `from_sector` int(11) NOT NULL DEFAULT 0,
+  `col_at_exile` int(11) NOT NULL DEFAULT 0,
+  `wt_at_exile` int(11) NOT NULL DEFAULT 1,
+  `round_start` date DEFAULT NULL,
+  `reports_sent` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `newround_sent` date DEFAULT NULL,
+  `last_mail_at` datetime DEFAULT NULL,
+  `returned_at` datetime DEFAULT NULL,
+  `reserve_m` bigint(20) NOT NULL DEFAULT 0,
+  `reserve_d` bigint(20) NOT NULL DEFAULT 0,
+  `closed` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `optout_token` char(32) NOT NULL DEFAULT '',
+  PRIMARY KEY (`user_id`),
+  KEY `last_mail_at` (`last_mail_at`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Einmalig beim Update eines laufenden Servers: bereits geparkte Konten übernehmen.
+-- Das Parkdatum ergibt sich aus last_login (beim Parken auf jetzt + 4000 Tage gesetzt, tickler/wt.php).
+-- reports_sent zählt die schon verstrichenen Berichtstermine (Standard 3/14/45 Tage), damit nichts nachgeholt wird.
+-- newround_sent bleibt NULL, damit diese Konten den Bericht zur laufenden Runde bekommen.
+-- Das Abmelde-Token wird beim ersten Versand in PHP erzeugt (random_bytes).
+INSERT IGNORE INTO `de_user_exile` (`user_id`, `since`, `from_sector`, `col_at_exile`, `wt_at_exile`, `round_start`, `reports_sent`, `newround_sent`)
+SELECT l.user_id, l.last_login - INTERVAL 4000 DAY, 0, d.col, 1, (SELECT rundenstart_datum FROM de_system LIMIT 1),
+  (DATEDIFF(NOW(), l.last_login - INTERVAL 4000 DAY) >= 3) + (DATEDIFF(NOW(), l.last_login - INTERVAL 4000 DAY) >= 14) + (DATEDIFF(NOW(), l.last_login - INTERVAL 4000 DAY) >= 45),
+  NULL
+FROM de_login l LEFT JOIN de_user_data d ON (d.user_id = l.user_id)
+WHERE l.status = 3 AND l.delmode = 2 AND d.npc = 0;
 
 -- --------------------------------------------------------
 

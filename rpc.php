@@ -111,6 +111,8 @@ if(isset($_REQUEST["getaccountdata"]) && $_REQUEST["getaccountdata"]==1)
     
     if($accstatus==3 AND $delmode==0)echo $rpc_lang['urlaubinfo'].': '.$last_login;
     if($accstatus==3 AND $delmode==1)echo $rpc_lang['loeschinfo'].': '.$last_login;
+    //im Exil: last_login wurde beim Parken auf jetzt + 4000 Tage gesetzt (tickler/wt.php)
+    if($accstatus==3 AND $delmode==2)echo $rpc_lang['exilinfo'].': '.date("d.m.Y", strtotime($row['last_login']) - 4000 * 86400);
     if($accstatus==2)echo $rpc_lang['sperrinfo'].': '.$supporter;
     
   }

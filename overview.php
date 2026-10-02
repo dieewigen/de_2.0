@@ -109,9 +109,25 @@ $aktdate = date("d.m. H:i", $filetime);
 
 //ausgabe der einzelnen positionen
 
-//wenn sektor 1, dann info über startsektor
+//Heimkehr aus dem Exil: Fluxurion meldet sich anstelle der Info über den Startsektor
+include_once 'inc/lang/'.$sv_server_lang.'_exile.lang.php';
+$exileText = '';
+try {
+    $exileService = new \DieEwigen\DE2\Model\Exile\ExileService($GLOBALS['dbi']);
+    $exileText = $exileService->overviewText((int)$_SESSION['ums_user_id'], (int)$sector, (int)$col, (float)$punkte, $exile_lang);
+} catch (\Throwable $e) {
+    error_log('Exil-Box fehlgeschlagen: '.$e->getMessage());
+}
 
-if ($sector == 1) {
+if ($exileText !== '') {
+    rahmen_oben($exile_lang['box_titel']);
+    echo '<div class="cell" style="width: 560px; min-height: 256px; font-size: 14px; overflow: hidden;">';
+    echo '<div style="float: left; margin-right: 10px;"><img src="gp/g/berater5.png" border="0" alt=""></div>';
+    echo $exileText;
+    echo '</div>';
+    rahmen_unten();
+    echo '<br>';
+} elseif ($sector == 1) {
     $text = '
 	<table width="586" border="0" cellpadding="0" cellspacing="0">
 	<tr>

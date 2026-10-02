@@ -37,15 +37,14 @@ class TickSpendCollectorFromSector1
         }
         $to = mysqli_fetch_array($resx);
 
-        // Abziehen, informieren
-        mysqli_execute_query($this->db, "UPDATE de_user_data SET col = col - 1, newnews = 1 WHERE user_id = ?", [$from['user_id']]);
+        // Abziehen. Keine Nachricht an den geparkten Spieler: Sie entstünde jeden Tick, bei der Rückkehr
+        // fasst die Heimkehr-Box von Fluxurion den Verlust zusammen (ExileService)
+        mysqli_execute_query($this->db, "UPDATE de_user_data SET col = col - 1 WHERE user_id = ?", [$from['user_id']]);
         $time = date('YmdHis');
-        $msgFrom = 'Du verlierst einen Kollektor an einen anderen Spieler außerhalb von Sektor 1.';
-        mysqli_execute_query($this->db, "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$from['user_id'], $time, $msgFrom]);
 
         // Draufpacken, informieren
         mysqli_execute_query($this->db, "UPDATE de_user_data SET col = col + 1, newnews = 1 WHERE user_id = ?", [$to['user_id']]);
-        $msgTo = 'Du erhältst einen Kollektor von einem anderen Spieler aus Sektor 1.';
+        $msgTo = 'Ein herrenloser Kollektor aus dem Exil in Sektor 1 hat sich Deinem System angeschlossen.';
         mysqli_execute_query($this->db, "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 3, ?, ?)", [$to['user_id'], $time, $msgTo]);
 
         return ['success' => true, 'fromUser' => (int)$from['user_id'], 'toUser' => (int)$to['user_id']];
