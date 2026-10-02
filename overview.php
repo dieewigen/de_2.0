@@ -357,14 +357,18 @@ echo($ueberschrift.'
 //Rundenfortschrittsanzeige
 echo $rca;
 
-//obere Buttons Server/Hilfe/Discord/Umfragen
+//obere Buttons Server/Hilfe/Umfragen, darunter Community (Discord/WhatsApp)
+//zwei Zeilen, da fünf Buttons (je ~120px) nicht in die 560px-Spalte passen
 echo'
-    <div style="display: flex; width: 100%;" class="mt15 mb15">
+    <div style="display: flex; width: 100%;" class="mt15">
         <div style="flex-grow: 1;"><a href="sinfo.php?" class="btn">Serverinfos</a></div>
         <div style="flex-grow: 1;"><a href="'.$sv_link[2].'" target="_blank" class="btn">Hilfe</a></div>
         <div style="flex-grow: 1;"><a href="vote_overview.php?bar=yes" class="btn">Umfragen</a></div>
+    </div>
+    <div style="display: flex; width: 100%;" class="mt5 mb15">
         <div style="flex-grow: 1;"><a href="https://discord.gg/qBpCPx4" target="_blank" class="btn">DE-Discord</a></div>
-    </div> 
+        <div style="flex-grow: 1;"><a href="https://chat.whatsapp.com/FmUiandWLPxHrrnolH5EuI" target="_blank" class="btn">DE-WhatsApp</a></div>
+    </div>
 
 
     <div style="font-weight: bold; font-size:14px; margin-bottom: 5px;">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</div>
