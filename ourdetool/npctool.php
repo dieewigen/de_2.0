@@ -1,5 +1,6 @@
 <?php
 include "../inccon.php";
+include "../inc/sv.inc.php";
 include "../functions.php";
 include "det_userdata.inc.php";
 

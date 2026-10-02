@@ -1524,18 +1524,18 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
     ////////////////////////////////////////////////////////////
     //DISCORD
     ////////////////////////////////////////////////////////////
-    $webhooks = $GLOBALS['webhooks'];
+    $webhooks = $GLOBALS['webhooks'] ?? array();
     $webhook = array();
 
     //Global
     if ($channeltyp == 3) {
-        $webhook[] = $webhooks['global'];
+        $webhook[] = $webhooks['global'] ?? '';
         $message = $sv_server_tag.' '.$spielername.': '.$chat_message;
     }
 
     //Allgemeiner Serverchat
     if ($channeltyp == 2) {
-        $webhook[] = $webhooks[$sv_server_tag];
+        $webhook[] = $webhooks[$sv_server_tag ?? ''] ?? '';
         $message = $spielername.': '.$chat_message;
     }
 
@@ -1559,6 +1559,9 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
             }
         }
     }
+
+    //nicht konfigurierte Webhooks überspringen (z.B. Server ohne eigenen Discord-Kanal)
+    $webhook = array_filter($webhook);
 
     if (count($webhook) > 0) {
 
