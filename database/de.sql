@@ -499,6 +499,37 @@ CREATE TABLE `de_dez_zeitung` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_hekate`
+-- Hekate (Spezialsystem 6 der Vergessenen Systeme): wechselnde Aufträge, eine Zeile mit id=1 (legt der HekateService selbst an)
+-- Beim Update eines laufenden Servers diese Tabelle und `de_hekate_lieferung` anlegen
+--
+
+CREATE TABLE `de_hekate` (
+  `id` tinyint(3) UNSIGNED NOT NULL,
+  `round_start` date DEFAULT NULL,
+  `period_nr` int(10) UNSIGNED NOT NULL DEFAULT 1,
+  `period_start_wt` bigint(20) NOT NULL DEFAULT 1,
+  `auftraege` varchar(1000) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_hekate_lieferung`
+-- erfüllte Aufträge je Periode und Spieler
+--
+
+CREATE TABLE `de_hekate_lieferung` (
+  `period_nr` int(10) UNSIGNED NOT NULL,
+  `user_id` mediumint(9) NOT NULL,
+  `auftrag` tinyint(3) UNSIGNED NOT NULL,
+  PRIMARY KEY (`period_nr`, `user_id`, `auftrag`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_hfn_buddy_ignore`
 --
 
@@ -4786,6 +4817,22 @@ CREATE TABLE `de_vote_umfragen` (
   `startdatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `enddatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ergebnisse` varchar(100) NOT NULL DEFAULT ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_vs_bonus`
+-- zeitlich begrenzte Boni in den Vergessenen Systemen (typ 1 = Industrie, 2 = Bauzeit), gültig bis einschließlich WT bis_wt-1
+-- der HekateService leert die Tabelle selbst beim Rundenwechsel
+-- Beim Update eines laufenden Servers diese Tabelle anlegen
+--
+
+CREATE TABLE `de_vs_bonus` (
+  `user_id` mediumint(9) NOT NULL,
+  `typ` tinyint(3) UNSIGNED NOT NULL,
+  `bis_wt` bigint(20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`user_id`, `typ`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

@@ -637,7 +637,70 @@ function vs_redirect($system_id, $field_id = null)
 }
 
 /**
- * Faktor für Bau- und Missionszeiten in den Vergessenen Systemen (Artefakt 12 verkürzt sie, max. 50%).
+ * Formular-Token für Aktionen in den Vergessenen Systemen (Hekate, Thanatos).
+ */
+function vs_csrf_token()
+{
+    if (empty($_SESSION['vs_token'])) {
+        $_SESSION['vs_token'] = bin2hex(random_bytes(16));
+    }
+    return $_SESSION['vs_token'];
+}
+
+function vs_csrf_check($token)
+{
+    return !empty($_SESSION['vs_token']) && is_string($token) && hash_equals($_SESSION['vs_token'], $token);
+}
+
+/**
+ * Meldung über das Redirect nach einer Aktion hinweg (vs_redirect), wird einmal angezeigt.
+ */
+function vs_flash_set($ok, $msg)
+{
+    $_SESSION['vs_flash'] = ['ok' => (bool)$ok, 'msg' => (string)$msg];
+}
+
+function vs_flash_html()
+{
+    $flash = $_SESSION['vs_flash'] ?? null;
+    unset($_SESSION['vs_flash']);
+    if (!is_array($flash)) {
+        return '';
+    }
+    return '<div style="color: '.($flash['ok'] ? '#00FF00' : '#FF0000').'; font-weight: bold; margin: 10px 0;">'.$flash['msg'].'</div>';
+}
+
+/**
+ * VS-Boni eines Spielers aus Hekates Gunst und dem Pfad des Thanatos, Prozentwerte noch ohne Obergrenze.
+ * Fehlt die Tabelle de_vs_bonus noch (Update nicht eingespielt), zählt nur der Pfad des Thanatos.
+ *
+ * @return array{industrie:int, bauzeit:int, hekate:array<int,int>, thanatos:int} hekate: typ => verbleibende WT
+ */
+function vs_bonus_info($uid)
+{
+    $info = ['industrie' => 0, 'bauzeit' => 0, 'hekate' => [], 'thanatos' => 0];
+
+    $info['thanatos'] = (new \DieEwigen\DE2\Model\Thanatos\ThanatosService($GLOBALS['dbi']))->getStufe($uid);
+    $info['industrie'] += \DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($info['thanatos']);
+    $info['bauzeit'] += \DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($info['thanatos']);
+
+    try {
+        $vs_bonus = new \DieEwigen\DE2\Model\VsBonus\VsBonusService($GLOBALS['dbi']);
+        $info['hekate'] = $vs_bonus->getActive($uid, $vs_bonus->getCurrentWt());
+    } catch (\Throwable $e) {
+        $info['hekate'] = [];
+    }
+    foreach ($info['hekate'] as $typ => $rest) {
+        $key = $typ == \DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE ? 'industrie' : 'bauzeit';
+        $info[$key] += \DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($typ);
+    }
+
+    return $info;
+}
+
+/**
+ * Faktor für Bau- und Missionszeiten in den Vergessenen Systemen. Artefakt 12 verkürzt sie um max. 50%,
+ * Hekates Gunst und der Pfad des Thanatos zusammen um weitere max. 50%.
  */
 function vs_duration_factor($uid, $ua_werte)
 {
@@ -651,7 +714,9 @@ function vs_duration_factor($uid, $ua_werte)
         $artbonus_duration = 50;
     }
 
-    return 1 - ($artbonus_duration / 100);
+    $vs_bonus = min(vs_bonus_info($uid)['bauzeit'], 50);
+
+    return (1 - ($artbonus_duration / 100)) * (1 - ($vs_bonus / 100));
 }
 
 function changeCredits($uid, $amount, $reason)

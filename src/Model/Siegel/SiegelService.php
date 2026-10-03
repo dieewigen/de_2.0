@@ -212,6 +212,7 @@ class SiegelService
 
     /**
      * Resonanzkristalle einsetzen. Die Menge wird auf den Anteil und den Lagerbestand gekappt.
+     * Der Aufrufer hält die Spielersperre (map_system.php sperrt die ganze Seite), daher hier kein setLock().
      *
      * @return array{ok:bool, msg:string}
      */
@@ -224,60 +225,52 @@ class SiegelService
         if ($wanted <= 0) {
             return ['ok' => false, 'msg' => $lang['fehler_menge']];
         }
-        if (!\setLock($uid)) {
-            return ['ok' => false, 'msg' => $lang['fehler_lock']];
+        $this->state = null;
+        $period = (int)$this->getState()['period_nr'];
+        $anteil = self::getAnteil();
+        $own = $this->getOwnAmount($uid);
+        if ($own >= $anteil) {
+            return ['ok' => false, 'msg' => $lang['fehler_anteil']];
+        }
+        $amount = min($wanted, $anteil - $own, $this->getStock($uid));
+        if ($amount <= 0) {
+            return ['ok' => false, 'msg' => $lang['fehler_lager']];
         }
 
-        try {
-            $this->state = null;
-            $period = (int)$this->getState()['period_nr'];
-            $anteil = self::getAnteil();
-            $own = $this->getOwnAmount($uid);
-            if ($own >= $anteil) {
-                return ['ok' => false, 'msg' => $lang['fehler_anteil']];
-            }
-            $amount = min($wanted, $anteil - $own, $this->getStock($uid));
-            if ($amount <= 0) {
-                return ['ok' => false, 'msg' => $lang['fehler_lager']];
-            }
-
-            //abbuchen, nur wenn der Bestand reicht
-            mysqli_execute_query($this->db, "UPDATE de_user_storage SET item_amount = item_amount - ? WHERE user_id = ? AND item_id = ? AND item_amount >= ? LIMIT 1", [$amount, $uid, self::ITEM_ID, $amount]);
-            if (mysqli_affected_rows($this->db) !== 1) {
-                return ['ok' => false, 'msg' => $lang['fehler_lager']];
-            }
-
-            //gutschreiben, der Anteil bleibt die Obergrenze
-            mysqli_execute_query($this->db, "INSERT IGNORE INTO de_siegel_beitrag (period_nr, user_id, amount) VALUES (?, ?, 0)", [$period, $uid]);
-            mysqli_execute_query($this->db, "UPDATE de_siegel_beitrag SET amount = amount + ? WHERE period_nr = ? AND user_id = ? AND amount + ? <= ?", [$amount, $period, $uid, $amount, $anteil]);
-            if (mysqli_affected_rows($this->db) !== 1) {
-                $this->refundStock($uid, $amount);
-                return ['ok' => false, 'msg' => $lang['fehler_anteil']];
-            }
-
-            //hat ein Wirtschaftstick die Periode inzwischen gewechselt, wäre der Beitrag verloren
-            $this->state = null;
-            if ((int)$this->getState()['period_nr'] !== $period) {
-                mysqli_execute_query($this->db, "UPDATE de_siegel_beitrag SET amount = amount - ? WHERE period_nr = ? AND user_id = ? AND amount >= ?", [$amount, $period, $uid, $amount]);
-                $this->refundStock($uid, $amount);
-                return ['ok' => false, 'msg' => $lang['fehler_gesperrt']];
-            }
-
-            //neue Stufe für die nächste Periode erreicht? Dann im Serverchat melden
-            if ($own + $amount >= $anteil) {
-                $contributors = $this->countContributors($period);
-                $level = $this->levelFor($contributors);
-                if ($level > $this->levelFor($contributors - 1)) {
-                    $res = mysqli_execute_query($this->db, "SELECT spielername FROM de_user_data WHERE user_id = ?", [$uid]);
-                    $name = htmlspecialchars((string)(mysqli_fetch_assoc($res)['spielername'] ?? ''), ENT_QUOTES, 'UTF-8');
-                    $this->chat(strtr($lang['chat_stufe'], ['{NAME}' => $name, '{LEVEL}' => $level]));
-                }
-            }
-
-            return ['ok' => true, 'msg' => strtr($lang['erfolg'], ['{AMOUNT}' => $amount])];
-        } finally {
-            \releaseLock($uid);
+        //abbuchen, nur wenn der Bestand reicht
+        mysqli_execute_query($this->db, "UPDATE de_user_storage SET item_amount = item_amount - ? WHERE user_id = ? AND item_id = ? AND item_amount >= ? LIMIT 1", [$amount, $uid, self::ITEM_ID, $amount]);
+        if (mysqli_affected_rows($this->db) !== 1) {
+            return ['ok' => false, 'msg' => $lang['fehler_lager']];
         }
+
+        //gutschreiben, der Anteil bleibt die Obergrenze
+        mysqli_execute_query($this->db, "INSERT IGNORE INTO de_siegel_beitrag (period_nr, user_id, amount) VALUES (?, ?, 0)", [$period, $uid]);
+        mysqli_execute_query($this->db, "UPDATE de_siegel_beitrag SET amount = amount + ? WHERE period_nr = ? AND user_id = ? AND amount + ? <= ?", [$amount, $period, $uid, $amount, $anteil]);
+        if (mysqli_affected_rows($this->db) !== 1) {
+            $this->refundStock($uid, $amount);
+            return ['ok' => false, 'msg' => $lang['fehler_anteil']];
+        }
+
+        //hat ein Wirtschaftstick die Periode inzwischen gewechselt, wäre der Beitrag verloren
+        $this->state = null;
+        if ((int)$this->getState()['period_nr'] !== $period) {
+            mysqli_execute_query($this->db, "UPDATE de_siegel_beitrag SET amount = amount - ? WHERE period_nr = ? AND user_id = ? AND amount >= ?", [$amount, $period, $uid, $amount]);
+            $this->refundStock($uid, $amount);
+            return ['ok' => false, 'msg' => $lang['fehler_gesperrt']];
+        }
+
+        //neue Stufe für die nächste Periode erreicht? Dann im Serverchat melden
+        if ($own + $amount >= $anteil) {
+            $contributors = $this->countContributors($period);
+            $level = $this->levelFor($contributors);
+            if ($level > $this->levelFor($contributors - 1)) {
+                $res = mysqli_execute_query($this->db, "SELECT spielername FROM de_user_data WHERE user_id = ?", [$uid]);
+                $name = htmlspecialchars((string)(mysqli_fetch_assoc($res)['spielername'] ?? ''), ENT_QUOTES, 'UTF-8');
+                $this->chat(strtr($lang['chat_stufe'], ['{NAME}' => $name, '{LEVEL}' => $level]));
+            }
+        }
+
+        return ['ok' => true, 'msg' => strtr($lang['erfolg'], ['{AMOUNT}' => $amount])];
     }
 
     private function refundStock(int $uid, int $amount): void

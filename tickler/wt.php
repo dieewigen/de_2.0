@@ -9,6 +9,7 @@ use DieEwigen\DE2\Model\Tick\TickExileReports;
 use DieEwigen\DE2\Model\Exile\ExileService;
 use DieEwigen\DE2\Model\Exile\ExileMail;
 use DieEwigen\DE2\Model\Siegel\SiegelService;
+use DieEwigen\DE2\Model\Hekate\HekateService;
 
 set_time_limit(240);
 $directory = '../';
@@ -25,9 +26,10 @@ include_once $directory."inccon.php";
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
-//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang und $sv_link müssen hier definiert sein
+//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang, $hekate_lang und $sv_link müssen hier definiert sein
 include $directory."inc/lang/".$sv_server_lang."_exile.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_siegel.lang.php";
+include $directory."inc/lang/".$sv_server_lang."_hekate.lang.php";
 include $directory."inc/".$sv_server_lang."_links.inc.php";
 include_once $directory."inc/sabotage.inc.php";
 include_once $directory."inc/allyjobs.inc.php";
@@ -355,6 +357,14 @@ if ($doetick == 1) {
         echo 'Bonus: '.($siegel_faktor * 100).' %<br>';
     } catch (\Throwable $e) {
         echo 'Fehler beim Siegel von Basranur: '.$e->getMessage().'<br>';
+    }
+
+    //Hekate: Periodenwechsel der Auftragstafel, Fehler dürfen den Tick nicht aufhalten
+    echo '<br>Hekate<br>';
+    try {
+        (new HekateService($GLOBALS['dbi']))->processTick($hekate_lang);
+    } catch (\Throwable $e) {
+        echo 'Fehler bei Hekate: '.$e->getMessage().'<br>';
     }
 
     ////////////////////////////////////////////////

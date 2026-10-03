@@ -38,7 +38,6 @@ $siegel_lang['fehler_anteil']='Du hast Deinen Anteil für diese Periode bereits 
 $siegel_lang['fehler_lager']='Du hast keine Resonanzkristalle.';
 $siegel_lang['fehler_menge']='Bitte gib eine gültige Menge an.';
 $siegel_lang['fehler_token']='Die Anfrage war ungültig, bitte versuche es erneut.';
-$siegel_lang['fehler_lock']='Es läuft bereits eine andere Aktion, bitte versuche es erneut.';
 
 //Listen
 $siegel_lang['titel_mitwirkende']='Mitwirkende dieser Periode';

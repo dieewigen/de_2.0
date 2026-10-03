@@ -150,9 +150,26 @@ if(!hasTech($pt,25)){
 		$prozentwert=500;
 	}
 
-	echo '<div>Rohstoffbonus durch eroberte Kollektoren (pro Kollektor 5%, max 500% insgesamt): '.number_format($prozentwert, 2, ',' ,'.').'%</div>
+	echo '<div>Rohstoffbonus durch eroberte Kollektoren (pro Kollektor 5%, max 500% insgesamt): '.number_format($prozentwert, 2, ',' ,'.').'%</div>';
 
+	//Hekates Gunst und Pfad des Thanatos, nur anzeigen, wenn etwas wirkt
+	$vs_boni=vs_bonus_info($_SESSION['ums_user_id']);
+	$vs_boni_teile=array();
+	foreach($vs_boni['hekate'] as $vs_typ => $vs_rest){
+		if($vs_typ==\DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE){
+			$vs_boni_teile[]='Hekates Gunst: Industrie +'.\DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($vs_typ).'% (noch '.$vs_rest.' WT)';
+		}else{
+			$vs_boni_teile[]='Hekates Gunst: Bauzeit -'.\DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($vs_typ).'% (noch '.$vs_rest.' WT)';
+		}
+	}
+	if($vs_boni['thanatos']>0){
+		$vs_boni_teile[]='Pfad des Thanatos Stufe '.$vs_boni['thanatos'].': Industrie +'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($vs_boni['thanatos']).'%, Bauzeit -'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($vs_boni['thanatos']).'%';
+	}
+	if(!empty($vs_boni_teile)){
+		echo '<div style="margin-top: 5px;">'.implode('<br>', $vs_boni_teile).'</div>';
+	}
 
+	echo '
 	<div style="border-bottom: 1px solid #999999; margin-bottom: 20px; margin-top: 20px;"></div>
 	';
 	

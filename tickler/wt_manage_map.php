@@ -31,6 +31,16 @@ $valid_rohstoff_ids=array(
 	array(12,12)
 );
 
+//Hekates Gunst und Pfad des Thanatos: zusätzlicher Industrie-Ertrag, Fehler dürfen den Tick nicht aufhalten
+$vs_bonus_aktiv=array();
+$thanatos_stufen=array();
+try{
+	$thanatos_stufen=(new \DieEwigen\DE2\Model\Thanatos\ThanatosService($GLOBALS['dbi']))->loadAllStufen();
+	$vs_bonus_aktiv=(new \DieEwigen\DE2\Model\VsBonus\VsBonusService($GLOBALS['dbi']))->loadAllActive($rundenalter_wt);
+}catch(\Throwable $e){
+	echo '<br>Fehler beim Laden der VS-Boni: '.$e->getMessage();
+}
+
 //die einzelnen User abarbeiten, die Gebäudedaten befinden sich alle im Array $bldg_data und für jeden aktiven Spieler wird dieses durchlaufen
 $aktive_user=array();
 $result = mysqli_query($GLOBALS['dbi'],"SELECT de_user_data.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0");
@@ -45,6 +55,12 @@ while($row = mysqli_fetch_array($result)){
 	if($prozentwert>500){
 		$prozentwert=500;
 	}
+
+	//Hekates Gunst und Pfad des Thanatos kommen dazu
+	if(isset($vs_bonus_aktiv[$uid][\DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE])){
+		$prozentwert+=\DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent(\DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE);
+	}
+	$prozentwert+=\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_stufen[$uid] ?? 0);
 
 	$prozentwert=1+($prozentwert/100);
 

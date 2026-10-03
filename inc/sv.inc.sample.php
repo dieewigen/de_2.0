@@ -162,6 +162,18 @@ $GLOBALS['sv_pcs_id']=11;
 //$GLOBALS['sv_siegel_spieler_pro_stufe']=4;    //Mitwirkende je Stufe, jede Stufe gibt +2 % planetaren Grundertrag
 //$GLOBALS['sv_siegel_max_stufe']=10;           //höchste Stufe
 
+//Hekate und Thanatos (Spezialsysteme 6 und 7 in den Vergessenen Systemen), optional, ohne Eintrag gelten diese Werte
+//$GLOBALS['sv_hekate_dauer']=192;                  //Länge einer Auftragsperiode bei Hekate in Wirtschaftsticks
+//$GLOBALS['sv_hekate_auftraege']=array(...);       //eigene Auftragsvorlagen, Aufbau siehe HekateService::AUFTRAEGE
+//$GLOBALS['sv_vs_bonus_industrie_prozent']=25;     //Hekates Gunst: Industrie-Ertrag in den VS
+//$GLOBALS['sv_vs_bonus_bauzeit_prozent']=25;       //Hekates Gunst: kürzere Bauzeit in den VS (max. 50)
+//$GLOBALS['sv_vs_bonus_max_vorlauf']=384;          //Hekates Gunst läuft höchstens so viele Wirtschaftsticks im Voraus
+//$GLOBALS['sv_thanatos_max_stufe']=10;             //höchste Stufe auf dem Pfad des Thanatos
+//$GLOBALS['sv_thanatos_kosten_faktor']=3;          //Stufe L kostet L x Faktor Handelswaren V
+//$GLOBALS['sv_thanatos_palenium_pro_stufe']=50;    //Stufe L zahlt einmalig L x Wert Palenium
+//$GLOBALS['sv_thanatos_industrie_pro_stufe']=5;    //Industrie-Ertrag in den VS je Stufe in Prozent, bis Rundenende
+//$GLOBALS['sv_thanatos_bauzeit_pro_stufe']=3;      //kürzere Bauzeit in den VS je Stufe in Prozent, bis Rundenende
+
 //serversprache
 $GLOBALS['sv_server_lang']=1;
 
