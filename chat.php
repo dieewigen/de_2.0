@@ -41,26 +41,17 @@ if($pageType==='mobile'){
 	echo '<div id="chatheader"><a href="menu.php" style="color:#fff; text-decoration:none;">zum Menü</a></div>';
 }
 
-//container-div
-echo '<div id="container" class="cellbg" style="'.($pageType==='mobile'
-	? 'flex:1 1 auto; display:flex; flex-direction:column; width:100%; min-height:0;'
-	: 'width:100%; height:100%; position:absolute;').'">';
+//container-div, das Layout (Nachrichten oben, Eingabe unten) kommt aus gp/de-chat.scss
+echo '<div id="container" class="cellbg">';
 
-// alter mobiler Menü-Block entfernt (Header jetzt außerhalb von chatcontent)
-
-//ausgabe div
-echo '<div id="chatcontent" style="'.($pageType==='mobile'
-	? 'flex:1 1 auto; overflow:auto; -webkit-overflow-scrolling:touch; min-height:0;'
-	: 'width:100%; height:100px; overflow:auto; position:relative;').'">';
-
+//ausgabe div; der Knopf erscheint, wenn man hochgescrollt hat und neue Nachrichten kommen
+echo '<div class="chat-scroll">';
+echo '<div id="chatcontent"></div>';
+echo '<button type="button" id="chatnewmsgs" class="chat-newmsgs" hidden>Neue Nachrichten &darr;</button>';
 echo '</div>';
 
 //input div
 if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
-
-    $chatchannelchangefontsize = 20;
-    $chatinputheight = 40;
-    $inputfontsize = 24;
 
     if (!isset($_COOKIE['deactivate_swipe'])) {
         $_COOKIE['deactivate_swipe'] = 0;
@@ -134,37 +125,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		<?php
     }
-} else {
-    $chatchannelchangefontsize = 10;
-    $chatinputheight = 16;
-    $inputfontsize = 12;
 }
 
 if ($_SESSION['ums_mobi'] == 1) {
-	$inputtags = ' autocomplete="on" autocorrect="on" spellcheck="on" ';
+	$inputtags = ' autocorrect="on" spellcheck="true"';
 } else {
 	$inputtags = '';
 }
-$chatHeight = $chatinputheight + 1;
-$containerStyle = ($pageType==='mobile' ? 'position:relative; width:100%;' : 'bottom:0; position:relative; width:100%;');
 $chatinput_html = <<<HTML
-<div id="chatinput" style="$containerStyle">
+<div id="chatinput">
 	<form onsubmit="return chat_input()">
-		<div style="display:flex;">
-			<div style="flex-grow:1;">
-				<span id="chatchannelchanger" style="font-size: {$chatchannelchangefontsize}px;"></span>&nbsp;
-			</div>
-			<div style="font-size:14px;">
-				<span>Autoscroll</span> <input type="checkbox" id="autoscroll" checked>
-			</div>
-		</div>
-		<div style="width:100%; display:flex; justify-content:center; align-items:center; height: {$chatHeight}px;">
-			<div style="flex-grow:1;">
-				<input $inputtags class="chatinput" style="width:100%; height: {$chatHeight}px; font-size: {$inputfontsize}px" type="text" name="chatinputfield" id="chatinputfield" maxlength="1000" value="" autocomplete="off">
-			</div>
-			<div style="width:100px; text-align:center; margin-left:2px;">
-				<input style="width:100%; height: {$chatHeight}px; font-size: {$chatchannelchangefontsize}px;" type="submit" name="send" id="chatsend" value="{$chat_lang['senden']}">
-			</div>
+		<div id="chatchannelchanger"></div>
+		<div class="chat-inputrow">
+			<input$inputtags type="text" name="chatinputfield" id="chatinputfield" maxlength="1000" value="" autocomplete="off">
+			<button type="submit" id="chatsend">{$chat_lang['senden']}</button>
 		</div>
 	</form>
 </div>
@@ -179,8 +153,6 @@ if($pageType==='mobile'){
 
 ?>
 <script type="text/javascript">
-window.onresize = setsize;
-
 var chatToken = <?php echo json_encode($_SESSION['chat_token']); ?>;
 //so viele Zeilen bleiben im Chatfenster, ältere werden entfernt
 var chatMaxLines = 500;
@@ -188,28 +160,68 @@ var chatcounter = 100;
 
 //Reihenfolge im Menü; typ wie channeltyp in de_chat_msg, die Farben stehen in gp/de-chat.scss
 var chatChannels = [
-	{typ: 3, name: 'Global'},
-	{typ: 2, name: 'Server'},
-	{typ: 0, name: <?php echo json_encode($chat_lang['sektor']); ?>},
-	{typ: 1, name: <?php echo json_encode($chat_lang['allianz']); ?>}
+	{typ: 3, name: 'Global', placeholder: 'Nachricht an alle Server …'},
+	{typ: 2, name: 'Server', placeholder: 'Nachricht an den Server …'},
+	{typ: 0, name: <?php echo json_encode($chat_lang['sektor']); ?>, placeholder: 'Nachricht an den Sektor …'},
+	{typ: 1, name: <?php echo json_encode($chat_lang['allianz']); ?>, placeholder: 'Nachricht an die Allianz …'}
 ];
 
 function show_chatmenu(channeltyp){
 	var menu = $('#chatchannelchanger').empty();
 	$.each(chatChannels, function(i, ch){
-		var item = $('<span class="chatchannel">').text(ch.name).on('click', function(){
+		var item = $('<span class="chatchannel chat-ch'+ch.typ+'">').text(ch.name).on('click', function(){
 			change_chatchannel(ch.typ);
 		});
 		if(ch.typ == channeltyp){
-			item.addClass('active chat-ch'+ch.typ);
+			item.addClass('active');
+			$('#chatinputfield').attr('placeholder', ch.placeholder);
 		}
-		if(i > 0) menu.append('&nbsp;');
 		menu.append(item);
 	});
 
 	//Eingabefeld und Senden-Knopf in der Farbe des Channels
 	$('#chatinputfield, #chatsend').removeClass('chat-ch0 chat-ch1 chat-ch2 chat-ch3').addClass('chat-ch'+channeltyp);
 }
+
+//Trennlinie vor dem ersten Eintrag jedes Tages ("Heute", "Gestern", sonst Datum)
+function chat_daydividers(){
+	var chatcontent = $('#chatcontent');
+	chatcontent.children('.chat-day').remove();
+
+	var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+	var d = new Date();
+	var today = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	d.setDate(d.getDate() - 1);
+	var yesterday = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+
+	var last = '';
+	chatcontent.children('.chatline[data-day]').each(function(){
+		var day = this.getAttribute('data-day');
+		if(day !== last){
+			var p = day.split('-');
+			var label = day === today ? 'Heute' : (day === yesterday ? 'Gestern' : p[2] + '.' + p[1] + '.' + p[0]);
+			$(this).before($('<div class="chat-day">').text(label));
+			last = day;
+		}
+	});
+}
+
+//steht man (fast) ganz unten im Chat?
+function chat_atbottom(){
+	var cc = document.getElementById('chatcontent');
+	return cc.scrollHeight - cc.scrollTop - cc.clientHeight < 30;
+}
+
+function chat_scrolldown(){
+	var cc = document.getElementById('chatcontent');
+	cc.scrollTop = cc.scrollHeight;
+	$('#chatnewmsgs').prop('hidden', true);
+}
+
+$('#chatnewmsgs').on('click', chat_scrolldown);
+$('#chatcontent').on('scroll', function(){
+	if(chat_atbottom()) $('#chatnewmsgs').prop('hidden', true);
+});
 
 function change_chatchannel(channeltyp){
 	$.post('de_ajaxrpc.php', {changechatchannel: channeltyp + 1, token: chatToken}, function(data){
@@ -225,6 +237,9 @@ if (window.Worker) {
 	worker.addEventListener('message', function(e) {
 		if(e.data.output){
 			var chatcontent = $('#chatcontent');
+			//nur mitscrollen, wenn man unten war; wer hochgescrollt hat, bekommt stattdessen den Hinweisknopf
+			var atBottom = chat_atbottom();
+
 			//anhängen statt neu aufbauen, so bleibt auch eine Textmarkierung erhalten
 			chatcontent.append(e.data.output);
 
@@ -233,8 +248,12 @@ if (window.Worker) {
 				lines.slice(0, lines.length - chatMaxLines).remove();
 			}
 
-			if($('#autoscroll').prop('checked')){
-				chatcontent.scrollTop(chatcontent.prop('scrollHeight'));
+			chat_daydividers();
+
+			if(atBottom){
+				chat_scrolldown();
+			}else{
+				$('#chatnewmsgs').prop('hidden', false);
 			}
 		}
 
@@ -269,21 +288,15 @@ function chat_input(){
 	$.post('de_ajaxrpc.php', {chatinsert: 1, insert: text, token: chatToken}, function(data){
 		if(data[0].data == 1) $('#chatcontent').html('');
 		if(data[0].data == 2) restore();
+		//der Server hat den Channel umgestellt (z.B. keine Allianz mehr)
+		if(data[0].newchatchannel !== undefined) show_chatmenu(data[0].newchatchannel);
 		chatcounter = 100;
 	}, 'json').fail(restore);
 
 	return false;
 }
 
-function setsize(){
-	if('<?php echo $pageType; ?>'==='mobile') return; // Flex regelt mobil automatisch
-	var height=document.getElementById('container').offsetHeight-document.getElementById('chatinput').offsetHeight;
-	if(height<50) height=50;
-	$('#chatcontent').css({height: height+'px', 'max-height': height+'px'});
-}
-
 show_chatmenu(<?php echo intval($_SESSION['de_chat_inputchannel']); ?>);
-setsize();
 </script>
 </body>
 </html>

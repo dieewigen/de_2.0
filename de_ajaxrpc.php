@@ -108,6 +108,18 @@ if(isset($_REQUEST['chatinsert'])){
 		  $return=1;
 		}
 
+		//test auf comsperre, der Spieler bekommt einen Hinweis statt ins Leere zu schreiben
+		$akttime=date("Y-m-d H:i:s",time());
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'],
+		  "SELECT com_sperre FROM de_login WHERE user_id=?",
+		  [$_SESSION['ums_user_id']]);
+		$row = mysqli_fetch_assoc($db_daten);
+		if($chat_message!='' && $row['com_sperre']>$akttime){
+			$_SESSION['chat_hint']='Sperre für ausgehende Kommunikation bis: '.date("d.m.Y - G:i", strtotime($row['com_sperre'])).' Uhr';
+			$chat_message='';
+			$return=2;
+		}
+
 		//channel bestimmen
 		if($channeltyp==0){//sektor
 			$db_daten=mysqli_execute_query($GLOBALS['dbi'],
@@ -117,20 +129,18 @@ if(isset($_REQUEST['chatinsert'])){
 			$channel=$row['sector'];
 		}elseif($channeltyp==1){//allianz
 			$channel=get_player_allyid($_SESSION['ums_user_id']);
+			//nicht (mehr) in einer Allianz: die Nachricht würde niemand lesen, daher zurück auf Sektor
+			if($channel==0 && $chat_message!=''){
+				$_SESSION["de_chat_inputchannel"]=0;
+				$_SESSION['chat_hint']='Du bist in keiner Allianz, der Chat ist jetzt auf Sektor gestellt. Bitte sende die Nachricht erneut.';
+				$chat_message='';
+				$return=2;
+				$chat_newchannel=0;
+			}
 		}elseif($channeltyp==2){//allgemein
 			$channel=0;
 		}elseif($channeltyp==3){//global
 			$channel=0;
-		}
-
-		//test auf comsperre
-		$akttime=date("Y-m-d H:i:s",time());
-		$db_daten=mysqli_execute_query($GLOBALS['dbi'],
-		  "SELECT com_sperre FROM de_login WHERE user_id=?",
-		  [$_SESSION['ums_user_id']]);
-		$row = mysqli_fetch_assoc($db_daten);
-		if($row['com_sperre']>$akttime){
-			$chat_message='';
 		}
 
 		if($chat_message!=''){
@@ -139,6 +149,10 @@ if(isset($_REQUEST['chatinsert'])){
 	}
 
 	$data[] = array ('data' => $return);
+	//der Channel wurde hier umgestellt, das Menü im Chatfenster muss folgen
+	if(isset($chat_newchannel)){
+		$data[0]['newchatchannel']=$chat_newchannel;
+	}
 	echo json_encode($data);
 }
 
@@ -358,10 +372,12 @@ function format_chat_output($row){
 
 	$zeit=date("H:i", $row["timestamp"]);
 	$datum=date("d.m.Y", $row["timestamp"]);
+	//für die Tagestrenner im Chatfenster
+	$tag=date("Y-m-d", $row["timestamp"]);
 
-	//schauen ob es ein servertag gibt
+	//schauen ob es ein servertag gibt, wird als kleines Abzeichen angezeigt
 	if(!empty($row['server_tag'])){
-		$server_tag=' '.$row['server_tag'];
+		$server_tag='<span class="chat-tag">'.$row['server_tag'].'</span> ';
 	}else{
 		$server_tag='';
 	}
@@ -381,20 +397,21 @@ function format_chat_output($row){
 	}
 
 	//die Farbe kommt über die Klasse des Channels (gp/de-chat.scss)
-	$output='<div class="chatline chat-ch'.intval($row["channeltyp"]).'"><span title="'.$datum.'">['.$zeit.']'.$server_tag.'</span> ';
+	$output='<div class="chatline chat-ch'.intval($row["channeltyp"]).'" data-day="'.$tag.'"><span class="chat-time" title="'.$datum.'">'.$zeit.'</span> '.$server_tag;
 
 	//schauen ob es ein emote ist
 	if(substr($row["message"], 0, 3)==='/me'){
-		$output.='<span class="chat-emote"><a href="'.$link.'" target="h"><u>'.$spielername.'</u></a> '.substr($row["message"], 3).'</span>';
+		$output.='<span class="chat-emote"><a class="chat-name" href="'.$link.'" target="h">'.$spielername.'</a>'.substr($row["message"], 3).'</span>';
 	}else{
 		if($row["spielername"]!=''){
-			$output.='<a href="'.$link.'" target="h"><i><u>'.$spielername.'</u></i></a>';
+			$output.='<a class="chat-name" href="'.$link.'" target="h">'.$spielername.'</a>';
 
 			if($row['spielername']=='odo'){
 				$output.='&#x1f37a;';
 			}
+			$output.=': ';
 		}
-		$output.=': '.$row["message"];
+		$output.=$row["message"];
 	}
 	$output.='</div>';
 

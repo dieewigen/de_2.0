@@ -60,12 +60,32 @@ $themes: (
   color: #fff;
 }
 
-#chatcontent{
+// ------------------------------------------------------------
+// Layout: Nachrichten füllen den Platz über der Eingabezeile
+// ------------------------------------------------------------
+#container {
+  display: flex;
+  flex-direction: column;
+}
+body.desktop #container {
+  position: absolute;
+  inset: 0;
+}
+.chat-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+#chatcontent {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 4px 6px;
   font-size: 16px;
 }
 
 // ------------------------------------------------------------
-// Chatzeilen (format_chat_output in de_ajaxrpc.php) und Channel-Auswahl
+// Chatzeilen (format_chat_output in de_ajaxrpc.php)
 // ------------------------------------------------------------
 
 // Farbe je channeltyp: 0 = Sektor, 1 = Allianz, 2 = Server, 3 = Global
@@ -79,8 +99,7 @@ $chat-channels: (
 @each $typ, $col in $chat-channels {
   #chatcontent .chat-ch#{$typ},
   #chatcontent .chat-ch#{$typ} a,
-  #chatchannelchanger .chat-ch#{$typ},
-  #chatinput input.chat-ch#{$typ} {
+  #chatinput .chat-ch#{$typ} {
     color: $col;
   }
 }
@@ -89,6 +108,7 @@ $chat-channels: (
 #chatcontent .chat-emote,
 #chatcontent .chat-emote a {
   color: #FF771D;
+  font-style: italic;
 }
 #chatcontent .chat-herold {
   color: #FDFB59;
@@ -97,16 +117,143 @@ $chat-channels: (
   color: #FF0000;
 }
 
-#chatchannelchanger .chatchannel {
+#chatcontent .chatline {
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.4;
+  overflow-wrap: anywhere; // lange Wörter und Links umbrechen
+}
+#chatcontent .chatline:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+#chatcontent .chat-time {
+  font-size: 0.8em;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+#chatcontent .chat-tag {
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 0.7em;
+  line-height: 1.3;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  opacity: 0.8;
+  vertical-align: 0.1em;
+}
+#chatcontent .chat-name {
+  font-weight: bold;
+  text-decoration: none;
+}
+#chatcontent .chat-name:hover {
+  text-decoration: underline;
+}
+
+// Tagestrenner ("Heute", "Gestern", Datum)
+#chatcontent .chat-day {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+  font-size: 0.75em;
+  color: rgba(255, 255, 255, 0.5);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+}
+
+// Hinweisknopf, wenn man hochgescrollt hat und neue Nachrichten kommen (Farbe je Rasse unten im Theme)
+.chat-newmsgs {
+  position: absolute;
+  right: 14px;
+  bottom: 8px;
+  padding: 4px 12px;
+  font: bold 12px sans-serif;
+  color: #000;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
   cursor: pointer;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// ------------------------------------------------------------
+// Eingabebereich: Channel-Reiter, Eingabefeld, Senden
+// ------------------------------------------------------------
+#chatinput {
+  flex: 0 0 auto;
+  padding: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#chatchannelchanger {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+#chatchannelchanger .chatchannel {
+  padding: 1px 9px;
+  font-size: 12px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  opacity: 0.75;
+  cursor: pointer;
+  user-select: none;
+}
+#chatchannelchanger .chatchannel:hover {
+  opacity: 1;
 }
 #chatchannelchanger .chatchannel.active {
-  font-size: 1.2em; // Desktop: 10px -> 12px
-  border: 1px solid;
-  padding: 1px;
+  opacity: 1;
+  font-weight: bold;
+  border-color: currentColor;
+  background-color: rgba(255, 255, 255, 0.08);
 }
-body.mobile #chatchannelchanger .chatchannel.active {
-  font-size: 1.1em; // Mobil: 20px -> 22px
+
+#chatinput .chat-inputrow {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+#chatinput #chatinputfield {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  padding: 4px 8px;
+  font: 14px sans-serif;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  outline: none;
+}
+#chatinput #chatinputfield:focus {
+  box-shadow: 0 0 0 1px currentColor;
+}
+#chatinput #chatinputfield::placeholder {
+  color: inherit;
+  opacity: 0.45;
+}
+#chatinput #chatsend {
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 14px;
+  font: bold 13px sans-serif;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#chatinput #chatsend:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 // Mobile Layout (flex-basiert)
@@ -148,24 +295,24 @@ body.mobile #chatheader {
 }
 
 body.mobile #chatcontent {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  font-size: 20px;
+  font-size: 18px;
 }
 body.mobile #chatinput {
-  flex: 0 0 auto;
-  background: #000;
-  padding: 4px 4px 4px;
-  box-sizing: border-box;
-  border-top: 1px solid #333;
+  background-color: #000;
 }
-body.mobile #chatinput input[type=text] {
-  width: 100%;
-  box-sizing: border-box;
+body.mobile #chatchannelchanger .chatchannel {
+  padding: 4px 12px;
+  font-size: 16px;
+}
+// ab 16px zoomt iOS beim Tippen nicht in die Seite
+body.mobile #chatinput #chatinputfield,
+body.mobile #chatinput #chatsend {
+  height: 44px;
+  font-size: 17px;
 }
 body.mobile a { font-size: 20px; }
+body.mobile #chatcontent a { font-size: inherit; }
 
 // Theme-Generator
 @each $name, $cfg in $themes {
@@ -189,6 +336,8 @@ body.mobile a { font-size: 20px; }
       border: 1px solid $col;
     }
     input.c { border: none; }
+    // Akzentfarbe der Rasse
+    .chat-newmsgs { background-color: $col; }
   }
 
   // Desktop-Variante: ersetzt nur den Hintergrund gemäß Originaldateien

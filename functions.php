@@ -1699,8 +1699,7 @@ function insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_messag
     $time = time();
 
     if ($channeltyp == 3) {//gloabler Chat
-        mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES 
-		('$channel', '$channeltyp', '$server_tag', '$spielername', '$chat_message', '$time', '$owner_id')");
+        mysqli_execute_query($GLOBALS['dbi_ls'], "INSERT INTO de_chat_msg (channel, channeltyp, server_tag, spielername, message, timestamp, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [$channel, $channeltyp, $server_tag, $spielername, $chat_message, $time, $owner_id]);
     } else {
         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_chat_msg (channel, channeltyp, spielername, message, timestamp, owner_id) VALUES (?, ?, ?, ?, ?, ?)", [$channel, $channeltyp, $spielername, $chat_message, $time, $owner_id]);
     }
