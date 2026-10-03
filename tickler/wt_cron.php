@@ -177,7 +177,8 @@ if ($nachtcron != $time) {
                 $channeltyp = 3;
                 $spielername = '[SYSTEM]';
                 $chat_message = '<span style="color: #ffff00;">Es gibt aktuell '.$anzahl_uc.' aktive Spieler.</span>';
-                insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, -1, 'DE');
+                //owner_id 0 + [SYSTEM] kennzeichnet Systemmeldungen (die Spalte ist UNSIGNED, -1 wirft im Strict-Modus einen Fehler)
+                insert_chat_msg_admin($channel, $channeltyp, $spielername, $chat_message, 0, 'DE');
             }
 
             break;

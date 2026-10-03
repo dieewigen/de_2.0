@@ -229,9 +229,9 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 				$chatdata[]=$row;
 			}
 		}
-	}else{//nur die Meldungen von [SYSTEM] auslesen
+	}else{//nur die Meldungen von [SYSTEM] auslesen (wt_cron, npctool); echte Spieler haben immer eine owner_id > 0
 		if(isset($_REQUEST['chatidallg'])){
-			$sqlallg="SELECT * FROM de_chat_msg WHERE owner_id=-1 AND channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC, id ASC";
+			$sqlallg="SELECT * FROM de_chat_msg WHERE owner_id=0 AND spielername='[SYSTEM]' AND channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC, id ASC";
 			$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'], $sqlallg, [$chatidallg, $cleartime]);
 			//ausgeben
 			//$first=1;
