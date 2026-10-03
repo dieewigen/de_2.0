@@ -490,7 +490,9 @@ if(setLock($_SESSION['ums_user_id'])){
 
 			$content.='</div>';
 
-			$content.='<script type="text/javascript">ang_countdown('.($active_tech_types_row[$i]['time_finished']-time()).',"tech_counter'.$i.'",'.$sound_id.')</script>';
+			//nach Ablauf die Technologie in der Liste unten wie eine erledigte behandeln
+			$on_finish='function(){ tech_finished('.intval($active_tech_types_row[$i]['tech_id']).', '.($tech_erledigte_techs==0 ? 'true' : 'false').'); }';
+			$content.='<script type="text/javascript">ang_countdown('.($active_tech_types_row[$i]['time_finished']-time()).',"tech_counter'.$i.'",'.$sound_id.','.$on_finish.')</script>';
 		}
 	}
 
@@ -633,8 +635,8 @@ if(setLock($_SESSION['ums_user_id'])){
 						//man hat es
 						$voraussetzungen.='<br>'.$tech_name;
 					}else{
-						//man hat es nicht
-						$voraussetzungen.='<br><span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>'.$tech_name.'</span>';
+						//man hat es nicht, data-vor-id: damit tech_finished() die Markierung entfernen kann
+						$voraussetzungen.='<br><span data-vor-id=\''.intval($ben_tech_id).'\' style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>'.$tech_name.'</span>';
 						$has_all=false;
 						$has_voraussetzungen=false;
 					}
@@ -745,7 +747,7 @@ if(setLock($_SESSION['ums_user_id'])){
 			}
 
 			$tech_field='
-				<div class="'.$tech_class.' tech_typ_'.$row['tech_typ'].'" '.$baujs.' title="'.$title.'" rel="tooltip">
+				<div class="'.$tech_class.' tech_typ_'.$row['tech_typ'].'" data-tech-id="'.$row['tech_id'].'" '.$baujs.' title="'.$title.'" rel="tooltip">
 					<div class="tech_bg'.$row['tech_typ'].'"></div>
 					'.$baulink[0].'<div class="'.$tech_name_class.'"><span class="uppercase">'.$tech_name.'</span>';
 			
