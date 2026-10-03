@@ -92,7 +92,7 @@ class TickExileReports
     {
         $sys = $this->service->getSystem();
         $offsets = $this->offsets();
-        $maxNewroundDays = (int)($GLOBALS['sv_exile_newround_maxdays'] ?? 365);
+        $maxNewroundDays = (int)($GLOBALS['sv_exile_newround_maxdays'] ?? 0);
 
         //Anzahl der verstrichenen Berichtstermine, Werte sind durch offsets() bereits Ganzzahlen
         $passed = '0';
@@ -101,7 +101,11 @@ class TickExileReports
         }
         //wer länger als 14 Tage über dem letzten Termin liegt, bekommt keinen nachgeholten Bericht mehr
         $staleDays = end($offsets) + 14;
-        $newroundDue = "((e.newround_sent IS NULL OR e.newround_sent <> ?) AND e.since >= NOW() - INTERVAL ? DAY)";
+        $newroundDue = "(e.newround_sent IS NULL OR e.newround_sent <> ?)";
+        //0 = ohne Grenze, auch lange Abwesende bekommen den Rundenbericht
+        if ($maxNewroundDays > 0) {
+            $newroundDue = "($newroundDue AND e.since >= NOW() - INTERVAL $maxNewroundDays DAY)";
+        }
 
         $sql = "SELECT e.*, l.reg_mail, d.spielername, d.col, d.score, d.allytag, d.status AS ally_status,
                   ($passed) AS passed, $newroundDue AS newround_due
@@ -115,7 +119,7 @@ class TickExileReports
                 ORDER BY (e.last_mail_at IS NOT NULL), e.last_mail_at, e.since DESC
                 LIMIT 1";
         $round = $sys['rundenstart_datum'];
-        $res = mysqli_execute_query($this->db, $sql, [$round, $maxNewroundDays, $round, $maxNewroundDays]);
+        $res = mysqli_execute_query($this->db, $sql, [$round, $round]);
         $row = $res ? mysqli_fetch_assoc($res) : null;
 
         return $row ?: null;

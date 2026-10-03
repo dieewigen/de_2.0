@@ -45,7 +45,7 @@ $GLOBALS['sv_server_url']='';
 
 //Lageberichte von Fluxurion an Spieler im Exil (Sektor 1)
 $GLOBALS['sv_exile_report_days']=[3, 14, 45]; //Berichte nach x Tagen im Exil
-$GLOBALS['sv_exile_newround_maxdays']=365;    //Rundenbericht nur an Konten, die höchstens so lange im Exil sind
+$GLOBALS['sv_exile_newround_maxdays']=0;      //Rundenbericht nur an Konten, die höchstens so viele Tage im Exil sind, 0 = ohne Grenze
 $GLOBALS['sv_exile_mail_hours']=[9, 21];      //Versandfenster: ab 9:00 Uhr bis vor 21:00 Uhr
 $GLOBALS['sv_exile_mails_per_hour']=10;       //Drossel, höchstens eine Mail pro Wirtschaftstick
 
