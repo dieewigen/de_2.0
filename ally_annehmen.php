@@ -143,8 +143,8 @@ else
             die ($allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3']);
 
         $result = mysqli_execute_query($GLOBALS['dbi'],
-            "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ?",
-            [$allyid]
+            "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ? AND ally_id_partner = ?",
+            [$allyid, $clanid]
         );
         $row = mysqli_fetch_assoc($result);
         $antragexists = $row['count'];
@@ -156,7 +156,7 @@ else
             "SELECT * FROM de_ally_war 
              WHERE (ally_id_angreifer = ? AND ally_id_angegriffener = ?) 
              OR (ally_id_angreifer = ? AND ally_id_angegriffener = ?)",
-            [$allyid, $allyid_partner, $allyid_partner, $allyid]
+            [$allyid, $clanid, $clanid, $allyid]
         );
         $num = mysqli_num_rows($db_daten);
         if ($num > 0) {
