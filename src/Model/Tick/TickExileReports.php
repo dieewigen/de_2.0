@@ -80,6 +80,7 @@ class TickExileReports
             //Fehlversuch zählt zum Stundenlimit, der Bericht wird nach der Sperrfrist erneut versucht
             mysqli_execute_query($this->db, "UPDATE de_user_exile SET last_mail_at = NOW() WHERE user_id = ?", [$uid]);
         }
+        $this->service->logMail($uid, $type, $sent);
 
         return ['sent' => $sent, 'user_id' => $uid, 'type' => $type];
     }

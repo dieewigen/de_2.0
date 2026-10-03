@@ -8,6 +8,7 @@ return [
         'usersearch'  => ['index.php', 'User suchen'],
         'lastreg'     => ['lastreg.php', 'Letzte Registrierungen'],
         'observation' => ['observation.php', 'Beobachtungsliste'],
+        'exilemails'  => ['exile_mails.php', 'Exil-Mails'],
     ],
     'Multi-Erkennung' => [
         'multi1'      => ['multi.php?statistic=1', 'Multi-IP m. gesperrt'],

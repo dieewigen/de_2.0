@@ -4275,6 +4275,37 @@ WHERE l.status = 3 AND l.delmode = 2 AND d.npc = 0;
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_user_exile_mail`
+-- Versandprotokoll der Mails von Fluxurion (Vorwarnung, Lageberichte, neue Runde) für die Statistik im Admintool
+-- login_at ist der erste Login nach der Mail (index.php)
+--
+
+CREATE TABLE `de_user_exile_mail` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` mediumint(9) NOT NULL,
+  `type` varchar(16) NOT NULL DEFAULT '',
+  `sent_at` datetime NOT NULL,
+  `ok` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `login_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `sent_at` (`sent_at`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Einmalig beim Update eines laufenden Servers: die schon verschickten Mails aus de_user_exile übernehmen.
+-- Bis zum 05.10.2026 hat jedes Konto höchstens eine Mail bekommen, den Bericht zur neuen Runde
+-- (newround_sent gesetzt = verschickt, NULL = Fehlversuch). Spätere Mails lassen sich so nicht zuordnen und bleiben außen vor.
+-- Der Login danach stammt aus dem IP-Log.
+INSERT INTO `de_user_exile_mail` (`user_id`, `type`, `sent_at`, `ok`, `login_at`)
+SELECT e.user_id, 'neue_runde', e.last_mail_at, e.newround_sent IS NOT NULL,
+  (SELECT MIN(i.time) FROM de_user_ip i WHERE i.user_id = e.user_id AND i.time > e.last_mail_at)
+FROM de_user_exile e
+WHERE e.last_mail_at IS NOT NULL AND e.last_mail_at < '2026-10-05 00:00:00'
+  AND NOT EXISTS (SELECT 1 FROM de_user_exile_mail m WHERE m.user_id = e.user_id);
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_user_fleet`
 --
 

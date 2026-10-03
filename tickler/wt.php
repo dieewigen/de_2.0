@@ -1065,7 +1065,8 @@ if ($doetick == 1) {
         $uid = $row["user_id"];
 
         $mail = $exileMail->render('vorab', ['name' => $row['spielername'], 'days' => $sv_inactiv_deldays - 1, 'col' => $row['col']]);
-        @$exileMail->send($row["reg_mail"], $mail);
+        $sent = @$exileMail->send($row["reg_mail"], $mail);
+        $exileService->logMail((int)$uid, 'vorab', $sent);
         //damit er nur einmal die mail bekommt inaktmail auf 1 setzen
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET inaktmail = 1 WHERE user_id = ?", [$uid]);
     }

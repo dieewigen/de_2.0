@@ -201,6 +201,31 @@ class ExileService
     }
 
     /**
+     * Mail von Fluxurion für die Statistik im Admintool protokollieren.
+     * Fehler werden nur geloggt, das Protokoll darf weder den Versand noch den Tick aufhalten.
+     */
+    public function logMail(int $uid, string $type, bool $ok): void
+    {
+        try {
+            mysqli_execute_query($this->db, "INSERT INTO de_user_exile_mail (user_id, type, sent_at, ok) VALUES (?, ?, NOW(), ?)", [$uid, $type, $ok ? 1 : 0]);
+        } catch (\Throwable $e) {
+            error_log('Exil-Mailprotokoll fehlgeschlagen: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Beim Login vermerken, dass der Spieler nach seinen Mails von Fluxurion zurückgekommen ist.
+     */
+    public function recordLogin(int $uid): void
+    {
+        try {
+            mysqli_execute_query($this->db, "UPDATE de_user_exile_mail SET login_at = NOW() WHERE user_id = ? AND login_at IS NULL", [$uid]);
+        } catch (\Throwable $e) {
+            error_log('Exil-Mailprotokoll (Login) fehlgeschlagen: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Abmelde-Token für die Lageberichte liefern und bei Bedarf erzeugen.
      */
     public function ensureToken(int $uid): string
