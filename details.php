@@ -622,13 +622,13 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
     //unterscheiden zwischen Spieler auf eigenem Server und Spieler auf anderem Server
     echo '<form action="details.php" method="post">';
     if (!empty($_REQUEST['sn'])) {
-        echo '<input type="hidden" name="sn" value="' . $_REQUEST['sn'] . '">';
+        echo '<input type="hidden" name="sn" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '">';
     }
     if (!empty($_REQUEST['ctyp'])) {
-        echo '<input type="hidden" name="ctyp" value="' . $_REQUEST['ctyp'] . '">';
+        echo '<input type="hidden" name="ctyp" value="' . intval($_REQUEST['ctyp']) . '">';
     }
     if (!empty($_REQUEST['cid'])) {
-        echo '<input type="hidden" name="cid" value="' . $_REQUEST['cid'] . '">';
+        echo '<input type="hidden" name="cid" value="' . intval($_REQUEST['cid']) . '">';
     }
 
     rahmen_oben('Verwaltung von Spielern die im Chat ignoriert werden');
@@ -651,10 +651,12 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
                 //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
                 if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
                     $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
-                    $sql = "INSERT INTO de_chat_ignore SET owner_id='" . $_SESSION['ums_owner_id'] . "', owner_id_ignore='$zowner_id', score=1, ignore_until='$ignore_until', 
-						spielername='" . ($_REQUEST['ignore_name'] ?? $_REQUEST['sn']) . "';";
-
-                    mysqli_query($GLOBALS['dbi_ls'], $sql);
+                    $spielername = mb_substr($_REQUEST['ignore_name'] ?? $_REQUEST['sn'], 0, 20);
+                    mysqli_execute_query(
+                        $GLOBALS['dbi_ls'],
+                        "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
+                        [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]
+                    );
                 }
 
                 //�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
@@ -668,10 +670,10 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
 
                 if ($num == 1) {  // er steht schon drin
                     $row = mysqli_fetch_assoc($db_daten);
-                    echo 'Dieser Spieler (' . $row['spielername'] . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
+                    echo 'Dieser Spieler (' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
                 } elseif ($zowner_id > 0) { //er steht noch nicht drin
                     echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-                    echo '<input name="ignore_name" maxlength="20" value="' . $_REQUEST['sn'] . '" autocomplete="off" type="text">';
+                    echo '<input name="ignore_name" maxlength="20" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '" autocomplete="off" type="text">';
 
                     echo '<br>Zeitdauer der Blockierung: ';
 
@@ -715,7 +717,7 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
             //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
             if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
                 $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
-                $spielername = isset($_REQUEST['ignore_name']) ? $_REQUEST['ignore_name'] : $_REQUEST['sn'];
+                $spielername = mb_substr($_REQUEST['ignore_name'] ?? $_REQUEST['sn'], 0, 20);
                 mysqli_execute_query(
                     $GLOBALS['dbi_ls'],
                     "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
@@ -734,10 +736,10 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
 
             if ($num == 1) {  // er steht schon drin
                 $row = mysqli_fetch_assoc($db_daten);
-                echo 'Dieser Spieler (' . $row['spielername'] . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
+                echo 'Dieser Spieler (' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
             } elseif ($zowner_id > 0) { //er steht noch nicht drin
                 echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-                echo '<input name="ignore_name" maxlength="20" value="' . $_REQUEST['sn'] . '" autocomplete="off" type="text">';
+                echo '<input name="ignore_name" maxlength="20" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '" autocomplete="off" type="text">';
 
                 echo '<br>Zeitdauer der Blockierung: ';
 
@@ -792,7 +794,7 @@ if ($num >= 1) {
     while ($row = mysqli_fetch_assoc($db_daten)) {
         echo '
 		<tr>
-			<td>' . $row['spielername'] . '</td>
+			<td>' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . '</td>
 			<td>' . date("d.m.Y", $row['ignore_until']) . '</td>
 			<td><a href="details.php?del_ignore=' . $row['id'] . '">Eintrag l&ouml;schen</a></td>
 		</tr>';

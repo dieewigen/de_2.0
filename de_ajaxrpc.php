@@ -5,10 +5,10 @@ mb_internal_encoding("UTF-8");
 include "inc/header.inc.php";
 include 'functions.php';
 
-$chat_sectorcolor='#FFFFFF';
-$chat_allycolor='#00FF00';
-$chat_allgemeincolor='#4a91fc';
-$chat_globalcolor='#ffad5d';
+//Mindestabstand zwischen zwei Chatnachrichten eines Spielers in Sekunden
+$chat_min_interval=1;
+//maximale Länge einer Chatnachricht in Zeichen
+$chat_max_length=1000;
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -17,6 +17,12 @@ $chat_globalcolor='#ffad5d';
 //////////////////////////////////////////////////////////
 if(isset($_REQUEST['changechatchannel'])){
 	$newchannel=intval($_REQUEST['changechatchannel'])-1;
+
+	//ohne gültigen Token bleibt der bisherige Channel
+	if(!chat_request_valid()){
+		$newchannel=intval($_SESSION["de_chat_inputchannel"] ?? 0);
+		$_SESSION['chat_hint']='Der Chat wurde aktualisiert. Bitte lade die Seite neu.';
+	}
 
 	if($newchannel<0 OR $newchannel>3)$newchannel=0;
 
@@ -67,66 +73,70 @@ if(isset($_REQUEST['changechatchannel'])){
 //////////////////////////////////////////////////////////
 if(isset($_REQUEST['chatinsert'])){
 
-	//outputlib soll keine [tags] umschreiben
-	//$outputlib_dontchangetags=1;
-  
-	$chat_message=trim($_REQUEST['insert']);
-	$chat_message=htmlspecialchars($chat_message, ENT_QUOTES, 'UTF-8');
+	$return=0; //0 alles ok, 1=clear, 2=abgelehnt (der Grund erscheint mit der nächsten Chat-Abfrage)
+	$insert=$_POST['insert'] ?? '';
 
-	//Maruh Joke
-	$chat_message=str_replace('Maruh', 'Maruh (gepriesen sei der DE-Auserwählte)', $chat_message);
-	$chat_message=str_replace('maruh', 'maruh (gepriesen sei der DE-Auserwählte)', $chat_message);
+	if(!chat_request_valid()){
+		//z.B. ein Chatfenster, das schon vor einem Update offen war
+		$_SESSION['chat_hint']='Der Chat wurde aktualisiert. Bitte lade die Seite neu, um wieder schreiben zu können.';
+		$return=2;
+	}elseif(microtime(true)-($_SESSION['chat_last_insert'] ?? 0)<$chat_min_interval){
+		$_SESSION['chat_hint']='Bitte nicht so schnell schreiben.';
+		$return=2;
+	}elseif(is_string($insert)){
+		$_SESSION['chat_last_insert']=microtime(true);
 
-	$chat_message=strip_tags($chat_message);
-	
-	
+		$chat_message=mb_substr(trim($insert), 0, $chat_max_length);
+		$chat_message=htmlspecialchars($chat_message, ENT_QUOTES, 'UTF-8');
 
-	$return=0; //0 alles ok, 1=clear
+		//Maruh Joke
+		$chat_message=str_replace('Maruh', 'Maruh (gepriesen sei der DE-Auserwählte)', $chat_message);
+		$chat_message=str_replace('maruh', 'maruh (gepriesen sei der DE-Auserwählte)', $chat_message);
 
-	$time=time();
+		$chat_message=strip_tags($chat_message);
 
+		$time=time();
 
-	$channeltyp=$_SESSION["de_chat_inputchannel"];
+		$channeltyp=$_SESSION["de_chat_inputchannel"];
 
-	if($chat_message=='/clear'){
-	  //db updaten
-	  mysqli_execute_query($GLOBALS['dbi'],
-	    "UPDATE de_user_data SET chatclear=? WHERE user_id = ?",
-	    [$time, $_SESSION['ums_user_id']]);
-	  $chat_message='';
-	  $return=1;
-	}
+		if($chat_message=='/clear'){
+		  //db updaten
+		  mysqli_execute_query($GLOBALS['dbi'],
+		    "UPDATE de_user_data SET chatclear=? WHERE user_id = ?",
+		    [$time, $_SESSION['ums_user_id']]);
+		  $chat_message='';
+		  $return=1;
+		}
 
+		//channel bestimmen
+		if($channeltyp==0){//sektor
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'],
+			  "SELECT sector, chatclear, chatoffallg FROM de_user_data WHERE user_id=?",
+			  [$_SESSION['ums_user_id']]);
+			$row = mysqli_fetch_assoc($db_daten);
+			$channel=$row['sector'];
+		}elseif($channeltyp==1){//allianz
+			$channel=get_player_allyid($_SESSION['ums_user_id']);
+		}elseif($channeltyp==2){//allgemein
+			$channel=0;
+		}elseif($channeltyp==3){//global
+			$channel=0;
+		}
 
-	//channel bestimmen
-	if($channeltyp==0){//sektor
+		//test auf comsperre
+		$akttime=date("Y-m-d H:i:s",time());
 		$db_daten=mysqli_execute_query($GLOBALS['dbi'],
-		  "SELECT sector, chatclear, chatoffallg FROM de_user_data WHERE user_id=?",
+		  "SELECT com_sperre FROM de_login WHERE user_id=?",
 		  [$_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($db_daten);
-		$channel=$row['sector'];
-	}elseif($channeltyp==1){//allianz
-		$channel=get_player_allyid($_SESSION['ums_user_id']);
-	}elseif($channeltyp==2){//allgemein
-		$channel=0;
-	}elseif($channeltyp==3){//global
-		$channel=0;
-	}
-	
-	//test auf comsperre
-	$akttime=date("Y-m-d H:i:s",time());
-	$db_daten=mysqli_execute_query($GLOBALS['dbi'],
-	  "SELECT com_sperre FROM de_login WHERE user_id=?",
-	  [$_SESSION['ums_user_id']]);
-	$row = mysqli_fetch_assoc($db_daten);
-	if($row['com_sperre']>$akttime){
-		$chat_message='';
-	}
-	
-	if($chat_message!=''){
-		insert_chat_msg($channel, $channeltyp, $_SESSION['ums_spielername'], $chat_message);
-	}
+		if($row['com_sperre']>$akttime){
+			$chat_message='';
+		}
 
+		if($chat_message!=''){
+			insert_chat_msg($channel, $channeltyp, $_SESSION['ums_spielername'], $chat_message);
+		}
+	}
 
 	$data[] = array ('data' => $return);
 	echo json_encode($data);
@@ -163,42 +173,43 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 
 	//sql-befehl zusammenbauen
 	//Sektor
-	$sql="SELECT * FROM de_chat_msg WHERE ((channel='$sector' AND channeltyp=0) ";
+	$conds=array('(channel=? AND channeltyp=0)');
+	$params=array($sector);
 
 	//Allianz
 	//allyid herausfinden
 	$allyid=get_player_allyid($_SESSION['ums_user_id']);
-	//sql-befehl f�r allychat und b�ndnispartner
+	//sql-befehl für allychat und bündnispartner
 	if($allyid>0){
 		//eigene ally
-		$sql.=" OR (channel=$allyid AND channeltyp=1)";
-		//test auf allianzb�ndnis um deren chat auch mit anzuzeigen
+		$conds[]='(channel=? AND channeltyp=1)';
+		$params[]=$allyid;
+		//test auf allianzbündnis um deren chat auch mit anzuzeigen
 		$db_daten=mysqli_execute_query($GLOBALS['dbi'],
 		  "SELECT * FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
 		  [$allyid, $allyid]);
 		$num = mysqli_num_rows($db_daten);
 
-		if($num==1){  
+		if($num==1){
 			$row = mysqli_fetch_assoc($db_daten);
 			if($row['ally_id_1']==$allyid)$allyidpartner=$row['ally_id_2'];
 			else $allyidpartner=$row['ally_id_1'];
-			$sql.=" OR (channel=$allyidpartner AND channeltyp=1)";
+			$conds[]='(channel=? AND channeltyp=1)';
+			$params[]=$allyidpartner;
 		}
 	}
 
 	//allgemeiner channel
 	if($chatoffallg==0){
-		//alt
-		$sql.=' OR channeltyp=2';
+		$conds[]='channeltyp=2';
 	}
 
-	//$sql.=") AND timestamp > '$cleartime' AND id > '".$_SESSION['de_chat_lastid']."' ORDER BY timestamp ASC";
-	$sql.=") AND timestamp > '$cleartime' AND id > '".$chatid."' ORDER BY timestamp ASC";
-
-	//$output=$sql;
+	$sql='SELECT * FROM de_chat_msg WHERE ('.implode(' OR ', $conds).') AND timestamp > ? AND id > ? ORDER BY timestamp ASC, id ASC';
+	$params[]=$cleartime;
+	$params[]=$chatid;
 
 	//daten aus der db holen
-	$db_daten=mysqli_query($GLOBALS['dbi'], $sql);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, $params);
 	//ausgeben
 	//$first=1;
 	while ($row = mysqli_fetch_assoc($db_daten)){
@@ -210,7 +221,7 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	if($chatoffglobal==0){
 		//server�bergreifend
 		if(isset($_REQUEST['chatidallg'])){
-			$sqlallg="SELECT * FROM de_chat_msg WHERE channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC";
+			$sqlallg="SELECT * FROM de_chat_msg WHERE channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC, id ASC";
 			$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'], $sqlallg, [$chatidallg, $cleartime]);
 			//ausgeben
 			//$first=1;
@@ -220,7 +231,7 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		}
 	}else{//nur die Meldungen von [SYSTEM] auslesen
 		if(isset($_REQUEST['chatidallg'])){
-			$sqlallg="SELECT * FROM de_chat_msg WHERE owner_id=-1 AND channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC";
+			$sqlallg="SELECT * FROM de_chat_msg WHERE owner_id=-1 AND channeltyp=3 AND id > ? AND timestamp > ? ORDER BY timestamp ASC, id ASC";
 			$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'], $sqlallg, [$chatidallg, $cleartime]);
 			//ausgeben
 			//$first=1;
@@ -230,22 +241,11 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		}
 	}
 	
-	//chatdata sortieren und ausgeben
-	//solange es Elemente gibt alles immer wieder durchgehen
-	$sorted=array();
-	while(count($chatdata)>0){
-		$index=-1;
-		$timestamp=999999999999999999;
-		for($i=0;$i<count($chatdata);$i++){
-			if($chatdata[$i]['timestamp']<=$timestamp){
-				$index=$i;
-				$timestamp=$chatdata[$i]['timestamp'];
-			}
-		}
-		
-		$sorted[]=$chatdata[$index];
-		array_splice($chatdata, $index, 1);
-	}
+	//chatdata nach Zeit sortieren; usort ist stabil, Nachrichten aus derselben Sekunde behalten ihre Reihenfolge
+	usort($chatdata, function($a, $b){
+		return (int)$a['timestamp'] <=> (int)$b['timestamp'];
+	});
+	$sorted=$chatdata;
 	
 	////////////////////////////////////////////////////////////////
 	// Liste der Spieler laden, die man selbst ignoriert
@@ -299,11 +299,18 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 			}
 		}
 
-		if(!empty($row['server_tag'])){
+		//globale Nachrichten liegen in der DB der Accountverwaltung und haben eigene IDs
+		if($row['channeltyp']==3){
 			if($row['id']>$chatidallg)$chatidallg=$row['id'];
 		}else{
 			if($row['id']>$chatid)$chatid=$row['id'];
 		}
+	}
+
+	//Hinweis aus chatinsert/changechatchannel, z.B. zu schnell geschrieben
+	if(!empty($_SESSION['chat_hint'])){
+		$output.='<div class="chatline chat-error">'.htmlspecialchars($_SESSION['chat_hint'], ENT_QUOTES, 'UTF-8').'</div>';
+		unset($_SESSION['chat_hint']);
 	}
 
 
@@ -347,63 +354,58 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 }
 
 function format_chat_output($row){
-	global 	$chat_sectorcolor, $chat_allycolor, $chat_allgemeincolor, $chat_globalcolor, $sv_server_tag;
-
-	$output='';
+	global $sv_server_tag;
 
 	$zeit=date("H:i", $row["timestamp"]);
 	$datum=date("d.m.Y", $row["timestamp"]);
 
-	$row["spielername"]=$row["spielername"];
-
-	//schauen ob es einen nachricht vom herold ist
-	if($row["spielername"]=='^Der Herold^'){
-		$row["spielername"]='<font color="#FDFB59">'.$row["spielername"].'</font>';
-	}
-	
 	//schauen ob es ein servertag gibt
 	if(!empty($row['server_tag'])){
 		$server_tag=' '.$row['server_tag'];
 	}else{
 		$server_tag='';
 	}
-	
-	if($row["channeltyp"]==0){
-		$color=$chat_sectorcolor;}
-	elseif($row["channeltyp"]==1){
-		$color=$chat_allycolor;
-	}elseif($row["channeltyp"]==2){
-		$color=$chat_allgemeincolor;
-	}elseif($row["channeltyp"]==3){
-		$color=$chat_globalcolor;
+
+	//Link zum Spieler; der Name ist HTML-escaped gespeichert
+	$link='details.php?sn='.rawurlencode(html_entity_decode($row["spielername"], ENT_QUOTES, 'UTF-8'));
+	//Spieler anderer Server werden über die Chat-ID gefunden (Ignore-Liste)
+	if($row['server_tag']!='' && $row['server_tag']!=$sv_server_tag){
+		$link.='&ctyp='.intval($row['channeltyp']).'&cid='.intval($row['id']);
+	}
+	$link=htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
+
+	$spielername=$row["spielername"];
+	//schauen ob es einen nachricht vom herold ist
+	if($spielername=='^Der Herold^'){
+		$spielername='<span class="chat-herold">'.$spielername.'</span>';
 	}
 
-	//$row['message']=umlaut($row['message']);
-	
+	//die Farbe kommt über die Klasse des Channels (gp/de-chat.scss)
+	$output='<div class="chatline chat-ch'.intval($row["channeltyp"]).'"><span title="'.$datum.'">['.$zeit.']'.$server_tag.'</span> ';
+
 	//schauen ob es ein emote ist
-	if($row["message"][0]=='/' AND $row["message"][1]=='m' AND $row["message"][2]=='e'){
-		//me entfernen
-		$row["message"] = str_replace("/me","",$row["message"]);
-		$output.='<font color="'.$color.'" title="'.$datum.'">['.$zeit.']'.$server_tag.'</font> <font color="#FF771D"><a href="details.php?sn='.$row["spielername"].'" target="h" style="color: #FF771D;"><u>'.$row["spielername"].'</u></a> '.$row["message"].'</font>';
+	if(substr($row["message"], 0, 3)==='/me'){
+		$output.='<span class="chat-emote"><a href="'.$link.'" target="h"><u>'.$spielername.'</u></a> '.substr($row["message"], 3).'</span>';
 	}else{
 		if($row["spielername"]!=''){
-			if($sv_server_tag==$row['server_tag'] || $row['server_tag']==''){
-				$spielername='<a href="details.php?sn='.$row["spielername"].'" target="h" style="color: '.$color.';"><i><u>'.$row["spielername"].'</u></i></a>';
-			}else{
-				$spielername='<a href="details.php?sn='.$row["spielername"].'&ctyp='.$row['channeltyp'].'&cid='.$row['id'].'" target="h" style="color: '.$color.';"><i><u>'.$row["spielername"].'</u></i></a>';
-			}
+			$output.='<a href="'.$link.'" target="h"><i><u>'.$spielername.'</u></i></a>';
 
 			if($row['spielername']=='odo'){
-				$spielername.='&#x1f37a;';
-			}			
-
-		}else{
-			$spielername='';
+				$output.='&#x1f37a;';
+			}
 		}
-		$output.='<font color="'.$color.'" title="'.$datum.'">['.$zeit.']'.$server_tag.'</font> '.$spielername.'<font color="'.$color.'">: '.$row["message"].'</font>';
+		$output.=': '.$row["message"];
 	}
-	$output.="<br>";
-	
+	$output.='</div>';
+
 	return $output;
+}
+
+//Chat-Aktionen nur per POST mit dem Token aus chat.php, damit fremde Seiten/Links nichts im Namen des Spielers auslösen
+function chat_request_valid(){
+	return $_SERVER['REQUEST_METHOD']==='POST'
+		&& !empty($_SESSION['chat_token'])
+		&& is_string($_POST['token'] ?? null)
+		&& hash_equals($_SESSION['chat_token'], $_POST['token']);
 }
 ?>

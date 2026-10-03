@@ -4,14 +4,14 @@ $eftachatbotdefensedisable = 1;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_chat.lang.php';
 
-//farben definieren
-$chat_sectorcolor = '#FFFFFF';
-$chat_allycolor = '#00FF00';
-$chat_allgemeincolor = '#4a91fc';
-
 //schauen ob es die variablen schon gibt
 if (!isset($_SESSION["de_chat_inputchannel"])) {
     $_SESSION["de_chat_inputchannel"] = 0;
+}
+
+//Token für Schreiben/Channelwechsel, wird in de_ajaxrpc.php geprüft
+if (empty($_SESSION['chat_token'])) {
+    $_SESSION['chat_token'] = bin2hex(random_bytes(16));
 }
 
 //$_SESSION['ums_mobi']=0;
@@ -163,7 +163,7 @@ $chatinput_html = <<<HTML
 				<input $inputtags class="chatinput" style="width:100%; height: {$chatHeight}px; font-size: {$inputfontsize}px" type="text" name="chatinputfield" id="chatinputfield" maxlength="1000" value="" autocomplete="off">
 			</div>
 			<div style="width:100px; text-align:center; margin-left:2px;">
-				<input style="width:100%; height: {$chatHeight}px; font-size: {$chatchannelchangefontsize}px;" type="submit" name="send" value="{$chat_lang['senden']}" onclick="chat_input()">
+				<input style="width:100%; height: {$chatHeight}px; font-size: {$chatchannelchangefontsize}px;" type="submit" name="send" id="chatsend" value="{$chat_lang['senden']}">
 			</div>
 		</div>
 	</form>
@@ -181,112 +181,98 @@ if($pageType==='mobile'){
 <script type="text/javascript">
 window.onresize = setsize;
 
-var chatcounter=100;
+var chatToken = <?php echo json_encode($_SESSION['chat_token']); ?>;
+//so viele Zeilen bleiben im Chatfenster, ältere werden entfernt
+var chatMaxLines = 500;
+var chatcounter = 100;
+
+//Reihenfolge im Menü; typ wie channeltyp in de_chat_msg, die Farben stehen in gp/de-chat.scss
+var chatChannels = [
+	{typ: 3, name: 'Global'},
+	{typ: 2, name: 'Server'},
+	{typ: 0, name: <?php echo json_encode($chat_lang['sektor']); ?>},
+	{typ: 1, name: <?php echo json_encode($chat_lang['allianz']); ?>}
+];
 
 function show_chatmenu(channeltyp){
-	var nm=''
-	if(channeltyp==3){
-		nm=nm+'<span onClick="change_chatchannel(4)" style="cursor: pointer; font-size: <?php echo ($chatchannelchangefontsize + 2)?>px; color: #ffad5d; border: 1px solid; padding: 1px;">Global</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(3)" style="cursor: pointer;">Server</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(1)" style="cursor: pointer;"><?php echo $chat_lang['sektor'];?></span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(2)" style="cursor: pointer;"><?php echo $chat_lang['allianz'];?></span>';
-		$('input').css('color', '#ffad5d');
-	}
-	if(channeltyp==2){
-		nm=nm+'<span onClick="change_chatchannel(4)" style="cursor: pointer;">Global</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(3)" style="cursor: pointer; font-size: <?php echo ($chatchannelchangefontsize + 2)?>px; color: #4a91fc; border: 1px solid; padding: 1px;">Server</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(1)" style="cursor: pointer;"><?php echo $chat_lang['sektor'];?></span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(2)" style="cursor: pointer;"><?php echo $chat_lang['allianz'];?></span>';
-		$('input').css('color', '#4a91fc');
-	}
-	if(channeltyp==0){
-		nm=nm+'<span onClick="change_chatchannel(4)" style="cursor: pointer;">Global</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(3)" style="cursor: pointer;">Server</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(1)" style="cursor: pointer; font-size: <?php echo ($chatchannelchangefontsize + 2)?>px; color: #FFFFFF; border: 1px solid; padding: 1px;"><?php echo $chat_lang['sektor'];?></span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(2)" style="cursor: pointer;"><?php echo $chat_lang['allianz'];?></span>';
-		$('input').css('color', '#FFFFFF');
-	}
-	if(channeltyp==1){
-		nm=nm+'<span onClick="change_chatchannel(4)" style="cursor: pointer;">Global</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(3)" style="cursor: pointer;">Server</span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(1)" style="cursor: pointer;"><?php echo $chat_lang['sektor'];?></span>';
-		nm=nm+'&nbsp;<span onClick="change_chatchannel(2)" style="cursor: pointer; font-size: <?php echo ($chatchannelchangefontsize + 2)?>px; color: #00FF00; border: 1px solid; padding: 1px;"><?php echo $chat_lang['allianz'];?></span>';
-		$('input').css('color', '#00FF00');
-	}
+	var menu = $('#chatchannelchanger').empty();
+	$.each(chatChannels, function(i, ch){
+		var item = $('<span class="chatchannel">').text(ch.name).on('click', function(){
+			change_chatchannel(ch.typ);
+		});
+		if(ch.typ == channeltyp){
+			item.addClass('active chat-ch'+ch.typ);
+		}
+		if(i > 0) menu.append('&nbsp;');
+		menu.append(item);
+	});
 
-	$('#chatchannelchanger').html(nm);
+	//Eingabefeld und Senden-Knopf in der Farbe des Channels
+	$('#chatinputfield, #chatsend').removeClass('chat-ch0 chat-ch1 chat-ch2 chat-ch3').addClass('chat-ch'+channeltyp);
 }
 
-function change_chatchannel(channeltyp)
-{
-  $.getJSON("de_ajaxrpc.php?changechatchannel="+channeltyp,
-	function(data)
-	{
-	  show_chatmenu(data[0].newchatchannel);	
-	}
-  );
-} 
-
-var chatid=0;
-var chatcounter=100;
+function change_chatchannel(channeltyp){
+	$.post('de_ajaxrpc.php', {changechatchannel: channeltyp + 1, token: chatToken}, function(data){
+		show_chatmenu(data[0].newchatchannel);
+		//einen eventuellen Hinweis gleich abholen
+		chatcounter = 100;
+	}, 'json');
+}
 
 if (window.Worker) {
 	var worker = new Worker('js/de_chat.js?time=<?php echo time();?>');
-	
-	worker.addEventListener('message', function(e) {
-		if(e.data.output!=''){
-			$('#chatcontent').html($('#chatcontent').html()+e.data.output);
-			
-			if($('#autoscroll').prop('checked')){
-				$(window.opera?'html':'html, body, container, chatcontent').animate({ 
-					  scrollTop: 100000}, 'slow' 
-					);
 
-				var objDiv = document.getElementById("chatcontent");
-				objDiv.scrollTop = objDiv.scrollHeight;
+	worker.addEventListener('message', function(e) {
+		if(e.data.output){
+			var chatcontent = $('#chatcontent');
+			//anhängen statt neu aufbauen, so bleibt auch eine Textmarkierung erhalten
+			chatcontent.append(e.data.output);
+
+			var lines = chatcontent.children('.chatline');
+			if(lines.length > chatMaxLines){
+				lines.slice(0, lines.length - chatMaxLines).remove();
+			}
+
+			if($('#autoscroll').prop('checked')){
+				chatcontent.scrollTop(chatcontent.prop('scrollHeight'));
 			}
 		}
 
-		if(e.data.infocenter!=''){
+		if(e.data.infocenter){
 			$('#infocenter', parent.document).html(e.data.infocenter);
 		}
-
-	  //alert('Worker said: '+e.data);
 	}, false);
+
+	setInterval(get_chatdata, 1000);
+}else{
+	$('#chatcontent').html('<div class="chatline chat-error">Der Browser unterst&uuml;tzt keine Webworker, verwende bitte einen modernen Browser.</div>');
 }
 
 function get_chatdata(){
-  if(chatcounter>=10){
-	worker.postMessage('getchatdata'); // Send data to our worker.
-    chatcounter=0;
-  }
-  else chatcounter++;
-}
-
-if (window.Worker) {
-	var refreshID1 = setInterval(
-	function()
-	{
-	  get_chatdata();
-	},1000);
-}else{
-	$('#chatcontent').html("<font style='color: #FF0000;'>Der Browser unterst&uuml;tzt keine Webworker, verwende bitte einen modernen Browser.</font>");
+	if(chatcounter>=10){
+		worker.postMessage('getchatdata');
+		chatcounter=0;
+	}
+	else chatcounter++;
 }
 
 function chat_input(){
-  	let inputfield=$("#chatinputfield").val();
-  	$("#chatinputfield").val('');
-  
-  	if (inputfield==='') return false;
-  
-	inputfield = encodeURIComponent(inputfield);
- 
-  	$.post("de_ajaxrpc.php?chatinsert=1&insert="+inputfield, function(data, textStatus) {
-		if(data[0].data==1)$('#chatcontent').html('');
-		chatcounter=100;
-	}, "JSON");
-  
-  return false;
+	var text = $('#chatinputfield').val();
+	if (text === '') return false;
+	$('#chatinputfield').val('');
+
+	//abgelehnt oder nicht angekommen: Text zurück ins Eingabefeld, sofern dort nichts Neues steht
+	function restore(){
+		if($('#chatinputfield').val() === '') $('#chatinputfield').val(text);
+	}
+
+	$.post('de_ajaxrpc.php', {chatinsert: 1, insert: text, token: chatToken}, function(data){
+		if(data[0].data == 1) $('#chatcontent').html('');
+		if(data[0].data == 2) restore();
+		chatcounter = 100;
+	}, 'json').fail(restore);
+
+	return false;
 }
 
 function setsize(){
@@ -296,7 +282,7 @@ function setsize(){
 	$('#chatcontent').css({height: height+'px', 'max-height': height+'px'});
 }
 
-show_chatmenu(<?php echo $_SESSION['de_chat_inputchannel']; ?>);
+show_chatmenu(<?php echo intval($_SESSION['de_chat_inputchannel']); ?>);
 setsize();
 </script>
 </body>

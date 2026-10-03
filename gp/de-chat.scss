@@ -64,6 +64,51 @@ $themes: (
   font-size: 16px;
 }
 
+// ------------------------------------------------------------
+// Chatzeilen (format_chat_output in de_ajaxrpc.php) und Channel-Auswahl
+// ------------------------------------------------------------
+
+// Farbe je channeltyp: 0 = Sektor, 1 = Allianz, 2 = Server, 3 = Global
+$chat-channels: (
+  0: #FFFFFF,
+  1: #00FF00,
+  2: #4a91fc,
+  3: #ffad5d
+);
+
+@each $typ, $col in $chat-channels {
+  #chatcontent .chat-ch#{$typ},
+  #chatcontent .chat-ch#{$typ} a,
+  #chatchannelchanger .chat-ch#{$typ},
+  #chatinput input.chat-ch#{$typ} {
+    color: $col;
+  }
+}
+
+// nach den Channel-Farben, damit sie bei gleicher Spezifität gewinnen
+#chatcontent .chat-emote,
+#chatcontent .chat-emote a {
+  color: #FF771D;
+}
+#chatcontent .chat-herold {
+  color: #FDFB59;
+}
+#chatcontent .chat-error {
+  color: #FF0000;
+}
+
+#chatchannelchanger .chatchannel {
+  cursor: pointer;
+}
+#chatchannelchanger .chatchannel.active {
+  font-size: 1.2em; // Desktop: 10px -> 12px
+  border: 1px solid;
+  padding: 1px;
+}
+body.mobile #chatchannelchanger .chatchannel.active {
+  font-size: 1.1em; // Mobil: 20px -> 22px
+}
+
 // Mobile Layout (flex-basiert)
 html, body.mobile { height: 100%; }
 body.mobile {

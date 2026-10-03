@@ -1670,26 +1670,25 @@ function insert_chat_msg($channel, $channeltyp, $spielername, $chat_message)
     $webhook = array_filter($webhook);
 
     if (count($webhook) > 0) {
+        $message = strip_tags(html_entity_decode($message));
+
+        //allowed_mentions leer: Spieler dürfen über den Chat kein @everyone/@here/@Rolle auslösen
+        $data = array("content" => $message, "username" => "Der Reporter", "allowed_mentions" => array("parse" => array()));
 
         foreach ($webhook as $webhook_send) {
-            $message = html_entity_decode($message);
-            $message = strip_tags($message);
-
-            $data = array("content" => $message, "username" => "Der Reporter");
             $curl = curl_init($webhook_send);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            //ein hängendes Discord darf weder die Chat-Eingabe noch den Tick aufhalten
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 3);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 5);
 
-
+            //kein echo: die Ausgabe würde die JSON-Antwort des Chats zerstören
             if (curl_exec($curl) === false) {
-                echo 'Curl-Fehler: ' . curl_error($curl);
-            } else {
-                //echo 'Operation ohne Fehler vollständig ausgeführt';
+                error_log('Discord-Webhook: '.curl_error($curl));
             }
         }
     }
