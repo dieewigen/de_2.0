@@ -1,4 +1,7 @@
 <?php
+//Ausgabe puffern, damit nach Aktionen per vs_redirect() umgeleitet werden kann
+ob_start();
+
 $GLOBALS['deactivate_old_design']=true;
 
 include "inc/header.inc.php";
@@ -24,20 +27,8 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 
 $vs_auto_explore=$row['vs_auto_explore'];
 
-////////////////////////////////////////////////////////////////////////////////
-//userartefakte auslesen
-////////////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=12 AND user_id='".$_SESSION['ums_user_id']."'");
-$artbonus_duration=0;
-while($row = mysqli_fetch_array($db_daten)){
-	$artbonus_duration=$artbonus_duration+$ua_werte[$row["id"]-1][$row["level"]-1][0];
-}
-
-if($artbonus_duration>50){
-	$artbonus_duration=50;
-}
-
-$GLOBALS['duration_factor']=1-($artbonus_duration/100);
+//Bauzeitverkürzung durch Artefakte
+$GLOBALS['duration_factor']=vs_duration_factor($_SESSION['ums_user_id'], $ua_werte);
 
 ?>
 <!DOCTYPE HTML>
@@ -71,10 +62,25 @@ if(isset($sv_deactivate_vsystems) && $sv_deactivate_vsystems==1){
 	die('</body></html>');
 }
 
+echo '<div id="vs-resline">';
 include "resline.php";
+echo '</div>';
 
-//hat man die benötigte Technologie?
-if(!hasTech($pt,25)){
+echo '<div id="vs-main">';
+
+//transaktionsbeginn, verhindert doppelte Aktionen durch schnelles Klicken oder mehrere Tabs
+$vs_locked=setLock($_SESSION['ums_user_id']);
+if($vs_locked){
+	//innerhalb der Sperre aktuelle Werte verwenden
+	$ps=loadPlayerStorage($_SESSION['ums_user_id']);
+	$GLOBALS['ps']=$ps;
+	$pd=loadPlayerData($_SESSION['ums_user_id']);
+	$GLOBALS['pd']=$pd;
+}
+
+if(!$vs_locked){
+	echo '<br><div class="info_box text2">Es wird noch eine Aktion ausgef&uuml;hrt. Bitte <a href="map_system.php?id='.intval($_REQUEST['id'] ?? 1).'">kurz warten und neu laden</a>.</div>';
+}elseif(!hasTech($pt,25)){
 	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=25";
 	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
 	$row_techcheck = mysqli_fetch_array($db_tech);
@@ -259,16 +265,19 @@ if(!hasTech($pt,25)){
 					</td>
 				</tr>';
 				echo '</table>';
-				rahmen_unten();  
+				rahmen_unten();
 			}
-		}	
+		}
 	}
-
-	echo '<script>vs_system_init();</script>';
 }
 
+echo '</div>';//vs-main
 
+if($vs_locked){
+	releaseLock($_SESSION['ums_user_id']);
+}
 
+echo '<script>vs_system_init(); vs_ajax_init();</script>';
 ?>
 	
 	

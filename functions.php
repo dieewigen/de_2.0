@@ -591,7 +591,7 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
     $kopfzeile .= '
 	<div style="flex-grow: 1;">'.$sytem_name.' 
 		(#<input id="input_system_id"type="text" style="height: 12px; width: 30px; text-align: center;" value="'.$system_id.'">&nbsp;
-		<span style="display: inline-block; width: 30px; cursor: pointer; height: 18px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;" onclick="location.href=\'map_system.php?id=\'+$(\'#input_system_id\').val()">OK</span>)
+		<span style="display: inline-block; width: 30px; cursor: pointer; height: 18px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;" onclick="vs_navigate(\'map_system.php?id=\'+$(\'#input_system_id\').val())">OK</span>)
 		<a id="link_map" href="map_mobile.php#sysid'.$system_id.'" style="margin-right: 8px; display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;"'.$tooltip_map.'>&there4;</a>
 	</div>';
 
@@ -604,13 +604,54 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 	<script type="text/javascript">
 		$("#input_system_id").keyup(function(event) {
 			if (event.keyCode === 13) {
-				location.href=\'map_system.php?id=\'+$(\'#input_system_id\').val();
+				vs_navigate(\'map_system.php?id=\'+$(\'#input_system_id\').val());
 			}
 		});
 	</script>
 	';
 
     return $kopfzeile;
+}
+
+/**
+ * Leitet nach einer Aktion in den Vergessenen Systemen per 303 auf die Systemansicht um (Post/Redirect/Get).
+ * Setzt voraus, dass die Seite mit ob_start() gepuffert wird und ggf. ein setLock() aktiv ist.
+ */
+function vs_redirect($system_id, $field_id = null)
+{
+    $url = 'map_system.php?id='.intval($system_id);
+    if ($field_id !== null) {
+        $url .= '&fieldid='.intval($field_id);
+    }
+
+    if (function_exists('releaseLock')) {
+        releaseLock($_SESSION['ums_user_id']);
+    }
+
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    header('Location: '.$url, true, 303);
+    exit;
+}
+
+/**
+ * Faktor für Bau- und Missionszeiten in den Vergessenen Systemen (Artefakt 12 verkürzt sie, max. 50%).
+ */
+function vs_duration_factor($uid, $ua_werte)
+{
+    $artbonus_duration = 0;
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=12 AND user_id=?", [$uid]);
+    while ($row = mysqli_fetch_assoc($db_daten)) {
+        $artbonus_duration = $artbonus_duration + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
+    }
+
+    if ($artbonus_duration > 50) {
+        $artbonus_duration = 50;
+    }
+
+    return 1 - ($artbonus_duration / 100);
 }
 
 function changeCredits($uid, $amount, $reason)
