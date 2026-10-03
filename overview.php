@@ -373,6 +373,32 @@ echo($ueberschrift.'
 //Rundenfortschrittsanzeige
 echo $rca;
 
+//Siegel von Basranur, nur wenn die Vergessenen Systeme aktiv sind
+if (($GLOBALS['sv_deactivate_vsystems'] ?? 0) != 1) {
+    try {
+        include_once 'inc/lang/'.$sv_server_lang.'_siegel.lang.php';
+        $siegel = new \DieEwigen\DE2\Model\Siegel\SiegelService($GLOBALS['dbi']);
+        $siegel_level = $siegel->getLevel();
+        $siegel_contributors = $siegel->countContributors();
+        $siegel_missing = $siegel->missingForNextLevel($siegel_contributors);
+        $siegel_text = strtr($siegel_lang['ov_zeile'], [
+            '{LEVEL}' => $siegel_level,
+            '{PCT}' => $siegel_level * \DieEwigen\DE2\Model\Siegel\SiegelService::PROZENT_PRO_STUFE,
+            '{N}' => $siegel_contributors,
+        ]);
+        if ($siegel_missing > 0) {
+            $siegel_text .= strtr($siegel_lang['ov_noch_bis'], ['{MISSING}' => $siegel_missing, '{STEP}' => $siegel->levelFor($siegel_contributors) + 1]);
+        }
+        $siegel_explored = $siegel->isExplored((int)$_SESSION['ums_user_id']);
+        $siegel_title = $siegel_explored
+            ? '<a href="map_system.php?id='.$siegel->getSealMapId().'">'.$siegel_lang['ov_titel'].'</a>'
+            : $siegel_lang['ov_titel'];
+        echo '<div class="mt5" style="font-size: 12px;"><b>'.$siegel_title.':</b> '.$siegel_text.'.'.($siegel_explored ? '' : ' '.$siegel_lang['ov_hinweis']).'</div>';
+    } catch (\Throwable $e) {
+        error_log('Siegel von Basranur: '.$e->getMessage());
+    }
+}
+
 //obere Buttons Server/Hilfe/Umfragen, darunter Community (Discord/WhatsApp)
 //zwei Zeilen, da fünf Buttons (je ~120px) nicht in die 560px-Spalte passen
 echo'

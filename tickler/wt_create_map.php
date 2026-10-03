@@ -479,7 +479,7 @@ if($row['create_map_objects']==1){
 	$specialsystem_names[0]='shaKer';
 	$specialsystem_names[1]='Ares';
 	$specialsystem_names[2]='Hephaistos';
-	$specialsystem_names[3]='Hades';
+	$specialsystem_names[3]='Siegel von Basranur';//früher Hades, siehe src/Model/Siegel/SiegelService.php
 	$specialsystem_names[4]='Hekate';
 	$specialsystem_names[5]='Thanatos';
 

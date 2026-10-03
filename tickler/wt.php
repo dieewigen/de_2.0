@@ -8,6 +8,7 @@ use DieEwigen\DE2\Model\Tick\TickGiveSecBuildingsToNPC2;
 use DieEwigen\DE2\Model\Tick\TickExileReports;
 use DieEwigen\DE2\Model\Exile\ExileService;
 use DieEwigen\DE2\Model\Exile\ExileMail;
+use DieEwigen\DE2\Model\Siegel\SiegelService;
 
 set_time_limit(240);
 $directory = '../';
@@ -24,8 +25,9 @@ include_once $directory."inccon.php";
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
-//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang und $sv_link müssen hier definiert sein
+//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang und $sv_link müssen hier definiert sein
 include $directory."inc/lang/".$sv_server_lang."_exile.lang.php";
+include $directory."inc/lang/".$sv_server_lang."_siegel.lang.php";
 include $directory."inc/".$sv_server_lang."_links.inc.php";
 include_once $directory."inc/sabotage.inc.php";
 include_once $directory."inc/allyjobs.inc.php";
@@ -345,6 +347,16 @@ if ($doetick == 1) {
         $spec3cache[$i] = -1;
     }
 
+    //Siegel von Basranur: Periodenwechsel und Bonus auf den planetaren Grundertrag, Fehler dürfen den Tick nicht aufhalten
+    echo '<br>Siegel von Basranur<br>';
+    $siegel_faktor = 0;
+    try {
+        $siegel_faktor = (new SiegelService($GLOBALS['dbi']))->processTick($siegel_lang) / 100;
+        echo 'Bonus: '.($siegel_faktor * 100).' %<br>';
+    } catch (\Throwable $e) {
+        echo 'Fehler beim Siegel von Basranur: '.$e->getMessage().'<br>';
+    }
+
     ////////////////////////////////////////////////
     // die Spieler nach Rassen durchgehen
     ////////////////////////////////////////////////
@@ -509,16 +521,19 @@ if ($doetick == 1) {
             }
 
 
+            //Siegel von Basranur: wirkt additiv zur Sektor-Spezialisierung, nur für menschliche Spieler
+            $siegel_bonus = ($npc == 0) ? $siegel_faktor : 0;
+
             if (!hasTech($pt, 4)) {//keine gilde
-                $grundm = $sv_plan_grundertrag[0] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grundd = $sv_plan_grundertrag[1] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grundi = $sv_plan_grundertrag[2] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grunde = $sv_plan_grundertrag[3] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
+                $grundm = $sv_plan_grundertrag[0] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grundd = $sv_plan_grundertrag[1] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grundi = $sv_plan_grundertrag[2] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grunde = $sv_plan_grundertrag[3] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
             } else {  //mit gilde
-                $grundm = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grundd = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grundi = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
-                $grunde = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * (1 + $spec3cache[$sector]);
+                $grundm = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grundd = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grundi = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
+                $grunde = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * (1 + $spec3cache[$sector] + $siegel_bonus);
             }
 
             $grundm = $grundm + floor($agent_lost * $sv_zoellnerertrag[0]);

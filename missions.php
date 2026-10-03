@@ -317,6 +317,19 @@ $md[$md_index]['storage_capacity']=$res_bezahlen*10;
 $md[$md_index]['special_system_phase_need']=array(4,1);
 $md[$md_index]['ally_mission_counter_id']=2;
 
+//Geheimdienst BASRANUR - Resonanzkristalle für das Siegel von Basranur (Spezialsystem 5), muss am Ende stehen, da die Missions-ID die Position ist
+$md_index++;
+$md[$md_index]['typ']=0;
+$md[$md_index]['subtyp']=3;//Basranur
+$md[$md_index]['reward'][0]=array('I', \DieEwigen\DE2\Model\Siegel\SiegelService::ITEM_ID, 1);
+$md[$md_index]['time']=\DieEwigen\DE2\Model\Siegel\SiegelService::getMissionZeit()*$duration_factor;
+$need_agents=round($agent_avg*0.25);
+if($need_agents<500){
+	$need_agents=500;
+}
+$md[$md_index]['need_agents']=$need_agents;
+$md[$md_index]['special_system_phase_need']=array(\DieEwigen\DE2\Model\Siegel\SiegelService::SPECIAL_SYSTEM_ID,1);
+
 //Handel - HADES - man zahlt Verteidigungsanlagen BNG 9000 und erhält Sektorkollektoren
 
 ?>
@@ -431,7 +444,11 @@ if(!hasTech($pt,29)){
 					case 2: //HEPHAISTOS
 						$missionstyp.=' (HEPHAISTOS)';
 					break;
-		
+
+					case 3: //Siegel von Basranur
+						$missionstyp.=' (BASRANUR)';
+					break;
+
 				}
 			}
 
@@ -619,7 +636,14 @@ if(!hasTech($pt,29)){
 								$free_artefact_places=0;
 							}
 
+							//den Missionsdatensatz zuerst auf erledigt stellen, damit parallele Anfragen die Belohnung nicht doppelt erhalten
+							$mission_claimed=false;
 							if($free_artefact_places>=$need_artefact_places){
+								mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_mission SET get_reward=1, counter=counter+1 WHERE mission_id=? AND user_id=? AND get_reward=0", [$m, $_SESSION['ums_user_id']]);
+								$mission_claimed=mysqli_affected_rows($GLOBALS['dbi'])==1;
+							}
+
+							if($mission_claimed){
 								//Agenten wieder gutschreiben
 								$sql="UPDATE de_user_data SET agent=agent+".$um[$m]['need_agents']." WHERE user_id=".$_SESSION['ums_user_id'].";";
 								write2agentlog($_SESSION['ums_user_id'], 'mission-getback', $md[$m]['need_agents']);
@@ -698,10 +722,6 @@ if(!hasTech($pt,29)){
 								}
 								$success_msg.='</div>';
 
-								//den Missionsdatensatz auf erledigt stellen und den counter erhöhen
-								$sql="UPDATE de_user_mission SET get_reward=1, counter=counter+1 WHERE mission_id=".$m." AND user_id=".$_SESSION['ums_user_id'].";";
-								mysqli_query($GLOBALS['dbi'],$sql);
-								
 								$um[$m]['end_time']=0;
 								$um[$m]['get_reward']=1;
 
@@ -716,8 +736,11 @@ if(!hasTech($pt,29)){
 								//infocenter zum schnelleren Reload vormerken
 								$_SESSION['ic_last_refresh']=0;
 
+							}elseif($free_artefact_places<$need_artefact_places){
+								$err_msg='<div style="color: #FF0000; font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">Im Artefaktgeb&auml;ude ist kein freier Platz.</div>';
 							}else{
-								$err_msg='<div style="color: #FF0000; font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">Im Artefaktgeb&auml;ude ist kein freier Platz.</div>';	
+								//eine parallele Anfrage hat die Belohnung bereits abgeholt
+								$err_msg='<div style="color: #FF0000; font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">Die Mission wurde bereits beendet.</div>';
 							}
 						}else{
 							$err_msg='<div style="color: #FF0000; font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">Die Mission wurde bereits beendet.</div>';	

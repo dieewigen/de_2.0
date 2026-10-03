@@ -565,7 +565,11 @@ INSERT INTO `de_item_data` (`item_id`, `item_name`, `item_quality`, `item_sort_o
 (17, 'Handelswaren IV', 0, 17, 'I9x400;I10x200;Z24;P21x2'),
 (18, 'Handelswaren V', 0, 18, 'I11x400;I12x200;Z24;P20x2'),
 (19, 'Drasogi-Kristall', 0, 19, ''),
-(20, 'Infiltrator Omega', 0, 20, 'I3x1000;I4x500;I19x1;Z24;P24x10');
+(20, 'Infiltrator Omega', 0, 20, 'I3x1000;I4x500;I19x1;Z24;P24x10'),
+(21, 'Resonanzkristall', 1, 21, '');
+
+-- Beim Update eines laufenden Servers: Resonanzkristall für das Siegel von Basranur nachtragen
+-- INSERT IGNORE INTO `de_item_data` (`item_id`, `item_name`, `item_quality`, `item_sort_order`, `item_blueprint`) VALUES (21, 'Resonanzkristall', 1, 21, '');
 
 -- --------------------------------------------------------
 
@@ -2868,6 +2872,37 @@ CREATE TABLE `de_server_stat` (
   `max_col_build` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `gesamt_kartefakt` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `max_kartefakt` bigint(20) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_siegel`
+-- Das Siegel von Basranur: gemeinsames Serverprojekt, eine Zeile mit id=1 (legt der SiegelService selbst an)
+--
+
+CREATE TABLE `de_siegel` (
+  `id` tinyint(3) UNSIGNED NOT NULL,
+  `round_start` date DEFAULT NULL,
+  `period_nr` int(10) UNSIGNED NOT NULL DEFAULT 1,
+  `period_start_wt` bigint(20) NOT NULL DEFAULT 1,
+  `level` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `history` varchar(2000) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_siegel_beitrag`
+-- eingesetzte Resonanzkristalle je Periode und Spieler
+--
+
+CREATE TABLE `de_siegel_beitrag` (
+  `period_nr` int(10) UNSIGNED NOT NULL,
+  `user_id` mediumint(9) NOT NULL,
+  `amount` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`period_nr`, `user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -5354,7 +5389,7 @@ ALTER TABLE `de_dez_zeitung`
 -- AUTO_INCREMENT für Tabelle `de_item_data`
 --
 ALTER TABLE `de_item_data`
-  MODIFY `item_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `item_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT für Tabelle `de_login`

@@ -155,8 +155,12 @@ $GLOBALS['sv_activetime']=3600;
 //id für das pcs
 $GLOBALS['sv_pcs_id']=11;
 
-//das siegel von basranur: nach x ticks starten, ticklaufzeit, maxprozent
-$GLOBALS['sv_siegel1'] = array (480, 4800, 0.03);
+//Das Siegel von Basranur (Spezialsystem 5 in den Vergessenen Systemen), optional, ohne Eintrag gelten diese Werte
+//$GLOBALS['sv_siegel_dauer']=480;              //Länge einer Aufladeperiode in Wirtschaftsticks
+//$GLOBALS['sv_siegel_mission_zeit']=14400;     //Dauer des Agenteneinsatzes BASRANUR in Sekunden
+//$GLOBALS['sv_siegel_anteil']=3;               //Resonanzkristalle pro Spieler und Periode, um als Mitwirkender zu zählen
+//$GLOBALS['sv_siegel_spieler_pro_stufe']=4;    //Mitwirkende je Stufe, jede Stufe gibt +2 % planetaren Grundertrag
+//$GLOBALS['sv_siegel_max_stufe']=10;           //höchste Stufe
 
 //serversprache
 $GLOBALS['sv_server_lang']=1;

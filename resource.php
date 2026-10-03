@@ -3,6 +3,7 @@ include "inc/header.inc.php";
 include "lib/transaction.lib.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_resource.lang.php';
+include 'inc/lang/'.$sv_server_lang.'_siegel.lang.php';
 include 'inc/sabotage.inc.php';
 include "functions.php";
 
@@ -57,6 +58,15 @@ if ($planertragbonus > 100) {
 }
 $planertragbonus = $planertragbonus / 100;
 
+//Bonus durch das Siegel von Basranur, wirkt wie im Wirtschaftstick additiv zur Spezialisierung
+$siegelbonus = 0;
+if ($pd['npc'] == 0) {
+    try {
+        $siegelbonus = (new \DieEwigen\DE2\Model\Siegel\SiegelService($GLOBALS['dbi']))->getBonusPercent() / 100;
+    } catch (\Throwable $e) {
+        error_log('Siegel von Basranur: '.$e->getMessage());
+    }
+}
 
 //schauen welche sektorartefakte in dem sektor sind
 $sartefakt = 0;
@@ -81,27 +91,39 @@ if (($maxtick > 2500000 && $sv_ewige_runde != 1 && $sv_hardcore != 1)) {
 }
 
 if (!hasTech($pt, 4)) {//keine gilde
-    $grundm = $sv_plan_grundertrag[0] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grundd = $sv_plan_grundertrag[1] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grundi = $sv_plan_grundertrag[2] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grunde = $sv_plan_grundertrag[3] * $grundertragmultiplikator * (1 + $planertragbonus);
+    $grundm = $sv_plan_grundertrag[0] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grundd = $sv_plan_grundertrag[1] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grundi = $sv_plan_grundertrag[2] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grunde = $sv_plan_grundertrag[3] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
 
     //bonus durch spezialisierung
     $spezim = $sv_plan_grundertrag[0] * $grundertragmultiplikator * $planertragbonus;
     $spezid = $sv_plan_grundertrag[1] * $grundertragmultiplikator * $planertragbonus;
     $spezii = $sv_plan_grundertrag[2] * $grundertragmultiplikator * $planertragbonus;
     $spezie = $sv_plan_grundertrag[3] * $grundertragmultiplikator * $planertragbonus;
+
+    //bonus durch das siegel von basranur
+    $siegelm = $sv_plan_grundertrag[0] * $grundertragmultiplikator * $siegelbonus;
+    $siegeld = $sv_plan_grundertrag[1] * $grundertragmultiplikator * $siegelbonus;
+    $siegeli = $sv_plan_grundertrag[2] * $grundertragmultiplikator * $siegelbonus;
+    $siegele = $sv_plan_grundertrag[3] * $grundertragmultiplikator * $siegelbonus;
 } else {  //mit gilde
-    $grundm = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grundd = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grundi = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * (1 + $planertragbonus);
-    $grunde = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * (1 + $planertragbonus);
+    $grundm = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grundd = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grundi = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
+    $grunde = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * (1 + $planertragbonus + $siegelbonus);
 
     //bonus durch spezialisierung
     $spezim = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * $planertragbonus;
     $spezid = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * $planertragbonus;
     $spezii = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * $planertragbonus;
     $spezie = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * $planertragbonus;
+
+    //bonus durch das siegel von basranur
+    $siegelm = $sv_plan_grundertrag_whg[0] * $grundertragmultiplikator * $siegelbonus;
+    $siegeld = $sv_plan_grundertrag_whg[1] * $grundertragmultiplikator * $siegelbonus;
+    $siegeli = $sv_plan_grundertrag_whg[2] * $grundertragmultiplikator * $siegelbonus;
+    $siegele = $sv_plan_grundertrag_whg[3] * $grundertragmultiplikator * $siegelbonus;
 }
 
 
@@ -924,10 +946,10 @@ echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-a
 		border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe9'].'<br><br>Aus dem aktiven Dienst entlassene Geheimagenten ('.
       number_format($agent_lost, 0, "", ".").') werden als Zollkontrolleure eingesetzt und sorgen f&uuml;r ein zus&auml;tzliches Einkommen.<br>
 		Grundwert: '.
-      number_format($grundm - $spezim, 0, "", ".").' M / '.
-      number_format($grundd - $spezid, 0, "", ".").' D / '.
-      number_format($grundi - $spezii, 0, "", ".").' I / '.
-      number_format($grunde - $spezie, 0, "", ".").' E
+      number_format($grundm - $spezim - $siegelm, 0, "", ".").' M / '.
+      number_format($grundd - $spezid - $siegeld, 0, "", ".").' D / '.
+      number_format($grundi - $spezii - $siegeli, 0, "", ".").' I / '.
+      number_format($grunde - $spezie - $siegele, 0, "", ".").' E
 		<br>
 		Zolleinnahmen: '.
       number_format($zollm, 0, "", ".").' M / '.
@@ -939,7 +961,14 @@ echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-a
       number_format($spezim, 0, "", ".").' M / '.
       number_format($spezid, 0, "", ".").' D / '.
       number_format($spezii, 0, "", ".").' I / '.
-      number_format($spezie, 0, "", ".").' E
+      number_format($spezie, 0, "", ".").' E'.
+      ($siegelbonus > 0 ? '
+		<br>
+		'.strtr($siegel_lang['resource_tooltip'], ['{PCT}' => round($siegelbonus * 100)]).': '.
+      number_format($siegelm, 0, "", ".").' M / '.
+      number_format($siegeld, 0, "", ".").' D / '.
+      number_format($siegeli, 0, "", ".").' I / '.
+      number_format($siegele, 0, "", ".").' E' : '').'
 
 		  "> '.$resource_lang['plusplanrohstoff'].'</td>';
 echo '<td class="'.$bg.'">'.number_format($grundm + $zollm, 0, "", ".")."</td>";
