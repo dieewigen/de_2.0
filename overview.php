@@ -87,7 +87,7 @@ while ($rew = mysqli_fetch_array($sel_news)) {
     $t = $rew['time'];
     $time = $t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15];
 
-    $det_news .= '<a href="newspaper.php?id='.$rew['id'].'"><span class="text1">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rew['betreff'].'</span></a><br>';
+    $det_news .= '<a href="newspaper.php?id='.$rew['id'].'" class="ov-news-zeile"><span class="ov-news-datum">'.$time.'</span><span class="ov-news-betreff">'.$rew['betreff'].'</span></a>';
 }
 
 //stelle die ressourcenleiste dar
@@ -99,7 +99,7 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT com_sperre FROM de_log
 $row = mysqli_fetch_array($db_daten);
 if ($row['com_sperre'] > $akttime) {
     $sperrtime = strtotime($row['com_sperre']);
-    echo('<div class="info_box text2" style="margin-bottom: 5px; font-size: 14px;">Account: Sperre f&uuml;r ausgehende Kommunikation bis: '.date("d.m.Y - H:i", $sperrtime).'</div>');
+    echo('<div class="ov-sperre mod"><div class="mod-meldung mod-meldung-fehler">Account: Sperre f&uuml;r ausgehende Kommunikation bis: '.date("d.m.Y - H:i", $sperrtime).'</div></div>');
 }
 
 
@@ -121,47 +121,15 @@ try {
 
 if ($exileText !== '') {
     rahmen_oben($exile_lang['box_titel']);
-    echo '<div class="cell" style="width: 560px; min-height: 256px; font-size: 14px; overflow: hidden;">';
-    echo '<div style="float: left; margin-right: 10px;"><img src="gp/g/berater5.png" border="0" alt=""></div>';
-    echo $exileText;
-    echo '</div>';
+    echo '<div class="ov ov-berater mod"><img src="gp/g/berater5.png" class="ov-berater-bild" alt=""><div class="ov-berater-text">'.$exileText.'</div></div>';
     rahmen_unten();
-    echo '<br>';
 } elseif ($sector <= 1) {
     //Sektor 0 ist nur der Übergang: neue Konten stehen dort, bis register_user.php sie in Sektor 1 setzt (jede Minute)
-    $sek0info = ($sector == 0) ? '<div class="text3" style="margin-bottom: 8px;">'.$ov_lang['sek0info'].'</div>' : '';
-    $text = '
-	<table width="586" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-	<td width="13" height="37" class="rol">&nbsp;</td>
-	<td width="560" align="center" class="ro"><div class="cellu">'.$ov_lang['sek1welcome'].'</div></td>
-	<td width="13" class="ror">&nbsp;</td>
-	</tr>
-	<tr>
-	<td class="rl">&nbsp;</td>
-	<td><div class="cell">'.$sek0info.$ov_lang['sek1info'].'</div></td>
-	<td width="13" class="rr">&nbsp;</td>
-	</tr>
-	</table>
-	<table width="586" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-	<td width="13" class="rul">&nbsp;</td>
-	<td class="ru">&nbsp;</td>
-	<td width="13" class="rur">&nbsp;</td>
-	</tr>
-	</table><br><br>';
-    echo($text);
+    $sek0info = ($sector == 0) ? '<div class="mod-meldung mod-meldung-ok">'.$ov_lang['sek0info'].'</div>' : '';
+    rahmen_oben($ov_lang['sek1welcome']);
+    echo '<div class="ov ov-willkommen mod">'.$sek0info.$ov_lang['sek1info'].'</div>';
+    rahmen_unten();
 }
-
-//det-meldung
-
-$ueberschrift = '
-    <table width="586" border="0" cellpadding="0" cellspacing="0">
-    <tr>
-    <td width="13" height="37" class="rol">&nbsp;</td>
-    <td width="560" align="center" class="ro"><div class="cellu">Übersicht</div></td>
-    <td width="13" class="ror">&nbsp;</td>
-    </tr>';
 
 ///////////////////////////////////////////////////////////////
 //die rundencounteranzeige erstellen - anfang
@@ -173,14 +141,14 @@ if ($sv_hardcore == 1) {
     $maxtick = $row['tick'];
 
 
-    $rca = '<div class="fett text3">Das Ziel beim Hardcore-Rundenmodus ist es als erster 5 Erhabenenteilsiege zu erreichen und somit zum vollwertigen ERHABENEN zu werden.</div>';
+    $rca = '<div class="ov-hc-ziel">Das Ziel beim Hardcore-Rundenmodus ist es als erster 5 Erhabenenteilsiege zu erreichen und somit zum vollwertigen ERHABENEN zu werden.</div>';
 
     //Top 3
     //die ersten drei Plätze anzeigen
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 AND (eh_siege>0 OR eh_counter>0) ORDER BY eh_siege DESC, eh_counter DESC LIMIT 3", []);
     $num = mysqli_num_rows($db_daten);
     if ($num > 0) {
-        $rca .= '<div style="width: 100%; height: 78px; margin-top: 8px;">';
+        $rca .= '<div class="ov-hc">';
         $platzc = 1;
         while ($row = mysqli_fetch_array($db_daten)) {
             if ($row['status'] == 1 && !empty($row['allytag'])) {
@@ -189,8 +157,8 @@ if ($sv_hardcore == 1) {
                 $allianz = '';
             }
 
-            $rca .= '<div style="width: 31%; height: 100%; padding-top: 10px; border: 1px solid #FFFFFF; margin-right: 11px; float: left;">';
-            $rca .= '<span class="fett">Top '.$platzc.' - EH-Anw&auml;rter</span>'.
+            $rca .= '<div class="ov-hc-box">';
+            $rca .= '<span class="mod-typ">Top '.$platzc.' - EH-Anw&auml;rter</span>'.
                     '<br>'.$row['spielername'].
                     $allianz.
                     '<br>EH-Teilsiege: '.$row['eh_siege'].'/'.$sv_hardcore_need_wins.
@@ -203,7 +171,7 @@ if ($sv_hardcore == 1) {
     }
 
 
-    $rca .= '<div style="width: 100%; height: 78px; margin-top: 24px; margin-bottom: 10px;">';
+    $rca .= '<div class="ov-hc">';
     //aktueller EH-Counter
     if ($maxtick > 1000) {
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE npc=0 AND sector > 1 ORDER BY ehscore DESC LIMIT 1", []);
@@ -218,8 +186,8 @@ if ($sv_hardcore == 1) {
                     $allianz = '';
                 }
 
-                $rca .= '<div style="width: 31%; height: 100%; padding-top: 10px; border: 1px solid #FFFFFF; margin-right: 11px; float: left;">';
-                $rca .= '<span class="fett">EH-Counter l&auml;uft f&uuml;r</span>'.
+                $rca .= '<div class="ov-hc-box">';
+                $rca .= '<span class="mod-typ">EH-Counter l&auml;uft f&uuml;r</span>'.
                         '<br>'.$row['spielername'].
                         $allianz.
                         '<br>EH-Teilsiege: '.$row['eh_siege'].'/'.$sv_hardcore_need_wins.
@@ -245,8 +213,8 @@ if ($sv_hardcore == 1) {
                 $allianz = '';
             }
 
-            $rca .= '<div style="width: 31%; height: 100%; padding-top: 10px; border: 1px solid #FFFFFF; margin-right: 11px; float: left;">';
-            $rca .= '<span class="fett">Deine Daten</span>'.
+            $rca .= '<div class="ov-hc-box">';
+            $rca .= '<span class="mod-typ">Deine Daten</span>'.
                     '<br>'.$row['spielername'].
                     $allianz.
                     '<br>EH-Teilsiege: '.$row['eh_siege'].'/'.$sv_hardcore_need_wins.
@@ -367,13 +335,11 @@ if ($sv_hardcore == 1) {
 //die rundencounteranzeige erstellen - ende
 ///////////////////////////////////////////////////////////////
 
-echo($ueberschrift.'
-<tr>
-<td class="rl">&nbsp;</td>
-<td align="center" class="text1 bgpic3">');
+rahmen_oben('&Uuml;bersicht');
+echo '<div class="ov mod">';
 
 //Rundenfortschrittsanzeige
-echo $rca;
+echo '<div class="ov-runde">'.$rca.'</div>';
 
 //Siegel von Basranur, nur wenn die Vergessenen Systeme aktiv sind
 if (($GLOBALS['sv_deactivate_vsystems'] ?? 0) != 1) {
@@ -395,112 +361,65 @@ if (($GLOBALS['sv_deactivate_vsystems'] ?? 0) != 1) {
         $siegel_title = $siegel_explored
             ? '<a href="map_system.php?id='.$siegel->getSealMapId().'">'.$siegel_lang['ov_titel'].'</a>'
             : $siegel_lang['ov_titel'];
-        echo '<div class="mt5" style="font-size: 12px;"><b>'.$siegel_title.':</b> '.$siegel_text.'.'.($siegel_explored ? '' : ' '.$siegel_lang['ov_hinweis']).'</div>';
+        echo '<div class="ov-siegel"><b>'.$siegel_title.':</b> '.$siegel_text.'.'.($siegel_explored ? '' : ' '.$siegel_lang['ov_hinweis']).'</div>';
     } catch (\Throwable $e) {
         error_log('Siegel von Basranur: '.$e->getMessage());
     }
 }
 
-//obere Buttons Server/Hilfe/Umfragen, darunter Community (Discord/WhatsApp)
-//zwei Zeilen, da fünf Buttons (je ~120px) nicht in die 560px-Spalte passen
-echo'
-    <div style="display: flex; width: 100%;" class="mt15">
-        <div style="flex-grow: 1;"><a href="sinfo.php?" class="btn">Serverinfos</a></div>
-        <div style="flex-grow: 1;"><a href="'.$sv_link[2].'" target="_blank" class="btn">Hilfe</a></div>
-        <div style="flex-grow: 1;"><a href="vote_overview.php?bar=yes" class="btn">Umfragen</a></div>
-    </div>
-    <div style="display: flex; width: 100%;" class="mt5 mb15">
-        <div style="flex-grow: 1;"><a href="https://discord.gg/qBpCPx4" target="_blank" class="btn">DE-Discord</a></div>
-        <div style="flex-grow: 1;"><a href="https://chat.whatsapp.com/FmUiandWLPxHrrnolH5EuI" target="_blank" class="btn">DE-WhatsApp</a></div>
+//Links: Serverinfos, Hilfe, Umfragen, Community; als schlichte Knöpfe passen alle fünf in eine Zeile
+echo '
+    <div class="ov-links">
+        <a href="sinfo.php?" class="mod-btn mod-btn-leise">Serverinfos</a>
+        <a href="'.$sv_link[2].'" target="_blank" class="mod-btn mod-btn-leise">Hilfe</a>
+        <a href="vote_overview.php?bar=yes" class="mod-btn mod-btn-leise">Umfragen</a>
+        <a href="https://discord.gg/qBpCPx4" target="_blank" class="mod-btn mod-btn-leise">DE-Discord</a>
+        <a href="https://chat.whatsapp.com/FmUiandWLPxHrrnolH5EuI" target="_blank" class="mod-btn mod-btn-leise">DE-WhatsApp</a>
     </div>
 
+    <div class="ov-news">
+        <div class="ov-kopf"><span class="mod-typ">'.$ov_lang['detkristueber'].'</span><a href="newspaper.php?action=archiv&typ=1" class="ov-kopf-link">'.$ov_lang['archiv'].'</a></div>
+        '.$det_news.'
+    </div>';
+echo '</div>';
+rahmen_unten();
 
-    <div style="font-weight: bold; font-size:14px; margin-bottom: 5px;">'.$ov_lang['detkristueber'].' [<a href="newspaper.php?action=archiv&typ=1">'.$ov_lang['archiv'].'</a>]</div>
-    <div align="left">
-        <table border="0">
-            <tr><td width="30">&nbsp;</td><td>'.$det_news.'</td></tr>
-        </table>
+//Systemübersicht: oben wer man ist, darunter die Kennzahlen als Kacheln
+$allianz_str = (trim($allytag) != '') ? ' &middot; '.$ov_lang['allianz'].' '.$allytag : '';
+$kennzahlen = array(
+    array($ov_lang['kollektoren'], number_format($col, 0, "", ".")),
+    array($ov_lang['sonden'], number_format($sonde, 0, "", ".")),
+    array($ov_lang['agenten'], number_format($agent, 0, "", ".")),
+    array($ov_lang['handelspunkte'], number_format($tradescore, 0, "", ".")),
+    array($ov_lang['rundenpunkte'], number_format($rundenpunkte, 0, "", ".")),
+    //tick zählt jeden Wirtschaftstick seit Bestehen des Kontos
+    array('Spielzeit', number_format($own_tick, 0, "", ".").' <small>WT</small>'),
+);
+$kacheln = '';
+foreach ($kennzahlen as $kennzahl) {
+    $kacheln .= '<div class="ov-wert"><span class="mod-typ">'.$kennzahl[0].'</span><b>'.$kennzahl[1].'</b></div>';
+}
+
+rahmen_oben($ov_lang['systemuebersicht']);
+echo '
+<div class="ov mod">
+    <div class="ov-profil">
+        <img src="gp/g/derassenlogo'.$_SESSION['ums_rasse'].'.png" class="ov-logo" alt="">
+        <div class="ov-profil-text">
+            <div class="ov-name">'.$_SESSION['ums_spielername'].'</div>
+            <div class="ov-unter">'.$rasse.$allianz_str.' &middot; '.$ov_lang['sys'].' '.$sector.':'.$system.'</div>
+            <div class="ov-chips">
+                <span class="mod-chip">'.$ov_lang['platz'].' <b>'.number_format($platz, 0, "", ".").'</b></span>
+                <span class="mod-chip">'.$ov_lang['rang'].' <b>'.$rang.'</b></span>
+            </div>
+        </div>
     </div>
-
-
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-</table>
-
-
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rml">&nbsp;</td>
-         <td align="center" class="ro"><div class="cellu">'.$ov_lang['systemuebersicht'].'</div></td>
-         <td width="13" class="rmr">&nbsp;</td>
-         </tr>';
-echo('<tr>
-       <td width="13" class="rl">&nbsp;</td><td>
-       
-       <table width="100%" border="0" cellpadding="0" cellspacing="1">
-       <tr align="left">
-       <td width="140" class="cell">'.$ov_lang['accountid'].'</td>
-       <td width="140" class="cell" align="center">'.$sv_server_tag.$_SESSION['ums_user_id'].'</td>
-       <td width="140" class="cell1">'.$ov_lang['rundenpunkte'].'</td>
-       <td width="140" class="cell1" align="center">'.$rundenpunkte.'</td>
-	   </tr>
-       <tr align="left">
-       <td class="cell">'.$ov_lang['name'].'</td>
-       <td class="cell" align="center">'.$_SESSION['ums_spielername'].'</td>
-	   <td class="cell1">'.$ov_lang['allianz'].'</td>
-       <td class="cell1" align="center">'.$allytag.'</td>
-	   </tr>
-       <tr align="left">
-       <td class="cell">'.$ov_lang['sys'].'</td>
-       <td class="cell" align="center">'.$sector.':'.$system.'</td>
-	   <td class="cell1">'.$ov_lang['kollektoren'].'</td>
-       <td class="cell1" align="center">'.number_format($col, 0, "", ".").'</td>
-       </tr>
-       <tr align="left">
-       <td class="cell">'.$ov_lang['rang'].'</td>
-       <td class="cell" align="center">'.$rang.'</td>
-	   <td class="cell1">'.$ov_lang['sonden'].'</td>
-       <td class="cell1" align="center">'.number_format($sonde, 0, "", ".").'</td>
-       </tr>
-       <tr align="left">
-       <td class="cell">'.$ov_lang['platz'].'</td>
-       <td class="cell" align="center">'.number_format($platz, 0, "", ".").'</td>
-	   <td class="cell1">'.$ov_lang['agenten'].'</td>
-       <td class="cell1" align="center">'.number_format($agent, 0, "", ".").'</td>
-       </tr>
-       <tr align="left">
-       <td class="cell">'.$ov_lang['woche'].'</td>
-       <td class="cell" align="center">'.number_format($own_tick, 0, "", ".").'</td>
-	   <td class="cell1">'.$ov_lang['handelspunkte'].'</td>
-       <td class="cell1" align="center">'.number_format($tradescore, 0, "", ".").'</td>
-       </tr>
-
-       <tr align="left">
-       <td class="cell">'.$ov_lang['rasse'].'</td>
-       <td class="cell" align="center">'.$rasse.'</td>
-	   <td class="cell1">'.$ov_lang['galaxie'].'</td>
-       <td class="cell1" align="center">'.$sv_server_name.'</td>
-       </tr>
-       
-       </table>
-       ');
-echo('</td><td width="13" class="rr">&nbsp;</td>
-       </tr>
-       </table>
-       ');
+    <div class="ov-werte">'.$kacheln.'</div>
+    <div class="ov-meta">'.$ov_lang['accountid'].' '.$sv_server_tag.$_SESSION['ums_user_id'].' &middot; '.$ov_lang['galaxie'].' '.$sv_server_name.'</div>
+</div>';
+rahmen_unten();
 
 //schiffseinheiten/verteidigungsanlagen
-echo '
-		   <table width="586" border="0" cellpadding="0" cellspacing="0">
-		   <tr>
-		   <td width="13" height="37" class="rml">&nbsp;</td>
-		   <td width="280" align="center" class="ro"><div class="cellu">'.$ov_lang['schiffseinheiten'].'</div></td>
-		   <td width="280" align="center" class="ro"><div class="cellu">'.$ov_lang['verteidigungsanlagen'].'</div></td>
-		   <td width="13" class="rmr">&nbsp;</td>
-		   </tr>
-		   ';
-
 //zaehle alle schiffe, die schon vorhanden sind - anfang
 $ec = array();
 $ec[81] = 0;
@@ -569,154 +488,22 @@ while ($row = mysqli_fetch_array($db_daten)) {
     $ik++;
 }
 
-//jetzt die daten komprimiert ausgeben
-echo('<tr align="center" height="25">');
-echo('<td width="13" class="rl">&nbsp;</td><td colspan=2>');
-
-$max = count($schiffe);
-if (count($defense) > $max) {
-    $max = count($defense);
+//Einheiten in zwei Spalten; Typen ohne Bestand blass
+$einheiten_spalten = '';
+foreach (array(array($ov_lang['schiffseinheiten'], $schiffe), array($ov_lang['verteidigungsanlagen'], $defense)) as $spalte) {
+    $zeilen = '';
+    foreach ($spalte[1] as $einheit) {
+        $zeilen .= '<div class="ov-einheit'.($einheit[1] === '0' ? ' ov-einheit-null' : '').'"><span>'.$einheit[0].'</span><b>'.$einheit[1].'</b></div>';
+    }
+    $einheiten_spalten .= '<div class="ov-einheiten-spalte"><div class="mod-typ">'.$spalte[0].'</div>'.$zeilen.'</div>';
 }
 
-//2 spalten für schiffe/verteidigungsanlagen
-echo('<div class="cell"><table width="100%" border="0" cellpadding="0" cellspacing="0">');
-echo('<tr><td width="50%"><div class="bgpic1" style="height: 150px;">
+rahmen_oben($ov_lang['schiffseinheiten'].' &amp; '.$ov_lang['verteidigungsanlagen']);
+echo '<div class="ov mod"><div class="ov-einheiten">'.$einheiten_spalten.'</div></div>';
+rahmen_unten();
 
-		<table border="0" cellpadding="0" cellspacing="1">');
-for ($jk = 0;$jk < $max;$jk++) {
-    if ($jk == 0) {
-        $w1 = ' width="200"';
-        $w2 = ' width="80"';
-    } else {
-        $w1 = '';
-        $w2 = '';
-    }
-
-    if (isset($schiffe[$jk][0])) {
-        $out[0] = $schiffe[$jk][0];
-    } else {
-        $out[0] = '';
-    }
-
-    if (isset($schiffe[$jk][1])) {
-        $out[1] = $schiffe[$jk][1];
-    } else {
-        $out[1] = '';
-    }
-
-    if (isset($defense[$jk][0])) {
-        $out[2] = $defense[$jk][0];
-    } else {
-        $out[2] = '';
-    }
-
-    if (isset($defense[$jk][1])) {
-        $out[3] = $defense[$jk][1];
-    } else {
-        $out[3] = '';
-    }
-
-    if ($out[0] == '') {
-        $out[0] = '&nbsp;';
-    }
-    if ($out[1] == '') {
-        $out[1] = '&nbsp;';
-    }
-    if ($out[2] == '') {
-        $out[2] = '&nbsp;';
-    }
-    if ($out[3] == '') {
-        $out[3] = '&nbsp;';
-    }
-
-    echo('<tr>');
-    echo('<td'.$w1.' class="text1">'.$out[0]."</td>");
-    echo('<td'.$w2.' class="text1" align="center">'.$out[1]."</td>");
-    echo('</tr>');
-}
-
-// die 2 spalten folgen hier aufeinander
-echo('</table></div></td><td width="50%"><div class="bgpic2">');
-
-echo('<table border="0" cellpadding="0" cellspacing="1">');
-
-for ($jk = 0;$jk < $max;$jk++) {
-    if ($jk == 0) {
-        $w1 = ' width="200"';
-        $w2 = ' width="80"';
-    } else {
-        $w1 = '';
-        $w2 = '';
-    }
-
-    if (isset($schiffe[$jk][0])) {
-        $out[0] = $schiffe[$jk][0];
-    } else {
-        $out[0] = '';
-    }
-
-    if (isset($schiffe[$jk][1])) {
-        $out[1] = $schiffe[$jk][1];
-    } else {
-        $out[1] = '';
-    }
-
-    if (isset($defense[$jk][0])) {
-        $out[2] = $defense[$jk][0];
-    } else {
-        $out[2] = '';
-    }
-
-    if (isset($defense[$jk][1])) {
-        $out[3] = $defense[$jk][1];
-    } else {
-        $out[3] = '';
-    }
-
-    if ($out[0] == '') {
-        $out[0] = '&nbsp;';
-    }
-    if ($out[1] == '') {
-        $out[1] = '&nbsp;';
-    }
-    if ($out[2] == '') {
-        $out[2] = '&nbsp;';
-    }
-    if ($out[3] == '') {
-        $out[3] = '&nbsp;';
-    }
-
-    echo('<tr>');
-    //echo ('<td'.$w1.' class="cell">'.$out[0]."</td>");
-    //echo ('<td'.$w2.' class="cell" align="center">'.$out[1]."</td>");
-    echo('<td'.$w1.' class="text1">'.$out[2]."</td>");
-    echo('<td'.$w2.' class="text1" align="center">'.$out[3]."</td>");
-    echo('</tr>');
-}
-echo('</table></div></td></tr></table>');
-
-//tabelle schlie�en
-echo('</td><td width="13" class="rr">&nbsp;</td>');
-echo('</tr>');
-echo('</table>');
-
-//errungenschaften
-echo '
-         <table width="586" border="0" cellpadding="0" cellspacing="0">
-         <tr>
-         <td width="13" height="37" class="rml">&nbsp;</td>
-         <td width="560" align="center" class="ro"><div class="cellu">'.$ov_lang['errungenschaften'].'</div></td>
-         <td width="13" class="rmr">&nbsp;</td>
-         </tr>
-         ';
-
-
-echo('<tr align="center" height="25">');
-echo('<td width="13" class="rl">&nbsp;</td><td>');
-
-echo('<table border="0" cellpadding="0" cellspacing="1">');
-//tabellen�berschrift ausgeben
-echo('<tr align="center"><td width="50" class="cell">'.$ov_lang['stufe'].'</td><td width="510" class="cell">'.$ov_lang['aufgabe'].'</td></tr>');
+//errungenschaften: die Zeilen sammelt die Schleife in $ac_zeilen, ausgegeben werden sie danach
+$ac_zeilen = '';
 
 //alle errungenschaften auslesen
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_achievement WHERE user_id = ?", [$_SESSION['ums_user_id']]);
@@ -994,55 +781,14 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
         }
     }
 
-    //grafischen fortschrittsbalken/tooltip erzeugen
+    //Fortschritt und Tooltip
+    $ac_prozent = 0;
     if ($do_calc == 1 and $ac_max > 0) {
-        $gessb = 500;
-
-        //spaltenbreite
-        //wieviel prozent hat man schon
-        //$p=$ticks/$sv_winscore;
-        $p = $zielwert / $rewards[$ac_max - 1][0];
-        if ($p > 1) {
-            $p = 1;
+        //Fortschritt bis zur höchsten bereits freigeschalteten Stufe
+        $ac_prozent = $zielwert / $rewards[$ac_max - 1][0];
+        if ($ac_prozent > 1) {
+            $ac_prozent = 1;
         }
-
-        $sb1 = round($gessb * $p);
-        $sb2 = round($gessb * (1 - $p));
-
-        //spaltenfarbe
-        $sc1 = 10;
-        $sc2 = 11;
-
-        $sc3 = 20;
-        $sc4 = 21;
-
-        if ($p > 0.33) {
-            $sc1 = 7;
-            $sc2 = 8;
-        }
-        if ($p > 0.66) {
-            $sc1 = 4;
-            $sc2 = 5;
-        }
-        if ($p >= 1) {
-            $sc1 = 1;
-            $sc2 = 2;
-            $sc3 = 2;
-            $sc4 = 3;
-        }
-
-        $rca = '<table width="500" border="0" cellpadding="0" cellspacing="0">';
-        $rca .= '<tr height="9">';
-        //linke grafik
-        $rca .= '<td width="5" style="background-image:url(gp/g/rc'.$sc1.'.gif)"></td>';
-        //mittelteil
-        $rca .= '<td width="'.$sb1.'" style="background-image:url(gp/g/rc'.$sc2.'.gif); background-repeat: repeat-x;"></td>';
-        $rca .= '<td width="'.$sb2.'" style="background-image:url(gp/g/rc'.$sc3.'.gif); background-repeat: repeat-x;"></td>';
-        //rechte grafik
-        $rca .= '<td width="6" style="background-image:url(gp/g/rc'.$sc4.'.gif)"></td>';
-        $rca .= '</tr>';
-        $rca .= '</table>';
-
 
         //tooltip bauen
         $actip[$ac] = $text1.'&'.$text2.'<br>'.$ov_lang['zielwert'].': '.number_format($zielwert, 0, "", ".").'/'.
@@ -1050,22 +796,19 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
         '<br><br>Stufe: Zielwert (Belohnung in M)';
 
         for ($a = 0;$a < count($rewards);$a++) {
-            $font = '#FF0000';
+            $font = '#ff6b6b';
             if ($ac_max > $a) {
-                $font = '#FFFF00';
+                $font = '#ffb45c';
             }
             if ($ac_akt > $a) {
-                $font = '#00FF00';
+                $font = '#5fe08a';
             }
             $actip[$ac] .= '<br><font color='.$font.'>'.($a + 1).': '.number_format($rewards[$a][0], 0, "", ".").' ('.number_format($rewards[$a][1], 0, "", ".").')</font>';
         }
-        $actip[$ac] .= '<br>Farblegende:<br><font color=#00FF00>Gr&uuml;n: erledigt</font>, <font color=#FFFF00>Gelb: freigeschaltet, aber noch nicht erledigt</font>, <font color=#FF0000>Rot: wird automatisch zu einem sp&auml;teren Rundenzeitpunkt freigeschalten</font>';
+        $actip[$ac] .= '<br>Farblegende:<br><font color=#5fe08a>Gr&uuml;n: erledigt</font>, <font color=#ffb45c>Gelb: freigeschaltet, aber noch nicht erledigt</font>, <font color=#ff6b6b>Rot: wird automatisch zu einem sp&auml;teren Rundenzeitpunkt freigeschalten</font>';
 
     }
 
-    if ($ac_max == 0) {
-        $rca = '-';
-    }
     //ac_akt nur hochsetzen, wenn die Stufe noch den alten Wert hat: so gibt es jede Stufe nur einmal,
     //auch wenn die Übersicht in zwei Sitzungen gleichzeitig geladen wird
     if ($ac_akt != $ac_akt_alt) {
@@ -1079,63 +822,36 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
         }
     }
 
-    //ziele ausgeben ausgeben
-    if ($c1 == 0) {
-        $c1 = 1;
-        $bg = 'cell1';
+    //Zeile: erledigte/freigeschaltete Stufen, Aufgabe, Fortschrittsbalken; alle Stufen stehen im Tooltip
+    if ($ac_max == 0) {
+        $ac_zustand = ' ov-ziel-gesperrt';
+        $ac_wert = 'noch nicht freigeschaltet';
     } else {
-        $c1 = 0;
-        $bg = 'cell';
-    }
-    //farbe f�r den fortschritt
-    $str1 = '</font>';
-    if ($ac_akt < $ac_max) {
-        $str = '<font color="#FF0000">';
-    } else {
-        $str = '<font color="#00FF00">';
+        $ac_zustand = ($ac_akt < $ac_max) ? ' ov-ziel-offen' : ' ov-ziel-fertig';
+        $ac_wert = number_format($zielwert, 0, "", ".").' / '.number_format($rewards[$ac_max - 1][0], 0, "", ".");
     }
 
-    if ($do_calc == 1 and $ac_max > 0) {
-        echo('<tr align="center" title="'.$actip[$ac].'">
-          <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.' ('.number_format($zielwert, 0, "", ".").'/'.number_format($rewards[$ac_max - 1][0], 0, "", ".").')'.$rca.'</td>
-          </tr>');
-    } else {
-        if ($ac_max > 0) {
-            echo('<tr align="center">
-          <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.' ('.number_format($zielwert, 0, "", ".").'/'.number_format($rewards[$ac_max - 1][0], 0, "", ".").')'.$rca.'</td>
-          </tr>');
-        } else {
-            echo('<tr align="center">
-          <td class="'.$bg.'">'.$str.$ac_akt.'/'.$ac_max.$str1.'</td><td class="'.$bg.'">'.$text1.'</td>
-          </tr>');
-        }
-
-    }
+    $ac_zeilen .= '
+        <div class="ov-ziel'.$ac_zustand.'"'.(($do_calc == 1 and $ac_max > 0) ? ' rel="tooltip" title="'.$actip[$ac].'"' : '').'>
+            <div class="ov-ziel-stufe">'.$ac_akt.'/'.$ac_max.'</div>
+            <div class="ov-ziel-text">
+                <div class="ov-ziel-kopf"><span class="ov-ziel-name">'.$text1.'</span><span class="ov-ziel-wert">'.$ac_wert.'</span></div>
+                <div class="mod-balken"><span style="width: '.round($ac_prozent * 100, 1).'%;"></span></div>
+            </div>
+        </div>';
 }
-
-//ziele ausgeben
-echo($output);
 
 //belohnungen mit einem mal in der db gutschreiben
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01 = restyp01 + ? WHERE user_id = ?", [$ac_belohnung, $_SESSION['ums_user_id']]);
 //echo ($ac_belohnung);
 
-echo('</table>');
-
-//tabelle schlie�en
-echo('</td><td width="13" class="rr">&nbsp;</td>');
-echo('</tr>');
-echo('</table>');
-
-//fussleiste ausgeben
-echo('
-<table width="586" border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td width="13" class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td width="13" class="rur">&nbsp;</td>
-</tr>
-</table><br><br>');
+rahmen_oben($ov_lang['errungenschaften']);
+echo '<div class="ov mod">';
+echo '<div class="ov-ziele">'.$ac_zeilen.'</div>';
+echo '<div class="ov-legende">Stufe: erledigt / freigeschaltet. Weitere Stufen werden im Lauf der Runde freigeschaltet, Belohnungen automatisch gutgeschrieben. Alle Stufen zeigt der Tooltip.</div>';
+echo '</div>';
+rahmen_unten();
+echo '<br>';
 
 function calculate_ac_max($acs)
 {

@@ -1358,6 +1358,21 @@ body.theme-rasse4 {
   box-shadow: 0 0 12px rgba(255, 107, 107, 0.2);
 }
 
+.mod .mod-btn-leise,
+.mod .mod-btn-leise:link,
+.mod .mod-btn-leise:visited {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mod .mod-btn-leise:hover {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+}
+
 .mod .mod-btn-bereit,
 .mod .mod-btn-bereit:link,
 .mod .mod-btn-bereit:visited,
@@ -2312,6 +2327,306 @@ a.art-kachel-zurueck:hover::after {
 
 .mis-fortschritt {
   margin-top: 8px;
+}
+
+.ov {
+  width: 576px;
+}
+
+.ov-sperre {
+  width: 602px;
+  margin-bottom: 6px;
+  padding: 0;
+  background: none;
+}
+.ov-sperre .mod-meldung {
+  margin: 0;
+}
+
+.ov-berater {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.ov-berater-bild {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  border-radius: 10px;
+}
+
+.ov-willkommen {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.ov-runde {
+  margin-bottom: 10px;
+}
+.ov-runde .scifi-progress-container {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ov-siegel {
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  color: #9da7b1;
+}
+.ov-siegel b {
+  color: #ffffff;
+}
+
+.ov-links {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.ov-links .mod-btn,
+.ov-links .mod-btn:link,
+.ov-links .mod-btn:visited {
+  flex: 1 1 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.ov-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.mod .ov-kopf-link,
+.mod .ov-kopf-link:link,
+.mod .ov-kopf-link:visited {
+  font-size: 12px;
+}
+
+.mod .ov-news-zeile,
+.mod .ov-news-zeile:link,
+.mod .ov-news-zeile:visited {
+  display: flex;
+  gap: 12px;
+  padding: 5px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  text-decoration: none;
+  color: #c9d1d9;
+}
+
+.mod .ov-news-zeile:hover {
+  background: rgba(255, 255, 255, 0.04);
+  text-decoration: none;
+}
+.mod .ov-news-zeile:hover .ov-news-betreff {
+  color: var(--akzent);
+}
+
+.ov-news-datum {
+  flex: 0 0 auto;
+  color: #8b949e;
+}
+
+.ov-news-betreff {
+  overflow-wrap: anywhere;
+}
+
+.ov-hc-ziel {
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #5fe08a;
+}
+
+.ov-hc {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ov-hc-box {
+  flex: 1 1 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.ov-profil {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.ov-logo {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--akzent-mittel);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--akzent-weich), rgba(0, 0, 0, 0) 70%);
+  box-shadow: 0 0 14px var(--akzent-weich);
+}
+
+.ov-profil-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ov-name {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+
+.ov-unter {
+  font-size: 12px;
+  color: #9da7b1;
+}
+
+.ov-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ov-werte {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.ov-wert {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ov-wert b {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.ov-wert small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.ov-meta {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.ov-einheiten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.ov-einheiten-spalte .mod-typ {
+  margin-bottom: 4px;
+}
+
+.ov-einheit {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.ov-einheit b {
+  color: #ffffff;
+}
+
+.ov-einheit-null {
+  color: #6e7681;
+}
+.ov-einheit-null b {
+  font-weight: 400;
+  color: #6e7681;
+}
+
+.ov-ziele {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ov-ziel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: help;
+}
+
+.ov-ziel-stufe {
+  flex: 0 0 48px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ov-ziel-offen .ov-ziel-stufe {
+  color: #ffb45c;
+}
+
+.ov-ziel-fertig .ov-ziel-stufe {
+  color: #5fe08a;
+}
+
+.ov-ziel-gesperrt .ov-ziel-stufe {
+  color: #6e7681;
+}
+
+.ov-ziel-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ov-ziel-kopf {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.ov-ziel-name {
+  color: #ffffff;
+}
+
+.ov-ziel-wert {
+  flex: 0 0 auto;
+  color: #8b949e;
+}
+
+.ov-legende {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8b949e;
 }
 
 body.mobile {
