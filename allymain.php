@@ -305,7 +305,7 @@ $partnerallianz='';
 if($allyidpartner>0){
   	$db_daten2=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_allys WHERE id=?", [$allyidpartner]);
 	$row2 = mysqli_fetch_array($db_daten2);
-    $partnerallianz=$row2['allyname'].' ('.$row2['allytag'].')<br>';
+    $partnerallianz=$row2['allyname'].' ('.$row2['allytag'].')';
 }
 
 //platz nach rundensiegpunkten
@@ -320,11 +320,10 @@ echo '<table width="100%">';
 //print("<tr><td><h2>$allyallymain_lang[msg_4], $_SESSION['ums_spielername']</h2></td></tr>");
 //print("<tr><td><hr></td></tr>");
 
+//Übersicht, Posten und Biografie jeweils im üblichen Rahmen
 echo '<tr><td>
-		<table border="0" width="100%" cellspacing="1" cellpadding="0">
-    		<tr>
-      			<td height=21 class="cl" colspan="4"><h3>'.$allyallymain_lang['allyoverview'].':</h3></td>
-    		</tr>
+		<div class="ally-rahmen">'.rahmen_oben($allyallymain_lang['allyoverview'], false).'
+		<table border="0" width="100%" cellspacing="1" cellpadding="0" class="ally-info">
     		<tr class=cl>
       			<td height=21>Allianzname /-tag:</td>
       			<td height=21 colspan="3"><b>'.htmlspecialchars($clanname, ENT_QUOTES, 'UTF-8').' / '.htmlspecialchars($clankuerzel, ENT_QUOTES, 'UTF-8').'</b></td>
@@ -397,14 +396,9 @@ echo '<tr class="cl">
 			<td height="21" colspan="3"><b><a href="'.$homepagelink.'" target=_blank>'.$homepageurl.'</a></b></td>
 		</tr>
 		
-		</table>
-		<table width="100%">
-		<tr>
-			<td height="21" colspan="2"><hr></td>
-		</tr>
-		<tr>
-			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzposten'].':</h3></td>
-		</tr>
+		</table>'.rahmen_unten(false).'</div>
+		<div class="ally-rahmen">'.rahmen_oben($allyallymain_lang['allianzposten'], false).'
+		<table width="100%" class="ally-info">
 		<tr class="cl">
 			<td height=21>'.$leadername.': </td>
 			<td height=21><b>'.$leaderlink.'</b></td>
@@ -496,16 +490,10 @@ if ($moid2 > -1)
 }
 
 echo '
-			<tr>
-      			<td height="21" colspan="2"><hr></td>
-    		</tr>
-    		<tr>
-      			<td height="21" colspan="2" class="cl"><h3>'.$allyallymain_lang['allianzbiografie'].':</h3></td>
-    		</tr>
-    		<tr>
-      			<td class="cl" height="21" colspan="2">'.nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8')).'</td>
-    		</tr>
-			</table>
+			</table>'.rahmen_unten(false).'</div>
+			<div class="ally-rahmen">'.rahmen_oben($allyallymain_lang['allianzbiografie'], false).'
+			<div class="ally-bio">'.nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8')).'</div>
+			'.rahmen_unten(false).'</div>
 ';
 
 if ($isleader || $iscoleader)

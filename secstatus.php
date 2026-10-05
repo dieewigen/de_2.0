@@ -521,6 +521,10 @@ for ($i = 0; $i < $fa; $i++) {
     echo '<td class="'.$cl.'">-</td>';
     echo '</tr>';
 }
+//leere Tabelle erklären, sonst sieht es nach einem Fehler aus
+if (count($fleet_data) == 0 && count($sector_fleet_data) == 0) {
+    echo '<tr><td colspan="9" class="cell leer-hinweis">Es wurden keine anfliegenden Angreifer oder Verteidiger entdeckt.</td></tr>';
+}
 //echo '</table><br><br>';
 ?>
 </table>
@@ -1018,6 +1022,10 @@ for ($i = 0; $i < $fa; $i++) {
     $zsysold = $zsys1;
 }
 
+if (count($outgoing_fleet_data) == 0 && $fa == 0) {
+    echo '<tr><td colspan="6" class="cell leer-hinweis">'.($secstatdisable == 1 ? 'Zurzeit sind keine deiner Flotten unterwegs.' : 'Zurzeit sind keine Flotten deines Sektors unterwegs.').'</td></tr>';
+}
+
 //echo '</table>';
 ?>
 </table>
@@ -1397,6 +1405,10 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
         }
         $zsecold = $zsec1;
         $zsysold = $zsys1;
+    }
+
+    if ($fa == 0) {
+        echo '<tr><td colspan="9" class="cell leer-hinweis">Bei deinen Allianzmitgliedern wurden keine anfliegenden Flotten entdeckt.</td></tr>';
     }
 
     //echo '</table><br><br>';

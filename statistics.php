@@ -21,19 +21,25 @@ $sector=$row['sector'];$system=$row['system'];$hasally=$row['status'];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include "resline.php";
+
+//Reiter wie in der Rangliste (toplist.php)
+function statistik_menu($aktiv){
+	global $stat_lang;
+	$punkte=array(1=>$stat_lang['spieler'], 2=>$stat_lang['sektor'], 3=>$stat_lang['allianz'], 4=>$stat_lang['server']);
+	$html='<div class="menu_box"><ul id="menu">';
+	foreach($punkte as $mp=>$name){
+		$html.='<li><a href="statistics.php?mp='.$mp.'">'.($mp==$aktiv ? '<b>'.$name.'</b>' : $name).'</a></li>';
+	}
+	return $html.'</ul></div><br>';
+}
+
 if(!isset($_REQUEST['mp'])){
   $_REQUEST['mp']=1;
 }
 
 if($_REQUEST['mp']==1)
 {
-  echo '<table width="600"><tr>
-    <td width="25%\" class="cl"><a href="statistics.php?mp=1"><b>>> '.$stat_lang['spieler'].'</b></a></td>
-	<td width="25%\" class="cl"><a href="statistics.php?mp=2">'.$stat_lang['sektor'].'</a></td>
-	<td width="25%\" class="cl"><a href="statistics.php?mp=3">'.$stat_lang['allianz'].'</a></td>
-	<td width="25%\" class="cl"><a href="statistics.php?mp=4">'.$stat_lang['server'].'</a></td>
-	</tr>
-    </table><br>';
+  echo statistik_menu(1);
   echo'
     <div class="cellu" style="width: 600px;">'.$stat_lang['punkteentwicklung'].'</div>
     <img src="statistics_genpic.php?typ=1" width="600">
@@ -148,13 +154,7 @@ if($_REQUEST['mp']==1)
 }
 elseif($_REQUEST['mp']==2)
 {
-  echo '<table width=600><tr>
-    <td width="25%" class="cl"><a href="statistics.php?mp=1">'.$stat_lang['spieler'].'</b></a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=2"><b>>> '.$stat_lang['sektor'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=3">'.$stat_lang['allianz'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=4">'.$stat_lang['server'].'</a></td>
-	</tr>
-    </table><br>';
+  echo statistik_menu(2);
     
   echo'
     <div class="cellu" style="width: 600px;">'.$stat_lang['punkteentwicklung'].'</div><br><br>
@@ -235,13 +235,7 @@ elseif($_REQUEST['mp']==2)
 }
 elseif($_REQUEST['mp']==3)
 {
-  echo '<table width=600><tr>
-    <td width="25%" class="cl"><a href="statistics.php?mp=1">'.$stat_lang['spieler'].'</b></a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=2">'.$stat_lang['sektor'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=3"><b>>> '.$stat_lang['allianz'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=4">'.$stat_lang['server'].'</a></td>
-	</tr>
-    </table><br>';
+  echo statistik_menu(3);
   //schauen ob man eine allianz hat
   if ($hasally==1)
   echo'
@@ -257,13 +251,7 @@ elseif($_REQUEST['mp']==3)
 }
 elseif($_REQUEST['mp']==4)
 {
-  echo '<table width=600><tr>
-    <td width="25%" class="cl"><a href="statistics.php?mp=1">'.$stat_lang['spieler'].'</b></a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=2">'.$stat_lang['sektor'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=3">'.$stat_lang['allianz'].'</a></td>
-	<td width="25%" class="cl"><a href="statistics.php?mp=4"><b>>> '.$stat_lang['server'].'</a></td>
-	</tr>
-    </table><br>';
+  echo statistik_menu(4);
   //gr��ter tick
   $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data");
   $row = mysqli_fetch_assoc($result);

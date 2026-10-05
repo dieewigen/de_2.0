@@ -78,7 +78,7 @@ $resource_lang['stueck']=' Stück ';
 $resource_lang['ticks']='Ticks';
 $resource_lang['transfer']='Transfer';
 $resource_lang['transferieren']='Transferieren';
-$resource_lang['uebersichtseklager']='übersicht Sektorlager';
+$resource_lang['uebersichtseklager']='Übersicht Sektorlager';
 $resource_lang['umwandlungsverh']='Umwandlungsverhältnis';
 $resource_lang['vorhandenekollis']='Vorhandene Kollektoren';
 ?>

@@ -30,7 +30,7 @@ $stat_lang['legende3']='aktiv';
 $stat_lang['datum']='Datum';
 $stat_lang['zielsektor']='Zielsektor';
 $stat_lang['legende']='Legende';
-$stat_lang['verlorenekollektoren']='verlorene Kollektoren';
-$stat_lang['erobertekollektoren']='eroberte Kollektoren';
+$stat_lang['verlorenekollektoren']='Verlorene Kollektoren';
+$stat_lang['erobertekollektoren']='Eroberte Kollektoren';
 $stat_lang['geloeschterspieler']='gelöschter Spieler';
 ?>

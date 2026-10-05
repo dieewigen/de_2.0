@@ -58,7 +58,7 @@ if (isset($_GET["t"])) {
 </table>';
 }
 
-if ($_GET["a"]) {
+if (!empty($_GET["a"])) {
     //echo '<a href="javascript:history.back();">'.$help_lang['zurueck'].'</a><br><br>';
     $a = (int)$_GET["a"];
     $artresult = mysqli_execute_query($GLOBALS['dbi'], 
@@ -73,6 +73,8 @@ if ($_GET["a"]) {
         $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
         $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
 
+        //Artefaktfarbe nur als Randmarkierung, der Text selbst hell (farbiger Text auf rotem Grund war kaum lesbar)
+        $farbe = preg_match('/^[0-9a-fA-F]{6}$/', $row["color"]) ? $row["color"] : '777777';
 
         echo '
 <table border="0" cellpadding="0" cellspacing="0">
@@ -83,7 +85,7 @@ if ($_GET["a"]) {
 </tr>
 <tr>
 <td width="13" class="rl">&nbsp;</td>
-<td width="500" align="center"><div class="cell"><font color="#'.$row["color"].'">'.$desc.'</div></td>
+<td width="500" align="center"><div class="cell help-art" style="border-left-color: #'.$farbe.';">'.$desc.'</div></td>
 <td width="13" class="rr">&nbsp;</td>
 </tr>
 <tr>

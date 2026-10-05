@@ -176,12 +176,12 @@ if (!hasTech($pt, 4)) {
             if ($creator) {
                 $reduzierung_in_prozent = ($nachlass + $artbonus_auktion) / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
-                $nachlass_str = ' / <span style="color: #00FF00;">'.number_format(($nachlass + $artbonus_auktion), 2, ",", ".").' % Preisnachlass</span>';
+                $nachlass_str = ' &middot; <span style="color: #00FF00;">'.number_format(($nachlass + $artbonus_auktion), 2, ",", ".").' % Preisnachlass</span>';
             } else {
                 $reduzierung_in_prozent = $artbonus_auktion / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
                 if($reduzierung_in_prozent > 0){
-                    $nachlass_str = ' / <span style="color: #00FF00;">'.number_format($artbonus_auktion, 2, ",", ".").' % Preisnachlass</span>';
+                    $nachlass_str = ' &middot; <span style="color: #00FF00;">'.number_format($artbonus_auktion, 2, ",", ".").' % Preisnachlass</span>';
                 }
             }
 
@@ -206,7 +206,7 @@ if (!hasTech($pt, 4)) {
 
                     $preis .= '<div style="display: flex;">';
                     $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$resnamen[$cost[1] - 1].'<br>Lagerbestand: '.number_format($pd['restyp0'.$cost[1]], 0, ",", ".").'"><img src="gp/g/icon'.$cost[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$resnamen[$cost[1] - 1].'<br><span style="font-size: 10px;">WT: '.number_format($reduzierung, 0, ",", ".").$nachlass_str.'</span></div>';
+                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$resnamen[$cost[1] - 1].'<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
                     $preis .= '</div>';
 
 
@@ -241,7 +241,7 @@ if (!hasTech($pt, 4)) {
 
                     $preis .= '<div style="display: flex;">';
                     $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$ps[$cost[1]]['item_name'].'<br>Lagerbestand: '.number_format($ps[$cost[1]]['item_amount'], 0, ",", ".").'"><img src="gp/g/'.$filename.'" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$ps[$cost[1]]['item_name'].'<br><span style="font-size: 10px;">WT: '.number_format($reduzierung, 0, ",", ".").$nachlass_str.'</span></div>';
+                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$ps[$cost[1]]['item_name'].'<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
                     $preis .= '</div>';
 
                     break;
@@ -267,7 +267,7 @@ if (!hasTech($pt, 4)) {
 
                     $preis .= '<div style="display: flex;">';
                     $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' Credits<br>Lagerbestand: '.number_format($pd['credits'], 0, ",", ".").'"><img src="gp/g/credits.gif" class="rounded-borders" style="width: 50px; height: auto; margin-top: 11px;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.number_format($amount, 0, ",", ".").' Credits<br><span style="font-size: 10px;">WT: '.number_format($reduzierung, 0, ",", ".").$nachlass_str.'</span></div>';
+                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.number_format($amount, 0, ",", ".").' Credits<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
                     $preis .= '</div>';
 
 

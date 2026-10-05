@@ -38,13 +38,12 @@ include "resline.php";
 
 if(isset($_REQUEST['reset'])){
 	$verbtime=$resettime-($tick-$specreset);
-	if($verbtime<1)
-	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET specreset=?, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0 WHERE user_id=?", [$tick, $_SESSION['ums_user_id']]);
-	$spec[0]=0;
-	$spec[1]=0;
-	$spec[2]=0;
-	$spec[3]=0;
-	$spec[4]=0;
+	//nur zurücksetzen (und so anzeigen), wenn die Sperrzeit abgelaufen ist
+	if($verbtime<1){
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET specreset=?, spec1=0, spec2=0, spec3=0, spec4=0, spec5=0 WHERE user_id=?", [$tick, $_SESSION['ums_user_id']]);
+		$spec=array(0,0,0,0,0);
+		$specreset=$tick;
+	}
 }
 
 //grenzen für die einzelnen stufen anhand der möglichen errungenschaften berechnen
@@ -86,17 +85,16 @@ else{
 
 if(isset($_REQUEST['level'])){
 	$level=intval($_REQUEST['level']);
-	$choose=intval($_REQUEST['choose']);	
-	
-	//hat man die benötigten Achievements?
-	if($achievements>=$needa[$level-1]){
+	$choose=intval($_REQUEST['choose'] ?? 0);
 
-		if($level>0 AND $level<6 AND $choose>0 AND $choose<4)	{
-			if($spec[$level-1]==0)		{
+	//gültige Stufe/Auswahl und die benötigten Achievements
+	if($level>0 AND $level<6 AND $choose>0 AND $choose<4 AND $achievements>=$needa[$level-1]){
+		if($spec[$level-1]==0){
+			//nur setzen, wenn in dieser Stufe noch nichts gewählt ist (auch bei zwei gleichzeitigen Anfragen)
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET spec".$level."=? WHERE user_id=? AND spec".$level."=0", [$choose, $_SESSION['ums_user_id']]);
+			if(mysqli_affected_rows($GLOBALS['dbi'])==1){
 				$spec[$level-1]=$choose;
-				//db updaten
-				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET spec".$level."=? WHERE user_id=?", [$choose, $_SESSION['ums_user_id']]);
-			}		
+			}
 		}
 	}
 }
@@ -104,98 +102,110 @@ if(isset($_REQUEST['level'])){
 //echo '<div class="info_box" style="font-size: 20px;">Dies sind die vorl�ufig geplanten Spezialisierungen. Vor Einbau wird um Feedback gebeten, damit diese ggf. noch angepa�t werden k�nnen. Bitte die Feedback-Funktion bei den News verwenden, oder im Forum im Spezialisierungen-Diskussionsthread posten.</div><br>';
 
 rahmen_oben('Spezialisierung <img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" title="Die einzelnen Spezialisierungen werden mit Hilfe von Errungenschaften freigeschaltet. Die Zahl gibt an wie viele Errungenschaften ben&ouml;tigt werden. Nach der Freischaltung kann eine von den jeweils drei Spezialisierungen gew&auml;hlt werden.">');
-echo '<div class="bgpic3" style="width: 566px; height: 432px; position: relative;">';
 
 $specboni=array(2,2,10,1,10);
 
 $buttontexte=array('I','II','III','IV','V');
 
-$link=array();
+//Spalten und Kurzbezeichnungen für die Übersicht; die vollständige Beschreibung steht in $specdesc
+$spectitel=array('Verteidigung', 'Flotte', 'Sektor');
+$specbild=array('symbol21.png', 'symbol22.png', 'symbol23.png');
+$speckurz[0]=array('Bauzeit Verteidigung &minus;50%', 'Erfahrung Verteidigung +50%', 'Schutzschild +10%', 'Agentenabwehr +5%', 'Schutz vor Sabotage');
+$speckurz[1]=array('Bauzeit Flotte &minus;50%', 'Erfahrung Flotte +10%', 'Tr&auml;gerkapazit&auml;t +20%', 'Missionsdauer &minus;10%', 'Heimkehr 1 KT schneller');
+$speckurz[2]=array('Kollektorkosten &minus;2%', 'Sektorschiffkosten &minus;2%', 'Planetarer Ertrag +10%', 'Recycling +1%', '+10 Sektorkollektoren');
+
+//Auswahl erst über den Button in der Beschreibung, ein Tipp auf den Kreis zeigt nur die Beschreibung an
+echo '<div class="spec">';
+echo '<div class="spec-hinweis">Tippe auf eine Spezialisierung, um ihre Beschreibung zu sehen. Gew&auml;hlt wird erst mit dem Button darunter.</div>';
+echo '<div class="spec-kopf"><div class="spec-need">Errungenschaften<br><span>du hast '.number_format($achievements, 0, '', '.').'</span></div>';
+foreach($spectitel as $titel){
+	echo '<div class="spec-spalte">'.$titel.'</div>';
+}
+echo '</div>';
+
 for($i=0;$i<5;$i++){
-	$link[0]='';
-	$link[1]='';
-	$link[2]='';
-	$linkende='';
-	
-	//farbiger hintergrund/beschreibung
-	if($achievements>=$needa[$i]){
-		$bgcolor='#00AA00';
-		$zeiledesc='Dieser Bereich ist freigeschaltet.';
-		if($spec[$i]==0){
-			$link[0]='<a href="specialization.php?level='.($i+1).'&choose=1">';
-			$link[1]='<a href="specialization.php?level='.($i+1).'&choose=2">';
-			$link[2]='<a href="specialization.php?level='.($i+1).'&choose=3">';
-			$linkende='</a>';
-		}
-		//upgradeinfo
-		if($spec[$i]==0) $upgradeinfo='<div style="bottom: 0px; position: absolute; margin-left: 125px;">Du kannst eine der drei Spezialisierungen ausw&auml;hlen.</div>';
-		else $upgradeinfo='';
-	}else{ 
-		
-		$bgcolor='#AA0000';
+	$frei=($achievements>=$needa[$i]);
+	$offen=($frei && $spec[$i]==0);
+
+	if(!$frei){
+		$zeilenklasse='spec-gesperrt';
+		$zeilenstatus='gesperrt';
 		$zeiledesc='Du hast leider erst '.$achievements.' von '.$needa[$i].' ben&ouml;tigten Errungenschaftspunkten um diesen Bereich freizuschalten.';
-		
-		$upgradeinfo='';
-		$status='<br>Status: inaktiv';
+	}elseif($offen){
+		$zeilenklasse='spec-offen';
+		$zeilenstatus='w&auml;hlbar';
+		$zeiledesc='Dieser Bereich ist freigeschaltet. Du kannst eine der drei Spezialisierungen ausw&auml;hlen.';
+	}else{
+		$zeilenklasse='spec-frei';
+		$zeilenstatus='gew&auml;hlt';
+		$zeiledesc='Dieser Bereich ist freigeschaltet.';
 	}
-	
-	$buttontext=$buttontexte[$i];
-	
-	echo '<div style="height: 82px; border: 1px solid '.$bgcolor.'; margin-bottom: 3px; text-align: center; position: relative;">';
-	//zeile darstellen
-	//echo '<div class="bgpic3" style="width: 100%; height: 100%;">';
-	
-	//info, dass man eins auswählen kann, wenn noch nichts gewählt wurde
-	echo $upgradeinfo;
-	
-	//benötigte achievement-punkte
-	echo '<div style="float: left; width: 130px; font-size: 20px; text-align: center; padding-top: 30px; color: '.$bgcolor.';" title="'.$zeiledesc.'">'.$needa[$i].'</div>';
-	
-	//1. spalte
-	if(($spec[$i]==1 OR $spec[$i]==0) AND $achievements>=$needa[$i]){$picsize=50; $cssfontsize=26; $csspadding=9;}else {$picsize=30; $cssfontsize=10; $csspadding=9; $cssletterspacing=0;}
-	if($spec[$i]==1 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
-	if($spec[$i]==1){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
-	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[0].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol21.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
-	<div title="'.$specdesc[0][$i].$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2; font-weight: bold; font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
-	'.$linkende.
-	'</div>';
-	
-	//2. spalte
-	if(($spec[$i]==2 OR $spec[$i]==0) AND $achievements>=$needa[$i]){$picsize=50; $cssfontsize=26; $csspadding=9;}else {$picsize=30; $cssfontsize=10; $csspadding=9; $cssletterspacing=0;}
-	if($spec[$i]==2 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
-	if($spec[$i]==2){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
-	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[1].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol22.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
-	<div title="'.$specdesc[1][$i].$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2; font-weight: bold;  font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
-	'.$linkende.
-	'</div>';
-	
-	//3. spalte
-	//auslesen wie oft es gewählt worden ist
+
+	echo '<div class="spec-row '.$zeilenklasse.'">';
+	echo '<div class="spec-need" title="'.$zeiledesc.'">'.$needa[$i].'<br><span>'.$zeilenstatus.'</span></div>';
+
+	//Sektor-Spalte: wie oft im Sektor gewählt
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? AND spec".($i+1)."=3", [$sector]);
 	$bonuswert = ' Aktueller Wert: '.mysqli_num_rows($db_daten) * $specboni[$i];
 	if($i!=4){
-		$bonuswert.='%';	
+		$bonuswert.='%';
 	}
 
-	if(($spec[$i]==3 OR $spec[$i]==0) AND $achievements>=$needa[$i]){$picsize=50; $cssfontsize=26; $csspadding=9;}else {$picsize=30; $cssfontsize=10; $csspadding=9; $cssletterspacing=0;}
-	if($spec[$i]==3 OR $spec[$i]==0 AND $i==2)$cssletterspacing=-4;else $cssletterspacing=0;
-	if($spec[$i]==3){$status='<br>Status: aktiv';}else {$status='<br>Status: inaktiv';}
-	echo '<div style="float: left; width: 140px; height: 66px; padding-top: 15px; position: relative;">
-	'.$link[2].'<div style="position: absolute; width: 100%; height: 100%; z-index: 1;"><img src="'.'gp/'.'g/symbol23.png" border="0" width="'.$picsize.'px" heigth="'.$picsize.'px"></div>
-	<div title="'.$specdesc[2][$i].$bonuswert.$status.'" style="left: -1px; position: absolute; width: '.$picsize.'px; height: '.$picsize.'px; margin-left: '.((140-$picsize)/2).'px; z-index: 2;  font-weight: bold; font-size: '.$cssfontsize.'px; color: #000000; padding-top: '.$csspadding.'px; font-family: Courier New;letter-spacing: '.$cssletterspacing.'px;">'.$buttontext.'</div>
-	'.$linkende.
-	'</div>';
-	
+	$details='';
+	for($j=0;$j<3;$j++){
+		$aktiv=($spec[$i]==$j+1);
+		//klein und gedämpft: gesperrt, oder in dieser Stufe ist etwas anderes gewählt
+		$aus=(!$frei || ($spec[$i]!=0 && !$aktiv));
+		$klasse='spec-opt'.($aktiv ? ' spec-aktiv' : '').($aus ? ' spec-aus' : '');
+		$kreisklasse='spec-kreis'.(strlen($buttontexte[$i])>2 ? ' spec-kreis-eng' : '');
 
-	
-	//echo '</div>';
+		echo '<button type="button" class="'.$klasse.'" data-spec="'.$i.'_'.$j.'">
+			<span class="'.$kreisklasse.'" style="background-image: url(gp/g/'.$specbild[$j].');">'.$buttontexte[$i].'</span>
+			<span class="spec-kurz">'.$speckurz[$j][$i].'</span>
+		</button>';
 
+		if($aktiv){
+			$status='<span class="text3">aktiv</span>';
+		}elseif(!$frei){
+			$status='gesperrt &ndash; du hast erst '.$achievements.' von '.$needa[$i].' ben&ouml;tigten Errungenschaften';
+		}elseif($offen){
+			$status='noch nicht gew&auml;hlt';
+		}else{
+			$status='nicht gew&auml;hlt, in dieser Stufe ist bereits eine andere Spezialisierung aktiv';
+		}
+
+		$details.='<div class="spec-detail" id="spec_detail_'.$i.'_'.$j.'" hidden>
+			<b>'.$spectitel[$j].' '.$buttontexte[$i].': '.$speckurz[$j][$i].'</b><br>
+			'.$specdesc[$j][$i].($j==2 ? $bonuswert : '').'<br>
+			Status: '.$status;
+		if($offen){
+			$details.='<form method="post" action="specialization.php">
+				<input type="hidden" name="level" value="'.($i+1).'">
+				<input type="hidden" name="choose" value="'.($j+1).'">
+				<input type="submit" value="Diese Spezialisierung w&auml;hlen">
+			</form>';
+		}
+		$details.='</div>';
+	}
+
+	echo $details;
 	echo '</div>';
-	
 }
 echo '</div>';
+
+//Beschreibung ein-/ausblenden, in einer Stufe immer nur eine
+echo '<script>
+document.querySelectorAll(".spec-opt").forEach(function(b){
+	b.addEventListener("click", function(){
+		var row=b.closest(".spec-row");
+		var ziel=document.getElementById("spec_detail_"+b.getAttribute("data-spec"));
+		var warOffen=!ziel.hidden;
+		row.querySelectorAll(".spec-detail").forEach(function(d){ d.hidden=true; });
+		row.querySelectorAll(".spec-opt").forEach(function(o){ o.classList.remove("spec-markiert"); });
+		if(!warOffen){ ziel.hidden=false; b.classList.add("spec-markiert"); }
+	});
+});
+</script>';
 
 rahmen_unten();
 

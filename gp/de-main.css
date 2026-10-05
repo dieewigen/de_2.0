@@ -998,6 +998,195 @@ a.btn:visited {
   margin: 0 3px;
 }
 
+.spec {
+  width: 566px;
+  background: url(g/cellblack.png) repeat;
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.spec-hinweis {
+  padding: 4px 6px 6px 6px;
+  text-align: center;
+  color: #aaaaaa;
+}
+
+.spec-kopf,
+.spec-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.spec-kopf {
+  font-weight: bold;
+  color: #ffffff;
+  padding-bottom: 3px;
+}
+.spec-kopf .spec-need span {
+  font-weight: normal;
+  color: #aaaaaa;
+}
+
+.spec-spalte {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 13px;
+}
+
+.spec-need {
+  flex: 0 0 110px;
+  text-align: center;
+  font-size: 20px;
+}
+.spec-need span {
+  font-size: 11px;
+}
+
+.spec-kopf .spec-need {
+  font-size: 12px;
+}
+
+.spec-row {
+  border: 1px solid #AA0000;
+  margin-bottom: 3px;
+  padding: 4px 0;
+}
+
+.spec-offen,
+.spec-frei {
+  border-color: #00AA00;
+}
+.spec-offen .spec-need,
+.spec-frei .spec-need {
+  color: #00AA00;
+}
+
+.spec-offen {
+  box-shadow: inset 0 0 12px rgba(0, 170, 0, 0.25);
+}
+
+.spec-gesperrt .spec-need {
+  color: #AA0000;
+}
+
+.spec-opt {
+  flex: 1 1 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 2px 4px 2px;
+  color: #cccccc;
+  font: inherit;
+  cursor: pointer;
+}
+.spec-opt:hover, .spec-opt.spec-markiert {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.spec-kreis {
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 3px auto;
+  background-size: contain;
+  background-repeat: no-repeat;
+  font: bold 26px "Courier New", monospace;
+  line-height: 50px;
+  text-align: center;
+  color: #000000;
+}
+
+.spec-kreis-eng {
+  letter-spacing: -4px;
+}
+
+.spec-kurz {
+  display: block;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.spec-aktiv .spec-kurz {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.spec-aus .spec-kreis {
+  width: 30px;
+  height: 30px;
+  margin: 10px auto 13px auto;
+  font-size: 10px;
+  line-height: 30px;
+  letter-spacing: 0;
+}
+.spec-aus .spec-kurz {
+  color: #777777;
+}
+
+.spec-detail {
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  margin: 4px 6px 0 6px;
+  padding: 6px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #dddddd;
+  line-height: 1.4;
+  text-align: left;
+}
+.spec-detail form {
+  margin-top: 6px;
+  text-align: center;
+}
+.spec-detail input[type=submit] {
+  font-size: 12px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.spec-detail[hidden] {
+  display: none;
+}
+
+.help-art {
+  border-left: 4px solid #777777;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #dddddd;
+}
+
+.leer-hinweis {
+  padding: 6px;
+  text-align: center;
+  font-style: italic;
+  font-size: 12px;
+  color: #aaaaaa;
+}
+
+.ally-rahmen > table {
+  width: 100%;
+}
+
+.ally-info tr.cl td {
+  padding: 1px 4px;
+  color: #aaaaaa;
+}
+.ally-info tr.cl td b {
+  color: #ffffff;
+}
+
+.ally-bio {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #dddddd;
+  background: url(g/cellblack.png) repeat;
+  overflow-wrap: anywhere;
+}
+
 body.mobile {
   height: 100vh;
   height: 100dvh;
