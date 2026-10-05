@@ -1077,11 +1077,12 @@ if ($doetick == 1) {
 
     $tis = time() - (86400 * ($sv_inactiv_deldays - 1));
     $datum = date("Y-m-d H:i:s", $tis);
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.reg_mail, de_user_data.spielername, de_user_data.col FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND inaktmail = 0 AND de_login.status=1", [$datum]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.reg_mail, de_user_data.spielername, de_user_data.col, de_user_data.sector FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_login.last_ip<>'127.0.0.1' AND de_user_data.user_id=de_login.user_id AND inaktmail = 0 AND de_login.status=1", [$datum]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $uid = $row["user_id"];
 
-        $mail = $exileMail->render('vorab', ['name' => $row['spielername'], 'days' => $sv_inactiv_deldays - 1, 'col' => $row['col']]);
+        //sector: wer schon in Sektor 1 ist, bekommt den Text zum Ruhezustand statt zur Verlegung
+        $mail = $exileMail->render('vorab', ['name' => $row['spielername'], 'days' => $sv_inactiv_deldays - 1, 'col' => $row['col'], 'sector' => $row['sector']]);
         $sent = @$exileMail->send($row["reg_mail"], $mail);
         $exileService->logMail((int)$uid, 'vorab', $sent);
         //damit er nur einmal die mail bekommt inaktmail auf 1 setzen

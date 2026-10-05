@@ -8,3 +8,4 @@ $session_lang['botschutzabfrage']='Botschutz';
 $session_lang['datenbestaetigen']='Daten bestätigen';
 $session_lang['zahl']='Zahl (in Ziffern)';
 $session_lang['botschutzinfo']='Berechne die Aufgabe im Bild und klicke das Ergebnis an';
+$session_lang['botschutzhinweis']='Ist die Aufgabe schlecht lesbar, klicke auf das Bild, dann erscheint eine neue. Achtung: Ein falsches Ergebnis meldet dich ab.';

@@ -33,7 +33,7 @@ class ExileMail
      * Mail erzeugen.
      *
      * @param array $data Werte aus ExileService::buildMailData(), zusätzlich 'optout_url' für Lageberichte.
-     *                    Für 'vorab' genügen 'name', 'days' und 'col'.
+     *                    Für 'vorab' genügen 'name', 'days', 'col' und 'sector' (aktueller Sektor).
      * @return array{subject:string, html:string, headers:array<string,string>}
      */
     public function render(string $type, array $data): array
@@ -50,10 +50,13 @@ class ExileMail
         $paragraphs = [];
         $headers = [];
 
+        //wer schon in Sektor 1 war, wird nicht dorthin verlegt, sein System ruht dort nur
+        $sektor1 = $type === 'vorab' ? (int)($data['sector'] ?? 0) === 1 : (int)($data['from_sector'] ?? 0) === 1;
+
         if ($type === 'vorab') {
-            $subject = $l['betreff_vorab'];
-            $title = $l['titel_vorab'];
-            $paragraphs[] = $l['intro_vorab'];
+            $subject = $sektor1 ? $l['betreff_vorab_sektor1'] : $l['betreff_vorab'];
+            $title = $sektor1 ? $l['titel_vorab_sektor1'] : $l['titel_vorab'];
+            $paragraphs[] = $sektor1 ? $l['intro_vorab_sektor1'] : $l['intro_vorab'];
             if ((int)($data['col'] ?? 0) > 25) {
                 $paragraphs[] = $l['intro_vorab_kollektoren'];
             }
@@ -63,7 +66,7 @@ class ExileMail
         } else {
             $subject = $type === 'neue_runde' ? $l['betreff_neue_runde'] : $l['betreff_bericht'];
             $title = $l['titel_'.$type];
-            $paragraphs[] = $l['intro_'.$type];
+            $paragraphs[] = ($type === 'bericht1' && $sektor1) ? $l['intro_bericht1_sektor1'] : $l['intro_'.$type];
             foreach ($this->blocks($type, $data) as $block) {
                 $paragraphs[] = $block;
             }

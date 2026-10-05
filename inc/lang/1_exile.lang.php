@@ -10,11 +10,13 @@ $exile_lang['button']='Zurück ins Kommando';
 
 //Betreffzeilen
 $exile_lang['betreff_vorab']='Die Ewigen ({TAG}): Dein System wird morgen nach Sektor 1 verlegt';
+$exile_lang['betreff_vorab_sektor1']='Die Ewigen ({TAG}): Dein System geht morgen in den Ruhezustand';
 $exile_lang['betreff_bericht']='Die Ewigen ({TAG}): Lagebericht aus Sektor 1';
 $exile_lang['betreff_neue_runde']='Die Ewigen ({TAG}): Eine neue Runde hat begonnen';
 
 //Überschriften
 $exile_lang['titel_vorab']='Letzte Meldung vor der Verlegung';
+$exile_lang['titel_vorab_sektor1']='Letzte Meldung vor dem Ruhezustand';
 $exile_lang['titel_bericht1']='Lagebericht aus Sektor 1';
 $exile_lang['titel_bericht2']='Zweiter Lagebericht aus Sektor 1';
 $exile_lang['titel_bericht3']='Letzter Lagebericht aus Sektor 1';
@@ -22,10 +24,13 @@ $exile_lang['titel_neue_runde']='Eine neue Runde hat begonnen';
 
 //Einleitungen
 $exile_lang['intro_vorab']='seit {DAYS} Tagen erreichen mich keine Befehle von Dir. Ich halte die Stellung, doch ohne Kommandant kann ich Dein System nicht auf Dauer im Spielgeschehen lassen.<br><br>Meldest Du Dich nicht innerhalb der nächsten 24 Stunden, verlege ich es in den Schutzraum von Sektor 1. Dort ist es vor Angriffen sicher und wird nicht gelöscht. Die Produktion ruht dann allerdings, bis Du zurückkehrst.';
+//für Spieler, die schon in Sektor 1 sind: nichts wird verlegt, das System ruht nur
+$exile_lang['intro_vorab_sektor1']='seit {DAYS} Tagen erreichen mich keine Befehle von Dir. Ich halte die Stellung, doch ohne Kommandant kann ich Dein System nicht auf Dauer im Spielgeschehen lassen.<br><br>Meldest Du Dich nicht innerhalb der nächsten 24 Stunden, versetze ich es in den Ruhezustand. Es bleibt im Schutz von Sektor 1 und wird nicht gelöscht. Die Produktion ruht dann allerdings, bis Du zurückkehrst.';
 $exile_lang['intro_vorab_kollektoren']='Außerdem gebe ich von Deinen {COL} Kollektoren nach und nach alle über 25 an aktive Kommandanten außerhalb von Sektor 1 ab.';
 $exile_lang['outro_vorab']='Ein Login genügt, und alles bleibt, wie es ist.';
 
 $exile_lang['intro_bericht1']='wie angekündigt habe ich Dein System vor {DAYS} Tagen in den Schutzraum von Sektor 1 verlegt. Hier ist mein erster Lagebericht.';
+$exile_lang['intro_bericht1_sektor1']='wie angekündigt ruht Dein System seit {DAYS} Tagen im Schutz von Sektor 1. Hier ist mein erster Lagebericht.';
 $exile_lang['intro_bericht2']='seit {DAYS} Tagen ruht Dein System in Sektor 1. Draußen dreht sich das Universum weiter. Hier ist, was ich beobachte.';
 $exile_lang['intro_bericht3']='Dein System ruht seit {DAYS} Tagen in Sektor 1. Dies ist mein letzter regelmäßiger Lagebericht.';
 $exile_lang['intro_neue_runde']='am {DATE} hat eine neue Runde begonnen. Alle Kommandanten haben wieder bei null angefangen, auch jene, die Dich zuletzt hinter sich gelassen haben. Wer jetzt einsteigt, ist noch mitten im Rennen.';

@@ -105,7 +105,8 @@ if (!$zuschnell && (int)($_REQUEST['nummer'] ?? -1) === (int)$antwort) {
     //test ob man schon die maximale fehleranzahl erreicht hat
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT points FROM de_login WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
-    if (isset($row['points']) && $row['points'] >= 10) {
+    $fehlversuche = (int)($row['points'] ?? 0);
+    if ($fehlversuche >= 10) {
         $fehlermsg = $index_lang['falschesergebnisgesperrt'];
         $time = date("Y-m-d H:i:s");
         $comment = mysqli_execute_query($GLOBALS['dbi'], "SELECT kommentar FROM de_user_info WHERE user_id=?", [$_SESSION['ums_user_id']]);
@@ -121,8 +122,8 @@ if (!$zuschnell && (int)($_REQUEST['nummer'] ?? -1) === (int)$antwort) {
         include "cssinclude.php";
         echo '</head>';
         echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-        echo '<br><center><div class="info_box text2">Ihr Ergebnis war mehrfach nicht richtig und der Acounnt wurde aus Sicherheitsgr&uuml;nden gesperrt.<br><br>
-  		Nehmen sie bitte Kontakt mit dem Support auf.</div>';
+        echo '<br><center><div class="info_box text2">'.$botcheck_lang['gesperrt'].'<br><br>
+  		'.$botcheck_lang['support'].' <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>';
         echo '</body></html>';
         session_destroy();
         exit;
@@ -136,7 +137,14 @@ echo '<!DOCTYPE html>
     echo '</head>';
     echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-    echo '<br><center><div class="info_box text2">'.$botcheck_lang['error1'].'<br>'.$botcheck_lang['error2'].':<br><br><a href="'.$sv_link[1].'">Login</a></div>';
+    //verständlich erklären, was passiert ist und wie man es beim nächsten Mal vermeidet
+    $grund = $zuschnell ? $botcheck_lang['zuschnell'] : $botcheck_lang['falsch'];
+    echo '<br><center><div class="info_box" style="padding: 10px; font-size: 14px; color: #DDDDDD;">
+        <div class="text2" style="margin-bottom: 8px;">'.$grund.'</div>
+        '.$botcheck_lang['logout'].'<br><br>
+        '.str_replace('{N}', $fehlversuche, $botcheck_lang['versuche']).'<br><br>
+        '.$botcheck_lang['tipp'].'<br><br>
+        <a href="'.$sv_link[1].'">Zum Login</a></div>';
     echo '</body></html>';
     @session_destroy();
     exit;
