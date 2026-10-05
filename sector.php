@@ -41,9 +41,9 @@ if(isset($_REQUEST["sso"])){
 }
 
 //spieler sortiert auslesen    
-$orderby='`system`';
-if($secsort=='1')$orderby='col';
-elseif($secsort=='2')$orderby='score';
+$orderby='`system`';$sort_sso=1;
+if($secsort=='1'){$orderby='col';$sort_sso=2;}
+elseif($secsort=='2'){$orderby='score';$sort_sso=3;}
 
 //maximale anzahl von kollektoren auslesen
 $sql = "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0";
@@ -107,6 +107,67 @@ function wellenrechner($kol, $maxcol, $npcsec){
 	$str.="</table><br>Gr&uuml;ner Kollektorenwert: Kollektoren liegen &uuml;ber der Kollektorenangriffsgrenze und werden erobert.<br><br>Roter Kollektorenwert: Kollektoren liegen unter der Kollektorenangriffsgrenze und werden zerst&ouml;rt.";
 
 	return ($str);
+}
+
+//Reisezeit-Kennzeichen im Sektorkopf
+function sector_rz_badge($rzadd){
+	return '<span class="sec-rz sec-rz'.($rzadd==0 ? '0' : '2').'" title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampfticks">+'.$rzadd.'</span>';
+}
+
+//Sektorkopf: immer einzeilig, ein zu langer Sektorname wird am Ende gekürzt und steht vollständig im Tooltip
+function sector_head($inhalt, $name=''){
+	if($name!=''){
+		//der Name ist beim Speichern schon escaped; für den Tooltip (rendert HTML) noch einmal escapen
+		$inhalt.=' &middot; <span title="Sektorname&'.htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'">'.$name.'</span>';
+	}
+	return '<div class="sec-head">'.$inhalt.'</div>';
+}
+
+//Spaltenkopf der Spielertabelle; sortierbare Spalten sind Links, die aktive Sortierung ist unterstrichen
+function sector_th($label, $width, $sso=0, $sort_sso=0, $sf=0){
+	if($sso==0){
+		return '<td width="'.$width.'" class="cell sec-th">'.$label.'</td>';
+	}
+	$aktiv=($sso==$sort_sso) ? ' sec-sort-active' : '';
+	return '<td width="'.$width.'" class="cell sec-th'.$aktiv.'"><a href="sector.php?sso='.$sso.'&sf='.$sf.'" title="Sortieren nach: '.$label.'">'.$label.'</a></td>';
+}
+
+//Zeile im Infoblock, optional mit Erklärung als Tooltip am Namen
+function sector_inforow($label, $wert, $tooltip=''){
+	if($tooltip!=''){
+		$label='<span class="sec-hint" title="'.$tooltip.'">'.$label.'</span>';
+	}
+	return '<tr><td>'.$label.'</td><td>'.$wert.'</td></tr>';
+}
+
+//Legende unter der Spielertabelle, zugeklappt; ob sie offen ist, merkt sich der Browser
+function sector_legende($kopfgeld){
+	$punkte='<span class="tc3">gr&uuml;n</span> angreifbar &middot; <span class="tc2">rot</span> unter der Angriffsgrenze';
+	if($kopfgeld){
+		$punkte.=' &middot; <b>fett</b>: Kopfgeld ausgesetzt';
+	}
+
+	return '
+	<details class="sec-legend" id="sec_legend">
+	<summary>Legende</summary>
+	<table>
+	<tr><td>Reisezeit</td><td><span class="sec-rz sec-rz0">+0</span>eigener Sektor &middot; <span class="sec-rz sec-rz2">+2</span>andere Sektoren: Flugzeit +2 Kampfticks</td></tr>
+	<tr><td>System</td><td>^5^ Sektorkommandant &middot; [5] gesperrt &middot; (5) Urlaubsmodus &middot; {5} L&ouml;schmodus</td></tr>
+	<tr><td>Name</td><td>* in den letzten 30 Minuten aktiv (nur im eigenen Sektor) &middot; <span class="user_title"></span> Titel (Maus dar&uuml;ber)</td></tr>
+	<tr><td>Rasse</td><td>sichtbar im eigenen Sektor (au&szlig;er Sektor 1) und nach einem Scan</td></tr>
+	<tr><td>Allianz</td><td><span class="tc1">wei&szlig;</span> eigene &middot; <span class="tc3">gr&uuml;n</span> Partner &middot; <span class="tc2">rot</span> Kriegsgegner &middot; <span class="tc4">gelb</span> andere</td></tr>
+	<tr><td>Punkte</td><td>'.$punkte.'</td></tr>
+	<tr><td>Kollektoren</td><td><span class="tc3">gr&uuml;n</span> werden erobert &middot; <span class="tc2">rot</span> werden zerst&ouml;rt &middot; Maus dar&uuml;ber: Wellenrechner</td></tr>
+	<tr><td>Aktion</td><td>S Sonde &middot; A Agenten &middot; F Flotte &middot; Punkt: deine Einstufung im Geheimdienst (<img src="gp/g/ps_0.gif" alt=""> neutral, <img src="gp/g/ps_1.gif" alt=""> freundlich, <img src="gp/g/ps_2.gif" alt=""> feindlich)</td></tr>
+	</table>
+	</details>
+	<script>
+	(function(){
+		var d=document.getElementById("sec_legend");
+		try{ if(localStorage.getItem("sec_legend")==="1"){ d.open=true; } }catch(e){}
+		d.addEventListener("toggle", function(){ try{ localStorage.setItem("sec_legend", d.open ? "1" : "0"); }catch(e){} });
+	})();
+	</script>';
 }
 
 if(isset($_REQUEST['sf'])){
@@ -174,25 +235,17 @@ if($sec_data['npc']==1){
   	$rec_bonus=0;
   	
 	//sektoransicht darstellen
-	//reisezeit
-	if($rzadd==0){
-		$style='border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	}else{
-		$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	}
-	
-	$sektorinfo='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
-	$sektorinfo.='';
+	$sektorinfo=sector_rz_badge($rzadd);
 	//rahmen
-	rahmen_oben('<div style="text-align: left">'.$sektorinfo.' '.$sec_data['name'].'</div>');
+	rahmen_oben(sector_head($sektorinfo.$sec_data['name']));
     //tabellen�berschrift
-	echo '<table border="0" cellpadding="0" cellspacing="1" width="100%">
-	<tr>
-	<td width="50" class="cell tac"><a href="sector.php?sso=1&sf='.$sf.'"><font size="1">'.$sec_lang['sys'].'</font></a></td>
-	<td width="246" class="cell tac"><font size="1">'.$sec_lang['name'].'</font></td>
-	<td width="150" class="cell tac"><a href="sector.php?sso=3&sf='.$sf.'"><font size="1">'.$sec_lang['punkte'].'</font></a></td>
-	<td width="60" class="cell tac"><a href="sector.php?sso=2&sf='.$sf.'"><font size="1">'.$sec_lang['kollektoren'].'</font></a></td>
-	<td width="70" class="cell tac"><font size="1">'.$sec_lang['aktion'].'</font></td>
+	echo '<table border="0" cellpadding="0" cellspacing="1" width="100%" class="sec-table">
+	<tr>'.
+	sector_th($sec_lang['sys'], 50, 1, $sort_sso, $sf).
+	sector_th($sec_lang['name'], 230).
+	sector_th($sec_lang['punkte'], 150, 3, $sort_sso, $sf).
+	sector_th($sec_lang['kollektoren'], 76, 2, $sort_sso, $sf).
+	sector_th($sec_lang['aktion'], 70).'
 	</tr>';
 	$sql = "SELECT * FROM de_user_data WHERE sector=? ORDER BY $orderby ASC LIMIT 300";
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
@@ -327,16 +380,17 @@ if($sec_data['npc']==1){
 	if($secstatdisable==1 AND $ownsector==$sf) echo '<div class="info_box text2">'.$sec_lang['secstatdisable'].'</div><br>';
 	
 	$gesamtpunkte=0;$anz=0;
-	$output='<table border="0" cellpadding="0" cellspacing="1" width="100%">
-	<tr>
-	<td width="36" class="cell tac"><a href="sector.php?sso=1&sf='.$sf.'"><font size="1">'.$sec_lang['sys'].'</font></a></td>
-	<td width="32" class="cell tac"><font size="1">'.$sec_lang['rang'].'</font></td>
-	<td width="199" class="cell tac"><font size="1">'.$sec_lang['name'].'</font></td>
-	<td width="30" class="cell tac"><font size="1">'.$sec_lang['rasse'].'</font></td>
-	<td width="55" class="cell tac"><font size="1">'.$sec_lang['allianz'].'</font></td>
-	<td width="90" class="cell tac"><a href="sector.php?sso=3&sf='.$sf.'"><font size="1">'.$sec_lang['punkte'].'</font></a></td>
-	<td width="60" class="cell tac"><a href="sector.php?sso=2&sf='.$sf.'"><font size="1">'.$sec_lang['kollektoren'].'</font></a></td>
-	<td width="70" class="cell tac"><font size="1">'.$sec_lang['aktion'].'</font></td>
+	//Breiten so verteilt, dass die Köpfe in lesbarer Größe in die Gesamtbreite passen; die Namensspalte gibt dafür etwas ab
+	$output='<table border="0" cellpadding="0" cellspacing="1" width="100%" class="sec-table">
+	<tr>'.
+	sector_th($sec_lang['sys'], 44, 1, $sort_sso, $sf).
+	sector_th($sec_lang['rang'], 34).
+	sector_th($sec_lang['name'], 170).
+	sector_th($sec_lang['rasse'], 38).
+	sector_th($sec_lang['allianz'], 55).
+	sector_th($sec_lang['punkte'], 90, 3, $sort_sso, $sf).
+	sector_th($sec_lang['kollektoren'], 76, 2, $sort_sso, $sf).
+	sector_th($sec_lang['aktion'], 65).'
 	</tr>';
 	
 	//die spielerdaten laden
@@ -362,8 +416,9 @@ if($sec_data['npc']==1){
 	while($row = mysqli_fetch_assoc($db_daten)){
 		$gesamtpunkte+=$row['score'];
 		$gescol+=$row['col'];
-		
-		$output.='<tr>';
+
+		//eigene Zeile hervorheben
+		$output.=($row['user_id']==$_SESSION['ums_user_id']) ? '<tr class="sec-own">' : '<tr>';
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
 		//system inkl sk/bk und accountstatus
@@ -428,7 +483,7 @@ if($sec_data['npc']==1){
 			$userTitle='<div class="user_title" title="'.$userTitle.'"></div>';
 		}
 
-		$output.='<td class="cell tac" style="font-size: 10pt;"><a href="details.php?se='.$sector.'&sy='.$row['system'].'">
+		$output.='<td class="cell tac sec-wrap" style="font-size: 10pt;"><a href="details.php?se='.$sector.'&sy='.$row['system'].'">
 		<span class="'.$csstag.'">'.$playername.$osown.$userTitle.'</span></a></td>';
 		
 		////////////////////////////////////////////////////////////////////////
@@ -464,7 +519,7 @@ if($sec_data['npc']==1){
 			if($row['rasse']==2)$rasse='<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
 			if($row['rasse']==3)$rasse='<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
 			if($row['rasse']==4)$rasse='<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
-			if($row['rasse']==5)$rasse='<img src="'.'gp/'.'g/r/raceD.png" title="Z&#180;tah-ara" width="16px" height="16px">';
+			if($row['rasse']==5)$rasse='<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
 		}
 		
 		$output.='<td class="cell tac">'.$rasse.'</td>';
@@ -526,7 +581,7 @@ if($sec_data['npc']==1){
 			$showallytag='<a href="ally_detail.php?allytag='.urlencode($showallytag).'"><span class="'.$csstag.'">'.$showallytag.'</span></a>';
 		}
 
-        $output.='<td class="cell tac" style="font-size: 10pt;">'.$showallytag.'</td>';
+        $output.='<td class="cell tac sec-wrap" style="font-size: 10pt;">'.$showallytag.'</td>';
 		
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
@@ -576,26 +631,18 @@ if($sec_data['npc']==1){
 	
 	
 	$output.='</table>';
-	
+	$output.=sector_legende($sv_oscar!=1);
+
 
 	//die sektor�berschrift zusammenbauen
-	$sektorinfo='<div style="text-align: left;">';
-	//reisezeit
-	if($rzadd==0){
-		$style='border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	}else{
-		$style='border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
-	}
-	
-	$sektorinfo.='<span title="Reisezeitmalus&Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
-	$sektorinfo.=' <span title="Platz in der Sektorwertung">Platz: '.$sec_data['platz'].'</span>';
-	$sektorinfo.=' Punkte: '.number_format($gesamtpunkte, 0,",",".");
-	if($sec_data['name']!='')$sektorinfo.=' - '.$sec_data['name'];
-	$sektorinfo.='</div>';
-	
+	$sektorinfo=sector_rz_badge($rzadd);
+	$sektorinfo.='<span title="Platz in der Sektorwertung">Platz: '.$sec_data['platz'].'</span>';
+	$sektorinfo.=' &middot; Punkte: '.number_format($gesamtpunkte, 0,",",".");
+	$sektorinfo=sector_head($sektorinfo, $sec_data['name']);
+
 	//Sektor 1 soll einen festen Namen haben
 	if($sf==1){
-		$sektorinfo='Sektor 1 - Startsektor';
+		$sektorinfo=sector_head(sector_rz_badge($rzadd).'Sektor 1 - Startsektor');
 	}
 	
 	rahmen_oben($sektorinfo);
@@ -652,7 +699,7 @@ if($sec_data['npc']==1){
     $artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
     $c++;
   }
-  if($artstr=='')$artstr='&nbsp;';
+  if($artstr=='')$artstr='<span class="sec-none">keine</span>';
   
   //sektorraumbasistooltip erzeugen
   $basestr='';
@@ -668,36 +715,35 @@ if($sec_data['npc']==1){
     //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen
     if($bed=='000')$basestr='&nbsp;';
    }
-  
-	//infostring zusammenbauen
-	if($sector>1 AND $anz>0){  
-		if($sector==1)$sec_angriffsgrenze='-';
-		else $sec_angriffsgrenze=number_format($sec_angriffsgrenze*100, 2,",",".").'%';
-		if($sector==1)$rec_bonus='-';
-		else $rec_bonus=number_format($rec_bonus, 2,",",".").'%';  
-		$infostr=
-		$sec_lang['angriffsgrenze'].': '.$sec_angriffsgrenze.' / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%<br>'.
-		$sec_lang['kollektoren'].': '.number_format($gescol, 0,"",".").'<br>'.
-		$sec_lang['kollektorendurchschnitt'].': '.number_format($gescol/$anz, 2,",",".").'<br>'.
-		$sec_lang['punktedurchschnitt'].': '.number_format($gesamtpunkte/$anz, 0,",",".").'<br>'.
-		$sec_lang['platz'].' ('.$sec_lang['jetzt'].'): '.number_format($secplatz, 0,"",".").'<br>'.
-		$sec_lang['platz'].' ('.$sec_lang['gestern'].'): '.number_format($sec_data['platz_last_day'], 0,"",".").'<br>'.
-		$sec_lang['bewohntesysteme'].': '.number_format($anz, 0,"",".").'<br>'.
-		$sec_lang['recyclingbonus'].': '.$rec_bonus.'<br>'.
-		$sec_lang['sektorartefakthaltezeit'].': '.number_format($sec_data['arthold'], 0,"",".").'<br>';
-		//$sec_lang[relverbreitung].': '.number_format($secrelcounter*100/($sv_maxsystem*10), 2,",",".").'%';
+  if($basestr=='')$basestr='<span class="sec-none">nicht gebaut</span>';
 
+	//infostring zusammenbauen
+	if($sector>1 AND $anz>0){
+		$infostr='<table class="sec-info">'.
+		sector_inforow('Angriffsgrenze Punkte', number_format($sec_angriffsgrenze*100, 2,",",".").'%',
+			'Punkte-Angriffsgrenze&Ziele mit weniger als diesem Anteil deiner Punkte kannst du nicht angreifen. Steht dieser Sektor in der Sektorwertung hinter deinem, steigt die Grenze (Sektormalus).').
+		sector_inforow('Angriffsgrenze Kollektoren', number_format($col_angriffsgrenze_final*100, 2,",",".").'%',
+			'Kollektoren-Angriffsgrenze&Hat das Ziel mindestens diesen Anteil deiner Kollektoren, werden seine Kollektoren erobert, sonst zerst&ouml;rt.').
+		sector_inforow($sec_lang['kollektoren'], number_format($gescol, 0,"",".")).
+		sector_inforow($sec_lang['kollektorendurchschnitt'], number_format($gescol/$anz, 2,",",".")).
+		sector_inforow($sec_lang['punktedurchschnitt'], number_format($gesamtpunkte/$anz, 0,",",".")).
+		sector_inforow($sec_lang['platz'].' ('.$sec_lang['jetzt'].' / '.$sec_lang['gestern'].')', number_format($secplatz, 0,"",".").' / '.number_format($sec_data['platz_last_day'], 0,"",".")).
+		sector_inforow($sec_lang['bewohntesysteme'], number_format($anz, 0,"",".")).
+		sector_inforow($sec_lang['recyclingbonus'], number_format($rec_bonus, 2,",",".").'%',
+			'Recyclingbonus&Zusatz f&uuml;r das Recyclotron der Verteidiger in diesem Sektor. Je weiter hinten der Sektor in der Sektorwertung steht, desto h&ouml;her, h&ouml;chstens '.$sv_recyclotron_sector_bonus.'%.').
+		sector_inforow('Sektorartefakt-Haltezeit', number_format($sec_data['arthold'], 0,"",".").' WT',
+			'Sektorartefakt-Haltezeit&Wirtschaftsticks, in denen der Sektor Sektorartefakte gehalten hat (je Artefakt und Tick +1).').
+		'</table>';
 
 		//daten ausgeben
-		//rahmen_oben($sec_lang[sektordaten]);
-		echo '<table width="580" border="0" cellpadding="0" cellspacing="1">';
+		echo '<table width="580" border="0" cellpadding="0" cellspacing="1" class="sec-table">';
 		$bg='cell';
 		echo '<tr align="center">';
-		echo '<td class="'.$bg.'" width="33%">'.$sec_lang['informationen'].'</td>';
-		echo '<td class="'.$bg.'" width="34%">'.$sec_lang['sektorraumbasis'].'</td>';
-		echo '<td class="'.$bg.'" width="33%">'.$sec_lang['sektorartefakte'].'</td>';
+		echo '<td class="'.$bg.' sec-th" width="46%">'.$sec_lang['informationen'].'</td>';
+		echo '<td class="'.$bg.' sec-th" width="30%">'.$sec_lang['sektorraumbasis'].'</td>';
+		echo '<td class="'.$bg.' sec-th" width="24%">'.$sec_lang['sektorartefakte'].'</td>';
 		echo '</tr>';
-		
+
 		echo '<tr align="center">';
 		echo '<td align="left" valign="top" class="'.$bg.'">'.$infostr.'</td>';
 		echo '<td align="center" valign="middle" class="'.$bg.'">'.$basestr.'</td>';

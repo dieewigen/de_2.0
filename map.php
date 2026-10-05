@@ -379,12 +379,12 @@ $rec_bonus = 0;
 //sektoransicht darstellen
 //reisezeit
 if ($rzadd == 0) {
-    $style = 'border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+    $style = 'border: 1px solid #444444; background-color: #00DD00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
 } else {
-    $style = 'border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+    $style = 'border: 1px solid #444444; background-color: #f05a00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
 }
 
-$sektorinfo = '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
+$sektorinfo = '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Anderer Sektor: Reisezeit +2 Kampftick" style="'.$style.'">+'.$rzadd.'</span>';
 if (!empty($sf)) {
     //hinweistext für npc-sektoren
     $npchint = '<img src="'.'gp/'.'g/symbol12.png" border="0" style="margin-bottom: -4px; width: 20px; height: 20px;" title="'.
@@ -865,9 +865,9 @@ foreach ($sectorList as $sf) {
         }
 
         if ($rzadd == 0) {
-            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #00DD00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #00DD00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
         } else {
-            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #f05a00; color: #000000; width: 16px; display: inline-block; text-align: center;';
+            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #f05a00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
         }
 
 
@@ -891,7 +891,7 @@ foreach ($sectorList as $sf) {
 
         if ($anz > 0) {
             $sektorinfo = '';
-            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
+            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">+'.$rzadd.'</span>';
             $sektorinfo .= ' '.$infostr.' ';
             $sektorinfo .= ' <span title="Sektornummer">S:'.$sf.'</span> <span title="Platz in der Sektorwertung">P:'.$sec_data['platz'].'</span>';
             $sektorinfo .= ' <span title="Sektorpunkte">SP:'.number_format($gesamtpunkte, 0, ",", ".");
@@ -901,7 +901,7 @@ foreach ($sectorList as $sf) {
             $sektorinfo .= '</span>';
         } else {
             $sektorinfo = '';
-            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">'.$rzadd.'</span>';
+            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">+'.$rzadd.'</span>';
             $sektorinfo .= ' '.$infostr.' freier Sektor';
             $sektorinfo .= '</span>';
         }
