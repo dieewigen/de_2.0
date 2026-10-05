@@ -1710,6 +1710,80 @@ function validDigit($digit)
     return is_int($digit);
 }
 
+/**
+ * Spielertext für die Ausgabe in HTML escapen. Vorhandene Entities (z. B. &uuml; aus älteren Einträgen) bleiben erhalten.
+ */
+function html_text($string)
+{
+    return htmlspecialchars((string)$string, ENT_QUOTES, 'UTF-8', false);
+}
+
+/**
+ * Von Spielern eingetragene Adresse als escapten http(s)-Link liefern, sonst ''.
+ * Ohne Schema wird http:// ergänzt; javascript: & Co. fallen damit heraus.
+ */
+function safe_http_url($url)
+{
+    $url = trim((string)$url);
+    if ($url === '') {
+        return '';
+    }
+    if (!preg_match('#^https?://#i', $url)) {
+        $url = 'http://'.$url;
+    }
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        return '';
+    }
+    return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Discord-Einladungscode aus einer Spielereingabe: ein vorangestelltes (https://)discord.gg/ wird entfernt,
+ * erlaubt sind nur Buchstaben, Ziffern und Bindestrich, sonst ''.
+ */
+function discord_invite_code($code)
+{
+    $code = preg_replace('#^(https?://)?(www\.)?discord\.gg/#i', '', trim((string)$code));
+    return preg_match('/^[A-Za-z0-9-]+$/', $code) ? $code : '';
+}
+
+/**
+ * Spielertext mit einfacher Formatierung (b, i, u, strong, p, br, ul, li, font color) für die Ausgabe säubern:
+ * andere Tags werden entfernt, die erlaubten verlieren alle Attribute außer einer einfachen Farbe bei font.
+ */
+function safe_basic_html($string)
+{
+    $string = strip_tags((string)$string, '<br><i><b><strong><u><ul><li><p><font>');
+    return preg_replace_callback('/<(\/?)(br|i|b|strong|u|ul|li|p|font)\b[^>]*>/i', function ($m) {
+        $tag = strtolower($m[2]);
+        if ($m[1] === '' && $tag === 'font' && preg_match('/color\s*=\s*["\']?(#[0-9a-f]{3,6}|[a-z]{3,20})\b/i', $m[0], $c)) {
+            return '<font color="'.$c[1].'">';
+        }
+        return '<'.$m[1].$tag.'>';
+    }, $string);
+}
+
+/**
+ * Energieschlüssel "M;D;I;E" in vier Prozentwerte zerlegen.
+ * Ein ungültiger Schlüssel (Wert negativ oder über 100, Summe über 100) zählt wie der Standardschlüssel 100;0;0;0,
+ * damit manipulierte Werte im Wirtschaftstick keine Rohstoffe erzeugen.
+ */
+function parse_energy_key($ekey)
+{
+    $hv = explode(";", (string)$ekey);
+    $key = array();
+    for ($i = 0; $i < 4; $i++) {
+        $key[$i] = (float)($hv[$i] ?? 0);
+        if ($key[$i] < 0 || $key[$i] > 100) {
+            return array(100, 0, 0, 0);
+        }
+    }
+    if (array_sum($key) > 100) {
+        return array(100, 0, 0, 0);
+    }
+    return $key;
+}
+
 function getfleetlevel($exp)
 {
     $counter = 0;
@@ -2117,9 +2191,7 @@ function issectorcommander() {
 	//global $system;
 	//alle user des sektors auslesen
 	if($sector>0){
-		$sql="SELECT votefor, `system` FROM de_user_data WHERE sector=$sector";
-		//echo $sql;
-		$resultsk = mysqli_query($GLOBALS['dbi'], $sql);
+		$resultsk = mysqli_execute_query($GLOBALS['dbi'], "SELECT votefor, `system` FROM de_user_data WHERE sector=?", [intval($sector)]);
 		$anz = mysqli_num_rows($resultsk);
 
 		while($row=mysqli_fetch_array($resultsk)){
@@ -2171,16 +2243,14 @@ function issectorcommander() {
 function getSKSystemBySecID($sec_id){
 	global $sv_maxsystem;
 
-	$sector=$sec_id;
+	$sector=intval($sec_id);
 
 	//echo '<br>IS_SK: '.$sector.'/'.$sv_maxsystem;
 
 	//global $system;
 	//alle user des sektors auslesen
 	if($sector>0){
-		$sql="SELECT votefor, `system` FROM de_user_data WHERE sector=$sector";
-		//echo $sql;
-		$resultsk = mysqli_query($GLOBALS['dbi'], $sql);
+		$resultsk = mysqli_execute_query($GLOBALS['dbi'], "SELECT votefor, `system` FROM de_user_data WHERE sector=?", [$sector]);
 		$anz = mysqli_num_rows($resultsk);
 
 		while($row=mysqli_fetch_array($resultsk)){

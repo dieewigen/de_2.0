@@ -1,7 +1,7 @@
 <?php
 
 if (!isset($_SESSION)) {
-    session_start();
+    session_start(['cookie_httponly' => true]); // JavaScript kann das Login-Cookie nicht auslesen
 }
 //sprachdatei laden
 if (isset($session_subdir) && $session_subdir == 1) {
@@ -96,8 +96,13 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
     }
 
     //dateiname speichern um später darauf weiterleiten zu können
-    //basename: PHP_SELF kann ueber PATH_INFO fremde zeichen enthalten (XSS/redirect)
-    $_SESSION['ums_bot_protection_filename'] = basename($_SERVER['PHP_SELF']);
+    //SCRIPT_NAME statt PHP_SELF: PHP_SELF enthält PATH_INFO und damit fremde Zeichen (XSS/Weiterleitung);
+    //zusätzlich nur einfache Dateinamen, der Wert landet später in header("Location: ...")
+    $bot_protection_filename = basename($_SERVER['SCRIPT_NAME']);
+    if (!preg_match('/^[a-z0-9_]+\.php$/i', $bot_protection_filename)) {
+        $bot_protection_filename = 'overview.php';
+    }
+    $_SESSION['ums_bot_protection_filename'] = $bot_protection_filename;
 
     //beim ersten erscheinen des Botschutzes die $_GET/$_POST/$_REQUEST-Daten zwischenspeichern
     //unset($_SESSION['save_request']);

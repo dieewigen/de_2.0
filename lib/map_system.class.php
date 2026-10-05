@@ -399,7 +399,8 @@ class map_system{
 		///////////////////////////////////////////
 		$content.='</div><div style="flex-grow: 1; padding-left: 20px;">';
 
-		if(isset($_REQUEST['fieldid'])){
+		//nur Felder, die es in diesem System gibt: sonst ließen sich auf erfundenen Feld-IDs beliebig viele Gebäude bauen
+		if(isset($_REQUEST['fieldid']) && isset($this->fields[intval($_REQUEST['fieldid'])])){
 			$fieldid=intval($_REQUEST['fieldid']);
 
 			if(isset($this->fields[$fieldid][1])){

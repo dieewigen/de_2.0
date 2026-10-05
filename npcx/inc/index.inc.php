@@ -1,6 +1,12 @@
 <?php
 // Include environment configuration
 require_once '../inc/env.inc.php';
+
+//die Testseite schreibt den API-Key in den Quelltext, daher nur dort, wo sie in der env.inc.php ausdrücklich freigeschaltet ist (nie auf Produktivservern)
+if (empty($GLOBALS['env_npcx_enabled'])) {
+    http_response_code(404);
+    exit;
+}
 ?>
 <!doctype html>
 <html>

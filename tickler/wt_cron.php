@@ -250,23 +250,8 @@ function give_sector_bonus()
                 $playerdata[$cp]['user_id'] = $row['user_id'];
                 $playerdata[$cp]['gesamtstunden'] = 0;
 
-                $hv = explode(";", $row["ekey"]);
-                if ($hv[0] == '') {
-                    $hv[0] = 0;
-                }
-                if ($hv[1] == '') {
-                    $hv[1] = 0;
-                }
-                if ($hv[2] == '') {
-                    $hv[2] = 0;
-                }
-                if ($hv[3] == '') {
-                    $hv[3] = 0;
-                }
-                $playerdata[$cp]['keym'] = $hv[0];
-                $playerdata[$cp]['keyd'] = $hv[1];
-                $playerdata[$cp]['keyi'] = $hv[2];
-                $playerdata[$cp]['keye'] = $hv[3];
+                //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+                [$playerdata[$cp]['keym'], $playerdata[$cp]['keyd'], $playerdata[$cp]['keyi'], $playerdata[$cp]['keye']] = parse_energy_key($row["ekey"]);
 
                 //aktivität auslesen, maximalaktivität pro tag max 12h
                 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_stat WHERE user_id=? ORDER BY datum DESC LIMIT 7", [$playerdata[$cp]['user_id']]);

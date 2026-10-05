@@ -305,8 +305,15 @@ if ($dortick == 1) {
 			GROUP BY sector ORDER BY systeme, RAND() ASC LIMIT 1";
             $rx = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sv_free_startsectors, $maxsector, $last_sector]);
             $rowx = mysqli_fetch_array($rx);
-            $sec = $rowx["sector"];
+            $sec = $rowx["sector"] ?? null;
             //echo $sql.'<br>'.$sec.'<br>'.$fullsec;
+        }
+
+        //kein Zielsektor verfügbar (alle gesperrt/voll): diesen Umzug beim nächsten Lauf erneut versuchen,
+        //sonst bricht das UPDATE weiter unten ab und register_user bleibt dauerhaft gesperrt (dortick=0)
+        if (empty($sec)) {
+            echo '<br>kein Zielsektor für '.$spielername.' gefunden, Umzug verschoben';
+            continue;
         }
 
         //$sys=rand (1, $maxsystem);
@@ -352,13 +359,13 @@ if ($dortick == 1) {
         //31588
         //freie position ermitteln - ende
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=savestatus WHERE user_id='$uid'");//status aktiv
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET status=savestatus WHERE user_id=?", [$uid]);//status aktiv
         //heimatsystem festlegen
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=$secz, `system`=$sysz, votefor=0, last_sector='$secz' WHERE user_id='$uid'");
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sector=?, `system`=?, votefor=0, last_sector=? WHERE user_id=?", [$secz, $sysz, $secz, $uid]);
         //info in der sektorhistorie hinterlegen
-        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES ('$maxtick', '2', '$secz', '$spielername');");
+        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, '2', ?, ?)", [$maxtick, $secz, $spielername]);
 
-        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET fromsec=$secz,  fromsys=$sysz WHERE  absender='$uid' and sender=0");
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_hyper SET fromsec=?, fromsys=? WHERE absender=? and sender=0", [$secz, $sysz, $uid]);
         //flottenkoordinaten updaten
         $fleet_id = $uid.'-0';
         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET hsec=?, hsys=? WHERE user_id=?", [$secz, $sysz, $fleet_id]);

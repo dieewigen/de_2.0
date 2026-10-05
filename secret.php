@@ -249,14 +249,21 @@ $zsys1 = isset($_REQUEST['zsys1']) ? $_REQUEST['zsys1'] : '';
 $zsec2 = isset($_REQUEST['zsec2']) ? $_REQUEST['zsec2'] : '';
 $zsys2 = isset($_REQUEST['zsys2']) ? $_REQUEST['zsys2'] : '';
 
-$copy_zsys2 = $zsys2;
-$copy_zsec2 = $zsec2;
+//nur Zahlen: die Koordinaten landen im Verlauf (scanhistory) und von dort im HTML/JavaScript
+$copy_zsys2 = intval($zsys2);
+$copy_zsec2 = intval($zsec2);
 
 //Agenten/Sonden bauen
 if (hasTech($pt, 9)) {
     if (isset($_POST["b110"]) || isset($_POST["b111"])) {//ja, es wurde ein button gedrueckt
         //transaktionsbeginn
         if (setLock($_SESSION['ums_user_id'])) {
+            //Rohstoffe innerhalb der Sperre neu laden, sonst bezahlt ein paralleler Bauauftrag mit veralteten Beständen
+            $row_res = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]));
+            $gr01 = $restyp01 = $row_res['restyp01'];
+            $gr02 = $restyp02 = $row_res['restyp02'];
+            $gr03 = $restyp03 = $row_res['restyp03'];
+            $gr04 = $restyp04 = $row_res['restyp04'];
             for ($i = 110; $i <= 111; $i++) {
                 $h = intval($_POST['b'.$i] ?? 0);
                 if ($h >= 1) { //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags
@@ -930,10 +937,13 @@ if (!hasTech($pt, 9)) {
     //agenteneinsatz
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
-    $etyp = isset($_POST['etyp']) ? $_POST['etyp'] : '';
+    //nur die Einsatzarten aus dem Auswahlfeld (9 und 11 sind abgeschaltet) und nur als Ganzzahl:
+    //ein Wert wie "7.0" träfe im switch case 7, fände aber keine Wartezeit/Verluste in $sv_sabotage
+    $etyp = intval($_POST['etyp'] ?? -1);
+    $etyp_ok = in_array($etyp, array(0, 1, 2, 3, 4, 5, 6, 7, 8, 10), true);
     $az = isset($_POST['az']) ? intval($_POST['az']) : '';
 
-    if (isset($_POST["zsec2"]) && isset($_POST["zsys2"]) && !isset($_POST["b110"]) && !isset($_POST["b111"]) && hasTech($pt, 111)) {
+    if ($etyp_ok && isset($_POST["zsec2"]) && isset($_POST["zsys2"]) && !isset($_POST["b110"]) && !isset($_POST["b111"]) && hasTech($pt, 111)) {
 
         if (validDigit($zsec2) && validDigit($zsys2) && validDigit($az)) {
 
@@ -2131,6 +2141,10 @@ if (!hasTech($pt, 9)) {
 
             while ($i < (Count($scanhistory) - 1)) {
                 $daten = explode(":", $scanhistory[$i]);
+                //ältere Einträge können noch rohe Eingaben enthalten
+                $daten[0] = intval($daten[0]);
+                $daten[1] = intval($daten[1]);
+                $daten[2] = htmlspecialchars($daten[2] ?? '', ENT_QUOTES, 'UTF-8');
                 echo '
 			<tr>
 				<td  class="cell" nowrap align="center">&nbsp;&nbsp;&nbsp;<a href="javascript:insertsonde('.$daten[0].','.$daten[1].')">'.$secret_lang['sondenzielproggen'].'</a></td>
@@ -2174,7 +2188,7 @@ if (!hasTech($pt, 9)) {
 	}
 	';
 
-        echo 'sei('.$_REQUEST['etyp'].');';
+        echo 'sei('.intval($_REQUEST['etyp']).');';
         echo '</script>';
 
 

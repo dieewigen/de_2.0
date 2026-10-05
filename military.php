@@ -789,14 +789,18 @@ function recall($fleet_id, $sector, $system, $db){
 	//erstmal schauen, ob man sie �berhaupt zur�ckrufen kann
 	//if ($akttyp==1 OR $akttyp==2 OR $akttyp==4){//also wenn sie hinfliegt
 	if ($akttyp==1 OR $akttyp==2){//also wenn sie hinfliegt
+        //nur Flotten, die noch hinfliegen (aktion 1/2): sonst würde ein zweiter, gleichzeitiger Rückruf die Flugzeit nochmals umdrehen
         if($spec5!=2){
-            $sql="UPDATE de_user_fleet set aktion = 3, zeit = gesrzeit - zeit, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = gesrzeit - zeit, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id' AND aktion IN (1,2)";
         }else{
             // Saubere Lösung: Erst prüfen, dann berechnen
-            $sql="UPDATE de_user_fleet set aktion = 3, zeit = CASE WHEN gesrzeit > zeit THEN gesrzeit - zeit - 1 ELSE 0 END, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id'";
-        }		
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = CASE WHEN gesrzeit > zeit THEN gesrzeit - zeit - 1 ELSE 0 END, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id' AND aktion IN (1,2)";
+        }
 
 		mysqli_query($GLOBALS['dbi'],$sql);
+		if (mysqli_affected_rows($GLOBALS['dbi']) != 1) {
+			return;
+		}
 		//echo $sql;
 
 		//schon weit weg? wenn nicht, dann status wieder auf defence

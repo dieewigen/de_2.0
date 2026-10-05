@@ -1,7 +1,9 @@
 <?php
 	function writeHistory($allytag, $entry, $insert_chat=false){
 
-		$entry = html_entity_decode($entry);
+		//Einträge enthalten Allianz-/Spielernamen; nur einfache Formatierung (z. B. <i>) zulassen,
+		//der Eintrag landet auch im Allianz-Chat
+		$entry = safe_basic_html(html_entity_decode($entry));
 		$timestamp = time();
 		$datum = date("d.m.Y - H:i", $timestamp);
 		$sql = "SELECT id from de_allys WHERE allytag=?";

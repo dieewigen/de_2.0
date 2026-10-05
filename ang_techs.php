@@ -277,13 +277,14 @@ if(setLock($_SESSION['ums_user_id'])){
 		//ist die Runde bereits gestartet?
 		$result  = mysqli_query($GLOBALS['dbi'], "SELECT wt FROM de_system LIMIT 1");
 		$row     = mysqli_fetch_array($result);
-		$max_wt = $row["wt"];		
+		$max_wt = $row["wt"];
 
-		if($max_wt>1){
+		//nur baubare Technologien: unbekannte IDs hätten keine Kosten und keine Bauzeit
+		if($max_wt>1 && isset($tech_daten[intval($_REQUEST['start_tech'])])){
 
 			$tech_id=intval($_REQUEST['start_tech']);
 			$has_all=true;
-			
+
 			$need_storage_res=array();
 
 			//�berpr�fen ob schon eine Technologie dieses Typs in Bearbeitung ist

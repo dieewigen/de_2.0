@@ -80,7 +80,8 @@ if(isset($peaceto) && ($isleader || $iscoleader))
 		$uebrig = $ultimatum-$vergangen;
 		$stunden = floor($uebrig / (60*60));
 
-		$minuten = floor(($uebrig%($stunden*(60*60)))/60);
+		//Rest der angefangenen Stunde; das frühere "% ($stunden*3600)" brach in der letzten Stunde mit Modulo 0 ab
+		$minuten = floor(($uebrig % (60*60))/60);
 
 
 		die("$allywar_lang[msg_2_1] $stunden $allywar_lang[msg_2_2] $minuten $allywar_lang[msg_2_3]");
@@ -137,7 +138,12 @@ if($an and ($isleader || $iscoleader)){
 		"SELECT id FROM de_allys WHERE allytag=?",
 		[$an]);
 	$row = mysqli_fetch_assoc($result);
-	$angegriffener = $row["id"];
+	$angegriffener = $row["id"] ?? 0;
+
+	//nur gegen eine bestehende, fremde Allianz (das Auswahlfeld lässt die eigene aus, die Anfrage nicht)
+	if(empty($angegriffener) || $angegriffener==$allyid){
+		die('Krieg kann nur einer anderen, bestehenden Allianz erklärt werden.');
+	}
 
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT COUNT(user_id) as count, SUM(score) as sum FROM de_user_data WHERE allytag=?",

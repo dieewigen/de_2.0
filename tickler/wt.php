@@ -410,12 +410,8 @@ if ($doetick == 1) {
 
             $pt = loadPlayerTechs($uid);
 
-            //ekey aufsplitten
-            $hv = explode(";", $ekey);
-            $keym = (float)($hv[0] ?? 0);
-            $keyd = (float)($hv[1] ?? 0);
-            $keyi = (float)($hv[2] ?? 0);
-            $keye = (float)($hv[3] ?? 0);
+            //ekey aufsplitten, ungültige Schlüssel zählen als 100;0;0;0
+            [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
             $malus = 0;
             $sabotagemalus = 0;
@@ -1015,12 +1011,8 @@ if ($doetick == 1) {
 
         $col = $col + $specseccol;
 
-        //ekey aufsplitten
-        $hv = explode(";", $ekey);
-        $keym = (float)($hv[0] ?? 0);
-        $keyd = (float)($hv[1] ?? 0);
-        $keyi = (float)($hv[2] ?? 0);
-        $keye = (float)($hv[3] ?? 0);
+        //ekey aufsplitten, ungültige Schlüssel zählen als 100;0;0;0
+        [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
 
         //gesamtenergie pro tick, energieausbeute
@@ -1789,7 +1781,7 @@ if ($doetick == 1) {
 
 
         //sektor - sektor, name, punkte
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id>1 AND npc=0 AND platz>0 OR sec_id=5 ORDER BY platz ASC LIMIT 1", []);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_sector WHERE sec_id>1 AND npc=0 AND platz>0 ORDER BY platz ASC LIMIT 1", []);
         $row = mysqli_fetch_array($db_daten);
         $sec_id = $row["sec_id"];
         $ranglistendaten .= "Sektor: ".$row["sec_id"]."\n".
@@ -1819,23 +1811,17 @@ if ($doetick == 1) {
         @mail_smtp($GLOBALS['env_admin_email'], 'Die Runde auf '.$sv_server_tag.' ist vorbei - Ranglistendaten', $ranglistendaten);
 
         //Ranglistendaten in der DB speichern
-        $sql = "INSERT INTO de_server_round_toplist SET 
-            player_owner_id='$player_owner_id', 
-            player_spielername='$player_spielername', 
-            player_sector='$player_sector', 
-            player_system='$player_system', 
-            player_col='$player_col', 
-            player_score='$player_score', 
-            player_rasse='$player_rasse', 
-            round_wt='$round_wt', 
-            sector_id='$sector_id', 
-            sector_name='$sector_name', 
-            sector_score='$sector_score', 
-            ally_id='$ally_id', 
-            ally_tag='$ally_tag',
-            ally_roundpoints='$ally_roundpoints' 
-            ";
-        mysqli_query($GLOBALS['dbi'], $sql);
+        //Prepared Statement: der Sektorname stammt vom Sektorkommandanten (Apostroph würde das Rundenende abbrechen);
+        //Texte auf die Spaltenbreite kürzen, fehlende Werte (z. B. keine Allianz) als 0/leer eintragen
+        $sql = "INSERT INTO de_server_round_toplist SET
+            player_owner_id=?, player_spielername=?, player_sector=?, player_system=?, player_col=?, player_score=?, player_rasse=?,
+            round_wt=?, sector_id=?, sector_name=?, sector_score=?, ally_id=?, ally_tag=?, ally_roundpoints=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [
+            intval($player_owner_id), mb_substr((string)$player_spielername, 0, 20), intval($player_sector), intval($player_system),
+            intval($player_col), intval($player_score), intval($player_rasse), intval($round_wt),
+            intval($sector_id), mb_substr((string)$sector_name, 0, 30), intval($sector_score),
+            intval($ally_id), mb_substr((string)$ally_tag, 0, 7), intval($ally_roundpoints)
+        ]);
 
         $rundenNummer=mysqli_insert_id($GLOBALS['dbi']);
 

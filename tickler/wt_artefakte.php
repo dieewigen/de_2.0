@@ -24,11 +24,8 @@ while ($row = mysqli_fetch_array($res)) {
     $pt = loadPlayerTechs($uid);
 
     //ekey aufsplitten
-    $hv = explode(";", $ekey);
-    $keym = $hv[0];
-    $keyd = $hv[1];
-    $keyi = $hv[2];
-    $keye = $hv[3];
+    //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+    [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
     //gesamtenergie pro tick, energieausbeute
     $ea = $col * $sv_artefakt[0][0]; //die 5% energie f�r das artefakt
@@ -144,11 +141,8 @@ while ($row = mysqli_fetch_array($res)) {
     $pt = loadPlayerTechs($uid);
 
     //ekey aufsplitten
-    $hv = explode(";", $ekey);
-    $keym = $hv[0];
-    $keyd = $hv[1];
-    $keyi = $hv[2];
-    $keye = $hv[3];
+    //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+    [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
     //gesamtenergie pro tick, energieausbeute
     $ea = $col * $sv_artefakt[3][0]; //die 3% energie f�r das artefakt
@@ -222,11 +216,8 @@ while ($row = mysqli_fetch_array($res)) {
     $pt = loadPlayerTechs($uid);
 
     //ekey aufsplitten
-    $hv = explode(";", $ekey);
-    $keym = $hv[0];
-    $keyd = $hv[1];
-    $keyi = $hv[2];
-    $keye = $hv[3];
+    //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+    [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
     //gesamtenergie pro tick, energieausbeute
     $ea = $col * $sv_artefakt[4][0]; //die 3% energie f�r das artefakt
@@ -298,11 +289,8 @@ while ($row = mysqli_fetch_array($res)) {
     $pt = loadPlayerTechs($uid);
 
     //ekey aufsplitten
-    $hv = explode(";", $ekey);
-    $keym = $hv[0];
-    $keyd = $hv[1];
-    $keyi = $hv[2];
-    $keye = $hv[3];
+    //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+    [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
     //gesamtenergie pro tick, energieausbeute
     $ea = $col * $sv_artefakt[5][0]; //die 3% energie f�r das artefakt
@@ -449,11 +437,8 @@ for ($k = 11;$k <= 20;$k++) {
         $pt = loadPlayerTechs($uid);
 
         //ekey aufsplitten
-        $hv = explode(";", $ekey);
-        $keym = $hv[0];
-        $keyd = $hv[1];
-        $keyi = $hv[2];
-        $keye = $hv[3];
+        //ungültige Schlüssel zählen als 100;0;0;0 (siehe functions.php)
+        [$keym, $keyd, $keyi, $keye] = parse_energy_key($ekey);
 
         //bonusressourcen durch die gabe. $sv_kollieertrag_pa wird hier nicht mehr genutzt
         $ea = $col * $sv_kollieertrag / 100 * $sv_artefakt[$k - 1][0];

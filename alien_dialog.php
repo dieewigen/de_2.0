@@ -69,7 +69,7 @@ function isSameSectorAllyOrMetaAlien(int $npcSector, int $playerSector, $npcAlly
 // ---------------------------------------------------------------
 $playerData = mysqli_execute_query(
     $GLOBALS['dbi'],
-    'SELECT sector, ally_id FROM de_user_data WHERE user_id=?',
+    'SELECT sector, ally_id, status FROM de_user_data WHERE user_id=?',
     [$playerId]
 );
 $playerRow = mysqli_fetch_assoc($playerData);
@@ -79,7 +79,8 @@ if (!$playerRow) {
     exit;
 }
 $playerSector = (int) $playerRow['sector'];
-$playerAllyId = (int) $playerRow['ally_id'];
+//Bewerber haben ally_id schon gesetzt, zählen aber noch nicht als Mitglied
+$playerAllyId = ((int) $playerRow['status'] == 1) ? (int) $playerRow['ally_id'] : 0;
 
 $npc = new NPCCommunication();
 

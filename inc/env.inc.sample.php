@@ -47,5 +47,8 @@ $GLOBALS['webhooks']['xDE']=			'';
 //RPC Authcode
 $GLOBALS['env_rpc_authcode']='';
 
-// API Key for external services
+// API Key for external services (ohne Key ist die API gesperrt)
 $GLOBALS['env_api_key']='';
+
+// NPC-Testseite npcx/ freischalten; nur lokal, sie zeigt den API-Key im Browser
+$GLOBALS['env_npcx_enabled']=false;

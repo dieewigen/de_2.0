@@ -757,6 +757,13 @@ if (!empty($voteout) && $system == issectorcommander() && $sector > 1) {
         [$vuser_id]
     );
     $row = $db_daten->fetch_assoc();
+    //beim Umbau auf mysqli (Juli 2025) verloren gegangen: gesperrte Spieler lassen sich rausvoten, ohne Zähler
+    if (($row['status'] ?? 0) == 2) {
+        $gesperrt = 1;
+        $votecounter = 0;
+    } else {
+        $gesperrt = 0;
+    }
 
     //�berpr�fen ob er l�nger als 7 tage offline war
 
@@ -807,7 +814,12 @@ if (!empty($voteout) && $system == issectorcommander() && $sector > 1) {
 
 $sec_btn = isset($_POST['sec_btn']) ? $_POST['sec_btn'] : '';
 $newname = isset($_POST['newname']) ? $_POST['newname'] : '';
-$seksteuer = isset($_POST['seksteuer']) ?  $_POST['seksteuer'] : 0;
+$seksteuer = isset($_POST['seksteuer']) ? intval($_POST['seksteuer']) : 0;
+//nur die Werte aus dem Auswahlfeld (2-5) und nur mit Sektorhandelszentrum, sonst bleibt der bisherige Satz;
+//ein freier Wert würde über Missionen und den Konverter Rohstoffe aus dem Nichts bzw. aus der Sektorkasse erzeugen
+if (isset($_POST['seksteuer']) && (!in_array($seksteuer, array(2, 3, 4, 5), true) || $sectechs[4] != 1)) {
+    $seksteuer = $ssteuer;
+}
 if (!empty($sec_btn) && $system == issectorcommander()) {
     if (($name <> $newname) || ($ssteuer <> $seksteuer)) {
 
@@ -1047,7 +1059,8 @@ if($s==3 && $system==issectorcommander()) {
                   echo '<div class="cell" style="color: red;">'.$politics_lang['npc_fleet_config_error'].'</div>';
               }
          } else if ($_POST['action'] === 'save_npc_max_fp') {
-            $maxFp = (int)$_POST['max_fp'];
+            //Bereich wie im Schieberegler (-10 bis 200)
+            $maxFp = max(-10, min(200, (int)$_POST['max_fp']));
             try {
                 $npcControl->setMaxFleetPoints($npcId, $maxFp);
                 echo '<div class="cell" style="color: green;">'.$politics_lang['npc_fleet_max_config_success'].'</div>';

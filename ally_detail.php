@@ -57,13 +57,14 @@ if($num==1)
 	$row = mysqli_fetch_assoc($result);
 	
 	$clanid 		= $row["id"];
-	$clanname 		= $row["allyname"];
-	$clankuerzel 	= $row["allytag"];
+	//alle Texte stammen von Spielern und werden für die Ausgabe escaped bzw. gesäubert
+	$clanname 		= html_text($row["allyname"]);
+	$clankuerzel 	= html_text($row["allytag"]);
 	$leaderid		= $row["leaderid"];
-	$homepageurl 	= $row["homepage"];
+	$homepageurl 	= safe_http_url($row["homepage"]);
 	$memberlimit 	= $row["memberlimit"];
-	$openirc	 	= $row["openirc"];
-	$bewerberinfo 	= formatString($row["bewerberinfo"]);
+	$openirc	 	= discord_invite_code($row["openirc"]);
+	$bewerberinfo 	= safe_basic_html($row["bewerberinfo"]);
 	
 	$result2 = mysqli_execute_query($GLOBALS['dbi'], 
 	    "SELECT COUNT(*) as count FROM de_user_data WHERE allytag=? AND status=1",
@@ -72,8 +73,8 @@ if($num==1)
 	$membercount = $count_row['count'];
 	
 	$bio = formatString($row["besonderheiten"]);
-	$ausrichtung = $row["ausrichtung"];
-	$regierungsform = $row["regierungsform"];
+	$ausrichtung = html_text($row["ausrichtung"]);
+	$regierungsform = html_text($row["regierungsform"]);
 	$allianzform = $row["allianzform"];
 	
 	

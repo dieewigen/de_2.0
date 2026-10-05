@@ -16,7 +16,8 @@ $col_count=$row['col'];$npc=$row['npc'];
 
 $ally_id=intval($_REQUEST['ally_id']);
 $ally_data=getAllyByID($ally_id);
-$a_name=$ally_data['allyname'];
+//Allianzname stammt vom Gründer, nur escaped ausgeben
+$a_name=html_text($ally_data['allyname']);
 $a_tag=$ally_data['allytag'];
 
 $t_tojoin = round(($col_count / 4) -1, 0);
@@ -82,34 +83,41 @@ $ok=$_POST['ok'] ?? false;
 $warnung=$_POST['warnung'] ?? false;
 if($ok || $warnung || $npc==2){
 	$error=false;
-	if(!$warnung)	{
-		$result = mysqli_execute_query($GLOBALS['dbi'],
-			"SELECT * FROM de_user_data WHERE user_id=?",
-			[$_SESSION['ums_user_id']]);
-		$row = mysqli_fetch_assoc($result);
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT * FROM de_user_data WHERE user_id=?",
+		[$_SESSION['ums_user_id']]);
+	$row = mysqli_fetch_assoc($result);
 
-		$user_ally_id = $row['ally_id'];
-		$status = $row['status'];
+	$user_ally_id = $row['ally_id'];
+	$status = $row['status'];
 
-		$leader_result = mysqli_execute_query($GLOBALS['dbi'],
-			"SELECT id FROM de_allys WHERE leaderid=?",
-			[$_SESSION['ums_user_id']]);
-		if(mysqli_num_rows($leader_result))
-		{
-			die("$allyjoin_lang[msg_4]");
-		}
-		
-		if($user_ally_id>0 AND $status==1)
-		{
-			$error=true;
-		}
+	//Leader müssen ihr Amt immer erst abgeben, auch wenn die Rückfrage (warnung) bestätigt wurde:
+	//sonst stünde ihre ally_id auf der neuen Allianz und ally_delete.php würde deren Mitglieder entfernen
+	$leader_result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT id FROM de_allys WHERE leaderid=?",
+		[$_SESSION['ums_user_id']]);
+	if(mysqli_num_rows($leader_result))
+	{
+		die("$allyjoin_lang[msg_4]");
+	}
+
+	//Mitglieder einer Allianz müssen zuerst regulär austreten (ally_austritt.php): dort fallen die Austrittsgebühr,
+	//das Räumen von Posten, der Historieneintrag und die Benachrichtigung der Allianzführung an.
+	//NPCs (Typ 2) wechseln wie bisher nach Bestätigung (warnung).
+	if($user_ally_id>0 && $status==1 && ($npc!=2 || !$warnung))
+	{
+		$error=true;
 	}
 
 	if($error){
-		echo '
-			<form name="register" method="POST" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
-				<input type="hidden" name="ally_id" value="'.$ally_id.'">
-				<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung"></form>';
+		if($npc==2){
+			echo '
+				<form name="register" method="POST" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
+					<input type="hidden" name="ally_id" value="'.$ally_id.'">
+					<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung"></form>';
+		}else{
+			echo '<div class="info_box text2">'.$allyjoin_lang['msg_17'].' <a href="ally_austritt.php">'.$allyjoin_lang['zumaustritt'].'</a></div>';
+		}
 	}else{
 		if($ally_id<1){
 			echo $allyjoin_lang['msg_7'];
@@ -159,6 +167,15 @@ if($ok || $warnung || $npc==2){
 					$coleaderid1 = $row['coleaderid1'];
 					$coleaderid2 = $row['coleaderid2'];
 					$coleaderid3 = $row['coleaderid3'];
+
+					//wer aus einer Allianz wechselt, verliert dort seinen Co-Leader-Posten (wie beim Austritt)
+					if($user_ally_id>0 && $status==1){
+						for($c=1;$c<=3;$c++){
+							mysqli_execute_query($GLOBALS['dbi'],
+								"UPDATE de_allys SET coleaderid$c=-1 WHERE id=? AND coleaderid$c=?",
+								[$user_ally_id, $_SESSION['ums_user_id']]);
+						}
+					}
 
 					$result = mysqli_execute_query($GLOBALS['dbi'],
 						"UPDATE de_user_data SET ally_id=?, allytag=?, status=0 WHERE user_id=?",
@@ -224,7 +241,7 @@ if($ok || $warnung || $npc==2){
 		[$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_assoc($result);
 
-	$antrag_allyname = $row["allyname"] ?? '';
+	$antrag_allyname = html_text($row["allyname"] ?? '');
 	$antrag_antrag 	 = $row["antrag"] ?? '';
 
 	$result = mysqli_execute_query($GLOBALS['dbi'],

@@ -90,6 +90,11 @@ if (!hasTech($pt, 4)) {
 
     if (setLock($_SESSION['ums_user_id'])) {
 
+        //Bestände erst innerhalb der Sperre laden, sonst prüft eine zweite Anfrage gegen veraltete Werte
+        $pd = loadPlayerData($_SESSION['ums_user_id']);
+        $ps = loadPlayerStorage($_SESSION['ums_user_id']);
+        $GLOBALS['ps'] = $ps;
+
         $content .= '<div class="info_box">Nach dem Start der Auktion sinkt 1.000 Wirtschaftsticks lang der Preis. Auktionen, die man selbst gestartet hat, haben einen Nachlass von '.$nachlass.'%.</div><br>';
 
         //Rahmen oben
@@ -126,6 +131,14 @@ if (!hasTech($pt, 4)) {
             //überprüfen ob es Platz im Artefaktgebäude gibt, wenn nötig und dann ggf. den Kauf verhindern
             if ($is_artefact && $free_artefact_places < 1) {
                 $bid = -1;
+            }
+
+            //die Auktion vor dem Bezahlen für sich reservieren: bieten zwei Spieler gleichzeitig, bekommt sie nur einer
+            if ($bid == $row['id']) {
+                mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_auction SET bidder=? WHERE id=? AND bidder=0", [$_SESSION['ums_user_id'], $row['id']]);
+                if (mysqli_affected_rows($GLOBALS['dbi']) != 1) {
+                    $bid = -1;
+                }
             }
 
             //hat man sie selbst erstellt?
@@ -326,9 +339,13 @@ if (!hasTech($pt, 4)) {
 
             if ($bid == $row['id']) {
                 if ($bid_has_all) {
-                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_auction SET bidder=? WHERE id=?", 
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_auction SET bidder=? WHERE id=?",
                         [$_SESSION['ums_user_id'], $row['id']]);
 
+                } else {
+                    //nicht bezahlt: Reservierung wieder freigeben
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_auction SET bidder=0 WHERE id=? AND bidder=?",
+                        [$row['id'], $_SESSION['ums_user_id']]);
                 }
             }
 

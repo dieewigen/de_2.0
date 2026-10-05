@@ -53,7 +53,8 @@ if ($history_result){
 	for ($i=0;$i<$numrows;$i++)	{
 		$data = mysqli_fetch_assoc($history_result);
 		$datum = $data['displaydate'];
-		$entry = $data['entry'];
+		//ältere Einträge können noch ungefilterte Namen enthalten
+		$entry = safe_basic_html($data['entry']);
 		print('<tr><td width="110" valign="top">'.$datum.'</td><td valign="top">&nbsp; &nbsp;</td><td valign="top">'.$entry.'</td></tr>');
 	}
 }

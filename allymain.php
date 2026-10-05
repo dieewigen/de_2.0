@@ -125,9 +125,11 @@ if(($isleader || $iscoleader) && $own_ally_id >0){
 		"UPDATE de_allys 
 		SET homepage=?, besonderheiten=?, openirc=?, internirc=?, metairc=?, 
 			keywords=?, leadermessage=?, bewerberinfo=?, public_activity=?, discord_bot=? 
-		WHERE id=?",
-		[$hpurl, $bio, $openirc, $internirc, $metairc, $keywords, $leadermessage, 
-		$bewerberinfo, $showactivity, $discord_bot, $own_ally_id]);
+		WHERE id=? AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+		[$hpurl, $bio, $openirc, $internirc, $metairc, $keywords, $leadermessage,
+		$bewerberinfo, $showactivity, $discord_bot, $own_ally_id,
+		//nur in der eigenen Allianz und nur als deren Leader/Co-Leader
+		$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 
 		echo '<div class="info_box mt10 mb10">';
 
@@ -152,7 +154,9 @@ $memberlimit 	= $row_result["memberlimit"];
 
 
 $clankuerzel 	= $row_result["allytag"];
-$homepageurl 	= $row_result["homepage"];
+//Spielertexte: escaped für Formularfelder, geprüft für Links
+$homepageurl 	= html_text($row_result["homepage"]);
+$homepagelink 	= safe_http_url($row_result["homepage"]);
 $leaderid 		= $row_result["leaderid"];
 $coleaderid1 	= $row_result["coleaderid1"];
 $coleaderid2 	= $row_result["coleaderid2"];
@@ -163,21 +167,21 @@ $toid1 			= $row_result["tacticalofficer1"];
 $toid2 			= $row_result["tacticalofficer2"];
 $moid1 			= $row_result["memberofficer1"];
 $moid2 			= $row_result["memberofficer2"];
-$leadername 	= $row_result["leadername"];
-$coleadername1 	= $row_result["coleadername1"];
-$coleadername2 	= $row_result["coleadername2"];
-$coleadername3 	= $row_result["coleadername3"];
-$fcname1 		= $row_result["fcname1"];
-$fcname2 		= $row_result["fcname2"];
-$toname1 		= $row_result["toname1"];
-$toname2 		= $row_result["toname2"];
-$moname1 		= $row_result["moname1"];
-$moname2 		= $row_result["moname2"];
-$openirc	 	= $row_result["openirc"];
-$internirc 		= $row_result["internirc"];
-$metairc 		= $row_result["metairc"];
-$discord_bot	= $row_result["discord_bot"];
-$keywords 		= $row_result["keywords"];
+$leadername 	= html_text($row_result["leadername"]);
+$coleadername1 	= html_text($row_result["coleadername1"]);
+$coleadername2 	= html_text($row_result["coleadername2"]);
+$coleadername3 	= html_text($row_result["coleadername3"]);
+$fcname1 		= html_text($row_result["fcname1"]);
+$fcname2 		= html_text($row_result["fcname2"]);
+$toname1 		= html_text($row_result["toname1"]);
+$toname2 		= html_text($row_result["toname2"]);
+$moname1 		= html_text($row_result["moname1"]);
+$moname2 		= html_text($row_result["moname2"]);
+$openirc	 	= html_text($row_result["openirc"]);
+$internirc 		= html_text($row_result["internirc"]);
+$metairc 		= html_text($row_result["metairc"]);
+$discord_bot	= html_text($row_result["discord_bot"]);
+$keywords 		= html_text($row_result["keywords"]);
 $leadermessage 	= formatString($row_result["leadermessage"]);
 $bewerberinfo 	= formatString($row_result["bewerberinfo"]);
 $publicactivity = $row_result["public_activity"];
@@ -240,8 +244,8 @@ if ($moid2 > -1)
 $membercount_result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_data WHERE allytag=? AND status=1", [$clankuerzel]);
 $membercount = mysqli_num_rows($membercount_result);
 $bio = formatString($row_result["besonderheiten"]);
-$ausrichtung = $row_result["ausrichtung"];
-$regierungsform = $row_result["regierungsform"];
+$ausrichtung = html_text($row_result["ausrichtung"]);
+$regierungsform = html_text($row_result["regierungsform"]);
 $allianzform = $row_result["allianzform"];
 
 echo '<div class="cell" style="width: 600px;">';
@@ -351,16 +355,17 @@ $discord_open_link='';
 $discord_intern_link='';
 $discord_meta_link='';
 
-if(!empty(trim($openirc))){
-	$discord_open_link='<a href="https://discord.gg/'.$openirc.'" target="_blank">zu Discord</a>';
+//nur gültige Einladungscodes verlinken
+if(discord_invite_code($row_result["openirc"])!==''){
+	$discord_open_link='<a href="https://discord.gg/'.discord_invite_code($row_result["openirc"]).'" target="_blank">zu Discord</a>';
 }
 
-if(!empty(trim($internirc))){
-	$discord_intern_link='<a href="https://discord.gg/'.$internirc.'" target="_blank">zu Discord</a>';
+if(discord_invite_code($row_result["internirc"])!==''){
+	$discord_intern_link='<a href="https://discord.gg/'.discord_invite_code($row_result["internirc"]).'" target="_blank">zu Discord</a>';
 }
 
-if(!empty(trim($metairc))){
-	$discord_meta_link='<a href="https://discord.gg/'.$metairc.'" target="_blank">zu Discord</a>';
+if(discord_invite_code($row_result["metairc"])!==''){
+	$discord_meta_link='<a href="https://discord.gg/'.discord_invite_code($row_result["metairc"]).'" target="_blank">zu Discord</a>';
 }
 
 echo '<tr class="cl">
@@ -389,7 +394,7 @@ echo '<tr class="cl">
 		</tr>
 		<tr class=cl>
 			<td height="21">Website:</td>
-			<td height="21" colspan="3"><b><a href="'.$homepageurl.'" target=_blank>'.$homepageurl.'</a></b></td>
+			<td height="21" colspan="3"><b><a href="'.$homepagelink.'" target=_blank>'.$homepageurl.'</a></b></td>
 		</tr>
 		
 		</table>

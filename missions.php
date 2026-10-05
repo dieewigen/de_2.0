@@ -27,7 +27,8 @@ $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 //sektorsteuersatz auslesen
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT ssteuer FROM de_sector WHERE sec_id=?", [$sector]);
 $row = mysqli_fetch_array($db_daten);
-$sektorsteuersatz = $row['ssteuer'];
+//auf den erlaubten Bereich begrenzen (ältere, manipulierte Werte in der DB)
+$sektorsteuersatz = max(0, min(5, intval($row['ssteuer'])));
 
 
 //ally_id holen, wird für Allianzmissionen benötigt
@@ -517,6 +518,18 @@ if(!hasTech($pt,29)){
 								}
 							}
 
+						}
+
+						//Handelsmissionen nur mit einer Flotte, die zu Hause ist, und nur mit echter Ware:
+						//sonst gäbe es Handelspunkte ohne Kosten und eine angreifende/verteidigende Flotte würde umgesetzt
+						$mission_cost_ok=true;
+						foreach($md[$m]['cost'] ?? array() as $mission_cost){
+							if($mission_cost[2]<=0){
+								$mission_cost_ok=false;
+							}
+						}
+						if(($md[$m]['typ']==1 || $md[$m]['typ']==2) && ($fleet_data[$fleet_id]['aktion']!=0 || $storage_capacity<=0 || !$mission_cost_ok)){
+							$storage_is_ok=false;
 						}
 
 						//hat man genug Frachtraum?

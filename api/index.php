@@ -27,13 +27,15 @@ if(empty($apiKey)){
     $apiKey=$_SERVER['X-DE-API-KEY'] ?? '';
 }
 
-if($apiKey != $GLOBALS['env_api_key']) {
+//ohne konfigurierten Key bleibt die API gesperrt; hash_equals vergleicht zeitkonstant und ohne Typumwandlung
+$expectedKey = $GLOBALS['env_api_key'] ?? '';
+if (!is_string($expectedKey) || $expectedKey === '' || !is_string($apiKey) || !hash_equals($expectedKey, $apiKey)) {
     header('HTTP/1.1 401 Unauthorized');
     die('Invalid API Key');
 }
 
 if(!isset($_SESSION)){
-    session_start();
+    session_start(['cookie_httponly' => true]);
 }
 
 //JSON Payload auswerten
@@ -71,7 +73,7 @@ if(isset($data['action']) && !empty($data['action'])) {
                 echo json_encode($users);
                 break;
             case 'getAvailableTechs':
-                if (isset($user_id) && !$userService->isAPIUser($userId)) {
+                if (!$userService->isAPIUser($userId)) {
                     header('HTTP/1.1 403 Forbidden');
                     echo json_encode(['message' => 'Unberechtigter Zugriff']);
                     exit;
@@ -184,6 +186,13 @@ if(isset($data['action']) && !empty($data['action'])) {
                     exit;
                 }
                 
+                //nur die eigenen Flotten eines NPC-Kontos, nicht die von Spielern
+                if (!$userService->isAPIUser($userId)) {
+                    header('HTTP/1.1 403 Forbidden');
+                    echo json_encode(['message' => 'Unberechtigter Zugriff']);
+                    exit;
+                }
+
                 $zielSec = intval($data['target_sector']);
                 $zielSys = intval($data['target_system']);
 

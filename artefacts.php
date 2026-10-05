@@ -618,6 +618,13 @@ $fehlermsg='';
 if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxlevel) {
     //transaktionsbeginn
     if (setLock($_SESSION['ums_user_id'])) {
+        //Rohstoffe innerhalb der Sperre neu laden, sonst bezahlt eine parallele Anfrage mit veralteten Beständen
+        $row_res = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]));
+        $gr01 = $restyp01 = $row_res['restyp01'];
+        $gr02 = $restyp02 = $row_res['restyp02'];
+        $gr03 = $restyp03 = $row_res['restyp03'];
+        $gr04 = $restyp04 = $row_res['restyp04'];
+        $gr05 = $restyp05 = $row_res['restyp05'];
         $benrestyp01 = 0;
         $benrestyp02 = 0;
         $benrestyp03 = $ausbaukosten;

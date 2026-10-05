@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+session_start(['cookie_httponly' => true]); // JavaScript kann das Login-Cookie nicht auslesen
 header("Content-Type: image/png");
 include "inc/sv.inc.php";
 $givenocredit = 1;

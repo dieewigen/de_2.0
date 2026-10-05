@@ -34,12 +34,17 @@ else
 {
 	if(isset($a) && $a == 1)
 	{
-		$result = mysqli_execute_query($GLOBALS['dbi'], 
-            "SELECT id FROM de_allys WHERE leaderid=?", 
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT id, allytag FROM de_allys WHERE leaderid=?",
             [$_SESSION['ums_user_id']]);
 		if ($row = mysqli_fetch_array($result))
 		{
 			$allyid = $row['id'];
+			$deleted_allytag = $row['allytag'];
+		}
+		else
+		{
+			die($allydelete_lang['msg_1']);
 		}
 		$result = mysqli_execute_query($GLOBALS['dbi'],
             "SELECT MAX(kriegsstart) AS kriegsstart FROM de_ally_war, de_allys 
@@ -89,15 +94,11 @@ else
             "DELETE FROM de_ally_antrag WHERE ally_id=?",
             [$allyid]);
 
-		if($ally_id>0){
-			mysqli_execute_query($GLOBALS['dbi'],
-                "UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE ally_id=?",
-                [$ally_id]);
-		}else{
-			mysqli_execute_query($GLOBALS['dbi'],
-                "UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE allytag=?",
-                [$allytag]);
-		}
+		//Mitglieder und Bewerber der gelöschten Allianz zurücksetzen; nicht über ally_id/allytag des Leaders,
+		//die auf eine andere Allianz zeigen können
+		mysqli_execute_query($GLOBALS['dbi'],
+            "UPDATE de_user_data SET ally_id=0, allytag='', status=0 WHERE ally_id=? OR (ally_id=0 AND allytag=?)",
+            [$allyid, $deleted_allytag]);
 		//echo $allydelete_lang[msg_3];
 		header("Location: allymain.php");
 	}

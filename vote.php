@@ -16,25 +16,32 @@ $sql = "SELECT submit FROM de_user_info WHERE user_id=?";
 $db_daten_vote = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 $row_vote = mysqli_fetch_assoc($db_daten_vote);
 
-$vote = $_REQUEST['vote'] ?? 0;
+$vote = intval($_REQUEST['vote'] ?? 0);
 
 // Wenn Formular abgesendet wurde
 if (isset($_REQUEST['subform']) && $vote > 0) {
+    $id = intval($id);
 
     $sql = "SELECT vote_id FROM de_vote_stimmen WHERE user_id=? AND vote_id=?";
     $db_check = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id]);
 
-    $sql = "SELECT id, status FROM de_vote_umfragen WHERE id=?";
-    $vote_aktiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
+    //nur berechtigte Spieler (registriert vor Umfragestart, wie in der Liste) und nur vorhandene Antworten
+    $sql = "SELECT u.id, u.status, u.antworten FROM de_vote_umfragen u, de_login l WHERE u.id=? AND l.user_id=? AND UNIX_TIMESTAMP(l.register)<UNIX_TIMESTAMP(u.startdatum)";
+    $vote_aktiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $_SESSION['ums_user_id']]);
     $aktiv = mysqli_fetch_assoc($vote_aktiv);
     $menge = mysqli_num_rows($db_check);
+    $anzahl_antworten = $aktiv ? count(explode("|", $aktiv['antworten'])) : 0;
 
-    if ($menge == 0 && $aktiv['status'] == 1) {
+    if ($menge == 0 && $aktiv && $aktiv['status'] == 1 && $vote <= $anzahl_antworten) {
         if ($vote != "0" && $vote != "") {
             echo '<div class="info_box mt20"><span class="text3">'.$vote_lang['msg_3'].'</span></div>';
 
-            $sql = "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)";
-            mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id, $vote]);
+            //Prüfen und Eintragen in einer Anweisung (MyISAM sperrt dafür die Tabelle): zwei gleichzeitige
+            //Anfragen ergeben so nur eine Stimme. Ein UNIQUE-Index geht nicht, das Admin-Tool legt pro Umfrage
+            //mehrere Platzhalter mit user_id=0 an (ourdetool/umfragen.php).
+            $sql = "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor)
+                    SELECT ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM de_vote_stimmen WHERE user_id=? AND vote_id=?)";
+            mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id, $vote, $_SESSION['ums_user_id'], $id]);
             $_SESSION['ums_vote'] = 0;
         } else {
             echo $vote_lang['msg_4'];

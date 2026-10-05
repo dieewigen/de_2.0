@@ -474,10 +474,15 @@ if (isset($_POST['allimsg'])) {
     } elseif ($nachricht == "") {
         echo insertmessage($hyperfunk_lang['msg_1'], "r", $hyperfunk_lang['systemnachricht']);
     } else {
-        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT ally_id FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+        $holalli = mysqli_execute_query($GLOBALS['dbi'], "SELECT ally_id, status FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_array($holalli);
         $ally_id = $row['ally_id'];
 
+        //nur Mitglieder einer Allianz, nicht Bewerber (die haben ally_id schon gesetzt, aber status=0);
+        //ohne Allianz würde die Empfängerliste über ally_id=0 alle allianzlosen Spieler treffen
+        if ($row['status'] != 1 || $ally_id < 1) {
+            echo insertmessage('Eine Allianzrundmail k&ouml;nnen nur Mitglieder einer Allianz senden.', "r", $hyperfunk_lang['systemnachricht']);
+        } else {
         $resource = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE ally_id = ? AND status=1", [$ally_id]);
         $igmsg = 0;
         while ($rowa = mysqli_fetch_array($resource)) {
@@ -498,6 +503,7 @@ if (isset($_POST['allimsg'])) {
             echo insertmessage($hyperfunk_lang['msg_9'], "g", $hyperfunk_lang['systemnachricht']);
         } else {
             echo insertmessage($hyperfunk_lang['msg_10'], "g", $hyperfunk_lang['systemnachricht']);
+        }
         }
 
 
@@ -648,7 +654,8 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
     while ($row = mysqli_fetch_array($db_tfn)) {
 
         $row['betreff']=htmlspecialchars($row['betreff'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $row['text']=htmlspecialchars($row['text'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        //stripcslashes VOR dem Escaping: danach würde es aus \x3c wieder ein echtes < machen
+        $row['text']=htmlspecialchars(stripcslashes($row['text']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         $row['text'] = preg_replace("/\[b\]/i", "<b>", $row['text']);
         $row['text'] = preg_replace("/\[\/b\]/i", "</b>", $row['text']);
@@ -669,12 +676,13 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
         $row['text'] = str_replace("[CDE]", "<font color=\"#3399FF\">", $row['text']);
 
         $row['text'] = preg_replace("/\[email\]([^[]*)\[\/email\]/", "<a href=\"mailto:\\1\">\\1</a>", $row['text']);
-        $row['text'] = preg_replace("/\[url\]([^[]*)\[\/url\]/i", '<a href="\\1" target="_blank">\\1</a>', $row['text']);
+        //nur http(s)-Links, sonst wäre z. B. javascript: möglich
+        $row['text'] = preg_replace("/\[url\](https?:\/\/[^[]*)\[\/url\]/i", '<a href="\\1" target="_blank" rel="noopener">\\1</a>', $row['text']);
         $row['text'] = preg_replace("/\[color=#([^[]+)\]([^[]*)\[\/color\]/", "<font color=\"#\\1\" >\\2</font>", $row['text']);
         $row['text'] = preg_replace("/\[size=([^[]+)\]([^[]*)\[\/size\]/", "<font size=\"\\1\" >\\2</font>", $row['text']);
 
 
-        $row['text'] = nl2br(stripcslashes($row['text']));
+        $row['text'] = nl2br($row['text']);
 
         $t = (string)$row['time'];
 
@@ -913,9 +921,9 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
               } else {
                   ?>
               <input name="zielsek" id="zielsek" tabindex="1" size="4" style="border-style:solid;height:21;" <?php if ($action == "ant") {
-                  echo "value=\"$se\"";
+                  echo "value=\"".intval($se)."\"";
               }?>><input name="zielsys"  tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" <?php if ($action == "ant") {
-                  echo "value=\"$sy\"";
+                  echo "value=\"".intval($sy)."\"";
               }?>>
               <?php
               }
@@ -932,9 +940,9 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
               <td><input name=betreff size=30 tabindex="3" style="border-style:solid;height:21;" <?php
 
               if ($action == "ant") {
-                  echo 'value="'.$hyperfunk_lang['re'].' '.umlaut($rowtfn['betreff']).'">';
+                  echo 'value="'.$hyperfunk_lang['re'].' '.htmlspecialchars($rowtfn['betreff'], ENT_QUOTES, 'UTF-8', false).'">';
               } elseif ($action == "weiter") {
-                  echo 'value="'.$hyperfunk_lang['fw'].' '.umlaut($rowtfn['betreff']).'">';
+                  echo 'value="'.$hyperfunk_lang['fw'].' '.htmlspecialchars($rowtfn['betreff'], ENT_QUOTES, 'UTF-8', false).'">';
               }
 
             ?>

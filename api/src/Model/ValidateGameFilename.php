@@ -29,7 +29,7 @@ class ValidateGameFilename
 	);
 
     public function isValid($filename) :bool {
-		if(in_array($filename, self::VALID_FILENAMES)) {
+		if(in_array($filename, self::VALID_FILENAMES, true)) {
 			return true;
 		} else {
 			return false;

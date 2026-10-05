@@ -212,7 +212,9 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 		//$need_storage_res=array();
 		//nochmal die vorandenen Rohstoffe laden
 		$row=loadPlayerData($_SESSION['ums_user_id']);
-		$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];		
+		$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
+		//auch das Lager (z. B. Titanen-Energiekerne) innerhalb der Sperre neu laden
+		$ps=loadPlayerStorage($_SESSION['ums_user_id']);
 		for ($i=81; $i<=109; $i++){
 			$h=intval($_POST['b'.$i] ?? 0);
 			if ($h>=1){ //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags

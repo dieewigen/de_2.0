@@ -139,6 +139,8 @@ if (isset($_SESSION['ums_user_id']) && $_SESSION['ums_user_id'] > 0) {
     if ($user_accstatus != 1) {
         session_destroy();
         header("Location: index.php");
+        //sonst läuft die Seite mit der noch gefüllten Session weiter
+        exit;
     }
 
     if (!isset($eftachatbotdefensedisable)) {

@@ -186,7 +186,12 @@ if ($savedata == 1) {
 
     $trade_ins = req_int('trade_ins');
     $trade_acc = req_int('trade_acc');
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET spielername=? WHERE user_id=?", [$spielername, $uid]);
+    //dieselben Regeln wie bei der Registrierung/options.php: Namen landen in Tick-SQL, Kampfberichten und Ranglisten
+    if ($spielername !== '' && preg_match("/^[[:alpha:]0-9äöü_=-]*$/iu", $spielername)) {
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET spielername=? WHERE user_id=?", [$spielername, $uid]);
+    } else {
+        $flash[] = '<div class="flash flash-warn"><b>Spielername nicht ge&auml;ndert:</b> nur Buchstaben, Ziffern und _-= erlaubt.</div>';
+    }
 }
 
 if ($mail == "none" && $infostomail == true) {

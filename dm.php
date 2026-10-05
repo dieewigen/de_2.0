@@ -182,12 +182,13 @@ $chat_height=400;
 		//go-home-Button
 		echo '<img onclick="reset_map()" style="width: 40px; height: auto; position: absolute; right: 6px; top: 124px; cursor: pointer;" src="gp/g/icon10.png" class="rounded-borders" title="zum Heimatsektor" rel="tooltip">';
 
+//nur Zahlen, die Werte landen in einem JavaScript-String
 if(isset($_COOKIE['chat_width'])){
-	$chat_width=str_replace("px", "", $_COOKIE['chat_width']);
+	$chat_width=intval(str_replace("px", "", $_COOKIE['chat_width']));
 }
 
 if(isset($_COOKIE['chat_height'])){
-	$chat_height=str_replace("px", "", $_COOKIE['chat_height']);
+	$chat_height=intval(str_replace("px", "", $_COOKIE['chat_height']));
 }
 
 

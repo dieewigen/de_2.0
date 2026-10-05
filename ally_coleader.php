@@ -167,6 +167,28 @@ if ($isleader && $ally_id > 0 ){
 			$membername1=$_POST['membername1'];
 			$membername2=$_POST['membername2'];
 
+			//Posten nur an Mitglieder der eigenen Allianz (oder -1 = unbesetzt)
+			$own_members=array();
+			$res_members=mysqli_execute_query($GLOBALS['dbi'],
+				"SELECT u.user_id FROM de_user_data u JOIN de_allys a ON a.id=u.ally_id WHERE a.leaderid=? AND u.status=1",
+				[$_SESSION['ums_user_id']]);
+			while($row_member=mysqli_fetch_assoc($res_members)){
+				$own_members[]=(int)$row_member['user_id'];
+			}
+			$valid_post=function($id) use ($own_members){
+				$id=intval($id);
+				return ($id==-1 || in_array($id, $own_members, true)) ? $id : -1;
+			};
+			$coleader1=$valid_post($coleader1);
+			$coleader2=$valid_post($coleader2);
+			$coleader3=$valid_post($coleader3);
+			$fc1=$valid_post($fc1);
+			$fc2=$valid_post($fc2);
+			$tactic1=$valid_post($tactic1);
+			$tactic2=$valid_post($tactic2);
+			$member1=$valid_post($member1);
+			$member2=$valid_post($member2);
+
 			$result_update = mysqli_execute_query($GLOBALS['dbi'],
 				"UPDATE de_allys SET 
 					coleaderid1 = ?, coleaderid2 = ?, coleaderid3 = ?,
@@ -257,16 +279,16 @@ if ($isleader && $ally_id > 0 ){
 				<tr><td>
 					<table width="600">
 						<tr><td width="100" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['funktion'].'</strong></td><td width="200" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['besondererechte'].'</strong></td><td width="150" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['postenbezeichnung'].'</strong></td><td width="150" align="center" bgcolor="#1c1c1c"><strong>'.$allycoleader_lang['vergebenanmitglied'].'</strong></td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['allianzleader'].'</td><td align="center" bgcolor="#222222">Leader</td><td align="center" bgcolor="#222222"><input type="text" name="leadername" value="'.$leadername.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$spielername.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername1" value="'.$coleadername1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader1.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername2" value="'.$coleadername2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader2.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername3" value="'.$coleadername3.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader3.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname1" value="'.$fcname1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc1.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname2" value="'.$fcname2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc2.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname1" value="'.$tacticname1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic1.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname2" value="'.$tacticname2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic2.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername1" value="'.$membername1.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member1.'</td></tr>
-						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername2" value="'.$membername2.'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['allianzleader'].'</td><td align="center" bgcolor="#222222">Leader</td><td align="center" bgcolor="#222222"><input type="text" name="leadername" value="'.html_text($leadername).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$spielername.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername1" value="'.html_text($coleadername1).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername2" value="'.html_text($coleadername2).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['coleader'].'</td><td align="center" bgcolor="#222222">Co-Leader</td><td align="center" bgcolor="#222222"><input type="text" name="coleadername3" value="'.html_text($coleadername3).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_coleader3.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname1" value="'.html_text($fcname1).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['fleetcommander'].'</td><td align="center" bgcolor="#222222">Fleetcommander</td><td align="center" bgcolor="#222222"><input "type"=text name="fcname2" value="'.html_text($fcname2).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_fc2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname1" value="'.html_text($tacticname1).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['tofficer'].'</td><td align="center" bgcolor="#222222">Tactical Officer</td><td align="center" bgcolor="#222222"><input type="text" name="tacticname2" value="'.html_text($tacticname2).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_tactic2.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername1" value="'.html_text($membername1).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member1.'</td></tr>
+						<tr><td align="center" bgcolor="#222222">'.$allycoleader_lang['mofficer'].'</td><td align="center" bgcolor="#222222">Member Officer</td><td align="center" bgcolor="#222222"><input type="text" name="membername2" value="'.html_text($membername2).'" style="width:150px;height:20px"></td><td align="center" bgcolor="#222222">'.$select_member2.'</td></tr>
 					</table>
 				</td></tr>
 				<tr><td align="right"><input type="submit" name="submit" value="'.$allycoleader_lang['saveedit'].'"></td></tr>

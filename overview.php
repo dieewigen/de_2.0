@@ -960,6 +960,11 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
     }
 
     //�berpr�fen, ob man schon vorbedingungen erf�llt
+    //Belohnung und Nachrichten erst nach dem gesicherten Hochsetzen der Stufe gutschreiben (siehe unten)
+    $ac_akt_alt = $ac_akt;
+    $ac_belohnung_neu = 0;
+    $ac_news = array();
+
     if ($do_calc == 1) {
         if ($zielwert == '') {
             $zielwert = 0;
@@ -976,12 +981,11 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
                     //echo $ac_akt.'->';
                     //echo $rewards[$i][0].' ';
 
-                    $ac_belohnung += $rewards[$i][1];
+                    $ac_belohnung_neu += $rewards[$i][1];
                     //nachricht f�r jede gutschrift hinterlegen
                     $time = strftime("%Y%m%d%H%M%S");
                     $news = $ov_lang['errungenschaftenbonus'].' ('.$text1.' - '.$ov_lang['stufe'].' '.$ac_akt.'): '.number_format($rewards[$i][1], 0, "", ".").' M';
-                    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, ?)", [$_SESSION['ums_user_id'], $time, $news]);
-                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
+                    $ac_news[] = array($time, $news);
                 }
             }
         }
@@ -1059,8 +1063,18 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
     if ($ac_max == 0) {
         $rca = '-';
     }
-    //ac_akt updaten
-    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_achievement SET {$ac_table_field}=? WHERE user_id=?", [$ac_akt, $_SESSION['ums_user_id']]);
+    //ac_akt nur hochsetzen, wenn die Stufe noch den alten Wert hat: so gibt es jede Stufe nur einmal,
+    //auch wenn die Übersicht in zwei Sitzungen gleichzeitig geladen wird
+    if ($ac_akt != $ac_akt_alt) {
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_achievement SET {$ac_table_field}=? WHERE user_id=? AND {$ac_table_field}=?", [$ac_akt, $_SESSION['ums_user_id'], $ac_akt_alt]);
+        if (mysqli_affected_rows($GLOBALS['dbi']) == 1) {
+            $ac_belohnung += $ac_belohnung_neu;
+            foreach ($ac_news as $ac_news_entry) {
+                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, '60', ?, ?)", [$_SESSION['ums_user_id'], $ac_news_entry[0], $ac_news_entry[1]]);
+            }
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$_SESSION['ums_user_id']]);
+        }
+    }
 
     //ziele ausgeben ausgeben
     if ($c1 == 0) {

@@ -60,7 +60,7 @@ if($delallyid1 && $delallyid2 && ($isleader || $iscoleader)){
 	mysqli_execute_query($GLOBALS['dbi'],
 		"DELETE FROM de_ally_partner WHERE ally_id_1=? AND ally_id_2=?",
 		[$delallyid1, $delallyid2]);
-	echo $allypartner_lang[msg_2];
+	echo $allypartner_lang['msg_2'];
 	include("ally/allyfunctions.inc.php");
 	$delallyid1_tag = getAllyTag($delallyid1);
 	$delallyid2_tag = getAllyTag($delallyid2);

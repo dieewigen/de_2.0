@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+session_start(['cookie_httponly' => true]); // JavaScript kann das Login-Cookie nicht auslesen
 include "inc/sv.inc.php";
 include "inc/links.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_botcheck.lang.php';

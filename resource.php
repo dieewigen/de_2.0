@@ -238,11 +238,12 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
                 //sektorsteuersatz auslesen
                 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT ssteuer FROM de_sector WHERE sec_id=?", [$sector]);
                 $row_steuer = mysqli_fetch_assoc($db_daten);
-                $sektorsteuersatz = $row_steuer['ssteuer'];
+                //auf den erlaubten Bereich begrenzen (ältere, manipulierte Werte in der DB)
+                $sektorsteuersatz = max(0, min(5, intval($row_steuer['ssteuer'])));
 
                 $steueranteil = $res_cost / 100 * ($handelssteuersatz + $sektorsteuersatz);
 
-                $steueranteil_sektor = $steueranteil * $sektorsteuersatz / ($handelssteuersatz + $sektorsteuersatz);
+                $steueranteil_sektor = ($handelssteuersatz + $sektorsteuersatz) > 0 ? $steueranteil * $sektorsteuersatz / ($handelssteuersatz + $sektorsteuersatz) : 0;
 
                 $res_get = ($res_cost - $steueranteil) * $uv[$res_source - 1];
                 $res_get = $res_get / $uv[$res_target - 1];
@@ -353,7 +354,8 @@ $e_t2 = intval($_POST["e_t2"] ?? 0);
 $e_t3 = intval($_POST["e_t3"] ?? 0);
 $e_t4 = intval($_POST["e_t4"] ?? 0);
 if (!empty($e_t1) || !empty($e_t2) || !empty($e_t3) || !empty($e_t4)) {
-    if (validDigit($e_t1) && validDigit($e_t2) && validDigit($e_t3) && validDigit($e_t4)) {
+    //keine negativen Anteile: sonst ließe sich mehr als 100 % auf einen Rohstoff legen
+    if ($e_t1 >= 0 && $e_t2 >= 0 && $e_t3 >= 0 && $e_t4 >= 0) {
         if (($e_t1 + $e_t2 + $e_t3 + $e_t4) <= 100) {  //key ist ok und wird aktualisiert
             $newkey = $e_t1.";".$e_t2.";".$e_t3.";".$e_t4;
 
@@ -493,6 +495,14 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 
     //transaktionsbeginn
     if (setLock($_SESSION['ums_user_id'])) {
+        //Rohstoffe innerhalb der Sperre neu laden, sonst spendet eine zweite Anfrage mit veralteten Beständen
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+        $row_res = mysqli_fetch_assoc($db_daten);
+        $restyp01 = $row_res['restyp01'];
+        $restyp02 = $row_res['restyp02'];
+        $restyp03 = $row_res['restyp03'];
+        $restyp04 = $row_res['restyp04'];
+        $restyp05 = $row_res['restyp05'];
 
         if (validDigit($mtr) && validDigit($dtr) && validDigit($itr) && validDigit($etr) && validDigit($ttr)) {//alle werte sind ok
             //hat man auch soviele rohstoffe?
@@ -570,9 +580,14 @@ if (isset($_POST["b_col"])) {
     $b_col = intval($_POST["b_col"]);
     //transaktionsbeginn
     if (setLock($_SESSION['ums_user_id'])) {
-        //nochmal vorher die rohstoffe auslesen
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
+        //nochmal vorher die rohstoffe und die Kollektoren auslesen (die Anzahl bestimmt den Preis)
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, col FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_assoc($db_daten);
+        $colanz = $row['col'];
+        $result_colbuild = mysqli_execute_query($GLOBALS['dbi'], "SELECT anzahl FROM de_user_build WHERE user_id = ? AND tech_id=80", [$_SESSION['ums_user_id']]);
+        while ($row_colbuild = mysqli_fetch_assoc($result_colbuild)) {
+            $colanz += $row_colbuild["anzahl"];
+        }
         $restyp01 = $row['restyp01'];
         $restyp02 = $row['restyp02'];
         $restyp03 = $row['restyp03'];

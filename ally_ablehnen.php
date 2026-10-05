@@ -64,16 +64,22 @@ else
 	if($userid)
 	{
 		$result = mysqli_execute_query($GLOBALS['dbi'],
-            "SELECT allytag FROM de_user_data WHERE user_id = ?",
+            "SELECT allytag, status FROM de_user_data WHERE user_id = ?",
             [$userid]
         );
         $row = $result->fetch_assoc();
-        $clan = $row['allytag'];
+        $clan = $row['allytag'] ?? '';
 
-		if($clantag==$clan)
+		//nur Bewerber mit offenem Antrag bei dieser Allianz; Mitglieder (auch der Leader) gehen nur über ally_kick.php
+		$antrag_result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT user_id FROM de_ally_antrag WHERE user_id = ? AND ally_id = ?",
+            [$userid, $clanid]
+        );
+
+		if($clantag==$clan && ($row['status'] ?? 1)==0 && mysqli_num_rows($antrag_result)>0)
 		{
 			mysqli_execute_query($GLOBALS['dbi'],
-                "UPDATE de_user_data SET allytag = '' WHERE user_id = ?",
+                "UPDATE de_user_data SET allytag = '', ally_id = 0 WHERE user_id = ? AND status = 0",
                 [$userid]
             );
 

@@ -291,7 +291,8 @@ function showmenu($menuid, $menupos){
 	
 	//Datei mit den Daten einbinden
 	$filename = "cache/toplist/".$menudata[$menuid][$menupos]['dateiname'];
-	include $filename;
+	//readfile statt include: die Cache-Dateien enthalten Spielernamen und dürfen nie als PHP ausgeführt werden
+	readfile($filename);
 }
 
 
@@ -329,7 +330,7 @@ if ($s==1){
 ///////////////////////////////////
 if ($s==2){
   $filename = "cache/toplist/top2.tmp";
-  include $filename;
+  readfile($filename);
 }
 
 ///////////////////////////////////
@@ -344,7 +345,7 @@ if ($s==3){
 ///////////////////////////////////
 if ($s==4){
 	$filename = "cache/toplist/top4a.tmp";
-	include $filename;
+	readfile($filename);
 }
 
 ?>

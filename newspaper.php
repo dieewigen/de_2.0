@@ -21,7 +21,7 @@ $secmoves=$row["secmoves"];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include "resline.php";
 
-$id=$_REQUEST['id'] ?? -1;
+$id=intval($_REQUEST['id'] ?? -1);
 $typ=$_REQUEST['typ'] ?? 0;
 $action=$_REQUEST['action'] ?? '';
 
@@ -64,7 +64,9 @@ if($action!="archiv"){
 //////////////////////////////////////
 
 //e-mail senden
-if(isset($_REQUEST['feedback'])){
+//nur per Formular (POST) und höchstens alle 5 Minuten, sonst ließe sich das Admin-Postfach fluten
+if(isset($_POST['feedback']) && time() - ($_SESSION['newspaper_feedback_time'] ?? 0) > 300){
+	$_SESSION['newspaper_feedback_time']=time();
 	echo '<div class="info_box text3">Vielen Dank, das Feedback wurde gespeichert.</div><br>';
 	$sendto=$GLOBALS['env_admin_email'];
 	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$_SESSION['ums_user_id'].' '.$_SESSION['ums_spielername'];

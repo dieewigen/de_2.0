@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(['cookie_httponly' => true]); // JavaScript kann das Login-Cookie nicht auslesen
 include 'inc/sv.inc.php';
 include 'inc/lang/'.$sv_server_lang.'_index.lang.php';
 include 'inc/'.$sv_server_lang.'_links.inc.php';
@@ -26,7 +26,7 @@ $_SESSION['ums_rasse'] = 1;
 //wenn die variable logout gesetzt ist, dann ausloggen und session zerstören
 if (isset($_REQUEST['logout'])) {
     session_destroy();
-    session_start();
+    session_start(['cookie_httponly' => true]);
     header("Location: index.php");
 }
 

@@ -686,7 +686,9 @@ if($helper_dontshow==0)
 
   //zur�ck/weiter-buttons
   echo '<div style="position: absolute; bottom: 0px; right: 0px; width: 442px; text-align: center;">';
-  echo '<a href="'.$_SERVER['PHP_SELF'].'?helperdo=-1">zur&uuml;ck</a> '.($_SESSION['helperid']+1).'/'.($helper_progress+1).' <a href="'.$_SERVER['PHP_SELF'].'?helperdo=1">weiter</a>';
+  //SCRIPT_NAME statt PHP_SELF, das über PATH_INFO fremdes HTML enthalten kann
+  $helper_self = htmlspecialchars(basename($_SERVER['SCRIPT_NAME']), ENT_QUOTES, 'UTF-8');
+  echo '<a href="'.$helper_self.'?helperdo=-1">zur&uuml;ck</a> '.($_SESSION['helperid']+1).'/'.($helper_progress+1).' <a href="'.$helper_self.'?helperdo=1">weiter</a>';
   echo '</div>';
   
   echo '</div>';

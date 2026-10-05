@@ -43,12 +43,15 @@ $transfer=intval($_POST['transfer'] ?? 0);
 $t_transfer=intval($_POST['t_transfer'] ?? 0);
 
 if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
-	mysqli_execute_query($GLOBALS['dbi'], 
-	    "UPDATE de_user_data SET ally_tronic=ally_tronic+?, restyp05=restyp05-? WHERE user_id=?",
-	    [$t_transfer, $t_transfer, $_SESSION['ums_user_id']]);
-	mysqli_execute_query($GLOBALS['dbi'], 
-	    "UPDATE de_allys SET t_depot=t_depot+? WHERE allytag=?",
-	    [$t_transfer, $allytag]);
+	//Abbuchung nur, wenn das Tronic in diesem Moment noch da ist (zwei parallele Anfragen) und nur für Mitglieder
+	mysqli_execute_query($GLOBALS['dbi'],
+	    "UPDATE de_user_data SET ally_tronic=ally_tronic+?, restyp05=restyp05-? WHERE user_id=? AND restyp05>=? AND status=1",
+	    [$t_transfer, $t_transfer, $_SESSION['ums_user_id'], $t_transfer]);
+	if (mysqli_affected_rows($GLOBALS['dbi']) == 1) {
+		mysqli_execute_query($GLOBALS['dbi'],
+		    "UPDATE de_allys SET t_depot=t_depot+? WHERE allytag=?",
+		    [$t_transfer, $allytag]);
+	}
 	$message = "$allyfinance_lang[msg_1_1] $t_transfer $allyfinance_lang[msg_1_2]";
 	$result = mysqli_execute_query($GLOBALS['dbi'], 
 	    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, 
@@ -67,9 +70,10 @@ if ($transfer=="1" && $restyp05 >= $t_transfer && $t_transfer > 0){
 if(isset($_POST['changetzz']))
 {
 	$tronic_zahlungsziel=intval($_POST['tzz']);
-	mysqli_execute_query($GLOBALS['dbi'], 
-	    "UPDATE de_allys SET tronic_zahlungsziel=? WHERE allytag=?",
-	    [$tronic_zahlungsziel, $allytag]);
+	//nur Leader/Co-Leader genau dieser Allianz
+	mysqli_execute_query($GLOBALS['dbi'],
+	    "UPDATE de_allys SET tronic_zahlungsziel=? WHERE allytag=? AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+	    [$tronic_zahlungsziel, $allytag, $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 }
 
 if (isset($memberid) && $memberid > 0)

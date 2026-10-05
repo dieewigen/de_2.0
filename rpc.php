@@ -7,7 +7,9 @@ include 'functions.php';
 include "inc/lang/".$sv_server_lang."_rpc.lang.php";
 
 //jeden aufruf �ber einen key checken
-if(!isset($_REQUEST["authcode"]) || $_REQUEST["authcode"]!=$GLOBALS['env_rpc_authcode']){
+//ohne konfigurierten Authcode bleibt die Schnittstelle gesperrt; hash_equals vergleicht zeitkonstant und ohne Typumwandlung
+$rpc_authcode=$GLOBALS['env_rpc_authcode'] ?? '';
+if(!is_string($rpc_authcode) || $rpc_authcode==='' || !is_string($_REQUEST["authcode"] ?? null) || !hash_equals($rpc_authcode, $_REQUEST["authcode"])){
 	exit;
 }
 

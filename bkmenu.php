@@ -321,8 +321,9 @@ function recall($ownsector){
 }
 
 $befehle=isset($_POST['befehle']) ? $_POST['befehle'] : '';
-$zsecf1=isset($_POST['zsecf1']) ? $_POST['zsecf1'] : 1;
-$af1=isset($_POST['af1']) ? $_POST['af1'] : 0;
+$zsecf1=intval($_POST['zsecf1'] ?? 1);
+//nur die Befehle aus dem Auswahlfeld (0-5)
+$af1=max(0, min(5, intval($_POST['af1'] ?? 0)));
 if(!empty($befehle)){
 
   /*
