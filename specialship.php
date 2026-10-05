@@ -81,36 +81,29 @@ if(!hasTech($pt,159)){
 
 	$content.=rahmen_oben('BASISSTERN',false);
 
+	//Werte des Basissterns als Kacheln
+	$content.='
+	<div class="einh mod">
+		<div class="einh-kacheln">
+			<div class="ov-wert"><span class="mod-typ">Stufe</span><b>'.number_format($ship->ship_level, 0, ',' ,'.').'</b></div>
+			<div class="ov-wert"><span class="mod-typ">H&uuml;llenstruktur</span><b>'.number_format($ship->get_hp_max(), 0, ',' ,'.').'</b></div>
+			<div class="ov-wert"><span class="mod-typ">Schutzschildenergie</span><b>'.number_format($ship->get_shield_max(), 0, ',' ,'.').'</b></div>
+			<div class="ov-wert"><span class="mod-typ">Waffenschaden</span><b>'.number_format($ship->get_wp_min(), 0, ',' ,'.').' &ndash; '.number_format($ship->get_wp_max(), 0, ',' ,'.').'</b></div>
+		</div>';
 
-	$content.='<div class="cell" style="width: 572px;">';
-
-	$content.='<div style="display:flex;">';
-		$content.='<div style="flex-grow: 1;">BASISSTERN-Stufe:</div><div style="width: 100px; text-align: right;">'.number_format($ship->ship_level, 0, ',' ,'.').'</div>';
-	$content.='</div><div style="display:flex;">';
-		$content.='<div style="flex-grow: 1;">H&uuml;llenstruktur:</div><div style="width: 100px; text-align: right;">'.number_format($ship->get_hp_max(), 0, ',' ,'.').'</div>';
-	$content.='</div><div style="display:flex;">';
-		$content.='<div style="flex-grow: 1;">Schutzschildenergie:</div><div style="width: 100px; text-align: right;">'.number_format($ship->get_shield_max(), 0, ',' ,'.').'</div>';
-	$content.='</div><div style="display:flex;">';
-		$content.='<div style="flex-grow: 1;">Waffenschaden:</div><div style="width: 100px; text-align: right;">'.number_format($ship->get_wp_min(), 0, ',' ,'.').' - '.number_format($ship->get_wp_max(), 0, ',' ,'.').'</div>';
-	
-	$content.='</div>'; //Flex-Box-Ende
-
-	//Upgrade-Button
+	//Upgrade: Kosten in Palenium, Knopf nur wenn bezahlbar
+	$palenium_str='<span class="mod-chip"><img src="gp/g/item1.png" alt="">Palenium <b>'.number_format($ps[1]['item_amount'], 0, ',' ,'.').'</b></span>';
 	if($ps[1]['item_amount']>=$ship_upgrade_cost){
-		$content.='
-		<div style="margin-top: 20px;width: 100%; text-align: center;">
-			<a href="?upgrade_ship=1">BASISSTERN f&uuml;r '.number_format($ship_upgrade_cost, 0, ',' ,'.').' Palenium auf Stufe '.number_format(($ship->ship_level+1), 0, ',' ,'.').' upgraden</a>
-		</div>
-		';
+		$upgrade='<a href="?upgrade_ship=1" class="mod-btn">Auf Stufe '.number_format(($ship->ship_level+1), 0, ',' ,'.').' upgraden</a>';
 	}else{
-		$content.='
-		<div style="margin-top: 20px;width: 100%; text-align: center;">
-			Die Upgradekosten f&uuml;r die n&auml;chste Stufe betragen '.number_format($ship_upgrade_cost, 0, ',' ,'.').' Palenium.
-		</div>
-		';
+		$upgrade='<span class="mod-feld mod-feld-grund">Zu wenig Palenium</span>';
 	}
-
-	$content.='</div>'; //Background-Ende
+	$content.='
+		<div class="einh-upgrade">
+			<div class="einh-upgrade-text">Upgrade auf Stufe '.number_format(($ship->ship_level+1), 0, ',' ,'.').': <b>'.number_format($ship_upgrade_cost, 0, ',' ,'.').' Palenium</b> '.$palenium_str.'</div>
+			'.$upgrade.'
+		</div>
+	</div>';
 
 
 	$content.=rahmen_unten(false);
@@ -137,10 +130,7 @@ if(!hasTech($pt,159)){
 
 	$content.=rahmen_oben('BATTLEGROUNDS',false);
 
-	$content.='
-	<table width="572" border="0" cellpadding="0" cellspacing="0">
-		<tr align="left" class="cell">
-			<td valign="top">';
+	$content.='<div class="einh mod">';
 
 	//Battlegrounds aus der DB holen und darstellen
 	$sql="SELECT * FROM `de_map_objects` WHERE system_typ=4 ORDER BY system_subtyp ASC;";
@@ -155,80 +145,30 @@ if(!hasTech($pt,159)){
 		$result=mysqli_query($GLOBALS['dbi'],$sql);
 		$has_access = mysqli_num_rows($result);
 
-		$content.='
-		<div class="tech" style="width: 100%; cursor: default;">
-			<div class="tech_bg0"></div>
-			<div class="tech_name">
-				<div class="uppercase">'.$system_data->getSystemName().'</div>
-				<div style="margin-top: 8px; font-size: 12px;">'.$sv_bg[$system_subtyp]['subname'].'</div>';
-
-		
+		$status='';
 		if($has_access>0){
-			$content.='<span style="margin-top: 8px; font-size: 12px;">Du hast einen Weltraumhafen in dem System und nimmst an den K&auml;mpfen teil.</span>';
+			$status.='<span class="mod-chip mod-chip-gruen">Weltraumhafen vorhanden, du nimmst an den K&auml;mpfen teil</span>';
 
 			for($s=$max_kt;$s<$max_kt+$sv_bg[$system_subtyp]['start_interval'];$s++){
 				if(($s+1) % $sv_bg[$system_subtyp]['start_interval'] == 0){
 					$startet_in=$s-$max_kt+1;
-					$content.='<div style="margin-top: 8px; font-size: 12px;">N&auml;chster Start in '.$startet_in.' Kampfticks.</div>';
+					$status.='<span class="mod-chip">N&auml;chster Start in <b>'.$startet_in.'</b> KT</span>';
 					break;
 				}
 			}
-
-
-			/*
-			//versucht man sich anzumelden
-			if($_REQUEST['register']==$system_subtyp){
-				$sql="INSERT INTO `de_user_bg_register` SET user_id='".$_SESSION['ums_user_id']."', bg_id='".$system_subtyp."';";
-				//echo $sql;
-				mysqli_query($GLOBALS['dbi'],$sql);
-			}
-
-			//hat sich bereits zum BG angemeldet?
-			$sql="SELECT * FROM `de_user_bg_register` WHERE user_id='".$_SESSION['ums_user_id']."' AND bg_id='".$system_subtyp."';";
-			//echo $sql;
-			$result=mysqli_query($GLOBALS['dbi'],$sql);
-			$has_reservation = mysqli_num_rows($result);
-
-			if($has_reservation>0){
-				$content.='<div style="margin-top: 8px; font-size: 12px;">Du hast Dich angemeldet.</div>';
-				for($s=$max_kt;$s<$max_kt+$sv_bg[$system_subtyp]['start_interval'];$s++){
-					if(($s+1) % $sv_bg[$system_subtyp]['start_interval'] == 0){
-						$startet_in=$s-$max_kt+1;
-						$content.='<div style="margin-top: 8px; font-size: 12px;">N&auml;chster Start in '.$startet_in.' Kampfticks.</div>';
-						break;
-					}
-				}
-
-				
-			}else{
-				$content.='<div style="margin-top: 8px; font-size: 12px;">Du hast Dich noch nicht angemeldet.</div>';
-				//Anmelde-Link
-				if($system_subtyp==0){
-					$content.='<a href="?register='.$system_subtyp.'" class="btn">anmelden</a>';
-				}
-
-			}
-			*/
-
-
 		}else{
-			$content.='<span style="margin-top: 8px; font-size: 12px; background-color: #AA0000; padding: 0 3px 0 3px;">Du hast keinen Weltraumhafen in dem System.</span>';
+			$status.='<span class="mod-chip einh-chip-rot">Kein Weltraumhafen in dem System</span>';
 		}
 
 		$content.='
-			</div>
+		<div class="einh-bg">
+			<div class="einh-bg-name">'.$system_data->getSystemName().'</div>
+			<div class="mod-typ">'.$sv_bg[$system_subtyp]['subname'].'</div>
+			<div class="einh-bg-status">'.$status.'</div>
 		</div>';
-
 	}
 
-
-	//Anzahl der entdeckten Battlegrounds aus der DB holen
-
-	$content.='
-			</td>
-		</tr>
-	</table>';
-
+	$content.='</div>';
 
 	$content.=rahmen_unten(false);
 
@@ -241,6 +181,7 @@ if(!hasTech($pt,159)){
 //die einzelnen BGs durchgehen
 for($i=0;$i<3;$i++){
 	$content.=rahmen_oben('BATTLEGROUND '.($i+1).' GEWINNER',false);
+	$content.='<div class="einh mod">';
 
 	$play_typ=0; //Spieler-BG
 
@@ -248,16 +189,10 @@ for($i=0;$i<3;$i++){
 		$play_typ=1; //Ally-BG
 	}
 
+	$zeilen='';
 	if($play_typ==0){
 		//Spieler-BG
-		$content.='
-		<table width="572" border="0" cellpadding="0" cellspacing="0">
-			<tr align="left" class="cell fett" style="text-align: center;">
-				<td>Platz</td>
-				<td>Spieler</td>
-				<td>BASISSTERN-Stufe</td>
-				<td>Siege</td>
-			</tr>';
+		$kopf='<div class="einh-rang prod-kopf"><span class="prod-zahl">Platz</span><span>Spieler</span><span class="prod-zahl">BASISSTERN-Stufe</span><span class="prod-zahl">Siege</span></div>';
 
 		//Spielerdaten laden
 		$sql="SELECT * FROM `de_user_data` WHERE bgscore".$i." > 1 ORDER BY bgscore".$i." DESC;";
@@ -267,61 +202,38 @@ for($i=0;$i<3;$i++){
 			//Schiffsdaten laden
 			$ship=loadSpecialShip($row['user_id']);
 
-			$content.='
-			<tr align="left" class="cell" style="text-align: center;">
-				<td>'.$platz.'</td>
-				<td>'.$row['spielername'].'</td>
-				<td>'.$ship->ship_level.'</td>
-				<td>'.$row['bgscore'.$i].'</td>
-			</tr>';
+			$zeilen.='<div class="einh-rang einh-platz'.min($platz, 4).'"><span class="prod-zahl">'.$platz.'</span><span class="einh-rang-name">'.$row['spielername'].'</span><span class="prod-zahl">'.$ship->ship_level.'</span><span class="prod-zahl"><b>'.$row['bgscore'.$i].'</b></span></div>';
 
 			$platz++;
 		}
-
-		$content.='</table>';
 	}else{
 		//Allianz-BG
-		$content.='
-		<table width="572" border="0" cellpadding="0" cellspacing="0">
-			<tr align="left" class="cell fett" style="text-align: center;">
-				<td>Platz</td>
-				<td>Allianz</td>
-				<td>Siege</td>
-			</tr>';
+		$kopf='<div class="einh-rang einh-rang-ally prod-kopf"><span class="prod-zahl">Platz</span><span>Allianz</span><span class="prod-zahl">Siege</span></div>';
 
-		//Spielerdaten laden
+		//Allianzdaten laden
 		$sql="SELECT * FROM de_allys WHERE bgscore".$i." > 0 ORDER BY bgscore".$i." DESC;";
 		$db_data=mysqli_query($GLOBALS['dbi'],$sql);
 		$platz=1;
 		while($row = mysqli_fetch_array($db_data)){
-			$content.='
-			<tr align="left" class="cell" style="text-align: center;">
-				<td>'.$platz.'</td>
-				<td>'.$row['allytag'].'</td>
-				<td>'.$row['bgscore'.$i].'</td>
-			</tr>';
+			$zeilen.='<div class="einh-rang einh-rang-ally einh-platz'.min($platz, 4).'"><span class="prod-zahl">'.$platz.'</span><span class="einh-rang-name">'.$row['allytag'].'</span><span class="prod-zahl"><b>'.$row['bgscore'.$i].'</b></span></div>';
 
 			$platz++;
 		}
-
-		$content.='</table>';
 	}
 
+	if($zeilen==''){
+		$content.='<div class="mod-leer">Noch keine Gewinner.</div>';
+	}else{
+		$content.=$kopf.'<div class="prod-liste">'.$zeilen.'</div>';
+	}
+
+	$content.='</div>';
 	$content.=rahmen_unten(false);
-	$content.='<br><br>';
 }
 
 include "resline.php";
 
-echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
-if($sv_deactivate_vsystems!=1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
-}
-echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
-';
+echo einheiten_navi('specialship');
 
 echo $content;
 

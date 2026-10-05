@@ -241,28 +241,15 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 include 'resline.php';
 
-echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
-if($sv_deactivate_vsystems!=1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
-}
-echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
-';
+echo einheiten_navi('recycling');
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
-if($sabotage==1)
-{
-  $emsg.='<table width=600><tr><td class="ccr">';
-  $emsg.='Durch eine Sabotageaktion ist kein Recycling m&ouml;glich. Mehr Informationen sind im Geheimdienst abrufbar.';
-  $emsg.='</td></tr></table>';
-  echo $emsg;
-  
-  die('</body></html>');
+if($sabotage==1){
+	echo '<div class="prod mod prod-sabotage"><div class="mod-meldung mod-meldung-fehler">Durch eine Sabotageaktion ist kein Recycling m&ouml;glich. Mehr Informationen sind im Geheimdienst abrufbar.</div></div>';
+	die('</body></html>');
 }
 
-//ben�tigtes geb�ude recyclotron
+//benötigtes Gebäude: Recyclotron
 if(!hasTech($pt,129)){
 	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=129";
 	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
@@ -279,95 +266,93 @@ if(!hasTech($pt,129)){
 	rahmen_unten();
 }else{
 	///////////////////////////////////////////////////////////////////////
+	//  Oberfläche darstellen: kompakte Tabelle, eine Zeile je Einheit
 	///////////////////////////////////////////////////////////////////////
-	//  Oberfläche darstellen
-	///////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////
-	
-  	echo '<form action="recycling.php" method="POST">';
-	
-	//optische ausgabe
-	rahmen_oben('Recycling  <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
-	title="Informationen&Die Einheiten werden sofort in ihre Bestandteile zerlegt und der Bau der neuen Einheiten beginnt.<br><br>
-	Dabei tritt ein gewisser Schwund auf:<br>Abzug bei Einheiten der 
-	Heimatflotte: '.($fleetabzug*100).'%<br>Abzug bei Verteidigungseinheiten: '.($defabzug*100).'%<br><br>&Uuml;bersch&uuml;ssige Teile gehen verloren, also sollten m&ouml;glichst gro&szlig;e Mengen recycelt werden, da sonst der prozentuale Verlust zu gro&szlig; werden kann.<br><br>Titanen-Energiekerne werden nicht zur&uuml;ckerstattet.">');
-	echo '<table border="0" cellpadding="0" cellspacing="1" width="580px">';
-	//Heimatflotteneinheiten
-	echo '<tr class="cell1"><td colspan="4"><b>Einheiten in der Heimatflotte:</b></td></tr>';
-	echo '<tr class="cell"><td><b>Name</b></td><td align="center"><b>vorhanden</b></td><td align="center"><b>Recyclingmenge</b></td><td align="center"><b>Zieleinheit</td></tr>';
 
-	//einheiten aus der db lesen
+	//Bestände: Heimatflotte und Verteidigungsanlagen
+	$bestand=array();
 	$fleetid=$_SESSION['ums_user_id'].'-0';
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fleetid'");
 	$row = mysqli_fetch_array($db_daten);
 	for($i=81;$i<=90;$i++){
-		echo '<tr class="cell">
-		<td>'.$technames[$i].'</td>
-		<td align="right">'.number_format($row['e'.$i],0,",",".").'</td>
-		<td align="center"><input name="e'.$i.'" id="e'.$i.'" type="text" size="15" maxlength="15"></td>
-		<td align="center"><select name="t'.$i.'">'.$techselect.'</select></td>
-		</tr>';
+		$bestand[$i]=(int)$row['e'.$i];
 	}
-	
-	
-	//Verteidigungseinheiten
-	//echo '<div class="cell" style="width: 580px;">';
-	
-	echo '<tr class="cell1"><td colspan="4"><b>Verteidigungseinheiten:</b></td></tr>';
-	echo '<tr class="cell"><td><b>Name</b></td><td align="center"><b>vorhanden</b></td><td align="center"><b>Recyclingmenge</b></td><td align="center"><b>Zieleinheit</td></tr>';
-	
-	//einheiten aus der db lesen
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."'");
 	$row = mysqli_fetch_array($db_daten);
 	for($i=100;$i<=104;$i++){
-		echo '<tr class="cell">
-		<td>'.$technames[$i].'</td>
-		<td align="right">'.number_format($row['e'.$i],0,",",".").'</td>
-		<td align="center"><input name="e'.$i.'" id="e'.$i.'" type="text" size="15" maxlength="15"></td>
-		<td align="center"><select name="t'.$i.'">'.$techselect.'</select></td>
-		</tr>';
+		$bestand[$i]=(int)$row['e'.$i];
 	}
-	
-	echo '<tr><td class="cell" colspan="4" align="center"><input type="Submit" name="recyclingbutton" value="Recycling starten"></td></tr>';
 
-	/*
-	echo '</table>';
+	//eine Zeile: Name, Bestand, Menge, Zieleinheit, voraussichtliches Ergebnis
+	$zeilen=array('flotte' => '', 'verteidigung' => '');
+	foreach($bestand as $i => $vorhanden){
+		$zeilen[$i<100 ? 'flotte' : 'verteidigung'].='
+		<div class="rec-zeile'.($vorhanden>0 ? '' : ' rec-leer').'">
+			<span class="prod-name"><span>'.$technames[$i].'</span></span>
+			<span class="prod-zahl">'.number_format($vorhanden,0,",",".").'</span>
+			<span><input name="e'.$i.'" id="e'.$i.'" type="text" maxlength="15" autocomplete="off" inputmode="numeric" class="mod-eingabe rec-menge" data-quelle="'.$i.'"></span>
+			<span><select name="t'.$i.'" id="t'.$i.'" class="mod-eingabe" data-quelle="'.$i.'">'.$techselect.'</select></span>
+			<span class="prod-zahl rec-ergebnis" id="r'.$i.'">&ndash;</span>
+		</div>';
+	}
+
+	echo '<form action="recycling.php" method="POST">';
+	rahmen_oben('Recycling');
+	echo '
+	<div class="rec mod">
+		<div class="mod-hinweis">Die Einheiten werden sofort in ihre Bestandteile zerlegt und der Bau der neuen Einheiten beginnt. Dabei tritt Schwund auf: '.($fleetabzug*100).' % bei Einheiten der Heimatflotte, '.($defabzug*100).' % bei Verteidigungseinheiten. &Uuml;bersch&uuml;ssige Teile gehen verloren, also m&ouml;glichst gro&szlig;e Mengen recyceln. Titanen-Energiekerne werden nicht zur&uuml;ckerstattet.</div>
+		<div class="rec-zeile prod-kopf">
+			<span class="prod-name">Einheit</span>
+			<span class="prod-zahl">Vorhanden</span>
+			<span>Menge</span>
+			<span>Zieleinheit</span>
+			<span class="prod-zahl" title="Ergebnis&Voraussichtliche Anzahl der Zieleinheiten">Ergebnis</span>
+		</div>
+		<div class="prod-gruppe"><span class="mod-typ">Einheiten in der Heimatflotte</span><span class="mod-chip">Schwund <b>'.($fleetabzug*100).' %</b></span></div>
+		<div class="prod-liste">'.$zeilen['flotte'].'</div>
+		<div class="prod-gruppe"><span class="mod-typ">Verteidigungseinheiten</span><span class="mod-chip">Schwund <b>'.($defabzug*100).' %</b></span></div>
+		<div class="prod-liste">'.$zeilen['verteidigung'].'</div>
+		<div class="rec-los"><input type="Submit" name="recyclingbutton" value="Recycling starten" class="mod-btn"></div>';
+
+	//zeige aktive bauaufträge an
+	$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
+		WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
+	if(mysqli_num_rows($result)>0){
+		echo '<div class="geh-produktion"><div class="mod-typ">Aktive Bauauftr&auml;ge</div>';
+		while($row = mysqli_fetch_array($result)){
+			echo '<div class="geh-auftrag"><span>'.$technames[$row["tech_id"]].'</span><b>'.number_format($row["anzahl"], 0,"",".").'</b><span class="prod-punkte">'.number_format($row["score"], 0,"",".").' Punkte</span><span class="mod-chip">noch '.$row["verbzeit"].' WT</span></div>';
+		}
+		echo '</div>';
+	}
+
+	echo '</div>';
 	rahmen_unten();
-	*/
-	
-//zeige aktive bauauftr�ge an
-$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build` 
-	WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
-$num = mysqli_num_rows($result);
-if ($num>0){
-	echo '<tr class="cell1"><td colspan="4"><b>Aktive Bauauftr&auml;ge:</b></td></tr>';
-	
-	echo '<tr><td colspan="4">';
-	echo '<table border="0" cellpadding="0" cellspacing="1">';
-	echo '<tr align="center">';
-	echo '<td class="cell" width="300"><b>Einheit</b></td>';
-	echo '<td class="cell" width="80"><b>St&uuml;ck</b></td>';
-	echo '<td class="cell" width="115"><b>Punkte</b></td>';
-	echo '<td class="cell" width="78"><b>WT</b></td>';
-	echo '</tr>';
-
-	while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
-	{
-	    echo '<tr align="center">';
-	    echo '<td class="cell">'.$technames[$row["tech_id"]].'</td>';
-	    echo '<td class="cell">'.number_format($row["anzahl"], 0,"",".").'</td>';
-	    echo '<td class="cell">'.number_format($row["score"], 0,"",".").'</td>';
-	    echo '<td class="cell">'.$row["verbzeit"].'</td>';
-	    echo '</tr>';
-	}
-	echo '</table></td></tr>';
-}
-
-	echo '</table>';
-	
-	rahmen_unten();	
-	
 	echo '</form>';
+
+	//voraussichtliches Ergebnis wie beim Recycling oben: floor(Menge * Punkte * (1 - Schwund) / Punkte des Ziels), Menge höchstens der Bestand
+	echo '<script>
+	(function(){
+		var punkte = '.json_encode($techscore).', bestand = '.json_encode($bestand).';
+		function rechnen(i){
+			var menge = Math.min(parseInt(document.getElementById("e" + i).value, 10) || 0, bestand[i]);
+			var ziel = parseInt(document.getElementById("t" + i).value, 10) || 0;
+			var feld = document.getElementById("r" + i);
+			if(menge <= 0 || ziel == 0 || ziel == i){
+				feld.textContent = "–";
+				feld.classList.remove("rec-null");
+				return;
+			}
+			var anzahl = Math.floor(menge * punkte[i] * (1 - (i < 100 ? '.$fleetabzug.' : '.$defabzug.')) / punkte[ziel]);
+			feld.textContent = anzahl.toLocaleString("de-DE");
+			feld.classList.toggle("rec-null", anzahl <= 0);
+		}
+		[].forEach.call(document.querySelectorAll(".rec [data-quelle]"), function(f){
+			var i = parseInt(f.getAttribute("data-quelle"), 10);
+			f.addEventListener("input", function(){ rechnen(i); });
+			f.addEventListener("change", function(){ rechnen(i); });
+		});
+	})();
+	</script>';
 }
 
 

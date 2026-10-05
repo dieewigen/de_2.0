@@ -350,25 +350,12 @@ include "resline.php";
 
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
-echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
-if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems != 1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
-}
-echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
-';
+echo einheiten_navi('production');
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
-$emsg='';
 if($sabotage==1){
-  $emsg.='<table width="600px"><tr><td class="ccr">';
-  $emsg.=$production_lang['sabotage_aktiv'];
-  $emsg.='</td></tr></table>';
-  echo $emsg;
-  
-  die('</body></html>');
+	echo '<div class="prod mod prod-sabotage"><div class="mod-meldung mod-meldung-fehler">'.$production_lang['sabotage_aktiv'].'</div></div>';
+	die('</body></html>');
 }
 
 /*
@@ -391,44 +378,7 @@ if ($techs[13]==0){
 }else{
 */
 
-echo '<div align="center">';
-?>
-<form action="production.php" method="POST" name="produktion">
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37px">
-<td width="13px"class="rol">&nbsp;</td>
-<td width="200px" class="ro">&nbsp;&nbsp;<?php echo $production_lang['einheit'];?>:</td>
-<td width="51px" align="center" class="ro"><img src="gp/g/icon1.png" class="rounded-borders" style="width: 20px; height: auto;" title="Multiplex"></td>
-<td width="51px" align="center" class="ro"><img src="gp/g/icon2.png" class="rounded-borders" style="width: 20px; height: auto;" title="Dyharra"></td>
-<td width="51px" align="center" class="ro"><img src="gp/g/icon3.png" class="rounded-borders" style="width: 20px; height: auto;" title="Iradium"></td>
-<td width="51px" align="center" class="ro"><img src="gp/g/icon4.png" class="rounded-borders" style="width: 20px; height: auto;" title="Eternium"></td>
-<td width="31px" align="center" class="ro"><img src="gp/g/icon5.png" class="rounded-borders" style="width: 20px; height: auto;" title="Tronic"></td>
-<td width="31px" align="center" class="ro"><?php echo $production_lang['wochen'];?></td>
-<td width="55px" align="center" class="ro"><?php echo $production_lang['stueck'];?></td>
-<td width="55px" align="center" class="ro"><?php echo $production_lang['bauen'];?></td>
-<td width="13px" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13px" class="rl">&nbsp;</td>
-<td colspan="9">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="198px">
-<col width="50px">
-<col width="50px">
-<col width="50px">
-<col width="50px">
-<col width="30px">
-<col width="30px">
-<col width="50px">
-<col width="50px">
-</colgroup>
-<?php
-/////////////////////////////////////////////////////////////////////////////
-//info mit artefaktbonus ausgeben
-/////////////////////////////////////////////////////////////////////////////
-echo '<tr valign="middle" align="center" height="25"><td class="cell1" height="25" colspan="9" align="left"><b>&nbsp;Flotteneinheiten: '.
-	$production_lang['baukostenreduz'].$ua_name[0].$production_lang['artefakte'].number_format($artbonus_fleet, 2,",",".").'% (max. 5,00%)</b></td></tr>';
+echo '<div>';
 
 /////////////////////////////////////////////////////////////////////////////
 //Einheiten zählen
@@ -448,212 +398,134 @@ for($i=100;$i<=104;$i++){
 	$ec[$i]=$pd['e'.$i];
 }
 
-//print_r($unit);
 /////////////////////////////////////////////////////////////////////////////
-// Einheiten ausgeben
+// Einheiten ausgeben; js/produktion*.js braucht das Formular "produktion",
+// die Felder b81-b104 und die Summenfelder #m #d #i #e #t #k #p
 /////////////////////////////////////////////////////////////////////////////
-$c1=0;$c2=0;$z=0;
+$prod_resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
+$einheiten=array('flotte' => '', 'verteidigung' => '');
+$z=0;
 $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT  * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id");
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
-
-	if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-	
-	if($row['tech_id']<100){
-		$unit_index=$row['tech_id']-81;
+	$tech_id=$row['tech_id'];
+	if($tech_id<100){
+		$unit_index=$tech_id-81;
 		$artbonus=$artbonus_fleet;
+		$gruppe='flotte';
 	}else{
-		$unit_index=$row['tech_id']-90;
+		$unit_index=$tech_id-90;
 		$artbonus=$artbonus_def;
+		$gruppe='verteidigung';
 	}
-	
+
 	//bauzeit, boni mit einrechnen
 	$tech_ticks=$unit[$_SESSION['ums_rasse']-1][$unit_index]['bz'];
-	if($row['tech_id']<100 && $spec1==2){
+	if($tech_id<100 && $spec1==2){
 		$tech_ticks=round($tech_ticks/2);
-	}elseif($row['tech_id']>=100){
+	}elseif($tech_id>=100){
 		$tech_ticks=ceil($tech_ticks-($tech_ticks*$defense_bonus_buildtime/100));
 		if($tech_ticks<1)$tech_ticks=1;
 	}
-	
-	
-	//die Baukosten extrahieren
-	//print_r($einzelkosten);
-	$ben_restyp01=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][0];
-	$ben_restyp02=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][1];
-	$ben_restyp03=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][2];
-	$ben_restyp04=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][3];
-	$ben_restyp05=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][4];
-	
-	//zwischen Flotte und Verteidigung eine Zeile einf�gen
-	if($row['tech_id']==100){
-		echo '<tr valign="middle" align="center" height="25"><td class="'.$bg.'" height="25" colspan="9" align="left"><b>
-		&nbsp;Verteidigungseinheiten: '.$defense_lang['statusinformationen'].' <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$defstatus.'">
-		&nbsp;-&nbsp;Baukostenreduzierung: '.number_format($artbonus_def, 2,",",".").'% (max. 5,00%)</b></td></tr>';
-		if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
+
+	//Baukosten abzüglich Artefaktbonus, je Rohstoff eine Spalte; Nullwerte blass
+	$kosten='';
+	for($r=0;$r<5;$r++){
+		$betrag=$unit[$_SESSION['ums_rasse']-1][$unit_index][5][$r];
+		$betrag=$betrag-round($betrag*$artbonus/100);
+		$kosten.='<span class="prod-zahl'.($betrag>0 ? '' : ' prod-null').'">'.number_format($betrag, 0,"",".").'</span>';
 	}
-	
-	//kostet es besondere items?
+
+	//kostet es besondere items? klein unter dem Namen
+	$zusatz='';
 	if(!empty($unit[$_SESSION['ums_rasse']-1][$unit_index]['item_cost'])){
-		$item_kosten='<br>&nbsp;Zusatzkosten: ';
 		$einzelkosten=explode(';', $unit[$_SESSION['ums_rasse']-1][$unit_index]['item_cost']);
 		foreach ($einzelkosten as $value) {
 			$parts=explode("x", $value);
-			$item_kosten.='<br>&nbsp;'.$parts[1].' '.$ps[$value[1]]['item_name'];
-			$item_kosten.=' - Lager: '.$ps[$value[1]]['item_amount'];
+			$zusatz.='<span class="prod-zusatz" title="Zusatzkosten&Lager: '.number_format($ps[$value[1]]['item_amount'], 0,"",".").'">+ '.$parts[1].' '.$ps[$value[1]]['item_name'].'</span>';
 		}
-	}else{
-		$item_kosten='';
 	}
 
-	showeinheit_ang(getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']), $row['tech_id'], $ben_restyp01-round($ben_restyp01*$artbonus/100),
-	$ben_restyp02-round($ben_restyp02*$artbonus/100), $ben_restyp03-round($ben_restyp03*$artbonus/100),
-	$ben_restyp04-round($ben_restyp04*$artbonus/100), $ben_restyp05-round($ben_restyp05*$artbonus/100), $tech_ticks, $ec[$row['tech_id']], $bg,$z, hasTech($pt, $row['tech_id']), $item_kosten);
-
-
-	/*
-	if($design==1){
-	  showeinheit2($row["tech_name"], $row["tech_id"], $row["restyp01"]-round($row["restyp01"]*$artbonus/100),
-	  $row["restyp02"]-round($row["restyp02"]*$artbonus/100), $row["restyp03"]-round($row["restyp03"]*$artbonus/100),
-	  $row["restyp04"]-round($row["restyp04"]*$artbonus/100), $row["restyp05"]-round($row["restyp05"]*$artbonus/100), $tech_ticks, $ec, $bg,$z);
+	$hat_tech=hasTech($pt, $tech_id);
+	if($hat_tech){
+		$eingabe='<input type="text" name="b'.$tech_id.'" id="b'.$tech_id.'" value="" maxlength="9" autocomplete="off" inputmode="numeric" onKeyUp="berechnepreise();" class="mod-eingabe">';
 	}else{
-	  showeinheit($row["tech_name"], $row["tech_id"], $row["restyp01"]-round($row["restyp01"]*$artbonus/100),
-	  $row["restyp02"]-round($row["restyp02"]*$artbonus/100), $row["restyp03"]-round($row["restyp03"]*$artbonus/100),
-	  $row["restyp04"]-round($row["restyp04"]*$artbonus/100), $row["restyp05"]-round($row["restyp05"]*$artbonus/100), $tech_ticks, $ec, $bg,$z);
+		$eingabe='<span class="prod-fehlt-tech" title="Fehlende Technologie">Tech. fehlt</span>';
 	}
-	*/
+
+	$einheiten[$gruppe].='
+	<div class="prod-zeile'.($hat_tech ? '' : ' prod-gesperrt').'">
+		<span class="prod-name"><span rel="tooltip" title="'.$tooltips[$z].'">'.getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'</span>'.$zusatz.'</span>
+		'.$kosten.'
+		<span class="prod-zahl">'.$tech_ticks.'</span>
+		<span class="prod-zahl prod-bestand">'.number_format($ec[$tech_id], 0,"",".").'</span>
+		<span class="prod-eingabe">'.$eingabe.'</span>
+	</div>';
+
 	$z++;
-
 }
-?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<?php
 
-//oberer rahmen von der echtzeitrechnung
-  echo '<table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-        <td width="13" height="37" class="rml">&nbsp;</td>
-        <td align="left" class="ro"><div class="cellu">&nbsp;Baukosten:</div></td>
-        <td width="13" class="rmr">&nbsp;</td>
-        </tr>
-        <tr>
-        <td class="rl">&nbsp;</td><td>';
-?>
-<table border="0" cellpadding="1" cellspacing="1">
-<tr height="20" align="center">
-<td class="cell" align="left" width="58">&nbsp;</td>
-<td width="76" class="cell">M</td>
-<td width="76" class="cell">D</td>
-<td width="76" class="cell">I</td>
-<td width="76" class="cell">E</td>
-<td width="43" class="cell">T</td>
-<td width="71" class="cell"><?=$production_lang['kapazitaet']?></td>
-<td width="75" class="cell"><?=$production_lang['punkte']?></td>
-</tr>
-<tr height="20" align="center">
-<td class="cell1" align="left">&nbsp;<?=$production_lang['summe']?>:</td>
-<td class="cell1" id="m">0</td>
-<td class="cell1" id="d">0</td>
-<td class="cell1" id="i">0</td>
-<td class="cell1" id="e">0</td>
-<td class="cell1" id="t">0</td>
-<td class="cell1" id="k">0</td>
-<td class="cell1" id="p">0</td>
-</tr>
-<tr height="20">
-<td class="cell" colspan="8" align="center"><input type="Submit" name="submit" value="<?=$production_lang['bauen']?>"></td>
-</tr>
-</table>
-<?php
+//Summe der ausgewählten Einheiten, füllt js/produktion*.js
+$summe='';
+foreach(array('m','d','i','e','t') as $r => $feld){
+	$summe.='<span class="geh-kosten" title="'.$prod_resnamen[$r].'"><img src="gp/g/icon'.($r+1).'.png" alt=""><b id="'.$feld.'">0</b></span>';
+}
+$summe.='<span class="geh-kosten">'.$production_lang['kapazitaet'].' <b id="k">0</b></span>';
+$summe.='<span class="geh-kosten">'.$production_lang['punkte'].' <b id="p">0</b></span>';
 
+echo '<form action="production.php" method="POST" name="produktion">';
+rahmen_oben($production_lang['produktion']);
+//Kopfzeile: Rohstoff-Icons über den Kostenspalten
+$kopf='';
+for($r=0;$r<5;$r++){
+	$kopf.='<span class="prod-zahl"><img src="gp/g/icon'.($r+1).'.png" alt="" title="'.$prod_resnamen[$r].'"></span>';
+}
 
-//zeige aktive bauauftr�ge an
-//$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_build.anzahl, de_user_build.verbzeit, de_tech_data{$_SESSION['ums_rasse']}.tech_name, de_tech_data{$_SESSION['ums_rasse']}.score FROM de_user_build LEFT JOIN de_tech_data{$_SESSION['ums_rasse']} ON(de_user_build.tech_id = de_tech_data{$_SESSION['ums_rasse']}.tech_id) WHERE user_id=? AND de_user_build.tech_id > 80 AND de_user_build.tech_id < 110 ORDER BY de_user_build.verbzeit ASC", [$_SESSION['ums_user_id']]);
-/*
-unset($technames);
-$techselect='<option value="0">Bitte w&auml;hlen</option>';
-$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id>80 AND tech_id<105 ORDER BY tech_id", []);
-while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
-	$technames[$row['tech_id']]=$row['tech_name'];
-}*/
+echo '
+<div class="prod mod">
+	<div class="prod-zeile prod-kopf">
+		<span class="prod-name">'.$production_lang['einheit'].'</span>
+		'.$kopf.'
+		<span class="prod-zahl">'.$production_lang['wochen'].'</span>
+		<span class="prod-zahl prod-bestand">'.$production_lang['stueck'].'</span>
+		<span class="prod-eingabe">'.$production_lang['bauen'].'</span>
+	</div>
+	<div class="prod-gruppe">
+		<span class="mod-typ">Flotteneinheiten</span>
+		<span class="mod-chip">'.$production_lang['baukostenreduz'].$ua_name[0].$production_lang['artefakte'].' <b>'.number_format($artbonus_fleet, 2,",",".").' %</b> (max. 5,00 %)</span>
+	</div>
+	<div class="prod-liste">'.$einheiten['flotte'].'</div>
+	<div class="prod-gruppe">
+		<span class="mod-typ">Verteidigungseinheiten</span>
+		<span class="mod-chip prod-status" rel="tooltip" title="'.$defstatus.'">'.$defense_lang['statusinformationen'].'</span>
+		<span class="mod-chip">Baukostenreduzierung <b>'.number_format($artbonus_def, 2,",",".").' %</b> (max. 5,00 %)</span>
+	</div>
+	<div class="prod-liste">'.$einheiten['verteidigung'].'</div>
+	<div class="geh-summe">
+		<div class="geh-summe-text"><span class="mod-typ">Baukosten</span><div class="geh-summe-werte">'.$summe.'</div></div>
+		<input type="Submit" name="submit" value="'.$production_lang['bauen'].'" class="mod-btn">
+	</div>';
 
-$techdata=array();
+//zeige aktive bauaufträge an
+$technames=array();
 $sql="SELECT * FROM de_tech_data WHERE tech_id>=81 AND tech_id<=104 ORDER BY tech_id ASC";
 $db_daten=mysqli_query($GLOBALS['dbi'],$sql);
-//echo $sql;
 while($row = mysqli_fetch_array($db_daten)){
 	$technames[$row['tech_id']]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']);
 }
 
-$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build` 
+$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
 	WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
-$num = mysqli_num_rows($result);
-if ($num>0){
-	echo '</td><td width="13" class="rr">&nbsp;</td></tr></table>
-        <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-        <td width="13" height="37" class="rml">&nbsp;</td>
-        <td align="left" class="ro"><div class="cellu">&nbsp;'.$production_lang['aktiveauftraege'].':</div></td>
-        <td width="13" class="rmr">&nbsp;</td>
-        </tr>
-        <tr>
-        <td class="rl">&nbsp;</td><td>';
-
-	echo '<table border="0" cellpadding="0" cellspacing="1">';
-	echo '<tr align="center">';
-	echo '<td class="cell" width="300"><b>'.$production_lang['einheit'].'</b></td>';
-	echo '<td class="cell" width="88"><b>'.$production_lang['stueck'].'</b></td>';
-	echo '<td class="cell" width="105"><b>'.$production_lang['punkte'].'</b></td>';
-	echo '<td class="cell" width="78"><b>'.$production_lang['wochen'].'</b></td>';
-	echo '</tr>';
-
-
-	while($row = mysqli_fetch_array($result)){ //jeder gefundene datensatz wird geprueft
-	    echo '<tr align="center">';
-	    echo '<td class="cell">'.$technames[$row['tech_id']].'</td>';
-	    echo '<td class="cell">'.number_format($row['anzahl'], 0,"",".").'</td>';
-	    echo '<td class="cell">'.number_format($row['score'], 0,"",".").'</td>';
-	    echo '<td class="cell">'.$row['verbzeit'].'</td>';
-	    echo '</tr>';
+if(mysqli_num_rows($result)>0){
+	echo '<div class="geh-produktion"><div class="mod-typ">'.$production_lang['aktiveauftraege'].'</div>';
+	while($row = mysqli_fetch_array($result)){
+		echo '<div class="geh-auftrag"><span>'.$technames[$row['tech_id']].'</span><b>'.number_format($row['anzahl'], 0,"",".").'</b><span class="prod-punkte">'.number_format($row['score'], 0,"",".").' '.$production_lang['punkte'].'</span><span class="mod-chip">noch '.$row['verbzeit'].' WT</span></div>';
 	}
-  
-  echo '</table>';
-  echo '</td><td width="13" class="rr">&nbsp;</td>
-        </tr>
-        <tr>
-        <td width="13" class="rul">&nbsp;</td>
-        <td class="ru">&nbsp;</td>
-        <td width="13" class="rur">&nbsp;</td>
-        </tr>
-        </table><br>';
-}
-else  //nur unteren rahmen von der echtzeitrechnung
-{
-  echo '</td><td width="13" class="rr">&nbsp;</td>
-        </tr>
-        <tr>
-        <td width="13" class="rul">&nbsp;</td>
-        <td class="ru">&nbsp;</td>
-        <td width="13" class="rur">&nbsp;</td>
-        </tr>
-        </table><br>';
+	echo '</div>';
 }
 
-	//designauswahl
-	/*
-	  echo '<div class="cellu" style="width: 250px;">'; 
-	  if($design==1){$str1="<b>";$str2="</b>";}else{$str1='';$str2='';}
-	  echo $str1.'<a href="production.php?setdesign=1">'.$production_lang[design].' A</a>'.$str2.' - ';
-	  if($design==2){$str1="<b>";$str2="</b>";}else{$str1='';$str2='';}
-	  echo $str1.'<a href="production.php?setdesign=2">'.$production_lang[design].' B</a>'.$str2.'<br><br>';
-	  echo '</div>';
-	*/
-//}
-
+echo '</div>';
+rahmen_unten();
 echo '</form>';
-
 
 /////////////////////////////////////////////////
 // Waren/Handelsgüter/Itemproduktion
@@ -801,48 +673,23 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 	echo '<form action="production.php" method="POST" name="item_build">';
 	rahmen_oben('Waren/Handelsg&uuml;ter');
-	echo '
-	<table width="572" border="0" cellpadding="0" cellspacing="0">
-		<tr align="left" class="cell">
-			<td valign="top">';
+	echo '<div class="prod mod">';
 
-	//die genutzte/maximale Produktionskapazität anzeigen
-	echo '<div style="display: flex;">';
+	//genutzte/maximale Kapazität der Fabriken
+	echo '<div class="prod-fabriken">';
 	for($g=0;$g<count($GLOBALS['map_buildings']);$g++){
 		if(isset($GLOBALS['map_buildings'][$g]['factory_id'])){
-			/*
-			$result  = mysqli_query($GLOBALS['dbi'],"SELECT SUM(bldg_level) AS anzahl FROM de_user_map_bldg WHERE user_id='".$_SESSION['ums_user_id']."' AND bldg_id='".$g."';");
-			$row     = mysqli_fetch_array($result);
-			$anzahl = $row["anzahl"];
-			*/
-
-			$max=$factory_max_capacity[$GLOBALS['map_buildings'][$g]['factory_id']];
-
-			//die genutze Kapazität aus der DB holen
-
-			echo '<div style="flex-grow: 1; font-size: 16px;"><img src="'.'gp/'.'g/r/'.$GLOBALS['map_buildings'][$g]['factory_id'].'_g.gif" title="'.$GLOBALS['map_buildings'][$g]['name'].'"> '.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $GLOBALS['map_buildings'][$g]['factory_id'])).'/'.intval($max).'</div>';
+			$factory_id=$GLOBALS['map_buildings'][$g]['factory_id'];
+			echo '<span class="prod-fabrik" rel="tooltip" title="'.$GLOBALS['map_buildings'][$g]['name'].'&Genutzte / maximale Fabrikkapazit&auml;t"><img src="gp/g/r/'.$factory_id.'_g.gif" alt=""><b>'.intval(getUsedFactoryCapacity($_SESSION['ums_user_id'], $factory_id)).'</b> / '.intval($factory_max_capacity[$factory_id]).'</span>';
 		}
 	}
-
 	echo '</div>';
 
 	//die Baumöglichkeiten anzeigen
-	$c1=1;
 	foreach ($ps as $item_id_product => $item) {
 		if(!empty($item['item_blueprint'])){
-
-			if($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-			
-			echo '<div class="'.$bg.'" style="padding: 10px;">';
-
-			//Item-Name
-			echo '<div><span class="fett">'.$item['item_name'].'</span> (Lager: '.number_format($ps[$item_id_product]['item_amount'], 0,",",".").')</div>';
-
-			echo '<div style="display: flex; margin-top: 10px;">';
-
-			//Item-Bestandteile/Voraussetzungen/Bauzeit
+			//Bestandteile, Bauzeit und Fabrikkapazität aus dem Bauplan
 			$parts=explode(";", $item['item_blueprint']);
-			
 			$baukosten='';
 			$bauzeit='';
 			$fabrikkosten='';
@@ -850,53 +697,38 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 				if($einzel[0]=='I'){
 					$values=explode("x", $einzel);
 					$item_id=str_replace("I", "", $values[0]);
-
-					$baukosten.='<br>'.$values[1].' '.$ps[$item_id]['item_name'].' (Lager: '.number_format($ps[$item_id]['item_amount'], 0,",",".").')';
-
+					//rot, wenn es nicht einmal für ein Stück reicht
+					$fehlt=$ps[$item_id]['item_amount']<$values[1];
+					$baukosten.='<div class="prod-zutat'.($fehlt ? ' prod-fehlt' : '').'"><b>'.$values[1].'</b> '.$ps[$item_id]['item_name'].' <span>(Lager: '.number_format($ps[$item_id]['item_amount'], 0,",",".").')</span></div>';
 				}elseif($einzel[0]=='Z'){
 					$bauzeit=str_replace("Z", "", $einzel).' WT';
-
 				}elseif($einzel[0]=='P'){
 					$values=explode("x", $einzel);
 					$factory_id=str_replace("P", "", $values[0]);
-
-					$fabrikkosten.='<br>'.$values[1].' <img src="'.'gp/'.'g/r/'.$factory_id.'_g.gif" style="width: auto; height: 16px;">';
+					$fabrikkosten.=' <b>'.$values[1].'</b> <img src="gp/g/r/'.$factory_id.'_g.gif" alt="">';
 				}
 			}
 
-			//Spalte1 - Baukosten
 			echo '
-			<div style="width: 37%;">
-				Baukosten pro St&uuml;ck: '.$baukosten.'
-			</div>';
-			
-			//Spalte2 - Bauzeit und Fabrikkapazität
-			echo '
-			<div style="width: 43%;">
-				<div>Bauzeit: '.$bauzeit.'</div>
-				<div>Benötigte Fabrikkapazität pro Stück: '.$fabrikkosten.'</div>
-			</div>';
-					
-			//Spalte3 - Baumenge
-			echo '
-			<div style="width: 20%;">
-				<div>Baumenge: <input type="text" name="item_id_'.$item_id_product.'" value="" size="3" maxlength="9""></div>
-				<div>(Im Bau: '.intval(getItemBuildAmount($_SESSION['ums_user_id'], $item_id_product)).')</div>
-			</div>';
-
-			echo '
+			<div class="prod-ware">
+				<div class="prod-ware-kopf"><span class="prod-name">'.$item['item_name'].'</span><span class="mod-chip">Lager <b>'.number_format($ps[$item_id_product]['item_amount'], 0,",",".").'</b></span></div>
+				<div class="prod-ware-inhalt">
+					<div class="prod-ware-spalte" title="Baukosten pro St&uuml;ck">'.$baukosten.'</div>
+					<div class="prod-ware-spalte">
+						<div class="prod-zutat"><span>Bauzeit</span> <b>'.$bauzeit.'</b></div>
+						<div class="prod-zutat" title="Ben&ouml;tigte Fabrikkapazit&auml;t pro St&uuml;ck"><span>Fabrik pro St&uuml;ck</span>'.$fabrikkosten.'</div>
+					</div>
+					<div class="prod-ware-menge">
+						<input type="text" name="item_id_'.$item_id_product.'" value="" maxlength="9" autocomplete="off" inputmode="numeric" placeholder="Menge" class="mod-eingabe">
+						<span class="prod-klein">Im Bau: '.intval(getItemBuildAmount($_SESSION['ums_user_id'], $item_id_product)).'</span>
+					</div>
 				</div>
 			</div>';
 		}
 	}
 
-	echo '<div class="cell" style="margin-top: 4px; padding: 5px; text-align: center;"><input type="Submit" name="build_item" value="Bauen"></div>';
-			
-	echo '		
-			</td>
-		</tr>
-	</table>';
-
+	echo '<div class="prod-ware-los"><input type="Submit" name="build_item" value="Bauen" class="mod-btn"></div>';
+	echo '</div>';
 	rahmen_unten();
 
 	echo '</form>';

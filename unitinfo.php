@@ -26,15 +26,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 //stelle die ressourcenleiste dar
 include "resline.php";
 
-echo '
-<a href="production.php" title="Einheitenproduktion"><img src="'.'gp/'.'g/symbol19.png" border="0" width="64px" heigth="64px"></a> 
-<a href="recycling.php" title="Recycling&Hier k&ouml;nnen Einheiten der Heimatflotte und Verteidigungseinheiten recycelt werden."><img src="'.'gp/'.'g/symbol24.png" border="0" width="64px" heigth="64px"></a>';
-if(($sv_deactivate_vsystems ?? 0) != 1){
-	echo '<a href="specialship.php" title="Basisstern"><img src="'.'gp/'.'g/symbol27.png" border="0" width="64px" heigth="64px"></a>';
-}
-echo'
-<a href="unitinfo.php" title="Einheiteninformationen"><img src="'.'gp/'.'g/symbol26.png" border="0" width="64px" heigth="64px"></a>
-';
+echo einheiten_navi('unitinfo');
 
 
 //zuerst mal alle Einheitennamen aus der DB laden und in ein Array packen
@@ -67,138 +59,106 @@ $klassenname[]='Energiegeschoss-Plattform';
 $klassenname[]='Materiegeschoss-Plattform';
 $klassenname[]='Hochenergiegeschoss-Plattform';
 
-rahmen_oben('Einheiteninformationen');
-echo '<div style="width: 576px; position: relative; font-size: 10px; text-align: center;">';
-echo '<table style="width: 100%; font-size: 10px;">';
+//Reihenfolge aus Kampf- oder Blockmatrix: Zielklasse und Effizienz nacheinander;
+//die Jäger-Klasse (0) erscheint nur einmal; $nach_anzeige: Merker erst nach einer Anzeige setzen (Blockreihenfolge)
+function einheiten_reihenfolge($matrix, $unit_id, $klassenname, $nach_anzeige){
+	$effizienz=100;
+	$jaegerwar=false;
+	$html='';
+	for($x=0;$x<=14;$x++){
+		$effizienz=$effizienz-($effizienz/100*$matrix[$unit_id][$x*2+1]);
+		if($matrix[$unit_id][$x*2]!=0 || ($matrix[$unit_id][$x*2]==0 && $jaegerwar==false)){
+			//eine Zeile je Zielklasse, der Balken zeigt die abnehmende Effizienz
+			$html.='<div class="einh-folge"><span>'.$klassenname[$matrix[$unit_id][$x*2]].'</span><span class="einh-folge-balken"><span style="width: '.max(0, min(100, round($effizienz))).'%;"></span></span><b>'.number_format($effizienz, 0,",",".").' %</b></div>';
+			if($nach_anzeige && $matrix[$unit_id][$x*2]==0){
+				$jaegerwar=true;
+			}
+		}
+		if(!$nach_anzeige && $matrix[$unit_id][$x*2]==0){
+			$jaegerwar=true;
+		}
+	}
+	return $html;
+}
+
+//Werte einer Zeile für die fünf Rassen, die eigene Rasse hervorgehoben
+function einheiten_wertezeile($label, $werte){
+	$html='<span class="einh-label">'.$label.'</span>';
+	foreach($werte as $r => $wert){
+		$html.='<span class="einh-wert'.($r+1==$_SESSION['ums_rasse'] ? ' einh-eigen' : '').'">'.$wert.'</span>';
+	}
+	return $html;
+}
+
+$rassenlogos='<span class="einh-label"></span>';
+for($r=1;$r<=5;$r++){
+	$rassenlogos.='<span class="einh-wert'.($r==$_SESSION['ums_rasse'] ? ' einh-eigen' : '').'"><img src="gp/g/derassenlogo'.$r.'.png" alt=""></span>';
+}
+
+$sprungleiste='';
+$karten='';
 for($i=81;$i<=104;$i++){
 	if($i<100){
 		$unit_id=$i-81;
 	}else{
 		$unit_id=$i-90;
-	}		
-	
+	}
+
 	if(($i>=81 & $i<=90) || ($i>=100 & $i<=104)){
-		//Klassenname
-		$c1=0;
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}		
-		echo '<tr class="'.$bg.'"><td colspan="6" style="font-weight: bold; font-size: 24px;">'.$klassenname[$unit_id].'</td></tr>';
-		
-		//�berschrift
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}		
-		echo '
-			<tr class="'.$bg.'">
-				<td></td>
-				<td><img src="'.'gp/'.'g/derassenlogo1.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.'gp/'.'g/derassenlogo2.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.'gp/'.'g/derassenlogo3.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.'gp/'.'g/derassenlogo4.png" border="0" width="16px" heigth="16px"></td>
-				<td><img src="'.'gp/'.'g/derassenlogo5.png" border="0" width="16px" heigth="16px"></td>
-			</tr>';
-		
-		//Punkte
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-		echo '
-			<tr class="'.$bg.'">
-				<td>Punktewert</td>
-				<td>'.number_format($unit[0][$unit_id][4], 0,",",".").'</td>
-				<td>'.number_format($unit[1][$unit_id][4], 0,",",".").'</td>
-				<td>'.number_format($unit[2][$unit_id][4], 0,",",".").'</td>
-				<td>'.number_format($unit[3][$unit_id][4], 0,",",".").'</td>
-				<td>'.number_format($unit[4][$unit_id][4], 0,",",".").'</td>
-			</tr>';
-		
-		//Trefferpunkte
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-		echo '
-			<tr class="'.$bg.'">
-				<td>Trefferpunkte</td>
-				<td>'.number_format($unit[0][$unit_id][1], 0,",",".").'</td>
-				<td>'.number_format($unit[1][$unit_id][1], 0,",",".").'</td>
-				<td>'.number_format($unit[2][$unit_id][1], 0,",",".").'</td>
-				<td>'.number_format($unit[3][$unit_id][1], 0,",",".").'</td>
-				<td>'.number_format($unit[4][$unit_id][1], 0,",",".").'</td>
-			</tr>';
+		$sprungleiste.='<a href="#klasse'.$unit_id.'" class="mod-chip">'.$klassenname[$unit_id].'</a>';
 
-		//EMP-Waffen
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-		echo '
-			<tr class="'.$bg.'">
-				<td>EMP-Waffen</td>
-				<td>'.number_format($unit[0][$unit_id][3], 2,",",".").'</td>
-				<td>'.number_format($unit[1][$unit_id][3], 2,",",".").'</td>
-				<td>'.number_format($unit[2][$unit_id][3], 2,",",".").'</td>
-				<td>'.number_format($unit[3][$unit_id][3], 2,",",".").'</td>
-				<td>'.number_format($unit[4][$unit_id][3], 2,",",".").'</td>
-			</tr>';
-		
-		//Blockreihenfolge
-		if($unit[0][$unit_id][3]>0 || $unit[1][$unit_id][3]>0 || $unit[2][$unit_id][3]>0 || $unit[3][$unit_id][3]>0 || $unit[4][$unit_id][3]>0){
-			echo '
-				<tr class="'.$bg.'" style="font-style:italic;">
-					<td colspan="3">Blockreihenfolge</td>
-					<td colspan="3">Effizienz</td>
-				</tr>';		
-			$effizienz=100;
-			$jaegerwar=false;
-			for($x=0;$x<=14;$x++){
-				$effizienz=$effizienz-($effizienz/100*$blockmatrix[$unit_id][$x*2+1]);
-				if($blockmatrix[$unit_id][$x*2]!=0 || ($blockmatrix[$unit_id][$x*2]==0 && $jaegerwar==false)){
-					echo '
-						<tr class="'.$bg.'">
-							<td colspan="3">'.$klassenname[$blockmatrix[$unit_id][$x*2]].'</td>
-							<td colspan="3">'.number_format($effizienz, 0,",",".").'%</td>
-						</tr>';
-					if($blockmatrix[$unit_id][$x*2]==0){
-						$jaegerwar=true;
-					}
-				}
-			}
+		//Namen je Rasse, die DX61a23 haben keine eigenen
+		$namen=array();
+		$punkte=array();
+		$treffer=array();
+		$konv=array();
+		$emp=array();
+		for($r=0;$r<5;$r++){
+			$namen[]=($r<4) ? $techdata[$r+1][$i]['tech_name'] : '&ndash;';
+			$punkte[]=number_format($unit[$r][$unit_id][4], 0,",",".");
+			$treffer[]=number_format($unit[$r][$unit_id][1], 0,",",".");
+			$konv[]=number_format($unit[$r][$unit_id][2], 2,",",".");
+			$emp[]=number_format($unit[$r][$unit_id][3], 2,",",".");
 		}
-		
-		//Konventionelle Waffen
-		if ($c1==0){$c1=1;$bg='cell';}else{$c1=0;$bg='cell1';}
-		echo '
-			<tr class="'.$bg.'">
-				<td>Konventionelle Waffen</td>
-				<td>'.number_format($unit[0][$unit_id][2], 2,",",".").'</td>
-				<td>'.number_format($unit[1][$unit_id][2], 2,",",".").'</td>
-				<td>'.number_format($unit[2][$unit_id][2], 2,",",".").'</td>
-				<td>'.number_format($unit[3][$unit_id][2], 2,",",".").'</td>
-				<td>'.number_format($unit[4][$unit_id][2], 2,",",".").'</td>
-			</tr>';
 
-		//Angriffsreihenfolgen konv. Waffen
+		$reihenfolgen='';
+		//Angriffsreihenfolge der konventionellen Waffen
 		if($unit[0][$unit_id][2]>0 || $unit[1][$unit_id][2]>0 || $unit[2][$unit_id][2]>0 || $unit[3][$unit_id][2]>0 || $unit[4][$unit_id][2]>0){
-			echo '
-				<tr class="'.$bg.'" style="font-style:italic;">
-					<td colspan="3">Angriffsreihenfolge</td>
-					<td colspan="3">Effizienz</td>
-				</tr>';		
-			$effizienz=100;
-			$jaegerwar=false;
-			for($x=0;$x<=14;$x++){
-				$effizienz=$effizienz-($effizienz/100*$kampfmatrix[$unit_id][$x*2+1]);
-				if($kampfmatrix[$unit_id][$x*2]!=0 || ($kampfmatrix[$unit_id][$x*2]==0 && $jaegerwar==false)){
-					echo '
-						<tr class="'.$bg.'">
-							<td colspan="3">'.$klassenname[$kampfmatrix[$unit_id][$x*2]].'</td>
-							<td colspan="3">'.number_format($effizienz, 0,",",".").'%</td>
-						</tr>';		
-				}
-				
-				if($kampfmatrix[$unit_id][$x*2]==0){
-					$jaegerwar=true;
-				}
-			}
-		}		
-		
+			$reihenfolgen.='<div class="einh-reihe"><span class="mod-typ">Angriffsreihenfolge</span><span class="mod-typ">Effizienz</span>'.einheiten_reihenfolge($kampfmatrix, $unit_id, $klassenname, false).'</div>';
+		}
+		//Blockreihenfolge der EMP-Waffen
+		if($unit[0][$unit_id][3]>0 || $unit[1][$unit_id][3]>0 || $unit[2][$unit_id][3]>0 || $unit[3][$unit_id][3]>0 || $unit[4][$unit_id][3]>0){
+			$reihenfolgen.='<div class="einh-reihe"><span class="mod-typ">Blockreihenfolge</span><span class="mod-typ">Effizienz</span>'.einheiten_reihenfolge($blockmatrix, $unit_id, $klassenname, true).'</div>';
+		}
+		//Angriffs- und Blockreihenfolge nebeneinander
+		if($reihenfolgen!=''){
+			$reihenfolgen='<div class="einh-reihen">'.$reihenfolgen.'</div>';
+		}
+
+		$karten.='
+		<div class="einh-karte" id="klasse'.$unit_id.'">
+			<div class="einh-titel">'.$klassenname[$unit_id].'</div>
+			<div class="einh-werte">
+				'.$rassenlogos.'
+				'.einheiten_wertezeile('Name', $namen).'
+				'.einheiten_wertezeile('Punktewert', $punkte).'
+				'.einheiten_wertezeile('Trefferpunkte', $treffer).'
+				'.einheiten_wertezeile('Konventionelle Waffen', $konv).'
+				'.einheiten_wertezeile('EMP-Waffen', $emp).'
+			</div>
+			'.$reihenfolgen.'
+		</div>';
 	}
 }
-echo '</table></div>';
+
+rahmen_oben('Einheiteninformationen');
+echo '<div class="einh mod">';
+echo '<div class="einh-sprung">'.$sprungleiste.'</div>';
+echo $karten;
+echo '</div>';
 rahmen_unten();
 
 ?>
-</div>
 <br>
 
 </body>

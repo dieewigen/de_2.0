@@ -2946,7 +2946,7 @@ a.art-kachel-zurueck:hover::after {
 	color: #8b949e;
 }
 
-// Geheimdienst (secret.php)
+// Geheimdienst (secret.php); geh-feld, geh-kosten, geh-summe, geh-auftrag nutzt auch production.php
 .geh {
 	width: 572px;
 }
@@ -3273,6 +3273,601 @@ a.art-kachel-zurueck:hover::after {
 	table td.ccy {
 		color: #ffb45c;
 	}
+}
+
+// Produktion (production.php), nutzt die geh-Bausteine für Kosten, Summe und Aufträge
+.prod {
+	width: 572px;
+}
+
+.prod-sabotage {
+	width: 602px;
+	padding: 0;
+	background: none;
+
+	.mod-meldung {
+		margin: 0;
+	}
+}
+
+.prod-gruppe {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 8px;
+	margin: 10px 0 4px 0;
+	padding: 0 4px;
+
+	.mod-typ {
+		margin-right: auto;
+	}
+}
+
+.prod-status {
+	cursor: help;
+}
+
+// kompakte Tabelle: eine Zeile je Einheit, Kosten in festen Spalten untereinander (Spielerwunsch: alles auf einen Blick)
+.prod-zeile {
+	display: grid;
+	grid-template-columns: 1fr 64px 56px 52px 52px 30px 34px 62px 66px;
+	align-items: center;
+	column-gap: 6px;
+	min-height: 26px;
+	padding: 2px 4px 2px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
+}
+
+.prod-liste .prod-zeile:nth-child(odd) {
+	background: rgba(255, 255, 255, 0.035);
+}
+
+.prod-liste .prod-zeile:hover {
+	background: var(--akzent-weich);
+}
+
+.prod-kopf {
+	min-height: 26px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0;
+	font-size: 11px;
+	font-weight: 500;
+	color: #8b949e;
+
+	img {
+		width: 18px;
+		height: 18px;
+		border-radius: 4px;
+		vertical-align: middle;
+	}
+}
+
+.prod-name {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+
+	> span:first-child {
+		align-self: flex-start;
+		font-weight: 500;
+		color: #ffffff;
+	}
+
+	> span[rel="tooltip"] {
+		cursor: help;
+	}
+}
+
+.prod-kopf .prod-name {
+	color: #8b949e;
+}
+
+.prod-zusatz {
+	font-size: 10px;
+	color: #ffb45c;
+}
+
+.prod-zahl {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.prod-null {
+	color: #484f58;
+}
+
+.prod-bestand {
+	color: #ffffff;
+}
+
+.prod-kopf .prod-bestand {
+	color: #8b949e;
+}
+
+.prod-eingabe {
+	text-align: center;
+
+	.mod-eingabe {
+		width: 100%;
+		padding: 2px 6px;
+		font-size: 12px;
+		text-align: right;
+	}
+}
+
+.prod-fehlt-tech {
+	font-size: 10px;
+	color: #ff8a8a;
+	cursor: help;
+}
+
+// ohne Technologie: blass, Kosten bleiben lesbar
+.prod-gesperrt .prod-name > span:first-child,
+.prod-gesperrt .prod-bestand {
+	opacity: 0.55;
+}
+
+.prod-punkte {
+	color: #8b949e;
+}
+
+// Waren und Handelsgüter, kompakt wie die Einheitenliste
+.prod-fabriken {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.prod-fabrik {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 999px;
+	font-size: 12px;
+	color: #9da7b1;
+	cursor: help;
+
+	img {
+		height: 16px;
+		width: auto;
+	}
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.prod-ware {
+	padding: 6px 10px;
+	border-radius: 8px;
+
+	&:nth-child(odd of .prod-ware) {
+		background: rgba(255, 255, 255, 0.035);
+	}
+}
+
+.prod-ware-kopf {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 3px;
+
+	.prod-name {
+		font-size: 13px;
+		font-weight: 500;
+		color: #ffffff;
+	}
+}
+
+.prod-ware-inhalt {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+}
+
+.prod-ware-spalte {
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.prod-ware-menge {
+	flex: 0 0 90px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+
+	.mod-eingabe {
+		width: 100%;
+		padding: 2px 6px;
+		font-size: 12px;
+		text-align: right;
+	}
+}
+
+.prod-zutat {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 4px;
+	font-size: 12px;
+	color: #c9d1d9;
+
+	b {
+		color: #ffffff;
+	}
+
+	span {
+		color: #8b949e;
+	}
+
+	img {
+		height: 14px;
+		width: auto;
+	}
+}
+
+.prod-fehlt,
+.prod-fehlt b,
+.prod-fehlt span {
+	color: #ff6b6b;
+}
+
+.prod-klein {
+	font-size: 10px;
+	color: #8b949e;
+}
+
+.prod-ware-los {
+	margin-top: 8px;
+	text-align: right;
+}
+
+// Recycling (recycling.php), kompakt wie die Produktion; nutzt prod-kopf, prod-name, prod-zahl, prod-gruppe
+.rec {
+	width: 572px;
+}
+
+.rec-zeile {
+	display: grid;
+	grid-template-columns: 1fr 70px 86px 150px 64px;
+	align-items: center;
+	column-gap: 8px;
+	min-height: 26px;
+	padding: 2px 4px 2px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
+
+	.mod-eingabe {
+		width: 100%;
+		padding: 2px 6px;
+		font-size: 12px;
+	}
+
+	input.mod-eingabe {
+		text-align: right;
+	}
+}
+
+.prod-liste .rec-zeile:nth-child(odd) {
+	background: rgba(255, 255, 255, 0.035);
+}
+
+.prod-liste .rec-zeile:hover {
+	background: var(--akzent-weich);
+}
+
+// keine Einheiten vorhanden: blass
+.rec-leer .prod-name > span:first-child,
+.rec-leer > .prod-zahl:nth-child(2) {
+	opacity: 0.45;
+}
+
+.rec-ergebnis {
+	font-weight: 700;
+	color: #5fe08a;
+}
+
+// reicht nicht für eine einzige Zieleinheit
+.rec-ergebnis.rec-null {
+	color: #ff6b6b;
+}
+
+.rec-los {
+	margin-top: 10px;
+	text-align: right;
+}
+
+// Reiter über Produktion, Recycling, Basisstern, Einheiteninfo (einheiten_navi() in functions.php)
+.einh-navi {
+	display: flex;
+	gap: 4px;
+	width: 602px;
+	margin-bottom: 6px;
+	padding: 4px;
+	border-radius: 10px;
+}
+
+.mod .einh-reiter,
+.mod .einh-reiter:link,
+.mod .einh-reiter:visited {
+	flex: 1 1 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 4px 6px;
+	border: 1px solid transparent;
+	border-radius: 7px;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	color: #9da7b1;
+
+	img {
+		width: 30px;
+		height: 30px;
+		border-radius: 6px;
+	}
+}
+
+.mod .einh-reiter:hover {
+	background: rgba(255, 255, 255, 0.05);
+	text-decoration: none;
+	color: #ffffff;
+}
+
+.mod .einh-aktiv,
+.mod .einh-aktiv:link,
+.mod .einh-aktiv:visited,
+.mod .einh-aktiv:hover {
+	border-color: var(--akzent);
+	background: var(--akzent-weich);
+	color: #ffffff;
+}
+
+// Einheiteninfo (unitinfo.php) und Basisstern (specialship.php)
+.einh {
+	width: 572px;
+}
+
+.einh-sprung {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-bottom: 10px;
+
+	.mod-chip {
+		text-decoration: none;
+	}
+}
+
+.mod .einh-sprung a.mod-chip:link,
+.mod .einh-sprung a.mod-chip:visited {
+	font-size: 10px;
+	color: #9da7b1;
+}
+
+.mod .einh-sprung a.mod-chip:hover {
+	background: var(--akzent-weich);
+	color: #ffffff;
+}
+
+.einh-karte {
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 10px;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+
+	& + & {
+		margin-top: 8px;
+	}
+}
+
+.einh-titel {
+	margin-bottom: 4px;
+	font-size: 16px;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+// Werte der fünf Rassen nebeneinander, die eigene Spalte hervorgehoben
+.einh-werte {
+	display: grid;
+	grid-template-columns: 128px repeat(5, 1fr);
+	align-items: center;
+	font-size: 12px;
+
+	img {
+		width: 18px;
+		height: 18px;
+		vertical-align: middle;
+	}
+}
+
+.einh-label {
+	padding: 2px 0;
+	color: #8b949e;
+}
+
+.einh-wert {
+	padding: 2px 6px;
+	text-align: right;
+	overflow-wrap: break-word;
+	line-height: 1.25;
+	color: #c9d1d9;
+}
+
+.einh-eigen {
+	background: var(--akzent-weich);
+	font-weight: 700;
+	color: #ffffff;
+}
+
+// Angriffs- und Blockreihenfolge nebeneinander, eine allein nimmt die ganze Breite
+.einh-reihen {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	column-gap: 18px;
+	row-gap: 6px;
+	margin-top: 6px;
+	padding-top: 5px;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+// senkrechte Liste: Zielklasse, Balken, Effizienz; von oben nach unten in der Reihenfolge des Kampfes
+.einh-reihe {
+	display: grid;
+	grid-template-columns: max-content minmax(30px, 1fr) max-content;
+	align-content: start;
+	align-items: center;
+	column-gap: 8px;
+	row-gap: 1px;
+	font-size: 11px;
+	line-height: 16px;
+
+	> .mod-typ:first-child {
+		grid-column: 1 / 3;
+	}
+
+	> .mod-typ + .mod-typ {
+		text-align: right;
+	}
+}
+
+// eine Zielklasse: die Zellen liegen direkt im Raster der Liste, damit Balken und Prozente untereinander stehen
+.einh-folge {
+	display: contents;
+	color: #c9d1d9;
+
+	b {
+		text-align: right;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: #ffffff;
+	}
+}
+
+.einh-folge-balken {
+	height: 6px;
+	border-radius: 3px;
+	background: rgba(255, 255, 255, 0.07);
+	overflow: hidden;
+
+	> span {
+		display: block;
+		height: 100%;
+		border-radius: 3px;
+		background: var(--akzent);
+	}
+}
+
+// Basisstern
+.einh-kacheln {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 6px;
+}
+
+.einh-upgrade {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 10px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.3);
+}
+
+.einh-upgrade-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	> b {
+		color: #ffffff;
+	}
+}
+
+.einh-bg {
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 10px;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+
+	& + & {
+		margin-top: 6px;
+	}
+}
+
+.einh-bg-name {
+	font-size: 14px;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+.einh-bg-status {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 6px;
+}
+
+.einh-chip-rot {
+	background: rgba(255, 107, 107, 0.14);
+	color: #ff8a8a;
+}
+
+// Gewinnerlisten
+.einh-rang {
+	display: grid;
+	grid-template-columns: 44px 1fr 120px 60px;
+	align-items: center;
+	column-gap: 10px;
+	min-height: 26px;
+	padding: 2px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
+}
+
+.einh-rang-ally {
+	grid-template-columns: 44px 1fr 60px;
+}
+
+.prod-liste .einh-rang:nth-child(odd) {
+	background: rgba(255, 255, 255, 0.035);
+}
+
+.einh-rang-name {
+	overflow-wrap: anywhere;
+	color: #ffffff;
+}
+
+// die ersten drei Plätze
+.prod-liste .einh-rang.einh-platz1 {
+	background: rgba(255, 196, 0, 0.14);
+}
+
+.prod-liste .einh-rang.einh-platz2 {
+	background: rgba(200, 210, 220, 0.12);
+}
+
+.prod-liste .einh-rang.einh-platz3 {
+	background: rgba(205, 127, 50, 0.14);
 }
 
 // Mobile Layout

@@ -1286,6 +1286,29 @@ function showeinheit_ang($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05,
     echo '</tr>';
 }
 
+//Reiter über Produktion, Recycling, Basisstern und Einheiteninformationen; $aktiv ist der Dateiname ohne .php
+function einheiten_navi($aktiv)
+{
+    global $sv_deactivate_vsystems;
+
+    $reiter = array(
+        'production' => array('symbol19.png', 'Produktion'),
+        'recycling' => array('symbol24.png', 'Recycling'),
+        'specialship' => array('symbol27.png', 'Basisstern'),
+        'unitinfo' => array('symbol26.png', 'Einheiteninfo'),
+    );
+    //der Basisstern gehört zu den Vergessenen Systemen
+    if (($sv_deactivate_vsystems ?? 0) == 1) {
+        unset($reiter['specialship']);
+    }
+
+    $html = '<div class="mod einh-navi">';
+    foreach ($reiter as $datei => $r) {
+        $html .= '<a href="'.$datei.'.php" class="einh-reiter'.($datei == $aktiv ? ' einh-aktiv' : '').'"><img src="gp/g/'.$r[0].'" alt="">'.$r[1].'</a>';
+    }
+    return $html.'</div>';
+}
+
 function getTechNameByRasse($names, $rasse)
 {
     $tech_names = explode(";", $names);
