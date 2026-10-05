@@ -155,7 +155,7 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 	</tr>
 	<tr align="center">
 	<td class="rl">&nbsp;</td>
-	<td colspan="4" style="padding: 4px 10px; font-size: 13px; color: #DDDDDD;">'.$session_lang['botschutzhinweis'].'</td>
+	<td colspan="4" style="padding: 4px 10px; font-size: 13px; color: #DDDDDD;"><div style="width: 500px; margin: 0 auto;">'.$session_lang['botschutzhinweis'].'</div></td>
 	<td class="rr">&nbsp;</td>
 	</tr>
 	<tr align="center">
