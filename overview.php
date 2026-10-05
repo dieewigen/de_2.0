@@ -986,7 +986,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
 
                     $ac_belohnung_neu += $rewards[$i][1];
                     //nachricht f�r jede gutschrift hinterlegen
-                    $time = strftime("%Y%m%d%H%M%S");
+                    $time = date("YmdHis");
                     $news = $ov_lang['errungenschaftenbonus'].' ('.$text1.' - '.$ov_lang['stufe'].' '.$ac_akt.'): '.number_format($rewards[$i][1], 0, "", ".").' M';
                     $ac_news[] = array($time, $news);
                 }

@@ -297,14 +297,21 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   $num = mysqli_num_rows($db_daten);
   if($num==1 AND $id>0)die('4');
 
+  //werte so aufbereiten, wie mysql sie ohne strengen sql-modus ohnehin speichert (zahlen ganzzahlig und im
+  //spaltenbereich, texte auf spaltenlänge); mit strengem modus (z. b. nach einem datenbank-update) würde
+  //die kontoanlage sonst mit einem fehler abbrechen
+  $zahl = fn($wert, $max) => min(max(intval($wert), 0), $max);
+  $text = fn($wert, $laenge) => mb_substr((string)$wert, 0, $laenge);
+
   //wenn soweit alles ok ist den account anlegen
   //de_login
   //der Account ist jetzt immer direkt aktiv
   $status=1;
 
-  $sql="INSERT INTO de_login (owner_id, nic, reg_mail, register, last_login, status)
-  VALUES (?, ?, ?, NOW(), NOW(), ?)";
-  mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $spielername, $email, $status]);
+  //last_ip hat keinen standardwert, sie wird beim ersten login gesetzt
+  $sql="INSERT INTO de_login (owner_id, nic, reg_mail, register, last_login, status, last_ip)
+  VALUES (?, ?, ?, NOW(), NOW(), ?, '')";
+  mysqli_execute_query($GLOBALS['dbi'], $sql, [max(0, $id), $text($spielername, 100), $text($email, 100), $status]);
 
   $user_id=mysqli_insert_id($GLOBALS['dbi']);
   
@@ -316,13 +323,14 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
     VALUES (?, ?, 1, 100000, 50000, 's0000000000000000000000000000000000000001000010000000001000010000000000000000000000000000000000000000000000000',
     0, 0, ?, ?, ?, '1;2;3;4;5;6;7','0', ?, ?, ?)";
     
-  mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $spielername, $rasse, $spielername, $rasse, $premium, $patime, $werberid]);
+  mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $text($spielername, 20), intval($rasse), $text($spielername, 20), intval($rasse), $premium, $zahl($patime, 4294967295), $zahl($werberid, 16777215)]);
   //de_user_data fix f�r ekey in der dedv-version
   mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET ekey='100;0;0;0' WHERE user_id=?", [$user_id]);
 
   //de_user_info
   mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_info (user_id, vorname, nachname, strasse, plz, ort, land, telefon, tag, monat, jahr, geschlecht, kommentar, ud_all, ud_sector, ud_ally)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '')", [$user_id, $vorname, $nachname, $strasse, $plz, $ort, $land, $telefon, $tag, $monat, $jahr, $geschl]);
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '')", [$user_id, $text($vorname, 20), $text($nachname, 20), $text($strasse, 30), $zahl($plz, 4294967295),
+    $text($ort, 30), $text($land, 22), $text($telefon, 20), $zahl($tag, 255), $zahl($monat, 255), $zahl($jahr, 16777215), $zahl($geschl, 127)]);
 
   //de_user_fleet
   $fleet_id=$user_id.'-0';
@@ -336,7 +344,7 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
   $fleet_id=$user_id.'-3';
   mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_fleet (user_id) VALUES (?)", [$fleet_id]);
   
-  $time=strftime("%Y%m%d%H%M%S");
+  $time=date("YmdHis");
   //späteinsteigerhilfe, gilt nicht in der ewigen runde
   if($sv_ewige_runde!=1){
     //zuerst schauen wieviel ticks bereits vergangen sind

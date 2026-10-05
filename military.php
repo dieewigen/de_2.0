@@ -740,7 +740,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 
 					//nachricht an den account schicken
 					$entdeckt=1;
-					$time=strftime("%Y%m%d%H%M%S");
+					$time=date("YmdHis");
 					//$uid=mysqli_result($db_daten, 0, "user_id");
 					if ($akttyp==1){$freind=$military_lang['feindliche'];$newsid=51;}
 					else {$freind=$military_lang['verbuendete'];$newsid=53; $ge=$ge+$deftarn;}
@@ -814,7 +814,7 @@ function recall($fleet_id, $sector, $system, $db){
 		}
 
 		if ($entdeckt==1){ //r�ckzugsnachricht schreiben
-			$time=strftime("%Y%m%d%H%M%S");
+			$time=date("YmdHis");
 			$ak=$sector.':'.$system;
 
 			//einheiten z�hlen

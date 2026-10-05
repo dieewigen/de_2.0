@@ -43,7 +43,7 @@ function create_bknachricht(){
 	  	if ($anz>0){//bk-system ist auch besetzt
 			$row = mysqli_fetch_array($db_daten);
 			$uid = $row[0];
-			$time=strftime("%Y%m%d%H%M%S");
+			$time=date("YmdHis");
 			mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 56, ?, ?)", [$uid, $time, $nachricht]);
 			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
 	  	}

@@ -1814,7 +1814,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sells, trad
 $platz=1;
 //$tschnitt=$row["tradescore"]/$row["sells"];
 //$tschnitt=round($schnitt);
-//$time=strftime("%Y%m%d%H%M%S");
+//$time=date("YmdHis");
 while($row = mysqli_fetch_array($result)) //jeder gefundene datensatz wird geprueft
 {
 

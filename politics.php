@@ -444,7 +444,7 @@ if (!empty($joinsec) && $secmoves < $sv_max_secmoves && $secpass != '' && $techs
 
         if ($accanz < $sv_max_user_per_regsector) {
             //es ist noch ein platz frei -> spieler zieht um
-            $time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             //account sperren
             mysqli_execute_query(
                 $GLOBALS['dbi'],
@@ -507,7 +507,7 @@ if (!empty($voteoutcancel) && $system == issectorcommander()) {
         "DELETE FROM de_sector_voteout WHERE sector_id=?",
         [$sector]
     );
-    $time = strftime("%Y%m%d%H%M%S");
+    $time = date("YmdHis");
     //nachrichten an alle spieler schicken
     $db_daten = mysqli_execute_query(
         $GLOBALS['dbi'],
@@ -571,7 +571,7 @@ if (!empty($setvoteout) && ($vspielerwahl == $politics_lang["ja"] || $vspielerwa
             );
             $row1 = mysqli_fetch_array($result1);
             $vsystem = $row1["system"];
-            $time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             //spieler wurde rausgevotet
 
             //gesperrte user und leute im umode kommen direkt in sektor 1
@@ -786,7 +786,7 @@ if (!empty($voteout) && $system == issectorcommander() && $sector > 1) {
                 //rohstoffe vom sektor abziehen
 
                 //nachricht an alle im sektor schicken, dass es ein vote gibt
-                $time = strftime("%Y%m%d%H%M%S");
+                $time = date("YmdHis");
                 $result = mysqli_execute_query(
                     $GLOBALS['dbi'],
                     "SELECT user_id FROM de_user_data WHERE sector = ?",

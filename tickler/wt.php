@@ -1107,14 +1107,14 @@ if ($doetick == 1) {
         //�berpr�fen ob es account im l�sch-umode gibt und diese mit kicken
         $tis = time();
         $datum = date("Y-m-d H:i:s", $tis);
-        $time = strftime("%Y%m%d%H%M%S");
+        $time = date("YmdHis");
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_login SET last_login='0000-00-00 00:00:00' WHERE last_login < ? AND status=3 AND delmode=1", [$datum]);
 
 
         //inaktive account suchen
         $tis = time() - (86400 * $sv_inactiv_deldays);
         $datum = date("Y-m-d H:i:s", $tis);
-        $time = strftime("%Y%m%d%H%M%S");
+        $time = date("YmdHis");
 
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_login.user_id, de_login.nic, de_login.reg_mail, de_login.last_login, de_login.status, de_login.delmode, de_user_data.spielername, de_user_data.col, de_user_data.sector, de_user_data.`system` FROM de_login, de_user_data WHERE de_login.last_login < ? AND de_user_data.npc < 1 AND de_user_data.user_id=de_login.user_id", [$datum]);
 

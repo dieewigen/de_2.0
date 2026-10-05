@@ -46,7 +46,7 @@ if ($nachtcron != $time) {
             //die tägliche statistik speichern, alte entfernen
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
-            $zeit = strftime("%Y-%m-%d");
+            $zeit = date("Y-m-d");
             //daten für die userstatistik speichern, inkl. fortschritt (siehe save_daily_user_stat)
             $num = save_daily_user_stat($zeit);
             echo "<br>$num Spieler für die tägliche Statistik gespeichert.<br>";
@@ -211,7 +211,7 @@ function give_sector_bonus()
     //erst nach 2000 ticks
     if ($maxtick >= 2000) {
 
-        $time = strftime("%Y%m%d%H%M%S");
+        $time = date("YmdHis");
 
         $anzwticksprostunde = count($GLOBALS['wts'][12]);
 

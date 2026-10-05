@@ -233,7 +233,7 @@ function doBattleGround($bg)
 
             //DB updaten
             $kb = base64_encode(serialize($fightresult));
-            $time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             for ($p = 0;$p < count($player);$p++) {
                 $uid = $player[$p]['user_id'];
                 //Kampfbericht
@@ -363,7 +363,7 @@ function doBattleGround($bg)
 
             //DB updaten
             $kb = base64_encode(serialize($fightresult));
-            $time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             for ($p = 0;$p < count($player);$p++) {
                 //nur Spieler mit einer Ally erhalten den KB
                 if ($player[$p]['ally_id'] > 0) {

@@ -55,10 +55,9 @@ if ($sw) {
 //trigger auslesen
 $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT lasttick, lastmtick, doetick, domtick, dodelinactiv, dodeloldtrade, trade_active, winid, winticks FROM de_system");
 $row = mysqli_fetch_assoc($result);
-$lwt = $row["lasttick"];
-$lwt = $lwt[0].$lwt[1].$lwt[2].$lwt[3].' - '.$lwt[4].$lwt[5].' - '.$lwt[6].$lwt[7].' - '.$lwt[8].$lwt[9].':'.$lwt[10].$lwt[11];
-$lmt = $row["lastmtick"];
-$lmt = $lmt[0].$lmt[1].$lmt[2].$lmt[3].' - '.$lmt[4].$lmt[5].' - '.$lmt[6].$lmt[7].' - '.$lmt[8].$lmt[9].':'.$lmt[10].$lmt[11];
+//lasttick/lastmtick sind DATETIME-Spalten
+$lwt = $row["lasttick"] ? date('d.m.Y H:i', strtotime($row["lasttick"])) : '-';
+$lmt = $row["lastmtick"] ? date('d.m.Y H:i', strtotime($row["lastmtick"])) : '-';
 $doetick = $row["doetick"];
 $domtick = $row["domtick"];
 $dodelinactiv = $row["dodelinactiv"];

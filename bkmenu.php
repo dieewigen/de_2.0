@@ -233,7 +233,7 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 			if ($numbk!=0){//nachricht an bk schicken
 				$row = mysqli_fetch_assoc($db_daten);
 				$ge=$schiffe;
-				$time=strftime("%Y%m%d%H%M%S");
+				$time=date("YmdHis");
 				$uid=$row["user_id"];
 
 			if ($akttyp==1) $freind=$bkmenu_lang['feindliche'];else $freind=$bkmenu_lang['verbuendete'];
@@ -291,7 +291,7 @@ function recall($ownsector){
 		}
 
 		//r�ckzugsnachricht schreiben
-		$time=strftime("%Y%m%d%H%M%S");
+		$time=date("YmdHis");
 		//einheiten z�hlen
 		$ge=$e2;
 

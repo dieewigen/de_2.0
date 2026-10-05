@@ -910,7 +910,7 @@ if (!hasTech($pt, 9)) {
                     //echo $w.' '.$r;
                     if ($r <= $w) { //sonde wurde entdeckt
                         //nachricht an den account schicken
-                        $time = strftime("%Y%m%d%H%M%S");
+                        $time = date("YmdHis");
                         $textscanner = $secret_lang['diescannerhaben'].$sector.$secret_lang['diescannerhaben2'];
                         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 4, ?, ?)", [$uid, $time, $textscanner]);
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
@@ -1660,7 +1660,7 @@ if (!hasTech($pt, 9)) {
 
 
                             //info an das ziel und ggf. agenten abziehen
-                            $time=strftime("%Y%m%d%H%M%S");
+                            $time=date("YmdHis");
                             if($enttarnt>0){
                                 if($enttarnt>1){
                                     $msg='Bei einem feindlichen Agenteneinsatz von '.$_SESSION['ums_spielername'].' ('.$sector.':'.$system.') wurden '.number_format($enttarnt, 0,",",".").' Agenten enttarnt und arbeiten jetzt als Z&ouml;llner.';
@@ -1708,7 +1708,7 @@ if (!hasTech($pt, 9)) {
                                     echo $emsg;
 
                                     //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
-                                    $time = strftime("%Y%m%d%H%M%S");
+                                    $time = date("YmdHis");
                                     $msg = $secret_lang['erfolgsnachricht_sabotage_kollektoroutput'];
                                     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                     //sabotage counter setzen und dass er nen neue info hat
@@ -1759,7 +1759,7 @@ if (!hasTech($pt, 9)) {
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
-                                        $time = strftime("%Y%m%d%H%M%S");
+                                        $time = date("YmdHis");
                                         $msg = $secret_lang['erfolgsnachricht_sabotage_raumwerft'];
                                         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
@@ -1815,7 +1815,7 @@ if (!hasTech($pt, 9)) {
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
-                                        $time = strftime("%Y%m%d%H%M%S");
+                                        $time = date("YmdHis");
                                         $msg = $secret_lang['erfolgsnachricht_sabotage_verteidigungszentrum'];
                                         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
@@ -1871,7 +1871,7 @@ if (!hasTech($pt, 9)) {
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
-                                        $time = strftime("%Y%m%d%H%M%S");
+                                        $time = date("YmdHis");
                                         $msg = 'Ein Agenteneinsatz hat f&uuml;r Sch&auml;den am Missionssystem gesorgt. Mehr Informationen sind im Geheimdienst abrufbar.';
                                         mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 5, ?, ?)", [$uid, $time, $msg]);
                                         //sabotage counter setzen und dass er nen neue info hat
@@ -1911,7 +1911,7 @@ if (!hasTech($pt, 9)) {
                     //$zagentabz=round($aze/100*rand(8,10));
                     $zagentabz = 0;
 
-                    $time = strftime("%Y%m%d%H%M%S");
+                    $time = date("YmdHis");
                     if ($aze == 0) {
                         $aze = 1;
                     }

@@ -356,7 +356,7 @@ if (isset($_POST['antbut'])) {
             if ($numignore == "0") {
                 if ($rowaktiv['status'] == "1") {
 
-                    $time = strftime("%Y%m%d%H%M%S");
+                    $time = date("YmdHis");
 
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 0)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT into de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text, sender) values (?, ?, ?, ?, ?, ?, ?, ?, 1)", [$uid, $_SESSION['ums_user_id'], $asec, $asys, $_SESSION['ums_spielername'], $time, $betreff, $nachricht]);

@@ -8,7 +8,7 @@ function notifyUser($id, $text, $type)
 {
 	global $newstable;
 	global $userdatatable;
-	 $time=strftime("%Y%m%d%H%M%S");
+	 $time=date("YmdHis");
 	if ($id > 0)
 	{
 		$sql = "INSERT INTO $newstable (user_id, typ, time, text) VALUES (?, ?, ?, ?)";

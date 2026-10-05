@@ -1422,7 +1422,7 @@ for ($c = 0; $c < $z; $c++) {
             }
 
             //news in der db hinterlegen
-            $time = strftime("%Y%m%d%H%M%S");
+            $time = date("YmdHis");
             mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')");
             mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = $uid");
         }
@@ -1578,7 +1578,7 @@ for ($c = 0; $c < $z; $c++) {
 
 
                 //kopfgeldinfo an den angreifer
-                $time = strftime("%Y%m%d%H%M%S");
+                $time = date("YmdHis");
                 //$nachricht.='<div style="color: #FF0000; font-weight: bold;">Achtung: Dies ist ein Test, die Rohstoffe werden nicht gutgeschrieben. Bitte die Werte kontrollieren, ob sie stimmen.</div><br>';
                 $nachricht = 'Auf das Ziel ausgesetztes Kopfgeld: '.number_format($kg[0], 0, "", ".").' M -- '.number_format($kg[1], 0, "", ".").
                 ' D -- '.number_format($kg[2], 0, "", ".").' I -- '.number_format($kg[3], 0, "", ".").' E';
@@ -1836,7 +1836,7 @@ for ($c = 0; $c < $z; $c++) {
 
     //hier f�ngt die schleife f�r die spieler an um den kb zu speichern
 
-    $time = strftime("%Y%m%d%H%M%S");
+    $time = date("YmdHis");
     //////////////////////////////////////////////////////
     //zuerst die angreifer
     //////////////////////////////////////////////////////
@@ -1915,7 +1915,7 @@ for ($c = 0; $c < $z; $c++) {
                     $br_m_res=$atter_sk[$i]*1000000;
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp01=restyp01+".$br_m_res." WHERE user_id = '$uid'",$db);
                     //nachricht an den account
-                    $time=strftime("%Y%m%d%H%M%S");
+                    $time=date("YmdHis");
                     $text='Battleround-Multiplex-Bonus f&uuml;r eroberte Kollektoren: '.number_format($br_m_res, 0, ",",".");
                     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 60,'$time','$text')",$db);
 
@@ -2444,7 +2444,7 @@ for ($c = 0; $c < $z; $c++) {
     if ($sv_oscar == 1) {
         $nachricht = $kt_lang['recyclotronertrag'].': alle verlorenen Schiffe/T&uuml;rme';
 
-        $time = strftime("%Y%m%d%H%M%S");
+        $time = date("YmdHis");
         $hv = explode("-", $d_userdata[0][0]);
         $uid = $hv[0];
 
@@ -2452,7 +2452,7 @@ for ($c = 0; $c < $z; $c++) {
     }
 
     if ($rec == 1) {
-        $time = strftime("%Y%m%d%H%M%S");
+        $time = date("YmdHis");
         $hv = explode("-", $d_userdata[0][0]);
         $uid = $hv[0]; //so stellt man die user_id der flotte fest, einfach splitten
 

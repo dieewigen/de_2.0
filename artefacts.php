@@ -458,7 +458,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
 
                 $zuid=$atter[$w]['user_id'];
                 $zspielername=$atter[$w]['spielername'];
-                $time=strftime("%Y%m%d%H%M%S");
+                $time=date("YmdHis");
 
                 //dem ziel den kollektor entfernen
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET col=col-1, newnews=1, wurdegeruesselt=wurdegeruesselt+1 WHERE user_id=?", [$zuid]);
