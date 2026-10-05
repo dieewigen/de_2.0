@@ -4744,6 +4744,14 @@ CREATE TABLE `de_user_stat` (
   `h23` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Fortschritt je Tag für die Auswertung, wo Spieler vor dem Aufhören stehen bleiben (tickler/wt_cron.php, save_daily_user_stat).
+-- NULL = nicht erfasst (ältere Zeilen bzw. Server, die den Code noch nicht haben). helperprogress nur bei eingeschaltetem Berater.
+ALTER TABLE `de_user_stat`
+  ADD `techs` SMALLINT UNSIGNED NULL DEFAULT NULL AFTER `cybexp`,
+  ADD `sector` INT NULL DEFAULT NULL AFTER `techs`,
+  ADD `ally` TINYINT UNSIGNED NULL DEFAULT NULL AFTER `sector`,
+  ADD `helperprogress` SMALLINT UNSIGNED NULL DEFAULT NULL AFTER `ally`;
+
 -- --------------------------------------------------------
 
 --

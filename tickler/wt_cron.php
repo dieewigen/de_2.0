@@ -47,16 +47,9 @@ if ($nachtcron != $time) {
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
             $zeit = strftime("%Y-%m-%d");
-            //daten für die userstatistik speichern
-            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, score, col FROM de_user_data WHERE npc=0", []);
-            echo "<br>$num Spieler für die tägliche Statistik geladen.<br>";
-            while ($row = mysqli_fetch_array($db_daten)) {
-                $uid = $row["user_id"];
-                $score = $row["score"];
-                $col = $row["col"];
-
-                mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_stat SET user_id=?, datum=?, score=?, col=?", [$uid, $zeit, $score, $col]);
-            }
+            //daten für die userstatistik speichern, inkl. fortschritt (siehe save_daily_user_stat)
+            $num = save_daily_user_stat($zeit);
+            echo "<br>$num Spieler für die tägliche Statistik gespeichert.<br>";
 
             //maximal 1 Jahr speichern
 
@@ -311,6 +304,44 @@ function give_sector_bonus()
         }
     }
 }
+/**
+ * Tägliche Spielerstatistik speichern: Punkte und Kollektoren, dazu der Fortschritt (fertige Technologien,
+ * Sektor, Allianz, Schritt bei Fluxurion). Damit lässt sich auswerten, wo Spieler vor dem Aufhören stehen
+ * bleiben, auch Stammspieler nach einem Rundenreset. Solange die Spalten noch fehlen (Schema aus de.sql nicht
+ * eingespielt), wird wie bisher nur Punkte und Kollektoren gespeichert.
+ */
+function save_daily_user_stat($zeit)
+{
+    $res = mysqli_query($GLOBALS['dbi'], "SHOW COLUMNS FROM de_user_stat LIKE 'techs'");
+    $mit_fortschritt = mysqli_num_rows($res) > 0;
+
+    //fertige Technologien aller Spieler in einer Abfrage
+    $techs_fertig = array();
+    if ($mit_fortschritt) {
+        $db_techs = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, COUNT(*) AS anzahl FROM de_user_techs WHERE time_finished<=? GROUP BY user_id", [time()]);
+        while ($row = mysqli_fetch_assoc($db_techs)) {
+            $techs_fertig[$row['user_id']] = (int)$row['anzahl'];
+        }
+    }
+
+    $anzahl = 0;
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, score, col, sector, status, allytag, helper, helperprogress FROM de_user_data WHERE npc=0", []);
+    while ($row = mysqli_fetch_assoc($db_daten)) {
+        if ($mit_fortschritt) {
+            $ally = ($row['status'] == 1 && $row['allytag'] != '') ? 1 : 0;
+            //Schritt bei Fluxurion nur bei eingeschaltetem Berater, sonst NULL (Stammspieler nutzen ihn kaum)
+            $helperprogress = ($row['helper'] == 1) ? $row['helperprogress'] : null;
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_stat SET user_id=?, datum=?, score=?, col=?, techs=?, sector=?, ally=?, helperprogress=?",
+                [$row['user_id'], $zeit, $row['score'], $row['col'], $techs_fertig[$row['user_id']] ?? 0, $row['sector'], $ally, $helperprogress]);
+        } else {
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_stat SET user_id=?, datum=?, score=?, col=?", [$row['user_id'], $zeit, $row['score'], $row['col']]);
+        }
+        $anzahl++;
+    }
+
+    return $anzahl;
+}
+
 function remove_sm_rboost_br()
 {
     global $db, $sv_ewige_runde, $sv_hardcore;
