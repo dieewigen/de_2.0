@@ -124,3 +124,35 @@ function showHiddenInfo(id){
   $('#hidden_info'+id).css('display', 'block');
   $('#hidden_show'+id).css('display', 'none');
 }
+
+// Zwei-Klick-Bestätigung für Links mit data-bestaetigen="Text" (z. B. Auktionen, Artefakte) statt confirm():
+// der erste Klick zeigt den Text und färbt den Knopf um, der zweite Klick (auch als Doppelklick) führt den Link aus,
+// nach 4 Sekunden ohne zweiten Klick geht der Knopf zurück
+(function(){
+  var bereit = null, text = '', uhr = null;
+  function zurueck(){
+    if(bereit){
+      bereit.classList.remove('mod-btn-bereit');
+      bereit.innerHTML = text;
+      bereit = null;
+    }
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-bestaetigen]') : null;
+    if(!b){
+      return;
+    }
+    if(bereit === b){
+      b.classList.add('mod-btn-laeuft');
+      return;
+    }
+    e.preventDefault();
+    zurueck();
+    bereit = b;
+    text = b.innerHTML;
+    b.classList.add('mod-btn-bereit');
+    b.textContent = b.getAttribute('data-bestaetigen');
+    clearTimeout(uhr);
+    uhr = setTimeout(zurueck, 4000);
+  });
+})();

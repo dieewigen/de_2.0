@@ -128,7 +128,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
                 $errmsg .= '<span class="ccr">Du hast kein Artefakte dieser Art.</span>';
             }
         } else {
-            $errmsg .= '<table width=600><tr><td class="ccr">Dieses Artefakt kann nicht in einem Basisschiff verwendet werden.</span>';
+            $errmsg .= '<span class="ccr">Dieses Artefakt kann nicht in einem Basisschiff verwendet werden.</span>';
         }
 
         //transaktionsende
@@ -687,12 +687,56 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
 include "resline.php";
 
 $artefacts = array();
+$flotten = array();
 
-if (isset($errmsg) && $errmsg != '') {
-    echo '<div class="info_box">'.$errmsg.'</div><br>';
+//Ergebnis der letzten Aktion; die alten Texte bringen eigene Farben mit, hier zählt nur, ob es ein Fehler war
+$meldung = '';
+if ($errmsg != '') {
+    $meldung_fehler = preg_match('/FF0000|ccr/i', $errmsg);
+    $meldung = '<div class="mod-meldung '.($meldung_fehler ? 'mod-meldung-fehler' : 'mod-meldung-ok').'">'.trim(strip_tags($errmsg)).'</div>';
+}
+
+//Artefaktbild mit Stufenpunkten
+function artefact_kachel($id, $level, $maxlevel, $attribute = '', $klasse = '', $tag = 'div')
+{
+    $punkte = str_repeat('<i class="an"></i>', $level).str_repeat('<i></i>', max(0, $maxlevel - $level));
+    return '<'.$tag.' class="art-kachel'.$klasse.'"'.$attribute.'><img src="gp/g/arte'.$id.'.gif" alt=""><span class="art-pips">'.$punkte.'</span></'.$tag.'>';
+}
+
+//Bonuswerte je Stufe, leer bei Artefakten ohne Stufenbonus
+function artefact_boni($id)
+{
+    global $ua_werte;
+    $boni = array();
+    foreach ($ua_werte[$id - 1] ?? array() as $werte) {
+        if ($werte[0] > 0) {
+            $boni[] = $werte[0];
+        }
+    }
+    return $boni;
+}
+
+//Tooltip: Name, Beschreibung, Bonus je Stufe mit der aktuellen Stufe hervorgehoben
+function artefact_tooltip($id, $level)
+{
+    global $ua_name, $ua_desc, $artefacts_lang;
+    $title = $ua_name[$id - 1].'&'.$ua_desc[$id - 1];
+    $boni = artefact_boni($id);
+    if (count($boni) > 0) {
+        $title .= '<br>'.$artefacts_lang['bonusderstufe'];
+        foreach ($boni as $i => $wert) {
+            $zeile = ($i + 1).': '.number_format($wert, 2, ",", ".").'%';
+            $title .= '<br>'.($i == $level - 1 ? '<b>'.$zeile.' &#9664;</b>' : $zeile);
+        }
+    }
+    return $title;
 }
 
 if (!hasTech($pt, 28)) {
+    if ($errmsg != '') {
+        echo '<div class="info_box">'.$errmsg.'</div><br>';
+    }
+
     $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=28";
     $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
     $row_techcheck = mysqli_fetch_array($db_tech);
@@ -712,350 +756,313 @@ if (!hasTech($pt, 28)) {
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$_SESSION['ums_user_id']]);
     $gebinbau = mysqli_num_rows($db_daten);
 
-    ////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////
-    //artefakte/gebäude darstellen
-    ////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////
-
-    //rahmen öffnen
-    $title = $artefacts_lang['upinfo'].'&Der Geb&auml;udeausbau erfolgt &uuml;ber das Anklicken der Geb&auml;udegrafik.<br><br>'.$artefacts_lang['upinfo1'].'<br>'.$artefacts_lang['upinfo2'].'<br><br>'.
-    $artefacts_lang['upinfo3'].$tcost1.' Tronic<br>'.
-    $artefacts_lang['upinfo4'].$tcost2.' Tronic<br><br>'.
-    'Das Artefakt kann auch zerst&ouml;rt und in Palenium (100 pro Artefaktstufe) umgewandelt werden.<br><br>'.
-    $artefacts_lang['upinfo5'];
-
+    $plaetze = $artbldglevel + $ally_geb_bonus;
     $palenium = get_storage_amount($_SESSION['ums_user_id'], 1);
 
-    $ueberschrift = '
-	<div style="display: flex;">
-		<div style="width: 145px;"></div>
-		<div style="flex-grow: 1;">'.$artefacts_lang['artefaktgebaeude'].' <img id="info" title="'.$title.'" style="vertical-align: middle; margin-top: -4px;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"></div>
-		<div style="width: 145px; text-align: right;"><img id="info" title="Palenium" style="vertical-align: middle; width: 16px; height: auto; margin-top: -4px;" src="gp/g/item1.png"  class="rounded-borders"> '.number_format($palenium, 0, ",", ".").'&nbsp;</div>
-		
-	</div>
-	';
+    //artefakte aus der db holen
+    $db_artefakte = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$_SESSION['ums_user_id']]);
+    $anz_artefakte = mysqli_num_rows($db_artefakte);
 
-    rahmen_oben($ueberschrift);
+    ////////////////////////////////////////////////////////////////////
+    //Artefaktgebäude
+    ////////////////////////////////////////////////////////////////////
 
-    $cssheight = 143 + (ceil(($artbldglevel + $ally_geb_bonus) / 10) -1) * 70;
-
-    echo '<div class="cell" style="width: 576px; height: '.$cssheight.'px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
-
-    $title = $artefacts_lang['geblevel'].$artbldglevel.'/'.$maxlevel.'&'.$artefacts_lang['geblevel2'];
+    //Ausbau: Knopf mit Kosten, laufender Ausbau, fehlendes Iradium oder Höchststufe
     if ($gebinbau != 0) {
         $row = mysqli_fetch_array($db_daten);
-        //geb�ude wird bereits geupgraded
-        $title .= '<br>'.$artefacts_lang['gebwirdgebaut'].$row["verbzeit"].' WT<br>';
-        $showbldglink = 0;
-    } elseif ($artbldglevel < $maxlevel) {//das geb�ude kann noch weiter ausgebaut werden
-        $title .= '<br>'.$artefacts_lang['kosten'].': '.number_format($ausbaukosten, 0, ",", ".").' Iradium';
-        $title .= '<br>'.$artefacts_lang['upgradedauer'].': '.$ausbauzeit;
-        $title .= '<br><br>Klicken um das Geb&auml;ude auszubauen.';
-        $showbldglink = 1;
-    } else { //das geb�ude ist auf maximum
-        $title .= '<br>'.$artefacts_lang['gebistmax'];
-        $showbldglink = 0;
+        $ausbau = '<div class="mod-feld">Ausbau l&auml;uft<div class="art-klein">noch '.$row["verbzeit"].' WT</div></div>';
+    } elseif ($artbldglevel >= $maxlevel) {
+        $ausbau = '<div class="mod-feld">H&ouml;chststufe erreicht</div>';
+    } elseif ($restyp03 < $ausbaukosten) {
+        $ausbau = '<div class="mod-feld mod-feld-grund">Zu wenig Iradium<div class="art-klein">'.number_format($ausbaukosten, 0, ",", ".").' Iradium n&ouml;tig</div></div>';
+    } else {
+        $ausbau = '<a href="artefacts.php?bupgrade=1" class="mod-btn">Ausbauen</a><div class="art-klein">'.number_format($ausbaukosten, 0, ",", ".").' Iradium &middot; '.$ausbauzeit.' WT</div>';
     }
-    //ally-geb�ude-bonus
+
+    $belegt_title = 'Artefaktpl&auml;tze&'.$artefacts_lang['geblevel2'];
     if ($allyid > 0) {
-        $title .= '<br>Zus&auml;tzliche Artefaktpl&auml;tze durch Allianzprojekte: '.$ally_geb_bonus;
+        $belegt_title .= '<br>Zus&auml;tzliche Artefaktpl&auml;tze durch Allianzprojekte: '.$ally_geb_bonus;
     }
 
-    //Artefaktgebäude
-    echo '<div id="bldginfo" title="'.$title.'" style="position: relative; float: left; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; background-color: #000000;">';
-    if ($showbldglink == 1) {
-        echo '<a href="artefacts.php?bupgrade=1" style="font-size: 10px; color: #FFFFFF">';
-    }
+    rahmen_oben($artefacts_lang['artefaktgebaeude']);
+    echo '<div class="art mod">';
+    echo $meldung;
+    echo '<div class="art-kopf">
+		<img src="gp/g/t/1_28.jpg" class="art-gebaeude" alt="">
+		<div class="art-kopf-text">
+			<div class="mod-typ">Geb&auml;udestufe</div>
+			<div class="art-stufe-gross"><b>'.$artbldglevel.'</b> / '.$maxlevel.'</div>
+			<div class="art-belegt'.($anz_artefakte >= $plaetze ? ' art-belegt-voll' : '').'" rel="tooltip" title="'.$belegt_title.'"><b>'.$anz_artefakte.'</b> von '.$plaetze.' Artefaktpl&auml;tzen belegt</div>
+			<div class="mod-balken"><span style="width: '.($plaetze > 0 ? min(100, round($anz_artefakte / $plaetze * 100)) : 100).'%;"></span></div>
+		</div>
+		<div class="art-ausbau">'.$ausbau.'</div>
+	</div>';
 
-    echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/t/1_28.jpg" width="50px" height="50px" border="0"></span>';
-    echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artbldglevel.'/'.$maxlevel.'</span>';
-    if ($showbldglink == 1) {
-        echo '</a>';
-    }
-    echo '</div>';
+    //Palenium bekommt man beim Zerstören; es steht nicht in der Rohstoffleiste, Tronic schon
+    echo '<div class="art-bestand">
+		<span class="mod-chip"><img src="gp/g/item1.png" alt="">Palenium <b>'.number_format($palenium, 0, ",", ".").'</b></span>
+	</div>';
 
-    //msg-area
-    echo '<div id="msgarea" style="position: relative; padding: 3px; float: left; margin-left: 5.5px; margin-top: 4px; width: 503px; height: 64px; border: 1px solid #333333; background-color: #000000; font-size: 12px;">';
-    echo '</div>';
+    //Aktionsfeld, füllt das Skript unten je nach Auswahl
+    echo '<div class="art-panel" id="art-panel"></div>';
 
-    //artefakte aus der db holen
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? ORDER BY id, level", [$_SESSION['ums_user_id']]);
-    $anz_artefakte = mysqli_num_rows($db_daten);	//artefakte
+    echo '<div class="art-raster">';
     $ac = 0;
-    while ($row = mysqli_fetch_array($db_daten)) {
-        //title/tooltip festlegen
-        $title = $ua_name[$row["id"] - 1].'&'.$ua_desc[$row["id"] - 1];
-        if ($ua_werte[$row["id"] - 1][$row["level"] - 1][0] > 0) {
-            //einleitung
-            $title .= '<br>'.$artefacts_lang['bonusderstufe'];
-            //die einzelnen bonusstufen
-            for ($i = 0;$i < count($ua_werte[$row["id"] - 1]);$i++) {
-                if ($i == $row['level'] - 1) {
-                    $fc[0] = '<font color=#00FF00>';
-                    $fc[1] = '</font>';
-                } else {
-                    $fc[0] = '';
-                    $fc[1] = '';
-                }
-                $title .= '<br>'.$fc[0].($i + 1).': '.number_format($ua_werte[$row["id"] - 1][$i][0], 2, ",", ".").'%'.$fc[1];
-            }
-        }
+    while ($row = mysqli_fetch_array($db_artefakte)) {
+        $id = $row['id'];
+        echo artefact_kachel($id, $row['level'], $ua_maxlvl[$id - 1], ' data-i="'.$ac.'" data-nr="" rel="tooltip" title="'.artefact_tooltip($id, $row['level']).'"');
 
-        echo '
-        <div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">
-            <span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/arte'.$row["id"].'.gif" border="0" alt="'.$ua_name[$row["id"] - 1].'"></span>
-            <span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["level"].'/'.$ua_maxlvl[$row["id"] - 1].'</span>
-        </div>';
-        //daten für json zusammenfassen
-        $artefacts[$ac]['lid'] = $row['lid'];
-        $artefacts[$ac]['id'] = $row['id'];
-        $artefacts[$ac]['level'] = $row['level'];
-        $artefacts[$ac]['maxlevel'] = $ua_maxlvl[$row["id"] - 1];
-        $artefacts[$ac]['useable'] = $ua_useable[$row["id"] - 1] ?? 0;
-        $artefacts[$ac]['bs'] = $ua_bs[$row["id"] - 1] ?? 0;
-        $artefacts[$ac]['select'] = 0;
-
-        //id-counter erhöhen
+        //daten für das Skript
+        $artefacts[$ac] = array(
+            'lid' => (int)$row['lid'],
+            'id' => (int)$id,
+            'level' => (int)$row['level'],
+            'maxlevel' => (int)$ua_maxlvl[$id - 1],
+            'useable' => (int)($ua_useable[$id - 1] ?? 0),
+            'bs' => (int)($ua_bs[$id - 1] ?? 0),
+            'name' => $ua_name[$id - 1],
+            'desc' => $ua_desc[$id - 1],
+            'bonus' => artefact_boni($id),
+        );
         $ac++;
     }
 
-    $title = 'Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
-    for ($i = $ac;$i < $artbldglevel + $ally_geb_bonus;$i++) {
-        echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 51px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-        echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
-        echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$artefacts_lang['frei'].'</span>';
-        echo '</div>';
-        $ac++;
+    for ($i = $ac; $i < $plaetze; $i++) {
+        echo '<div class="art-kachel art-kachel-frei" rel="tooltip" title="Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.">'.$artefacts_lang['frei'].'</div>';
     }
+    echo '</div>';
 
+    //Regeln aufklappbar statt im Tooltip, damit man sie auch auf dem Handy lesen kann
+    echo '<details class="art-regeln">
+		<summary>So funktioniert das Artefaktgeb&auml;ude</summary>
+		<ul>
+			<li>'.$artefacts_lang['geblevel2'].'</li>
+			<li>'.$artefacts_lang['upinfo1'].' Kosten: '.$tcost1.' Tronic.</li>
+			<li>'.$artefacts_lang['upinfo2'].' Kosten: '.$tcost2.' Tronic.</li>
+			<li>Das Artefakt kann auch zerst&ouml;rt und in Palenium (100 pro Artefaktstufe) umgewandelt werden.</li>
+			<li>'.$artefacts_lang['upinfo5'].'</li>
+		</ul>
+	</details>';
     echo '</div>';
     rahmen_unten();
 
-    ///////////////////////////////////////////////////
-    // basisschiffe
-    ///////////////////////////////////////////////////
-    //echo '<br>';
-    $title = 'Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen je nach erforschten Artefaktpl&auml;tzen bis zu 6 Artefakte eingesetzt werden um ihre Wirksamkeit zu verbessern.<br>Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich.';
-    rahmen_oben('<img id="info" title="'.$title.'" style="vertical-align: middle;" src="gp/g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0"> Basisschiffartefakte');
-    echo '<div class="cell" style="width: 576px; height: 300px; top: 0px; position: relative; font-size: 10px; text-align: center;">';
+    ////////////////////////////////////////////////////////////////////
+    //Basisschiffe
+    ////////////////////////////////////////////////////////////////////
+    rahmen_oben('Basisschiffartefakte');
+    echo '<div class="art mod">';
+    echo '<div class="mod-hinweis">Jede Flotte wird von einem Basisschiff angef&uuml;hrt. In diesem k&ouml;nnen je nach erforschten Artefaktpl&auml;tzen bis zu 6 Artefakte eingesetzt werden, um ihre Wirksamkeit zu verbessern. Ein Austausch der Artefakte ist nur im Heimatsystem m&ouml;glich. Ein Klick auf ein eingesetztes Artefakt bringt es zur&uuml;ck ins Artefaktgeb&auml;ude.</div>';
 
-
-    //flottendaten laden
     $fleetnames = array('Heimatflotte', 'Flotte I', 'Flotte II', 'Flotte III');
-    echo '<table style="width: 100%; font-size: 10px;">';
-    //alle 4 flotten durchgehen
-    for ($flotte = 0;$flotte <= 3;$flotte++) {
+    for ($flotte = 0; $flotte <= 3; $flotte++) {
         $fleetid = $_SESSION['ums_user_id'].'-'.$flotte;
         $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
         $row = mysqli_fetch_array($result);
+        $daheim = ($row['aktion'] == 0);
 
-        echo '<tr>';
-
-        //flottenbezeichnung
-        echo '<td>';
-        echo $fleetnames[$flotte];
-        echo '</td>';
-
-
-        //alle artefakte der flotte durchgehen
-        for ($artplace = 1;$artplace <= 6;$artplace++) {
-            echo '<td style="font-size: 10px;">';
-            //title/tooltip festlegen
-
-            //if($ua_werte[$row["artid".$artplace]-1][$row["artlvl".$artplace]-1][0]>0){
-            if (!empty($ua_name[$row["artid".$artplace] - 1])) {
-                $title = $ua_name[$row["artid".$artplace] - 1].'&'.$ua_desc[$row["artid".$artplace] - 1];
-                //einleitung
-                $title .= '<br>'.$artefacts_lang['bonusderstufe'];
-                //die einzelnen bonusstufen
-                for ($i = 0;$i < count($ua_werte[$row["artid".$artplace] - 1]);$i++) {
-                    if ($i == $row['artlvl'.$artplace] - 1) {
-                        $fc[0] = '<font color=#00FF00>';
-                        $fc[1] = '</font>';
-                    } else {
-                        $fc[0] = '';
-                        $fc[1] = '';
-                    }
-                    $title .= '<br>'.$fc[0].($i + 1).': '.number_format($ua_werte[$row["artid".$artplace] - 1][$i][0], 2, ",", ".").'%'.$fc[1];
-                }
-                $title .= '<br><br>Anklicken um das Artefakt ins Artefaktgeb&auml;ude zu transferieren.';
-
-                //if(isset($ua_werte[$row["id"]-1][$row["level"]][0]))$title.='<br>'.$artefacts_lang['upinfo6'].number_format($ua_werte[$row["id"]-1][$row["level"]][0], 2,",",".").'%';
-                echo '<a href="artefacts.php?a=2&fid='.($flotte + 1).'&id='.$artplace.'" style="font-size: 10px; color: #FFFFFF;">';
-                echo '<div id="ac'.$ac.'" title="'.$title.'" onClick="ca(\'ac'.$ac.'\')" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000; cursor: pointer;">';
-                echo '<span style="position: absolute; left: 0px; top: 0px;"><img src="gp/g/arte'.$row["artid".$artplace].'.gif" border="0" alt="'.$ua_name[$row["artid".$artplace] - 1].'"></span>';
-                echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$row["artlvl".$artplace].'/'.$ua_maxlvl[$row["artid".$artplace] - 1].'</span>';
-                echo '</div>';
-                echo '</a>';
-                //daten f�r json zusammenfassen
-                /*
-                $artefacts[$ac]['lid']=$row['lid'];
-                $artefacts[$ac]['id']=$row['id'];
-                $artefacts[$ac]['level']=$row['level'];
-                $artefacts[$ac]['maxlevel']=$ua_maxlvl[$row["id"]-1];
-                $artefacts[$ac]['useable']=$ua_useable[$row["id"]-1];
-                $artefacts[$ac]['select']=0;
-                */
-            } else { //nicht erforschter/leerer platz
-                if ($artplace == 1) {
-                    $need_tech_id = 133;
-                } elseif ($artplace == 2) {
-                    $need_tech_id = 134;
-                } elseif ($artplace == 3) {
-                    $need_tech_id = 135;
-                } elseif ($artplace == 4) {
-                    $need_tech_id = 136;
-                } elseif ($artplace == 5) {
-                    $need_tech_id = 137;
-                } elseif ($artplace == 6) {
-                    $need_tech_id = 138;
-                }
-
-                if (hasTech($pt, $need_tech_id)) {
-                    $title = 'Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.';
-                    $bezeichnung = 'frei';
-                    $onclick = 'onClick="ca(\'ac'.$ac.'\')"';
+        $frei = 0;
+        $plaetze_html = '';
+        for ($artplace = 1; $artplace <= 6; $artplace++) {
+            $artid = $row['artid'.$artplace];
+            $artlvl = $row['artlvl'.$artplace];
+            if ($artid > 0 && !empty($ua_name[$artid - 1])) {
+                $tooltip = artefact_tooltip($artid, $artlvl);
+                if ($daheim) {
+                    $plaetze_html .= artefact_kachel($artid, $artlvl, $ua_maxlvl[$artid - 1], ' href="artefacts.php?a=2&fid='.($flotte + 1).'&id='.$artplace.'" rel="tooltip" title="'.$tooltip.'<br><br>Anklicken, um das Artefakt ins Artefaktgeb&auml;ude zu transferieren."', ' art-kachel-zurueck', 'a');
                 } else {
-                    $title = 'Fehlende Technologie&Diese Technologie muss erst noch erschlossen werden.';
-                    $bezeichnung = 'N/A';
-                    $onclick = '';
+                    $plaetze_html .= artefact_kachel($artid, $artlvl, $ua_maxlvl[$artid - 1], ' rel="tooltip" title="'.$tooltip.'<br><br>Die Flotte ist im Einsatz, ein Austausch ist nur im Heimatsystem m&ouml;glich."');
                 }
-                echo '<div id="ac'.$ac.'" title="'.$title.'" '.$onclick.' style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-                echo '<span style="position: absolute; left: 0px; top: 0px;">&nbsp;</span>';
-                echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$bezeichnung.'</span>';
-                echo '</div>';
+            } elseif (hasTech($pt, 132 + $artplace)) {
+                //Artefaktplätze 1-6 brauchen die Technologien 133-138
+                $frei++;
+                $plaetze_html .= '<div class="art-kachel art-kachel-frei" rel="tooltip" title="Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.">frei</div>';
+            } else {
+                $plaetze_html .= '<div class="art-kachel art-kachel-gesperrt" rel="tooltip" title="Fehlende Technologie&Diese Technologie muss erst noch erschlossen werden.">gesperrt</div>';
             }
-            echo '</td>';
         }
-        echo '</tr>';
+
+        echo '<div class="art-flotte">
+			<div class="art-flotte-name">'.$fleetnames[$flotte].'<span class="mod-chip'.($daheim ? '' : ' mod-chip-warn').'">'.($daheim ? 'im Heimatsystem' : 'im Einsatz').'</span></div>
+			<div class="art-flotte-plaetze">'.$plaetze_html.'</div>
+		</div>';
+
+        $flotten[] = array('name' => $fleetnames[$flotte], 'daheim' => $daheim, 'frei' => $frei);
     }
-    echo '</table>';
-
-
     echo '</div>';
     rahmen_unten();
 
+    ////////////////////////////////////////////////////////////////////
+    //Übersicht aller Artefakte
+    ////////////////////////////////////////////////////////////////////
     rahmen_oben('Informationen zu den Artefakten');
-    echo '<div class="cell" style="width: 576px; top: 0px; position: relative; font-size: 10px; text-align: left;">';
-    if (isset($_REQUEST['showinfo']) && $_REQUEST['showinfo'] == 1) {
-        echo '<b>Woher bekomme ich Artefakte?</b>
-		<br>- Du kannst diese durch Angriffe auf NPC-Systeme der DX61a23 bekommen.
-		<br>- Es gibt unter Missionen die Möglichkeit Artefakte zu erhalten.
-		<br>- Beim täglichen Allianzgeschenk ist ein Artefakt enthalten.
-		<br><br>
-		<b>Welche Artefakte gibt es?</b>';
-        echo '<table width="100%">';
-        $c1=0;
-        for ($i = 0;$i <= $ua_index;$i++) {
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell1';
-            } else {
-                $c1 = 0;
-                $bg = 'cell';
-            }
-            $ai = $i + 1;
-
-            echo '<tr class="'.$bg.'" align="center">
-    	  <td align="left">
-        	<div style="background-color: #000000; width: 50px; height: 50px;">
-        	<img src="gp/g/arte'.$ai.'.gif" border="0" title="'.$ua_name[$i].'">
-        	</div>
-      	</td>
-      	<td align="left"><u><b>'.$ua_name[$i].'</b></u><br>'.$ua_desc[$i].'</td></tr>';
+    echo '<div class="art mod">';
+    //showinfo=1 öffnet die Übersicht gleich, so funktionieren alte Links weiter
+    echo '<details class="art-lexikon"'.(($_REQUEST['showinfo'] ?? 0) == 1 ? ' open' : '').'>
+		<summary>Alle Artefakte im &Uuml;berblick</summary>
+		<div class="art-woher"><b>Woher bekomme ich Artefakte?</b>
+			<ul>
+				<li>Du kannst diese durch Angriffe auf NPC-Systeme der DX61a23 bekommen.</li>
+				<li>Es gibt unter Missionen die Möglichkeit Artefakte zu erhalten.</li>
+				<li>Beim täglichen Allianzgeschenk ist ein Artefakt enthalten.</li>
+			</ul>
+		</div>';
+    for ($i = 0; $i <= $ua_index; $i++) {
+        $merkmale = '';
+        if (($ua_bs[$i] ?? 0) == 1) {
+            $merkmale .= '<span class="mod-chip">Basisschiff</span>';
         }
-        echo '</table>';
-    } else {
-        echo '<a href="artefacts.php?showinfo=1">Hier klicken um weitere Informationen zu den Artefakten zu erhalten.</a>';
+        if (($ua_useable[$i] ?? 0) == 1) {
+            $merkmale .= '<span class="mod-chip">benutzbar</span>';
+        }
+        if ($ua_maxlvl[$i] > 1) {
+            $merkmale .= '<span class="mod-chip">Stufe 1&ndash;'.$ua_maxlvl[$i].'</span>';
+        }
+
+        $boni = artefact_boni($i + 1);
+        $boni_str = '';
+        if (count($boni) > 0) {
+            $boni_str = '<div class="art-eintrag-werte">Bonus je Stufe: '.implode(' &middot; ', array_map(function ($wert) {
+                return number_format($wert, 2, ",", ".").' %';
+            }, $boni)).'</div>';
+        }
+
+        echo '<div class="art-eintrag">
+			<div class="art-kachel"><img src="gp/g/arte'.($i + 1).'.gif" alt=""></div>
+			<div>
+				<div class="art-eintrag-name">'.$ua_name[$i].$merkmale.'</div>
+				<div>'.$ua_desc[$i].'</div>
+				'.$boni_str.'
+			</div>
+		</div>';
     }
-
-
+    echo '</details>';
     echo '</div>';
     rahmen_unten();
 }
 
 echo '<script>';
-$data = array('a' => $artefacts);
-echo 'var a = '.json_encode($artefacts).';';
+echo 'var artefakte = '.json_encode($artefacts, JSON_HEX_TAG).';';
+echo 'var artInfo = '.json_encode(array('tronic' => (int)$restyp05, 'kosten1' => $tcost1, 'kosten2' => $tcost2, 'flotten' => $flotten), JSON_HEX_TAG).';';
 ?>
 
-function ca(id)
-{
-  
-  aid=id.replace(/ac/g, '');
-  if(a!=null)
-  if(a[aid].select==0)
-  {
-	document.getElementById(id).style.borderColor = "#00FF00";
-	a[aid].select=1;
+//Auswahl im Artefaktgebäude: ein Artefakt benutzen, einsetzen oder zerstören, zwei Artefakte verschmelzen
+(function(){
+  var panel = document.getElementById('art-panel');
+  if(!panel){
+    return;
   }
-  else 
-  {
-	document.getElementById(id).style.borderColor = "#333333";
-	a[aid].select=0;
-  }
-  ca_showmsg();
-}
+  var gewaehlt = [];
 
-function ca_showmsg()
-{
-  var select=0;
-  for(i=0; i<500; i++)
-  {
-    if(a!=null)if(a[i]!=undefined)if(a[i].select==1)select++;
+  function zahl(wert){
+    return wert.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' %';
   }
-  
-  if(select==0)
-  {
-    $('#msgarea').html('<font color="#FFFFFF">Du hast die M&ouml;glichkeit Artefakte zu benutzen, oder sie zu kombinieren um ein neues Artefakt zu erhalten. Klicke dazu das gew&uuml;nschte Artefakt an.<br>Das Geb&auml;ude kannst du mit einem Klick auf die Geb&auml;udegrafik ausbauen.</font>');
-  }
-  else if(select==1)
-  {
-    for(i=0; i<500; i++)
-    {
-      id=i;
-      if(a[i]!=undefined)if(a[i].select==1)break;
-    }
-    
-    if(a[i].useable==1){
-		$('#msgarea').html('<font color="#00FF00">Dieses Artefakt kann benutzt werden.</font><br><a href="artefacts.php?useartefact=1&lid='+a[i].lid+'">Artefakt benutzen</a><br><a style="display: inline-block; margin-top: 10px;" href="artefacts.php?destroyartefact=1&lid='+a[i].lid+'" onclick="return confirm(\'Artefakt vernichten?\')">Artefakt zerst&ouml;ren und in Palenium umwandeln</a>');
-	}
-    else if(a[i].bs==1)
-    {
-		$('#msgarea').html('<font color="#00FF00">Dieses Artefakt kann in einem Basisschiff verwendet werden.</font><br><a href="artefacts.php?a=1&fid=1&id='+(a[i].id)+'&lvl='+(a[i].level)+'">Heimatflotte</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="artefacts.php?a=1&fid=2&id='+(a[i].id)+'&lvl='+(a[i].level)+'">Flotte I</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="artefacts.php?a=1&fid=3&id='+(a[i].id)+'&lvl='+(a[i].level)+'">Flotte II</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="artefacts.php?a=1&fid=4&id='+(a[i].id)+'&lvl='+(a[i].level)+'">Flotte III</a><div style="height: 12px;">&nbsp;</div></div><a href="artefacts.php?destroyartefact=1&lid='+a[i].lid+'" onclick="return confirm(\'Artefakt vernichten?\')">Artefakt zerst&ouml;ren und in Palenium umwandeln</a>');
-    }
-    else 
-    $('#msgarea').html('<font color="#FF0000">Dieses Artefakt kann nicht benutzt werden.</font><br><a href="artefacts.php?destroyartefact=1&lid='+a[i].lid+'" onclick="return confirm(\'Artefakt vernichten?\')">Artefakt zerst&ouml;ren und in Palenium umwandeln</a>');
-  }
-  else if(select==2)
-  {
-    for(i=0; i<500; i++)
-    {
-      id1=i;
-      if(a[i]!=undefined)if(a[i].select==1)break;
-    }
-    
-    for(i=0; i<500; i++)
-    {
-      id2=i;
-      if(a[i]!=undefined)if(a[i].select==1 && id1!=id2)break;
-    }    
-    
-    if(a[id1].id!=a[id2].id)$('#msgarea').html('<font color="#00FF00">Diese beiden Artefakte k&ouml;nnen in ein zuf&auml;lliges Artefakt der Stufe 1 verschmolzen werden. Das Zielartefakt wird anderer Art als die Quellartefakte sein.</font><br><a href="artefacts.php?mergeartefacts=1&lid1='+a[id1].lid+'&lid2='+a[id2].lid+'" onclick="return confirm(\'Neues Artefakt erzeugen?\')">neues Artefakt erzeugen</a>');
-    else if(a[id1].level!=a[id2].level)$('#msgarea').html('<font color="#FF0000">Artefakte der gleichen Art, aber mit unterschiedlicher Stufe k&ouml;nnen nicht verschmolzen werden.</font>'); 
-    else if(a[id1].level==a[id1].maxlevel)$('#msgarea').html('<font color="#FF0000">Diese Artefakte befinden sich bereits auf der h&ouml;chsten Stufe.</font>');
-    else
-    $('#msgarea').html('<font color="#00FF00">Diese Artefakte k&ouml;nnen zu einem Artefakt der gleichen Art mit einer h&ouml;heren Stufe verschmolzen werden.</font><br><a href="artefacts.php?mergeartefacts=1&lid1='+a[id1].lid+'&lid2='+a[id2].lid+'">Artefakte fusionieren</a>');
-  }
-  else if(select>2)
-  {
-    $('#msgarea').html('<font color="#FF0000">Es k&ouml;nnen nicht mehr als 2 Artefakte kombiniert werden.</font>');  
-  }  
-}
 
-ca_showmsg();
+  function kachel(x, stufe){
+    var punkte = '';
+    for(var s = 1; s <= x.maxlevel; s++){
+      punkte += '<i' + (s <= stufe ? ' class="an"' : '') + '></i>';
+    }
+    return '<div class="art-kachel"><img src="gp/g/arte' + x.id + '.gif" alt=""><span class="art-pips">' + punkte + '</span></div>';
+  }
 
+  function bonus(x, stufe){
+    return x.bonus.length >= stufe ? zahl(x.bonus[stufe - 1]) : '';
+  }
+
+  //bestaetigen: Text nach dem ersten Klick, ausgeführt wird erst beim zweiten (siehe de_fn.js)
+  function knopf(href, text, bestaetigen, gefahr){
+    return '<a class="mod-btn' + (gefahr ? ' mod-btn-gefahr' : '') + '" href="' + href + '"'
+      + (bestaetigen ? ' data-bestaetigen="' + bestaetigen + '"' : '') + '>' + text + '</a>';
+  }
+
+  function grund(text){
+    return '<span class="mod-feld mod-feld-grund">' + text + '</span>';
+  }
+
+  function zeige(){
+    document.querySelectorAll('.art-raster .art-kachel[data-i]').forEach(function(k){
+      var pos = gewaehlt.indexOf(parseInt(k.getAttribute('data-i'), 10));
+      k.classList.toggle('art-gewaehlt', pos >= 0);
+      k.setAttribute('data-nr', pos >= 0 ? pos + 1 : '');
+    });
+
+    if(gewaehlt.length == 0){
+      panel.innerHTML = '<div class="art-panel-leer">Tippe ein Artefakt an, um es zu benutzen, in ein Basisschiff zu setzen oder zu zerstören. Wähle zwei Artefakte aus, um sie zu verschmelzen.</div>';
+      return;
+    }
+    if(gewaehlt.length > 2){
+      panel.innerHTML = '<div class="art-wahl-fehler">Es können nicht mehr als 2 Artefakte kombiniert werden.</div>';
+      return;
+    }
+
+    var x = artefakte[gewaehlt[0]], html = '', knoepfe = '';
+
+    if(gewaehlt.length == 1){
+      var b = bonus(x, x.level), wirkung = '';
+      if(x.useable == 1){
+        knoepfe += knopf('artefacts.php?useartefact=1&lid=' + x.lid, 'Benutzen');
+      }else if(x.bs == 1){
+        artInfo.flotten.forEach(function(f, i){
+          if(f.daheim && f.frei > 0){
+            knoepfe += knopf('artefacts.php?a=1&fid=' + (i + 1) + '&id=' + x.id + '&lvl=' + x.level, 'In ' + f.name);
+          }else{
+            knoepfe += grund(f.name + ': ' + (f.daheim ? 'kein Platz frei' : 'im Einsatz'));
+          }
+        });
+      }else{
+        wirkung = '<div class="art-wahl-desc">Dieses Artefakt wirkt, solange es im Artefaktgebäude liegt.</div>';
+      }
+      knoepfe += knopf('artefacts.php?destroyartefact=1&lid=' + x.lid, 'Zerstören · +' + (100 * x.level) + ' Palenium', 'Wirklich zerstören?', true);
+
+      html = '<div class="art-wahl">' + kachel(x, x.level)
+        + '<div class="art-wahl-text"><div class="mod-typ">Artefakt · Stufe ' + x.level + ' von ' + x.maxlevel + '</div>'
+        + '<div class="art-wahl-name">' + x.name + '</div>'
+        + '<div class="art-wahl-desc">' + x.desc + (b ? ' Bonus dieser Stufe: <b>' + b + '</b>' : '') + '</div>'
+        + wirkung + '</div></div>';
+    }else{
+      var y = artefakte[gewaehlt[1]], kosten = 0, text = '', ziel = '';
+      if(x.id != y.id){
+        text = 'Diese beiden Artefakte können in ein zufälliges Artefakt der Stufe 1 verschmolzen werden. Das Zielartefakt wird anderer Art als die Quellartefakte sein.';
+        ziel = '<div class="art-kachel art-kachel-frei">?</div>';
+        kosten = artInfo.kosten2;
+        knoepfe = knopf('artefacts.php?mergeartefacts=1&lid1=' + x.lid + '&lid2=' + y.lid, 'Neues Artefakt erzeugen · ' + kosten + ' Tronic', 'Wirklich verschmelzen?');
+      }else if(x.level != y.level){
+        text = '<span class="art-wahl-fehler">Artefakte der gleichen Art, aber mit unterschiedlicher Stufe können nicht verschmolzen werden.</span>';
+      }else if(x.level >= x.maxlevel){
+        text = '<span class="art-wahl-fehler">Diese Artefakte befinden sich bereits auf der höchsten Stufe.</span>';
+      }else{
+        var b1 = bonus(x, x.level), b2 = bonus(x, x.level + 1);
+        text = 'Diese Artefakte können zu einem Artefakt der gleichen Art mit einer höheren Stufe verschmolzen werden.'
+          + (b2 ? ' Bonus: 2 × ' + b1 + ' → <b>' + b2 + '</b>' : '');
+        ziel = kachel(x, x.level + 1);
+        kosten = artInfo.kosten1;
+        knoepfe = knopf('artefacts.php?mergeartefacts=1&lid1=' + x.lid + '&lid2=' + y.lid, 'Verschmelzen · ' + kosten + ' Tronic');
+      }
+      if(kosten > artInfo.tronic){
+        knoepfe = grund('Zu wenig Tronic (' + kosten + ' nötig)');
+      }
+      html = '<div class="art-wahl">' + kachel(x, x.level) + '<span class="art-plus">+</span>' + kachel(y, y.level)
+        + (ziel ? '<span class="art-plus">→</span>' + ziel : '')
+        + '<div class="art-wahl-desc">' + text + '</div></div>';
+    }
+
+    panel.innerHTML = html + (knoepfe ? '<div class="art-knoepfe">' + knoepfe + '</div>' : '');
+  }
+
+  document.querySelectorAll('.art-raster .art-kachel[data-i]').forEach(function(k){
+    k.addEventListener('click', function(){
+      var i = parseInt(k.getAttribute('data-i'), 10), pos = gewaehlt.indexOf(i);
+      if(pos >= 0){
+        gewaehlt.splice(pos, 1);
+      }else{
+        gewaehlt.push(i);
+      }
+      zeige();
+    });
+  });
+
+  zeige();
+})();
 </script>
 </body>
 </html>

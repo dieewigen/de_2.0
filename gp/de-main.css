@@ -1213,6 +1213,783 @@ a.btn:visited {
   color: #aaaaaa;
 }
 
+:root {
+  --akzent: #3399FF;
+  --akzent-weich: rgba(51, 153, 255, 0.16);
+  --akzent-mittel: rgba(51, 153, 255, 0.35);
+}
+
+body.theme-rasse1 {
+  --akzent: #3399FF;
+  --akzent-weich: rgba(51, 153, 255, 0.16);
+  --akzent-mittel: rgba(51, 153, 255, 0.35);
+}
+
+body.theme-rasse2 {
+  --akzent: #A6A6A6;
+  --akzent-weich: rgba(166, 166, 166, 0.16);
+  --akzent-mittel: rgba(166, 166, 166, 0.35);
+}
+
+body.theme-rasse3 {
+  --akzent: #DE3939;
+  --akzent-weich: rgba(222, 57, 57, 0.16);
+  --akzent-mittel: rgba(222, 57, 57, 0.35);
+}
+
+body.theme-rasse4 {
+  --akzent: #ED951E;
+  --akzent-weich: rgba(237, 149, 30, 0.16);
+  --akzent-mittel: rgba(237, 149, 30, 0.35);
+}
+
+.mod {
+  padding: 10px;
+  text-align: left;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: #c9d1d9;
+  background: rgba(6, 9, 14, 0.9);
+}
+
+.mod-hinweis {
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-left: 3px solid var(--akzent);
+  border-radius: 0 6px 6px 0;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  color: #9da7b1;
+}
+
+.mod-typ {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.mod-chip {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 10px;
+  color: #9da7b1;
+}
+.mod-chip b {
+  font-weight: 700;
+  color: #ffffff;
+}
+.mod-chip img {
+  width: 14px;
+  height: 14px;
+  margin: -2px 3px 0 -2px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.mod-chip-gruen {
+  background: rgba(62, 207, 106, 0.14);
+  color: #5fe08a;
+}
+
+.mod-chip-warn {
+  background: rgba(255, 170, 60, 0.14);
+  color: #ffb45c;
+}
+
+.mod-balken {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.mod-balken span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--akzent), #5fe08a);
+}
+
+.mod .mod-btn,
+.mod .mod-btn:link,
+.mod .mod-btn:visited {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid var(--akzent);
+  border-radius: 7px;
+  background: var(--akzent-weich);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.mod .mod-btn:hover {
+  background: var(--akzent-mittel);
+  box-shadow: 0 0 12px var(--akzent-weich);
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.mod .mod-btn-gefahr,
+.mod .mod-btn-gefahr:link,
+.mod .mod-btn-gefahr:visited {
+  border-color: rgba(255, 107, 107, 0.7);
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.mod .mod-btn-gefahr:hover {
+  background: rgba(255, 107, 107, 0.25);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.2);
+}
+
+.mod .mod-btn-bereit,
+.mod .mod-btn-bereit:link,
+.mod .mod-btn-bereit:visited,
+.mod .mod-btn-bereit:hover {
+  border-color: #3ecf6a;
+  background: rgba(62, 207, 106, 0.3);
+  box-shadow: 0 0 12px rgba(62, 207, 106, 0.25);
+}
+
+.mod .mod-btn-gefahr.mod-btn-bereit,
+.mod .mod-btn-gefahr.mod-btn-bereit:hover {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.35);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.3);
+}
+
+.mod .mod-btn-laeuft {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.mod-feld {
+  display: inline-block;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  color: #9da7b1;
+}
+
+.mod-feld-grund {
+  border: 1px dashed rgba(255, 107, 107, 0.45);
+  color: #ff8a8a;
+}
+
+.mod-feld-ok {
+  border-color: rgba(62, 207, 106, 0.6);
+  background: rgba(62, 207, 106, 0.15);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #5fe08a;
+}
+
+.mod-meldung {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+
+.mod-meldung-ok {
+  background: rgba(62, 207, 106, 0.15);
+  color: #5fe08a;
+}
+
+.mod-meldung-fehler {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff8a8a;
+}
+
+.mod-leer {
+  padding: 24px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.mod .mod-leer a,
+.mod .mod-leer a:link,
+.mod .mod-leer a:visited {
+  font-size: 12px;
+}
+
+.auk {
+  width: 572px;
+}
+
+.auk-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.auk-kopf-zahl {
+  font-size: 13px;
+  color: #8b949e;
+}
+.auk-kopf-zahl b {
+  margin-right: 2px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.auk-plaetze {
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  font-size: 11px;
+  color: #8b949e;
+}
+.auk-plaetze b {
+  margin-left: 4px;
+  color: #ffffff;
+}
+
+.auk-plaetze-voll {
+  border-color: rgba(255, 107, 107, 0.5);
+}
+.auk-plaetze-voll b {
+  color: #ff6b6b;
+}
+
+.auk-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auk-karte {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.auk-karte:hover {
+  border-color: var(--akzent-mittel);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.auk-gekauft,
+.auk-gekauft:hover {
+  border-color: rgba(62, 207, 106, 0.6);
+  box-shadow: inset 0 0 24px rgba(62, 207, 106, 0.12);
+}
+
+.auk-ware {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  min-width: 0;
+}
+
+.auk-bild {
+  position: relative;
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01) 70%);
+}
+.auk-bild img {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.auk-artefakt .auk-bild {
+  border-color: rgba(176, 114, 255, 0.45);
+  background: radial-gradient(circle at 50% 45%, rgba(176, 114, 255, 0.35), rgba(176, 114, 255, 0.04) 70%);
+  box-shadow: 0 0 14px rgba(176, 114, 255, 0.18);
+}
+.auk-artefakt .auk-bild img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.auk-menge {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: #0d1117;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: #ffffff;
+}
+
+.auk-ware-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.auk-artefakt .mod-typ {
+  color: #c39bff;
+}
+
+.auk-name {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+
+.auk-info {
+  font-size: 11px;
+  color: #9da7b1;
+}
+
+.auk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.auk-kasse {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.28);
+}
+.auk-kasse .mod-btn,
+.auk-kasse .mod-btn:link,
+.auk-kasse .mod-btn:visited,
+.auk-kasse .mod-feld {
+  display: block;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.auk-preis {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: help;
+}
+.auk-preis img {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.auk-betrag {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.auk-einheit {
+  min-width: 0;
+  font-size: 12px;
+  color: #9da7b1;
+  overflow-wrap: anywhere;
+}
+
+.auk-lager {
+  margin-top: -3px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.auk-fehlt .auk-betrag,
+.auk-fehlt-text {
+  color: #ff6b6b;
+}
+
+.auk-verfall {
+  cursor: help;
+}
+
+.auk-verfall-text {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #8b949e;
+}
+
+.auk-karte .mod-meldung {
+  grid-column: 1/-1;
+  margin: 0;
+  border-radius: 0;
+}
+
+.art {
+  width: 576px;
+}
+
+.art-kopf {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.art-gebaeude {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.art-kopf-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.art-stufe-gross {
+  font-size: 13px;
+  color: #8b949e;
+}
+.art-stufe-gross b {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.art-belegt {
+  font-size: 11px;
+  color: #9da7b1;
+  cursor: help;
+}
+.art-belegt b {
+  color: #ffffff;
+}
+
+.art-belegt-voll b {
+  color: #ff6b6b;
+}
+
+.art-ausbau {
+  flex: 0 0 170px;
+  text-align: center;
+}
+.art-ausbau .mod-btn,
+.art-ausbau .mod-btn:link,
+.art-ausbau .mod-btn:visited,
+.art-ausbau .mod-feld {
+  display: block;
+}
+
+.art-klein {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #8b949e;
+}
+
+.art-bestand {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.art-panel {
+  min-height: 70px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+}
+
+.art-panel-leer {
+  color: #8b949e;
+}
+
+.art-wahl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.art-wahl-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.art-wahl-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.art-wahl-desc {
+  font-size: 11px;
+  color: #9da7b1;
+}
+
+.art-wahl-fehler {
+  color: #ff8a8a;
+}
+
+.art-knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.art-plus {
+  font-size: 18px;
+  color: #8b949e;
+}
+
+.art-raster {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+
+.art-kachel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 74px;
+  border: 1px solid rgba(176, 114, 255, 0.3);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 38%, rgba(176, 114, 255, 0.28), rgba(176, 114, 255, 0.03) 70%);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.art-kachel img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+}
+
+.art-raster .art-kachel[data-i],
+a.art-kachel {
+  cursor: pointer;
+}
+.art-raster .art-kachel[data-i]:hover,
+a.art-kachel:hover {
+  border-color: var(--akzent-mittel);
+  box-shadow: 0 0 12px var(--akzent-weich);
+}
+
+.art-raster .art-gewaehlt,
+.art-raster .art-gewaehlt:hover {
+  border-color: var(--akzent);
+  box-shadow: 0 0 0 1px var(--akzent), 0 0 16px var(--akzent-mittel);
+}
+.art-raster .art-gewaehlt::after,
+.art-raster .art-gewaehlt:hover::after {
+  content: attr(data-nr);
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--akzent);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  color: #000000;
+}
+
+.art-kachel-frei,
+.art-kachel-gesperrt {
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  background: none;
+  font-size: 10px;
+  color: #6e7681;
+}
+
+.art-kachel-gesperrt {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.3);
+  color: #484f58;
+}
+
+.art-pips {
+  display: flex;
+  gap: 3px;
+}
+.art-pips i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+.art-pips i.an {
+  background: #c39bff;
+  box-shadow: 0 0 4px rgba(195, 155, 255, 0.8);
+}
+
+.art-wahl .art-kachel {
+  flex: 0 0 62px;
+}
+
+.art-regeln,
+.art-lexikon {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.art-regeln summary,
+.art-lexikon summary {
+  padding: 4px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #c9d1d9;
+  cursor: pointer;
+}
+.art-regeln ul,
+.art-lexikon ul {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+}
+.art-regeln li,
+.art-lexikon li {
+  margin-bottom: 3px;
+}
+
+.art-lexikon {
+  margin-top: 0;
+}
+
+.art-flotte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.art-flotte + .art-flotte {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.art-flotte-name {
+  flex: 0 0 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.art-flotte-plaetze {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.art-flotte-plaetze .art-kachel {
+  height: 64px;
+}
+.art-flotte-plaetze .art-kachel img {
+  width: 40px;
+  height: 40px;
+}
+
+a.art-kachel-zurueck::after {
+  content: "↩";
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 12px;
+  color: var(--akzent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+a.art-kachel-zurueck:hover::after {
+  opacity: 1;
+}
+
+.art-woher {
+  margin: 6px 0 12px 0;
+}
+
+.art-eintrag {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.art-eintrag .art-kachel {
+  flex: 0 0 56px;
+  height: 56px;
+}
+.art-eintrag .art-kachel img {
+  width: 40px;
+  height: 40px;
+}
+
+.art-eintrag-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.art-eintrag-werte {
+  margin-top: 3px;
+  font-size: 10px;
+  color: #8b949e;
+}
+
 body.mobile {
   height: 100vh;
   height: 100dvh;

@@ -57,6 +57,19 @@ $nachlass = 25;
 
 $tradescore = 10000;
 
+//Bild der Ware mit Tooltip, die Menge steht als Zähler in der Ecke (bei Artefakten nicht)
+function auction_bild($img, $tooltip, $menge = 0)
+{
+    return '<div class="auk-bild" rel="tooltip" title="'.$tooltip.'"><img src="gp/g/'.$img.'" alt="">'
+        .($menge > 0 ? '<span class="auk-menge">'.formatMasseinheit($menge).'</span>' : '').'</div>';
+}
+
+//Prozentwert ohne überflüssige Nachkommastellen
+function auction_prozent($wert)
+{
+    return number_format($wert, (floor($wert) == $wert) ? 0 : 2, ",", ".");
+}
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -95,22 +108,10 @@ if (!hasTech($pt, 4)) {
         $ps = loadPlayerStorage($_SESSION['ums_user_id']);
         $GLOBALS['ps'] = $ps;
 
-        $content .= '<div class="info_box">Nach dem Start der Auktion sinkt 1.000 Wirtschaftsticks lang der Preis. Auktionen, die man selbst gestartet hat, haben einen Nachlass von '.$nachlass.'%.</div><br>';
-
-        //Rahmen oben
-        $content .= rahmen_oben('Auktionen', false);
-        //Auktionen Kopfzeile
-        $content .= '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-        $content .= '
-		<tr class="cell" style="font-weight: bold; text-align: center;">
-			<td>Artikel</td>
-			<td>Preis</td>
-			<td>Aktion</td>
-		</tr>';
-
-        //Handelspunkte
-        $tradesystemscore_str = '<br><span style="font-size: 10px;">+ '.number_format($tradescore, 0, ",", ".").' Handelspunkte</span>';
-
+        //Karten der einzelnen Auktionen, Kopf und Statuszeile kommen nach der Schleife davor
+        $karten = '';
+        $anz_auktionen = 0;
+        $anz_offen = 0;
 
         //die einzelnen Auktionen ausgeben
         $resnamen = array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
@@ -172,18 +173,26 @@ if (!hasTech($pt, 4)) {
             }
 
             //selbst erstellte Auktion?
-            $nachlass_str='';
+            $nachlass_str = '';
+            $nachlass_teile = array();
+            $nachlass_prozent = $creator ? $nachlass + $artbonus_auktion : $artbonus_auktion;
             if ($creator) {
                 $reduzierung_in_prozent = ($nachlass + $artbonus_auktion) / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
-                $nachlass_str = ' &middot; <span style="color: #00FF00;">'.number_format(($nachlass + $artbonus_auktion), 2, ",", ".").' % Preisnachlass</span>';
+                $nachlass_teile[] = 'Eigene Auktion: '.auction_prozent($nachlass).' %';
             } else {
                 $reduzierung_in_prozent = $artbonus_auktion / 100;
                 $amount = ceil($amount - ($amount * $reduzierung_in_prozent));
-                if($reduzierung_in_prozent > 0){
-                    $nachlass_str = ' &middot; <span style="color: #00FF00;">'.number_format($artbonus_auktion, 2, ",", ".").' % Preisnachlass</span>';
-                }
             }
+            if ($artbonus_auktion > 0) {
+                $nachlass_teile[] = $ua_name[21].'-Artefakte: '.auction_prozent($artbonus_auktion).' %';
+            }
+            if ($nachlass_prozent > 0) {
+                $nachlass_str = '<span class="mod-chip mod-chip-gruen" rel="tooltip" title="Preisnachlass&'.implode('<br>', $nachlass_teile).'">&minus;'.auction_prozent($nachlass_prozent).' %'.($creator ? ' eigene Auktion' : '').'</span>';
+            }
+
+            //Startpreis für diesen Spieler (mit Nachlass, ohne Preisverfall)
+            $startpreis = ceil($cost[2] - ($cost[2] * $reduzierung_in_prozent));
 
             switch ($cost[0]) {
                 case 'R': //Standard-Rohstoffe
@@ -197,19 +206,10 @@ if (!hasTech($pt, 4)) {
                         }
                     }
 
-                    //wenn man nicht genug zum bezahlen hat, rot einfärben
-                    $fehlende_res_color = '';
-                    if ($amount > $pd['restyp0'.$cost[1]]) {
-                        $fehlende_res_color = 'color: #ec0011;';
-                    }
-
-
-                    $preis .= '<div style="display: flex;">';
-                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$resnamen[$cost[1] - 1].'<br>Lagerbestand: '.number_format($pd['restyp0'.$cost[1]], 0, ",", ".").'"><img src="gp/g/icon'.$cost[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$resnamen[$cost[1] - 1].'<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
-                    $preis .= '</div>';
-
-
+                    $preis_img = 'icon'.$cost[1].'.png';
+                    $preis_name = $resnamen[$cost[1] - 1];
+                    $preis_lager = $pd['restyp0'.$cost[1]];
+                    $preis_text = formatMasseinheit($amount);
                     break;
                 case 'I': //neue Rohstoffe
                     //bietet man dafür?
@@ -225,12 +225,6 @@ if (!hasTech($pt, 4)) {
                         }
                     }
 
-                    //wenn man nicht genug zum bezahlen hat, rot einfärben
-                    $fehlende_res_color = '';
-                    if ($amount > $ps[$cost[1]]['item_amount']) {
-                        $fehlende_res_color = 'color: #ec0011;';
-                    }
-
                     $filename = 'item'.$cost[1].'.png';
                     //Item 3-10 verwendet die VS-Rohstoffe und dafür verwendet man einfach deren Grafiken
                     if($cost[1]>=3 && $cost[1]<=12){
@@ -239,11 +233,10 @@ if (!hasTech($pt, 4)) {
                         $filename = 'ele'.$nummer.'.gif';
                     }
 
-                    $preis .= '<div style="display: flex;">';
-                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$ps[$cost[1]]['item_name'].'<br>Lagerbestand: '.number_format($ps[$cost[1]]['item_amount'], 0, ",", ".").'"><img src="gp/g/'.$filename.'" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.formatMasseinheit($amount).' '.$ps[$cost[1]]['item_name'].'<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
-                    $preis .= '</div>';
-
+                    $preis_img = $filename;
+                    $preis_name = $ps[$cost[1]]['item_name'];
+                    $preis_lager = $ps[$cost[1]]['item_amount'];
+                    $preis_text = formatMasseinheit($amount);
                     break;
                 case 'C': //Credits
                     //bietet man dafür?
@@ -259,25 +252,38 @@ if (!hasTech($pt, 4)) {
                         }
                     }
 
-                    //wenn man nicht genug zum bezahlen hat, rot einfärben
-                    $fehlende_res_color = '';
-                    if ($amount > $pd['credits']) {
-                        $fehlende_res_color = 'color: #ec0011;';
-                    }
-
-                    $preis .= '<div style="display: flex;">';
-                    $preis .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' Credits<br>Lagerbestand: '.number_format($pd['credits'], 0, ",", ".").'"><img src="gp/g/credits.gif" class="rounded-borders" style="width: 50px; height: auto; margin-top: 11px;"></div>';
-                    $preis .= '<div style="flex-grow: 1; padding-left: 10px; font-size: 18px; height: 100%; padding-top: 8px;'.$fehlende_res_color.'">'.number_format($amount, 0, ",", ".").' Credits<br><span style="font-size: 10px;">Preisverfall: '.number_format(max(0, $reduzierung), 0, ",", ".").' / 1.000 WT'.$nachlass_str.'</span></div>';
-                    $preis .= '</div>';
-
-
+                    $preis_img = 'credits.gif';
+                    $preis_name = 'Credits';
+                    $preis_lager = $pd['credits'];
+                    $preis_text = number_format($amount, 0, ",", ".");
                     break;
             }
+
+            //wenn man nicht genug zum Bezahlen hat, rot einfärben und den Fehlbetrag nennen
+            $preis_fehlt = $amount > $preis_lager;
+            if ($preis_fehlt) {
+                $lager_str = '<span class="auk-fehlt-text">Es fehlen '.formatMasseinheit($amount - $preis_lager).'</span>';
+            } else {
+                $lager_str = 'Lager '.formatMasseinheit($preis_lager);
+            }
+            $preis = '<div class="auk-preis'.($preis_fehlt ? ' auk-fehlt' : '').'" rel="tooltip" title="'.number_format($amount, 0, ",", ".").' '.$preis_name.'&Lagerbestand: '.number_format($preis_lager, 0, ",", ".").'">'
+                .'<img src="gp/g/'.$preis_img.'" alt=""><span class="auk-betrag">'.$preis_text.'</span><span class="auk-einheit">'.$preis_name.'</span></div>'
+                .'<div class="auk-lager">'.$lager_str.'</div>';
+
+            //Preisverfall als Balken; der Startpreis steht im Tooltip
+            $verfall = max(0, $reduzierung);
+            $verfall_str = '<div class="auk-verfall" rel="tooltip" title="Preisverfall&Der Preis sinkt nach dem Start 1.000 WT lang gleichm&auml;&szlig;ig.<br>Bisher: '.number_format($verfall, 0, ",", ".").' / 1.000 WT<br>Startpreis: '.number_format($startpreis, 0, ",", ".").' '.$preis_name.'">'
+                .'<div class="mod-balken"><span style="width: '.($verfall / 10).'%;"></span></div>'
+                .'<div class="auk-verfall-text">'.($verfall >= 1000 ? 'Tiefstpreis erreicht' : 'Preis f&auml;llt noch '.number_format(1000 - $verfall, 0, ",", ".").' WT').'</div>'
+                .'</div>';
 
             ////////////////////////////////////////////////////////////////
             //Belohnung
             ////////////////////////////////////////////////////////////////
             $artikel = '';
+            $artikel_typ = '';
+            $artikel_name = '';
+            $artikel_info = '';
             $amount = $reward[2] ?? 0;
             switch ($reward[0]) {
                 case 'A': //Artefakt
@@ -293,10 +299,11 @@ if (!hasTech($pt, 4)) {
                         $bid_has_all = false;
                     }
 
-                    $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)<br>'.$ua_desc[$artid - 1].'"><img src="'.'gp/'.'g/arte'.$artid.'.gif"></div>';
-                    $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.$ua_name[$reward[1] - 1].$tradesystemscore_str.'</div>';
-                    $artikel .= '</div>';
+                    $artikel = auction_bild('arte'.$artid.'.gif', '1 '.$ua_name[$artid - 1].'-Artefakt (Stufe 1)&'.$ua_desc[$artid - 1]);
+                    $artikel_typ = 'Artefakt &middot; Stufe 1';
+                    $artikel_name = $ua_name[$artid - 1];
+                    //Wirkung direkt anzeigen, auf dem Handy gibt es keinen Tooltip
+                    $artikel_info = $ua_desc[$artid - 1];
                     break;
                 case 'R': //Standard-Rohstoffe
                     //bietet man dafür?
@@ -309,12 +316,9 @@ if (!hasTech($pt, 4)) {
                         }
                     }
 
-                    $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$resnamen[$reward[1] - 1].'"><img src="gp/g/icon'.$reward[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.number_format($reward[2], 0, ",", ".").' '.$resnamen[$reward[1] - 1].$tradesystemscore_str.'</div>';
-                    $artikel .= '</div>';
-
-
+                    $artikel_typ = 'Rohstoff';
+                    $artikel_name = $resnamen[$reward[1] - 1];
+                    $artikel = auction_bild('icon'.$reward[1].'.png', number_format($reward[2], 0, ",", ".").' '.$artikel_name, $reward[2]);
                     break;
                 case 'I': //neue Rohstoffe
                     //bietet man dafür?
@@ -325,11 +329,9 @@ if (!hasTech($pt, 4)) {
                             $bid_has_all = true;
                         }
                     }
-                    $artikel .= '<div style="display: flex;">';
-                    $artikel .= '<div style="width: 50px;" rel="tooltip" title="'.number_format($reward[2], 0, ",", ".").' '.$ps[$reward[1]]['item_name'].'"><img src="gp/g/item'.$reward[1].'.png" class="rounded-borders" style="width: 50px; height: auto;"></div>';
-                    $artikel .= '<div style="flex-grow: 1; padding: 8px 0 0 10px; font-size: 18px; vertical-align: middle;">'.number_format($reward[2], 0, ",", ".").' '.$ps[$reward[1]]['item_name'].$tradesystemscore_str.'</div>';
-                    $artikel .= '</div>';
-
+                    $artikel_typ = 'Ressource';
+                    $artikel_name = $ps[$reward[1]]['item_name'];
+                    $artikel = auction_bild('item'.$reward[1].'.png', number_format($reward[2], 0, ",", ".").' '.$artikel_name, $reward[2]);
                     break;
             }
 
@@ -352,13 +354,24 @@ if (!hasTech($pt, 4)) {
             ////////////////////////////////////////////////////////////////
             //Aktion
             ////////////////////////////////////////////////////////////////
-            $aktion = '<a href="?bid='.$row['id'].'" onclick="return confirm(\'F&uuml;r diesen Artikel bieten?\')">bieten</a>';
-            //nach dem Bieten Aktionsmöglichkeit entfernen und Spielerdaten neu laden
+            $gekauft = ($bid == $row['id'] && $bid_has_all);
+            if ($gekauft) {
+                $aktion = '<div class="mod-feld mod-feld-ok">&#10003; Ersteigert</div>';
+            } elseif ($is_artefact && $free_artefact_places < 1) {
+                $aktion = '<div class="mod-feld mod-feld-grund">Kein freier Artefaktplatz</div>';
+            } elseif ($preis_fehlt) {
+                $aktion = '<div class="mod-feld mod-feld-grund">Zu wenig '.$preis_name.'</div>';
+            } else {
+                //bestätigt wird mit einem zweiten Klick auf den Knopf (data-bestaetigen, siehe js/de_fn.js)
+                $aktion = '<a href="?bid='.$row['id'].'" class="mod-btn" data-bestaetigen="Best&auml;tigen">Bieten</a>';
+            }
+
+            //nach dem Bieten Spielerdaten neu laden
             if ($bid == $row['id']) {
                 if ($bid_has_all) {
-                    $aktion = '';
-
                     //Spielerdaten nach Update neu auslesen
+                    $ps = loadPlayerStorage($_SESSION['ums_user_id']);
+                    $GLOBALS['ps'] = $ps;
                     $pd = loadPlayerData($_SESSION['ums_user_id']);
                     $rowx = $pd;
                     $restyp01 = $rowx['restyp01'];
@@ -383,51 +396,52 @@ if (!hasTech($pt, 4)) {
                 }
             }
 
-            if ($is_artefact && $free_artefact_places < 1) {
-                $aktion = '';
-            }
-
-
             ////////////////////////////////////////////////////////////////
             //Auktion anzeigen
             ////////////////////////////////////////////////////////////////
-            $c1 = 0;
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell1';
-            } else {
-                $c1 = 0;
-                $bg = 'cell';
-            }
-            $content .= '
-			<tr style="text-align: right; vertical-align: middle;">
-				<td class="cell" style="text-align: left;">'.$artikel.'</td>
-				<td class="cell" style="text-align: left;">'.$preis.'</td>
-				<td class="cell" style="text-align: center;">'.$aktion.'</td>
-			</tr>';
-
             //Meldung beim Bieten
+            $meldung = '';
             if ($bid == $row['id']) {
                 if ($bid_has_all) {
-                    $content .= '
-					<tr style="text-align: right;">
-						<td class="cell" colspan="3" style="color: #00FF00;">Die Auktion wurde best&auml;tigt.</td>
-					</tr>';
+                    $meldung = '<div class="mod-meldung mod-meldung-ok">Die Auktion wurde best&auml;tigt.</div>';
                 } else {
-                    $content .= '
-					<tr style="text-align: right;">
-						<td class="cell" colspan="3" style="color: #FF0000;">Du kannst Dir diese Auktion nicht leisten.</td>
-					</tr>';
+                    $meldung = '<div class="mod-meldung mod-meldung-fehler">Du kannst Dir diese Auktion nicht leisten.</div>';
                 }
             }
 
-            //Trenner
-            $content .= '<tr><td class="cell" colspan="3"><div style="border-top: 1px solid #666666; height: 3px;"></div></td></tr>';
+            //links die Ware, rechts Preis, Preisverfall und Knopf
+            $karten .= '
+			<div class="auk-karte'.($is_artefact ? ' auk-artefakt' : '').($gekauft ? ' auk-gekauft' : '').'">
+				<div class="auk-ware">'.$artikel.'
+					<div class="auk-ware-text">
+						<div class="mod-typ">'.$artikel_typ.'</div>
+						<div class="auk-name">'.$artikel_name.'</div>
+						'.($artikel_info != '' ? '<div class="auk-info">'.$artikel_info.'</div>' : '').'
+						<div class="auk-chips">'.$nachlass_str.'<span class="mod-chip">+'.number_format($tradescore, 0, ",", ".").' Handelspunkte</span></div>
+					</div>
+				</div>
+				<div class="auk-kasse">'.$preis.$verfall_str.$aktion.'</div>
+				'.$meldung.'
+			</div>';
+            $anz_auktionen++;
+            if (!$gekauft) {
+                $anz_offen++;
+            }
         }
 
-
-        $content .= '</table>';
-        //Rahmen unten
+        $content .= rahmen_oben('Auktionen', false);
+        $content .= '<div class="auk mod">';
+        $content .= '<div class="auk-kopf">
+			<div class="auk-kopf-zahl"><b>'.$anz_offen.'</b> '.($anz_offen == 1 ? 'offene Auktion' : 'offene Auktionen').'</div>
+			<div class="auk-plaetze'.($free_artefact_places < 1 ? ' auk-plaetze-voll' : '').'">Freie Artefaktpl&auml;tze <b>'.max(0, $free_artefact_places).'</b></div>
+		</div>';
+        $content .= '<div class="mod-hinweis">Nach dem Start der Auktion sinkt 1.000 Wirtschaftsticks lang der Preis. Auktionen, die man selbst gestartet hat, haben einen Nachlass von '.$nachlass.'%.</div>';
+        if ($anz_auktionen > 0) {
+            $content .= '<div class="auk-liste">'.$karten.'</div>';
+        } else {
+            $content .= '<div class="mod-leer">Zurzeit gibt es keine offenen Auktionen.<br>Jeder abgeholte <a href="ally_dailygift.php">Allianzbonus</a> startet eine neue Auktion.</div>';
+        }
+        $content .= '</div>';
         $content .= rahmen_unten(false);
 
         //transaktionsende
