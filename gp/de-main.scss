@@ -1507,6 +1507,11 @@ a.btn:visited {
 	background: rgba(6, 9, 14, 0.9);
 }
 
+// hidden muss gegen display-Angaben der Bausteine gewinnen
+.mod [hidden] {
+	display: none !important;
+}
+
 .mod-hinweis {
 	margin-bottom: 12px;
 	padding: 7px 10px;
@@ -2285,6 +2290,308 @@ a.art-kachel-zurueck:hover::after {
 	margin-top: 3px;
 	font-size: 10px;
 	color: #8b949e;
+}
+
+// Missionen (missions.php)
+.mis {
+	width: 572px;
+}
+
+.mis-leiste {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+// Reiter: Alle, Agenten, Rohstoff-Handel, Waren-Handel
+.mis-tabs {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 10px;
+	padding: 3px;
+	border-radius: 9px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.mis-tab {
+	flex: 1 1 0;
+	padding: 7px 4px;
+	border: 0;
+	border-radius: 7px;
+	background: none;
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 500;
+	color: #9da7b1;
+	cursor: pointer;
+
+	&:hover {
+		color: #ffffff;
+	}
+}
+
+@each $typ in -1, 0, 1, 2 {
+	.mis[data-typ="#{$typ}"] .mis-tab[data-typ="#{$typ}"] {
+		background: var(--akzent-weich);
+		box-shadow: inset 0 0 0 1px var(--akzent);
+		color: #ffffff;
+	}
+}
+
+.mis-filter {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 10px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	select {
+		padding: 4px 8px;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 6px;
+		background: #0d1117;
+		font-family: inherit;
+		font-size: 12px;
+		color: #ffffff;
+	}
+}
+
+// Flottenwahl für Handelsmissionen; bei Agenteneinsätzen ohne Bedeutung
+.mis-flottenwahl {
+	display: grid;
+	grid-template-columns: auto repeat(3, 1fr);
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.mis[data-typ="0"] .mis-flottenwahl {
+	display: none;
+}
+
+.mis-flottenwahl-label {
+	padding-right: 4px;
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.mis-flotte {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	padding: 6px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.03);
+	font-family: inherit;
+	text-align: left;
+	color: #9da7b1;
+	cursor: pointer;
+
+	b {
+		font-size: 12px;
+		color: #ffffff;
+	}
+
+	span {
+		font-size: 10px;
+	}
+
+	&:hover {
+		border-color: var(--akzent-mittel);
+	}
+}
+
+.mis-flotte-aus b {
+	color: #8b949e;
+}
+
+// gewählte Flotte hervorheben und nur ihre Variante jeder Handelsmission zeigen
+.mis-variante {
+	display: none;
+}
+
+@each $flotte in 1, 2, 3 {
+	.mis[data-flotte="#{$flotte}"] .mis-flotte[data-flotte="#{$flotte}"] {
+		border-color: var(--akzent);
+		background: var(--akzent-weich);
+		box-shadow: 0 0 10px var(--akzent-weich);
+	}
+
+	.mis[data-flotte="#{$flotte}"] .mis-variante[data-flotte="#{$flotte}"] {
+		display: block;
+	}
+}
+
+.mis-liste {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.mis-karte {
+	padding: 10px 12px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 10px;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+
+	.mod-meldung {
+		margin: 10px 0 0 0;
+	}
+}
+
+.mis-karte-laeuft {
+	border-color: var(--akzent-mittel);
+}
+
+.mis-karte-fertig {
+	border-color: rgba(62, 207, 106, 0.6);
+	box-shadow: inset 0 0 24px rgba(62, 207, 106, 0.1);
+}
+
+.mis-kopf {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.mis-dauer {
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.mis-karte-laeuft .mis-dauer {
+	color: var(--akzent);
+}
+
+.mis-karte-fertig .mis-dauer {
+	color: #5fe08a;
+}
+
+.mis-zeile {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.mis-tausch {
+	flex: 1 1 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 10px;
+	min-width: 0;
+}
+
+.mis-posten {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	b {
+		font-size: 15px;
+		font-weight: 700;
+		color: #ffffff;
+	}
+}
+
+.mis-bild {
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
+	border-radius: 7px;
+	object-fit: contain;
+}
+
+// zufälliges Artefakt: violett wie auf den Artefakt- und Auktionsseiten
+.mis-bild-artefakt {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid rgba(176, 114, 255, 0.45);
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(176, 114, 255, 0.4), rgba(176, 114, 255, 0.05) 70%);
+	font-size: 16px;
+	font-weight: 700;
+	color: #e2d1ff;
+}
+
+// Ware ohne eigenes Bild
+.mis-bild-ware {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	background: rgba(255, 255, 255, 0.06);
+	font-size: 14px;
+	font-weight: 700;
+	color: #c9d1d9;
+}
+
+.mis-name {
+	font-size: 15px;
+	font-weight: 500;
+	color: #ffffff;
+}
+
+.mis-pfeil {
+	font-size: 18px;
+	color: #8b949e;
+}
+
+.mis-label {
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.mis-aktion {
+	flex: 0 0 130px;
+	text-align: center;
+
+	.mod-btn,
+	.mod-btn:link,
+	.mod-btn:visited,
+	.mod-feld {
+		display: block;
+	}
+}
+
+.mis-fuss {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 10px;
+	margin-top: 8px;
+	font-size: 11px;
+	color: #8b949e;
+
+	b {
+		color: #ffffff;
+	}
+
+	.mod-chip {
+		margin-left: auto;
+	}
+}
+
+.mis-anteil {
+	flex: 0 0 70px;
+}
+
+.mis-rot,
+.mis-rot b {
+	color: #ff6b6b;
+}
+
+.mis-fortschritt {
+	margin-top: 8px;
 }
 
 // Mobile Layout

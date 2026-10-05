@@ -45,6 +45,63 @@ function fk2frachter($fk, $ship_fk){
 	return $frachter;
 }
 
+//Posten einer Belohnung oder Kosten mit Bild und Menge; beim Rohstoff-Handel anteilig zur Frachtkapazität
+function mission_posten($liste, $prozent=100){
+	global $ua_name;
+	$resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
+	$faktor=min($prozent, 100)/100;
+	$html='';
+	foreach($liste as $posten){
+		switch($posten[0]){
+			case 'A':
+				if($posten[1]=='?'){
+					$html.='<span class="mis-posten"><span class="mis-bild mis-bild-artefakt">?</span><span class="mis-name">Zuf&auml;lliges Artefakt</span></span>';
+				}else{
+					$html.='<span class="mis-posten"><img src="gp/g/arte'.$posten[1].'.gif" class="mis-bild mis-bild-artefakt" alt=""><span class="mis-name">'.$ua_name[$posten[1]-1].'</span></span>';
+				}
+			break;
+
+			case 'R':
+				$html.='<span class="mis-posten"><img src="gp/g/icon'.$posten[1].'.png" class="mis-bild" alt=""><span><b>'.number_format(floor($posten[2]*$faktor), 0,"",".").'</b> '.$resnamen[$posten[1]-1].'</span></span>';
+			break;
+
+			case 'I':
+				//nicht jede Ware hat ein Bild, dann den Anfangsbuchstaben zeigen
+				$name=$GLOBALS['ps'][$posten[1]]['item_name'];
+				if(file_exists('gp/g/item'.$posten[1].'.png')){
+					$bild='<img src="gp/g/item'.$posten[1].'.png" class="mis-bild" alt="">';
+				}else{
+					$bild='<span class="mis-bild mis-bild-ware">'.mb_substr($name, 0, 1).'</span>';
+				}
+				$html.='<span class="mis-posten">'.$bild.'<span><b>'.number_format(floor($posten[2]*$faktor), 0,"",".").'</b> '.$name.'</span></span>';
+			break;
+		}
+	}
+	return $html;
+}
+
+//Zeit im selben Format wie der Countdown in ang_fn.js (Tage und Stunden nur, wenn nötig), damit nichts springt
+function mission_uhr($sekunden){
+	$sekunden=max(0, (int)ceil($sekunden));
+	$tage=floor($sekunden/86400);
+	$stunden=floor($sekunden/3600)%24;
+	return ($tage>0 ? $tage.':' : '').($tage>0 || $stunden>0 ? sprintf('%02d:', $stunden) : '').sprintf('%02d:%02d', floor($sekunden/60)%60, $sekunden%60);
+}
+
+//dasselbe als reiner Text für Tooltips
+function mission_text($liste){
+	$resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
+	$teile=array();
+	foreach($liste as $posten){
+		if($posten[0]=='R'){
+			$teile[]=number_format($posten[2], 0,"",".").' '.$resnamen[$posten[1]-1];
+		}elseif($posten[0]=='I'){
+			$teile[]=number_format($posten[2], 0,"",".").' '.$GLOBALS['ps'][$posten[1]]['item_name'];
+		}
+	}
+	return implode(', ', $teile);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
@@ -387,9 +444,8 @@ if(!hasTech($pt,29)){
 		$um[$row['mission_id']]['reward']=unserialize($um[$row['mission_id']]['reward']);
 	}
 
-	//Missionen anzeigen
-	$content.=rahmen_oben('Missionen <img style="margin-bottom: 2px;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br>Eingesetzte Agenten sind während der Mission nicht verfügbar. Nach der Beendiung der Mission werden diese jedoch wieder zurückerstattet.">',false);
-	$content.='<div style="width: 572px;">';
+	//Anzeige-Daten der Missionen, die Karten entstehen nach der Schleife
+	$anzeige=array();
 
 	///////////////////////////////////////////////////////////
 	//die statischen/wiederholbaren Missionen durchgehen
@@ -767,408 +823,307 @@ if(!hasTech($pt,29)){
 
 
 				///////////////////////////////////////////////////////////
-				//JS-Menü um die Missionstypen zu filtern
+				//für die Anzeige merken; die Karten entstehen nach der Schleife,
+				//wenn alle Aktionen verarbeitet sind und Flotten/Agenten aktuell sind
 				///////////////////////////////////////////////////////////
-				if($m==0){
-					//$content.='<div style="color: red;" class="cell">ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.<br><br></div>';
-
-					$content.='
-					<div class="cell">
-						<div style="display: flex; width: 572px; padding-bottom: 10px;">
-							<div style="margin-right: 10px;"><a href="javascript: void(0)" onclick="show_mission(-1)" class="btn">alle</a></div>
-							<div style="margin-right: 10px;"><a href="javascript: void(0)" onclick="show_mission(0)" class="btn">Agenten</a></div>
-							<div style="margin-right: 10px;"><a href="javascript: void(0)" onclick="show_mission(1)" class="btn">R-Handel</a></div>
-							<div style="margin-right: 10px;"><a href="javascript: void(0)" onclick="show_mission(2)" class="btn">W-Handel</a></div>
-						</div>
-						
-						<div id="trade_menu" style="display: none; margin-bottom: 10px;">
-							Ich ben&ouml;tige 
-							<select name="res_need" id="res_need" onchange="javascript: show_mission_trade();">
-								<option value="-1" selected>alles</option>
-								<option value="1">Multiplex</option>
-								<option value="2">Dyharra</option>
-								<option value="3">Iradium</option>
-								<option value="4">Eternium</option>
-							</select>
-						
-							und biete 
-						
-							<select name="res_offer" id="res_offer" onchange="javascript: show_mission_trade();">
-								<option value="-1" selected>alles</option>
-								<option value="1">Multiplex</option>
-								<option value="2">Dyharra</option>
-								<option value="3">Iradium</option>
-								<option value="4">Eternium</option>
-							</select>
-						</div>
-					</div>
-
-					<script>
-						function show_mission(typ){
-
-							if(typ==-1){
-								$(".mission_tag").css("display", "");
-							}
-
-							if(typ==0 || typ==1 || typ==2){
-								$(".mission_tag").css("display", "none");
-								$(".mission_typ"+typ).css("display", "");
-							}
-
-							if(typ==1){
-								$("#trade_menu").css("display", "");
-							}else{
-								$("#trade_menu").css("display", "none");
-							}
-						}
-
-						function show_mission_trade(){
-							var need=$("#res_need").val();
-							var offer=$("#res_offer").val();
-
-							$(".mission_tag").css("display", "none");
-							
-							if(need==-1 && offer==-1){
-								$("[class*=need_res][class*=offer_res]").css("display", "");
-							}
-						
-							if(need==-1 && offer>0){
-								$(".offer_res_"+offer+"[class*=need_res]").css("display", "");
-							}
-
-							if(need>0 && offer==-1){
-								$(".need_res_"+need+"[class*=offer_res]").css("display", "");
-							}						
-
-							if(need>0 && offer>0){
-								$(".need_res_"+need+".offer_res_"+offer).css("display", "");
-							}						
-
-						}
-
-					</script>
-					';
+				$meldung='';
+				if(!empty($err_msg)){
+					$meldung.='<div class="mod-meldung mod-meldung-fehler">'.trim(strip_tags($err_msg)).'</div>';
 				}
-
-				////////////////////////////////////////////////////////////
-				// Missionsliste anzeigen
-				////////////////////////////////////////////////////////////
-				
-				//class-tags für den Handel erstellen
-				if($md[$m]['typ']==1){
-					$trade_class='';
-					
-					for($r=0; $r<count($md[$m]['cost']); $r++){
-						if($md[$m]['cost'][$r][0]=='R'){
-							$trade_class.=' offer_res_'.$md[$m]['cost'][$r][1];
-						}
-					}
-
-					for($r=0; $r<count($md[$m]['reward']); $r++){
-						if($md[$m]['reward'][$r][0]=='R'){
-							$trade_class.=' need_res_'.$md[$m]['reward'][$r][1];
-						}
-					}
-
-				}else{
-					$trade_class='';
+				if(!empty($success_msg)){
+					$meldung.='<div class="mod-meldung mod-meldung-ok">'.preg_replace('/^(\s*<br>)+/i', '', trim(strip_tags($success_msg, '<br>'))).'</div>';
 				}
-
-				$content.='<div class="cell mission_tag mission_typ'.$md[$m]['typ'].$trade_class.'" style="padding-bottom: 10px;">';
-
-				$content.='<div style="height: 0; border: 1px solid #666666; width: 100%; margin-bottom: 10px;"></div>';
-				
-				$content.='Missionstyp: '.$missionstyp;
-				//Mission läuft aktuell
-				if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
-					$content.=' (Dauer: <span id="mission_counter'.$m.'">'.formatTime($md[$m]['time']*$GLOBALS['tech_build_time_faktor']).'</span>)'; 
-				}else{
-					$content.=' (Dauer: <span id="mission_counter'.$m.'"></span>)'; 
-				}
-				$content.='<table style="width: 100%;">';
-
-				
-
-				$belohnung='';
-				$kosten='';
-				$voraussetzung='';
-
-				//werden agenten benötigt?
-				if($md[$m]['need_agents']>0){
-					if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
-						$voraussetzung.=number_format($md[$m]['need_agents'], 0,"",".");
-					}else{
-						//wenn die Mission läuft die Anzahl der Agenten anzeigen, die unterwegs sind
-						$voraussetzung.=number_format($um[$m]['need_agents'], 0,"",".");
-					}
-				}
-
-				//gibt es eine Belohnung
-				if(count($md[$m]['reward'])>0){
-					if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
-						$belohnung.=generateMissionReward($md[$m]['reward']);
-					}else{
-							// Absicherung: Falls einzelne Keys (reward / reward_percentage) im laufenden Missions-Datensatz fehlen,
-							// auf Missions-Definition ($md) bzw. Standard 100% zurückfallen, um PHP-Warnings zu vermeiden.
-							$mission_reward_array = (isset($um[$m]['reward']) && is_array($um[$m]['reward'])) ? $um[$m]['reward'] : (isset($md[$m]['reward']) ? $md[$m]['reward'] : array());
-							$mission_reward_percent = isset($um[$m]['reward_percentage']) ? (int)$um[$m]['reward_percentage'] : 100;
-							$belohnung.=generateMissionReward($mission_reward_array, $mission_reward_percent);
-					}
-				}
-
-				//gibt es Kosten?
-				if(isset($md[$m]['cost']) && is_array($md[$m]['cost']) && count($md[$m]['cost'])>0){
-					if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
-						$kosten.=generateMissionReward($md[$m]['cost']);
-					}else{
-						//$kosten.='';
-					}
-
-					
-				}
-
-				//benötigte Transportkapazität
-				if($storage_capacity>0){
-					$voraussetzung.='Frachter: '.number_format(fk2frachter($storage_capacity, $sv_schiffsdaten[$_SESSION['ums_rasse']-1][8][3]), 0,"",".");
-				}
-
-				if($md[$m]['typ']==1){
-					$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor'];
-					//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';
-					$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
-				}else{
-					$belohnung_tradescore='';
-				}
-
-				//Ausgabe
-				if($md[$m]['typ']==0){//Agentenmission
-					$content.='<tr style="font-weight: bold;"><td style="width: 21%;"></td><td style="width: 39%;">Belohnung</td><td style="width: 40%;" colspan="2">Ben&ouml;tigte/Eingesetzte Agenten</td></tr>';
-					$content.='<tr class="cell1"><td id="agent_mission_link'.$m.'" style="padding: 5px;"></td><td style="vertical-align: top; padding: 5px;">'.$belohnung.$belohnung_tradescore.'</td><td style="vertical-align: top; padding: 5px;" colspan="2">'.$voraussetzung.'</td></tr>';
-				}elseif($md[$m]['typ']==1){ //R-Handelsmission
-					//Mission läuft aktuell bzw. Belohnung wurde noch nicht abgeholt
-					if(isset($um[$m]) && ($um[$m]['end_time']>time() || $um[$m]['get_reward']==0)){
-						$content.='<tr style="font-weight: bold;"><td style="width: 19%; padding: 5px;"></td><td style="width: 27%; padding: 5px;">Belohnung</td><td style="width: 27%; padding: 5px;"></td><td style="width: 27%; padding: 5px;"></td></tr>';
-						$content.='<tr class="cell1"><td id="agent_mission_link'.$m.'" style="padding: 5px;"></td><td style="vertical-align: top; padding: 5px;" colspan="3">'.$belohnung.$belohnung_tradescore.'</td></tr>';
-					}else{
-						$content.='<tr style="font-weight: bold;"><td style="width: 19%; padding: 5px;"></td><td style="width: 27%; padding: 5px;">Belohnung</td><td style="width: 27%; padding: 5px;">Kosten</td><td style="width: 27%; padding: 5px;">Voraussetzung</td></tr>';
-						$content.='<tr><td style="vertical-align: top; padding: 5px;">Maximum</td><td style="vertical-align: top; padding: 5px;">'.$belohnung.$belohnung_tradescore.'</td><td style="vertical-align: top; padding: 5px;">'.$kosten.'</td><td style="vertical-align: top; padding: 5px;">'.$voraussetzung.'</td></tr>';
-					}
-				}elseif($md[$m]['typ']==2){ //W-Handelsmission
-					//wenn die Mission läuft, die Belohnung anzeigen
-					if(isset($um[$m]) && ($um[$m]['end_time']>time() || $um[$m]['get_reward']==0)){
-						$content.='<tr style="font-weight: bold;"><td style="width: 19%; padding: 5px;"></td><td style="width: 27%; padding: 5px;">Belohnung</td><td style="width: 27%; padding: 5px;"></td><td style="width: 27%; padding: 5px;"></td></tr>';
-						$content.='<tr class="cell1"><td id="agent_mission_link'.$m.'" style="padding: 5px;"></td><td style="vertical-align: top; padding: 5px;" colspan="3">'.$belohnung.$belohnung_tradescore.'</td></tr>';
-					}else{
-						$content.='<tr style="font-weight: bold;"><td style="width: 19%; padding: 5px;"></td><td style="width: 27%; padding: 5px;">Belohnung</td><td style="width: 27%; padding: 5px;">Kosten</td><td style="width: 27%; padding: 5px;">Voraussetzung</td></tr>';
-					}
-				}
-
-				if(!empty($err_msg) || !empty($success_msg)){
-					$content.=$err_msg;
-					$content.=$success_msg;
-				}
-
-				//wenn die Mission zu Ende ist, oder noch nicht existiert, den START-Button anzeigen
-				if(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1)){
-					if($md[$m]['typ']==0){
-						//$content.='<tr><td colspan="4"><a href="?start_mission='.$m.'" class="btn" style="margin-left: auto; margin-right: auto;">START</a></td></tr>';
-						$content.='
-						<script>
-						$("#agent_mission_link'.$m.'").html(\'<a href="?start_mission='.$m.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">Mission starten</a>\');
-						</script>
-						';
-						
-					}elseif($md[$m]['typ']==1){ //R-Handelsmission
-
-						//Handelspunkte
-						if(!empty($belohnung)){
-							$belohnung.='<br>';
-						}
-						$tradescore=
-						$belohnung.=$tradescore.' Handelspunkte';
-
-
-						//Flotten-Frachtkapazität laden
-						$fleet_fk=getFleetFK($_SESSION['ums_user_id']);
-
-						//////////////////////////////////////////////////
-						//Flotte I-III
-						//////////////////////////////////////////////////
-						$fleet_names=array('Heimatflotte','Flotte I', 'Flotte II', 'Flotte III');
-						//ist die Flotte bereit
-						for($fleet_id=1;$fleet_id<=3;$fleet_id++){
-
-							//Berechnung Frachtkapazität in Prozent
-							/*
-							if($storage_capacity<=$fleet_fk[$fleet_id]){
-								$fleet_fk_bel=100;
-							}else{
-								$fleet_fk_percent=$storage_capacity*$fleet_fk[$fleet_id] / 100;
-							}*/
-
-							if($storage_capacity>0){
-								$fleet_fk_percent=$fleet_fk[$fleet_id] * 100 / $storage_capacity;
-							}else{
-								$fleet_fk_percent=0;
-							}
-
-							$belohnung_fleet=generateMissionReward($md[$m]['reward'],$fleet_fk_percent);
-
-							//Handelspunkte
-							if($fleet_fk_percent>100){
-								$p=100;
-							}else{
-								$p=$fleet_fk_percent;
-							}
-
-							$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor']*$p/100;
-							//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';					
-							$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
-
-
-							$kosten_fleet=generateMissionReward($md[$m]['cost'],$fleet_fk_percent);
-
-							//benötigte Transportkapazität
-							//$voraussetzung_fleet='Frachtkapazit&auml;t: '.number_format($fleet_fk[$fleet_id], 0,"",".").' ('.number_format($fleet_fk_percent, 2,",",".").'%)';
-							$voraussetzung_fleet='Frachter: '.number_format(fk2frachter($fleet_fk[$fleet_id], $sv_schiffsdaten[$_SESSION['ums_rasse']-1][8][3]), 0,"",".").' ('.number_format($fleet_fk_percent, 2,",",".").'%)';
-
-
-							if($fleet_fk[$fleet_id]>0){
-								$content.='<tr class="cell1"><td style="padding: 5px;"><a href="?start_mission='.$m.'&fleet_id='.$fleet_id.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">'.$fleet_names[$fleet_id].' starten</a></td><td style="padding: 5px;">'.$belohnung_fleet.$belohnung_tradescore.'</td><td style="padding: 5px;">'.$kosten_fleet.'</td><td style="padding: 5px;">'.$voraussetzung_fleet.'</td></tr>';
-							}else{
-								$content.='<tr class="cell1"><td style="padding: 5px;">'.$fleet_names[$fleet_id].'</td><td colspan="3" style="padding: 5px; text-align: center; color: #FFFF00;">Die Flotte ist nicht bereit.</td></tr>';
-							}
-						}
-						
-
-						//////////////////////////////////////////////////
-
-						//Welche Flotte entsehen?
-						/*
-						$content.='<tr><td colspan="4" style="text-align: center; font-weight: bold;">Welche Flotte m&ouml;chtest Du entsenden?</td></tr>';
-						$content.='<tr>';
-						$content.='<td></td>';
-						$content.='<td><a href="?start_mission='.$m.'&fleet_id=1" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE I</a></td>';
-						$content.='<td><a href="?start_mission='.$m.'&fleet_id=2" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE II</a></td>';
-						$content.='<td><a href="?start_mission='.$m.'&fleet_id=3" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE III</a></td>';
-						$content.='<tr>';
-						*/
-					}elseif($md[$m]['typ']==2){ //W-Handelsmission
-						//Handelspunkte
-						if(!empty($belohnung)){
-							$belohnung.='<br>';
-						}
-						$tradescore=
-						$belohnung.=$tradescore.' Handelspunkte';
-
-
-						//Flotten-Frachtkapazität laden
-						$fleet_fk=getFleetFK($_SESSION['ums_user_id']);
-
-						//////////////////////////////////////////////////
-						//Flotte I-III
-						//////////////////////////////////////////////////
-						$fleet_names=array('Heimatflotte','Flotte I', 'Flotte II', 'Flotte III');
-						//ist die Flotte bereit
-						for($fleet_id=1;$fleet_id<=3;$fleet_id++){
-
-							if($storage_capacity>0){
-								$fleet_fk_percent=$fleet_fk[$fleet_id] * 100 / $storage_capacity;
-							}else{
-								$fleet_fk_percent=0;
-							}
-
-							$belohnung_fleet=generateMissionReward($md[$m]['reward'],100);
-
-							//Handelspunkte
-							if($fleet_fk_percent>=100){
-								$p=100;
-								$fleet_ok=true;
-							}else{
-								$p=$fleet_fk_percent;
-								$fleet_ok=false;
-							}
-
-							$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor'];
-							//$belohnung_tradescore=number_format($tradescore, 0,"",".").' Handelspunkte';					
-							$belohnung_tradescore='<img src="gp/g/icon11.png" style="height: 20px; width: auto; margin-bottom: -5px;" rel="tooltip" title="Handelspunkte"> <div style="display: inline-block; margin-bottom: 5px;">'.number_format($tradescore, 0,"",".").'</div><br>';
-
-
-							$kosten_fleet=generateMissionReward($md[$m]['cost'],100);
-
-							//benötigte Transportkapazität
-							//$voraussetzung_fleet='Frachtkapazit&auml;t: '.number_format($fleet_fk[$fleet_id], 0,"",".").' ('.number_format($fleet_fk_percent, 2,",",".").'%)';
-							$voraussetzung_fleet='Frachter: '.number_format(fk2frachter($fleet_fk[$fleet_id], $sv_schiffsdaten[$_SESSION['ums_rasse']-1][8][3]), 0,"",".").' / '.number_format(fk2frachter($storage_capacity, $sv_schiffsdaten[$_SESSION['ums_rasse']-1][8][3]), 0,",",".");
-
-							if($fleet_fk[$fleet_id]>0){
-								if($fleet_ok){
-									$content.='<tr class="cell1"><td style="padding: 5px;"><a href="?start_mission='.$m.'&fleet_id='.$fleet_id.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">'.$fleet_names[$fleet_id].' starten</a></td><td style="padding: 5px;">'.$belohnung_fleet.$belohnung_tradescore.'</td><td style="padding: 5px;">'.$kosten_fleet.'</td><td style="padding: 5px;">'.$voraussetzung_fleet.'</td></tr>';
-								}else{
-									$content.='<tr class="cell1"><td style="padding: 5px;">'.$fleet_names[$fleet_id].'</td><td style="padding: 5px;">'.$belohnung_fleet.$belohnung_tradescore.'</td><td style="padding: 5px;">'.$kosten_fleet.'</td><td style="padding: 5px;"><span style="color: #FF0000;">'.$voraussetzung_fleet.'</span></td></tr>';
-								}
-							}else{
-								$content.='<tr><td>'.$fleet_names[$fleet_id].'</td><td colspan="3" style="text-align: center; color: #FFFF00;">Die Flotte ist nicht bereit.</td></tr>';
-							}
-						}
-
-
-						/*
-							if($fleet_fk[$fleet_id]>0){
-								$content.='<tr class="cell1"><td style="padding: 5px;"><a href="?start_mission='.$m.'&fleet_id='.$fleet_id.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">'.$fleet_names[$fleet_id].' starten</a></td><td style="padding: 5px;">'.$belohnung_fleet.$belohnung_tradescore.'</td><td style="padding: 5px;">'.$kosten_fleet.'</td><td style="padding: 5px;">'.$voraussetzung_fleet.'</td></tr>';
-							}else{
-								$content.='<tr class="cell1"><td style="padding: 5px;">'.$fleet_names[$fleet_id].'</td><td colspan="3" style="padding: 5px; text-align: center; color: #FFFF00;">Die Flotte ist nicht bereit.</td></tr>';
-							}
-						*/						
-
-						//////////////////////////////////////////////////
-
-						//Welche Flotte entsehen?
-						/*
-						$content.='<tr><td colspan="4" style="text-align: center; font-weight: bold;">Welche Flotte m&ouml;chtest Du entsenden?</td></tr>';
-						$content.='<tr>';
-						$content.='<td colspan="4"><div style="display: flex;">';
-						$content.='<div style="flex-grow: 1;"><a href="?start_mission='.$m.'&fleet_id=1" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE I</a></div>';
-						$content.='<div style="flex-grow: 1;"><a href="?start_mission='.$m.'&fleet_id=2" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE II</a></div>';
-						$content.='<div style="flex-grow: 1;"><a href="?start_mission='.$m.'&fleet_id=3" class="btn" style="margin-left: auto; margin-right: auto;">FLOTTE III</a></div>';
-						$content.='</div></td>';
-						$content.='<tr>';
-						*/
-
-					}
-				}else{
-					//counter
-					//$content.='<tr><td colspan="4"><div style="color: #00FF00;">Verbleibende Zeit: <span id="mission_counter'.$m.'"></span></div></td></tr>';
-					$content.='
-					<script>
-					$("#mission_counter'.$m.'").css("color", "#00FF00");
-					ang_countdown('.($um[$m]['end_time']-time()).',"mission_counter'.$m.'",0);
-					$("#agent_mission_link'.$m.'").html(\'<a href="?end_mission='.$m.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">Mission beenden</a>\');
-					</script>';
-
-					/*
-					if($md[$m]['typ']==0){
-						$content.='
-						<script>
-						$("#agent_mission_link'.$m.'").html(\'<a href="?end_mission='.$m.'" class="btn2" style="display: inline-block; width: 96px; text-align: center;">Mission beenden</a>\');
-						</script>
-						';
-					}else{
-						//button
-						$content.='<tr><td colspan="4"><a href="?end_mission='.$m.'" class="btn" style="margin-left: auto; margin-right: auto;">BEENDEN</a></td></tr>';
-					}
-					*/
-
-				}
-
-				$content.='</table>';
-				
-				$content.='</div>';
+				$anzeige[]=array('m' => $m, 'storage_capacity' => $storage_capacity, 'meldung' => $meldung);
 			}
 		}
 	}
 	
+	///////////////////////////////////////////////////////////
+	//Missionen anzeigen
+	///////////////////////////////////////////////////////////
+
+	//Flotten und Agenten erst jetzt laden, eine eben gestartete Mission hat sie verändert
+	$flotten_daten=getFleetData($_SESSION['ums_user_id']);
+	$flotten_fk=getFleetFK($_SESSION['ums_user_id']);
+	$row=mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT agent FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]));
+	$agenten=$row['agent'];
+	$frachter_fk=$sv_schiffsdaten[$_SESSION['ums_rasse']-1][8][3];
+	$flottennamen=array('Heimatflotte','Flotte I','Flotte II','Flotte III');
+	$laufend=array();
+
+	//vorgewählte Flotte für den Handel: die mit der größten Frachtkapazität im Heimatsystem
+	$flotte_wahl=1;
+	$beste_fk=-1;
+	for($f=1;$f<=3;$f++){
+		if($flotten_daten[$f]['aktion']==0 && $flotten_fk[$f]>$beste_fk){
+			$beste_fk=$flotten_fk[$f];
+			$flotte_wahl=$f;
+		}
+	}
+
+	//Statuszeile: Agenten, kürzere Missionen durch Spezialisierung/Artefakte, Sabotage
+	$leiste='<span class="mod-chip">Agenten verf&uuml;gbar <b>'.number_format($agenten, 0,"",".").'</b></span>';
+	$dauer_bonus=($spec4==2 ? 10 : 0)+$artbonus_duration;
+	if($dauer_bonus>0){
+		$bonus_title='K&uuml;rzere Missionen&';
+		if($spec4==2){
+			$bonus_title.='Spezialisierung: 10 %<br>';
+		}
+		if($artbonus_duration>0){
+			$bonus_title.=$ua_name[10].'-Artefakte: '.str_replace('.', ',', round($artbonus_duration, 2)).' %';
+		}
+		$leiste.='<span class="mod-chip mod-chip-gruen" rel="tooltip" title="'.$bonus_title.'">Missionsdauer &minus;'.str_replace('.', ',', round($dauer_bonus, 2)).' %</span>';
+	}
+	if($mission_sabotage){
+		$leiste.='<span class="mod-chip mod-chip-warn">Sabotiert: Missionsdauer +'.round($sv_sabotage[10][2]*100).' %</span>';
+	}
+
+	//Flottenwahl für Handelsmissionen
+	$flottenwahl='';
+	for($f=1;$f<=3;$f++){
+		$daheim=($flotten_daten[$f]['aktion']==0);
+		$frachter=fk2frachter($flotten_fk[$f], $frachter_fk);
+		if(!$daheim){
+			$status='unterwegs';
+			if($flotten_daten[$f]['aktion']==4 && $flotten_daten[$f]['mission_time']>time()){
+				$status.=' &middot; <span id="mis-flotte-uhr'.$f.'">'.mission_uhr($flotten_daten[$f]['mission_time']-time()).'</span>';
+				$laufend[]=array('mis-flotte-uhr'.$f, $flotten_daten[$f]['mission_time']-time(), -1);
+			}
+		}elseif($frachter==0){
+			$status='keine Frachter';
+		}else{
+			$status='bereit';
+		}
+		$flottenwahl.='<button type="button" class="mis-flotte'.($daheim && $frachter>0 ? '' : ' mis-flotte-aus').'" data-flotte="'.$f.'"><b>'.$flottennamen[$f].'</b><span>'.number_format($frachter, 0,"",".").' Frachter &middot; '.$status.'</span></button>';
+	}
+
+	//Karten
+	$karten='';
+	$typnamen=array('Agenteneinsatz','Rohstoff-Handel','Waren-Handel');
+	$subtypnamen=array(1 => 'ARES', 2 => 'HEPHAISTOS', 3 => 'BASRANUR');
+	foreach($anzeige as $a){
+		$m=$a['m'];
+		$typ=$md[$m]['typ'];
+		$storage_capacity=$a['storage_capacity'];
+		$dauer=$md[$m]['time']*$GLOBALS['tech_build_time_faktor'];
+		$frei=(!isset($um[$m]) || ($um[$m]['end_time']<time() && $um[$m]['get_reward']==1));
+		$rest=$frei ? 0 : $um[$m]['end_time']-time();
+
+		$label=$typnamen[$typ];
+		if(!empty($md[$m]['subtyp']) && isset($subtypnamen[$md[$m]['subtyp']])){
+			$label.=' &middot; '.$subtypnamen[$md[$m]['subtyp']];
+		}
+
+		//Filter nach Rohstoffen beim Rohstoff-Handel
+		$filter='';
+		if($typ==1){
+			$filter=' data-offer="'.$md[$m]['cost'][0][1].'" data-need="'.$md[$m]['reward'][0][1].'"';
+		}
+
+		if($frei){
+			$zustand='';
+			$dauer_text='Dauer '.mission_uhr($dauer);
+		}elseif($rest>0){
+			$zustand=' mis-karte-laeuft';
+			$dauer_text='l&auml;uft';
+		}else{
+			$zustand=' mis-karte-fertig';
+			$dauer_text='beendet';
+		}
+
+		$inhalt='';
+		if($frei && $typ==0){
+			//Agenteneinsatz
+			$genug=$agenten>=$md[$m]['need_agents'];
+			$inhalt.='<div class="mis-zeile"><div class="mis-tausch">'.mission_posten($md[$m]['reward']).'</div><div class="mis-aktion">'
+				.($genug ? '<a href="?start_mission='.$m.'" class="mod-btn">Starten</a>' : '<span class="mod-feld mod-feld-grund">Zu wenig Agenten</span>')
+				.'</div></div>';
+			$inhalt.='<div class="mis-fuss"><span'.($genug ? '' : ' class="mis-rot"').'>Ben&ouml;tigt <b>'.number_format($md[$m]['need_agents'], 0,"",".").'</b> Agenten</span></div>';
+
+		}elseif($frei){
+			//Handel: je Flotte eine Variante, angezeigt wird die gewählte Flotte
+			$maximum_title='Maximum&'.mission_text($md[$m]['cost']).' &rarr; '.mission_text($md[$m]['reward']).'<br>mit '.number_format(fk2frachter($storage_capacity, $frachter_fk), 0,"",".").' Frachtern';
+			for($f=1;$f<=3;$f++){
+				$fk=$flotten_fk[$f];
+				$daheim=($flotten_daten[$f]['aktion']==0);
+				$anteil=($storage_capacity>0) ? $fk*100/$storage_capacity : 0;
+
+				if($typ==1){
+					//Rohstoff-Handel: Kosten und Belohnung anteilig zur Frachtkapazität
+					$prozent=min(100, $anteil);
+					$ok=$daheim && $fk>0;
+					$grund=$daheim ? 'Keine Frachter' : 'Flotte unterwegs';
+					$frachter_text=number_format($prozent, 2,",",".").' % des Maximums &middot; '.number_format(fk2frachter($fk, $frachter_fk), 0,"",".").' von '.number_format(fk2frachter($storage_capacity, $frachter_fk), 0,"",".").' Frachtern';
+				}else{
+					//Waren-Handel: nur mit voller Frachtkapazität und vorhandener Ware
+					$prozent=100;
+					$genug_frachter=$anteil>=100;
+					$ok=$daheim && $genug_frachter && hasMissionNeeds($md[$m]['cost']);
+					if(!$daheim){
+						$grund='Flotte unterwegs';
+					}elseif(!$genug_frachter){
+						$grund='Zu wenig Frachter';
+					}else{
+						$grund='Zu wenig Waren';
+					}
+					$frachter_text='<span'.($genug_frachter ? '' : ' class="mis-rot"').'>'.number_format(fk2frachter($fk, $frachter_fk), 0,"",".").' von '.number_format(fk2frachter($storage_capacity, $frachter_fk), 0,"",".").' Frachtern</span>';
+				}
+				$handelspunkte=$dauer*$prozent/100;
+
+				$inhalt.='<div class="mis-variante" data-flotte="'.$f.'">
+					<div class="mis-zeile">
+						<div class="mis-tausch">'.mission_posten($md[$m]['cost'], $prozent).'<span class="mis-pfeil">&rarr;</span>'.mission_posten($md[$m]['reward'], $prozent).'</div>
+						<div class="mis-aktion">'.($ok ? '<a href="?start_mission='.$m.'&fleet_id='.$f.'" class="mod-btn">Starten</a>' : '<span class="mod-feld mod-feld-grund">'.$grund.'</span>').'</div>
+					</div>
+					<div class="mis-fuss">
+						<div class="mod-balken mis-anteil"><span style="width: '.round(min(100, $anteil)).'%;"></span></div>
+						<span rel="tooltip" title="'.$maximum_title.'">'.$frachter_text.'</span>
+						<span class="mod-chip">+'.number_format($handelspunkte, 0,"",".").' Handelspunkte</span>
+					</div>
+				</div>';
+			}
+
+		}else{
+			//läuft oder wartet auf das Abholen der Belohnung
+			$belohnung_liste=(isset($um[$m]['reward']) && is_array($um[$m]['reward'])) ? $um[$m]['reward'] : $md[$m]['reward'];
+			$belohnung_prozent=isset($um[$m]['reward_percentage']) ? (float)$um[$m]['reward_percentage'] : 100;
+
+			if($rest>0){
+				$aktion='<span class="mod-feld" id="mis-laeuft'.$m.'">noch <span id="mission_counter'.$m.'">'.mission_uhr($rest).'</span></span>'
+					.'<a href="?end_mission='.$m.'" class="mod-btn" id="mis-abholen'.$m.'" hidden>Abholen</a>';
+				$laufend[]=array('mission_counter'.$m, $rest, $m);
+			}else{
+				$aktion='<a href="?end_mission='.$m.'" class="mod-btn">Abholen</a>';
+			}
+
+			$fortschritt=($dauer>0) ? max(0, min(100, ($dauer-$rest)*100/$dauer)) : 100;
+			$inhalt.='<div class="mis-zeile"><div class="mis-tausch"><span class="mis-label">Belohnung</span>'.mission_posten($belohnung_liste, $belohnung_prozent).'</div><div class="mis-aktion">'.$aktion.'</div></div>';
+			if($typ==0){
+				$inhalt.='<div class="mis-fuss"><span>Unterwegs: <b>'.number_format($um[$m]['need_agents'], 0,"",".").'</b> Agenten</span></div>';
+			}
+			$inhalt.='<div class="mod-balken mis-fortschritt"><span data-rest="'.max(0, $rest).'" style="width: '.round($fortschritt, 1).'%;"></span></div>';
+		}
+
+		$karten.='
+		<div class="mis-karte'.$zustand.'" data-typ="'.$typ.'"'.$filter.'>
+			<div class="mis-kopf"><span class="mod-typ">'.$label.'</span><span class="mis-dauer">'.$dauer_text.'</span></div>
+			'.$inhalt.'
+			'.$a['meldung'].'
+		</div>';
+	}
+
+	$content.=rahmen_oben('Missionen',false);
+	$content.='<div class="mis mod" data-typ="-1" data-flotte="'.$flotte_wahl.'">';
+	$content.='<div class="mod-hinweis">Missionen k&ouml;nnen nicht abgebrochen werden. Eingesetzte Agenten sind w&auml;hrend der Mission nicht verf&uuml;gbar, nach dem Ende der Mission bekommst du sie zur&uuml;ck. Eine Flotte auf Handelsmission ist bis zu deren Ende unterwegs.</div>';
+	$content.='<div class="mis-leiste">'.$leiste.'</div>';
+	$content.='
+	<div class="mis-tabs">
+		<button type="button" class="mis-tab" data-typ="-1">Alle</button>
+		<button type="button" class="mis-tab" data-typ="0">Agenten</button>
+		<button type="button" class="mis-tab" data-typ="1">Rohstoff-Handel</button>
+		<button type="button" class="mis-tab" data-typ="2">Waren-Handel</button>
+	</div>
+	<div class="mis-filter" hidden>
+		Ich ben&ouml;tige
+		<select id="res_need">
+			<option value="-1" selected>alles</option>
+			<option value="1">Multiplex</option>
+			<option value="2">Dyharra</option>
+			<option value="3">Iradium</option>
+			<option value="4">Eternium</option>
+		</select>
+		und biete
+		<select id="res_offer">
+			<option value="-1" selected>alles</option>
+			<option value="1">Multiplex</option>
+			<option value="2">Dyharra</option>
+			<option value="3">Iradium</option>
+			<option value="4">Eternium</option>
+		</select>
+	</div>
+	<div class="mis-flottenwahl"><span class="mis-flottenwahl-label">Handeln mit</span>'.$flottenwahl.'</div>';
+	$content.='<div class="mis-liste">'.$karten.'</div>';
 	$content.='</div>';
-	$content.=rahmen_unten(false);  
+	$content.=rahmen_unten(false);
+
+	//Filter, Flottenwahl, Countdowns und Fortschrittsbalken
+	$content.='<script>
+	(function(){
+		var box=document.querySelector(".mis");
+		var karten=[].slice.call(box.querySelectorAll(".mis-karte"));
+		var filterbox=box.querySelector(".mis-filter");
+		var need=document.getElementById("res_need"), offer=document.getElementById("res_offer");
+
+		function merken(name, wert){
+			try{ localStorage.setItem(name, wert); }catch(e){}
+		}
+		function laden(name){
+			try{ return localStorage.getItem(name); }catch(e){ return null; }
+		}
+
+		function filtern(){
+			var typ=box.getAttribute("data-typ");
+			karten.forEach(function(k){
+				var sicht=(typ=="-1" || k.getAttribute("data-typ")==typ);
+				if(sicht && typ=="1"){
+					if(need.value!="-1" && k.getAttribute("data-need")!=need.value){ sicht=false; }
+					if(offer.value!="-1" && k.getAttribute("data-offer")!=offer.value){ sicht=false; }
+				}
+				k.hidden=!sicht;
+			});
+			filterbox.hidden=(typ!="1");
+		}
+
+		[].forEach.call(box.querySelectorAll(".mis-tab"), function(t){
+			t.addEventListener("click", function(){
+				box.setAttribute("data-typ", t.getAttribute("data-typ"));
+				merken("mis_typ", t.getAttribute("data-typ"));
+				filtern();
+			});
+		});
+		need.addEventListener("change", filtern);
+		offer.addEventListener("change", filtern);
+
+		[].forEach.call(box.querySelectorAll(".mis-flotte"), function(b){
+			b.addEventListener("click", function(){
+				box.setAttribute("data-flotte", b.getAttribute("data-flotte"));
+				merken("mis_flotte", b.getAttribute("data-flotte"));
+			});
+		});
+
+		//zuletzt gewählter Reiter und eine bereite Flotte bleiben erhalten
+		var typ=laden("mis_typ");
+		if(typ!==null && box.querySelector(".mis-tab[data-typ=\""+typ+"\"]")){
+			box.setAttribute("data-typ", typ);
+		}
+		var flotte=laden("mis_flotte");
+		var knopf=flotte ? box.querySelector(".mis-flotte[data-flotte=\""+flotte+"\"]") : null;
+		if(knopf && !knopf.classList.contains("mis-flotte-aus")){
+			box.setAttribute("data-flotte", flotte);
+		}
+		filtern();
+
+		//Countdowns; ist eine Mission fertig, erscheint der Abholknopf
+		'.json_encode($laufend).'.forEach(function(l){
+			ang_countdown(l[1], l[0], 0, function(){
+				if(l[2]<0){ return; }
+				var feld=document.getElementById("mis-laeuft"+l[2]), knopf=document.getElementById("mis-abholen"+l[2]);
+				if(feld){ feld.hidden=true; }
+				if(knopf){ knopf.hidden=false; }
+			});
+		});
+
+		//Fortschrittsbalken laufen bis zum Ende der Mission voll
+		[].forEach.call(box.querySelectorAll(".mis-fortschritt span[data-rest]"), function(s){
+			var rest=parseFloat(s.getAttribute("data-rest"));
+			if(rest>0){
+				s.getBoundingClientRect();
+				s.style.transition="width "+rest+"s linear";
+				s.style.width="100%";
+			}
+		});
+	})();
+	</script>';
 }
 
 include "resline.php";

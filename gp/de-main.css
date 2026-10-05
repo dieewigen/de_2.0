@@ -1254,6 +1254,10 @@ body.theme-rasse4 {
   background: rgba(6, 9, 14, 0.9);
 }
 
+.mod [hidden] {
+  display: none !important;
+}
+
 .mod-hinweis {
   margin-bottom: 12px;
   padding: 7px 10px;
@@ -1988,6 +1992,326 @@ a.art-kachel-zurueck:hover::after {
   margin-top: 3px;
   font-size: 10px;
   color: #8b949e;
+}
+
+.mis {
+  width: 572px;
+}
+
+.mis-leiste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mis-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mis-tab {
+  flex: 1 1 0;
+  padding: 7px 4px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9da7b1;
+  cursor: pointer;
+}
+.mis-tab:hover {
+  color: #ffffff;
+}
+
+.mis[data-typ="-1"] .mis-tab[data-typ="-1"] {
+  background: var(--akzent-weich);
+  box-shadow: inset 0 0 0 1px var(--akzent);
+  color: #ffffff;
+}
+
+.mis[data-typ="0"] .mis-tab[data-typ="0"] {
+  background: var(--akzent-weich);
+  box-shadow: inset 0 0 0 1px var(--akzent);
+  color: #ffffff;
+}
+
+.mis[data-typ="1"] .mis-tab[data-typ="1"] {
+  background: var(--akzent-weich);
+  box-shadow: inset 0 0 0 1px var(--akzent);
+  color: #ffffff;
+}
+
+.mis[data-typ="2"] .mis-tab[data-typ="2"] {
+  background: var(--akzent-weich);
+  box-shadow: inset 0 0 0 1px var(--akzent);
+  color: #ffffff;
+}
+
+.mis-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #9da7b1;
+}
+.mis-filter select {
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: #0d1117;
+  font-family: inherit;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.mis-flottenwahl {
+  display: grid;
+  grid-template-columns: auto repeat(3, 1fr);
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mis[data-typ="0"] .mis-flottenwahl {
+  display: none;
+}
+
+.mis-flottenwahl-label {
+  padding-right: 4px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.mis-flotte {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  font-family: inherit;
+  text-align: left;
+  color: #9da7b1;
+  cursor: pointer;
+}
+.mis-flotte b {
+  font-size: 12px;
+  color: #ffffff;
+}
+.mis-flotte span {
+  font-size: 10px;
+}
+.mis-flotte:hover {
+  border-color: var(--akzent-mittel);
+}
+
+.mis-flotte-aus b {
+  color: #8b949e;
+}
+
+.mis-variante {
+  display: none;
+}
+
+.mis[data-flotte="1"] .mis-flotte[data-flotte="1"] {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  box-shadow: 0 0 10px var(--akzent-weich);
+}
+
+.mis[data-flotte="1"] .mis-variante[data-flotte="1"] {
+  display: block;
+}
+
+.mis[data-flotte="2"] .mis-flotte[data-flotte="2"] {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  box-shadow: 0 0 10px var(--akzent-weich);
+}
+
+.mis[data-flotte="2"] .mis-variante[data-flotte="2"] {
+  display: block;
+}
+
+.mis[data-flotte="3"] .mis-flotte[data-flotte="3"] {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  box-shadow: 0 0 10px var(--akzent-weich);
+}
+
+.mis[data-flotte="3"] .mis-variante[data-flotte="3"] {
+  display: block;
+}
+
+.mis-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mis-karte {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+}
+.mis-karte .mod-meldung {
+  margin: 10px 0 0 0;
+}
+
+.mis-karte-laeuft {
+  border-color: var(--akzent-mittel);
+}
+
+.mis-karte-fertig {
+  border-color: rgba(62, 207, 106, 0.6);
+  box-shadow: inset 0 0 24px rgba(62, 207, 106, 0.1);
+}
+
+.mis-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.mis-dauer {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.mis-karte-laeuft .mis-dauer {
+  color: var(--akzent);
+}
+
+.mis-karte-fertig .mis-dauer {
+  color: #5fe08a;
+}
+
+.mis-zeile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mis-tausch {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.mis-posten {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #9da7b1;
+}
+.mis-posten b {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.mis-bild {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  object-fit: contain;
+}
+
+.mis-bild-artefakt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(176, 114, 255, 0.45);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(176, 114, 255, 0.4), rgba(176, 114, 255, 0.05) 70%);
+  font-size: 16px;
+  font-weight: 700;
+  color: #e2d1ff;
+}
+
+.mis-bild-ware {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  font-weight: 700;
+  color: #c9d1d9;
+}
+
+.mis-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.mis-pfeil {
+  font-size: 18px;
+  color: #8b949e;
+}
+
+.mis-label {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.mis-aktion {
+  flex: 0 0 130px;
+  text-align: center;
+}
+.mis-aktion .mod-btn,
+.mis-aktion .mod-btn:link,
+.mis-aktion .mod-btn:visited,
+.mis-aktion .mod-feld {
+  display: block;
+}
+
+.mis-fuss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #8b949e;
+}
+.mis-fuss b {
+  color: #ffffff;
+}
+.mis-fuss .mod-chip {
+  margin-left: auto;
+}
+
+.mis-anteil {
+  flex: 0 0 70px;
+}
+
+.mis-rot,
+.mis-rot b {
+  color: #ff6b6b;
+}
+
+.mis-fortschritt {
+  margin-top: 8px;
 }
 
 body.mobile {
