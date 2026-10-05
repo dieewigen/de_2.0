@@ -1447,6 +1447,38 @@ a.btn:visited {
 	overflow-wrap: anywhere;
 }
 
+// Fluxurion der Berater (lib/helper.inc.php): zurück/weiter als Buttons
+.helper-nav {
+	.helper-btn,
+	a.helper-btn:link,
+	a.helper-btn:visited {
+		display: inline-block;
+		min-width: 90px;
+		margin: 0 6px;
+		padding: 5px 12px;
+		border: 1px solid #777777;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.6);
+		font-size: 15px;
+		text-decoration: none;
+	}
+
+	a.helper-btn:hover {
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	.helper-btn-aus {
+		color: #666666;
+		border-color: #444444;
+		cursor: default;
+	}
+
+	.helper-zaehler {
+		font-size: 13px;
+		color: #aaaaaa;
+	}
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

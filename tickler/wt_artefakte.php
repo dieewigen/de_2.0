@@ -361,7 +361,7 @@ while ($row = mysqli_fetch_array($res)) {
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set restyp01 = restyp01 + ? WHERE user_id=?", [$wert, $uid]);
 
     /*$time=date("YmdHis");
-    $nachricht='Sie erhalten '.number_format($wert, 0,"",".").' M durch den Strom von Kiz-Murat.';
+    $nachricht='Du erhältst '.number_format($wert, 0,"",".").' M durch den Strom von Kiz-Murat.';
     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 1,'$time','$nachricht')",$db);
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = $uid",$db);*/
 }
@@ -379,7 +379,7 @@ while ($row = mysqli_fetch_array($res)) {
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set restyp02 = restyp02 + ? WHERE user_id=?", [$wert, $uid]);
 
     /*$time=date("YmdHis");
-    $nachricht='Sie erhalten '.number_format($wert, 0,"",".").' D durch den Strom von Kiz-Joar.';
+    $nachricht='Du erhältst '.number_format($wert, 0,"",".").' D durch den Strom von Kiz-Joar.';
     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 1,'$time','$nachricht')",$db);
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = $uid",$db);*/
 }
@@ -398,7 +398,7 @@ while ($row = mysqli_fetch_array($res)) {
 
     /*
     $time=date("YmdHis");
-    $nachricht='Sie erhalten '.number_format($wert, 0,"",".").' I durch den Strom von Kiz-Benir.';
+    $nachricht='Du erhältst '.number_format($wert, 0,"",".").' I durch den Strom von Kiz-Benir.';
     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 1,'$time','$nachricht')",$db);
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = $uid",$db);*/
 }
@@ -416,7 +416,7 @@ while ($row = mysqli_fetch_array($res)) {
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set restyp04 = restyp04 + ? WHERE user_id=?", [$wert, $uid]);
 
     /*$time=date("YmdHis");
-    $nachricht='Sie erhalten '.number_format($wert, 0,"",".").' E durch den Strom von Kiz-Vokl.';
+    $nachricht='Du erhältst '.number_format($wert, 0,"",".").' E durch den Strom von Kiz-Vokl.';
     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, 1,'$time','$nachricht')",$db);
     mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = $uid",$db);*/
 }

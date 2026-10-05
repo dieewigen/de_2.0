@@ -1,5 +1,5 @@
 <?php
-$allymenu_lang['accessdenied']='<BR><BR>Leider ist ihnen der Zugriff nicht gestattet. Auf dieses Dokument dürfen nur Allianzanführer zugreifen.';
+$allymenu_lang['accessdenied']='<BR><BR>Leider ist Dir der Zugriff nicht gestattet. Auf dieses Dokument dürfen nur Allianzanführer zugreifen.';
 $allymenu_lang['allgemein']='Allgemein';
 $allymenu_lang['coleader']='Co-Leader';
 $allymenu_lang['mitglieder']='Mitglieder';

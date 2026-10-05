@@ -358,6 +358,13 @@ if(isset($_REQUEST["createaccount"]) && $_REQUEST["createaccount"]==1){
     }
   }
 
+  //begrüßungs-hyperfunk mit den wichtigsten hinweisen für den einstieg
+  include_once "inc/".$sv_server_lang."_links.inc.php";
+  $begr_text=str_replace(array('{SPIELERNAME}', '{HILFE}'), array($spielername, $sv_link[2]), $rpc_lang['begrbody']);
+  mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, time, betreff, text) VALUES (?, 0, 0, 1, ?, ?, ?, ?)",
+    [$user_id, $rpc_lang['begrabs'], date("YmdHis"), $rpc_lang['begrbetreff'], $begr_text]);
+  mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans=1 WHERE user_id=?", [$user_id]);
+
 
   echo '1';
 }

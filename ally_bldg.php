@@ -273,7 +273,7 @@ if($num==1){
 			print('Datensatz Nr. '.$_SESSION['ums_user_id'].' Konnte nicht entsperrt werden.<br><br>');
 			}
 		}// if setlock-ende
-		else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
+		else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
     }
     
     //////////////////////////////////////////////////////

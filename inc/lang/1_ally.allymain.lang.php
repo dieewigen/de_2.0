@@ -27,8 +27,8 @@ $allyallymain_lang['allyoverview']='Allianzübersicht';
 $allyallymain_lang['ja']='Ja';
 
 $allyallymain_lang['msg_1']='Das Memberlimit wurde um eins erhöht. Die Kosten von 10 Tronic wurden dem Depot abgezogen.';
-$allyallymain_lang['msg_2']='Leider ist Ihre Allianz nicht in der Lage diese Aktion zu finanzieren.';
-$allyallymain_lang['msg_3']='Sie sind nicht befugt diese Aktion auszuführen.';
+$allyallymain_lang['msg_2']='Leider ist Deine Allianz nicht in der Lage, diese Aktion zu finanzieren.';
+$allyallymain_lang['msg_3']='Du bist nicht befugt, diese Aktion auszuführen.';
 $allyallymain_lang['msg_4']='Willkommen in der C.A.R.S. - übersicht';
 
 $allyallymain_lang['relverbreitung']='Allianzbonuspunktewert';

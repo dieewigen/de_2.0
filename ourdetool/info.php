@@ -84,8 +84,9 @@ $flash = array();
 
 if ($sendhyperfunk) {
     csrf_require();
-    $hyperfunktext = str_replace("\r\n", "<br>", $hyperfunktext);
-    $hyperfunktext = str_replace("\n", "<br>", $hyperfunktext);
+    //Zeilenumbrüche als Klartext speichern: hyperfunk.php escaped den Text und macht daraus selbst <br>,
+    //ein gespeichertes <br> würde sonst als Text angezeigt
+    $hyperfunktext = str_replace("\r\n", "\n", $hyperfunktext);
     $hftime = date("YmdHis");
     mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_hyper (empfaenger, absender, fromsec, fromsys, fromnic, betreff, text, time) VALUES (?, '0', '0', '1', 'Die-Ewigen-Team', ?, ?,?)", [$uid, $hyperfunkbetreff, $hyperfunktext, $hftime]);
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newtrans=1 WHERE user_id=?", [$uid]);

@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////
 
 //Description
-$content .= '<div>Dies ist die erste erreichbare Welt der vergessenen Systeme, wir nennen Sie daher DER EINGANG, da sie uns den Zugriff auf viele weitere Systeme ergm&ouml;glicht.</div>';
+$content .= '<div>Dies ist die erste erreichbare Welt der vergessenen Systeme, wir nennen sie daher DER EINGANG, da sie uns den Zugriff auf viele weitere Systeme erm&ouml;glicht.</div>';
 
 //Geb�udedaten laden
 $playerBldg = loadPlayerBuildings($_SESSION['ums_user_id'], $this->system_id);

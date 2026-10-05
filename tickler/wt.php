@@ -1520,7 +1520,7 @@ if ($doetick == 1) {
                             break;
                     }
 
-                    $meldung .= ' Andere Allianzen, ein evtl. Allianz-Partner ausgenommen, haben schwere Sch&auml;den bei Ihren Allianzgeb&auml;uden ('.$geb_name.') hinnehmen m&uuml;ssen.';
+                    $meldung .= ' Andere Allianzen, ein evtl. Allianz-Partner ausgenommen, haben schwere Sch&auml;den bei ihren Allianzgeb&auml;uden ('.$geb_name.') hinnehmen m&uuml;ssen.';
                 }
 
 

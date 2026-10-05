@@ -140,7 +140,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
+        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
     }
 } elseif (isset($_GET["a"]) && $_GET["a"] == 2) {
     //Artefakt aus einem Basisschiff entfernen
@@ -215,7 +215,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
+        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
     }
 }
 
@@ -703,7 +703,7 @@ if (!hasTech($pt, 28)) {
     echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
     echo '<tr align="left" class="cell">
 	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=28" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_28.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
+	<td valign="top">Du ben&ouml;tigst folgende Technologie: <b>'.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</b><br><br>'.link_technologien('Zu den Technologien').'</td>
 	</tr>';
     echo '</table>';
     rahmen_unten();

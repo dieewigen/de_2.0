@@ -14,7 +14,7 @@ $allydetail_lang['allianzbiografie']='Allianzbiografie';
 $allydetail_lang['bewerberinfo']='Information für Bewerber';
 
 $allydetail_lang['msg_1']='Bei dieser Allianz bewerben...';
-$allydetail_lang['msg_2']='Sie haben bereits eine Allianz';
+$allydetail_lang['msg_2']='Du hast bereits eine Allianz';
 $allydetail_lang['msg_3']='Memberlimit erreicht';
 $allydetail_lang['msg_4']='Zurück zu den Suchergebnissen';
 ?>

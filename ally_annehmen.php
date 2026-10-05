@@ -115,7 +115,7 @@ else
                         );
 					}
 				}
-				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Ihrem Antrag zugestimmt und Sie aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachten Sie, das Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
+				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Deinem Antrag zugestimmt und Dich aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachte, dass Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
 
 				echo '<div class="info_box text3">'.$allyablehnen_lang['msg_2_1'].' '.$sum.' '.$allyablehnen_lang['msg_2_2'].'.</div>';
 				include('ally/allyfunctions.inc.php');

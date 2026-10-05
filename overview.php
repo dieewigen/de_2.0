@@ -127,7 +127,9 @@ if ($exileText !== '') {
     echo '</div>';
     rahmen_unten();
     echo '<br>';
-} elseif ($sector == 1) {
+} elseif ($sector <= 1) {
+    //Sektor 0 ist nur der Übergang: neue Konten stehen dort, bis register_user.php sie in Sektor 1 setzt (jede Minute)
+    $sek0info = ($sector == 0) ? '<div class="text3" style="margin-bottom: 8px;">'.$ov_lang['sek0info'].'</div>' : '';
     $text = '
 	<table width="586" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -137,7 +139,7 @@ if ($exileText !== '') {
 	</tr>
 	<tr>
 	<td class="rl">&nbsp;</td>
-	<td><div class="cell">'.$ov_lang['sek1info'].'</div></td>
+	<td><div class="cell">'.$sek0info.$ov_lang['sek1info'].'</div></td>
 	<td width="13" class="rr">&nbsp;</td>
 	</tr>
 	</table>
@@ -904,9 +906,10 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards15;
 
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT arthold FROM de_sector WHERE sec_id = '$sector'");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT arthold FROM de_sector WHERE sec_id = ?", [$sector]);
             $rowx = mysqli_fetch_array($db_datenx);
-            $zielwert = $rowx['arthold'];
+            //Sektor 0 (Übergang beim Anlegen) hat keinen Eintrag in de_sector
+            $zielwert = $rowx['arthold'] ?? 0;
 
             $do_calc = 1;
             $text1 = $ov_lang['ac_ziel15_1'];

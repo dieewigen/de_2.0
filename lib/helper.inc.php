@@ -28,6 +28,16 @@ if(isset($_REQUEST['helperdo'])){
 	}
 }
 
+//die Erklärungen zur Oberfläche (Schritte 1-6) überspringen und direkt zur ersten Aufgabe (Schritt 7) gehen;
+//die übersprungenen Schritte bleiben über "zurück" erreichbar
+$helper_erste_aufgabe=7;
+if(isset($_REQUEST['helperskip']) && $helper_progress<$helper_erste_aufgabe){
+	$sql = "UPDATE de_user_data SET helperprogress=? WHERE user_id=? AND helperprogress<?";
+	mysqli_execute_query($GLOBALS['dbi'], $sql, [$helper_erste_aufgabe, $_SESSION['ums_user_id'], $helper_erste_aufgabe]);
+	$helper_progress=$helper_erste_aufgabe;
+	$_SESSION['helperid']=$helper_erste_aufgabe;
+}
+
 //welche Ansicht sieht der Spieler? gleiche Bedingung wie die Rohstoffleiste in resline.php
 if($_SESSION['ums_mobi']==1){
 	$helper_ui='mobile';
@@ -102,7 +112,10 @@ while(in_array($_SESSION['helperid'], $helper_skip)){
 switch($_SESSION['helperid']){
   case 0:
     $helper_msg='Willkommen bei Die Ewigen, mein Name ist Fluxurion und ich stehe Dir mit meinem Rat zur Seite. Wenn Du meine Dienste nicht mehr ben&ouml;tigst, 
-    kannst Du mich '.$helper_weg['optionen'].' bei "Berater aktivieren" entlassen. Nat&uuml;rlich kannst Du mich sp&auml;ter jederzeit wieder einstellen.<br><br>F&uuml;r mehr Informationen kannst Du einfach auf "weiter" klicken.';
+    kannst Du mich '.$helper_weg['optionen'].' bei "Berater aktivieren" entlassen. Nat&uuml;rlich kannst Du mich sp&auml;ter jederzeit wieder einstellen.<br><br>Mit "weiter" erkl&auml;re ich Dir zuerst die Oberfl&auml;che.';
+    if($helper_progress<$helper_erste_aufgabe){
+      $helper_msg.=' Willst Du gleich loslegen, <a href="'.htmlspecialchars(basename($_SERVER['SCRIPT_NAME']), ENT_QUOTES, 'UTF-8').'?helperskip=1">springe direkt zur ersten Aufgabe</a>. Die Erkl&auml;rungen findest Du danach jederzeit &uuml;ber "zur&uuml;ck".';
+    }
     $helper_picid=1;
     
     if($helper_progress==0){
@@ -129,9 +142,9 @@ switch($_SESSION['helperid']){
     $helper_msg=($helper_ui=='standard' ? 'Ganz rechts in der oberen Leiste' : 'Rechts von den Rohstoffen').' werden 3 Uhrzeiten angezeigt. Von oben nach unten:<br>- <b>Serverzeit</b>: Die aktuelle Uhrzeit des Servers.
     <br>- <b>Letzter Wirtschaftstick</b>: Sie sind f&uuml;r den &ouml;konomischen Teil wichtig, also f&uuml;r Bau, Forschungen und Rohstoffgewinnung. 
 	<br>-<b>Letzter Kampftick</b>: Sie sind f&uuml;r den Kampf und das Versenden von Flotten zust&auml;ndig.
-	<br><br>Ein Tick kann mehrere Minuten Echtzeit betragen, wie lange das ist wird im Hauptaccount bei der jeweiligen Serverinformation angezeigt.';
+	<br><br>Zwischen zwei Ticks vergehen mehrere Minuten Echtzeit. Wann die Ticks laufen, steht in der Serverinfo, die Du &uuml;ber den Button <b>Serverinfos</b> auf der &Uuml;bersicht erreichst.';
     if($helper_ui=='standard'){
-      $helper_msg.=' Ein Klick auf die Uhrzeiten &ouml;ffnet die Serverinfo.';
+      $helper_msg.=' Auch ein Klick auf die Uhrzeiten &ouml;ffnet die Serverinfo.';
     }
     $helper_picid=3;
     
@@ -586,7 +599,7 @@ switch($_SESSION['helperid']){
   break;
 
   case 28:
-    $helper_msg='Gehe '.$helper_weg['spezialisierung'].'. Dort kannst Du Dein Volk in 5 Bereichen spezialisieren, zum Beispiel f&uuml;r k&uuml;rzere Bauzeiten, mehr Erfahrung f&uuml;r Deine Flotten oder k&uuml;rzere Missionen.<br><br>Die Bereiche werden mit Errungenschaftspunkten freigeschaltet. Diese erh&auml;ltst Du f&uuml;r die Aufgaben, die unten auf der &Uuml;bersicht unter <b>Errungenschaften</b> stehen. In jedem freigeschalteten Bereich w&auml;hlst Du mit einem Klick auf ein Symbol eine von drei M&ouml;glichkeiten. Vorsicht, es gibt keine R&uuml;ckfrage. Zur&uuml;cksetzen kannst Du die Auswahl kostenlos alle 480 Wirtschaftsticks.';
+    $helper_msg='Gehe '.$helper_weg['spezialisierung'].'. Dort kannst Du Dein Volk in 5 Bereichen spezialisieren, zum Beispiel f&uuml;r k&uuml;rzere Bauzeiten, mehr Erfahrung f&uuml;r Deine Flotten oder k&uuml;rzere Missionen.<br><br>Die Bereiche werden mit Errungenschaftspunkten freigeschaltet. Diese erh&auml;ltst Du f&uuml;r die Aufgaben, die unten auf der &Uuml;bersicht unter <b>Errungenschaften</b> stehen. In jedem freigeschalteten Bereich w&auml;hlst Du eine von drei M&ouml;glichkeiten: Ein Klick auf ein Symbol zeigt die Beschreibung, gew&auml;hlt wird mit dem Button darunter. Zur&uuml;cksetzen kannst Du die Auswahl kostenlos alle 480 Wirtschaftsticks.';
     $helper_picid=7;
 
     if($helper_progress==28){
@@ -680,15 +693,28 @@ if($helper_dontshow==0)
 {
   rahmen_oben('Fluxurion der Berater');
 
-  echo '<div class="cell" style="width: 570px; height: 256px; font-size: 14px; position: relative;">';
+  //min-height statt fester Höhe, damit lange Texte nicht unter die Buttons laufen; unten Platz für die Buttons
+  echo '<div class="cell" style="width: 570px; min-height: 256px; padding-bottom: 46px; box-sizing: border-box; font-size: 14px; position: relative;">';
   echo '<div style="float: left;"><img src="gp/g/berater'.$helper_picid.'.png" border="0"></div>';
   echo $helper_msg;
 
-  //zur�ck/weiter-buttons
-  echo '<div style="position: absolute; bottom: 0px; right: 0px; width: 442px; text-align: center;">';
+  //zurück/weiter als Buttons (gut zu treffen, auch am Handy); deaktiviert, wenn es in die Richtung nicht weitergeht
+  echo '<div class="helper-nav" style="position: absolute; bottom: 6px; right: 0px; width: 442px; text-align: center;">';
   //SCRIPT_NAME statt PHP_SELF, das über PATH_INFO fremdes HTML enthalten kann
   $helper_self = htmlspecialchars(basename($_SERVER['SCRIPT_NAME']), ENT_QUOTES, 'UTF-8');
-  echo '<a href="'.$helper_self.'?helperdo=-1">zur&uuml;ck</a> '.($_SESSION['helperid']+1).'/'.($helper_progress+1).' <a href="'.$helper_self.'?helperdo=1">weiter</a>';
+  if($_SESSION['helperid']>0){
+    echo '<a href="'.$helper_self.'?helperdo=-1" class="helper-btn">&lsaquo; zur&uuml;ck</a>';
+  }else{
+    echo '<span class="helper-btn helper-btn-aus">&lsaquo; zur&uuml;ck</span>';
+  }
+  echo '<span class="helper-zaehler">'.($_SESSION['helperid']+1).'/'.($helper_progress+1).'</span>';
+  if($_SESSION['helperid']<$helper_progress){
+    echo '<a href="'.$helper_self.'?helperdo=1" class="helper-btn">weiter &rsaquo;</a>';
+  }else{
+    //Schritt 34 ist der letzte Hinweis, davor fehlt noch die erledigte Aufgabe
+    $helper_titel=($_SESSION['helperid']>=34) ? 'Das war der letzte Hinweis.' : 'Erledige zuerst die Aufgabe, dann geht es weiter.';
+    echo '<span class="helper-btn helper-btn-aus" title="'.$helper_titel.'">weiter &rsaquo;</span>';
+  }
   echo '</div>';
   
   echo '</div>';

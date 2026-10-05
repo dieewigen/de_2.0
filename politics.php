@@ -1047,7 +1047,7 @@ if($s==3 && $system==issectorcommander()) {
                              }
                          }
                      } else {
-                         echo '<br><font color="#FF0000">Es ist zurzeit bereits eine Transaktion aktiv. Bitte warten Sie, bis die Transaktion abgeschlossen ist.</font><br><br>';
+                         echo '<br><font color="#FF0000">Es ist zurzeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
                      }
                  }
 

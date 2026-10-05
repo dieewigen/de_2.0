@@ -656,6 +656,8 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
         $row['betreff']=htmlspecialchars($row['betreff'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         //stripcslashes VOR dem Escaping: danach würde es aus \x3c wieder ein echtes < machen
         $row['text']=htmlspecialchars(stripcslashes($row['text']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        //ältere Nachrichten aus dem Admin-Tool enthalten gespeicherte <br>, nur diese wieder als Umbruch zulassen
+        $row['text'] = preg_replace('/&lt;br\s*\/?&gt;/i', '<br>', $row['text']);
 
         $row['text'] = preg_replace("/\[b\]/i", "<b>", $row['text']);
         $row['text'] = preg_replace("/\[\/b\]/i", "</b>", $row['text']);

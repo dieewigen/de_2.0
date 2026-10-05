@@ -83,6 +83,7 @@ $ov_lang['rundenstatus']='Rundenstatus';
 $ov_lang['schiffseinheiten']='Schiffseinheiten';
 $ov_lang['schwarzmarktcredits']='Schwarzmarktcredits';
 $ov_lang['sek1welcome']='Willkommen in Sektor 1';
+$ov_lang['sek0info']='Dein System wird gerade in Sektor 1 eingerichtet. Das dauert höchstens eine Minute, lade die Seite danach einfach neu.';
 $ov_lang['sek1info']='Du befindest dich momentan im Startsektor 1. Hier kannst du dich in Ruhe mit den Spielfunktionen vertraut machen.<br><br>Dein Sonnensystem wird ab 10 Kollektoren, oder ab 5.000.000 Punkten in das normale Spielgeschehen versetzt. Ab diesem Zeitpunkt bist du auch angreifbar, kannst jedoch auch selber angreifen.';
 $ov_lang['sonden']='Sonden';
 $ov_lang['stufe']='Stufe';

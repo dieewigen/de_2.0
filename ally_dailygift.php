@@ -476,7 +476,11 @@ if ($ally_id > 0 && $allystatus == 1) {
 
 } else {
     include('resline.php');
-    echo '<div class="info_box"><span class="text2">'.$allydailygift_lang['keineally'].'</span></div><br>';
+    //ohne Allianz erklären, wofür der Bonus da ist und wie man zu einer Allianz kommt
+    echo '<div class="info_box" style="padding: 10px; font-size: 14px; color: #DDDDDD;">
+        <div class="text2" style="margin-bottom: 8px;">'.$allydailygift_lang['keineally'].'</div>
+        '.$allydailygift_lang['keineally_info'].'<br><br>
+        <a href="allymain.php">'.$allydailygift_lang['zurallianz'].'</a></div><br>';
 }
 
 ?>

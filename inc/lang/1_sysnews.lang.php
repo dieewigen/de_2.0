@@ -15,5 +15,5 @@ $sn_lang['allianz']='Allianz';
 $sn_lang['mailservice']='Mailservice';
 $sn_lang['mailbutton']='Alle Nachrichten per Email versenden';
 $sn_lang['deletenews']='Alle Nachrichten löschen';
-$sn_lang['deletewarning']='Warnung: Alle Nachrichten werden unwiderruflich gelöscht. Möchten Sie diese Aktion ausführen?';
+$sn_lang['deletewarning']='Warnung: Alle Nachrichten werden unwiderruflich gelöscht. Möchtest Du diese Aktion ausführen?';
 ?>

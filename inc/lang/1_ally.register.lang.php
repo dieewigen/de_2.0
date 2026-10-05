@@ -22,5 +22,5 @@ $allyregister_lang['allianzinformation']='Allianzinformation';
 $allyregister_lang['abschicken']='Abschicken';
 $allyregister_lang['zurueck']='Zurücksetzen';
 
-$allyregister_lang['msg_1']='Vorerst werden sie als Anführer eingetragen. Sie können dieses Amt aber jederzeit weitergeben.<br> Nach der Registrierung der Allianz können Sie weitere Informationen im Administrationsmodus eintragen.<br>	Nicht änderbar sind Regierungsform und spezielle Ausrichtung der Allianz! Wählen Sie mit Bedacht... (beide Einträge sind zur Zeit noch ohne Funktion)';
+$allyregister_lang['msg_1']='Vorerst wirst Du als Anführer eingetragen. Du kannst dieses Amt aber jederzeit weitergeben.<br> Nach der Registrierung der Allianz kannst Du weitere Informationen im Administrationsmodus eintragen.<br>	Nicht änderbar sind Regierungsform und spezielle Ausrichtung der Allianz! Wähle mit Bedacht... (beide Einträge sind zur Zeit noch ohne Funktion)';
 ?>

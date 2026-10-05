@@ -1,7 +1,7 @@
 <?php
 $allydelete_lang['title']='Allianz löschen';
 
-$allydelete_lang['msg_1']='Leider ist ihnen der Zugriff nicht gestattet. Auf dieses Dokument dürfen nur Allyleader zugreifen.';
+$allydelete_lang['msg_1']='Leider ist Dir der Zugriff nicht gestattet. Auf dieses Dokument dürfen nur Allyleader zugreifen.';
 $allydelete_lang['msg_2_1']='Leider befindest du dich noch in den ersten 72 Stunden eines Krieges !<BR>Du musst noch';
 $allydelete_lang['msg_2_2']='Stunden und';
 $allydelete_lang['msg_2_3']='Minuten warten bevor du deine Allianz löschen kannst.';

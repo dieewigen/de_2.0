@@ -187,18 +187,18 @@ $kolliemsg[0]='Ein gro&szlig;er Konzern beteiligt sich an einem prestigeversprec
 $kolliemsg[1]='Eine private Forschungseinrichtung möchte ein neues Steuerungssystem für Kollektoren testen und stellt kostenlos {VALUE1} Kollektorprototypen zur Verfügung.';
 $kolliemsg[2]='Eine private Universität hat einen verbesserten Kollektorzellenwerkstoff entwickelt und stellt ihre {VALUE1} Prototypen zur Verfügung.';
 $kolliemsg[3]='Eine übungsstaffel entdeckt zwischen Trümmern {VALUE1} verloren geglaubte Kollektoren.';
-$kolliemsg[4]='Ein gro&szlig;es Energieversorgungsunternehmen ist zahlungsunfähig. Die Insolvenzverwaltung spricht ihnen als Hauptgläubiger {VALUE1} Kollektoren zu.';
+$kolliemsg[4]='Ein gro&szlig;es Energieversorgungsunternehmen ist zahlungsunfähig. Die Insolvenzverwaltung spricht Dir als Hauptgläubiger {VALUE1} Kollektoren zu.';
 $kolliemsg[5]='Durch Umstellung auf einige selbstreplizierende Komponenten konnte der Kollektorbestand ohne zusätzlichen Ressourcenaufwand um {VALUE1} vergrö&szlig;ert werden.';
 
 $schiffmsg=array();
-$schiffmsg[0]='Sie gewinnen {VALUE1} {VALUE2}';
+$schiffmsg[0]='Du gewinnst {VALUE1} {VALUE2}';
 
 $deffmsg=array();
-$deffmsg[0]='Ihre Truppen nehmen eine Separatistenstellung ein. {VALUE1} {VALUE2} können wieder für ihre Zwecke eingesetzt werden.';
+$deffmsg[0]='Deine Truppen nehmen eine Separatistenstellung ein. {VALUE1} {VALUE2} können wieder für Deine Zwecke eingesetzt werden.';
 $deffmsg[1]='Durch Fortschritte in der Nanobotwartungstechnologie können Ingenieure {VALUE1} veraltete {VALUE2} wieder auf den neuesten Stand bringen.';
-$deffmsg[2]='Bei der Ausschreibung eines Gro&szlig;auftrags erhalten sie als Muster insgesamt {VALUE1} funktionsfähige {VALUE2} von verschiedenen Konzernen.';
+$deffmsg[2]='Bei der Ausschreibung eines Gro&szlig;auftrags erhältst Du als Muster insgesamt {VALUE1} funktionsfähige {VALUE2} von verschiedenen Konzernen.';
 $deffmsg[3]='Polizeieinheiten beschlagnahmen {VALUE1} funktionsfähige {VALUE2} der Rüstungsmafia.';
-$deffmsg[4]='Ein namenhafter Konzern hat ihnen einige unzulässige Vertragsbedingungen untergejubelt und wurde von einem Gericht zur kostenfreien Lieferung von {VALUE1} {VALUE2} verurteilt.';
+$deffmsg[4]='Ein namenhafter Konzern hat Dir einige unzulässige Vertragsbedingungen untergejubelt und wurde von einem Gericht zur kostenfreien Lieferung von {VALUE1} {VALUE2} verurteilt.';
 $deffmsg[5]='Bei einer Razzia einer illegalen Kriegsgerätemesse können Polizeieinheiten {VALUE1} {VALUE2} beschlagnahmen.';
 $deffmsg[6]='Eine spontane Mutation eines Nanobotstamms repliziert {VALUE1} {VALUE2} bevor er sich wegen unkontrollierter Verbreitung selbst vernichtet.';
 
@@ -207,18 +207,18 @@ $erfahrungsmsg[0]='Es fand ein Manöver statt. Der kommandierende Offizier gewan
 $erfahrungsmsg[1]='Bei einem übungsflug erlitt ein Flottenkommandant einen Unfall, jedoch nur leichte Verletzungen. Wenigstens hat er was draus gelernt {VALUE1} Erfahrungspunkte).';
 
 $agentenmsg=array();
-$agentenmsg[0]='Einige feindliche Agenten laufen zu ihnen über. Nach einer gründlichen Integritätsprüfung können sie {VALUE1} Agenten in den aktiven Dienst übernehmen.';
-$agentenmsg[1]='Auf eine Imagekampagne ihres Nachrichtendienstes melden sich viele neue Mitarbeiter für den Au&szlig;endienst. Die Ausbildungsabteilung kann allerdings nur {VALUE1} zu ordentlichen Agenten ausbilden.';
-$agentenmsg[2]='Ihr Nachrichtendienst führte eine umfangreiche Rekrutierungsaktion bester Köpfe durch. Von allen neu zugewiesenen Identitäten wurden {VALUE1} angenommen, um die übrigen wurde sich gekümmert. Die Familien erhielten die übliche Zuwendung.';
-$agentenmsg[3]='Durch eine Zusammenlegung zweier Abteilungen ihres Geheimdienstes konnten Stellen gespart werden. Es konnten {VALUE1} Agenten für den Au&szlig;endienst mobilisiert werden, die übrigen erhielten die nötige Aufmerksamkeit.';
+$agentenmsg[0]='Einige feindliche Agenten laufen zu Dir über. Nach einer gründlichen Integritätsprüfung kannst Du {VALUE1} Agenten in den aktiven Dienst übernehmen.';
+$agentenmsg[1]='Auf eine Imagekampagne Deines Nachrichtendienstes melden sich viele neue Mitarbeiter für den Au&szlig;endienst. Die Ausbildungsabteilung kann allerdings nur {VALUE1} zu ordentlichen Agenten ausbilden.';
+$agentenmsg[2]='Dein Nachrichtendienst führte eine umfangreiche Rekrutierungsaktion bester Köpfe durch. Von allen neu zugewiesenen Identitäten wurden {VALUE1} angenommen, um die übrigen wurde sich gekümmert. Die Familien erhielten die übliche Zuwendung.';
+$agentenmsg[3]='Durch eine Zusammenlegung zweier Abteilungen Deines Geheimdienstes konnten Stellen gespart werden. Es konnten {VALUE1} Agenten für den Au&szlig;endienst mobilisiert werden, die übrigen erhielten die nötige Aufmerksamkeit.';
 $agentenmsg[4]='Durch neue, psychische Trainigsmethoden konnten {VALUE1} Agenten die für den Au&szlig;endienst nötige Sicherheitsstufe erlangen.';
 $agentenmsg[5]='Einige in Haft befindliche Agenten konnten durch chemische Umerziehungsma&szlig;nahmen wieder auf Linie gebracht werden. {VALUE1} Agenten überstanden diese.';
 $agentenmsg[6]='Eine Befreiungsaktion brachte einige verloren geglaubte Agenten auf. {VALUE1} von ihnen überstanden alles ohne bleibende Schäden, die anderen wurden kostengünstig in den Ruhestand geschickt.';
-$agentenmsg[7]='Durch das Klonen ihrer besten Agenten konnte das nachrichtendienstliche Personal um {VALUE1} Agenten aufgestockt werden.';
+$agentenmsg[7]='Durch das Klonen Deiner besten Agenten konnte das nachrichtendienstliche Personal um {VALUE1} Agenten aufgestockt werden.';
 
 $sondenmsg=array();
 $sondenmsg[0]='Durch Kostenbeteiligung an Forschungssonden konnten einige nachrichtendienstlich taugliche Instrumente und ein Steuerungssystem heimlich angebracht werden. {VALUE1} solcher Geräte stehen dem Geheimdienst nun zusätzlich zur Verfügung.';
-$sondenmsg[1]='Als Bonus zur Vergabe eines umfangreichen Rüstungsvertrages erhält ihr Geheimdienst einen Satz von {VALUE1} Spionagesonden.';
+$sondenmsg[1]='Als Bonus zur Vergabe eines umfangreichen Rüstungsvertrages erhält Dein Geheimdienst einen Satz von {VALUE1} Spionagesonden.';
 $sondenmsg[2]='Beim testen einer selbstreplizierenden Sonde enstanden auf Anhieb {VALUE1} funktionsfähige Sonden, alle weiteren waren allerdings fehlerhaft, weshalb das Projekt erstmal auf Eis gelegt wurde.';
 
 $ressmsg=array();

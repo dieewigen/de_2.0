@@ -1711,6 +1711,15 @@ function validDigit($digit)
 }
 
 /**
+ * Link zur Technologieseite. In der Desktopversion (dm.php) öffnet sie sich wie über das Menü im großen Fenster,
+ * sonst (mobil, klassische Frames) als normaler Link.
+ */
+function link_technologien($text)
+{
+    return '<a href="ang_techs.php" onclick="if(window.parent!==window &amp;&amp; typeof window.parent.switch_iframe_main_container_big===\'function\'){window.parent.switch_iframe_main_container_big(\'ang_techs.php\');return false;}">'.$text.'</a>';
+}
+
+/**
  * Spielertext für die Ausgabe in HTML escapen. Vorhandene Entities (z. B. &uuml; aus älteren Einträgen) bleiben erhalten.
  */
 function html_text($string)
