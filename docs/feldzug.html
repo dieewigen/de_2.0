@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feldzug – Regelwerk</title>
+<meta name="description" content="Feldzug um die Vergessenen Systeme: das neue Eroberungssystem für Allianzen in Die Ewigen (Entwurf)">
+<style>
+:root {
+  --bg: #f4f5fa;
+  --surface: #ffffff;
+  --text: #1c2130;
+  --muted: #5a6376;
+  --border: #dde1ea;
+  --accent: #7b3fc4;
+  --accent-soft: #f1eafb;
+  --accent-text: #ffffff;
+  --cell: #eef0f6;
+  --ok: #1f9463;
+  --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 4px 16px rgba(20, 24, 40, .05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1120;
+    --surface: #151a2c;
+    --text: #e4e7f1;
+    --muted: #9ea6bd;
+    --border: #283050;
+    --accent: #b48cf0;
+    --accent-soft: #261d42;
+    --accent-text: #160f26;
+    --cell: #1d2338;
+    --ok: #3cc48a;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1120;
+  --surface: #151a2c;
+  --text: #e4e7f1;
+  --muted: #9ea6bd;
+  --border: #283050;
+  --accent: #b48cf0;
+  --accent-soft: #261d42;
+  --accent-text: #160f26;
+  --cell: #1d2338;
+  --ok: #3cc48a;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 16px 64px; }
+
+header.hero { padding: 48px 0 28px; }
+.eyebrow {
+  display: inline-block;
+  font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+.lead { font-size: 18px; color: var(--muted); margin: 0; max-width: 680px; }
+.stand { margin-top: 14px; font-size: 14px; color: var(--muted); }
+.badge {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px;
+}
+
+.facts {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin: 8px 0 32px;
+}
+.fact {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.fact b { display: block; font-size: 21px; line-height: 1.2; color: var(--accent); }
+.fact span { font-size: 14px; color: var(--muted); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 22px 24px; margin: 0 0 20px; box-shadow: var(--shadow);
+}
+@media (max-width: 560px) { .card { padding: 18px 16px; } }
+
+nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+nav.toc li { break-inside: avoid; margin: 2px 0; }
+@media (max-width: 560px) { nav.toc ol { columns: 1; } }
+nav.toc h2 { margin-top: 0; }
+nav.toc .toc-first { margin: 0 0 6px; }
+
+h2 { font-size: 22px; line-height: 1.3; margin: 0 0 12px; scroll-margin-top: 16px; }
+h2 .num { color: var(--accent); margin-right: 6px; }
+h3 { font-size: 17px; margin: 22px 0 8px; }
+p { margin: 0 0 12px; }
+ul, ol { margin: 0 0 12px; padding-left: 22px; }
+li { margin: 4px 0; }
+li > ul { margin: 4px 0 0; }
+a { color: var(--accent); }
+strong { font-weight: 650; }
+
+.table-wrap { overflow-x: auto; margin: 4px 0 14px; border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+th { background: var(--cell); font-weight: 650; }
+tr:last-child td { border-bottom: 0; }
+td.c, th.c { text-align: center; }
+.yes { color: var(--ok); font-weight: 700; }
+.no { color: var(--muted); }
+
+/* breite Tabellen auf dem Handy als Blöcke untereinander, mit Spaltenname vor jedem Wert */
+@media (max-width: 600px) {
+  table.stack thead { display: none; }
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+  table.stack tr { border-bottom: 1px solid var(--border); padding: 6px 0 8px; }
+  table.stack tr:last-child { border-bottom: 0; }
+  table.stack td { border: 0; padding: 2px 14px; text-align: left; }
+  table.stack td:first-child { font-weight: 650; padding-top: 6px; }
+  table.stack td[data-label]::before { content: attr(data-label) ": "; color: var(--muted); font-weight: 500; }
+}
+
+.formula {
+  background: var(--accent-soft); border-left: 4px solid var(--accent);
+  border-radius: 8px; padding: 12px 16px; margin: 8px 0 14px; font-weight: 600;
+}
+.formula span { font-weight: 400; }
+
+.steps { counter-reset: s; list-style: none; padding-left: 0; }
+.steps > li { counter-increment: s; position: relative; padding-left: 40px; margin: 10px 0; }
+.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-text);
+  font-weight: 700; font-size: 14px; display: grid; place-items: center;
+}
+
+/* Skizze des Handy-Bildschirms */
+.phone {
+  max-width: 360px; margin: 10px auto 8px;
+  background: var(--bg); border: 2px solid var(--border); border-radius: 22px;
+  padding: 14px 12px 12px; font-size: 14px; line-height: 1.4;
+}
+.ph-head { font-weight: 700; font-size: 15px; }
+.ph-head small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.ph-bar {
+  margin: 10px 0; padding: 6px 10px; border-radius: 8px;
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px;
+}
+.ph-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px 10px; margin: 6px 0;
+}
+.ph-name { flex: 1; min-width: 0; }
+.ph-name b { display: block; }
+.ph-name span { color: var(--muted); font-size: 12.5px; }
+.tag { font-weight: 600; color: var(--text); }
+.stp { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex: none; }
+.stp b { width: 30px; text-align: center; background: var(--cell); color: var(--accent); font-size: 16px; line-height: 28px; }
+.stp em { width: 30px; text-align: center; font-style: normal; font-weight: 700; }
+.ph-last { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+.sketch-note { text-align: center; font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+
+footer { text-align: center; color: var(--muted); font-size: 14px; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Die Ewigen · Vergessene Systeme</div>
+  <h1>Feldzug um die Vergessenen Systeme</h1>
+  <p class="lead">Ein Wettstreit für Allianzen um einzelne Vergessene Systeme. Gewinnen sollen kluge Planung und gutes Taktieren, nicht Größe oder ständige Anwesenheit. Gespielt wird über eine einfache Liste, auch auf dem Handy.</p>
+  <p class="stand"><span class="badge">Entwurf</span>&nbsp; Stand 05.10.2026</p>
+</header>
+
+<div class="facts">
+  <div class="fact"><b>12 Legionen</b><span>pro Allianz und Zug, für alle gleich</span></div>
+  <div class="fact"><b>Lange Züge</b><span>Verteilung bleibt stehen</span></div>
+  <div class="fact"><b>Keine Karte</b><span>eine Liste, auch mobil</span></div>
+  <div class="fact"><b>ab 2 Allianzen</b><span>auch Einzelspieler</span></div>
+  <div class="fact"><b>14 Züge</b><span>pro Feldzug</span></div>
+</div>
+
+<nav class="card toc" aria-label="Inhalt">
+  <h2>Inhalt</h2>
+  <p class="toc-first"><a href="#wichtig">Das Wichtigste</a></p>
+  <ol>
+    <li><a href="#ablauf">So läuft ein Feldzug</a></li>
+    <li><a href="#brennpunkte">Brennpunkte</a></li>
+    <li><a href="#teilnahme">Teilnahme</a></li>
+    <li><a href="#verteilen">Legionen verteilen</a></li>
+    <li><a href="#auswertung">Auswertung eines Zuges</a></li>
+    <li><a href="#belohnungen">Belohnungen</a></li>
+    <li><a href="#rechte">Wer sieht und darf was?</a></li>
+  </ol>
+</nav>
+
+<section class="card" id="wichtig">
+  <h2>Das Wichtigste</h2>
+  <ul>
+    <li>Gekämpft wird mit <strong>Legionen</strong>, nicht mit Flotten. Am normalen Kampf ändert sich nichts, Schiffe gehen dabei nicht verloren.</li>
+    <li>Die Allianzen kämpfen um <strong>Brennpunkte</strong>, das sind einzelne Vergessene Systeme. Eine Karte braucht man dafür nicht.</li>
+    <li>Jede Allianz hat <strong>12 Legionen pro Zug</strong>, egal wie groß sie ist. Alle verteilen gleichzeitig und verdeckt. Nach jedem Zug sieht jeder, wie die anderen verteilt hatten.</li>
+    <li>Die <strong>Züge sind lang</strong>: 480 WT, auf dem langsameren Server 144 WT. Die Verteilung bleibt stehen, bis jemand sie ändert.</li>
+    <li><strong>Alle Allianzen</strong> können mitmachen, auch Einzelspieler mit eigener Allianz. Der Eintritt kostet VS-Rohstoffe aus der Kriegskasse der Allianz.</li>
+    <li><strong>Belohnungen:</strong> Questpunkte für den Allianz-Rundensieg, Vorteile durch Mine und Werft, das Kürzel der Allianz bei ihren Brennpunkten und der Titel <strong>Feldherr/in</strong>.</li>
+    <li>Battlegrounds, ARES und HEPHAISTOS bleiben, wie sie sind.</li>
+  </ul>
+</section>
+
+<section class="card" id="ablauf">
+  <h2><span class="num">1</span>So läuft ein Feldzug</h2>
+  <ol class="steps">
+    <li>Ein <strong>Aufruf</strong> beginnt. Allianzen melden sich an und füllen ihre Kriegskasse.</li>
+    <li>Zum Start werden einige Vergessene Systeme zu <strong>Brennpunkten</strong>, und zwar so viele, wie es Teilnehmer gibt, plus 3.</li>
+    <li>In <strong>12 Zügen</strong> verteilt jede Allianz ihre 12 Legionen auf die Brennpunkte.</li>
+    <li>Wer auf einem Brennpunkt am stärksten ist, hält ihn. Gehaltene Brennpunkte bringen nach jedem Zug <strong>Kontrollpunkte</strong>.</li>
+    <li>Wer am Ende die meisten Kontrollpunkte hat, gewinnt den Feldzug. Danach beginnt der nächste Aufruf mit neuen Brennpunkten.</li>
+  </ol>
+  <ul>
+    <li><strong>Zuglänge:</strong> Ein Zug dauert 480 WT, auf dem langsameren Server 144 WT.</li>
+    <li><strong>Erster Aufruf:</strong> nach 7 Zügen Rundenlaufzeit, also nach 3.360 WT, auf dem langsameren Server nach 1.008 WT. Bis dahin haben sich die Allianzen nach dem Reset neu gefunden.</li>
+    <li><strong>Dauer:</strong> Ein Feldzug besteht aus 2 Zügen Aufruf und 12 Zügen Kampf, zusammen 14 Züge: 6.720 WT, auf dem langsameren Server 2.016 WT. Danach beginnt gleich der nächste. So gibt es mehrere Feldzüge pro Runde.</li>
+    <li><strong>Rundenende:</strong> Ein laufender Feldzug endet mit der Runde. Seine Punkte sind dann schon gutgeschrieben, weil sie nach jedem Zug vergeben werden.</li>
+  </ul>
+</section>
+
+<section class="card" id="brennpunkte">
+  <h2><span class="num">2</span>Brennpunkte</h2>
+  <ul>
+    <li><strong>Anzahl:</strong> Teilnehmer plus 3. Bei 2 Allianzen gibt es 5 Brennpunkte, bei 6 Allianzen 9. Es gibt also immer mehr Brennpunkte als Allianzen, und nicht jeder lässt sich stark besetzen.</li>
+    <li><strong>Auswahl:</strong> Zum Start werden zufällig gewöhnliche Vergessene Systeme gewählt, keine Battlegrounds und keine Sondersysteme. Jeder Brennpunkt trägt den Namen seines Systems.</li>
+    <li>Jeder Feldzug hat neue Brennpunkte.</li>
+  </ul>
+
+  <h3>Werte</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Art</th><th>Anzahl</th><th class="c">Kontrollpunkte pro Zug</th></tr></thead>
+    <tbody>
+      <tr><td>Kern</td><td>1</td><td class="c">3</td></tr>
+      <tr><td>Wichtiger Brennpunkt</td><td>etwa ein Drittel der übrigen</td><td class="c">2</td></tr>
+      <tr><td>Brennpunkt</td><td>der Rest</td><td class="c">1</td></tr>
+    </tbody>
+  </table></div>
+  <p>Ein Beispiel mit 5 Brennpunkten: ein Kern mit 3 Punkten, ein wichtiger Brennpunkt mit 2 und drei mit je 1.</p>
+
+  <h3>Rollen</h3>
+  <p>Einige Brennpunkte haben zusätzlich eine Rolle, der Kern nie:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Rolle</th><th>Anzahl</th><th>Wirkung für den Halter</th></tr></thead>
+    <tbody>
+      <tr><td>Festung</td><td>1, ab 8 Brennpunkten 2</td><td>Verteidigung +1 zusätzlich zum Halterbonus</td></tr>
+      <tr><td>Mine</td><td>1</td><td>Alle Mitglieder: +10 % Ertrag der VS-Industrie</td></tr>
+      <tr><td>Werft</td><td>1</td><td>Alle Mitglieder: −10 % Bauzeit in den VS</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>Am Anfang sind alle Brennpunkte <strong>neutral</strong>. Neutrale Brennpunkte haben keine Verteidigung.</li>
+    <li><strong>Wo man sie sieht:</strong> auf der Feldzugseite, für alle Spieler. In der Liste der V-Systeme und auf der Desktop-Karte sind Brennpunkte markiert, mit dem Kürzel des Halters. Zum Bauen muss man ein System weiterhin erkunden. Am Bauen und an den eigenen Gebäuden ändert der Feldzug nichts.</li>
+    <li>Nach dem Ende eines Feldzugs bleiben die Kürzel der letzten Halter sichtbar, bis der nächste Feldzug beginnt.</li>
+  </ul>
+</section>
+
+<section class="card" id="teilnahme">
+  <h2><span class="num">3</span>Teilnahme</h2>
+  <h3>Voraussetzungen</h3>
+  <p>Eine Allianz ist dabei, wenn am Ende des Aufrufs drei Dinge erfüllt sind:</p>
+  <ol>
+    <li>Ein Mitglied mit Posten hat die Allianz angemeldet.</li>
+    <li>Die Allianz hat mindestens <strong>1 berechtigtes Mitglied</strong>, auch Einzelspieler mit eigener Allianz können also mitmachen. Berechtigt ist jeder Spieler mit aktivem Konto, der in einem Sektor größer als 1 steht und <strong>seit Beginn des Aufrufs</strong> in der Allianz ist. Eine Allianz, die erst während des Aufrufs gegründet wird, ist deshalb erst beim nächsten Feldzug dabei.</li>
+    <li>Die <strong>Kriegskasse</strong> enthält den Eintrittspreis.</li>
+  </ol>
+
+  <h3>Kriegskasse und Eintrittspreis</h3>
+  <ul>
+    <li>Die Kriegskasse ist das Allianzlager. <strong>Jedes Mitglied</strong> kann VS-Rohstoffe aus dem eigenen Lager hineinspenden. Eine Spende lässt sich nicht zurückholen.</li>
+    <li><strong>Eintrittspreis:</strong> pro Feldzug von jeder der zehn Rohstoffarten (Eisen bis Octagium) derselbe Betrag.
+      <ul>
+        <li>Beim ersten Feldzug einer Runde sind das 2.000 je Rohstoffart auf dem schnellen Server und 600 auf dem langsameren.</li>
+        <li>Danach steigt der Preis in dem Maß, in dem die Spieler insgesamt mehr in den VS produzieren. Gemessen wird das zu Beginn jedes Aufrufs.</li>
+      </ul>
+    </li>
+  </ul>
+  <div class="formula">Eintrittspreis = Grundpreis × (Produktion jetzt ÷ Produktion beim ersten Feldzug)<br><span>mindestens der Grundpreis, gerundet auf volle Hundert</span></div>
+  <ul>
+    <li>Der Preis steht zu Beginn des Aufrufs fest und ändert sich bis zum Start nicht mehr. Die Feldzugseite zeigt ihn an.</li>
+    <li>Weil alle zehn Arten verlangt werden, lohnt sich Zusammenlegen. Die Felder sind zufällig verteilt, kaum jemand hat alle Arten.</li>
+    <li><strong>Einzelspieler</strong> zahlen denselben Preis und bekommen dieselben 12 Legionen.</li>
+    <li>Der Eintrittspreis wird beim Start der Kampfphase abgebucht. Was darüber hinaus in der Kasse liegt, bleibt für den nächsten Feldzug.</li>
+  </ul>
+
+  <h3>Teilnehmerzahl</h3>
+  <ul>
+    <li>Ein Feldzug braucht <strong>mindestens 2</strong> Allianzen. Jede Allianz, die die Voraussetzungen erfüllt, ist dabei. Eine Obergrenze gibt es nicht, die Zahl der Brennpunkte wächst mit.</li>
+    <li>Mit weniger als 2 Allianzen fällt der Feldzug aus. Dann wird nichts abgebucht, und ein neuer Aufruf beginnt.</li>
+    <li>Alle berechtigten Mitglieder zum Start zählen als <strong>Teilnehmer</strong>. Nur Teilnehmer können den Feldherren-Titel bekommen.</li>
+  </ul>
+</section>
+
+<section class="card" id="verteilen">
+  <h2><span class="num">4</span>Legionen verteilen</h2>
+  <ul>
+    <li>Jede Allianz hat <strong>12 Legionen pro Zug</strong> und verteilt sie beliebig auf die Brennpunkte, auch alle auf einen einzigen. Legionen, die nicht verteilt sind, bleiben ungenutzt.</li>
+    <li><strong>Verteilen</strong> dürfen alle Mitglieder mit Posten: Leader, Co-Leader, Fleet Commander, Tactical Officer und Member Officer.</li>
+    <li>Legionen auf einem eigenen Brennpunkt verteidigen ihn, Legionen auf einem fremden oder neutralen Brennpunkt greifen ihn an. Mehr Befehle gibt es nicht.</li>
+    <li><strong>Stehende Verteilung:</strong> Die Verteilung gilt, bis jemand sie ändert. Wer einen Zug verpasst, kämpft mit der alten Verteilung weiter.</li>
+    <li><strong>Frist:</strong> Ausgewertet wird mit dem WT, der den Zug abschließt. Bis dahin lässt sich die Verteilung beliebig ändern. Die Feldzugseite zeigt, wie viele WT noch fehlen.</li>
+    <li>Jede Änderung wird mit Name und Zeit festgehalten. Alle Mitglieder sehen, wer was geändert hat.</li>
+    <li>Allianzen können sich absprechen, aber ihre Legionen nicht zusammenlegen. Jede Allianz kämpft auf jedem Brennpunkt für sich.</li>
+  </ul>
+
+  <h3>So könnte ein Zug auf dem Handy aussehen</h3>
+  <p class="sketch-note">Skizze, die echte Seite kann davon abweichen</p>
+  <div class="phone" aria-label="Skizze der Feldzugseite auf dem Handy">
+    <div class="ph-head">Feldzug · Zug 5 von 12<small>Auswertung in 132 WT</small></div>
+    <div class="ph-bar">Verteilt: 12 von 12 Legionen</div>
+    <div class="ph-row"><div class="ph-name"><b>Nexus-7 · Kern</b><span>3 Punkte · hält <span class="tag">[A]</span></span></div><span class="stp"><b>–</b><em>4</em><b>+</b></span></div>
+    <div class="ph-row"><div class="ph-name"><b>Arvo · Mine</b><span>2 Punkte · neutral</span></div><span class="stp"><b>–</b><em>4</em><b>+</b></span></div>
+    <div class="ph-row"><div class="ph-name"><b>Kelm · Festung</b><span>1 Punkt · hält <span class="tag">[B]</span></span></div><span class="stp"><b>–</b><em>0</em><b>+</b></span></div>
+    <div class="ph-row"><div class="ph-name"><b>Sirr</b><span>1 Punkt · neutral</span></div><span class="stp"><b>–</b><em>4</em><b>+</b></span></div>
+    <div class="ph-row"><div class="ph-name"><b>Duun · Werft</b><span>1 Punkt · neutral</span></div><span class="stp"><b>–</b><em>0</em><b>+</b></span></div>
+    <div class="ph-last">Letzter Zug: Nexus-7: A 4 · B 3 — Kelm: B 3 · A 2 — …</div>
+  </div>
+</section>
+
+<section class="card" id="auswertung">
+  <h2><span class="num">5</span>Auswertung eines Zuges</h2>
+  <p>Für jeden Brennpunkt, alle gleichzeitig:</p>
+  <ol class="steps">
+    <li><strong>Stärke:</strong> Jede Allianz ist so stark, wie sie Legionen auf diesem Brennpunkt hat.</li>
+    <li><strong>Halterbonus:</strong> Der bisherige Halter bekommt +1, auf einer Festung +2. Das gilt auch, wenn er dort gerade keine Legionen hat.</li>
+    <li><strong>Ergebnis:</strong> Die stärkste Allianz hält den Brennpunkt. Bei Gleichstand bleibt der bisherige Halter, auch wenn zwei andere Allianzen gleichauf über ihm liegen. Ein neutraler Brennpunkt bleibt bei Gleichstand neutral.</li>
+    <li><strong>Punkte:</strong> Jeder gehaltene Brennpunkt bringt seinem Halter seine Kontrollpunkte.</li>
+    <li><strong>Für alle sichtbar:</strong> Alle Spieler sehen danach für jeden Brennpunkt, welche Allianz wie viele Legionen gesetzt hatte und wer ihn jetzt hält. Im allgemeinen Chat erscheint <strong>eine</strong> Sammelmeldung zu allen Besitzwechseln, im Allianzchat eine Kurzmeldung zum eigenen Ergebnis.</li>
+  </ol>
+  <p>Legionen gehen nie verloren, im nächsten Zug sind wieder alle 12 da. Verlieren kann man nur einen Brennpunkt.</p>
+
+  <h3>Beispiel</h3>
+  <p>Zwei Allianzen, 5 Brennpunkte, beide verteilen ihre 12 Legionen:</p>
+  <div class="table-wrap"><table class="stack">
+    <thead><tr><th>Brennpunkt</th><th class="c">Wert</th><th>Halter vorher</th><th>A</th><th>B</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td>Nexus-7 (Kern)</td><td class="c" data-label="Wert">3</td><td data-label="Halter vorher">A</td><td data-label="A">4, mit Halterbonus 5</td><td data-label="B">5</td><td data-label="Ergebnis">A hält, Gleichstand geht an den Halter</td></tr>
+      <tr><td>Arvo (Mine)</td><td class="c" data-label="Wert">2</td><td data-label="Halter vorher">neutral</td><td data-label="A">4</td><td data-label="B">0</td><td data-label="Ergebnis">A erobert</td></tr>
+      <tr><td>Kelm (Festung)</td><td class="c" data-label="Wert">1</td><td data-label="Halter vorher">B</td><td data-label="A">0</td><td data-label="B">3, mit Festung 5</td><td data-label="Ergebnis">B hält</td></tr>
+      <tr><td>Sirr</td><td class="c" data-label="Wert">1</td><td data-label="Halter vorher">neutral</td><td data-label="A">4</td><td data-label="B">2</td><td data-label="Ergebnis">A erobert</td></tr>
+      <tr><td>Duun (Werft)</td><td class="c" data-label="Wert">1</td><td data-label="Halter vorher">neutral</td><td data-label="A">0</td><td data-label="B">2</td><td data-label="Ergebnis">B erobert</td></tr>
+    </tbody>
+  </table></div>
+  <p>A bekommt 3 + 2 + 1 = 6 Kontrollpunkte, B bekommt 1 + 1 = 2. Hätte B eine Legion von Duun auf Nexus-7 verlegt, hätte B den Kern erobert und Duun trotzdem gehalten: 5 zu 3 für B.</p>
+</section>
+
+<section class="card" id="belohnungen">
+  <h2><span class="num">6</span>Belohnungen</h2>
+  <h3>Questpunkte nach jedem Zug</h3>
+  <div class="formula">1 Kontrollpunkt = 30 Questpunkte<br><span>auf dem langsameren Server 9 Questpunkte, weil die Züge dort kürzer sind</span></div>
+  <ul>
+    <li>Wer einen guten Teil der Brennpunkte hält, bekommt damit im gleichen Zeitraum etwa so viel wie für eine erfüllte Allianzaufgabe, auf beiden Servern gleich.</li>
+    <li>Questpunkte entscheiden über den <strong>Allianz-Rundensieg</strong>. Der Feldzug wird damit zu einem wichtigen Weg dorthin.</li>
+  </ul>
+
+  <h3>Vorteile, solange man hält</h3>
+  <ul>
+    <li><strong>Mine:</strong> Alle Mitglieder bekommen +10 % Ertrag der VS-Industrie, zusätzlich zu ihren übrigen Boni.</li>
+    <li><strong>Werft:</strong> Alle Mitglieder bekommen −10 % Bauzeit in den VS. Wie bei allen VS-Bauzeitboni gilt eine Obergrenze von zusammen 50 %.</li>
+  </ul>
+
+  <h3>Feldzugsieg</h3>
+  <ul>
+    <li>Sieger ist die Allianz mit den meisten Kontrollpunkten über den ganzen Feldzug. Bei Gleichstand gewinnt, wer am Ende mehr Brennpunkte hält. Ist auch das gleich, entscheidet das Los.</li>
+    <li>Der Sieg wird im allgemeinen Chat gemeldet und in der Rangliste festgehalten.</li>
+  </ul>
+
+  <h3>Feldherren der Runde</h3>
+  <ul>
+    <li>Am Rundenende werden die Feldherren ermittelt. Das ist die Allianz mit den meisten Feldzugsiegen in der Runde. Bei Gleichstand zählt die Summe der Kontrollpunkte.</li>
+    <li>Den Titel bekommen die <strong>Spieler</strong> dieser Allianz, die an einem ihrer gewonnenen Feldzüge teilgenommen haben. Er bleibt dauerhaft in ihrem Account: „[Servertag] FELDHERR/IN – Runde N“, genau wie beim Erhabenen.</li>
+    <li>Die Feldherren bleiben in der Rundenhistorie der Rangliste stehen, auch nachdem die Allianzen beim Rundenwechsel aufgelöst wurden.</li>
+  </ul>
+</section>
+
+<section class="card" id="rechte">
+  <h2><span class="num">7</span>Wer sieht und darf was?</h2>
+  <div class="table-wrap"><table class="stack">
+    <thead><tr><th></th><th class="c">Alle Spieler</th><th class="c">Mitglieder einer teilnehmenden Allianz</th><th class="c">Mitglieder mit Posten</th></tr></thead>
+    <tbody>
+      <tr><td>Brennpunkte mit Wert, Rolle und Halter</td><td class="c yes" data-label="Alle Spieler">sehen</td><td class="c yes" data-label="Mitglieder">sehen</td><td class="c yes" data-label="Mit Posten">sehen</td></tr>
+      <tr><td>Ergebnisse aller vergangenen Züge, Punktestand, Historie</td><td class="c yes" data-label="Alle Spieler">sehen</td><td class="c yes" data-label="Mitglieder">sehen</td><td class="c yes" data-label="Mit Posten">sehen</td></tr>
+      <tr><td>Aktuelle Verteilung der eigenen Allianz</td><td class="c no" data-label="Alle Spieler">–</td><td class="c yes" data-label="Mitglieder">sehen</td><td class="c yes" data-label="Mit Posten">sehen und ändern</td></tr>
+      <tr><td>VS-Rohstoffe in die Kriegskasse spenden</td><td class="c no" data-label="Alle Spieler">–</td><td class="c yes" data-label="Mitglieder">ja</td><td class="c yes" data-label="Mit Posten">ja</td></tr>
+      <tr><td>Allianz zum Feldzug anmelden</td><td class="c no" data-label="Alle Spieler">–</td><td class="c no" data-label="Mitglieder">–</td><td class="c yes" data-label="Mit Posten">ja</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Verrat:</strong> Alle Mitglieder sehen die aktuelle Verteilung der eigenen Allianz und könnten sie an Gegner weitergeben. Vertrauen in der eigenen Allianz ist also etwas wert.</p>
+</section>
+
+<footer>Die Ewigen · Feldzug um die Vergessenen Systeme · Entwurf, Stand 05.10.2026</footer>
+
+</div>
+</body>
+</html>
