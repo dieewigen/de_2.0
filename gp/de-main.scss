@@ -1657,6 +1657,23 @@ a.btn:visited {
 	pointer-events: none;
 }
 
+// Eingabefelder; eigene Klasse, da das Theme input/select mit höherer Spezifität einfärbt
+.mod .mod-eingabe {
+	padding: 6px 8px;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: 6px;
+	background: #0d1117;
+	font-family: inherit;
+	font-size: 13px;
+	color: #ffffff;
+
+	&:focus {
+		outline: none;
+		border-color: var(--akzent);
+		box-shadow: 0 0 0 2px var(--akzent-weich);
+	}
+}
+
 // Feld an Stelle eines Knopfs: Grund, warum es nicht geht, oder Ergebnis
 .mod-feld {
 	display: inline-block;
@@ -2927,6 +2944,335 @@ a.art-kachel-zurueck:hover::after {
 	margin-top: 10px;
 	font-size: 11px;
 	color: #8b949e;
+}
+
+// Geheimdienst (secret.php)
+.geh {
+	width: 572px;
+}
+
+.geh-zeile {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 10px 14px;
+
+	& + & {
+		margin-top: 10px;
+	}
+}
+
+.geh-feld {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+
+	.mod-chip {
+		align-self: flex-start;
+		cursor: help;
+	}
+}
+
+.geh-breit {
+	flex: 1 1 auto;
+
+	select {
+		width: 100%;
+	}
+}
+
+.geh-los {
+	margin-left: auto;
+}
+
+.geh-bestand {
+	min-width: 90px;
+
+	b {
+		font-size: 18px;
+		font-weight: 700;
+		line-height: 30px;
+		color: #ffffff;
+	}
+}
+
+.geh-koord {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	color: #8b949e;
+
+	.mod-eingabe {
+		width: 58px;
+		text-align: center;
+	}
+}
+
+.mod .geh-anzahl {
+	width: 96px;
+}
+
+.geh-beschreibung {
+	margin: 12px 0 0 0;
+}
+
+// letzte Einsätze: Ziel und die beiden Übernahme-Knöpfe
+.geh-verlauf {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 0;
+
+	& + & {
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.mod-btn,
+	.mod-btn:link,
+	.mod-btn:visited {
+		padding: 5px 10px;
+		font-size: 11px;
+	}
+}
+
+.geh-verlauf-ziel {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 13px;
+	color: #9da7b1;
+	overflow-wrap: anywhere;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+// Ausbildung und Bau
+.geh-einheiten {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.geh-einheit {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 10px;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+}
+
+.geh-einheit-bild {
+	display: block;
+	width: 64px;
+	height: 44px;
+	border-radius: 7px;
+	object-fit: cover;
+}
+
+.geh-einheit-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-width: 0;
+}
+
+.mod .geh-einheit-name,
+.mod .geh-einheit-name:link,
+.mod .geh-einheit-name:visited {
+	font-size: 15px;
+	font-weight: 500;
+	color: #ffffff;
+}
+
+.geh-einheit-kosten,
+.geh-summe-werte {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 10px;
+}
+
+.geh-kosten {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	img {
+		width: 16px;
+		height: 16px;
+		border-radius: 4px;
+	}
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.geh-summe {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 10px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.3);
+}
+
+.geh-summe-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.geh-klein {
+	margin-top: 6px;
+	font-size: 10px;
+	color: #8b949e;
+}
+
+.geh-produktion {
+	margin-top: 12px;
+
+	.mod-typ {
+		margin-bottom: 4px;
+	}
+}
+
+.geh-auftrag {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 5px 2px;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+	font-size: 12px;
+	color: #c9d1d9;
+
+	span:first-child {
+		flex: 1 1 auto;
+	}
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.geh-sabotage {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 12px;
+	border-radius: 8px;
+	background: rgba(255, 107, 107, 0.12);
+	font-size: 12px;
+	color: #ff8a8a;
+
+	& + & {
+		margin-top: 6px;
+	}
+}
+
+// Berichte nach Sonden- und Agenteneinsätzen: alter Tabellenaufbau, moderne Flächen;
+// !important, weil die Zellklassen im Theme mit höherer Spezifität gesetzt sind
+.geh-berichte {
+	// so breit wie die Rahmen; schmale Berichtstabellen (400 px) stehen mittig darunter
+	width: 602px;
+
+	> table,
+	> form > table {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.info_box {
+		box-sizing: border-box;
+		width: 602px;
+		border: 0;
+		border-radius: 8px;
+		background: rgba(6, 9, 14, 0.92);
+		font-family: Roboto, Arial, Helvetica, sans-serif;
+		font-size: 13px;
+		line-height: 1.4;
+		color: #c9d1d9;
+	}
+
+	.cell,
+	.cell1 {
+		font-family: Roboto, Arial, Helvetica, sans-serif;
+		font-size: 12px;
+		color: #c9d1d9;
+	}
+
+	.cell,
+	tr.cell > td {
+		background: rgba(6, 9, 14, 0.92) !important;
+	}
+
+	.cell1,
+	tr.cell1 > td {
+		background: rgba(30, 37, 48, 0.95) !important;
+	}
+
+	td {
+		padding: 2px 6px;
+	}
+
+	b {
+		color: #ffffff;
+	}
+
+	// Zellen der Agentenberichte; "table td.x" schlägt die Theme-Regel body.theme-rasseN .x
+	table td.c,
+	table td.cl,
+	table td.cc,
+	table td.cr,
+	table td.tl,
+	table td.tc,
+	table td.tr,
+	table td.ccg,
+	table td.ccr,
+	table td.ccy {
+		padding: 4px 8px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: rgba(6, 9, 14, 0.92);
+		font-family: Roboto, Arial, Helvetica, sans-serif;
+		font-size: 12px;
+	}
+
+	table td.c,
+	table td.cl,
+	table td.cc,
+	table td.cr {
+		color: #c9d1d9;
+	}
+
+	// Kopfzellen
+	table td.tl,
+	table td.tc,
+	table td.tr {
+		background: rgba(30, 37, 48, 0.95);
+		font-weight: 500;
+		color: #ffffff;
+	}
+
+	table td.ccg {
+		color: #5fe08a;
+	}
+
+	table td.ccr {
+		color: #ff6b6b;
+	}
+
+	table td.ccy {
+		color: #ffb45c;
+	}
 }
 
 // Mobile Layout

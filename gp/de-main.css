@@ -1394,6 +1394,21 @@ body.theme-rasse4 {
   pointer-events: none;
 }
 
+.mod .mod-eingabe {
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: #0d1117;
+  font-family: inherit;
+  font-size: 13px;
+  color: #ffffff;
+}
+.mod .mod-eingabe:focus {
+  outline: none;
+  border-color: var(--akzent);
+  box-shadow: 0 0 0 2px var(--akzent-weich);
+}
+
 .mod-feld {
   display: inline-block;
   padding: 7px 10px;
@@ -2627,6 +2642,300 @@ a.art-kachel-zurueck:hover::after {
   margin-top: 10px;
   font-size: 11px;
   color: #8b949e;
+}
+
+.geh {
+  width: 572px;
+}
+
+.geh-zeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+}
+.geh-zeile + .geh-zeile {
+  margin-top: 10px;
+}
+
+.geh-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.geh-feld .mod-chip {
+  align-self: flex-start;
+  cursor: help;
+}
+
+.geh-breit {
+  flex: 1 1 auto;
+}
+.geh-breit select {
+  width: 100%;
+}
+
+.geh-los {
+  margin-left: auto;
+}
+
+.geh-bestand {
+  min-width: 90px;
+}
+.geh-bestand b {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #ffffff;
+}
+
+.geh-koord {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #8b949e;
+}
+.geh-koord .mod-eingabe {
+  width: 58px;
+  text-align: center;
+}
+
+.mod .geh-anzahl {
+  width: 96px;
+}
+
+.geh-beschreibung {
+  margin: 12px 0 0 0;
+}
+
+.geh-verlauf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+.geh-verlauf + .geh-verlauf {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.geh-verlauf .mod-btn,
+.geh-verlauf .mod-btn:link,
+.geh-verlauf .mod-btn:visited {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.geh-verlauf-ziel {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
+  color: #9da7b1;
+  overflow-wrap: anywhere;
+}
+.geh-verlauf-ziel b {
+  color: #ffffff;
+}
+
+.geh-einheiten {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.geh-einheit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+}
+
+.geh-einheit-bild {
+  display: block;
+  width: 64px;
+  height: 44px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.geh-einheit-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mod .geh-einheit-name,
+.mod .geh-einheit-name:link,
+.mod .geh-einheit-name:visited {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.geh-einheit-kosten,
+.geh-summe-werte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.geh-kosten {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #9da7b1;
+}
+.geh-kosten img {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.geh-kosten b {
+  color: #ffffff;
+}
+
+.geh-summe {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.geh-summe-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.geh-klein {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #8b949e;
+}
+
+.geh-produktion {
+  margin-top: 12px;
+}
+.geh-produktion .mod-typ {
+  margin-bottom: 4px;
+}
+
+.geh-auftrag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.geh-auftrag span:first-child {
+  flex: 1 1 auto;
+}
+.geh-auftrag b {
+  color: #ffffff;
+}
+
+.geh-sabotage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.12);
+  font-size: 12px;
+  color: #ff8a8a;
+}
+.geh-sabotage + .geh-sabotage {
+  margin-top: 6px;
+}
+
+.geh-berichte {
+  width: 602px;
+}
+.geh-berichte > table,
+.geh-berichte > form > table {
+  margin-left: auto;
+  margin-right: auto;
+}
+.geh-berichte .info_box {
+  box-sizing: border-box;
+  width: 602px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(6, 9, 14, 0.92);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #c9d1d9;
+}
+.geh-berichte .cell,
+.geh-berichte .cell1 {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.geh-berichte .cell,
+.geh-berichte tr.cell > td {
+  background: rgba(6, 9, 14, 0.92) !important;
+}
+.geh-berichte .cell1,
+.geh-berichte tr.cell1 > td {
+  background: rgba(30, 37, 48, 0.95) !important;
+}
+.geh-berichte td {
+  padding: 2px 6px;
+}
+.geh-berichte b {
+  color: #ffffff;
+}
+.geh-berichte table td.c,
+.geh-berichte table td.cl,
+.geh-berichte table td.cc,
+.geh-berichte table td.cr,
+.geh-berichte table td.tl,
+.geh-berichte table td.tc,
+.geh-berichte table td.tr,
+.geh-berichte table td.ccg,
+.geh-berichte table td.ccr,
+.geh-berichte table td.ccy {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(6, 9, 14, 0.92);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.geh-berichte table td.c,
+.geh-berichte table td.cl,
+.geh-berichte table td.cc,
+.geh-berichte table td.cr {
+  color: #c9d1d9;
+}
+.geh-berichte table td.tl,
+.geh-berichte table td.tc,
+.geh-berichte table td.tr {
+  background: rgba(30, 37, 48, 0.95);
+  font-weight: 500;
+  color: #ffffff;
+}
+.geh-berichte table td.ccg {
+  color: #5fe08a;
+}
+.geh-berichte table td.ccr {
+  color: #ff6b6b;
+}
+.geh-berichte table td.ccy {
+  color: #ffb45c;
 }
 
 body.mobile {

@@ -222,6 +222,8 @@ function insertagent(sec,sys)
   {
      document.getElementById("zsec2").value = sec;
      document.getElementById("zsys2").value = sys;
+     //zum Formular springen, auf dem Handy liegt es sonst außer Sicht
+     document.getElementById("zsec2").scrollIntoView({block: "center", behavior: "smooth"});
   }
   else
   {
@@ -234,6 +236,7 @@ function insertsonde(sec,sys)
     if(document.sonde.zsec1) {
         document.getElementById("zsec1").value = sec;
         document.getElementById("zsys1").value = sys;
+        document.getElementById("zsec1").scrollIntoView({block: "center", behavior: "smooth"});
     }else{
         alert("<?php echo $secret_lang['keinesonden'];?>");
     }
@@ -409,6 +412,9 @@ if (!hasTech($pt, 9)) {
         $zsys1 = $zsys2;
     }
 
+
+    //alle Berichte (Scanverlauf, Sonde, Agenten) in einer Hülle mit eigenen Stilen
+    echo '<div class="geh-berichte">';
 
     //scanhistory ausgeben
     if ((isset($_GET["a"]) && $_GET["a"] == 'd') || $showscanhistory == 1) {
@@ -1995,146 +2001,80 @@ if (!hasTech($pt, 9)) {
 
 
 
-    if ($sonde > 0 && hasTech($pt, 9) && hasTech($pt, 110)) {//stelle sondenmen� dar
+    //Ende der Berichte
+    echo '</div>';
+
+    if ($sonde > 0 && hasTech($pt, 9) && hasTech($pt, 110)) {//Sondeneinsatz
         echo '<form action="secret.php" method="POST" name="sonde">';
         rahmen_oben($secret_lang['sondengeheimaktion']);
-        echo '<table border="0" cellpadding="0" cellspacing="1">';
-        $bg = 'cell1';
-
-        echo '<tr align="center">';
-        echo '<td width="200" class="'.$bg.'">'.$secret_lang['vorhanden'].'</td>';
-        echo '<td width="160" class="'.$bg.'">'.$secret_lang['zielkoordinaten'].'</td>';
-        echo '<td width="200" class="'.$bg.'">'.$secret_lang['aktion'].'</td>';
-        echo "</tr>";
-
-        $bg = 'cell';
-        echo '<tr align="center">';
-        echo '<td class="'.$bg.'" align="center">'.$sonde.'</td>';
-        echo '<td class="'.$bg.'" align="center"><input type="text" name="zsec1" id="zsec1" value="'.$zsec1.'" size="3" maxlength="5">&nbsp;&nbsp;<input type="text" name="zsys1" id="zsys1" value="'.$zsys1.'" size="3" maxlength="3"></td>';
-        echo '<td class="'.$bg.'"><input type="Submit" name="startsonde" value="'.$secret_lang['sondestarten'].'"></td>';
-        echo '</tr>';
-        echo '</table>';
+        echo '
+        <div class="geh mod">
+            <div class="geh-zeile">
+                <div class="geh-feld geh-bestand"><span class="mod-typ">'.$secret_lang['vorhanden'].'</span><b>'.number_format($sonde, 0, "", ".").'</b></div>
+                <div class="geh-feld"><span class="mod-typ">'.$secret_lang['zielkoordinaten'].'</span>
+                    <span class="geh-koord"><input type="text" name="zsec1" id="zsec1" value="'.$zsec1.'" maxlength="5" inputmode="numeric" class="mod-eingabe"><span>:</span><input type="text" name="zsys1" id="zsys1" value="'.$zsys1.'" maxlength="3" inputmode="numeric" class="mod-eingabe"></span>
+                </div>
+                <div class="geh-feld geh-los"><input type="submit" name="startsonde" value="'.$secret_lang['sondestarten'].'" class="mod-btn"></div>
+            </div>
+        </div>';
         rahmen_unten();
         echo '</form>';
     }
 
-    if (hasTech($pt, 111)) {//stelle agentenmen� dar
-        echo '<form action="secret.php" method="POST" name="agent">';
-        rahmen_oben($secret_lang['aggigeheimaktion']);
-        echo '<table border="0" cellpadding="0" cellspacing="1">';
-        $bg = 'cell1';
-        echo '<tr align="center">';
-        echo '<td width="83" class="'.$bg.'">'.$secret_lang['vorhanden'].'</td>';
-        echo '<td width="73" class="'.$bg.'">'.$secret_lang['einsetzen'].'</td>';
-        echo '<td width="189" class="'.$bg.'">'.$secret_lang['einsatzziel'].'</td>';
-        echo '<td width="100" class="'.$bg.'">'.$secret_lang['zielkoordinaten'].'</td>';
-        echo '<td width="115" class="'.$bg.'">'.$secret_lang['aktion'].'</td>';
-        echo '</tr>';
-
+    if (hasTech($pt, 111)) {//Agenteneinsatz
         $agenten_einsetzen = $agent;
         if (isset($_REQUEST['az'])) {
             $agenten_einsetzen = intval($_REQUEST['az']);
         }
 
-        $bg = 'cell';
-        echo '<tr align="center">';
-        echo '<td class="'.$bg.'">'.number_format($agent, 0, "", ".").' <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$secret_lang['boni'].'&'.$bstr.'"></td>';
-        echo '<td class="'.$bg.'"><input type="text" name="az" value="'.$agenten_einsetzen.'" size="5" maxlength="10" autocomplete="off"></td>';
-
-        echo '<td class="'.$bg.'"><select name="etyp" size="0" onChange="sei(this.options[this.selectedIndex].value)">';
-
         if (!isset($_REQUEST['etyp'])) {
             $_REQUEST['etyp'] = 3;
         }
 
-        if ($_REQUEST['etyp'] == 3) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
+        //Einsatzziele in der gewohnten Reihenfolge (9 und 11 sind abgeschaltet)
+        $einsatzziele = array(
+            3 => $secret_lang['nachrichten'],
+            0 => $secret_lang['flottenaufstellung'],
+            1 => $secret_lang['flottenauftrag'],
+            2 => $secret_lang['verteidigungsanlagen'],
+            4 => $secret_lang['entwicklungen'],
+            5 => $secret_lang['allytag'],
+            6 => $secret_lang['systemstatus'],
+            7 => $secret_lang['sabotage_kollektoroutput'],
+            8 => $secret_lang['sabotage_raumwerft'],
+            10 => 'S: Missionsystem',
+        );
+        $optionen = '';
+        foreach ($einsatzziele as $wert => $text) {
+            $optionen .= '<option value="'.$wert.'"'.($_REQUEST['etyp'] == $wert ? ' selected' : '').'>'.$text.'</option>';
         }
-        echo '<option value="3"'.$selected.'>'.$secret_lang['nachrichten'].'</option>';
-        if ($_REQUEST['etyp'] == 0) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="0"'.$selected.'>'.$secret_lang['flottenaufstellung'].'</option>';
-        if ($_REQUEST['etyp'] == 1) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="1"'.$selected.'>'.$secret_lang['flottenauftrag'].'</option>';
-        if ($_REQUEST['etyp'] == 2) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="2"'.$selected.'>'.$secret_lang['verteidigungsanlagen'].'</option>';
-        if ($_REQUEST['etyp'] == 4) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="4"'.$selected.'>'.$secret_lang['entwicklungen'].'</option>';
-        if ($_REQUEST['etyp'] == 5) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="5"'.$selected.'>'.$secret_lang['allytag'].'</option>';
-        if ($_REQUEST['etyp'] == 6) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="6"'.$selected.'>'.$secret_lang['systemstatus'].'</option>';
-        //if($_REQUEST['etyp']==11){$selected=' selected';}else{$selected='';}
-        //echo '<option value="11"'.$selected.'>Enttarnung</option>';
-        if ($_REQUEST['etyp'] == 7) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="7"'.$selected.'>'.$secret_lang['sabotage_kollektoroutput'].'</option>';
-        if ($_REQUEST['etyp'] == 8) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="8"'.$selected.'>'.$secret_lang['sabotage_raumwerft'].'</option>';
-        //if($_REQUEST['etyp']==9){$selected=' selected';}else{$selected='';}
-        //echo '<option value="9"'.$selected.'>'.$secret_lang[sabotage_verteidigungszentrum].'</option>';
-        if ($_REQUEST['etyp'] == 10) {
-            $selected = ' selected';
-        } else {
-            $selected = '';
-        }
-        echo '<option value="10"'.$selected.'>S: Missionsystem</option>';
 
-        echo '</select></td>';
-
-        echo '<td class="'.$bg.'"><input type="text" name="zsec2" id="zsec2" value="'.$zsec2.'" size="3" maxlength="5">&nbsp;&nbsp;
-			<input type="text" name="zsys2" id="zsys2" value="'.$zsys2.'" size="3" maxlength="3"></td>';
-        echo '<td class="'.$bg.'"><input type="Submit" name="startagent" value="'.$secret_lang['einsatzstarten'].'"></td>';
-        echo '</tr>';
-        echo '<tr><td width="560" colspan="5" class="'.$bg.'"><div id="seii"></div></td></tr>';
-
-        echo '</table>';
-
+        echo '<form action="secret.php" method="POST" name="agent">';
+        rahmen_oben($secret_lang['aggigeheimaktion']);
+        echo '
+        <div class="geh mod">
+            <div class="geh-zeile">
+                <div class="geh-feld geh-bestand"><span class="mod-typ">'.$secret_lang['vorhanden'].'</span><b>'.number_format($agent, 0, "", ".").'</b></div>
+                <div class="geh-feld"><span class="mod-typ">'.$secret_lang['einsetzen'].'</span><input type="text" name="az" value="'.$agenten_einsetzen.'" maxlength="10" autocomplete="off" inputmode="numeric" class="mod-eingabe geh-anzahl"></div>
+                <div class="geh-feld geh-breit"><span class="mod-typ">'.$secret_lang['einsatzziel'].'</span><select name="etyp" onChange="sei(this.options[this.selectedIndex].value)" class="mod-eingabe">'.$optionen.'</select></div>
+            </div>
+            <div class="geh-zeile">
+                <div class="geh-feld"><span class="mod-typ">'.$secret_lang['zielkoordinaten'].'</span>
+                    <span class="geh-koord"><input type="text" name="zsec2" id="zsec2" value="'.$zsec2.'" maxlength="5" inputmode="numeric" class="mod-eingabe"><span>:</span><input type="text" name="zsys2" id="zsys2" value="'.$zsys2.'" maxlength="3" inputmode="numeric" class="mod-eingabe"></span>
+                </div>
+                <div class="geh-feld geh-breit"><span class="mod-chip" rel="tooltip" title="'.$secret_lang['boni'].'&'.$bstr.'">'.$secret_lang['boni'].': Einsatz +'.number_format($artbonusatt, 2, ",", ".").' %, Abwehr +'.number_format($artbonusdeff, 2, ",", ".").' %</span></div>
+                <div class="geh-feld geh-los"><input type="submit" name="startagent" value="'.$secret_lang['einsatzstarten'].'" class="mod-btn"></div>
+            </div>
+            <div class="mod-hinweis geh-beschreibung" id="seii"></div>
+        </div>';
         rahmen_unten();
         echo '</form>';
 
 
         rahmen_oben($secret_lang['letzteeinsaetze']);
-
-        echo '<table width="568" border="0" cellpadding="0" cellspacing="1">';
-        $bg = 'cell';
-
+        echo '<div class="geh mod">';
         if ($scanhistory == "") {
-            echo '<tr>
-			   <td class="'.$bg.'" align="center" colspan="3"> - </td>
-			 </tr>';
+            echo '<div class="mod-leer">Noch keine Eins&auml;tze.</div>';
         } else {
             $i = 0;
             $scanhistory = explode("|", $scanhistory);
@@ -2146,16 +2086,15 @@ if (!hasTech($pt, 9)) {
                 $daten[1] = intval($daten[1]);
                 $daten[2] = htmlspecialchars($daten[2] ?? '', ENT_QUOTES, 'UTF-8');
                 echo '
-			<tr>
-				<td  class="cell" nowrap align="center">&nbsp;&nbsp;&nbsp;<a href="javascript:insertsonde('.$daten[0].','.$daten[1].')">'.$secret_lang['sondenzielproggen'].'</a></td>
-				<td  class="cell" nowrap><table border="0" cellpadding="0" cellspacing="0"><tr><td width="20">&nbsp;</td><td class="cell"><b>'.$daten[0].':'.$daten[1].'&nbsp;('.$daten[2].')</b></td></tr></table></td>
-				<td  class="cell" nowrap align="center">&nbsp;&nbsp;&nbsp;<a href="javascript:insertagent('.$daten[0].','.$daten[1].')">'.$secret_lang['infiltrieren'].'</a></td>
-			</tr>';
+                <div class="geh-verlauf">
+                    <span class="geh-verlauf-ziel"><b>'.$daten[0].':'.$daten[1].'</b> '.$daten[2].'</span>
+                    <a href="javascript:insertsonde('.$daten[0].','.$daten[1].')" class="mod-btn mod-btn-leise">'.$secret_lang['sondenzielproggen'].'</a>
+                    <a href="javascript:insertagent('.$daten[0].','.$daten[1].')" class="mod-btn mod-btn-leise">'.$secret_lang['infiltrieren'].'</a>
+                </div>';
                 $i++;
             }
         }
-
-        echo '</table>';
+        echo '</div>';
         rahmen_unten();
 
         echo '<script language="javascript">';
@@ -2194,255 +2133,99 @@ if (!hasTech($pt, 9)) {
 
     }
 
-    echo '<form action="secret.php" method="POST" name="produktion">';
-    echo
-    '<table border="0" cellpadding="0" cellspacing="0">
-	<tr height="37">
-	<td width="13" height="37" class="rol">&nbsp;</td>
-	<td width="208" class="ro"><div class="cellu">&nbsp;&nbsp;'.$secret_lang['sondenundaggis'].': <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$buildstatus.'"></div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">M</div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">D</div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">I</div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">E</div></td>
-	<td width="27" align="center" class="ro"><div class="cellu">T</div></td>
-	<td width="33" align="center" class="ro"><div class="cellu">'.$secret_lang['wochen'].'</div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">'.$secret_lang['stueck'].'</div></td>
-	<td width="50" align="center" class="ro"><div class="cellu">A/B</div></td>
-	<td width="13" class="ror">&nbsp;</td>
-	</tr>';
-    ?>
-	<tr>
-	<td width="13" class="rl">&nbsp;</td>
-	<td colspan="9">
-	<table border="0" cellpadding="0" cellspacing="1" width="100%">
-	<colgroup>
-	<col width="">
-	<col width="50">
-	<col width="50">
-	<col width="50">
-	<col width="50">
-	<col width="20">
-	<col width="30">
-	<col width="50">
-	<col width="50">
-	</colgroup>
-
-	<?php
-      $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>=110 AND tech_id<=111 ORDER BY tech_id", []);
+    //Ausbildung und Bau; js/produktion*.js braucht das Formular "produktion", die Felder b110/b111,
+    //die rohe Agentenzahl in #va und die Summenfelder #m #d #i #e #t #p
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>=110 AND tech_id<=111 ORDER BY tech_id", []);
 
     $ergebnis = mysqli_execute_query($GLOBALS['dbi'], "SELECT sonde, agent FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
     $rowe = mysqli_fetch_array($ergebnis);
 
-    //Check f�r Echtzeitrechner
-    $techtrue = 0;
-
-    $c1 = 1;
-    $c2 = 0;
-    $z = 0;
-    //zerlege vorbedinguns-string
+    $geh_resnamen = array('Multiplex', 'Dyharra', 'Iradium', 'Eternium', 'Tronic');
+    $einheiten_zeilen = '';
     while ($row = mysqli_fetch_array($db_daten)) {
         $tech_id = $row['tech_id'];
-        if (hasTech($pt, $tech_id)) { //echo "Vorbedingung erf�llt";
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell';
-            } else {
-                $c1 = 0;
-                $bg = 'cell1';
-            }
-
-            $ec = 0;
-            $z = 0;
-            if ($tech_id == 110) {//Sonde
-                $ec = $rowe["sonde"];
-                $z = 0;
-            } elseif (
-                $tech_id == 111) {//Agent
-                $ec = $rowe["agent"];
-                $z = 1;
-            }
-
-            showeinheit2(
-                getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']),
-                $tech_id,
-                $einheiten_daten[$tech_id]['kosten'][0] - round($einheiten_daten[$tech_id]['kosten'][0] * $artbonusbuild / 100),
-                $einheiten_daten[$tech_id]['kosten'][1] - round($einheiten_daten[$tech_id]['kosten'][1] * $artbonusbuild / 100),
-                $einheiten_daten[$tech_id]['kosten'][2] - round($einheiten_daten[$tech_id]['kosten'][2] * $artbonusbuild / 100),
-                $einheiten_daten[$tech_id]['kosten'][3] - round($einheiten_daten[$tech_id]['kosten'][3] * $artbonusbuild / 100),
-                $einheiten_daten[$tech_id]['kosten'][4] - round($einheiten_daten[$tech_id]['kosten'][4] * $artbonusbuild / 100),
-                $einheiten_daten[$tech_id]['bz'],
-                $ec,
-                $bg,
-                $z
-            );
-
-            $techtrue++;
+        if (!hasTech($pt, $tech_id)) {
+            continue;
         }
+
+        $vorhanden = ($tech_id == 110) ? $rowe["sonde"] : $rowe["agent"];
+
+        //Kosten mit Artefaktnachlass, nur Rohstoffe, die tatsächlich gebraucht werden
+        $kosten = '';
+        for ($r = 0; $r < 5; $r++) {
+            $betrag = $einheiten_daten[$tech_id]['kosten'][$r] - round($einheiten_daten[$tech_id]['kosten'][$r] * $artbonusbuild / 100);
+            if ($betrag > 0) {
+                $kosten .= '<span class="geh-kosten" title="'.$geh_resnamen[$r].'"><img src="gp/g/icon'.($r + 1).'.png" alt="">'.number_format($betrag, 0, "", ".").'</span>';
+            }
+        }
+
+        $einheiten_zeilen .= '
+            <div class="geh-einheit">
+                <a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t='.$tech_id.'" target="_blank"><img src="gp/g/t/'.$_SESSION['ums_rasse'].'_'.$tech_id.'.jpg" class="geh-einheit-bild" alt="" rel="tooltip" title="'.$tooltips[$tech_id - 110].'"></a>
+                <div class="geh-einheit-text">
+                    <a href="help.php?t='.$tech_id.'" class="geh-einheit-name">'.getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']).'</a>
+                    <div class="geh-einheit-kosten">'.$kosten.'<span class="geh-kosten">'.$einheiten_daten[$tech_id]['bz'].' WT</span></div>
+                </div>
+                <div class="geh-feld geh-bestand"><span class="mod-typ">'.$secret_lang['vorhanden'].'</span><b>'.number_format($vorhanden, 0, "", ".").'</b>'.($tech_id == 111 ? '<span id="va" hidden>'.$vorhanden.'</span>' : '').'</div>
+                <div class="geh-feld"><span class="mod-typ">'.$secret_lang['anzahl'].'</span><input type="text" name="b'.$tech_id.'" id="b'.$tech_id.'" value="" maxlength="9" autocomplete="off" inputmode="numeric" onKeyUp="berechnepreise();" class="mod-eingabe geh-anzahl"></div>
+            </div>';
     }
-    ?>
-	</table>
-	</td>
-	<td width="13" class="rr">&nbsp;</td>
-	</tr>
 
-	<?php
-    //oberer rahmen von der echtzeitrechnung
-    echo '<table border="0" cellpadding="0" cellspacing="0">
-		  <tr>
-		  <td width="13" height="37" class="rml">&nbsp;</td>
-		  <td align="left" class="ro"><div class="cellu">&nbsp;'.$secret_lang['kostenaggis'].'</div></td>
-		  <td width="13" class="rmr">&nbsp;</td>
-		  </tr>
-		  <tr>
-		  <td class="rl">&nbsp;</td><td>';
+    //Summe der ausgewählten Einheiten, füllt js/produktion*.js
+    $summe = '';
+    foreach (array('m', 'd', 'i', 'e', 't') as $r => $feld) {
+        $summe .= '<span class="geh-kosten" title="'.$geh_resnamen[$r].'"><img src="gp/g/icon'.($r + 1).'.png" alt=""><b id="'.$feld.'">0</b></span>';
+    }
+    $summe .= '<span class="geh-kosten">'.$secret_lang['punkte'].' <b id="p">0</b></span>';
 
+    echo '<form action="secret.php" method="POST" name="produktion">';
+    rahmen_oben($secret_lang['sondenundaggis']);
     echo '
-	<table border="0" cellpadding="1" cellspacing="1">
-	<tr height="20" class="cell1" align="center">
-	<td width="70">&nbsp;</td>
-	<td width="76">M</td>
-	<td width="76">D</td>
-	<td width="76">I</td>
-	<td width="76">E</td>
-	<td width="42">T</td>
-	<td width="130">'.$secret_lang['punkte'].'</td>
-	</tr>';
-    echo '
-	<tr height="20" class="cell" align="center">
-	<td>&nbsp;'.$secret_lang['summe'].'</td>
-	<td id="m">0</td>
-	<td id="d">0</td>
-	<td id="i">0</td>
-	<td id="e">0</td>
-	<td id="t">0</td>
-	<td id="p">0</td>
-	</tr>
-	<tr class="cell1">
-	<td align="center" colspan="7"><input type="Submit" name="trainbuild" value="'.$secret_lang['ausbildenbauen'].'"></td>
-	</tr>
-
-	</table>
-	';
+    <div class="geh mod">
+        <div class="geh-einheiten">'.$einheiten_zeilen.'</div>
+        <div class="geh-summe">
+            <div class="geh-summe-text"><span class="mod-typ">'.$secret_lang['kostenaggis'].'</span><div class="geh-summe-werte">'.$summe.'</div></div>
+            <input type="submit" name="trainbuild" value="'.$secret_lang['ausbildenbauen'].'" class="mod-btn">
+        </div>
+        <div class="geh-klein">'.$buildstatus.'</div>';
 
     //aktive Bauaufträge
     $sql = "SELECT SUM(de_user_build.anzahl) AS anzahl, de_user_build.verbzeit, de_tech_data".$_SESSION['ums_rasse'].".tech_name FROM de_user_build LEFT JOIN de_tech_data".$_SESSION['ums_rasse']." on(de_user_build.tech_id = de_tech_data".$_SESSION['ums_rasse'].".tech_id) WHERE user_id=? AND de_user_build.tech_id > 109 AND de_user_build.tech_id < 120 GROUP BY de_user_build.tech_id, de_user_build.verbzeit ORDER BY de_user_build.verbzeit ASC";
-    //echo $sql;
     $result = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $num = mysqli_num_rows($result);
-
-    if ($num > 0) {
-        echo '</td><td width="13" class="rr">&nbsp;</td></tr></table>
-			<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-			<td width="13" height="37" class="rml">&nbsp;</td>
-			<td align="left" class="ro">&nbsp;'.$secret_lang['aktiveproduktion'].'</td>
-			<td width="13" class="rmr">&nbsp;</td>
-			</tr>
-			<tr>
-			<td class="rl">&nbsp;</td><td>';
-
-        echo '<table border="0" cellpadding="0" cellspacing="1">';
-        echo '<tr align="center">';
-        echo '<td class="cell" width="379">'.$secret_lang['einheit2'].'</td>';
-        echo '<td class="cell" width="80">'.$secret_lang['anzahl'].'</td>';
-        echo '<td class="cell" width="105">'.$secret_lang['wochen'].'</td>';
-        echo '</tr>';
-
-
+    if (mysqli_num_rows($result) > 0) {
+        echo '<div class="geh-produktion"><div class="mod-typ">'.$secret_lang['aktiveproduktion'].'</div>';
         while ($row = mysqli_fetch_array($result)) {
-            echo '<tr align="center">';
-            echo '<td class="cell">'.$row["tech_name"].'</td>';
-            echo '<td class="cell">'.number_format($row["anzahl"], 0, "", ".").'</td>';
-            echo '<td class="cell">'.$row["verbzeit"].'</td>';
-            echo '</tr>';
+            echo '<div class="geh-auftrag"><span>'.$row["tech_name"].'</span><b>'.number_format($row["anzahl"], 0, "", ".").'</b><span class="mod-chip">noch '.$row["verbzeit"].' WT</span></div>';
         }
-        echo '</table>';
-        echo '</td><td width="13" class="rr">&nbsp;</td>
-			</tr>
-			<tr>
-			<td width="13" class="rul">&nbsp;</td>
-			<td class="ru">&nbsp;</td>
-			<td width="13" class="rur">&nbsp;</td>
-			</tr>
-			</table><br>';
-    } else { //nur unteren rahmen von der echtzeitrechnung
-        echo '</td><td width="13" class="rr">&nbsp;</td>
-			</tr>
-			<tr>
-			<td width="13" class="rul">&nbsp;</td>
-			<td class="ru">&nbsp;</td>
-			<td width="13" class="rur">&nbsp;</td>
-			</tr>
-			</table><br>';
+        echo '</div>';
     }
-
+    echo '</div>';
+    rahmen_unten();
     echo '</form>';
 
     ///////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////
     // anzeige der aktionen die aktuell gegen einen laufen
     ///////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////
-    if ($maxroundtick < $mysc1 + $sv_sabotage[7][0] or $maxroundtick < $mysc2 + $sv_sabotage[8][0] or $maxroundtick < $mysc3 + $sv_sabotage[9][0] or $maxroundtick < $mysc4 + $sv_sabotage[10][0]) {
+    $sabotagen = array();
+    if ($maxroundtick < $mysc1 + $sv_sabotage[7][0]) {
+        $sabotagen[] = array($secret_lang['einsatzbeschreibung_sabotage_kollektoroutput2'].': '.$sv_sabotage[7][2], $mysc1 + $sv_sabotage[7][0] - $maxroundtick);
+    }
+    if ($maxroundtick < $mysc2 + $sv_sabotage[8][0]) {
+        $sabotagen[] = array($secret_lang['einsatzbeschreibung_sabotage_raumwerft2'], $mysc2 + $sv_sabotage[8][0] - $maxroundtick);
+    }
+    if ($maxroundtick < $mysc3 + $sv_sabotage[9][0]) {
+        $sabotagen[] = array($secret_lang['einsatzbeschreibung_sabotage_verteidigungszentrum2'], $mysc3 + $sv_sabotage[9][0] - $maxroundtick);
+    }
+    if ($maxroundtick < $mysc4 + $sv_sabotage[10][0]) {
+        $sabotagen[] = array('Das Missionssystem ist gest&ouml;rt.', $mysc4 + $sv_sabotage[10][0] - $maxroundtick);
+    }
+    if (count($sabotagen) > 0) {
         rahmen_oben($secret_lang['sabotageauswirkungen']);
-
-        echo '<table width="568" border="0" cellpadding="0" cellspacing="1">';
-
-        //kollektorenergieoutput verringern
-        if ($maxroundtick < $mysc1 + $sv_sabotage[7][0]) {
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell';
-            } else {
-                $c1 = 0;
-                $bg = 'cell1';
-            }
-            echo '<tr class="'.$bg.'" align="center"><td>';
-            echo $secret_lang['einsatzbeschreibung_sabotage_kollektoroutput2'].': '.$sv_sabotage[7][2];
-            echo '<br>'.$secret_lang['einsatzbeschreibung_wirkungsdauer'].': '.($mysc1 + $sv_sabotage[7][0] - $maxroundtick);
-            echo '</td></tr>';
+        echo '<div class="geh mod">';
+        foreach ($sabotagen as $sabotage) {
+            echo '<div class="geh-sabotage"><span>'.$sabotage[0].'</span><span class="mod-chip mod-chip-warn">'.$secret_lang['einsatzbeschreibung_wirkungsdauer'].': noch '.$sabotage[1].'</span></div>';
         }
-        if ($maxroundtick < $mysc2 + $sv_sabotage[8][0]) {
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell';
-            } else {
-                $c1 = 0;
-                $bg = 'cell1';
-            }
-            echo '<tr class="'.$bg.'" align="center"><td>';
-            echo $secret_lang['einsatzbeschreibung_sabotage_raumwerft2'];
-            echo '<br>'.$secret_lang['einsatzbeschreibung_wirkungsdauer'].': '.($mysc2 + $sv_sabotage[8][0] - $maxroundtick);
-            echo '</td></tr>';
-        }
-        if ($maxroundtick < $mysc3 + $sv_sabotage[9][0]) {
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell';
-            } else {
-                $c1 = 0;
-                $bg = 'cell1';
-            }
-            echo '<tr class="'.$bg.'" align="center"><td>';
-            echo $secret_lang['einsatzbeschreibung_sabotage_verteidigungszentrum2'];
-            echo '<br>'.$secret_lang['einsatzbeschreibung_wirkungsdauer'].': '.($mysc3 + $sv_sabotage[9][0] - $maxroundtick);
-            echo '</td></tr>';
-        }
-        if ($maxroundtick < $mysc4 + $sv_sabotage[10][0]) {
-            if ($c1 == 0) {
-                $c1 = 1;
-                $bg = 'cell';
-            } else {
-                $c1 = 0;
-                $bg = 'cell1';
-            }
-            echo '<tr class="'.$bg.'" align="center"><td>';
-            echo 'Das Missionssystem ist gest&ouml;rt.';
-            echo '<br>'.$secret_lang['einsatzbeschreibung_wirkungsdauer'].': '.($mysc4 + $sv_sabotage[10][0] - $maxroundtick);
-            echo '</td></tr>';
-        }
-        echo '</table>';
-
+        echo '</div>';
         rahmen_unten();
     }
 
