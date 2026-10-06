@@ -4,6 +4,7 @@ cache/*.tmp
 cache/**/*.tmp
 cache/creditlogs/*.txt
 cache/toplist/*.tmp
+cache/toplist/*.json
 cache/overview/*.tmp
 cache/botcheck/*.txt
 ourdetool/logs/*.txt

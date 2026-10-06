@@ -138,14 +138,24 @@ else
 	}
 	elseif($allyid)
 	{
+		//je Allianz nur ein Bündnis (wie beim Antrag in ally_partner.php), für beide Allianzen und in beiden Spalten:
+		//seit dem Antrag kann eine der beiden ein anderes Bündnis eingegangen sein
+		$maxbuendnis = 1;
 		$result = mysqli_execute_query($GLOBALS['dbi'],
             "SELECT COUNT(*) as count FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?",
-            [$allyid, $clanid]
+            [$clanid, $clanid]
         );
         $row = mysqli_fetch_assoc($result);
-        $alreadyinXallys = $row['count'];
-        if ($alreadyinXallys >= 2)
-            die ('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3'].'</div>'.$zurueck.'</div>');
+        if ($row['count'] >= $maxbuendnis)
+            die ('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_6'].'</div>'.$zurueck.'</div>');
+
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+            "SELECT COUNT(*) as count FROM de_ally_partner WHERE ally_id_1 = ? OR ally_id_2 = ?",
+            [$allyid, $allyid]
+        );
+        $row = mysqli_fetch_assoc($result);
+        if ($row['count'] >= $maxbuendnis)
+            die ('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_6_partner'].'</div>'.$zurueck.'</div>');
 
         $result = mysqli_execute_query($GLOBALS['dbi'],
             "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ? AND ally_id_partner = ?",
