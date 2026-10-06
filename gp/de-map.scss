@@ -368,3 +368,332 @@ background-size: cover;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E<g stroke='currentColor' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' fill='none'><rect x='4' y='5' width='16' height='14' rx='2' ry='2' fill='currentColor' fill-opacity='.15'/><path d='M8 9h4.5'/><path d='M8 13h8'/><path d='M8 16h8'/><circle cx='16.5' cy='9' r='1.2'/></g></svg>");
 }
 
+/*! Konsolen-Look der Karte (Okt. 2026): Sektoren, Spielerkacheln, Tooltip und VS-Linien wie die Menueleiste in dm.php */
+
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local('Roboto'), local('Roboto-Regular'), url(fonts/KFOmCnqEu92Fr1Mu4mxK.woff2) format('woff2');
+}
+
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: local('Roboto Medium'), local('Roboto-Medium'), url(fonts/KFOlCnqEu92Fr1MmEU9fBBc4.woff2) format('woff2');
+}
+
+// Akzentfarbe je Rasse (body.rasseN in map.php), dieselben Farben wie die Menüs
+$map-rassen: (
+	rasse1: #3399FF,
+	rasse2: #A6A6A6,
+	rasse3: #DE3939,
+	rasse4: #ED951E,
+);
+
+body {
+	--akzent: #3399FF;
+	--akzent-weich: rgba(51, 153, 255, 0.22);
+	--glow: 0 0 10px rgba(51, 153, 255, 0.55), 0 0 24px rgba(51, 153, 255, 0.3);
+}
+
+@each $name, $farbe in $map-rassen {
+	body.#{$name} {
+		--akzent: #{$farbe};
+		--akzent-weich: #{rgba($farbe, 0.22)};
+		--glow: 0 0 10px #{rgba($farbe, 0.55)}, 0 0 24px #{rgba($farbe, 0.3)};
+	}
+}
+
+// Sektor als Konsolen-Panel
+.sector-container {
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-radius: 14px;
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 6px),
+		linear-gradient(160deg, rgba(22, 31, 41, 0.94), rgba(8, 11, 16, 0.94) 70%);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.sector-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 7px 12px;
+	border-bottom: 1px solid rgba(160, 200, 255, 0.14);
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.01));
+	font-size: 13px;
+	font-weight: 500;
+	color: #d8e9ff;
+}
+
+.map-kopf {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+// Werte der Kopfzeile: S, P und SP als Anzeigefelder
+.map-wert {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 4px;
+	padding: 2px 8px;
+	border: 1px solid rgba(160, 200, 255, 0.14);
+	border-radius: 6px;
+	background: rgba(0, 0, 0, 0.35);
+	font-variant-numeric: tabular-nums;
+	color: #ffffff;
+
+	small {
+		font-size: 10px;
+		color: #8b949e;
+	}
+}
+
+.map-sektorname {
+	margin-left: 4px;
+	font-weight: 500;
+	color: #ffffff;
+}
+
+// Reisezeitmalus: +0 grün, +2 orange
+.map-reise {
+	display: inline-block;
+	min-width: 26px;
+	padding: 2px 6px;
+	border: 1px solid;
+	border-radius: 6px;
+	font-size: 12px;
+	font-weight: 500;
+	text-align: center;
+}
+
+.map-reise-0 {
+	border-color: rgba(95, 224, 138, 0.55);
+	background: rgba(62, 207, 106, 0.16);
+	color: #5fe08a;
+}
+
+.map-reise-2 {
+	border-color: rgba(255, 180, 92, 0.55);
+	background: rgba(255, 170, 60, 0.16);
+	color: #ffb45c;
+}
+
+// eigener Sektor: Leuchten in der Rassenfarbe statt grüner Fläche
+.own-sector {
+	border-color: var(--akzent);
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 6px),
+		linear-gradient(160deg, var(--akzent-weich), rgba(8, 11, 16, 0.94) 55%);
+	box-shadow: var(--glow), 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.own-sector .sector-header {
+	border-bottom-color: var(--akzent);
+	background: linear-gradient(90deg, var(--akzent-weich), rgba(255, 255, 255, 0.01));
+}
+
+// Sektorpolitik
+.map-btn {
+	display: inline-block;
+	padding: 5px 12px;
+	border: 1px solid var(--akzent);
+	border-radius: 8px;
+	background: linear-gradient(145deg, var(--akzent-weich), #0d1218 80%);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: #ffffff;
+	cursor: pointer;
+	transition: box-shadow 0.25s;
+
+	&:hover {
+		box-shadow: var(--glow);
+	}
+}
+
+.sector-base {
+	border: 1px solid rgba(160, 200, 255, 0.12);
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.35);
+}
+
+// Spielerkachel wie die Kacheln der Menüleiste: das Rassenlogo kommt als background-image aus map.php
+// (nicht über eine CSS-Variable, deren Bildpfad würde relativ zu gp/ aufgelöst), Glanz und Abdunklung
+// liegen als ::after zwischen Hintergrund und Inhalt
+.player-card {
+	isolation: isolate;
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-radius: 10px;
+	background-color: #111821;
+	background-position: 5px 0;
+	background-size: 95% auto;
+	background-repeat: no-repeat;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.6);
+	transition: border-color 0.25s, box-shadow 0.25s, transform 0.18s;
+
+	&::before {
+		background: linear-gradient(90deg, transparent, var(--akzent), transparent);
+		opacity: 0.45;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background:
+			linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 45%),
+			linear-gradient(180deg, transparent 40%, rgba(6, 9, 14, 0.55));
+		pointer-events: none;
+	}
+
+	&:hover {
+		border-color: var(--akzent);
+		box-shadow: var(--glow);
+		transform: translateY(-2px);
+	}
+}
+
+.player-name {
+	border: 1px solid rgba(160, 200, 255, 0.12);
+	border-radius: 6px;
+	background: rgba(6, 9, 14, 0.7) !important;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.player-stats {
+	border: 1px solid rgba(160, 200, 255, 0.12);
+	border-radius: 6px;
+	background: rgba(6, 9, 14, 0.85);
+	font-variant-numeric: tabular-nums;
+	text-shadow: none;
+}
+
+.player-actions {
+	border-top-color: rgba(160, 200, 255, 0.12);
+}
+
+// Aktionsknöpfe dunkel mit hellen Symbolen (die SVG-Symbole sind schwarz, daher invertiert)
+.player-actions .action-link {
+	border: 1px solid rgba(160, 200, 255, 0.2);
+	border-radius: 5px;
+	background: linear-gradient(145deg, #1d2a38, #0d1218);
+
+	> div {
+		filter: invert(0.9);
+	}
+
+	&:hover {
+		border-color: var(--akzent);
+		background: linear-gradient(145deg, var(--akzent-weich), #0d1218);
+		box-shadow: var(--glow);
+	}
+}
+
+// Tooltip als Konsolen-Panel
+#custom-tooltip {
+	border: 1px solid rgba(160, 200, 255, 0.25);
+	border-top: 2px solid var(--akzent);
+	border-radius: 10px;
+	background: linear-gradient(160deg, rgba(17, 26, 36, 0.97), rgba(6, 9, 13, 0.97));
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	color: #d8e9ff;
+}
+
+// Verbindungen der Vergessenen Systeme
+.map-kante {
+	stroke: rgba(150, 120, 255, 0.6);
+	stroke-width: 2;
+}
+
+// Knoten der Vergessenen Systeme: Planet als Hintergrund (inline aus map.php), beim Überfahren leuchtet er
+// in der Rassenfarbe
+.vsk {
+	position: absolute;
+	width: 98px;
+	height: 104px;
+	background-position: 5px 0;
+	background-size: 90% auto;
+	background-repeat: no-repeat;
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	cursor: pointer;
+	transition: filter 0.25s, transform 0.18s;
+
+	&:hover {
+		filter: drop-shadow(0 0 8px var(--akzent)) drop-shadow(0 0 16px var(--akzent-weich));
+		transform: translateY(-2px);
+	}
+}
+
+// Felder eines erforschten Systems als kleine Kacheln, 5 je Zeile, darunter die Gebäudestufe
+.vsk-felder {
+	display: grid;
+	grid-template-columns: repeat(5, 18px);
+	column-gap: 1px;
+	row-gap: 2px;
+	align-items: start;
+	width: max-content;
+	margin: 0 auto;
+	padding: 1px;
+	border: 1px solid rgba(160, 200, 255, 0.2);
+	border-radius: 6px;
+	background: rgba(6, 9, 14, 0.8);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.vsk-feld {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 18px;
+	font-size: 10px;
+	line-height: 11px;
+	color: #d8e9ff;
+
+	img {
+		display: block;
+		width: 18px;
+		height: 18px;
+		border-radius: 4px;
+	}
+
+	b {
+		font-weight: 500;
+	}
+
+	.vsk-bau {
+		color: #ffd56b;
+	}
+}
+
+// Außenposten, Fabriken (griechische Buchstaben) und Felder ohne Rohstoffe
+.vsk-box {
+	display: flex;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border: 1px solid rgba(160, 200, 255, 0.25);
+	border-radius: 4px;
+	background: linear-gradient(145deg, #2a3746, #161f29);
+	font-style: normal;
+	font-weight: 500;
+	color: #ffffff;
+}
+
+.vsk-leer {
+	border-color: rgba(255, 255, 255, 0.06);
+	background: rgba(255, 255, 255, 0.04);
+	color: #8b949e;
+}

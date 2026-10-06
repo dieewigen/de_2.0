@@ -92,7 +92,7 @@ $maxcol = $row['maxcol'];
   <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
   <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 </head>
-<body>
+<body class="rasse<?php echo intval($_SESSION['ums_rasse']); ?>">
 
 <div id="viewport">
   <div id="map">
@@ -781,12 +781,8 @@ foreach ($sectorList as $sf) {
                 $showallytag = '';
             }
 
-            $output .= '<div class="player-card" style="
-				background: url(gp/g/derassenlogo'.$planet_id.'.png);
-				background-size: 95% auto;
-				background-position: 5px 0px;
-				background-repeat: no-repeat;
-				" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')'.$userRang.$userTitle.'"">';
+            //Rassenlogo als Hintergrundbild, Größe, Lage und Farbe der Kachel kommen aus de-map.scss
+            $output .= '<div class="player-card" style="background-image: url(gp/g/derassenlogo'.$planet_id.'.png);" title="'.umlaut($row['spielername']).' ('.$sf.':'.$row['system'].')'.$userRang.$userTitle.'"">';
 
 
             ////////////////////////////////////////////////////////////////////////
@@ -864,11 +860,8 @@ foreach ($sectorList as $sf) {
             $output .= '</div>';//player-card
         }
 
-        if ($rzadd == 0) {
-            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #00DD00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
-        } else {
-            $style = 'margin-top: 2px; margin-left: 2px; border: 1px solid #444444; background-color: #f05a00; color: #000000; min-width: 16px; padding: 0 2px; box-sizing: border-box; display: inline-block; text-align: center;';
-        }
+        //Reisezeitmalus: grün im eigenen Sektor, orange in den anderen
+        $reise_klasse = $rzadd == 0 ? 'map-reise map-reise-0' : 'map-reise map-reise-2';
 
 
         $sec_angriffsgrenze = number_format($sec_angriffsgrenze * 100, 2, ",", ".").'%';
@@ -889,31 +882,28 @@ foreach ($sectorList as $sf) {
             $infostr = '<img src="'.'gp/'.'g/symbol12.png" border="0" style="margin-bottom: -5px; width: 20px; height: 20px;" title="freier Sektor">';
         }
 
+        //Kopfzeile: Reisezeit, Infosymbol, Sektor, Platz und Punkte als Anzeigefelder, dann der Sektorname
+        $sektorinfo = '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" class="'.$reise_klasse.'">+'.$rzadd.'</span>';
+        $sektorinfo .= ' '.$infostr.' ';
         if ($anz > 0) {
-            $sektorinfo = '';
-            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">+'.$rzadd.'</span>';
-            $sektorinfo .= ' '.$infostr.' ';
-            $sektorinfo .= ' <span title="Sektornummer">S:'.$sf.'</span> <span title="Platz in der Sektorwertung">P:'.$sec_data['platz'].'</span>';
-            $sektorinfo .= ' <span title="Sektorpunkte">SP:'.number_format($gesamtpunkte, 0, ",", ".");
+            $sektorinfo .= '<span class="map-wert" title="Sektornummer"><small>S</small>'.$sf.'</span>';
+            $sektorinfo .= '<span class="map-wert" title="Platz in der Sektorwertung"><small>P</small>'.$sec_data['platz'].'</span>';
+            $sektorinfo .= '<span class="map-wert" title="Sektorpunkte"><small>SP</small>'.number_format($gesamtpunkte, 0, ",", ".").'</span>';
             if ($sec_data['name'] != '') {
-                $sektorinfo .= ' - '.$sec_data['name'];
+                $sektorinfo .= '<span class="map-sektorname">'.$sec_data['name'].'</span>';
             }
-            $sektorinfo .= '</span>';
         } else {
-            $sektorinfo = '';
-            $sektorinfo .= '<span title="Reisezeitmalus<br>Eigener Sektor: kein Malus<br>Andere Sektoren: Reisezeit +2 Kampftick" style="'.$style.'">+'.$rzadd.'</span>';
-            $sektorinfo .= ' '.$infostr.' freier Sektor';
-            $sektorinfo .= '</span>';
+            $sektorinfo .= '<span class="map-sektorname">freier Sektor</span>';
         }
 
         // Neue Struktur mit verbessertem Design
-        echo '<div class="sector-header" style="display: flex; justify-content: space-between; align-items: center;">';
-        echo '<div>'.$sektorinfo.'</div>';
-        
+        echo '<div class="sector-header">';
+        echo '<div class="map-kopf">'.$sektorinfo.'</div>';
+
         // Button für Sektorpolitik nur im eigenen Sektor anzeigen
         if ($sf == $ownsector) {
             echo '<div>';
-            echo '<div onclick="switch_iframe_main_container(\'politics.php\')" class="button" style="background-color: #4CAF50; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px; display: inline-block; cursor:pointer !important;">Sektorpolitik</div>';
+            echo '<div onclick="switch_iframe_main_container(\'politics.php\')" class="map-btn">Sektorpolitik</div>';
             echo '</div>';
         }
         
@@ -1166,22 +1156,9 @@ while ($row = mysqli_fetch_array($db_daten)) {
 
     $sichtbare_systeme_koordinaten[$row['id']] = array($alienpos_x, $alienpos_y);
 
-    $output .= '<div style="left: '.$alienpos_x.'px; top: '.$alienpos_y.'px; position: absolute; width: 98px; height: 104px; 
-		border: 0px solid #cd02d9; color: #FFFFFF; font-size: 14px;
-		background: url('.$bg_image.');
-		background-size: 90% auto;
-		background-position: 5px 0px;
-		background-repeat: no-repeat;
-		cursor: pointer;
-		" title="'.$system_name.$tech_info.'" onclick="switch_iframe_main_container(\'map_system.php?id='.$row['id'].'\')">';
-
-    $output .= '<div style="background-color: rgba(0,0,0,0.6);">';
-    ///////////////////////////////////////////
-    //Felder durchgehen und anzeigen
-    ///////////////////////////////////////////
-
-    $output .= '<div style="display: flex;">';
-
+    //Knoten: Planet als Hintergrund, darüber bei erforschten normalen Systemen die Felder als kleine Kacheln
+    //(je Zeile 5, darunter die Gebäudestufe, gelb im Ausbau); Aussehen in de-map.scss (.vsk)
+    $felder = '';
     if (!isset($data->special_system)) {
         $data->special_system = 0;
     }
@@ -1189,72 +1166,41 @@ while ($row = mysqli_fetch_array($db_daten)) {
     if ($data->special_system < 1 && in_array($row['id'], $erforschte_systeme) && !in_array($row['id'], $immer_sichtbare_systeme)) {
         for ($i = 0;$i < count($data->fields);$i++) {
 
-            ///////////////////////////////////////////
-            //Feld-Ressource anzeigen
-            ///////////////////////////////////////////
             //Gebäudestufe bestimmen
             $stufeninfo = '';
             if (isset($bldg[$row['id']][$i]) && $bldg[$row['id']][$i] > 0) {
-                $stufeninfo = '<br>'.$bldg[$row['id']][$i]['bldg_level'];
-                //testen ob es gerade im Bau ist, dann die Farbe ändern
-                if ($bldg[$row['id']][$i]['bldg_time'] > time()) {
-                    $stufeninfo = '<span style="color: yellow;">'.$stufeninfo.'</span>';
-                }
+                $im_bau = $bldg[$row['id']][$i]['bldg_time'] > time();
+                $stufeninfo = '<b'.($im_bau ? ' class="vsk-bau"' : '').'>'.$bldg[$row['id']][$i]['bldg_level'].'</b>';
             }
 
-            //if(!in_array($row['id'],$immer_sichtbare_systeme)){
             if ($GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'] != '-' || $i == 0) {
-
-                //Grafik bestimmen
                 if ($i > 0) {
+                    //Feld-Ressource
                     $filename_nr = $data->fields[$i][0];
                     if ($filename_nr < 10) {
                         $filename_nr = '0'.$filename_nr;
                     }
-                    $output .= '<div style="text-align:center; margin-right: 1px; font-size: 10px; line-height: 10px;"><img style="width: 18px; box-sizing: border-box;" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+                    $felder .= '<span class="vsk-feld" title="'.$GLOBALS['map_field_typ'][$data->fields[$i][0]]['name'].'"><img src="gp/g/ele'.$filename_nr.'.gif" alt="">'.$stufeninfo.'</span>';
                 } else {
-                    //außenposten
-                    $output .= '
-						<div style="font-size: 10px; line-height: 10px; text-align:center;">
-							<div style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #999999; text-align: center; box-sizing: border-box; border-radius: 5px;" title="Au&szlig;enposten">A</div>
-							'.str_replace('<br>', '', $stufeninfo).'
-						</div>';
+                    //Außenposten
+                    $felder .= '<span class="vsk-feld" title="Au&szlig;enposten"><i class="vsk-box">A</i>'.$stufeninfo.'</span>';
                 }
-
             } else {
                 //Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
                 if (isset($bldg[$row['id']][$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id'])) {
-
-                    $output .= '
-						<div style="font-size: 10px; line-height: 10px; text-align:center;">
-							<div style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #999999; text-align: center; box-sizing: border-box; border-radius: 5px;" title="'.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['name'].'">'.$GLOBALS['greek_chars'][$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id']].'</div>
-							'.str_replace('<br>', '', $stufeninfo).'
-						</div>';
-
-
+                    $felder .= '<span class="vsk-feld" title="'.$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['name'].'"><i class="vsk-box">'.$GLOBALS['greek_chars'][$GLOBALS['map_buildings'][$bldg[$row['id']][$i]['bldg_id']]['factory_id']].'</i>'.$stufeninfo.'</span>';
                 } else {
-                    $output .= '<div title="keine Rohstoffe" class="rounded-borders" style=" margin-right: 1px; line-height: 18px; width: 18px; height: 18px; background-color: #666666; text-align: center; box-sizing: border-box;">-</div>';
+                    $felder .= '<span class="vsk-feld" title="keine Rohstoffe"><i class="vsk-box vsk-leer">&ndash;</i></span>';
                 }
-
-
-
-
-            }
-
-
-            if (($i + 1) % 5 == 0) {
-                $output .= '</div><div style="display: flex;">';
             }
         }
     }
 
-
+    $output .= '<div class="vsk" style="left: '.$alienpos_x.'px; top: '.$alienpos_y.'px; background-image: url('.$bg_image.');" title="'.$system_name.$tech_info.'" onclick="switch_iframe_main_container(\'map_system.php?id='.$row['id'].'\')">';
+    if ($felder != '') {
+        $output .= '<div class="vsk-felder">'.$felder.'</div>';
+    }
     $output .= '</div>';
-
-    $output .= '</div>';
-
-    $output .= '</div>';
-
     //if($row['user_id']<1 && $data->always_visible==0){
     if (!in_array($row['id'], $sichtbare_systeme)) {
         $output = '';
@@ -1284,7 +1230,7 @@ for ($i = 0;$i < count($erforschte_systeme);$i++) {
             $x2 = $sichtbare_systeme_koordinaten[$kanten[$k][1]][0] + 50;
             $y2 = $sichtbare_systeme_koordinaten[$kanten[$k][1]][1] + 50;
 
-            $output .= '<line data-svg="1" x1="'.$x1.'" y1="'.$y1.'" x2="'.$x2.'" y2="'.$y2.'" style="stroke:rgb(102,51,153);stroke-width:1" />';
+            $output .= '<line data-svg="1" x1="'.$x1.'" y1="'.$y1.'" x2="'.$x2.'" y2="'.$y2.'" class="map-kante" />';
         }
     }
 }
