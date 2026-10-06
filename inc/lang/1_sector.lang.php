@@ -40,6 +40,7 @@ $sec_lang['sekbldg1']='Sektorsprungfeldbegrenzer';
 $sec_lang['sekbldg2']='Sektorraumwerft';
 $sec_lang['sekbldg3']='Sektorhandelszentrum';
 $sec_lang['sekbldg4']='Scannerphalanx';
+$sec_lang['sekbldg5']='DX61a23-Kommunikationszentrale';
 $sec_lang['sekerweiterungen']='Erweiterungen';
 $sec_lang['sektor']='Sektor';
 $sec_lang['sektorartefakte']='Sektorartefakte';

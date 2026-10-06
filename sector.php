@@ -709,7 +709,8 @@ if($sec_data['npc']==1){
   	if($sec_data['techs'][3]>0)$srbstr.='<br>- '.$sec_lang['sekbldg2'];
   	if($sec_data['techs'][4]>0)$srbstr.='<br>- '.$sec_lang['sekbldg3'];
   	if($sec_data['techs'][5]>0)$srbstr.='<br>- '.$sec_lang['sekbldg4'];
-  	
+  	if($sec_data['techs'][6]>0)$srbstr.='<br>- '.$sec_lang['sekbldg5'];
+
   	$stip = $sec_lang['sektorraumbasis'].'&'.$srbstr;
     $basestr='<a href="'.'gp/'.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.'gp/'.'g/'.$bn.'" name="sb" title="'.$stip.'"></a>';
     //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen

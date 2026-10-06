@@ -997,6 +997,9 @@ foreach ($sectorList as $sf) {
                 if ($sec_data['techs'][5] > 0) {
                     $srbstr .= '<br>- '.$sec_lang['sekbldg4'];
                 }
+                if ($sec_data['techs'][6] > 0) {
+                    $srbstr .= '<br>- '.$sec_lang['sekbldg5'];
+                }
 
                 $stip = 'Sektorraumbasis'.$srbstr;
                 $basestr = '<a href="'.'gp/'.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.'gp/'.'g/'.$bn.'" name="sb" title="'.$stip.'" style="width: 100%; height: auto;"></a>';
