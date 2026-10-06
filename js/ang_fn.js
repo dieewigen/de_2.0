@@ -110,57 +110,6 @@ function playSound(sound_id){
 	}
 }
 
-function show_tech_typ(typ){
-	
-	if(typ==-1){
-		$(".tech").css("display", "");
-		$(".tech_einspaltig").css("display", "");
-	}else{
-		$(".tech").css("display", "none");
-		$(".tech_einspaltig").css("display", "none");
-
-		$(".tech_typ_"+typ).css("display", "");
-	}
-	setCookie('tech_filter_typ', typ);
-}
-
-//eine gerade fertig gewordene Technologie in der Liste so darstellen, als waere die Seite neu geladen worden
-function tech_finished(tech_id, hide){
-	var tech=$('[data-tech-id="'+tech_id+'"]');
-	if(tech.length>0){
-		//liegt die Maus darauf, wuerde der Tooltip sonst stehen bleiben
-		if(tech.is(':hover')){
-			$('#tt').remove();
-		}
-
-		if(hide){
-			//entfernen statt verstecken, sonst blendet show_tech_typ() sie wieder ein
-			tech.remove();
-		}else{
-			tech.removeAttr('onclick');
-			tech.find('.tech_name').attr('class', 'tech_name_grey');
-		}
-	}
-
-	//bei den Technologien, die sie voraussetzen, nicht mehr als fehlend markieren:
-	//direkt angezeigt bzw. im gerade offenen Tooltip...
-	$('[data-vor-id="'+tech_id+'"]').contents().unwrap();
-
-	//...und im Tooltip-Text, der im title bzw. nach dem ersten Mouseover in data('original-title') steht
-	var fehlt=new RegExp("<span data-vor-id='"+tech_id+"'[^>]*>([^<]*)</span>", 'g');
-	$('[data-tech-id]').each(function(){
-		var el=$(this);
-		var title=el.attr('title');
-		if(title){
-			el.attr('title', title.replace(fehlt, '$1'));
-		}
-		var original=el.data('original-title');
-		if(original){
-			el.data('original-title', original.replace(fehlt, '$1'));
-		}
-	});
-}
-
 function vs_filter_init(){
 	var vsf0a=getCookie("vsf0a");
 	var vsf0b=getCookie("vsf0b");

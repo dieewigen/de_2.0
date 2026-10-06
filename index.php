@@ -220,16 +220,6 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
                     "UPDATE de_login SET logins=logins+1 WHERE user_id=?",
                     [$_SESSION['ums_user_id']]
                 );
-
-                //technologieseite auf mobilgeräten: eine spalte, kosten und voraussetzungen direkt auf der kachel,
-                //denn ein tipp auf die kachel startet sofort den bau; änderbar über das zahnrad der seite
-                if ($_SESSION['ums_mobi'] == 1) {
-                    foreach (array('tech_anordnung', 'tech_kosten', 'tech_vor') as $tech_cookie) {
-                        if (!isset($_COOKIE[$tech_cookie])) {
-                            setcookie($tech_cookie, '1', array('expires' => time() + 3600 * 24 * 365 * 5, 'path' => '/'));
-                        }
-                    }
-                }
             }
 
             //testen ob er das alternativ-pw verwendet hat

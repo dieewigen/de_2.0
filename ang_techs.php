@@ -15,10 +15,11 @@ include 'functions.php';
 include "cssinclude.php";
 ?>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
+<script type="text/javascript" src="js/ang_techs.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_techs.js');?>"></script>
 </head>
 <?php
-echo '<body style="margin: 0; padding:0; color: #FFFFFF;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-echo '<div style="position: absolute; background-color: rgba(10,10,10,0.95); height: 100%; width: 100%; min-width: 100%; overflow:auto;">';
+echo '<body class="tc-body theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+echo '<div class="tc-fenster">';
 
 $content='';
 
@@ -30,55 +31,27 @@ if(!isset($sv_deactivate_vsystems)){
 if(setLock($_SESSION['ums_user_id'])){
 	$pd=loadPlayerData($_SESSION['ums_user_id']);
 	$pt=loadPlayerTechs($_SESSION['ums_user_id']);
-	
+
 	$ps=loadPlayerStorage($_SESSION['ums_user_id']);
-	
+
 	$row=$pd;
 	$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
 	$punkte=$row["score"];$newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 	$dailyallygift=$row['dailyallygift'];$allytag=$row['allytag'];$allystatus=$row['status'];
-	
+
 	$newtrans=$row["newtrans"];$newnews=$row["newnews"];
 
-	$tech_anordnung=					0;
-	$tech_erledigte_techs=				0;
-	$tech_techs_ohne_voraussetzung =	0;
-	$tech_kosten=						0;
-	$tech_vor=							0;
-	$tech_desc=							0;
-	$tech_sound=						0;
-
-	
-	//Cookie-Daten laden
-	if(isset($_COOKIE['tech_anordnung'])){
-		$tech_anordnung=					intval($_COOKIE['tech_anordnung']);
-	}
-	
-	if(isset($_COOKIE['tech_erledigte_techs'])){
-		$tech_erledigte_techs=				intval($_COOKIE['tech_erledigte_techs']);
-	}
-	
-	if(isset($_COOKIE['tech_techs_ohne_voraussetzung'])){
-		$tech_techs_ohne_voraussetzung =	intval($_COOKIE['tech_techs_ohne_voraussetzung']);
-	}
-	
-	if(isset($_COOKIE['tech_kosten'])){
-		$tech_kosten=						intval($_COOKIE['tech_kosten']);
+	//Anzeige aus den Cookies (js/ang_techs.js setzt sie ohne Neuladen):
+	//Ansicht 0 = Baum (Spalten je Stufe), 1 = Liste; ohne Cookie mobil die Liste
+	$tech_anordnung=isset($_COOKIE['tech_anordnung']) ? intval($_COOKIE['tech_anordnung']) : ($_SESSION['ums_mobi']==1 ? 1 : 0);
+	$tech_sound=intval($_COOKIE['tech_sound'] ?? 0);
+	$tech_filter_typ=isset($_COOKIE['tech_filter_typ']) ? intval($_COOKIE['tech_filter_typ']) : -1;
+	//Statusfilter; ohne Cookie wie die frühere Einstellung "erledigte Technologien nicht ausblenden"
+	$tech_status=$_COOKIE['tech_status'] ?? (intval($_COOKIE['tech_erledigte_techs'] ?? 0)==1 ? 'alle' : 'offen');
+	if(!in_array($tech_status, array('baubar', 'offen', 'erledigt', 'alle'))){
+		$tech_status='offen';
 	}
 
-	if(isset($_COOKIE['tech_vor'])){
-		$tech_vor=							intval($_COOKIE['tech_vor']);
-	}
-	
-	if(isset($_COOKIE['tech_desc'])){
-		$tech_desc=							intval($_COOKIE['tech_desc']);
-	}
-
-	if(isset($_COOKIE['tech_sound'])){
-		$tech_sound=						intval($_COOKIE['tech_sound']);
-	}
-
-	//print_r($pt);
 	///////////////////////////////////////////////////////////////////
 	//alle Technologien aus der DB auslesen und in ein Array packen
 	///////////////////////////////////////////////////////////////////
@@ -95,7 +68,7 @@ if(setLock($_SESSION['ums_user_id'])){
 	$active_tech_types_row=array();
 	$anzahl_tech_types=4;
 	for($i=0;$i<$anzahl_tech_types;$i++){
-		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id) 
+		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
 			WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_typ='$i' AND time_finished>='".time()."';");
 		$num=mysqli_num_rows($db_daten);
 		$active_tech_types[$i] = $num;
@@ -104,73 +77,18 @@ if(setLock($_SESSION['ums_user_id'])){
 			$active_tech_types_row[$i]=$row;
 		}
 	}
-	
+
 	///////////////////////////////////////////////////////////////////
 	//Konfigurationsbereich
 	///////////////////////////////////////////////////////////////////
 
+	//die Rohstoffleiste steht im großen Fenster der Desktop-Version links statt zentriert
 	$flag_ang_big_iframe=true;
-
-	//include "cssinclude.php";
-	
-	$deactivate_touch_menu=0;
-	if($_SESSION['ums_mobi']==1 && $tech_anordnung==0){
-		$deactivate_touch_menu=1;
-	}
 
 	//close-button
 	if($_SESSION['ums_mobi']!=1 && $_SESSION['desktop_version']==0){
 		$content.='<img onclick="closeIframeMain();" src="gp/g/close_icon.png" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
 	}
-
-	$class='';
-
-	$content.='
-		<div id="tech_config" class="invisible" style="z-index: 100; position: fixed; top: 40px; left: 3px; background-color: #000000; width: 400px; border: 1px solid #EEEEEE; color: #EEEEEE; padding: 5px;">
-			<table style="width: 100%;">
-			<tr>
-				<td>Anordnung:</td>
-				<td style="text-align: right;">'.sf('tech_anordnung', array(0=>'mehrere Spalten', 1=>'eine Spalte'), $tech_anordnung, $class, 'onChange="onchange_select(\'tech_anordnung\')"').'</td>
-			</tr>
-			<tr>
-				<td>Erledigte Technologien:</td>
-				<td style="text-align: right;">'.sf('tech_erledigte_techs', array(0=>'ausblenden', 1=>'nicht ausblenden'), $tech_erledigte_techs, $class, 'onChange="onchange_select(\'tech_erledigte_techs\')"').'</td></td>
-			</tr>
-			<tr>
-				<td>Technologien mit fehlenden Voraussetzungen:</td>
-				<td style="text-align: right;">'.sf('tech_techs_ohne_voraussetzung', array(0=>'nicht ausblenden', 1=>'ausblenden'), $tech_techs_ohne_voraussetzung, $class, 'onChange="onchange_select(\'tech_techs_ohne_voraussetzung\')"').'</td></td>
-			</tr>
-			<tr>
-				<td>Anzeige Kosten:</td>
-				<td style="text-align: right;">'.sf('tech_kosten', array(0=>'Mouseover', 1=>'direkt'), $tech_kosten, $class, 'onChange="onchange_select(\'tech_kosten\')"').'</td></td>
-			</tr>
-			<tr>
-				<td>Anzeige ben&ouml;tigte Technologien:</td>
-				<td style="text-align: right;">'.sf('tech_vor', array(0=>'Mouseover', 1=>'direkt'), $tech_vor, $class, 'onChange="onchange_select(\'tech_vor\')"').'</td></td>
-			</tr>
-			<tr>
-				<td>Anzeige Beschreibung:</td>
-				<td style="text-align: right;">'.sf('tech_desc', array(0=>'Mouseover', 1=>'direkt', 2=>'gar nicht'), $tech_desc, $class, 'onChange="onchange_select(\'tech_desc\')"').'</td></td>
-			</tr>
-
-			<tr>
-				<td>Sound:</td>
-				<td style="text-align: right;">'.sf('tech_sound', array(0=>'an', 1=>'aus'), $tech_sound, $class, 'onChange="onchange_select(\'tech_sound\')"').'</td></td>
-			</tr>
-			
-			</table>
-			
-			<span style="font-size: 12px;">Um die &Auml;nderungen zu sehen, bitte die Seite aktualisieren.</span>
-		</div>
-		';
-
-	/////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////
-	//Konfiguration und laufende Technologien
-	$content.='
-	<div style="display: flex; min-height: 32px; margin-top: 5px; margin-bottom: 8px;">
-		<div><img onclick="$(\'#tech_config\').toggleClass(\'invisible\');" src="gp/g/button_config.png" style="margin-left: 8px; margin-right: 8px; height: 32px; width: auto; cursor: pointer;"></div>
-	';		
 
 	///////////////////////////////////////////////////////////////////
 	// soll eine Technologie abgebrochen werden?
@@ -179,8 +97,8 @@ if(setLock($_SESSION['ums_user_id'])){
 		$tech_id=intval($_REQUEST['cancel_tech']);
 		$has_all=true;
 		$need_storage_res=array();
-		
-		//überprüfen ob diese Technologie gerade l�uft
+
+		//überprüfen ob diese Technologie gerade läuft
 		if(isset($pt[$tech_id]) && $pt[$tech_id]['time_finished']>time()){
 			//test auf ausreichende Rohstoffe
 			$einzelkosten=explode(';', $tech_daten[$tech_id]['tech_build_cost']);
@@ -227,7 +145,7 @@ if(setLock($_SESSION['ums_user_id'])){
 						if(!in_array($value1, array(3,4,5,6,7,8,9,10,11,12))){
 							//V-Systeme sind aktiv
 							//genug im storage vorhanden?
-							
+
 							if($ps[$value1]['item_amount']<$parts[1]){$has_all=false;}
 							//speichern wie viel man aus dem storage benötigt
 							$need_storage_res[$value1]=$parts[1];
@@ -237,7 +155,7 @@ if(setLock($_SESSION['ums_user_id'])){
 			}
 
 			//Kosten gutschreiben
-			$sql="UPDATE de_user_data SET 
+			$sql="UPDATE de_user_data SET
 				restyp01=restyp01+'".$ben_restyp01."',
 				restyp02=restyp02+'".$ben_restyp02."',
 				restyp03=restyp03+'".$ben_restyp03."',
@@ -247,12 +165,12 @@ if(setLock($_SESSION['ums_user_id'])){
 
 			//echo $sql;
 			mysqli_query($GLOBALS['dbi'], $sql);
-			
+
 			//Item-Kosten gutschreiben
 			foreach ($need_storage_res as $key => $value){
 				change_storage_amount($_SESSION['ums_user_id'], $key, $value);
 			}
-			
+
 
 			//Technologie in der DB hinterlegen
 			//
@@ -260,16 +178,16 @@ if(setLock($_SESSION['ums_user_id'])){
 			$sql="DELETE FROM de_user_techs WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id='".$tech_id."';";
 			//echo $sql;
 			mysqli_query($GLOBALS['dbi'], $sql);
-			$msg='<span class="text_green">Der Auftrag wurde abgebrochen.</span>';
+			$msg='<div class="mod-meldung mod-meldung-ok">Der Auftrag wurde abgebrochen, die Kosten wurden erstattet.</div>';
 
 			//Daten erneut auslesen
 			$pd=loadPlayerData($_SESSION['ums_user_id']);
 			$pt=loadPlayerTechs($_SESSION['ums_user_id']);
 			$row=$pd;
 			$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
-			
+
 		}else{
-			$msg='<span class="text_red">Der Auftrag wurde bereits abgeschlossen.</span>';
+			$msg='<div class="mod-meldung mod-meldung-fehler">Der Auftrag wurde bereits abgeschlossen.</div>';
 		}
 	}
 
@@ -290,10 +208,10 @@ if(setLock($_SESSION['ums_user_id'])){
 
 			$need_storage_res=array();
 
-			//�berpr�fen ob schon eine Technologie dieses Typs in Bearbeitung ist
+			//überprüfen ob schon eine Technologie dieses Typs in Bearbeitung ist
 			$tech_typ=$tech_daten[$tech_id]['tech_typ'];
 			if($active_tech_types[$tech_typ]==0){
-				//�berpr�fen ob man diese Technologie bereits hat
+				//überprüfen ob man diese Technologie bereits hat
 				if(!isset($pt[$tech_id])){
 					//Voraussetzungen
 
@@ -326,7 +244,7 @@ if(setLock($_SESSION['ums_user_id'])){
 					//wenn die V-Systeme deaktiviert sind, dann sind die Techs auch nicht nutzbar
 					if($sv_deactivate_vsystems==1 && $tech_typ==3){
 						$has_all=false;
-					}					
+					}
 
 					if($has_all){
 						//test auf ausreichende Rohstoffe
@@ -378,7 +296,7 @@ if(setLock($_SESSION['ums_user_id'])){
 										//speichern wie viel man aus dem storage benötigt
 										$need_storage_res[$value1]=$parts[1];
 									}
-								}								
+								}
 							}elseif($value[0]=='B'){
 								if($value[1]==1){
 									if($sv_hardcore==1){
@@ -392,7 +310,7 @@ if(setLock($_SESSION['ums_user_id'])){
 
 						if($has_all){
 							//Rohstoff-Kosten abziehen
-							$sql="UPDATE de_user_data SET 
+							$sql="UPDATE de_user_data SET
 								restyp01=restyp01-'".$ben_restyp01."',
 								restyp02=restyp02-'".$ben_restyp02."',
 								restyp03=restyp03-'".$ben_restyp03."',
@@ -402,7 +320,7 @@ if(setLock($_SESSION['ums_user_id'])){
 
 							//echo $sql;
 							mysqli_query($GLOBALS['dbi'], $sql);
-							
+
 							//Item-Kosten abziehen
 							foreach ($need_storage_res as $key => $value){
 								change_storage_amount($_SESSION['ums_user_id'], $key, $value*-1);
@@ -416,51 +334,54 @@ if(setLock($_SESSION['ums_user_id'])){
 							//echo $sql;
 							mysqli_query($GLOBALS['dbi'], $sql);
 
+							$tech_names=explode(";",$tech_daten[$tech_id]['tech_name']);
+							$msg='<div class="mod-meldung mod-meldung-ok">'.$tech_names[$_SESSION['ums_rasse']-1].' l&auml;uft jetzt '.RealTime::until($time_finished).'.</div>';
+
 							//Daten erneut auslesen
 							$pd=loadPlayerData($_SESSION['ums_user_id']);
 							$pt=loadPlayerTechs($_SESSION['ums_user_id']);
 							$row=$pd;
 							$restyp01=$row['restyp01'];$restyp02=$row['restyp02'];$restyp03=$row['restyp03'];$restyp04=$row['restyp04'];$restyp05=$row['restyp05'];
-							
+
 
 						}else{
-							$msg='<span class="text_red">Es sind nicht alle ben&ouml;tigten Rohstoffe/Voraussetzungen vorhanden.</span>';
+							$msg='<div class="mod-meldung mod-meldung-fehler">Es sind nicht alle ben&ouml;tigten Rohstoffe/Voraussetzungen vorhanden.</div>';
 						}
 					}else{
-						$msg='<span class="text_red">Es sind nicht alle Voraussetzungen f&uuml;r diese Technologie erf&uuml;llt.</span>';
+						$msg='<div class="mod-meldung mod-meldung-fehler">Es sind nicht alle Voraussetzungen f&uuml;r diese Technologie erf&uuml;llt.</div>';
 					}
 				}else{
-					$msg='<span class="text_red">An einer Technologie dieser Art wird/wurde bereits gearbeitet.</span>';
+					$msg='<div class="mod-meldung mod-meldung-fehler">An einer Technologie dieser Art wird/wurde bereits gearbeitet.</div>';
 				}
 
 			}else{
 				switch($tech_typ){
 					case 0:
-						$msg='<span class="text_red">Es wird bereits an einem Geb&auml;ude gearbeitet.</span>';
+						$msg='<div class="mod-meldung mod-meldung-fehler">Es wird bereits an einem Geb&auml;ude gearbeitet.</div>';
 					break;
 					case 1:
-						$msg='<span class="text_red">Es wird bereits eine Technologie erforscht.</span>';
+						$msg='<div class="mod-meldung mod-meldung-fehler">Es wird bereits eine Technologie erforscht.</div>';
 					break;
 					default:
-						$msg='<span class="text_red">An einer Technologie dieser Art wird bereits gearbeitet.</span>';
+						$msg='<div class="mod-meldung mod-meldung-fehler">An einer Technologie dieser Art wird bereits gearbeitet.</div>';
 					break;
 
 
 				}
 			}
 		}else{
-			$msg='<span class="text_red">Die Runde l&auml;uft noch nicht.</span>';
+			$msg='<div class="mod-meldung mod-meldung-fehler">Die Runde l&auml;uft noch nicht.</div>';
 		}
 	}
-	
-	
+
+
 	///////////////////////////////////////////////////////////////////
 	//nochmal auslesen, welche Technologietypen aktuell in Bearbeitung sind sind
 	///////////////////////////////////////////////////////////////////
 	$active_tech_types=array();
 	$active_tech_types_row=array();
 	for($i=0;$i<$anzahl_tech_types;$i++){
-		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id) 
+		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
 			WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_typ='$i' AND time_finished>='".time()."';");
 		$num=mysqli_num_rows($db_daten);
 		$active_tech_types[$i] = $num;
@@ -469,353 +390,189 @@ if(setLock($_SESSION['ums_user_id'])){
 			$active_tech_types_row[$i]=$row;
 		}
 	}
-	
+
+	//je Technologietyp ein Bauplatz; Texte der Status, die js/ang_techs.js beim Nachziehen ebenso setzt
+	$tc_plaetze=array(0 => 'Geb&auml;ude', 1 => 'Forschung', 2 => 'Basisschiff', 3 => 'V-Systeme');
+	$tc_reiter=array(-1 => 'Alle', 0 => 'Geb&auml;ude', 1 => 'Forschungen', 2 => 'Basisschiffe', 3 => 'V-Systeme');
+	if($sv_deactivate_vsystems==1){
+		unset($tc_plaetze[3], $tc_reiter[3]);
+	}
+	$tc_texte=array('baubar' => 'baubar', 'res' => 'Rohstoffe fehlen', 'platz' => 'Bauplatz belegt', 'vor' => 'Voraussetzung fehlt', 'laeuft' => 'läuft', 'erledigt' => 'erledigt');
+	$tc_chips=array('baubar' => ' mod-chip-gruen', 'res' => ' mod-chip-warn', 'platz' => '', 'vor' => '', 'laeuft' => '', 'erledigt' => '');
+
+	$content.='<div class="mod tc tc-'.($tech_anordnung==1 ? 'liste' : 'baum').'" id="tc" data-typ="'.$tech_filter_typ.'" data-status="'.$tech_status.'" data-ton="'.($tech_sound==0 ? 1 : 0).'" data-texte="'.htmlspecialchars(json_encode($tc_texte), ENT_QUOTES, 'UTF-8').'">';
+	$content.='<div class="tc-oben">';
+
+	//Kopf: Ansicht und Ton
+	$content.='<div class="tc-kopf"><b class="tc-titel">Technologien</b><div class="tc-schalter">';
+	$content.='<span class="mod-typ">Ansicht</span><span class="tc-seg"><button type="button" data-ansicht="0">Baum</button><button type="button" data-ansicht="1">Liste</button></span>';
+	$content.='<span class="mod-typ">Ton</span><span class="tc-seg"><button type="button" data-ton="0">an</button><button type="button" data-ton="1">aus</button></span>';
+	$content.='</div></div>';
+
+	if(!empty($msg)){
+		$content.=$msg;
+	}
+
 	///////////////////////////////////////////////////////////////////
-	//aktive Prozesse ausgeben
+	//Bauplätze: laufender Auftrag oder frei
 	///////////////////////////////////////////////////////////////////
-	//print_r($active_tech_types);
-	for($i=0;$i<$anzahl_tech_types;$i++){
+	$content.='<div class="tc-plaetze">';
+	foreach($tc_plaetze as $i => $platz_name){
 		if(isset($active_tech_types[$i]) && $active_tech_types[$i]>0){
 			$tech_names=explode(";",$active_tech_types_row[$i]['tech_name']);
 			$tech_name=$tech_names[$_SESSION['ums_rasse']-1];
-			$tech_typ=$active_tech_types_row[$i]['tech_typ'];
 
-			$content.='<div class="tech tech_typ_'.$tech_typ.'" style="width: initial;">
-			<div class="tech_bg'.$tech_typ.'"></div>
-			';
-
-			$content.='<div class="tech_name uppercase" rel="tooltip" title="Fertigstellung: '.date("H:i:s d.m.Y", $active_tech_types_row[$i]['time_finished']).'">'.$tech_name.' (<span id="tech_ende'.$i.'">'.RealTime::until($active_tech_types_row[$i]['time_finished']).'</span><span id="tech_counter'.$i.'" hidden></span>) <a href="ang_techs.php?cancel_tech='.$active_tech_types_row[$i]['tech_id'].'" class="btn2" onclick="return confirm(unescape(\'Auftrag abbrechen? Die Rohstoffkosten werden erstattet.\'))" >Abbruch</a></div>';
-			if($tech_sound==0){
-				$sound_id=1;
-			}else{
-				$sound_id=0;
-			}
-
-
-			$content.='</div>';
+			$content.='<div class="tc-platz tc-typ-'.$i.'" data-platz="'.$i.'"><span class="mod-typ">'.$platz_name.'</span><div class="tc-platz-inhalt">';
+			$content.='<b>'.$tech_name.'</b><small><span id="tech_ende'.$i.'">'.RealTime::until($active_tech_types_row[$i]['time_finished']).'</span><span id="tech_counter'.$i.'" hidden></span></small>';
+			$content.='<a href="ang_techs.php?cancel_tech='.$active_tech_types_row[$i]['tech_id'].'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Wirklich abbrechen?" title="Die Kosten werden erstattet.">Abbrechen</a>';
+			$content.='</div></div>';
 
 			//nach Ablauf die Technologie in der Liste unten wie eine erledigte behandeln; angezeigt wird die Endzeit
-			//(Forschung läuft in Echtzeit), der Countdown läuft dafür unsichtbar mit
-			$on_finish='function(){ tech_finished('.intval($active_tech_types_row[$i]['tech_id']).', '.($tech_erledigte_techs==0 ? 'true' : 'false').'); var z=document.getElementById("tech_ende'.$i.'"); if(z){ z.textContent="fertig"; } }';
-			$content.='<script type="text/javascript">ang_countdown('.($active_tech_types_row[$i]['time_finished']-time()).',"tech_counter'.$i.'",'.$sound_id.','.$on_finish.')</script>';
-		}
-	}
-
-	//flex-box Konfiguration / laufende Techs schließen
-	$content.='</div>';
-	
-	if(!empty($msg)){
-		$content.='<div style="margin: 20px;">'.$msg.'</div>';
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// nach Technologietyp filtern
-	//////////////////////////////////////////////////////////////////////
-
-	$content.='
-	<div style="display: flex; padding-bottom: 10px;">
-		<div style="margin-left: 10px;"><a href="javascript: show_tech_typ(-1);" class="btn">alle</a></div>
-		<div style="margin-left: 10px;"><a href="javascript: show_tech_typ(0);" class="btn">Gebäude</a></div>
-		<div style="margin-left: 10px;"><a href="javascript: show_tech_typ(1);" class="btn">Forschungen</a></div>';
-		if($_SESSION['ums_mobi']==1 || $_SESSION['desktop_version']==1){
-			$content.='</div><div style="display: flex; padding-bottom: 10px;">';
-	}
-	$content.='
-		<div style="margin-left: 10px;"><a href="javascript: show_tech_typ(2);" class="btn">Basisschiffe</a></div>';
-	if($sv_deactivate_vsystems!=1){
-		$content.='
-		<div style="margin-left: 10px;"><a href="javascript: show_tech_typ(3);" class="btn">V-Systeme</a></div>';
-	}
-	$content.='
-	</div>
-	';
-
-	///////////////////////////////////////////////////////////////////
-	//die Technlogien durchgehen und entsprechend ausgeben
-	///////////////////////////////////////////////////////////////////
-	$tech_output=array();
-	$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_sort_id < 1000 ORDER BY tech_level ASC, tech_sort_id ASC");
-	while($row = mysqli_fetch_array($db_daten)){
-		//alle Voraussetzungen vorhanden-Flag setzen
-		$has_all=true;
-
-
-		if(isset($pt[$row['tech_id']]) && $pt[$row['tech_id']]['time_finished']<=time()){
-			//man hat es
-			$bereits_fertig=true;
-			//echo '<br>1: '.$pt[$row['tech_id']]['time_finished'];
+			//(Forschung läuft in Echtzeit), der Countdown läuft dafür unsichtbar mit, den Ton spielt tc_fertig()
+			$content.='<script type="text/javascript">ang_countdown('.($active_tech_types_row[$i]['time_finished']-time()).',"tech_counter'.$i.'",0,function(){ tc_fertig('.intval($active_tech_types_row[$i]['tech_id']).', '.$i.'); })</script>';
 		}else{
-			//man hat es nicht
-			$bereits_fertig=false;
-			//echo '<br>2: '.$pt[$row['tech_id']]['time_finished'];
+			$content.='<div class="tc-platz tc-typ-'.$i.'" data-platz="'.$i.'" data-frei="1"><span class="mod-typ">'.$platz_name.'</span><div class="tc-platz-inhalt"><span class="tc-frei">frei</span></div></div>';
+		}
+	}
+	$content.='</div>';
+
+	//Filter: Typ und Status, ohne Neuladen (js/ang_techs.js)
+	$content.='<div class="ally-navi tc-typen">';
+	foreach($tc_reiter as $typ => $reiter_name){
+		$content.='<button type="button" class="ally-reiter'.($typ>=0 ? ' tc-typ-'.$typ : '').'" data-filter-typ="'.$typ.'">'.$reiter_name.'</button>';
+	}
+	$content.='</div>';
+	$content.='<div class="tc-filter"><span class="tc-seg">';
+	foreach(array('baubar' => 'Baubar', 'offen' => 'Offen', 'erledigt' => 'Erledigt', 'alle' => 'Alle') as $status => $status_name){
+		$content.='<button type="button" data-filter-status="'.$status.'">'.$status_name.' <b data-anzahl="'.$status.'"></b></button>';
+	}
+	$content.='</span></div>';
+	$content.='</div>';//tc-oben
+
+	///////////////////////////////////////////////////////////////////
+	//die Technologien durchgehen: Status, Kosten, fehlende Voraussetzungen
+	///////////////////////////////////////////////////////////////////
+	$tc_stufen=array();
+	foreach($tech_daten as $row){
+		//wenn die V-Systeme deaktiviert sind, dann sind die Techs auch nicht nutzbar
+		if($sv_deactivate_vsystems==1 && $row['tech_typ']==3){
+			continue;
 		}
 
+		$bereits_fertig=isset($pt[$row['tech_id']]) && $pt[$row['tech_id']]['time_finished']<=time();
+		$laeuft=isset($pt[$row['tech_id']]) && !$bereits_fertig;
 
-		//Kosten
+		//Kosten, rot wenn ein Posten nicht reicht
+		$res_ok=true;
 		$kosten='';
-
-		$kosten.='<br><br>Kosten:';
-		$einzelkosten=explode(';', $row['tech_build_cost']);
-		foreach ($einzelkosten as $value) {
-			/*
-			if($kosten!='<span style="color: #00AA00;">'){
-				$kosten.='<br>';
-			}*/
-			$kosten.='<br>';
-
+		foreach (explode(';', $row['tech_build_cost']) as $value) {
 			$parts=explode("x", $value);
+			$posten='';
+			$fehlt=false;
 
 			//5 Grundrohstoffe
 			if($value[0]=='R'){
-				if($value[1]==1){
-					if($pd['restyp01']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' M';
-					if($pd['restyp01']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==2){
-					if($pd['restyp02']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' D';
-					if($pd['restyp02']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==3){
-					if($pd['restyp03']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' I';
-					if($pd['restyp03']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==4){
-					if($pd['restyp04']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' E';
-					if($pd['restyp04']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==5){
-					if($pd['restyp05']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' T';
-					if($pd['restyp05']<$parts[1]){$kosten.='</span>';}
+				$kurz=array(1 => 'M', 2 => 'D', 3 => 'I', 4 => 'E', 5 => 'T');
+				if(isset($kurz[$value[1]])){
+					$fehlt=$pd['restyp0'.$value[1]]<$parts[1];
+					$posten=number_format($parts[1],0,",",".").' '.$kurz[$value[1]];
 				}
 			}elseif($value[0]=='I'){
-				if($sv_deactivate_vsystems!=1){
-					//V-Systeme sind aktiv
-					$value1=str_replace('I','',$parts[0]);
-					if($ps[$value1]['item_amount']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' '.$ps[$value1]['item_name'];
-					if($ps[$value1]['item_amount']<$parts[1]){$kosten.='</span>';}
-				}else{
-					//V-Systeme sind inaktiv
-					$value1=str_replace('I','',$parts[0]);
-					if(!in_array($value1, array(3,4,5,6,7,8,9,10,11,12))){
-						//V-Systeme sind aktiv
-						if($ps[$value1]['item_amount']<$parts[1]){$kosten.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;}
-						$kosten.=number_format($parts[1],0,",",".");
-						$kosten.=' '.$ps[$value1]['item_name'];
-						if($ps[$value1]['item_amount']<$parts[1]){$kosten.='</span>';}
-					}
+				$value1=str_replace('I','',$parts[0]);
+				//bei deaktivierten V-Systemen zählen deren Waren (3-12) nicht
+				if($sv_deactivate_vsystems!=1 || !in_array($value1, array(3,4,5,6,7,8,9,10,11,12))){
+					$fehlt=$ps[$value1]['item_amount']<$parts[1];
+					$posten=number_format($parts[1],0,",",".").' '.$ps[$value1]['item_name'];
 				}
+			}
+
+			if($posten!=''){
+				if($fehlt){
+					$res_ok=false;
+				}
+				$kosten.='<span'.($fehlt ? ' class="tc-fehlt"' : '').'>'.$posten.'</span>';
 			}
 		}
 
-		//Bauzeit bzw. fertig gestellt
-
-		$bauzeit='<br><br><span style=\'color: rgba(255,255,255, 0.4)\'>Dauer: '.formatTime($row['tech_build_time']*$GLOBALS['tech_build_time_faktor']).'</span>';
-		//$bauzeit_gesamt+=$row['tech_build_time'];
-
-		//Voraussetzungen
-		$voraussetzungen='';
-		$has_voraussetzungen=true;
+		//fehlende Voraussetzungen; data-vor-id, damit tc_fertig() sie entfernen kann
+		$vor='';
+		$fehlt_ids=array();
+		$sonder=false;
 		if(!empty($row['tech_vor'])){
-			$voraussetzungen.='<br><br><span>Voraussetzungen: ';
-			$vors=explode(";", $row['tech_vor']);
-			for($i=0;$i<count($vors);$i++){
+			foreach(explode(";", $row['tech_vor']) as $v){
 				//Technologie als Voraussetzungen
-				if($vors[$i][0]=='T'){
-					$ben_tech_id=str_replace("T","",$vors[$i]);
-				
-					$tech_names=explode(";",$tech_daten[$ben_tech_id]['tech_name']);
-					$tech_name=$tech_names[$_SESSION['ums_rasse']-1];
-
-					//erfüllt man die Voraussetzung?
-					if(isset($pt[$ben_tech_id]) && $pt[$ben_tech_id]['time_finished']<=time()){
-						//man hat es
-						$voraussetzungen.='<br>'.$tech_name;
-					}else{
-						//man hat es nicht, data-vor-id: damit tech_finished() die Markierung entfernen kann
-						$voraussetzungen.='<br><span data-vor-id=\''.intval($ben_tech_id).'\' style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>'.$tech_name.'</span>';
-						$has_all=false;
-						$has_voraussetzungen=false;
+				if($v[0]=='T'){
+					$ben_tech_id=str_replace("T","",$v);
+					if(!(isset($pt[$ben_tech_id]) && $pt[$ben_tech_id]['time_finished']<=time())){
+						$tech_names=explode(";",$tech_daten[$ben_tech_id]['tech_name']);
+						$vor.='<span class="tc-fehlt" data-vor-id="'.intval($ben_tech_id).'">'.$tech_names[$_SESSION['ums_rasse']-1].'</span>';
+						$fehlt_ids[]=intval($ben_tech_id);
 					}
-				}elseif($vors[$i][0]=='B'){ //Besondere Bedingungen
+				}elseif($v[0]=='B'){ //Besondere Bedingungen
 					//EH-Teilsiege
-					if($vors[$i][1]=='1'){
-						$parts=explode("x", $vors[$i]);
-						if($sv_hardcore==1){
-							$voraussetzungen.='<br>';
-							if($pd['eh_siege']<$parts[1]){$voraussetzungen.='<span style=\'color: #FFFFFF; background-color: #AA0000; padding: 0 3px 0 3px;\'>';$has_all=false;$has_voraussetzungen=false;}
-							$voraussetzungen.=$parts[1].' EH-Teilsieg(e)';
-							if($pd['eh_siege']<$parts[1]){$voraussetzungen.='</span>';}
+					if($v[1]=='1'){
+						$parts=explode("x", $v);
+						if($sv_hardcore==1 && $pd['eh_siege']<$parts[1]){
+							$vor.='<span class="tc-fehlt">'.$parts[1].' EH-Teilsieg(e)</span>';
+							$sonder=true;
 						}
 					}
 				}
-
-
 			}
-			$voraussetzungen.='</span>';
 		}
 
-		//Beschreibung
-		$beschreibung='';
-		if(!empty($row['tech_desc'])){
-			$beschreibung.='<br><br>Beschreibung:</br>';
-			$tech_descs=explode(";",$row['tech_desc']);
-			$beschreibung.=$tech_descs[$_SESSION['ums_rasse']-1];
-		}	
-
-		//tooltip je nach Einstellungen zusammensetzen
-		$title='';
-		if($tech_kosten==0){
-			$title.=$kosten;
-			$title.=$bauzeit;
-		}		
-		if($tech_vor==0){
-			$title.=$voraussetzungen;
+		//Status wie beim Start oben geprüft; js/ang_techs.js (tc_neu) bestimmt ihn genauso neu
+		if($bereits_fertig){
+			$status='erledigt';
+		}elseif($laeuft){
+			$status='laeuft';
+		}elseif(!empty($fehlt_ids) || $sonder){
+			$status='vor';
+		}elseif(!$res_ok){
+			$status='res';
+		}elseif($active_tech_types[$row['tech_typ']]>0){
+			$status='platz';
+		}else{
+			$status='baubar';
 		}
-		if($tech_desc==0){
-			$title.=$beschreibung;
-		}
-		
-		//$title=$kosten.$bauzeit.$voraussetzungen.$beschreibung;
 
-		//Ausgabe
 		$tech_names=explode(";",$row['tech_name']);
 		$tech_name=$tech_names[$_SESSION['ums_rasse']-1];
 
-		/*
-		if($has_all){
-			$tech_name_class='tech_name';
-			$baulink[0]='<a style="text-decoration: none;" href="ang_techs.php?start_tech='.$row['tech_id'].'">';
-			$baulink[1]='</a>';
-		}else{
-			$tech_name_class='tech_name';
-			$baulink[0]='<a style="text-decoration: none;" href="ang_techs.php?start_tech='.$row['tech_id'].'">';
-			$baulink[1]='</a>';
-		}*/
-		$hide_tech=false;
-		if(!$bereits_fertig){
-			$tech_name_class='tech_name';
-			//$baulink[0]='<a style="text-decoration: none;" href="ang_techs.php?start_tech='.$row['tech_id'].'">';
-			//$baulink[1]='</a>';
-			$baulink[0]='';
-			$baulink[1]='';
-			$baujs='onclick="window.location.href=\'ang_techs.php?start_tech='.$row['tech_id'].'\';"';
-		}else{
-			//fertig, test ob man es generell ausblenden soll
-			if($tech_erledigte_techs==0){
-				$hide_tech=true;
+		$kachel='<div class="tc-tech tc-typ-'.$row['tech_typ'].' tc-st-'.$status.'" data-tech-id="'.$row['tech_id'].'" data-typ="'.$row['tech_typ'].'" data-status="'.$status.'" data-res="'.($res_ok ? 1 : 0).'" data-sonder="'.($sonder ? 1 : 0).'" data-fehlt="'.implode(',', $fehlt_ids).'">';
+		$kachel.='<div class="tc-tech-kopf"><span class="tc-name">'.$tech_name.'</span><span class="mod-chip tc-chip'.$tc_chips[$status].'">'.$tc_texte[$status].'</span></div>';
+		if(!$bereits_fertig && !$laeuft){
+			$kachel.='<div class="tc-kosten">'.$kosten.'<small>Dauer '.formatTime($row['tech_build_time']*$GLOBALS['tech_build_time_faktor']).'</small></div>';
+			if($vor!=''){
+				$kachel.='<div class="tc-vor">Ben&ouml;tigt: '.$vor.'</div>';
 			}
-			
-			$tech_name_class='tech_name_grey';
-			$baulink[0]='';
-			$baulink[1]='';
-			$baujs='';
-		}	
-
-		if($tech_anordnung==0){
-			$tech_class='tech';
-		}else{
-			$tech_class='tech_einspaltig';
 		}
-
-		//noch nicht erforschte Techs ausblenden?
-		//echo 'A: '.$tech_techs_ohne_voraussetzung;
-		if($tech_techs_ohne_voraussetzung==1 && $has_voraussetzungen==false){
-			$hide_tech=true;
+		//unten: Beschreibung zum Aufklappen und Starten bei erfüllten Voraussetzungen; ob Rohstoffe und Bauplatz
+		//reichen, prüft der Start (nach einem WT oder einem fertigen Auftrag kann es inzwischen klappen)
+		$kachel.='<div class="tc-unten">';
+		if(!empty($row['tech_desc'])){
+			$tech_descs=explode(";",$row['tech_desc']);
+			$kachel.='<details class="tc-info"><summary>Beschreibung</summary>'.$tech_descs[$_SESSION['ums_rasse']-1].'</details>';
 		}
-
-
-		//wenn die V-Systeme deaktiviert sind, dann sind die Techs auch nicht nutzbar
-		if($sv_deactivate_vsystems==1 && $row['tech_typ']==3){
-			$hide_tech=true;
+		if(in_array($status, array('baubar', 'res', 'platz'))){
+			$kachel.='<div class="tc-fuss"><a href="ang_techs.php?start_tech='.$row['tech_id'].'" class="mod-btn ally-btn-klein'.($status=='baubar' ? '' : ' mod-btn-leise').'">Starten</a></div>';
 		}
-		
-		if(!$hide_tech){
+		$kachel.='</div></div>';
 
-			if(strpos($title, '<br><br>')===0){
-				//str_replace('<br><br>', '<br>', $title);
-				
-				$title=preg_replace('/<br><br>/', '<br>', $title, 1);
-
-			}
-
-			if(!empty($title)){
-				$title='<div class=\'uppercase\'>'.$tech_name.'</div>'.$title;
-			}
-
-			$tech_field='
-				<div class="'.$tech_class.' tech_typ_'.$row['tech_typ'].'" data-tech-id="'.$row['tech_id'].'" '.$baujs.' title="'.$title.'" rel="tooltip">
-					<div class="tech_bg'.$row['tech_typ'].'"></div>
-					'.$baulink[0].'<div class="'.$tech_name_class.'"><span class="uppercase">'.$tech_name.'</span>';
-			
-					
-			//ggf. die direkt anzuzeigenden Daten ausgeben
-			if($tech_kosten==1){
-				$tech_field.=$kosten;
-				$tech_field.=$bauzeit;
-			}		
-			if($tech_vor==1){
-				$tech_field.=$voraussetzungen;
-			}
-			if($tech_desc==1){
-				$tech_field.=$beschreibung;
-			}					
-					
-			$tech_field.=$baulink[1];
-			
-			$tech_field.=
-					'</div>';
-			
-			$tech_field.='
-				</div>';
-			
-			if(isset($tech_output[$row['tech_level']])){
-				$tech_output[$row['tech_level']].=$tech_field;
-			}else{
-				$tech_output[$row['tech_level']]=$tech_field;
-			}
-
-			
-		}
-		//echo $tech_field;
-
-		
-
+		$tc_stufen[$row['tech_level']]=($tc_stufen[$row['tech_level']] ?? '').$kachel;
 	}
 
-	//print_r($tech_output);
-	if($tech_anordnung==0){$content.='<table><tr style="vertical-align: top;">';}
-	for($i=0;$i<=100;$i++){
-		if(!empty($tech_output[$i])){
-			if($tech_anordnung==0){$content.='<td class="font1">';}
-			$content.=$tech_output[$i];
-			if($tech_anordnung==0){$content.='</td>';}
-		}
+	//je Stufe eine Spalte (Baum) bzw. ein Abschnitt (Liste)
+	ksort($tc_stufen);
+	$content.='<div class="tc-stufen">';
+	foreach($tc_stufen as $stufe => $kacheln){
+		$content.='<section class="tc-stufe"><span class="mod-typ tc-stufe-titel">Stufe '.$stufe.'</span><div class="tc-stufe-techs">'.$kacheln.'</div></section>';
 	}
-	if($tech_anordnung==0){$content.='</tr></table>';}
+	$content.='</div>';
+	$content.='<div class="mod-leer tc-leer" hidden>F&uuml;r diesen Filter gibt es keine Technologien.</div>';
+	$content.='</div>';//tc
 
-
-	if(isset($_COOKIE['tech_filter_typ'])){
-		$tech_filter_typ=intval($_COOKIE['tech_filter_typ']);
-	}else{
-		$tech_filter_typ=-1;
-	}
-
-	$content.='
-	<script>
-	$( document ).ready(function() {
-		show_tech_typ('.$tech_filter_typ.');
-	});	
-	</script>
-	';
+	$content.='<script type="text/javascript">$(function(){ tc_init(); });</script>';
 
 
 	$erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
