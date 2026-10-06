@@ -4815,6 +4815,411 @@ a.art-kachel-zurueck:hover::after {
 	color: #8b949e;
 }
 
+// Militär (military.php): Flotten als Spalten, Aufstellung und Befehle in einem Raster
+.mil {
+	width: 572px;
+}
+
+// Meldungen nach Befehlen oder Umstellung, direkt unter der Rohstoffleiste
+.mil-meldungen {
+	width: 602px;
+	margin-bottom: 6px;
+	border-radius: 10px;
+
+	.mod-meldung {
+		margin-bottom: 4px;
+	}
+
+	.mod-meldung:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.mod-meldung-warn {
+	background: rgba(255, 170, 60, 0.14);
+	color: #ffb45c;
+}
+
+// Namensspalte, Heimatflotte, Flotte I-III; die Flottenspalten sind als durchgehende Bänder hinterlegt
+.mil-raster {
+	display: grid;
+	grid-template-columns: 100px repeat(4, 1fr);
+	column-gap: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
+
+	> span {
+		display: flex;
+		align-items: center;
+		min-width: 0;
+		min-height: 23px;
+	}
+}
+
+.mil-sp {
+	justify-content: flex-end;
+	padding: 0 6px;
+	background: rgba(255, 255, 255, 0.035);
+}
+
+.mil-sp-heim {
+	background: rgba(255, 255, 255, 0.065);
+}
+
+// Spaltenkopf: Name, Auftrag, Ziel und Zeit, Punkte; die obere Kante zeigt den Auftrag
+.mil-raster > .mil-kopf {
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: flex-start;
+	gap: 2px;
+	margin-bottom: 4px;
+	padding: 6px 6px 7px;
+	border-top: 2px solid rgba(255, 255, 255, 0.18);
+	border-radius: 8px 8px 0 0;
+	text-align: right;
+	cursor: help;
+
+	b {
+		font-size: 13px;
+		color: #ffffff;
+	}
+}
+
+.mil-kopf-heim {
+	border-top-color: var(--akzent);
+}
+
+.mil-kopf-angriff {
+	border-top-color: #ff6b6b;
+}
+
+.mil-kopf-verteidigung {
+	border-top-color: #3ecf6a;
+}
+
+.mil-kopf-rueckflug {
+	border-top-color: #6cb6ff;
+}
+
+.mil-kopf-mission {
+	border-top-color: #e27bf0;
+}
+
+.mil-detail {
+	min-height: 14px;
+	font-size: 10px;
+	color: #9da7b1;
+}
+
+// unten im Kopf, damit die Punkte aller Flotten auf einer Linie mit der Beschriftung links stehen
+.mil-punktwert {
+	margin-top: auto;
+	padding-top: 2px;
+	font-size: 14px;
+	font-weight: 700;
+	white-space: nowrap;
+	color: #ffffff;
+
+	small {
+		font-size: 10px;
+		font-weight: 400;
+		color: #8b949e;
+	}
+}
+
+// links neben den Köpfen: Formationen oben, Beschriftung der Punkte auf Höhe der Punktwerte
+.mil-raster > .mil-ecke {
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 8px 0 8px;
+}
+
+.mil-ecke-punkte {
+	font-size: 11px;
+	line-height: 1.2;
+	color: #8b949e;
+}
+
+.mil-hilfe {
+	cursor: help;
+}
+
+.mil-status {
+	display: inline-block;
+	padding: 1px 7px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+	font-size: 10px;
+	font-weight: 500;
+	white-space: nowrap;
+	color: #9da7b1;
+}
+
+.mil-status-angriff {
+	background: rgba(255, 107, 107, 0.14);
+	color: #ff8a8a;
+}
+
+.mil-status-verteidigung {
+	background: rgba(62, 207, 106, 0.14);
+	color: #5fe08a;
+}
+
+.mil-status-rueckflug {
+	background: rgba(108, 182, 255, 0.14);
+	color: #6cb6ff;
+}
+
+.mil-status-mission {
+	background: rgba(226, 123, 240, 0.14);
+	color: #e27bf0;
+}
+
+.mil-name {
+	font-weight: 500;
+	overflow-wrap: anywhere;
+	color: #ffffff;
+	cursor: help;
+}
+
+.mil-zahl {
+	white-space: nowrap;
+}
+
+.mil-heim {
+	font-weight: 700;
+	color: #ffffff;
+}
+
+// Flotte unterwegs: nur die Anzahl, nicht änderbar
+.mil-unterwegs {
+	color: #9da7b1;
+}
+
+// Nullen treten zurück (Heimatflotte und Eingabefelder setzt military.js)
+.mil-raster .mil-null {
+	font-weight: 400;
+	color: #484f58;
+}
+
+// flache Eingabefelder, erst beim Überfahren oder Bearbeiten mit Rahmen
+.mod .mil-eingabe {
+	width: 100%;
+	height: 20px;
+	padding: 1px 5px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	background: rgba(0, 0, 0, 0.3);
+	font-family: inherit;
+	font-size: 12px;
+	text-align: right;
+	color: #ffffff;
+
+	&:hover {
+		border-color: rgba(255, 255, 255, 0.16);
+	}
+
+	&:focus {
+		outline: none;
+		border-color: var(--akzent);
+		background: #0d1117;
+		box-shadow: 0 0 0 2px var(--akzent-weich);
+	}
+}
+
+.mod .mil-eingabe.mil-null {
+	color: #5a626b;
+}
+
+.mil-feld {
+	padding: 1px 4px;
+}
+
+// Werte, die bei einer Flotte unterwegs nichts aussagen
+.mil-aus > * {
+	visibility: hidden;
+}
+
+.mod .mil-auswahl {
+	width: 100%;
+	height: 20px;
+	padding: 0 2px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 5px;
+	background: rgba(0, 0, 0, 0.3);
+	font-family: inherit;
+	font-size: 11px;
+	color: #ffffff;
+
+	&:focus {
+		outline: none;
+		border-color: var(--akzent);
+	}
+}
+
+// Trennlinie vor Schnellwahl, Werten und Befehlen
+.mil-raster > .mil-trenn {
+	margin-top: 4px;
+	padding-top: 4px;
+	border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.mil-label {
+	flex-direction: column;
+	align-items: flex-start !important;
+	justify-content: center;
+	font-size: 11px;
+	color: #8b949e;
+
+	small {
+		font-size: 9px;
+		line-height: 1.2;
+		color: #6e7681;
+	}
+}
+
+// zwei Werte in einer Zelle (Reisezeit eigener/anderer Sektor, Träger benötigt/vorhanden)
+.mil-paar {
+	gap: 3px;
+
+	b {
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	i {
+		font-style: normal;
+		color: #484f58;
+	}
+
+	// Flotte unterwegs: military.js leert die Reisezeit
+	b:empty + i {
+		display: none;
+	}
+}
+
+.mil-zuwenig {
+	font-weight: 700;
+	color: #ff8a8a;
+}
+
+.mod .mil-btn-klein {
+	padding: 1px 10px;
+	font-size: 11px;
+}
+
+.mil-gesperrt {
+	font-size: 10px;
+	color: #8b949e;
+}
+
+.mil-raster > .mil-unten {
+	padding-bottom: 6px;
+	border-radius: 0 0 8px 8px;
+}
+
+// Befehl, Ziel, Sichtbarkeit: höher und mit Abstand, damit man auf dem Handy das richtige Feld trifft
+.mil-raster > .mil-befehlzeile {
+	min-height: 38px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.mil-raster > .mil-befehlzeile.mil-trenn {
+	padding-top: 8px;
+}
+
+.mil-raster > .mil-befehlzeile.mil-unten {
+	padding-bottom: 8px;
+}
+
+.mod .mil-auswahl.mil-gross {
+	height: 30px;
+	padding: 0 4px;
+	font-size: 12px;
+}
+
+// "Alle" in der Schnellwahl: so groß wie die Auswahlfelder daneben
+.mod .mil-btn-voll {
+	width: 100%;
+	height: 30px;
+	padding: 0 6px;
+	font-size: 12px;
+}
+
+.mil-koords {
+	gap: 4px;
+
+	// beide Felder teilen sich die Spaltenbreite, bündig mit Befehl und Sichtbarkeit
+	.mil-eingabe {
+		flex: 1 1 0;
+		width: auto;
+		min-width: 0;
+		height: 30px;
+		padding: 1px 3px;
+		border-color: rgba(255, 255, 255, 0.12);
+		font-size: 13px;
+		text-align: center;
+
+		&::placeholder {
+			font-size: 11px;
+			color: #6e7681;
+		}
+	}
+
+	i {
+		font-style: normal;
+		color: #8b949e;
+	}
+}
+
+// ganze Fläche antippbar, nicht nur das Kästchen
+.mil-sichtbar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	height: 30px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 5px;
+	background: rgba(0, 0, 0, 0.3);
+	font-size: 11px;
+	color: #c9d1d9;
+	cursor: pointer;
+	user-select: none;
+
+	input {
+		width: 16px;
+		height: 16px;
+		margin: 0;
+		cursor: pointer;
+	}
+
+	&:hover {
+		border-color: rgba(255, 255, 255, 0.24);
+	}
+}
+
+.mil-ziel {
+	font-weight: 700;
+	color: #ffffff;
+}
+
+// Ziel für den Sektor verdeckt
+.mil-ziel-verdeckt {
+	font-style: italic;
+	color: #8b949e;
+}
+
+.mil-fuss {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 10px;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

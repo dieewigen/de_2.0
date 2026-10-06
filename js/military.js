@@ -81,8 +81,9 @@ function GetSetTrager() {
 
   for(var i=0;i<3;i++){
     var tag1=''; var tag2='';
-    if(tragbar[0][0] + tragbar[0][1]>trager[0]){
-      tag1='<span style="color: #FF0000">';
+    //zu wenig Trägerkapazität in genau dieser Flotte (früher wurde für alle Flotten Flotte I geprüft)
+    if(tragbar[i][0] + tragbar[i][1]>trager[i]){
+      tag1='<span class="mil-zuwenig">';
       tag2='</span>';
     }
 
@@ -190,6 +191,19 @@ function CalcFleetPoints()
   document.getElementById("fp1").innerHTML = addPkt(fp[1]);
   document.getElementById("fp2").innerHTML = addPkt(fp[2]);
   document.getElementById("fp3").innerHTML = addPkt(fp[3]);
+  MarkNull();
+}
+
+//Nullen in der Aufstellung abschwächen (Heimatflotte und Eingabefelder), damit die belegten Zahlen auffallen
+function MarkNull() {
+  for (var x=0; x <= anzs; ++x) {
+    var heim = document.getElementById("m"+(x+1)+"_0");
+    if (heim && heim.classList) { heim.classList.toggle("mil-null", delPkt(heim.innerHTML) == 0); }
+    for (var y=1; y <= 3; ++y) {
+      var feld = document.getElementById("m"+(x+1)+"_"+y);
+      if (feld && feld.classList) { feld.classList.toggle("mil-null", delPkt(feld.value) == 0); }
+    }
+  }
 }
  
  
