@@ -7,6 +7,14 @@ include 'inc/lang/'.$sv_server_lang.'_siegel.lang.php';
 include 'inc/sabotage.inc.php';
 include "functions.php";
 
+//Meldungen der Aktionen, ausgegeben unter der Rohstoffleiste
+$res_meldungen = array();
+function res_meldung($text, $typ = 'fehler')
+{
+    global $res_meldungen;
+    $res_meldungen[] = '<div class="mod-meldung mod-meldung-'.$typ.'">'.$text.'</div>';
+}
+
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
 $pd = loadPlayerData($_SESSION['ums_user_id']);
 $row = $pd;
@@ -192,6 +200,9 @@ if ($num == 1) {
     }
 }
 
+//Meldungen der Aktionen; früher erst nach dem Tausch geleert, dessen Fehlermeldungen gingen dabei verloren
+$fehlermsg = '';
+
 //Tausch durchführen
 if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) && hasTech($pt, 4) && $ally_has_notfallkonverter) {
     //transaktionsbeginn
@@ -288,11 +299,11 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            echo 'Fehler bei der Transaktion.';
+            res_meldung('Fehler bei der Transaktion.');
         }
     }// if setlock-ende
     else {
-        echo 'Fehler bei der Transaktion.';
+        res_meldung('Fehler bei der Transaktion.');
     }
 }
 
@@ -314,40 +325,23 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 $avg_player = getAveragePlayerAmountInSectorOnServer();
 $kostenfaktor = 10 - $avg_player;
 
-
-//sektorgebäudekosten auslesen
-$btipstr = '<table width=500px border=0 cellpadding=0 cellspacing=1><tr align=center><td>&nbsp;</td><td>M</td><td>D</td><td>I</td><td>E</td><td>T</td><tr>';
+//sektorgebäudekosten auslesen: je Zeile Name, M, D, I, E, T
+$sektorkosten = array();
 //gebäude
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name, restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id");
 while ($row = mysqli_fetch_assoc($db_daten)) {
-    $btipstr .= '<tr align=center>';
-    $btipstr .= '<td align=left>'.$row['tech_name'].'</td>';
-    $btipstr .= '<td>'.number_format($row['restyp01'] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row['restyp02'] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row['restyp03'] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row['restyp04'] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '<td>'.number_format($row['restyp05'] / $kostenfaktor, 0, ",", ".").'</td>';
-    $btipstr .= '</tr>';
+    $sektorkosten[] = array($row['tech_name'], $row['restyp01'] / $kostenfaktor, $row['restyp02'] / $kostenfaktor, $row['restyp03'] / $kostenfaktor, $row['restyp04'] / $kostenfaktor, $row['restyp05'] / $kostenfaktor);
 }
 
 //raumschiff
-$btipstr .= '<tr align=center>';
-$btipstr .= '<td align=left>'.$resource_lang['sektorraumschiff'].'</td>';
-$btipstr .= '<td>'.number_format(2000, 0, ",", ".").'</td>';
-$btipstr .= '<td>'.number_format(500, 0, ",", ".").'</td>';
-$btipstr .= '<td>'.number_format(500, 0, ",", ".").'</td>';
-$btipstr .= '<td>'.number_format(2000, 0, ",", ".").'</td>';
-$btipstr .= '<td>'.number_format(0, 0, ",", ".").'</td>';
-$btipstr .= '</tr>';
-
-$btipstr .= '</table>';
+$sektorkosten[] = array($resource_lang['sektorraumschiff'], 2000, 500, 500, 2000, 0);
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // den verteilungsschlüssel ändern
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-$fehlermsg = '';
+//$fehlermsg wird schon vor dem Rohstofftausch geleert
 
 $e_t1 = intval($_POST["e_t1"] ?? 0);
 $e_t2 = intval($_POST["e_t2"] ?? 0);
@@ -538,6 +532,8 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
                 $restyp03 = $restyp03 - $itr;
                 $restyp04 = $restyp04 - $etr;
                 $restyp05 = $restyp05 - $ttr;
+                //für die Bestätigung unter der Rohstoffleiste
+                $res_gespendet = array($mtr, $dtr, $itr, $etr, $ttr);
                 //an den bk ne info schicken
                 $bk = getSKSystemBySecID($sector);
 
@@ -562,11 +558,11 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            print($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']."<br><br><br>");
+            res_meldung($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']);
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$resource_lang['releaselock3'].'</font><br><br>';
+        res_meldung($resource_lang['releaselock3']);
     }
 
 }
@@ -665,11 +661,11 @@ if (isset($_POST["b_col"])) {
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            print($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']."<br><br><br>");
+            res_meldung($resource_lang['releaselock'].$_SESSION['ums_user_id'].$resource_lang['releaselock2']);
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$resource_lang['releaselock3'].'</font><br><br>';
+        res_meldung($resource_lang['releaselock3']);
     }
 
 }
@@ -677,653 +673,303 @@ if (isset($_POST["b_col"])) {
 //stelle die ressourcenleiste dar
 include "resline.php";
 
-echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
+echo '<script>var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
+//Zahl im Spielformat
+function res_zahl($wert)
+{
+    return number_format((float)$wert, 0, "", ".");
+}
+
+//Beschriftung mit Hilfetext als Tooltip (Kopf&Text)
+function res_hilfe($text, $hilfe)
+{
+    return '<span class="res-hilfe" title="'.strip_tags($text).'&'.$hilfe.'">'.$text.'</span>';
+}
+
+//Zeile der Rohstofftabelle: Beschriftung und je ein Wert für M, D, I, E
+function res_rohstoffzeile($label, $werte, $klasse = 'bk-zahl', $labelklasse = 'bk-label')
+{
+    $html = '<span class="'.$labelklasse.'">'.$label.'</span>';
+    foreach ($werte as $wert) {
+        $html .= '<span class="'.$klasse.'">'.$wert.'</span>';
+    }
+    return $html;
+}
+
+//////////////////////////////////////////////////////////////
+// Ergebnisse der Aktionen
+//////////////////////////////////////////////////////////////
 if ($fehlermsg != '') {
-    echo '<div class="info_box"><span class="text2">'.$fehlermsg.'</span></div><br>';
+    res_meldung($fehlermsg, $fehlermsg == $resource_lang['reswarnung'] ? 'warn' : 'fehler');
 }
-
 if (isset($trademsg) && !empty($trademsg)) {
-    echo '<div class="info_box"><span class="text1">'.$trademsg.'</span></div><br>';
+    res_meldung($trademsg, 'ok');
+}
+//Kollektorbau: $z = Anzahl in Auftrag gegeben (nur gesetzt, wenn der Bau versucht wurde)
+if (isset($_POST['b_col']) && isset($z) && $fehlermsg == '') {
+    if ($z > 0) {
+        res_meldung(res_zahl($z).' '.($z == 1 ? 'Kollektor' : 'Kollektoren').' in Auftrag gegeben, fertig in 4 WT.', 'ok');
+    } else {
+        res_meldung('Die Rohstoffe reichen f&uuml;r keinen weiteren Kollektor.');
+    }
+}
+if (isset($newkey) && $fehlermsg == '') {
+    res_meldung('Der Energieverteilungsschl&uuml;ssel ist gespeichert.', 'ok');
+}
+if (isset($res_gespendet)) {
+    $teile = array();
+    foreach (array('M', 'D', 'I', 'E', 'T') as $i => $kurz) {
+        if ($res_gespendet[$i] > 0) {
+            $teile[] = res_zahl($res_gespendet[$i]).' '.$kurz;
+        }
+    }
+    if (count($teile) > 0) {
+        res_meldung('Ins Sektorlager eingezahlt: '.implode(' &middot; ', $teile).'.', 'ok');
+    } else {
+        res_meldung('Es wurde nichts eingezahlt.', 'warn');
+    }
+}
+if (count($res_meldungen) > 0) {
+    echo '<div class="mod pol-meldungen">'.implode('', $res_meldungen).'</div>';
 }
 
-//k�nnen Kollektoren gebaut werden?
+//////////////////////////////////////////////////////////////
+// Kollektorenbau
+//////////////////////////////////////////////////////////////
 if (!hasTech($pt, 7)) {
     $techcheck = "SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=7";
     $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
     $row_techcheck = mysqli_fetch_assoc($db_tech);
 
-    echo '<br>';
     rahmen_oben($resource_lang['fehlendesgebaeude']);
-    echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-    echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=7" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_7.jpg" border="0"></a></td>
-	<td valign="top">'.$resource_lang['gebaeudeinfo'].': '.$row_techcheck['tech_name'].'</td>
-	</tr>';
-    echo '</table>';
+    echo '<div class="mod res"><div class="res-kolli">';
+    echo '<img src="gp/g/kollie.gif" alt="'.$resource_lang['kolli'].'" class="res-kolli-bild">';
+    echo '<div class="mod-hinweis res-fehlt">'.$resource_lang['gebaeudeinfo'].': <a href="help.php?t=7">'.$row_techcheck['tech_name'].'</a></div>';
+    echo '</div></div>';
     rahmen_unten();
 } else {
-    $m = floor(1000 + ($colanz * $colanz / 20 * 150));
-    $d = floor(100 + ($colanz * $colanz / 20 * 20));
-    ?>
-<form action="resource.php" method="POST">
-<table border="0" cellpadding="0" cellspacing="0" class="pctabs pctab1">
-<tr align="center">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td align="center" class="ro"><div class="cellu"><?php echo $resource_lang['kollibau3'];?></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr align="center">
-<td class="rl">&nbsp;</td>
-<td>
+    //Kosten wie beim Bau: der nächste Kollektor und wie viele die Rohstoffe hergeben (Sektor 1: höchstens 25)
+    $res_kollis = $col + $anzahl;
+    $res_naechster_m = floor((1000 + ($res_kollis * $res_kollis / 20 * 150)) * (1 - $baukostenreduzierung));
+    $res_naechster_d = floor((100 + ($res_kollis * $res_kollis / 20 * 20)) * (1 - $baukostenreduzierung));
+    $res_max = 0;
+    $c = $res_kollis;
+    $m_rest = $restyp01;
+    $d_rest = $restyp02;
+    while ($res_max < 99999 && floor((1000 + floor($c * $c / 20 * 150)) * (1 - $baukostenreduzierung)) <= $m_rest &&
+            floor((100 + floor($c * $c / 20 * 20)) * (1 - $baukostenreduzierung)) <= $d_rest) {
+        $m_rest -= floor((1000 + ($c * $c / 20 * 150)) * (1 - $baukostenreduzierung));
+        $d_rest -= floor((100 + ($c * $c / 20 * 20)) * (1 - $baukostenreduzierung));
+        $c++;
+        $res_max++;
+    }
+    if ($sector == 1) {
+        $res_max = max(0, min($res_max, 25 - $res_kollis));
+    }
 
-<table width="565" border="0" cellpadding="0" cellspacing="1">
-<tr>
-<td>
-<?php
-      $bg = 'cell';
-    echo '<tr valign="middle" align="center" height="20">';
-    echo '<td rowspan="3" class="cell"><img src="'.'gp/'.'g/kollie.gif" border="0" alt="'.$resource_lang['kolli'].'"></td>';
-    echo '<td class="'.$bg.'"><b>'.$resource_lang['vorhandenekollis'].'</b>:</td>';
-    echo '<td class="'.$bg.'"><b>'.number_format($col, 0, "", ".").' ('.number_format($anzahl, 0, "", ".").$resource_lang['imbau'].')</b></td>';
-    echo '</tr>';
-
-    $bg = 'cell1';
-    echo '<tr valign="middle" align="center" height="20">';
-    echo '<td class="'.$bg.'"><b>'.$resource_lang['kollektorbau'].'</b>:</td>';
-    echo '<td class="'.$bg.'"><input type="text" id="b_col" name="b_col" value="" size="4" maxlength="5" onkeyup="calccolcost('.($col + $anzahl).');"><b>'.$resource_lang['stueck'].'</b><input type="Submit" name="build" value="'.$resource_lang['bauen'].'"></td>';
-    echo '</tr>';
-
-    $bg = 'cell';
-
-    echo '<tr valign="middle" align="center" height="20">';
-    echo '<td class="'.$bg.'"><b>'.$resource_lang['colbaukosten'].'</b>:</td>';
-    echo '<td class="'.$bg.'"><b><span id="colmcost">0</span> M + <span id="coldcost">0</span> D</b></td>';
-    echo '</tr>';
-
-    echo '</table>';
-    ?>
-
-</td>
-<td class="rr">&nbsp;</td>
-</tr>
-<tr>
-<td class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur">&nbsp;</td>
-</tr>
-</table>
-<br>
-</form>
-<?php
-}
-?>
-<form action="resource.php" method="POST">
-<table border="0" cellpadding="0" cellspacing="0" class="pctabs pctab2">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="560" class="ro" align="center"><div class="cellu"><?php echo $resource_lang['resertrag']?></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td>
-
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="200">
-<col width="90">
-<col width="90">
-<col width="90">
-<col width="90">
-</colgroup>
-<?php
-  //kollektorenergieoutput
-  //grundenergie
-  $c1 = 0;
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe1'].'"> '.$resource_lang['kolliausbeute'].'</td>';
-echo '<td class="'.$bg.'" colspan=4>'.number_format($ea, 0, "", ".").' ('.number_format($col, 0, "", ".").' '.$resource_lang['kollis'].')</td>';
-echo '</tr>';
-
-//sektorartefaktenergie
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe2'].'"> + '.$resource_lang['sekartibonus'].'</td>';
-echo '<td class="'.$bg.'" colspan=4>'.number_format($sartefaktenergie, 0, "", ".").' ('.number_format($sartefakt, 2, ",", ".").' %)</td>';
-echo '</tr>';
-
-//kriegsartefaktenergie
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe6'].'"> + '.$resource_lang['kriegsartibonus'].'</td>';
-echo '<td class="'.$bg.'" colspan=4>'.number_format($kartefaktenergie, 0, "", ".").' ('.$resource_lang['kriegsartefakte'].': '.$kartefakt.')</td>';
-echo '</tr>';
-
-//gesamtenergie
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<b>'.$resource_lang['gesamtenergie'].'</b></td>';
-echo '<td class="'.$bg.'" colspan=4><b>'.number_format($eages, 0, "", ".").'</b></td>';
-echo '</tr>';
-
-//energie-materieumwandlung
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<b>'.$resource_lang['energie'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.$resource_lang['multiplex'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.$resource_lang['dyharra'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.$resource_lang['iradium'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.$resource_lang['eternium'].'</b></td>';
-echo '</tr>';
-
-//energieverteilunsschlüssel
-if (hasTech($pt, 14)) {
-    $st[0] = '<input type="text" name="e_t1" value="'.$keym.'" size="3" maxlength="3">&nbsp;%';
-} else {
-    $st[0] = 'N/A';
+    rahmen_oben($resource_lang['kollibau3']);
+    echo '<form action="resource.php" method="POST" class="mod res"><div class="res-kolli">';
+    //der drehende Kollektor bleibt (Wunsch des Users: nostalgischer Wert)
+    echo '<img src="gp/g/kollie.gif" alt="'.$resource_lang['kolli'].'" class="res-kolli-bild">';
+    echo '<div class="res-kolli-rechts">';
+    echo '<div class="res-kacheln">';
+    echo '<div class="ov-wert"><span class="mod-typ">'.$resource_lang['vorhandenekollis'].'</span><b>'.res_zahl($col).'</b>'.($anzahl > 0 ? '<small>+'.res_zahl($anzahl).$resource_lang['imbau'].'</small>' : '').'</div>';
+    echo '<div class="ov-wert"><span class="mod-typ">N&auml;chster Kollektor</span><b>'.res_zahl($res_naechster_m).' M</b><small>'.res_zahl($res_naechster_d).' D</small></div>';
+    echo '</div>';
+    echo '<div class="res-bau">';
+    echo '<input type="text" id="b_col" name="b_col" value="" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="Anzahl" class="mod-eingabe res-anzahl" data-kollis="'.$res_kollis.'">';
+    if ($res_max > 0) {
+        echo '<button type="button" class="mod-btn mod-btn-leise ally-btn-klein" id="res-max" data-max="'.$res_max.'">Max. '.res_zahl($res_max).'</button>';
+    }
+    echo '<button type="submit" name="build" value="'.$resource_lang['bauen'].'" class="mod-btn">Bauen</button>';
+    echo '</div>';
+    echo '<div class="res-kosten">'.$resource_lang['colbaukosten'].': <b id="colmcost">0</b> M + <b id="coldcost">0</b> D <span class="bk-leise">&middot; Bauzeit 4 WT</span></div>';
+    echo '</div></div></form>';
+    rahmen_unten();
 }
 
-if (hasTech($pt, 15)) {//wenn kollektor vorhanden zeige eingabefeld, ansonsten unsichtbar
-    $st[1] = "<input type=\"text\" name=\"e_t2\" value=\"$keyd\" size=\"3\" maxlength=\"3\">&nbsp;%";
-} else {
-    $st[1] = 'N/A';
+//////////////////////////////////////////////////////////////
+// Ressourcenertrag und Energieverteilungsschlüssel
+//////////////////////////////////////////////////////////////
+rahmen_oben($resource_lang['resertrag']);
+echo '<form action="resource.php" method="POST" class="mod res">';
+
+//Energie aus Kollektoren und Artefakten
+echo '<div class="res-energie">';
+echo '<span>'.res_hilfe($resource_lang['kolliausbeute'], $resource_lang['hilfe1']).'</span><span><b>'.res_zahl($ea).'</b> <small>('.res_zahl($col).' '.$resource_lang['kollis'].')</small></span>';
+echo '<span>'.res_hilfe('+ '.$resource_lang['sekartibonus'], $resource_lang['hilfe2']).'</span><span>'.res_zahl($sartefaktenergie).' <small>('.number_format($sartefakt, 2, ",", ".").' %)</small></span>';
+echo '<span>'.res_hilfe('+ '.$resource_lang['kriegsartibonus'], $resource_lang['hilfe6']).'</span><span>'.res_zahl($kartefaktenergie).' <small>('.$resource_lang['kriegsartefakte'].': '.$kartefakt.')</small></span>';
+echo '<span class="res-summe">'.$resource_lang['gesamtenergie'].'</span><span class="res-summe"><b>'.res_zahl($eages).'</b> Energie je WT</span>';
+echo '</div>';
+
+//Verteilung auf die Rohstoffe, Umwandlung und Ertrag
+$schluessel = array($keym, $keyd, $keyi, $keye);
+$st = array();
+for ($i = 0; $i < 4; $i++) {
+    //ohne Materieumwandler kein Eingabefeld
+    if (hasTech($pt, 14 + $i)) {
+        $st[$i] = '<span class="bk-prozent"><input type="text" name="e_t'.($i + 1).'" value="'.$schluessel[$i].'" maxlength="3" inputmode="numeric" autocomplete="off" class="mod-eingabe res-schluessel">%</span>';
+    } else {
+        $st[$i] = '<span class="bk-leise" title="Materieumwandler fehlt&Ohne das Geb&auml;ude wird keine Energie in diesen Rohstoff umgewandelt.">&ndash;</span>';
+    }
 }
 
-if (hasTech($pt, 16)) {//wenn kollektor vorhanden zeige eingabefeld, ansonsten unsichtbar
-    $st[2] = "<input type=\"text\" name=\"e_t3\" value=\"$keyi\" size=\"3\" maxlength=\"3\">&nbsp;%";
-} else {
-    $st[2] = 'N/A';
+$resges[0] = $rm + $grundm + $zollm + $sa_grund[0];
+$resges[1] = $rd + $grundd + $zolld + $sa_grund[1];
+$resges[2] = $ri + $grundi + $zolli + $sa_grund[2];
+$resges[3] = $re + $grunde + $zolle + $sa_grund[3];
+
+$planet_hilfe = $resource_lang['hilfe9'].'<br><br>Aus dem aktiven Dienst entlassene Geheimagenten ('.res_zahl($agent_lost).') werden als Zollkontrolleure eingesetzt und sorgen f&uuml;r ein zus&auml;tzliches Einkommen.';
+
+echo '<div class="bk-energie res-tabelle">';
+echo '<span class="bk-label">'.str_replace('->', ' &rarr; ', $resource_lang['energie']).'</span><span class="bk-spalte">'.$resource_lang['multiplex'].'</span><span class="bk-spalte">'.$resource_lang['dyharra'].'</span><span class="bk-spalte">'.$resource_lang['iradium'].'</span><span class="bk-spalte">'.$resource_lang['eternium'].'</span>';
+echo '<span class="bk-label">'.res_hilfe('Verteilung', $resource_lang['hilfe7']).'</span>';
+foreach ($st as $feld) {
+    echo $feld;
 }
+echo res_rohstoffzeile(res_hilfe($resource_lang['energieinput'], 'Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieverteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt.'),
+    array(res_zahl($em), res_zahl($ed), res_zahl($ei), res_zahl($ee)));
+echo res_rohstoffzeile(res_hilfe($resource_lang['umwandlungsverh'], $resource_lang['hilfe8']),
+    array($emvm.':1', $emvd.':1', $emvi.':1', $emve.':1'), 'bk-zahl bk-leise');
+echo res_rohstoffzeile(res_hilfe($resource_lang['materieoutput'], 'Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde.'),
+    array(res_zahl($rm), res_zahl($rd), res_zahl($ri), res_zahl($re)));
+echo res_rohstoffzeile(res_hilfe($resource_lang['plusplanrohstoff'], $planet_hilfe),
+    array(res_zahl($grundm + $zollm), res_zahl($grundd + $zolld), res_zahl($grundi + $zolli), res_zahl($grunde + $zolle)));
+echo res_rohstoffzeile(res_hilfe($resource_lang['plussekartibonus'], $resource_lang['hilfe10']),
+    array(res_zahl($sa_grund[0]), res_zahl($sa_grund[1]), res_zahl($sa_grund[2]), res_zahl($sa_grund[3])));
+echo res_rohstoffzeile('<b>Ertrag je WT</b>',
+    array('<b>'.res_zahl($resges[0]).'</b>', '<b>'.res_zahl($resges[1]).'</b>', '<b>'.res_zahl($resges[2]).'</b>', '<b>'.res_zahl($resges[3]).'</b>'), 'bk-zahl res-ertrag', 'bk-label res-ertrag');
+echo '</div>';
 
-if (hasTech($pt, 17)) {//wenn kollektor vorhanden zeige eingabefeld, ansonsten unsichtbar
-    $st[3] = "<input type=\"text\" name=\"e_t4\" value=\"$keye\" size=\"3\" maxlength=\"3\">&nbsp;%";
-} else {
-    $st[3] = 'N/A';
+//planetarer Ertrag aufgeschlüsselt
+echo '<details class="res-details"><summary>Planetarer Rohstoffertrag im Detail</summary><div class="bk-energie res-tabelle">';
+echo res_rohstoffzeile('Grundwert', array(res_zahl($grundm - $spezim - $siegelm), res_zahl($grundd - $spezid - $siegeld), res_zahl($grundi - $spezii - $siegeli), res_zahl($grunde - $spezie - $siegele)));
+echo res_rohstoffzeile('Zolleinnahmen <small>('.res_zahl($agent_lost).' Agenten)</small>', array(res_zahl($zollm), res_zahl($zolld), res_zahl($zolli), res_zahl($zolle)));
+echo res_rohstoffzeile('Spezialisierungen', array(res_zahl($spezim), res_zahl($spezid), res_zahl($spezii), res_zahl($spezie)));
+if ($siegelbonus > 0) {
+    echo res_rohstoffzeile(strtr($siegel_lang['resource_tooltip'], ['{PCT}' => round($siegelbonus * 100)]), array(res_zahl($siegelm), res_zahl($siegeld), res_zahl($siegeli), res_zahl($siegele)));
 }
+echo '</div></details>';
 
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe7'].'"> '.$resource_lang['energieschluessel'].'</td>';
-echo '<td class="'.$bg.'">'.$st[0].'</td>';
-echo '<td class="'.$bg.'">'.$st[1].'</td>';
-echo '<td class="'.$bg.'">'.$st[2].'</td>';
-echo '<td class="'.$bg.'">'.$st[3].'</td>';
-echo '</tr>';
+echo '<div class="bk-fuss"><span class="bk-summe">Summe <b id="res-summe">'.($keym + $keyd + $keyi + $keye).'</b> % von 100 %</span>';
+echo '<button type="submit" name="change" value="Schl&uuml;ssel &auml;ndern" class="mod-btn">Verteilung speichern</button></div>';
+echo '</form>';
+rahmen_unten();
 
-//Bestätigen-Button
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'"></td>';
-echo '<td class="'.$bg.'" colspan="4"><input name="change" value="Schl&uuml;ssel &auml;ndern" type="Submit"></td>';
-echo '</tr>';
-
-
-
-//energie-inputmenge
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert h&auml;ngt von der Gesamtenergie und dem Energieveteilungsschl&uuml;ssel ab. Diese Energiemenge wird in die entsprechende Materie umgewandelt."> '.$resource_lang['energieinput'].'</td>';
-echo '<td class="'.$bg.'">'.number_format($em, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ed, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ei, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ee, 0, "", ".")."</td>";
-echo '</tr>';
-
-//umwandlungsverh�ltnis
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe8'].'"> '.$resource_lang['umwandlungsverh'].'</td>';
-echo '<td class="'.$bg.'">'.$emvm.':1</td>';
-echo '<td class="'.$bg.'">'.$emvd.':1</td>';
-echo '<td class="'.$bg.'">'.$emvi.':1</td>';
-echo '<td class="'.$bg.'">'.$emve.':1</td>';
-echo '</tr>';
-
-//umwandlungsertrag
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&Dieser Wert ist die Menge der Ressourcen, die durch die Umwandlung von Energie in Materie erhalten wurde."> '.$resource_lang['materieoutput'].'</td>';
-echo '<td class="'.$bg.'">'.number_format($rm, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($rd, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ri, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($re, 0, "", ".")."</td>";
-echo '</tr>';
-$resges[0] = $rm;
-$resges[1] = $rd;
-$resges[2] = $ri;
-$resges[3] = $re;
-
-//planetarer rohstoffertrag
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" 
-		border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe9'].'<br><br>Aus dem aktiven Dienst entlassene Geheimagenten ('.
-      number_format($agent_lost, 0, "", ".").') werden als Zollkontrolleure eingesetzt und sorgen f&uuml;r ein zus&auml;tzliches Einkommen.<br>
-		Grundwert: '.
-      number_format($grundm - $spezim - $siegelm, 0, "", ".").' M / '.
-      number_format($grundd - $spezid - $siegeld, 0, "", ".").' D / '.
-      number_format($grundi - $spezii - $siegeli, 0, "", ".").' I / '.
-      number_format($grunde - $spezie - $siegele, 0, "", ".").' E
-		<br>
-		Zolleinnahmen: '.
-      number_format($zollm, 0, "", ".").' M / '.
-      number_format($zolld, 0, "", ".").' D / '.
-      number_format($zolli, 0, "", ".").' I / '.
-      number_format($zolle, 0, "", ".").' E
-		<br>
-		Einnahmen durch Spezialisierungen: '.
-      number_format($spezim, 0, "", ".").' M / '.
-      number_format($spezid, 0, "", ".").' D / '.
-      number_format($spezii, 0, "", ".").' I / '.
-      number_format($spezie, 0, "", ".").' E'.
-      ($siegelbonus > 0 ? '
-		<br>
-		'.strtr($siegel_lang['resource_tooltip'], ['{PCT}' => round($siegelbonus * 100)]).': '.
-      number_format($siegelm, 0, "", ".").' M / '.
-      number_format($siegeld, 0, "", ".").' D / '.
-      number_format($siegeli, 0, "", ".").' I / '.
-      number_format($siegele, 0, "", ".").' E' : '').'
-
-		  "> '.$resource_lang['plusplanrohstoff'].'</td>';
-echo '<td class="'.$bg.'">'.number_format($grundm + $zollm, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($grundd + $zolld, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($grundi + $zolli, 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($grunde + $zolle, 0, "", ".")."</td>";
-echo '</tr>';
-$resges[0] += $grundm;
-$resges[1] += $grundd;
-$resges[2] += $grundi;
-$resges[3] += $grunde;
-$resges[0] += $zollm;
-$resges[1] += $zolld;
-$resges[2] += $zolli;
-$resges[3] += $zolle;
-
-//Handel
-/*
-  if ($c1==0){$c1=1;$bg='cell1';}else{$c1=0;$bg='cell';}
-  echo '<tr valign="middle" align="center" height="25">';
-  echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="Handel&Einkommen aus Handelsrouten"> + Handel</td>';
-  echo '<td class="'.$bg.'">'.number_format($ertrag_handel[0], 0,"",".")."</td>";
-  echo '<td class="'.$bg.'">'.number_format($ertrag_handel[1], 0,"",".")."</td>";
-  echo '<td class="'.$bg.'">'.number_format($ertrag_handel[2], 0,"",".")."</td>";
-  echo '<td class="'.$bg.'">'.number_format($ertrag_handel[3], 0,"",".")."</td>";
-  echo '</tr>';
-  $resges[0]+=$ertrag_handel[0];
-  $resges[1]+=$ertrag_handel[1];
-  $resges[2]+=$ertrag_handel[2];
-  $resges[3]+=$ertrag_handel[3];
-*/
-
-//sektorartefaktbonus
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['hilfe'].'&'.$resource_lang['hilfe10'].'"> '.$resource_lang['plussekartibonus'].'</td>';
-echo '<td class="'.$bg.'">'.number_format($sa_grund[0], 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($sa_grund[1], 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($sa_grund[2], 0, "", ".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($sa_grund[3], 0, "", ".")."</td>";
-echo '</tr>';
-$resges[0] += $sa_grund[0];
-$resges[1] += $sa_grund[1];
-$resges[2] += $sa_grund[2];
-$resges[3] += $sa_grund[3];
-
-//gesamtrohstoffe
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" style="text-align: left;">&nbsp;<b>'.$resource_lang['gesamtrohstoff'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.number_format($resges[0], 0, "", ".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($resges[1], 0, "", ".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($resges[2], 0, "", ".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($resges[3], 0, "", ".")."</b></td>";
-echo '</tr>';
-
-?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-</form>
-<br><br>
-<?php
-
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 // rohstoffhandel - eingabemöglichkeit
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-rahmen_oben('Allianz-Notfallrohstoffkonverter <img style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" 
-title="Hier k&ouml;nnen Rohstoffe umgewandelt werden.&Verlustleistung: '.($handelssteuersatz).'%'.'">');
-
-echo '<div class="cell" style="width: 560px; text-align: center;">';
+rahmen_oben('Allianz-Notfallrohstoffkonverter');
+echo '<div class="mod res">';
 
 if ($ally_has_notfallkonverter && hasTech($pt, 4)) {
+    //die Sektorsteuer kommt beim Tausch zur Verlustleistung hinzu (wie oben beim Tausch begrenzt)
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT ssteuer FROM de_sector WHERE sec_id=?", [$sector]);
+    $row_steuer = mysqli_fetch_assoc($db_daten);
+    $res_sektorsteuer = max(0, min(5, intval($row_steuer['ssteuer'] ?? 0)));
 
-    echo '<form action="resource.php" method="POST">';
-    echo 'Ich ben&ouml;tige ';
+    $res_optionen = function ($gewaehlt) {
+        $html = '';
+        foreach (array(1 => 'Multiplex', 2 => 'Dyharra', 3 => 'Iradium', 4 => 'Eternium') as $wert => $name) {
+            $html .= '<option value="'.$wert.'"'.($wert == $gewaehlt ? ' selected' : '').'>'.$name.'</option>';
+        }
+        return $html;
+    };
 
-    echo '<input type="text" id="rh_amount" name="rh_amount" value="" size="12" maxlength="16" onkeyup="javascript: rh_calc(0);"> ';
-
-    echo '<select name="rh_v1" id="rh_v1" onchange="javascript: rh_calc(0);">
-      <option value="1" selected>Multiplex</option>
-      <option value="2">Dyharra</option>
-      <option value="3">Iradium</option>
-      <option value="4">Eternium</option>
-    </select>';
-
-    echo ' und bezahle mit ';
-
-    echo '<input type="text" id="rh_cost" name="rh_cost" value="" size="12" maxlength="16" onkeyup="javascript: rh_calc(1);"> ';
-
-    echo '<select name="rh_v2" id="rh_v2" onchange="javascript: rh_calc(0);">
-      <option value="1">Multiplex</option>
-      <option value="2" selected>Dyharra</option>
-      <option value="3">Iradium</option>
-      <option value="4">Eternium</option>
-    </select>.';
-
-    echo '<br><br><input type="Submit" name="startrestrade" value="Rohstoffe umwandeln">';
+    echo '<div class="res-text">Wandelt Rohstoffe in andere um. Verlust: <b>'.$handelssteuersatz.' %</b>'.($res_sektorsteuer > 0 ? ' + <b>'.$res_sektorsteuer.' %</b> Sektorsteuer (geht in die Sektorkasse)' : '').'.</div>';
+    echo '<form action="resource.php" method="POST" class="res-konverter">';
+    echo '<div class="res-wahl"><span>Ich ben&ouml;tige</span><input type="text" id="rh_amount" name="rh_amount" value="" maxlength="16" inputmode="numeric" autocomplete="off" class="mod-eingabe"><select name="rh_v1" id="rh_v1" class="mod-eingabe">'.$res_optionen(1).'</select></div>';
+    echo '<div class="res-wahl"><span>und bezahle mit</span><input type="text" id="rh_cost" name="rh_cost" value="" maxlength="16" inputmode="numeric" autocomplete="off" class="mod-eingabe"><select name="rh_v2" id="rh_v2" class="mod-eingabe">'.$res_optionen(2).'</select></div>';
+    echo '<div class="bk-fuss"><span></span><button type="submit" name="startrestrade" value="Rohstoffe umwandeln" class="mod-btn">Rohstoffe umwandeln</button></div>';
     echo '</form>';
 } else {
     $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=4";
     $db_tech = mysqli_query($GLOBALS['dbi'], $techcheck);
     $row_techcheck = mysqli_fetch_array($db_tech);
 
-    echo '<span class="text2">Du ben&ouml;tigst eine Allianz mit Notfallmateriekonverter und folgendes Geb&auml;ude: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</span>';
+    echo '<div class="mod-leer">Du ben&ouml;tigst eine Allianz mit Notfallmateriekonverter und folgendes Geb&auml;ude: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</div>';
 }
 
 echo '</div>';
-
 rahmen_unten();
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 // sektorlager
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlung ins sektorlager m&ouml;glich
+if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlung ins sektorlager möglich
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_sector WHERE sec_id=?", [$sector]);
     $row = mysqli_fetch_assoc($db_daten);
-    $srestyp01 = $row['restyp01'];
-    $srestyp02 = $row['restyp02'];
-    $srestyp03 = $row['restyp03'];
-    $srestyp04 = $row['restyp04'];
-    $srestyp05 = $row['restyp05'];
-    ?>
-<br>
-<form action="resource.php" method="POST">
-<table border="0" cellpadding="0" cellspacing="0" class="pctabs pctab3">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="1" class="ro" align="center">&nbsp;</td>
-<?php
-    echo '<td width="550px" class="ro" align="center">
-	
-	<table width="100%"><tr>
-	<td width="20px">&nbsp;</td>
-	<td align="center">'.$resource_lang['uebersichtseklager'].'</td>
-	<td width="20px"><img style="vertical-align: middle;" src="'.
-        'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$resource_lang['sektorkosten'].'&'.$btipstr.'"></td>
-	</tr></table>
-	
-	</td>';
-    ?>
-<td width="1" class="ro" align="center">&nbsp;</td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="3">
-<div class="cell">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="100">
-<col width="100">
-<col width="100">
-</colgroup>
-<?php
-      //echo '<table border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">';
-      echo '<tr align="center">';
-    echo '<td><font color="28FF50">'.$resource_lang['rohstoff'].'</td>';
-    echo '<td><font color="28FF50">'.$resource_lang['sektorlager'].'</td>';
-    echo '<td><font color="28FF50">'.$resource_lang['transfer'].'</td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>Multiplex</td>';
-    echo '<td align="right">'.number_format($srestyp01, 0, "", ".").'</td>';
-    echo '<td><input type="text" name="mtr" value="" size="8" maxlength="8"></td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>Dyharra</td>';
-    echo '<td align="right">'.number_format($srestyp02, 0, "", ".").'</td>';
-    echo '<td><input type="text" name="dtr" value="" size="8" maxlength="8"></td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>Iradium</td>';
-    echo '<td align="right">'.number_format($srestyp03, 0, "", ".").'</td>';
-    echo '<td><input type="text" name="itr" value="" size="8" maxlength="8"></td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>Eternium</td>';
-    echo '<td align="right">'.number_format($srestyp04, 0, "", ".").'</td>';
-    echo '<td><input type="text" name="etr" value="" size="8" maxlength="8"></td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>Tronic</td>';
-    echo '<td align="right">'.number_format($srestyp05, 0, "", ".").'</td>';
-    echo '<td><input type="text" name="ttr" value="" size="8" maxlength="8"></td>';
-    echo '</tr>';
-    echo '<tr align="center">';
-    echo '<td>&nbsp;</td>';
-    echo '<td><input type="Submit" name="trans" value="'.$resource_lang['transferieren'].'"></td>';
-    echo '<td>&nbsp;</td>';
-    echo '</tr>';
-    ?>
-</table>
-</div>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-<br>
-</form>
-<?php
+
+    rahmen_oben($resource_lang['uebersichtseklager']);
+    echo '<form action="resource.php" method="POST" class="mod res">';
+    echo '<div class="res-sektorlager">';
+    echo '<span class="bk-spalte">'.$resource_lang['rohstoff'].'</span><span class="bk-spalte bk-zahl">'.$resource_lang['sektorlager'].'</span><span class="bk-spalte bk-zahl">Einzahlen</span>';
+    foreach (array('Multiplex' => array('mtr', $row['restyp01']), 'Dyharra' => array('dtr', $row['restyp02']), 'Iradium' => array('itr', $row['restyp03']),
+        'Eternium' => array('etr', $row['restyp04']), 'Tronic' => array('ttr', $row['restyp05'])) as $name => $feld) {
+        echo '<span>'.$name.'</span><span class="bk-zahl">'.res_zahl($feld[1]).'</span>';
+        echo '<span class="bk-zahl"><input type="text" name="'.$feld[0].'" value="" maxlength="8" inputmode="numeric" autocomplete="off" class="mod-eingabe res-einzahlung"></span>';
+    }
+    echo '</div>';
+    echo '<div class="bk-fuss"><span class="bk-leise">Jede Einzahlung wird dem Sektorkommandanten gemeldet.</span>';
+    echo '<button type="submit" name="trans" value="'.$resource_lang['transferieren'].'" class="mod-btn">'.$resource_lang['transferieren'].'</button></div>';
+
+    //was der Sektor mit dem Lager bauen kann
+    echo '<details class="res-details"><summary>'.$resource_lang['sektorkosten'].'</summary><div class="res-kosten-liste">';
+    echo '<span class="bk-spalte"></span><span class="bk-spalte bk-zahl">M</span><span class="bk-spalte bk-zahl">D</span><span class="bk-spalte bk-zahl">I</span><span class="bk-spalte bk-zahl">E</span><span class="bk-spalte bk-zahl">T</span>';
+    foreach ($sektorkosten as $kosten) {
+        echo '<span>'.$kosten[0].'</span>';
+        for ($i = 1; $i <= 5; $i++) {
+            echo '<span class="bk-zahl'.($kosten[$i] == 0 ? ' bk-null' : '').'">'.number_format($kosten[$i], 0, ",", ".").'</span>';
+        }
+    }
+    echo '</div></details>';
+    echo '</form>';
+    rahmen_unten();
 }
-?>
-<input type="Submit" name="button" value="" style="visibility: hidden;">
-</form>
-<?php
-//////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////
 // Ressourcenlager
 //////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
 rahmen_oben('Dein Lager');
-echo '<table cellspacing="1" cellpadding="0" style="width: 560px;" class="pctabs pctab4">';
-$c1 = 0;
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr class="'.$bg.'" style="font-weight: bold; text-align: center;"><td>Name</td><td>Anzahl</td></tr>';
-//Multiplex
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr class="'.$bg.'"><td>Multiplex</td><td style="text-align: right">'.number_format(floor($restyp01), 0, ",", ".").'</td></tr>';
-//Dyharra
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr class="'.$bg.'"><td>Dyharra</td><td style="text-align: right">'.number_format(floor($restyp02), 0, ",", ".").'</td></tr>';
-//Iradium
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr class="'.$bg.'"><td>Iradium</td><td style="text-align: right">'.number_format(floor($restyp03), 0, ",", ".").'</td></tr>';
-//Eternium
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
-}
-echo '<tr class="'.$bg.'"><td>Eternium</td><td style="text-align: right">'.number_format(floor($restyp04), 0, ",", ".").'</td></tr>';
+echo '<div class="mod res"><div class="res-bestand">';
+
 //Tronic
 $tronic_hinweis = '';
 if (hasTech($pt, 160)) {
     $tronicertrag = 1;
     $tronicertrag += intval(getArtefactAmountByUserId($_SESSION['ums_user_id'], 21));
-    $tronic_hinweis = '<span style="color: #00FF00;">(jeden 20. Wirtschaftstick +'.$tronicertrag.')</span> ';
-
+    $tronic_hinweis = '<span class="mod-chip mod-chip-gruen" title="Tronic&Jeden 20. Wirtschaftstick +'.$tronicertrag.'">+'.$tronicertrag.' alle 20 WT</span>';
 }
 
-if ($c1 == 0) {
-    $c1 = 1;
-    $bg = 'cell1';
-} else {
-    $c1 = 0;
-    $bg = 'cell';
+foreach (array('Multiplex' => array($restyp01, ''), 'Dyharra' => array($restyp02, ''), 'Iradium' => array($restyp03, ''), 'Eternium' => array($restyp04, ''), 'Tronic' => array($restyp05, $tronic_hinweis)) as $name => $wert) {
+    echo '<div class="res-posten"><span>'.$name.'</span>'.$wert[1].'<b>'.number_format(floor($wert[0]), 0, ",", ".").'</b></div>';
 }
-echo '<tr class="'.$bg.'"><td>Tronic</td><td style="text-align: right">'.$tronic_hinweis.number_format(floor($restyp05), 0, ",", ".").'</td></tr>';
 
 //weitere items aus der DB auslesen
-$sql = "SELECT * FROM de_user_storage LEFT JOIN de_item_data ON(de_user_storage.item_id=de_item_data.item_id) 
+$sql = "SELECT * FROM de_user_storage LEFT JOIN de_item_data ON(de_user_storage.item_id=de_item_data.item_id)
 	WHERE de_user_storage.user_id='".$_SESSION['ums_user_id']."' ORDER BY item_sort_order ASC, item_name ASC";
-//echo $sql;
 $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
 
-
 while ($row = mysqli_fetch_array($db_daten)) {
-    if ($c1 == 0) {
-        $c1 = 1;
-        $bg = 'cell1';
-    } else {
-        $c1 = 0;
-        $bg = 'cell';
-    }
-
     //check auf Änderung im Tick
     if ($row['item_wt_change'] > 0) {
-        $item_change_wt = '<span style="color: #00FF00;">(+'.number_format($row['item_wt_change'], 0, ",", ".").')</span> ';
+        $item_change_wt = '<span class="mod-chip mod-chip-gruen" title="'.$row['item_name'].'&Jeden Wirtschaftstick +'.number_format($row['item_wt_change'], 0, ",", ".").'">+'.number_format($row['item_wt_change'], 0, ",", ".").' je WT</span>';
     } else {
         $item_change_wt = '';
     }
 
-    echo '<tr class="'.$bg.'"><td>'.$row['item_name'].'</td><td style="text-align: right">'.$item_change_wt.number_format($row['item_amount'], 0, ",", ".").'</td></tr>';
+    echo '<div class="res-posten"><span>'.$row['item_name'].'</span>'.$item_change_wt.'<b>'.number_format($row['item_amount'], 0, ",", ".").'</b></div>';
 }
 
-echo '</table>';
-
+echo '</div></div>';
 rahmen_unten();
 ?>
 
 <script>
 <?php
-echo 'var p='.($handelssteuersatz).';';
+//Verlust beim Konverter: Grundsatz und Sektorsteuer, wie beim Tausch
+echo 'var p='.($handelssteuersatz + ($res_sektorsteuer ?? 0)).';';
 ?>
 var bkr=<?php echo $baukostenreduzierung;?>;
 function number_format(s) {
@@ -1345,6 +991,7 @@ function number_format(s) {
 	return uf;
 	}
 
+//Kosten der eingegebenen Anzahl; rot, wenn die Rohstoffe nicht reichen
 function calccolcost(hascol){
 	var build=parseInt($("#b_col").val());
 	if(isNaN(build))build=0;
@@ -1357,18 +1004,13 @@ function calccolcost(hascol){
 		hascol++;
 	}
 
-	var color1="#FFFFFF";
-	var color2="#FFFFFF";
-	if(mcost>hasres[0])color1="#FF0000";
-	if(dcost>hasres[1])color2="#FF0000";
-
-	$("#colmcost").html('<font color="'+color1+'">'+number_format(Math.round(mcost))+'</font>');
-	$("#coldcost").html('<font color="'+color2+'">'+number_format(Math.round(dcost))+'</font>');
+	$("#colmcost").text(number_format(Math.round(mcost))).toggleClass('res-zu-teuer', mcost>hasres[0]);
+	$("#coldcost").text(number_format(Math.round(dcost))).toggleClass('res-zu-teuer', dcost>hasres[1]);
 }
 
 function rh_calc(pos){
 	uv=new Array(1,2,3,4,10000);
-	
+
 	if(pos==0)
 	{
 		target='#rh_cost';
@@ -1376,7 +1018,7 @@ function rh_calc(pos){
 		rc1=($('#rh_v1 option:selected').val());
 		rc2=($('#rh_v2 option:selected').val());
 	}
-	else 
+	else
 	{
 		target='#rh_amount';
 		value=$("#rh_cost").val();
@@ -1397,10 +1039,25 @@ function rh_calc(pos){
 		value=value-(value/100*p);
 		value=Math.floor(value);
 	}
-	
+
 	$(target).val(value);
 }
 
+$(function(){
+	//Kollektorbau: Kosten beim Tippen, Max. trägt die größte bezahlbare Anzahl ein
+	$('#b_col').on('input', function(){ calccolcost($(this).data('kollis')); });
+	$('#res-max').on('click', function(){ $('#b_col').val($(this).data('max')).trigger('input'); });
+	//Konverter: die jeweils andere Menge mitrechnen
+	$('#rh_amount').on('input', function(){ rh_calc(0); });
+	$('#rh_cost').on('input', function(){ rh_calc(1); });
+	$('#rh_v1, #rh_v2').on('change', function(){ rh_calc(0); });
+	//Summe des Energieverteilungsschlüssels
+	$('.res-schluessel').on('input', function(){
+		var s = 0;
+		$('.res-schluessel').each(function(){ s += parseInt(this.value, 10) || 0; });
+		$('#res-summe').text(s).parent().toggleClass('bk-summe-falsch', s != 100);
+	});
+});
 </script>
 </body>
 </html>

@@ -7508,6 +7508,294 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
+// Ressourcen (resource.php): Kollektorbau, Ertrag mit Energieverteilung (Raster wie bkmenu.php: bk-energie),
+// Notfallkonverter, Sektorlager, eigenes Lager
+.res {
+	width: 572px;
+}
+
+// Kollektorbau: der drehende Kollektor (gp/g/kollie.gif) bleibt, daneben Bestand, Kosten und Eingabe
+.res-kolli {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.res-kolli-bild {
+	flex: 0 0 auto;
+	width: 83px;
+	height: 62px;
+	margin-top: 2px;
+}
+
+.res-kolli-rechts {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.res-kacheln {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+
+	.ov-wert b {
+		font-size: 15px;
+	}
+
+	small {
+		font-size: 11px;
+		color: #8b949e;
+	}
+}
+
+.res-bau {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.mod .res-anzahl {
+	width: 90px;
+	text-align: right;
+}
+
+.res-kosten {
+	margin-top: 6px;
+	font-size: 12px;
+	color: #8b949e;
+
+	b {
+		color: #ffffff;
+	}
+
+	b.res-zu-teuer {
+		color: #ff8a8a;
+	}
+}
+
+.res-fehlt {
+	flex: 1 1 auto;
+	margin-bottom: 0;
+	font-size: 12px;
+	line-height: 1.45;
+}
+
+// Energie aus Kollektoren und Artefakten
+.res-energie {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 4px 12px;
+	margin-bottom: 10px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	font-size: 12px;
+	color: #c9d1d9;
+
+	> span:nth-child(even) {
+		text-align: right;
+	}
+
+	small {
+		color: #8b949e;
+	}
+
+	b {
+		color: #ffffff;
+	}
+
+	.res-summe {
+		padding-top: 4px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		font-weight: 600;
+		color: #ffffff;
+	}
+}
+
+// Hilfetext als Tooltip an der Beschriftung
+.res-hilfe {
+	cursor: help;
+	text-decoration: underline dotted rgba(255, 255, 255, 0.3);
+	text-underline-offset: 3px;
+}
+
+.res-tabelle {
+	grid-template-columns: 170px repeat(4, 1fr);
+
+	> span {
+		text-align: right;
+	}
+
+	> .bk-label {
+		text-align: left;
+	}
+
+	> .bk-spalte {
+		text-align: right;
+	}
+
+	.bk-prozent {
+		justify-content: flex-end;
+	}
+
+	.res-ertrag {
+		padding-top: 4px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+}
+
+// aufklappbare Aufschlüsselung (planetarer Ertrag, Sektorkosten)
+.res-details {
+	margin-top: 10px;
+
+	summary {
+		font-size: 11px;
+		color: #8b949e;
+		cursor: pointer;
+
+		&:hover {
+			color: #c9d1d9;
+		}
+	}
+
+	> div {
+		margin-top: 6px;
+	}
+}
+
+// Notfallkonverter
+.res-text {
+	margin-bottom: 8px;
+	font-size: 12px;
+	color: #c9d1d9;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.res-wahl {
+	display: grid;
+	grid-template-columns: 110px 1fr 130px;
+	gap: 6px;
+	align-items: center;
+	margin-bottom: 6px;
+	font-size: 12px;
+	color: #8b949e;
+
+	.mod-eingabe {
+		min-width: 0;
+	}
+
+	input.mod-eingabe {
+		text-align: right;
+	}
+}
+
+// Sektorlager: Bestand und Einzahlung je Rohstoff
+.res-sektorlager {
+	display: grid;
+	grid-template-columns: 1fr 1fr 130px;
+	gap: 4px 10px;
+	align-items: center;
+	font-size: 12px;
+	color: #c9d1d9;
+}
+
+.mod .res-einzahlung {
+	width: 120px;
+	padding: 5px 8px;
+	text-align: right;
+}
+
+.res-kosten-liste {
+	display: grid;
+	grid-template-columns: 1fr repeat(5, 70px);
+	gap: 3px 8px;
+	font-size: 11px;
+	color: #c9d1d9;
+}
+
+// eigenes Lager: Rohstoffe und Gegenstände
+.res-bestand {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 4px 12px;
+}
+
+.res-posten {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 8px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.03);
+	font-size: 12px;
+	color: #c9d1d9;
+
+	> span:first-child {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	b {
+		color: #ffffff;
+		white-space: nowrap;
+	}
+
+	.mod-chip {
+		font-size: 10px;
+		white-space: nowrap;
+	}
+}
+
+// News (newspaper.php): Meldung, Feedback an das Team, Archiv (Zeilen wie die News in der Übersicht: ov-news-zeile)
+.np {
+	width: 572px;
+}
+
+.np-text {
+	font-size: 13px;
+	line-height: 1.55;
+	color: #c9d1d9;
+	overflow-wrap: anywhere;
+}
+
+.np-info {
+	margin-bottom: 8px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+}
+
+.np-wichtig {
+	font-weight: 600;
+}
+
+.np-hinweis {
+	font-size: 12px;
+}
+
+.mod .np-feedback {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 140px;
+	resize: vertical;
+	line-height: 1.45;
+}
+
+.np-fuss {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 10px;
+}
+
+.mod-leer + .np-fuss {
+	justify-content: center;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

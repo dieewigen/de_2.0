@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\View\RealTime;
+
 include "inc/header.inc.php";
 include 'functions.php';
 
@@ -25,6 +27,15 @@ $id=intval($_REQUEST['id'] ?? -1);
 $typ=$_REQUEST['typ'] ?? 0;
 $action=$_REQUEST['action'] ?? '';
 
+//Arten der Meldungen (de_news_overview.typ); bisher gibt es nur die DET-Meldungen aus der Übersicht
+$np_arten = array(1 => 'DET-Meldungen');
+
+//Datum einer Meldung wie in der Übersicht
+function np_datum($zeit)
+{
+	return date('d.m.Y - H:i', strtotime($zeit));
+}
+
 //news anzeigen
 if($action!="archiv"){
 	$sel_news_show = mysqli_execute_query($GLOBALS['dbi'],
@@ -37,119 +48,82 @@ if($action!="archiv"){
 	  "UPDATE de_news_overview SET klicks=klicks+1, time=time WHERE id=?",
 	  [$id]);
 
+	//////////////////////////////////////
+	// feedback formular
+	//////////////////////////////////////
 
-	$nachricht = nl2br($row['nachricht']);
-	echo '<br>
-	<table border="0" cellspacing="0" cellpadding="0" width="600px">
-	<tr>
-	<td width="13" height="25" class="rol"></td>
-	<td align="center" height="35" class="ro"><div class="cellu">'.$row['betreff'].' (<a href="newspaper.php?action=archiv&typ='.$row['typ'].'">Archiv</a>)</td>
-	<td width="13" height="25" class="ror"></td>
-	</tr>
-	<tr>
-		<td width="13" class="rl" height="35"></td>
-		<td><div class="cell">'.$nachricht.'</div></td>
+	//e-mail senden
+	//nur per Formular (POST) und höchstens alle 5 Minuten, sonst ließe sich das Admin-Postfach fluten
+	$np_meldung = '';
+	$np_entwurf = '';
+	if(isset($_POST['feedback']) && time() - ($_SESSION['newspaper_feedback_time'] ?? 0) > 300){
+		$_SESSION['newspaper_feedback_time']=time();
+		$np_meldung = '<div class="mod-meldung mod-meldung-ok">Vielen Dank, das Feedback wurde gespeichert.</div>';
+		$sendto=$GLOBALS['env_admin_email'];
+		$betreff='Feedback: '.($row['betreff'] ?? '').' '.$sv_server_tag.' '.$_SESSION['ums_user_id'].' '.$_SESSION['ums_spielername'];
+		$text=str_replace('\r\n',"\r\n",$_REQUEST['feedback']);
+		$sendfrom='FROM: '.$GLOBALS['env_admin_email'];
+		@mail($sendto, $betreff, $text, $sendfrom);
+	} elseif (isset($_POST['feedback'])) {
+		//zu früh: nicht gesendet, der Text bleibt im Feld stehen
+		$np_meldung = '<div class="mod-meldung mod-meldung-warn">Du hast gerade erst Feedback gesendet. Weiteres Feedback ist ab '.RealTime::at($_SESSION['newspaper_feedback_time'] + 301).' m&ouml;glich.</div>';
+		$np_entwurf = (string)$_POST['feedback'];
+	}
 
-		<td width="13" height="25" class="rr"></td>
-	</tr>
-	<tr>
-	<td width="13" class="rul">&nbsp;</td>
-	<td class="ru">&nbsp;</td>
-	<td width="13" class="rur">&nbsp;</td>
-	</tr>
-	</table><br>';
+	if ($np_meldung != '') {
+		echo '<div class="mod pol-meldungen">'.$np_meldung.'</div>';
+	}
 
-//////////////////////////////////////
-// feedback formular
-//////////////////////////////////////
+	if (!$row) {
+		rahmen_oben('News');
+		echo '<div class="mod np"><div class="mod-leer">Diese Meldung gibt es nicht.</div>';
+		echo '<div class="np-fuss"><a href="newspaper.php?action=archiv&amp;typ=1" class="mod-btn mod-btn-leise ally-btn-klein">Zum Archiv</a></div></div>';
+		rahmen_unten();
+	} else {
+		$nachricht = nl2br($row['nachricht']);
+		rahmen_oben($row['betreff']);
+		echo '<div class="mod np">';
+		echo '<div class="ov-kopf"><span class="mod-typ">'.($np_arten[$row['typ']] ?? 'Meldung').' &middot; '.np_datum($row['time']).'</span>';
+		echo '<a href="newspaper.php?action=archiv&amp;typ='.$row['typ'].'" class="mod-btn mod-btn-leise ally-btn-klein">Archiv</a></div>';
+		echo '<div class="np-text">'.$nachricht.'</div>';
+		echo '</div>';
+		rahmen_unten();
 
-//e-mail senden
-//nur per Formular (POST) und höchstens alle 5 Minuten, sonst ließe sich das Admin-Postfach fluten
-if(isset($_POST['feedback']) && time() - ($_SESSION['newspaper_feedback_time'] ?? 0) > 300){
-	$_SESSION['newspaper_feedback_time']=time();
-	echo '<div class="info_box text3">Vielen Dank, das Feedback wurde gespeichert.</div><br>';
-	$sendto=$GLOBALS['env_admin_email'];
-	$betreff='Feedback: '.$row['betreff'].' '.$sv_server_tag.' '.$_SESSION['ums_user_id'].' '.$_SESSION['ums_spielername'];
-	$text=str_replace('\r\n',"\r\n",$_REQUEST['feedback']);
-	$sendfrom='FROM: '.$GLOBALS['env_admin_email'];
-	@mail($sendto, $betreff, $text, $sendfrom);
-}
-
-echo '
-<script>
-function chkFeedback(){
-if(document.newspaper.feedback.value =="Trage hier bitte Dein Feedback ein."){
-alert("Gib bitte Dein Feedback ein, damit wir das Spiel weiter verbessern können!");
-document.newspaper.feedback.focus();
-return false;
-}
-}
-</script>';
-
-//echo '<form action="newspaper.php" method="POST">';
-echo '<form action="newspaper.php" method="POST" name="newspaper" onSubmit="return chkFeedback()">';
-echo '<input type="hidden" name="id" value="'.$id.'">';
-rahmen_oben('Feedback zum Beitrag');
-echo '<div class="cell" style="width: 575px;">';
-echo 'Wenn Du gerne Feedback zu diesem Beitrag geben m&ouml;chtest, so empfehlen wir daf&uuml;r das Forum. 
-Solltest Du Dich aber nicht trauen &ouml;ffentlich etwas zu schreiben, dann kannst Du auch dieses Feedback-Formular nutzen. Es werden auf jeden Fall alle Feedbacks gelesen.
-<br><br><font style="font-size: 20px; color: #FF0000;">Beachte bitte, dass auf Fragen nicht geantwortet werden kann, diese kannst 
-Du aber im Discord stellen.</font><br><br>Schreibe bitte m&ouml;glichst ausf&uuml;hrlich, damit man wei&szlig; was gemeint ist, ein einfaches "ist doof" wird zwar registriert, aber eine Begr&uuml;ndung fehlt. Des Weiteren werden keine Beleidigungen toleriert.
- <br><br><font color="#00FF00">Meldungen zu Verst&ouml;&szlig;e gegen die Nutzungsbedingungen kannst Du im Discord melden.
- </font>
- 
- ';
-
-//echo '<br><textarea cols="70" rows="10" name="feedback">Trage hier bitte Dein Feedback ein.</textarea>';
-?>
-<textarea cols="70" rows="10" name="feedback" onfocus="if(this.value == 'Trage hier bitte Dein Feedback ein.') this.value='';" onblur="if (this.value=='') this.value='Trage hier bitte Dein Feedback ein.';">Trage hier bitte Dein Feedback ein.</textarea>
-<?php
-echo '<br><input type="Submit" value="Feedback senden">';
-
-echo '</div>';
-
-rahmen_unten();
-echo '</form>';
-
+		rahmen_oben('Feedback zum Beitrag');
+		echo '<form action="newspaper.php" method="POST" name="newspaper" class="mod np">';
+		echo '<input type="hidden" name="id" value="'.$id.'">';
+		echo '<div class="np-info">Wenn Du gerne Feedback zu diesem Beitrag geben m&ouml;chtest, so empfehlen wir daf&uuml;r das Forum.
+			Solltest Du Dich aber nicht trauen &ouml;ffentlich etwas zu schreiben, dann kannst Du auch dieses Feedback-Formular nutzen. Es werden auf jeden Fall alle Feedbacks gelesen.</div>';
+		echo '<div class="mod-meldung mod-meldung-warn np-wichtig">Beachte bitte, dass auf Fragen nicht geantwortet werden kann, diese kannst Du aber im Discord stellen.</div>';
+		echo '<div class="np-info">Schreibe bitte m&ouml;glichst ausf&uuml;hrlich, damit man wei&szlig; was gemeint ist, ein einfaches "ist doof" wird zwar registriert, aber eine Begr&uuml;ndung fehlt. Des Weiteren werden keine Beleidigungen toleriert.</div>';
+		echo '<div class="mod-hinweis np-hinweis">Meldungen zu Verst&ouml;&szlig;en gegen die Nutzungsbedingungen kannst Du im Discord melden.</div>';
+		echo '<textarea name="feedback" rows="8" required placeholder="Trage hier bitte Dein Feedback ein." class="mod-eingabe np-feedback">'.htmlspecialchars($np_entwurf, ENT_QUOTES, 'UTF-8').'</textarea>';
+		echo '<div class="np-fuss"><button type="submit" class="mod-btn">Feedback senden</button></div>';
+		echo '</form>';
+		rahmen_unten();
+	}
 }
 else  //archiv
 {
-?>
+	$typ=(int)$typ;
+	$sel_news=mysqli_execute_query($GLOBALS['dbi'],
+	  "SELECT * FROM de_news_overview WHERE typ=? ORDER BY id DESC",
+	  [$typ]);
 
-<br><br>
-<table border="0" cellspacing="0" cellpadding="0" width="585">
-<tr>
-<td width="13" height="25" class="rol"></td>
-<td align="center" height="35" class="ro"><div class="cellu">A r c h i v</div></td>
-<td width="13" height="25" class="ror"></td>
-</tr>
-<tr>
-    <td width="13" class="rl" height="35"></td>
-    <td><div class="cell"><br>
-    <?php
-     $typ=(int)$typ;
-     $sel_news=mysqli_execute_query($GLOBALS['dbi'],
-       "SELECT * FROM de_news_overview WHERE typ=? ORDER BY id DESC",
-       [$typ]);
-
-     while($rew=mysqli_fetch_assoc($sel_news))
-     {
-       $t=(string)$rew['time'];
-       $time=$t[8].$t[9].'.'.$t[5].$t[6].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[11].$t[12].':'.$t[14].$t[15].':'.$t[17].$t[18];
-  echo '&nbsp;&nbsp;<a href="newspaper.php?id='.$rew['id'].'">'.$time.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rew['betreff'].'</a><br><br>';
-     }
-     ?>
-     </div></td>
-     <td width="13" height="25" class="rr"></td>
-</tr>
-<tr>
-<td width="13" class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td width="13" class="rur">&nbsp;</td>
-</tr>
-</table>
-
-<?php
+	rahmen_oben('Archiv'.(isset($np_arten[$typ]) ? ' &middot; '.$np_arten[$typ] : ''));
+	echo '<div class="mod np">';
+	$anzahl = 0;
+	while($rew=mysqli_fetch_assoc($sel_news))
+	{
+		echo '<a href="newspaper.php?id='.$rew['id'].'" class="ov-news-zeile"><span class="ov-news-datum">'.np_datum($rew['time']).'</span><span class="ov-news-betreff">'.$rew['betreff'].'</span></a>';
+		$anzahl++;
+	}
+	if ($anzahl == 0) {
+		echo '<div class="mod-leer">Hier gibt es noch keine Meldungen.</div>';
+	}
+	echo '<div class="np-fuss"><a href="overview.php" class="mod-btn mod-btn-leise ally-btn-klein">Zur &Uuml;bersicht</a></div>';
+	echo '</div>';
+	rahmen_unten();
 }
 ?>
 </body>
