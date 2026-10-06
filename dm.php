@@ -52,19 +52,18 @@ $chat_height=400;
 	
 	<div id="topbar" style="z-index: 1000;">
 		<?php 
-		//Rassenlogo
+		//Rassenlogo: Klick zur Übersicht, beim Überfahren das Aufklappmenü im Look der Menüleiste
+		//(Sektor und Optionen wie die Reiter: normaler Klick in der Spielspalte, Mittel- oder Strg-Klick im neuen Tab)
 		echo '
 		<div class="dropdown">
 			<img src="gp/g/derassenlogo'.$_SESSION['ums_rasse'].'.png" style="position: absolute; left: -31px; top: -1px; width: auto; height: 72px; cursor: pointer;" onclick="switch_iframe_main_container(\'overview.php\')">
-			<div class="dropdown-content" style="z-index: 200;">
-			
-				<span onclick="switch_iframe_main_container(\'sector.php\')" class="btn">'.$menu_lang['eintrag_12'].'</span>
-				<br>
-				<span onclick="switch_iframe_main_container(\'options.php\')" class="btn">'.$menu_lang['eintrag_24'].'</span>
-				<br><a href="index.php?logout=1" class="btn">'.$menu_lang['eintrag_29'].'</a>
-			</div>
-		</div>';		
-		
+			<nav class="dropdown-content dm-aufklapp">
+				<a href="sector.php" class="dm-aufklapp-punkt" data-icon="⌬" onclick="return dm_menu_klick(event, \'sector.php\', false)">'.$menu_lang['eintrag_12'].'</a>
+				<a href="options.php" class="dm-aufklapp-punkt" data-icon="⚙" onclick="return dm_menu_klick(event, \'options.php\', false)">'.$menu_lang['eintrag_24'].'</a>
+				<a href="index.php?logout=1" class="dm-aufklapp-punkt dm-aufklapp-gefahr" data-icon="🚪">'.$menu_lang['eintrag_29'].'</a>
+			</nav>
+		</div>';
+
 		//Rohstoffe/Credits
 		//Multiplex
 		echo '<img onclick="switch_iframe_main_container(\'resource.php\')" src="gp/g/icon1.png" class="rounded-borders" style="cursor: pointer; position: absolute; left: 40px; top: 4px; width: 24px; height: auto;" title="'.$resline_lang['restipres01desc'].'" rel="tooltip">';
@@ -120,46 +119,35 @@ $chat_height=400;
 		echo '<img onclick="switch_iframe_main_container(\'missions.php\')" id="tb_infocenter_missions" src="gp/g/icon14.png" class="rounded-borders" style="display: none; cursor: pointer; position: absolute; left: 406px; top: 36px; width: 24px; height: auto;" rel="tooltip">'; 
 
 
-		//serverzeit
-		echo '<div onclick="switch_iframe_main_container(\'sinfo.php\')" style="position: absolute; right: 31px; top:0; height:66px; width: 84px; cursor: pointer;">
-				<img src="gp/g/tb_timedata.png" style="position: absolute; width: 100%; height: 100%;">
-				<div id="tb_time1" style="position: absolute; top: 1px; left: 34px;"></div>
-				<div id="tb_time2" style="position: absolute; top: 24px; left: 34px;"></div>
-				<div id="tb_time3" style="position: absolute; top: 47px; left: 34px;"></div>
+		//Serverzeit, letzter WT und KT (füllt resline.php), Klick zu den Serverinfos
+		echo '<div onclick="switch_iframe_main_container(\'sinfo.php\')" class="dm-zeiten" title="Serverinfos" rel="tooltip">
+				<span class="mod-typ">Zeit</span><b id="tb_time1"></b>
+				<span class="mod-typ">WT</span><b id="tb_time2"></b>
+				<span class="mod-typ">KT</span><b id="tb_time3"></b>
 			</div>';
 		
-		//Menüpunkte
-		echo '<div style="position: absolute; left:0; top: 0px; padding-top: 0px; height: calc(100% - 0px); z-index: 2000; padding-right: 6px;
-			margin-left: 540px; margin-right: 112px; background-color: #111111; border-left: 1px solid #666666; border-right: 1px solid #666666;">';
-
-		//Technologien
-		echo '<span onclick="switch_iframe_main_container_big(\'ang_techs.php\')" class="btn">'.$menu_lang['eintrag_36'].'</span>';
-		//Spezialisierung
-		echo '<span onclick="switch_iframe_main_container(\'specialization.php\')" class="btn">Spezialisierung</span>';
-		//Artefakte
-		echo '<span onclick="switch_iframe_main_container(\'artefacts.php\')" class="btn">'.$menu_lang['eintrag_18'].'</span>';
-		//Auktion
-		echo '<span onclick="switch_iframe_main_container(\'auction.php\')" class="btn">Auktion</span>';
-		//Missionen
-		echo '<span onclick="switch_iframe_main_container(\'missions.php\')" class="btn">Missionen</span>';
-		//Produktion
-		echo '<span onclick="switch_iframe_main_container(\'production.php\')" class="btn">Produktion</span>';
-
-		echo '<span onclick="switch_iframe_main_container(\'military.php\')" class="btn">Flotten</span>';
-		
-		echo '<span onclick="switch_iframe_main_container(\'secret.php\')" class="btn">'.$menu_lang['eintrag_11'].'</span>';
-	
-		echo '<span onclick="switch_iframe_main_container(\'allymain.php\')" class="btn">'.$menu_lang['eintrag_16'].'</span>';
-
-
-
-		
-
-		echo '<span onclick="switch_iframe_main_container(\'statistics.php\')" class="btn">'.$menu_lang['eintrag_21'].'</span>';
-		echo '<span onclick="switch_iframe_main_container(\'toplist.php\')" class="btn">'.$menu_lang['eintrag_22'].'</span>';
-			
-
-		echo '</div>
+		//Menüpunkte als Reiter: ein normaler Klick öffnet die Seite in der Spielspalte (Technologien im großen Fenster),
+		//Mittel- oder Strg-Klick wie ein Link in einem neuen Tab; markiert wird die Seite, die gerade offen ist
+		//(dm_menu_markieren() unten, Muster auf den Dateinamen)
+		//Symbole wie im Mobilmenü (menu.php)
+		$dm_menu = array(
+			array('ang_techs.php', $menu_lang['eintrag_36'], '^ang_techs\.php$', true, '⚛'),
+			array('specialization.php', 'Spezialisierung', '^specialization\.php$', false, '🧬'),
+			array('artefacts.php', $menu_lang['eintrag_18'], '^artefacts\.php$', false, '✧'),
+			array('auction.php', 'Auktion', '^auction\.php$', false, '⚖'),
+			array('missions.php', 'Missionen', '^missions\.php$', false, '✪'),
+			array('production.php', 'Produktion', '^production\.php$', false, '🏭'),
+			array('military.php', 'Flotten', '^military\.php$', false, '🚀'),
+			array('secret.php', $menu_lang['eintrag_11'], '^secret\.php$', false, '🕵️'),
+			array('allymain.php', $menu_lang['eintrag_16'], '^ally', false, '∞'),
+			array('statistics.php', $menu_lang['eintrag_21'], '^statistics\.php$', false, '📊'),
+			array('toplist.php', $menu_lang['eintrag_22'], '^toplist\.php$', false, '★'),
+		);
+		echo '<nav class="dm-menu">';
+		foreach ($dm_menu as [$seite, $text, $muster, $gross, $symbol]) {
+			echo '<a href="'.$seite.'" class="dm-reiter" data-icon="'.$symbol.'" data-muster="'.$muster.'" onclick="return dm_menu_klick(event, \''.$seite.'\', '.($gross ? 'true' : 'false').')">'.$text.'</a>';
+		}
+		echo '</nav>
 		</div>';
 
 		////////////////////////////////////////////////////////
@@ -302,6 +290,41 @@ $(document).ready(function() {
 		}
 	});
 });
+
+//Menü: normaler Klick öffnet die Seite in der Spielspalte, Strg-/Umschalt-Klick wie ein Link (der Mittelklick löst kein click aus)
+function dm_menu_klick(e, seite, gross){
+	if(e.ctrlKey || e.metaKey || e.shiftKey || e.button!==0){
+		return true;
+	}
+	if(gross){
+		switch_iframe_main_container_big(seite);
+	}else{
+		switch_iframe_main_container(seite);
+	}
+	dm_menu_markieren(seite);
+	return false;
+}
+
+//markiert den Reiter der Seite, die gerade in der Spielspalte bzw. im großen Fenster steht; so stimmt die Markierung
+//auch nach Links innerhalb der Seiten oder Klicks auf der Karte. Während eine Seite lädt (about:blank), bleibt sie stehen.
+function dm_menu_markieren(seite){
+	if(seite===undefined){
+		var feld=$('#iframe_main_container_big').is(':visible') ? $('#iframe_main_big') : ($('#iframe_main_container').is(':visible') ? $('#iframe_main') : $());
+		seite='';
+		try{
+			if(feld.length){
+				seite=feld[0].contentWindow.location.pathname.split('/').pop();
+			}
+		}catch(err){}
+		if(seite==='blank'){
+			return;
+		}
+	}
+	$('.dm-reiter').each(function(){
+		$(this).toggleClass('dm-reiter-aktiv', seite!=='' && new RegExp($(this).attr('data-muster')).test(seite));
+	});
+}
+window.setInterval(function(){ dm_menu_markieren(); }, 500);
 
 window.setInterval(function(){
 	$("#iframe_menu").contents().find("body").css("background-color", "transparent");

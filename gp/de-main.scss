@@ -9125,6 +9125,274 @@ a.art-kachel-zurueck:hover::after {
 	max-width: 760px;
 }
 
+// Menü der Standard-Desktopansicht (dm.php): Kacheln im Stil der mobilen Kommandokonsole (menu.php) in der oberen
+// Leiste zwischen Rohstoffen (540 px) und Uhrzeiten; sie füllen die Breite, auf breiten Monitoren eine Zeile,
+// sonst zwei; die gerade offene Seite leuchtet
+// die ganze Leiste als eine Konsole: Scanlinien, dunkler Verlauf, unten eine feine Linie in der Rassenfarbe
+// (body #topbar, weil die ältere #topbar-Regel weiter hinten in der Datei steht)
+body #topbar {
+	border-bottom: 0;
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px),
+		radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, var(--akzent) 25%, var(--akzent) 75%, transparent);
+		opacity: 0.7;
+		pointer-events: none;
+	}
+}
+
+// Rohstoffe, Punkte und Flotten als Anzeigefelder neben ihren Symbolen (Positionen stehen inline in dm.php)
+#topbar .topbar_textfield {
+	height: 22px;
+	margin-top: -3px;
+	border: 1px solid rgba(160, 200, 255, 0.14);
+	border-radius: 6px;
+	background: linear-gradient(145deg, #161f29, #0d1218 60%);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	line-height: 20px;
+	color: #d8e9ff;
+}
+
+// Serverzeit, letzter WT und KT rechts in der Leiste
+#topbar .dm-zeiten {
+	position: absolute;
+	top: 0;
+	right: 31px;
+	width: 84px;
+	height: 67px;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-content: center;
+	align-items: center;
+	gap: 1px 6px;
+	padding: 0 8px;
+	border-left: 1px solid rgba(160, 200, 255, 0.12);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	cursor: pointer;
+
+	.mod-typ {
+		font-size: 9px;
+		color: #8b949e;
+	}
+
+	b {
+		font-size: 13px;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+		color: #d8e9ff;
+	}
+
+	&:hover b {
+		color: #ffffff;
+		text-shadow: 0 0 6px var(--akzent);
+	}
+}
+
+.dm-menu {
+	position: absolute;
+	top: 0;
+	right: 115px;
+	bottom: 0;
+	left: 540px;
+	z-index: 2000;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: center;
+	gap: 4px;
+	padding: 4px 8px;
+	border-right: 1px solid rgba(160, 200, 255, 0.12);
+	border-left: 1px solid rgba(160, 200, 255, 0.12);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+// dm.php hat body.rasseN statt theme-rasseN, daher die Akzentfarbe hier je Rasse (für die ganze obere Leiste)
+@each $name, $cfg in $themes {
+	body.#{$name} #topbar {
+		--akzent: #{map.get($cfg, color)};
+		--akzent-weich: #{color.change(map.get($cfg, color), $alpha: 0.22)};
+		--dm-glow: 0 0 8px #{color.change(map.get($cfg, color), $alpha: 0.6)}, 0 0 18px #{color.change(map.get($cfg, color), $alpha: 0.35)};
+	}
+}
+
+.dm-menu a.dm-reiter,
+.dm-menu a.dm-reiter:link,
+.dm-menu a.dm-reiter:visited {
+	position: relative;
+	display: flex;
+	flex: 1 0 auto;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 26px;
+	padding: 0 12px;
+	overflow: hidden;
+	isolation: isolate;
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-radius: 9px;
+	background: linear-gradient(145deg, #161f29, #0d1218 60%);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 6px rgba(0, 0, 0, 0.65);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	line-height: 1;
+	white-space: nowrap;
+	text-decoration: none;
+	color: #d8e9ff;
+	transition: border-color 0.25s, color 0.25s, transform 0.18s, box-shadow 0.25s;
+
+	// Symbol wie im Mobilmenü, einfarbige Zeichen in der Rassenfarbe
+	&::before {
+		content: attr(data-icon);
+		font-size: 16px;
+		line-height: 1;
+		color: var(--akzent);
+		filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25));
+		transition: transform 0.45s;
+	}
+
+	// Glanzstreifen
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background:
+			linear-gradient(120deg, transparent 0 40%, rgba(255, 255, 255, 0.07) 45%, transparent 55% 100%),
+			radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.1), transparent 60%);
+		opacity: 0.55;
+		pointer-events: none;
+	}
+}
+
+.dm-menu a.dm-reiter:hover {
+	border-color: var(--akzent);
+	box-shadow: var(--dm-glow);
+	color: #ffffff;
+	transform: translateY(-1px);
+
+	&::before {
+		transform: scale(1.12) rotate(5deg);
+	}
+}
+
+// offene Seite: Leuchtrahmen, Rassenfarbe im Verlauf und eine Leiste unten
+.dm-menu a.dm-reiter-aktiv,
+.dm-menu a.dm-reiter-aktiv:link,
+.dm-menu a.dm-reiter-aktiv:visited {
+	border-color: var(--akzent);
+	background: linear-gradient(145deg, var(--akzent-weich), #0d1218 75%);
+	box-shadow: var(--dm-glow), inset 0 -2px 0 var(--akzent);
+	color: #ffffff;
+}
+
+// Aufklappmenü am Rassenlogo (Sektor, Optionen, Logout): Konsolen-Panel unter dem Logo, Einträge wie die Kacheln
+// der Leiste; es überlappt das Logo um 2 px, damit es beim Herunterfahren mit der Maus offen bleibt
+#topbar .dm-aufklapp {
+	top: 69px;
+	left: -31px;
+	z-index: 2100;
+	min-width: 200px;
+	padding: 8px;
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-top: 2px solid var(--akzent);
+	border-radius: 0 0 12px 0;
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px),
+		linear-gradient(160deg, #111a24, #06090d 70%);
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75), var(--dm-glow);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+#topbar .dropdown:hover .dm-aufklapp {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.dm-aufklapp a.dm-aufklapp-punkt,
+.dm-aufklapp a.dm-aufklapp-punkt:link,
+.dm-aufklapp a.dm-aufklapp-punkt:visited {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	height: 32px;
+	padding: 0 12px;
+	overflow: hidden;
+	isolation: isolate;
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-radius: 9px;
+	background: linear-gradient(145deg, #161f29, #0d1218 60%);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 6px rgba(0, 0, 0, 0.65);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	line-height: 1;
+	white-space: nowrap;
+	text-decoration: none;
+	color: #d8e9ff;
+	transition: border-color 0.25s, color 0.25s, transform 0.18s, box-shadow 0.25s;
+
+	&::before {
+		content: attr(data-icon);
+		width: 20px;
+		font-size: 17px;
+		line-height: 1;
+		text-align: center;
+		color: var(--akzent);
+		filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25));
+		transition: transform 0.45s;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: linear-gradient(120deg, transparent 0 40%, rgba(255, 255, 255, 0.07) 45%, transparent 55% 100%);
+		opacity: 0.55;
+		pointer-events: none;
+	}
+}
+
+// Hintergrund ausdrücklich, sonst greift .dropdown-content a:hover (hellgrau) aus dem älteren Teil der Datei
+.dm-aufklapp a.dm-aufklapp-punkt:hover {
+	border-color: var(--akzent);
+	background: linear-gradient(145deg, var(--akzent-weich), #0d1218 75%);
+	box-shadow: var(--dm-glow);
+	color: #ffffff;
+	transform: translateX(3px);
+
+	&::before {
+		transform: scale(1.12) rotate(5deg);
+	}
+}
+
+// Logout abgesetzt, beim Überfahren rot
+.dm-aufklapp a.dm-aufklapp-gefahr {
+	margin-top: 4px;
+
+	&:hover {
+		border-color: #ff4a4a;
+		background: linear-gradient(145deg, rgba(255, 74, 74, 0.2), #0d1218 75%);
+		box-shadow: 0 0 10px rgba(255, 80, 80, 0.6), 0 0 22px rgba(255, 80, 80, 0.35);
+	}
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;
