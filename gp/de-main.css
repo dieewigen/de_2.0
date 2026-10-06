@@ -5054,6 +5054,434 @@ a.art-kachel-zurueck:hover::after {
   color: #8b949e;
 }
 
+.pol {
+  width: 572px;
+}
+
+.pol-navi {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.pol-meldungen {
+  width: 602px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+}
+.pol-meldungen .mod-meldung {
+  margin-bottom: 4px;
+}
+.pol-meldungen .mod-meldung:last-child {
+  margin-bottom: 0;
+}
+
+.pol-abstand {
+  margin-top: 10px;
+}
+
+.pol-text {
+  flex: 1 1 auto;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.pol-text b {
+  color: #ffffff;
+}
+
+.pol-leise {
+  color: #8b949e;
+}
+
+.pol-hinweis {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.mod .pol-hinweis a,
+.mod .pol-hinweis a:link,
+.mod .pol-hinweis a:visited {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--akzent);
+}
+
+.pol .ally-feld > .mod-feld {
+  align-self: flex-start;
+  min-width: 70px;
+}
+
+.pol-zeilenformular {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pol-zeilenformular .mod-eingabe {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.pol-zeilenformular .mod-btn {
+  flex: 0 0 auto;
+}
+
+.pol-steuer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #c9d1d9;
+}
+.pol-steuer .mod-eingabe {
+  width: 70px;
+}
+
+.pol-sk {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pol-sk-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pol-sk-name b {
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.pol-kacheln {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 6px;
+}
+
+.pol-passwort {
+  overflow-wrap: anywhere;
+  font-family: Consolas, "Courier New", monospace;
+  letter-spacing: 0.04em;
+}
+
+.pol-zeile {
+  display: grid;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.pol-liste > .pol-zeile:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.pol-kopfzeile {
+  min-height: 20px;
+  padding-top: 0;
+  padding-bottom: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.pol-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.pol-zahl {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pol-kopfzeile span:not(:first-child) {
+  text-align: right;
+}
+
+.pol-null {
+  color: #484f58;
+}
+
+.pol-stimme {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.pol-kosten {
+  grid-template-columns: 1fr repeat(5, 62px);
+}
+
+.pol-spende {
+  grid-template-columns: 1fr repeat(5, 58px) 62px;
+  font-size: 11px;
+}
+.pol-spende .pol-name {
+  font-size: 12px;
+}
+.pol-spende > .pol-zahl:last-child {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pol-info {
+  grid-template-columns: 1fr 150px 130px;
+}
+.pol-info > span:not(:first-child) {
+  text-align: center;
+}
+
+.pol-kopfzeile.pol-info span:not(:first-child) {
+  text-align: center;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mod a.pol-schalter,
+.mod a.pol-schalter:link,
+.mod a.pol-schalter:visited {
+  display: inline-block;
+  min-width: 44px;
+  padding: 2px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-size: 11px;
+  text-decoration: none;
+  color: #9da7b1;
+}
+
+.mod a.pol-schalter-an,
+.mod a.pol-schalter-an:link,
+.mod a.pol-schalter-an:visited {
+  border-color: rgba(62, 207, 106, 0.5);
+  background: rgba(62, 207, 106, 0.14);
+  color: #5fe08a;
+}
+
+.mod a.pol-schalter:hover {
+  border-color: var(--akzent);
+  color: #ffffff;
+}
+
+.pol-art {
+  grid-template-columns: 1fr 42px 56px repeat(4, 44px) 52px;
+  font-size: 11px;
+}
+.pol-art .pol-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.pol-punkt {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pol-details {
+  margin-top: 10px;
+}
+.pol-details summary {
+  font-size: 11px;
+  color: #8b949e;
+  cursor: pointer;
+}
+.pol-details summary:hover {
+  color: #c9d1d9;
+}
+.pol-details > .pol-zeile:first-of-type {
+  margin-top: 6px;
+}
+
+.pol-details-text {
+  margin: 6px 0;
+  font-size: 11px;
+  color: #9da7b1;
+}
+
+.pol-frage {
+  font-size: 14px;
+  color: #c9d1d9;
+}
+.pol-frage b {
+  color: #ffffff;
+}
+
+.pol-stand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pol-balken {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.pol-balken span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--akzent);
+}
+.pol-balken i {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  background: #ffffff;
+}
+
+.pol-abstimmen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.pol-abstimmen > .mod-typ {
+  flex-basis: 100%;
+}
+
+.pol-optionen {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 6px;
+}
+
+.pol-option {
+  flex: 1 1 0;
+  cursor: pointer;
+}
+.pol-option input {
+  position: absolute;
+  opacity: 0;
+}
+.pol-option span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+  font-weight: 500;
+  color: #c9d1d9;
+}
+.pol-option input:checked + span {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  color: #ffffff;
+}
+.pol-option input:focus-visible + span {
+  box-shadow: 0 0 0 2px var(--akzent-weich);
+}
+.pol-option:hover span {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.pol-npc {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.pol-npc:last-of-type {
+  margin-bottom: 0;
+}
+.pol-npc .pol-details {
+  margin-top: 6px;
+}
+
+.pol-npc-name {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pol-npc-zeile {
+  display: grid;
+  grid-template-columns: 150px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.pol-npc-zeile .mod-eingabe {
+  min-width: 0;
+}
+
+.pol-npc-label {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.pol-haken {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #c9d1d9;
+  cursor: pointer;
+}
+.pol-haken input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+
+.pol-haken-aus {
+  color: #6e7681;
+  cursor: help;
+}
+
+.pol-regler {
+  display: flex;
+  grid-column: span 2;
+  align-items: center;
+  gap: 10px;
+}
+.pol-regler input {
+  flex: 1 1 auto;
+  accent-color: var(--akzent);
+}
+.pol-regler output {
+  min-width: 70px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pol-preset {
+  display: flex;
+  flex-direction: column;
+  padding: 3px 0;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.pol-preset > b {
+  color: #ffffff;
+}
+.pol-preset span b {
+  color: #c9d1d9;
+}
+
 body.mobile {
   height: 100vh;
   height: 100dvh;
