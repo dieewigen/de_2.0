@@ -89,6 +89,7 @@ if((isset($_POST["e_t1"]) ||isset($_POST["e_t2"]) ||isset($_POST["e_t3"]) || iss
 			$fehlermsg=$bkmenu_lang['reswarnung'];
 		}else{
 			$keym=$e_t1;$keyd=$e_t2;$keyi=$e_t3;$keye=$e_t4;
+			$ekey_gespeichert=true;
 			mysqli_execute_query($GLOBALS['dbi'],
 				"UPDATE de_sector SET ekey = ? WHERE sec_id = ?",
 				[$newkey, $sector]);
@@ -150,32 +151,36 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 include "resline.php";
 
-echo '<table border="0" cellpadding="0" cellspacing="2" width="600">';
-echo '<tr align="center">';
-echo '<td><a href="politics.php?s=1" class="btn">'.$politics_lang["allgemein"].'</a></td>';
-
-if($system==issectorcommander()){
-	echo '<td><a href="politics.php?s=2" class="btn">SK-Politik</a></td>';
-    echo '<td><a href="politics.php?s=3" class="btn">'.$politics_lang['npc_config_page_btn'].'</a></td>';
-	echo '<td><a href="bkmenu.php" class="btn">SK-Bau/Flotte</a></td>';
-}
-
-echo '</tr>';
-echo '</table>';
-echo '<br>';
-
-
 if($system!=issectorcommander()){
-	echo '<div class="info_box text2">Fehlende Zugriffsrechte: Diese Seite ist nur f&uuml;r den Sektorkommandanten.</div>';
+	echo '<div class="mod pol-meldungen"><div class="mod-meldung mod-meldung-fehler">Fehlende Zugriffsrechte: Diese Seite ist nur f&uuml;r den Sektorkommandanten.</div>';
+	echo '<a href="politics.php?s=1" class="mod-btn mod-btn-leise">Zur Sektorpolitik</a></div>';
 
 	exit;
 }
 
-echo '<form action="bkmenu.php" method="post">';
+//Reiter wie in der Sektorpolitik (politics.php)
+echo '<div class="mod ally-navi pol-navi">';
+echo '<a href="politics.php?s=1" class="ally-reiter">'.$politics_lang["allgemein"].'</a>';
+echo '<a href="politics.php?s=2" class="ally-reiter">SK-Politik</a>';
+echo '<a href="politics.php?s=3" class="ally-reiter">'.$politics_lang['npc_config_page_btn'].'</a>';
+echo '<a href="bkmenu.php" class="ally-reiter ally-reiter-aktiv">SK-Bau/Flotte</a>';
+echo '</div>';
+
+//Meldungen der Aktionen, ausgegeben unter den Reitern; $art: ok, fehler, warn
+$meldungen = array();
+function bk_meldung($text, $art = 'fehler'){
+	global $meldungen;
+	$meldungen[] = '<div class="mod-meldung mod-meldung-'.$art.'">'.$text.'</div>';
+}
+
+function bk_zahl($wert){
+	return number_format($wert, 0, ",", ".");
+}
 
 function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 	global $bkmenu_lang;
 
+	$rz = 0;
   //teste ob die flotte bereit ist befehle zu bekommen
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT aktion, e2 FROM de_sector WHERE sec_id = ?",
@@ -185,9 +190,8 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 	$schiffe = $row["e2"];
 
 	// $akt wurde bereits gesetzt
-	//echo $schiffe.':'.$akt;
-	if ($schiffe==0) echo $bkmenu_lang['fleeterror1'];
-	if ($schiffe>=1 and $akt<>0) echo $bkmenu_lang['fleeterror2'];
+	if ($schiffe==0) bk_meldung($bkmenu_lang['fleeterror1']);
+	if ($schiffe>=1 and $akt<>0) bk_meldung($bkmenu_lang['fleeterror2']);
 	if ($schiffe>=1 and $akt==0){ //flotte kann befehle bekommen
 	  //teste ob die koordinaten ok sind
 	  if ($zsec=='')$zsec=0;
@@ -206,14 +210,12 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 		$rowx = mysqli_fetch_assoc($db_daten);
 		$ztechs = $rowx["techs"];
 
-		if ($ztechs[1]==1) $ok=1;else $ok=0;//wenn srb dann hinflug m�glich
+		if ($ztechs[1]==1) $ok=1;else $ok=0;//wenn srb dann hinflug möglich
 
 		$rz = 0; // Initialisierung der Variable $rz
 
 		if ($ok==1){
 			$rz=12;
-			//entfernungzuschlag
-			//if ($zsec<$ownsector+5 and $zsec>$ownsector-5) $rz=$rz+0;else $rz=$rz+2;
 
 			//wenn angriff akttyp=1 dann addiere sprungfeldbegrenzer
 			if ($akttyp==1 && $rz>0 && $ztechs[2]==1){
@@ -251,11 +253,11 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 			mysqli_execute_query($GLOBALS['dbi'],
 				"UPDATE de_sector SET aktion = ?, zeit = ?, gesrzeit = ?, zielsec = ?, aktzeit = ? WHERE sec_id = ?",
 				[$akttyp, $rz, $rz, $zsec, $aktzeit, $ownsector]);
-		}else echo $bkmenu_lang['fehlerkeinesrb'].'<br>';
-		//return $rz;
-	  } //else return 0;
-	} //else return 0;
-	if ($rz==0) echo $bkmenu_lang['fehlerflottenbefehle'];
+			bk_meldung('Die Sektorflotte fliegt '.($akttyp==1 ? 'zum Angriff auf' : 'zur Verteidigung von').' Sektor '.$zsec.', Reisezeit '.$rz.' KT.', 'ok');
+		}else bk_meldung($bkmenu_lang['fehlerkeinesrb']);
+	  }
+	}
+	if ($rz==0) bk_meldung($bkmenu_lang['fehlerflottenbefehle']);
 }
 
 function recall($ownsector){
@@ -290,14 +292,14 @@ function recall($ownsector){
 				[$ownsector]);
 		}
 
-		//r�ckzugsnachricht schreiben
+		//rückzugsnachricht schreiben
 		$time=date("YmdHis");
-		//einheiten z�hlen
+		//einheiten zählen
 		$ge=$e2;
 
 		//bk rausfinden
 		$bk=getSKSystemBySecID($zsec);
-		
+
     //user_id vom bk rausfinden
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 			"SELECT user_id FROM de_user_data WHERE sector=? AND system=?",
@@ -317,7 +319,9 @@ function recall($ownsector){
 				"UPDATE de_user_data SET newnews = 1 WHERE user_id = ?",
 				[$uid]);
 		}
+		bk_meldung('Die Sektorflotte kehrt heim'.($zeit==0 ? ' und verteidigt wieder den Sektor.' : ', Reisezeit '.$zeit.' KT.'), 'ok');
 	}//ende der if ($akttyp==1 OR $akttyp==2)
+	else bk_meldung('Die Sektorflotte ist nicht unterwegs.');
 }
 
 $befehle=isset($_POST['befehle']) ? $_POST['befehle'] : '';
@@ -331,7 +335,7 @@ if(!empty($befehle)){
     0: Verteidigung des Heimatsystems
     1: Angriff auf ein System
     2: Verteidigung eines anderen Systems
-    3: R�chflug ins Heimatsystem
+    3: Rüchflug ins Heimatsystem
   */
   //fuer jede flotte eigene sektion
   //flotte 1
@@ -362,12 +366,10 @@ if ($verlegen){
 	if($b1>0){
 		$h=$b1;
 	}
-	
+
 	if ($h>=1){ //es wurde ein wert eingegeben und er ist ok h=anzahl des auftrags
-		//echo 'von'.$from.' nach '.$to;
 		$from=intval($from+1);
 		$to=intval($to+1);
-		//echo 'mach was<br>';
 		$row = mysqli_fetch_assoc($einheiten_daten);
 		$ea=$row["e$from"];//schauen wieviele einheiten vorhanden sind
 		if ($ea>=$h) $ta=$h;else $ta=$ea;
@@ -383,8 +385,11 @@ if ($verlegen){
 			mysqli_execute_query($GLOBALS['dbi'],
 				"UPDATE de_sector SET e$to = e$to + ? WHERE sec_id = ?",
 				[$ta, $sector]);
+			bk_meldung(bk_zahl($ta).' '.($ta==1 ? 'Sektorraumschiff' : 'Sektorraumschiffe').' in die '.($to==2 ? $bkmenu_lang['sektorflotte'] : $bkmenu_lang['wachflotte']).' verlegt.', 'ok');
+		}elseif ($from==$to){
+			bk_meldung('Quelle und Ziel sind dieselbe Flotte.');
 		}else{
-			echo $bkmenu_lang['verlegenwarnung'];
+			bk_meldung($bkmenu_lang['verlegenwarnung']);
 		}
 	}
 }
@@ -462,29 +467,30 @@ if ($prod)//ja, es wurde ein button gedrueckt
       $gr04=$gr04-$srestyp04;
       $gr05=$gr05-$srestyp05;
       mysqli_execute_query($GLOBALS['dbi'],
-        "UPDATE de_sector SET 
+        "UPDATE de_sector SET
          restyp01 = restyp01 - ?,
          restyp02 = restyp02 - ?,
          restyp03 = restyp03 - ?,
          restyp04 = restyp04 - ?,
-         restyp05 = restyp05 - ? 
+         restyp05 = restyp05 - ?
          WHERE sec_id = ?",
         [$gr01, $gr02, $gr03, $gr04, $gr05, $sector]);
 
+      if ($z>0) {
+        bk_meldung(bk_zahl($z).' '.($z==1 ? 'Sektorraumschiff' : 'Sektorraumschiffe').' in Auftrag gegeben, Bauzeit '.$tech_ticks.' WT.'.($z<$prodanz ? ' Für mehr reichen die Rohstoffe nicht.' : ''), 'ok');
+      } else {
+        bk_meldung($bkmenu_lang['nichtgenugres']);
+      }
     }
 
     //transaktionsende
-    $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
-    if ($erg)
+    $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+    if (!$erg)
     {
-        //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
-    }
-    else
-    {
-        print("Datensatz Nr. ".$_SESSION['ums_user_id']." konnte nicht entsperrt werden!<br><br><br>");
+        bk_meldung("Datensatz Nr. ".$_SESSION['ums_user_id']." konnte nicht entsperrt werden!");
     }
   }// if setlock-ende
-  else echo '<br><font color="#FF0000">'.$bkmenu_lang['transactionactive'].'</font><br><br>';
+  else bk_meldung($bkmenu_lang['transactionactive']);
 
 }//submit ende
 
@@ -506,12 +512,12 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 	$srestyp01=$row["restyp01"];$srestyp02=$row["restyp02"];$srestyp03=$row["restyp03"];$srestyp04=$row["restyp04"];
 	$srestyp05=$row["restyp05"];
 	$gr01=$srestyp01;$gr02=$srestyp02;$gr03=$srestyp03;$gr04=$srestyp04;$gr05=$srestyp05;
-	
+
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor, tech_name FROM de_tech_data1 WHERE tech_id=?",
 		[$t]);
 	$row = mysqli_fetch_assoc($db_daten);
-	
+
 	$benrestyp01=floor($row['restyp01']/$kostenfaktor);
 	$benrestyp02=floor($row['restyp02']/$kostenfaktor);
 	$benrestyp03=floor($row['restyp03']/$kostenfaktor);
@@ -519,7 +525,7 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 	$benrestyp05=floor($row['restyp05']/$kostenfaktor);
 
 	$tech_ticks=$row["tech_ticks"];$tech_vor=$row["tech_vor"];
-	
+
 	//schauen obn man ihn bauen darf
 	$z1=0;$z2=0;
 	$vorb=explode(";",$tech_vor);
@@ -529,8 +535,8 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 		if ($techs[$einzelb]==1) $z2++;
 		if ($einzelb==0) {$z1=0;$z2=0;}
 	}
-	if ($z1==$z2) $fehlermsg='';//echo "Vorbedingung erf�llt";
-	else $fehlermsg='<font color="FF0000">'.$bkmenu_lang['fehlendevorbedingung'];
+	if ($z1==$z2) $fehlermsg='';//echo "Vorbedingung erfüllt";
+	else $fehlermsg=$bkmenu_lang['fehlendevorbedingung'];
 
 
 	//genug ressourcen vorhanden?
@@ -546,12 +552,12 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 		$gr04=$gr04-$srestyp04;
 		$gr05=$gr05-$srestyp05;
 		mysqli_execute_query($GLOBALS['dbi'],
-			"UPDATE de_sector SET 
+			"UPDATE de_sector SET
 			restyp01 = restyp01 - ?,
 			restyp02 = restyp02 - ?,
 			restyp03 = restyp03 - ?,
 			restyp04 = restyp04 - ?,
-			restyp05 = restyp05 - ? 
+			restyp05 = restyp05 - ?
 			WHERE sec_id = ?",
 			[$gr01, $gr02, $gr03, $gr04, $gr05, $sector]);
 		mysqli_execute_query($GLOBALS['dbi'],
@@ -572,15 +578,20 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 			"INSERT INTO de_news_sector(wt, typ, sector, text) VALUES (?, 7, ?, ?)",
 			[$maxtick, $sector, $row['tech_name']]);
 
-
-  	}
+		bk_meldung('Bau gestartet: '.$row['tech_name'].', Bauzeit '.$tech_ticks.' WT.', 'ok');
+  	}elseif ($fehlermsg==''){
+		bk_meldung($bkmenu_lang['nichtgenugres']);
+	}
+}elseif ($t>=120){
+	bk_meldung('Es wird bereits ein Sektorgeb&auml;ude gebaut.');
 }
 
-//sektorphalanx
+//sektorphalanx, nur mit Scannerphalanx (vorher fehlte die Prüfung, ohne Gebäude ließ sich per Formular scannen)
 $sc1=$_POST['sc1'] ?? false;
 $sc2=$_POST['sc2'] ?? false;
 $scansec = isset($_POST['scansec']) ? trim($_POST['scansec']) : null;
-if (($sc1 || $sc2) && $scansec){
+$scanbericht = '';
+if (($sc1 || $sc2) && $scansec && $techs[124]==1){
   $scansec=(int)$scansec;
   $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_sector WHERE sec_id=?",
@@ -602,305 +613,158 @@ if (($sc1 || $sc2) && $scansec){
 
       //daten des zielsectors ausgeben
       $zgesschiffe=$row["e1"]+$row["e2"];
-      echo '<br><table border="0" cellpadding="0" cellspacing="1" width="400">';
-      echo '<tr>';
-      echo '<td class="tc" width="100%">'.$bkmenu_lang['scannerbericht1'].' '.$scansec.'</td>';
-      echo '</tr>';
-      echo '</table>';
-      echo '<table border="0" cellpadding="0" cellspacing="1" width="400">';
-      echo '<tr>';
-      echo '<td class="cc">'.$bkmenu_lang['sektorkollektoren'].'</td>';
-      echo '<td class="cc">'.number_format($row['col'], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc" width="40%">Multiplex</td>';
-      echo '<td class="cc" width="60%">'.number_format($row["restyp01"], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">Dyharra</td>';
-      echo '<td class="cc">'.number_format($row["restyp02"], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">Iradium</td>';
-      echo '<td class="cc">'.number_format($row["restyp03"], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">Eternium</td>';
-      echo '<td class="cc">'.number_format($row["restyp04"], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">Tronic</td>';
-      echo '<td class="cc">'.number_format($row["restyp05"], 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">'.$bkmenu_lang['schiffe'].'</td>';
-      echo '<td class="cc">'.number_format($zgesschiffe, 0,"",".").'</td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td class="cc">'.$bkmenu_lang['schiffeimbau'].'</td>';
-      echo '<td class="cc">'.number_format($row1["anzahl"] ?? 0, 0,"",".").'</td>';
-      echo '</tr>';
-      echo '</table>';
+      $werte = array(
+        $bkmenu_lang['sektorkollektoren'] => $row['col'],
+        'Multiplex' => $row["restyp01"],
+        'Dyharra' => $row["restyp02"],
+        'Iradium' => $row["restyp03"],
+        'Eternium' => $row["restyp04"],
+        'Tronic' => $row["restyp05"],
+        $bkmenu_lang['schiffe'] => $zgesschiffe,
+        $bkmenu_lang['schiffeimbau'] => $row1["anzahl"] ?? 0,
+      );
+      $scanbericht .= rahmen_oben($bkmenu_lang['scannerbericht1'].' '.$scansec, false);
+      $scanbericht .= '<div class="mod bk"><div class="bk-scan">';
+      foreach ($werte as $name => $wert) {
+        $scanbericht .= '<div class="ov-wert"><span class="mod-typ">'.$name.'</span><b>'.bk_zahl($wert).'</b></div>';
+      }
+      $scanbericht .= '</div></div>';
+      $scanbericht .= rahmen_unten(false);
 
-
-      //tronic f�r die aktion abziehen
+      //tronic für die aktion abziehen
       mysqli_execute_query($GLOBALS['dbi'],
         "UPDATE de_sector SET restyp05 = restyp05 - 5 WHERE sec_id = ?",
         [$sector]);
       $srestyp05=$srestyp05-5;
     }
-    else echo '<font color="#FF0000">'.$bkmenu_lang['fehlerzuwenigtronic'].'</font>';
+    else bk_meldung($bkmenu_lang['fehlerzuwenigtronic']);
 
     if($sc2) //scanlevel 2
     if($srestyp05>=10)
     {
-      function showsecfleetstatus()
-      {
-      global $scansec, $db, $bkmenu_lang;
-      //ankommende sektorflotten anzeigen
-      echo '<br><table border="0" cellpadding="0" cellspacing="1" width="600">';
-      echo '<tr>';
-      echo '<td class="tc" width="100%">'.$bkmenu_lang['scannerbericht2'].' '.$scansec.'</td>';
-      echo '</tr>';
-      echo '</table>';
+      //Zeile eines Flugs: Ziel, Herkunft, Auftrag, Zeit, Schiffe (Bezeichnungen wie bisher)
+      $flug = function ($row, $ziel, $herkunft) use ($bkmenu_lang) {
+        $a1=$row["aktion"];
+        $t1=$row["zeit"];
+        $at1=$row["aktzeit"];
+        $art='rueckflug';
 
-      echo '<table border="0" cellpadding="0" cellspacing="1" width="600">';
-      echo '<tr align="center">';
-      echo '<td class="cc" width="14%">'.$bkmenu_lang['ziel'].'</td>';
-      echo '<td class="cc" width="16%">'.$bkmenu_lang['herkunft'].'</td>';
-      echo '<td class="cc" width="40%">'.$bkmenu_lang['aktion'].'</td>';
-      echo '<td class="cc" width="10%">'.$bkmenu_lang['reisezeit'].'</td>';
-      echo '<td class="cc" width="20%">'.$bkmenu_lang['anzahl'].'</td>';
-      echo '</tr>';
-	  
+        if ($a1==0) $a1=$bkmenu_lang['systemverteidigung'];
+        elseif ($a1==1) {$a1=$bkmenu_lang['angriff']; $art='angriff';}
+        elseif ($a1==2) {$a1=$bkmenu_lang['verteidigung']; $art='verteidigung';}
+        elseif ($a1==3) {$a1=$bkmenu_lang['rueckflug']; $art='rueckflug';}
+
+        if ($a1[0]=='V' && $t1==0) {$a1=$bkmenu_lang['Verteidige'];$t1=$at1;}
+
+        return '<div class="bk-zeile bk-flug"><span>'.$ziel.'</span><span>'.$herkunft.'</span><span><span class="mil-status mil-status-'.$art.'">'.$a1.'</span></span><span class="bk-zahl">'.$t1.' KT</span><span class="bk-zahl"><b>'.bk_zahl($row["e2"]).'</b></span></div>';
+      };
+
+      $zeilen = '';
       //flotten die zu dem sektor hinfliegen
       $flotten = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = ? AND sec_id <> ?",
         [$scansec, $scansec]);
-      $fa = mysqli_num_rows($flotten);
-      $i = 0;
       while ($row = mysqli_fetch_assoc($flotten))
       {
-        //$zsec1=$row["zielsec"];
-        $sec_id=$row["sec_id"];
-        $a1=$row["aktion"];
-        $t1=$row["zeit"];
-        $at1=$row["aktzeit"];
-
-        if ($a1==0) $a1=$bkmenu_lang['systemverteidigung'];
-        elseif ($a1==1) {$a1=$bkmenu_lang['angriff']; $cl='ccr';}
-        elseif ($a1==2) {$a1=$bkmenu_lang['verteidigung']; $cl='ccg';}
-        elseif ($a1==3) {$a1=$bkmenu_lang['rueckflug']; $cl='cc';}
-
-        if ($a1[0]=='V' && $t1==0) {$a1=$bkmenu_lang['Verteidige'];$t1=$at1;}
-
-        //einheiten z�hlen
-        $ge=$row["e2"];
-
-        echo '<tr>';
-        echo '<td class="'.$cl.'">'.$bkmenu_lang['sektor'].'</td>';
-        echo '<td class="'.$cl.'">['.$sec_id.']</td>';
-        echo '<td class="'.$cl.'">'.$a1.'</td>';
-        echo '<td class="'.$cl.'">'.$t1.'</td>';
-        echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';
-        echo '</tr>';
-        $i++;
+        $zeilen .= $flug($row, $bkmenu_lang['sektor'].' '.$scansec, $bkmenu_lang['sektor'].' '.$row["sec_id"]);
       }
 
       //flotten des gescannten sektors
       $flotten = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion <> 0 AND sec_id = ?",
         [$scansec]);
-      $fa = mysqli_num_rows($flotten);
-      $i = 0;
       while ($row = mysqli_fetch_assoc($flotten))
       {
-        $zsec1=$row["zielsec"];
-        $sec_id=$row["sec_id"];
-        $a1=$row["aktion"];
-        $t1=$row["zeit"];
-        $at1=$row["aktzeit"];
-
-        if ($a1==0) $a1=$bkmenu_lang['systemverteidigung'];
-        elseif ($a1==1) {$a1=$bkmenu_lang['angriff']; $cl='ccr';}
-        elseif ($a1==2) {$a1=$bkmenu_lang['verteidigung']; $cl='ccg';}
-        elseif ($a1==3) {$a1=$bkmenu_lang['rueckflug']; $cl='cc';}
-
-        if ($a1[0]=='V' && $t1==0) {$a1=$bkmenu_lang['Verteidige'];$t1=$at1;}
-
-        //einheiten z�hlen
-        $ge=$row["e2"];
-
-        echo '<tr>';
-        echo '<td class="'.$cl.'">['.$zsec1.']</td>';
-        echo '<td class="'.$cl.'">'.$bkmenu_lang['sektor'].'</td>';
-        echo '<td class="'.$cl.'">'.$a1.'</td>';
-        echo '<td class="'.$cl.'">'.$t1.'</td>';
-        echo '<td class="'.$cl.'">'.number_format($ge, 0,"",".").'</td>';
-        echo '</tr>';
-        $i++;
-
+        $zeilen .= $flug($row, $bkmenu_lang['sektor'].' '.$row["zielsec"], $bkmenu_lang['sektor'].' '.$scansec);
       }
 
-      echo '</table>';
+      $scanbericht .= rahmen_oben($bkmenu_lang['scannerbericht2'].' '.$scansec, false);
+      $scanbericht .= '<div class="mod bk">';
+      if ($zeilen == '') {
+        $scanbericht .= '<div class="mod-leer">Keine Flottenbewegungen.</div>';
+      } else {
+        $scanbericht .= '<div class="bk-zeile bk-flug bk-kopfzeile"><span>'.$bkmenu_lang['ziel'].'</span><span>'.$bkmenu_lang['herkunft'].'</span><span>'.$bkmenu_lang['aktion'].'</span><span>'.$bkmenu_lang['reisezeit'].'</span><span>'.$bkmenu_lang['schiffe'].'</span></div>';
+        $scanbericht .= '<div class="bk-liste">'.$zeilen.'</div>';
       }
-      showsecfleetstatus();
-      //tronic f�r die aktion abziehen
+      $scanbericht .= '</div>';
+      $scanbericht .= rahmen_unten(false);
+
+      //tronic für die aktion abziehen
       mysqli_execute_query($GLOBALS['dbi'],
         "UPDATE de_sector SET restyp05 = restyp05 - 10 WHERE sec_id = ?",
         [$sector]);
       $srestyp05=$srestyp05-10;
     }
-    else echo '<font color="#FF0000">'.$bkmenu_lang['fehlerzuwenigtronic'].'</font>';
+    else bk_meldung($bkmenu_lang['fehlerzuwenigtronic']);
   }
-  else echo '<font color="#FF0000">'.$bkmenu_lang['keinedaten'].'</font>';
+  else bk_meldung($bkmenu_lang['keinedaten']);
 }
 
-echo '<br>';
-//echo '<div class="cellu" style="width: 450px;"><b>'.$bkmenu_lang[bkmenu].'</b></div><br>';
+//Hinweise zum Energieverteilungsschlüssel (oben gesetzt) und fehlende Vorbedingung
+if ($fehlermsg!='') bk_meldung($fehlermsg, $fehlermsg==$bkmenu_lang['reswarnung'] ? 'warn' : 'fehler');
+if (!empty($ekey_gespeichert)) bk_meldung('Der Energieverteilungsschl&uuml;ssel ist gespeichert.', 'ok');
 
-if ($fehlermsg!='')echo '<table width=600><tr><td class="ccr">'.$fehlermsg.'</td></tr></table><br>';
+if (count($meldungen) > 0) {
+	echo '<div class="mod pol-meldungen">'.implode('', $meldungen).'</div>';
+}
+echo $scanbericht;
 
+//Sektorlager
 rahmen_oben($bkmenu_lang['sektorlagerbestand']);
-?>
-<table width="570" border="0" cellpadding="0" cellspacing="1">
-<tr>
-<td class="tc">Multiplex</td>
-<td class="tc">Dyharra</td>
-<td class="tc">Iradium</td>
-<td class="tc">Eternium</td>
-<td class="tc">Tronic</td>
-</tr>
-<tr align="center">
-
-<?php
-$bg='cell1';
-echo '<td class="'.$bg.'">'.number_format($srestyp01, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($srestyp02, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($srestyp03, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($srestyp04, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($srestyp05, 0,"",".")."</td>";
-echo '</tr></table>';
+echo '<div class="mod bk"><div class="bk-lager">';
+foreach (array('Multiplex' => $srestyp01, 'Dyharra' => $srestyp02, 'Iradium' => $srestyp03, 'Eternium' => $srestyp04, 'Tronic' => $srestyp05) as $name => $wert) {
+	echo '<div class="ov-wert"><span class="mod-typ">'.$name.'</span><b>'.bk_zahl($wert).'</b></div>';
+}
+echo '</div></div>';
 rahmen_unten();
-echo '<br>';
 
+//Sektorkollektoren: Verteilung der Energie auf die Rohstoffe
 rahmen_oben($bkmenu_lang['sektorkollektoren']);
-echo '<table width="570" border="0" cellpadding="0" cellspacing="1">';
-//kollektorenergieausbeute
-$bg='cell';
-echo '<tr height="25"><td width="35%" class="'.$bg.'" align="left">'.$bkmenu_lang['kollektorenergieausbeute'].'</td><td colspan="4" class="'.$bg.'" align="center"> '.number_format($eages, 0,"",".").' ('.$bkmenu_lang['kollektoren'].': '.number_format($seccol, 0,"",".").')</td></tr>';
-
-//energie-materieumwandlung
-$bg='cell1';
-echo '<tr height="25" align="center"><td width="35%" class="'.$bg.'" align="left"><b>'.$bkmenu_lang['energiematerieumwandlung'].'</b></td>
-<td class="'.$bg.'"><b>Multiplex</b></td>
-<td class="'.$bg.'"><b>Dyharra</b></td>
-<td class="'.$bg.'"><b>Iradium</b></td>
-<td class="'.$bg.'"><b>Eternium</b></td>
-</tr>';
-
-//energieverteilungssch�ssel
-$bg='cell';
-echo '<tr height="25" align="center"><td class="'.$bg.'" align="left">'.$bkmenu_lang['energieverteilungsschluessel'].'</td>';
-echo '<td class="'.$bg.'"><input type="text" name="e_t1" value="'.$keym.'" size="3" maxlength="3">&nbsp;%</td>';
-echo '<td class="'.$bg.'"><input type="text" name="e_t2" value="'.$keyd.'" size="3" maxlength="3">&nbsp;%</td>';
-echo '<td class="'.$bg.'"><input type="text" name="e_t3" value="'.$keyi.'" size="3" maxlength="3">&nbsp;%</td>';
-echo '<td class="'.$bg.'"><input type="text" name="e_t4" value="'.$keye.'" size="3" maxlength="3">&nbsp;%</td>';
-echo '</tr>';
-
-//energieinput
-$bg='cell1';
-echo '<tr height="25" align="center"><td class="'.$bg.'" align="left">'.$bkmenu_lang['energieinput'].'</td>';
-echo '<td class="'.$bg.'">'.number_format($em, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ed, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ei, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format($ee, 0,"",".")."</td>";
-echo '</tr>';
-
-//umwandlungsverh�ltnis
-$bg='cell';
-if($techs[120]==0)
-{
-  echo '<tr height="25" align="center"><td class="'.$bg.'" align="left">'.$bkmenu_lang['umwandlungsverhaeltnis'].'</td>';
-  echo '<td class="'.$bg.'">2:1</td>';
-  echo '<td class="'.$bg.'">4:1</td>';
-  echo '<td class="'.$bg.'">6:1</td>';
-  echo '<td class="'.$bg.'">8:1</td>';
-  echo '</tr>';
+echo '<form action="bkmenu.php" method="post" class="mod bk">';
+echo '<div class="bk-kopf"><span><b>'.bk_zahl($seccol).'</b> '.$bkmenu_lang['kollektoren'].'</span><span><b>'.bk_zahl($eages).'</b> Energie je WT</span></div>';
+if($techs[120]==0){
+	$verhaeltnis = array('2:1', '4:1', '6:1', '8:1');
+}else{
+	$verhaeltnis = array('1:1', '2:1', '3:1', '4:1');
 }
-else
-{
-  echo '<tr height="25" align="center"><td class="'.$bg.'" align="left">'.$bkmenu_lang['umwandlungsverhaeltnis'].'</td>';
-  echo '<td class="'.$bg.'">1:1</td>';
-  echo '<td class="'.$bg.'">2:1</td>';
-  echo '<td class="'.$bg.'">3:1</td>';
-  echo '<td class="'.$bg.'">4:1</td>';
-  echo '</tr>';
+$schluessel = array($keym, $keyd, $keyi, $keye);
+$energie = array($em, $ed, $ei, $ee);
+$ertrag = array($rm, $rd, $ri, $re);
+echo '<div class="bk-energie">';
+echo '<span></span><span class="bk-spalte">Multiplex</span><span class="bk-spalte">Dyharra</span><span class="bk-spalte">Iradium</span><span class="bk-spalte">Eternium</span>';
+echo '<span class="bk-label">Verteilung</span>';
+for ($i = 0; $i < 4; $i++) {
+	echo '<span class="bk-prozent"><input type="text" name="e_t'.($i+1).'" value="'.$schluessel[$i].'" maxlength="3" inputmode="numeric" autocomplete="off" class="mod-eingabe bk-schluessel">%</span>';
 }
-
-//gesamtertrag
-$bg='cell1';
-echo '<tr height="25" align="center"><td class="'.$bg.'" align="left"><b>'.$bkmenu_lang['gesamtrohstoffertrag'].'</b></td>';
-echo '<td class="'.$bg.'"><b>'.number_format($rm, 0,"",".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($rd, 0,"",".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($ri, 0,"",".")."</b></td>";
-echo '<td class="'.$bg.'"><b>'.number_format($re, 0,"",".")."</b></td>";
-echo '</tr>';
-
-
-
-echo '</table>';
+echo '<span class="bk-label">'.$bkmenu_lang['energieinput'].'</span>';
+for ($i = 0; $i < 4; $i++) {
+	echo '<span class="bk-zahl">'.bk_zahl($energie[$i]).'</span>';
+}
+echo '<span class="bk-label">'.$bkmenu_lang['umwandlungsverhaeltnis'].'</span>';
+for ($i = 0; $i < 4; $i++) {
+	echo '<span class="bk-zahl bk-leise">'.$verhaeltnis[$i].'</span>';
+}
+echo '<span class="bk-label"><b>Ertrag je WT</b></span>';
+for ($i = 0; $i < 4; $i++) {
+	echo '<span class="bk-zahl"><b>'.bk_zahl($ertrag[$i]).'</b></span>';
+}
+echo '</div>';
+echo '<div class="bk-fuss"><span class="bk-summe">Summe <b id="bk-summe">'.($keym + $keyd + $keyi + $keye).'</b> % von 100 %</span>';
+echo '<button type="submit" class="mod-btn">Verteilung speichern</button></div>';
+echo '</form>';
 rahmen_unten();
 
-
-echo '<input type="image" src="'.'gp/'.'g/e.gif" style="width:0; height=0; border:0px;">';
-echo '</form>';
-echo '<form action="bkmenu.php" method="post">';
-
-?>
-
-
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="159" class="ro"><div class="cellu">&nbsp;<?php echo $bkmenu_lang['gebaeude']?>:</div></td>
-<td width="59" align="center" class="ro"><div class="cellu">M</div></td>
-<td width="59" align="center" class="ro"><div class="cellu">D</div></td>
-<td width="59" align="center" class="ro"><div class="cellu">I</div></td>
-<td width="59" align="center" class="ro"><div class="cellu">E</div></td>
-<td width="49" align="center" class="ro"><div class="cellu">T</div></td>
-<td width="45" align="center" class="ro"><div class="cellu"><?php echo $bkmenu_lang['wochen']?></div></td>
-<td width="70" align="center" class="ro"><div class="cellu"><?php echo $bkmenu_lang['status']?></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="8">
-
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="159">
-<col width="59">
-<col width="59">
-<col width="59">
-<col width="59">
-<col width="49">
-<col width="45">
-<col width="70">
-</colgroup>
-<?php
-$bg='cell1';
-
-$c1=0;$c2=0;
+//Sektorgebäude
+rahmen_oben('Sektorgeb&auml;ude');
+echo '<div class="mod bk">';
+echo '<div class="bk-zeile bk-geb bk-kopfzeile"><span>'.$bkmenu_lang['gebaeude'].'</span><span>M</span><span>D</span><span>I</span><span>E</span><span>T</span><span>'.$bkmenu_lang['wochen'].'</span><span></span></div>';
+echo '<div class="bk-liste">';
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
 	"SELECT tech_id, tech_name, restyp01, restyp02, restyp03, restyp04, restyp05, tech_ticks, tech_vor FROM de_tech_data1 WHERE tech_id>119 AND tech_id<130 ORDER BY tech_id");
-$num = mysqli_num_rows($db_daten);
-
-for ($i=0; $i<$num; $i++) //jeder gefundene datensatz wird geprueft
+while ($row = mysqli_fetch_assoc($db_daten)) //jeder gefundene datensatz wird geprueft
 {
   //zerlege vorbedinguns-string
   $z1=0;$z2=0;
-  $row = mysqli_fetch_assoc($db_daten);
   $tech_vor = $row["tech_vor"];
   $vorb=explode(";",$tech_vor);
   foreach($vorb as $einzelb) //jede einzelne bedingung checken
@@ -909,244 +773,153 @@ for ($i=0; $i<$num; $i++) //jeder gefundene datensatz wird geprueft
     if ($techs[$einzelb]==1) $z2++;
     if ($einzelb==0) {$z1=0;$z2=0;}
   }
-  if ($z1==$z2) //echo "Vorbedingung erf�llt";
+  if ($z1==$z2) //Vorbedingung erfüllt
   {
-    if ($c1==0)
-    {
-      $c1=1;
-      $bg='cell';
+    $kosten = array();
+    $bezahlbar = true;
+    for ($r = 1; $r <= 5; $r++) {
+      $kosten[$r] = $row['restyp0'.$r]/$kostenfaktor;
+      //wie beim Bauen: abgerundete Kosten gegen das Sektorlager
+      if (${'srestyp0'.$r} < floor($kosten[$r])) $bezahlbar = false;
     }
-    else
-    {
-      $c1=0;
-      $bg='cell1';
+    $gebnr = $row["tech_id"];
+    if ($buildgnr == $gebnr) {
+      $status = '<span class="mod-chip bk-imbau">'.$functions['imbau'].' ('.$buildgtime.' WT)</span>';
+    } elseif ($techs[$gebnr] == 1) {
+      $status = '<span class="mod-chip mod-chip-gruen">'.$functions['gebaut'].'</span>';
+    } elseif ($buildgnr > 0) {
+      $status = '<span class="bk-leise">ausgelastet</span>';
+    } elseif (!$bezahlbar) {
+      $status = '<span class="bk-leise">Rohstoffe fehlen</span>';
+    } else {
+      $status = '<a href="bkmenu.php?ida='.$gebnr.'" class="mod-btn ally-btn-klein" data-bestaetigen="Wirklich bauen?">'.$functions['bauen'].'</a>';
     }
-    showtech($row["tech_name"], $row["tech_id"],
-	  $row["restyp01"]/$kostenfaktor, 
-	  $row["restyp02"]/$kostenfaktor,
-	  $row["restyp03"]/$kostenfaktor, 
-	  $row["restyp04"]/$kostenfaktor,
-      $row["restyp05"]/$kostenfaktor,
-      $row["tech_ticks"], $buildgnr, $techs, 2, $buildgtime, $bg, 0);
+    echo '<div class="bk-zeile bk-geb'.($techs[$gebnr] == 1 ? ' bk-gebaut' : '').'">';
+    echo '<span class="bk-name"><a href="help.php?t='.$gebnr.'">'.$row["tech_name"].'</a></span>';
+    for ($r = 1; $r <= 5; $r++) {
+      echo '<span class="bk-zahl'.($kosten[$r] == 0 ? ' bk-null' : '').'">'.number_format($kosten[$r], 0, "", ".").'</span>';
+    }
+    echo '<span class="bk-zahl">'.$row["tech_ticks"].'</span>';
+    echo '<span class="bk-status">'.$status.'</span>';
+    echo '</div>';
   }
 }
-//echo "</table>";
-?>
+echo '</div>';
+echo '</div>';
+rahmen_unten();
 
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td colspan="8" class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-<?php
 if ($techs[122]==1) //raumwerft vorhanden?
 {
-?>
-<br>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37" align="center">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="175" class="ro" align="left"><div class="cellu">&nbsp;&nbsp;<?php echo $bkmenu_lang['einheit']?>:</div></td>
-<td width="50" class="ro"><div class="cellu">M</div></td>
-<td width="50" class="ro"><div class="cellu">D</div></td>
-<td width="50" class="ro"><div class="cellu">I</div></td>
-<td width="50" class="ro"><div class="cellu">E</div></td>
-<td width="50" class="ro"><div class="cellu">T</div></td>
-<td width="45" class="ro"><div class="cellu"><?php echo $bkmenu_lang['wochen']?></div></td>
-<td width="45" class="ro"><div class="cellu"><?php echo $bkmenu_lang['stueck']?></div></td>
-<td width="35" class="ro"><div class="cellu"><?php echo $bkmenu_lang['bauen']?></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="9">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="175">
-<col width="50">
-<col width="50">
-<col width="50">
-<col width="50">
-<col width="50">
-<col width="45">
-<col width="45">
-<col width="35">
-</colgroup>
-<?php
-echo '<tr valign="middle" align="center" height="25">';
-echo '<td class="'.$bg.'" height="25"><div align="left">'.$bkmenu_lang['sektorraumschiff'].'</a></div></td>';
-echo '<td class="'.$bg.'">'.number_format(2000*(1-$baukostenreduzierung), 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format(500*(1-$baukostenreduzierung), 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format(500*(1-$baukostenreduzierung), 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format(2000*(1-$baukostenreduzierung), 0,"",".")."</td>";
-echo '<td class="'.$bg.'">'.number_format(0, 0,"",".")."</td>";
-echo '<td class="'.$bg.'">16</td>';
-echo '<td class="'.$bg.'">'.($showe1+$showe2)."</td>";
-echo '<td class="'.$bg.'"><input type="text" name="prodanz" value="" size="4" maxlength="5"></td>';
-echo "</tr>";
-?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td colspan="9" class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-<?php
-echo '<br><input type="Submit" name="prod" value="'.$bkmenu_lang['bauen'].'"><br>';
+	//Sektorraumschiffe bauen
+	$schiffkosten = array(2000*(1-$baukostenreduzierung), 500*(1-$baukostenreduzierung), 500*(1-$baukostenreduzierung), 2000*(1-$baukostenreduzierung), 0);
+	$lager = array($srestyp01, $srestyp02, $srestyp03, $srestyp04, $srestyp05);
+	$max = PHP_INT_MAX;
+	foreach ($schiffkosten as $i => $k) {
+		if ($k > 0) $max = min($max, floor($lager[$i] / $k));
+	}
 
-//zeige aktive bauauftr�ge an
-$result = mysqli_execute_query($GLOBALS['dbi'],
-	"SELECT anzahl, verbzeit FROM de_sector_build WHERE sector_id=? AND tech_id=1 ORDER BY verbzeit ASC",
-	[$sector]);
-$num = mysqli_num_rows($result);
-if ($num>0)
-{
-echo '<br><table border="0" cellpadding="0" cellspacing="1" width="310" bgcolor="#000000">';
-echo '<tr>';
-echo '<td class="tc" width="100%">'.$bkmenu_lang['aktivebauauftraege'].'</td>';
-echo '</tr>';
-echo '</table>';
-echo '<table border="0" cellpadding="0" cellspacing="1" width="310" bgcolor="#000000">';
-echo '<tr>';
-echo '<td class="tc" width="60%">'.$bkmenu_lang['einheit'].'</td>';
-echo '<td class="tc" width="20%">'.$bkmenu_lang['stueck'].'</td>';
-echo '<td class="tc" width="20%">'.$bkmenu_lang['wochen'].'</td>';
-echo '</tr>';
-echo '</table>';
+	rahmen_oben('Sektorraumschiffe bauen');
+	echo '<form action="bkmenu.php" method="post" class="mod bk">';
+	echo '<div class="bk-zeile bk-schiff bk-kopfzeile"><span>'.$bkmenu_lang['einheit'].'</span><span>M</span><span>D</span><span>I</span><span>E</span><span>T</span><span>'.$bkmenu_lang['wochen'].'</span><span>'.$bkmenu_lang['stueck'].'</span></div>';
+	echo '<div class="bk-zeile bk-schiff"><span class="bk-name">'.$bkmenu_lang['sektorraumschiff'].'</span>';
+	foreach ($schiffkosten as $k) {
+		echo '<span class="bk-zahl'.($k == 0 ? ' bk-null' : '').'">'.number_format($k, 0, "", ".").'</span>';
+	}
+	echo '<span class="bk-zahl">16</span><span class="bk-zahl">'.($showe1+$showe2).'</span></div>';
+	echo '<div class="bk-fuss"><span class="bk-leise">Mit dem Sektorlager sind bis zu <b>'.bk_zahl($max).'</b> baubar.</span>';
+	echo '<span class="bk-bauen"><input type="text" name="prodanz" value="" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="Anzahl" class="mod-eingabe">';
+	echo '<button type="submit" name="prod" value="'.$bkmenu_lang['bauen'].'" class="mod-btn">'.$bkmenu_lang['bauen'].'</button></span></div>';
 
-while($row = mysqli_fetch_assoc($result)) //jeder gefundene datensatz wird geprueft
-{
-echo '<table border="0" cellpadding="0" cellspacing="1" width="310" bgcolor="#000000">';
-echo '<tr>';
-echo '<td class="cc" width="60%" align="center">'.$bkmenu_lang['sektorraumschiff'].'</td>';
-echo '<td class="cc" width="20%" align="center">'.$row["anzahl"].'</td>';
-echo '<td class="cc" width="20%" align="center">'.$row["verbzeit"].'</td>';
-echo '</tr>';
-echo '</table>';
-}
-}//ende bauauftr�ge
-echo '<br>';
+	//zeige aktive bauaufträge an
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT anzahl, verbzeit FROM de_sector_build WHERE sector_id=? AND tech_id=1 ORDER BY verbzeit ASC",
+		[$sector]);
+	if (mysqli_num_rows($result) > 0)
+	{
+		echo '<div class="ally-abschnitt"><div class="mod-typ">'.$bkmenu_lang['aktivebauauftraege'].'</div><div class="bk-liste">';
+		while($row = mysqli_fetch_assoc($result))
+		{
+			echo '<div class="bk-zeile bk-auftrag"><span>'.$bkmenu_lang['sektorraumschiff'].'</span><span class="bk-zahl"><b>'.bk_zahl($row["anzahl"]).'</b> '.$bkmenu_lang['stueck'].'</span><span class="bk-zahl bk-leise">noch '.$row["verbzeit"].' WT</span></div>';
+		}
+		echo '</div></div>';
+	}
+	echo '</form>';
+	rahmen_unten();
 
-rahmen_oben($bkmenu_lang['flottenaufstellung']);
-?>
-<table border="0" cellpadding="0" cellspacing="1">
-<tr align="center">
-<td class="tc">&nbsp;</td>
-<td class="tc"><?php echo $bkmenu_lang['wachflotte']?></td>
-<td class="tc"><?php echo $bkmenu_lang['sektorflotte']?></td>
-</tr>
-<?php
-echo '<tr>';
-echo '<td width="205" class="cc">'.$bkmenu_lang['sektorraumschiff'].'</td>';
-echo '<td width="180" class="cc">'.number_format($showe1, 0,"",".").'</td>';
-echo '<td width="180" class="cc">'.number_format($showe2, 0,"",".").'</td>';
-echo "</tr>";
-echo '<tr align="center">';
-echo '<td class="cc">Reisezeit</td>';
-echo '<td class="cc">&nbsp;</td>';
-echo '<td class="cc">12</td>';
-echo "</tr>";
-/*
-echo '<tr align="center">';
-echo '<td class="cc"><font color="#FDFB59">'.$bkmenu_lang[nahesektoren].'</td>';
-echo '<td class="cc">&nbsp;</td>';
-echo '<td class="cc"><font color="#FDFB59">12</td>';
-echo "</tr>";
-echo '<tr align="center">';
-echo '<td class="cc"><font color="#F10505">'.$bkmenu_lang[fernesektoren].'</td>';
-echo '<td class="cc">&nbsp;</td>';
-echo '<td class="cc"><font color="#F10505">14</td>';
-*/
-echo "</tr></table>";
-echo rahmen_unten();
+	//Sektorflotte: Aufstellung, Verlegen, Befehle
+	if ($a1==0) {
+		$auftrag = array('heim', $bkmenu_lang['sektorverteidigung'], '');
+	} elseif ($a1==1) {
+		$auftrag = array('angriff', $bkmenu_lang['angriff'], 'Sektor '.$zsec1.' &middot; '.$t1.' KT');
+	} elseif ($a1==2 && $t1==0) {
+		$auftrag = array('verteidigung', $bkmenu_lang['Verteidige'], 'Sektor '.$zsec1.' &middot; noch '.$at1.' KT');
+	} elseif ($a1==2) {
+		$auftrag = array('verteidigung', $bkmenu_lang['verteidigung'], 'Sektor '.$zsec1.' &middot; '.$t1.' KT');
+	} else {
+		$auftrag = array('rueckflug', $bkmenu_lang['rueckflug'], $t1.' KT');
+	}
 
-//einheiten verlegen
+	rahmen_oben($bkmenu_lang['flottenaufstellung']);
+	echo '<div class="mod bk">';
+	echo '<div class="bk-flotten">';
+	echo '<div class="ov-wert"><span class="mod-typ">'.$bkmenu_lang['wachflotte'].'</span><b>'.bk_zahl($showe1).'</b><small>bleibt im Sektor</small></div>';
+	echo '<div class="ov-wert"><span class="mod-typ">'.$bkmenu_lang['sektorflotte'].'</span><b>'.bk_zahl($showe2).'</b><small><span class="mil-status'.($auftrag[0] != 'heim' ? ' mil-status-'.$auftrag[0] : '').'">'.$auftrag[1].'</span> '.$auftrag[2].'</small></div>';
+	echo '</div>';
 
-rahmen_oben($bkmenu_lang['einheitenverlegen']);
-echo '<table border="0" cellpadding="0" cellspacing="1">';
-echo '<tr>';
-echo '<td width="175" class="tc">&nbsp;</td>';
-echo '<td width="110" class="tc">'.$bkmenu_lang['anzahl'].'</td>';
-echo '<td width="140" class="tc">'.$bkmenu_lang['von'].'</td>';
-echo '<td width="140" class="tc">'.$bkmenu_lang['nach'].'</td>';
-echo '</tr>';
-echo '<tr>';
-echo '<td class="cc">'.$bkmenu_lang['sektorraumschiff'].'</td>';
-echo '<td class="cc"><input type="text" name="b1" value="" size="5" maxlength="9"></td>';
-echo '<td class="cc"><select name="from1" size=0><option value=0>'.$bkmenu_lang['wachflotte'].'</option><option value=1>'.$bkmenu_lang['sektorflotte'].'</option></select></td>';
-echo '<td class="cc"><select name="to1" size=0><option value=0>'.$bkmenu_lang['wachflotte'].'</option><option value=1>'.$bkmenu_lang['sektorflotte'].'</option></select></td>';
-echo '</tr>';
-echo '<tr><td align="center" colspan="4"><input type="Submit" name="verlegen" value="'.$bkmenu_lang['verlegen'].'"></td></tr>';
-echo '</table>';
-rahmen_unten();
+	//einheiten verlegen
+	echo '<form action="bkmenu.php" method="post" class="ally-abschnitt">';
+	echo '<div class="mod-typ">'.$bkmenu_lang['einheitenverlegen'].'</div>';
+	echo '<div class="bk-formzeile">';
+	echo '<input type="text" name="b1" value="" maxlength="9" inputmode="numeric" autocomplete="off" placeholder="Anzahl" class="mod-eingabe bk-anzahl">';
+	echo '<label class="bk-wahl"><span>'.$bkmenu_lang['von'].'</span><select name="from1" class="mod-eingabe"><option value="0">'.$bkmenu_lang['wachflotte'].'</option><option value="1">'.$bkmenu_lang['sektorflotte'].'</option></select></label>';
+	echo '<label class="bk-wahl"><span>'.$bkmenu_lang['nach'].'</span><select name="to1" class="mod-eingabe"><option value="0">'.$bkmenu_lang['wachflotte'].'</option><option value="1" selected>'.$bkmenu_lang['sektorflotte'].'</option></select></label>';
+	echo '<button type="submit" name="verlegen" value="'.$bkmenu_lang['verlegen'].'" class="mod-btn mod-btn-leise">Verlegen</button>';
+	echo '</div></form>';
 
-//flotten verlegen
-rahmen_oben($bkmenu_lang['flottenbefehleerteilen']);
-echo '<table border="0" cellpadding="0" cellspacing="1">';
-echo '<tr>';
-
-echo '<td width="145" class="tc">'.$bkmenu_lang['flotte'].'</td>';
-echo '<td width="150" class="tc">'.$bkmenu_lang['aktuellebefehle'].'</td>';
-echo '<td width="170" class="tc">'.$bkmenu_lang['befehl'].'</td>';
-echo '<td width="100" class="tc">'.$bkmenu_lang['zielsektor'].'</td>';
-echo "</tr>";
-echo '<tr>';
-//echo '<td class="cc">'.$bkmenu_lang[sflotte].'</td>';
-echo '<td class="cc">Sektorflotte</td>';
-//rausfinden, was die flotte gerade macht
-if ($a1==0) $a1=$bkmenu_lang['sektorverteidigung'];
-elseif ($a1==1) $a1=$bkmenu_lang['angriff'].' ('.$zsec1.') '.$bkmenu_lang['reisezeit'].': '.$t1;
-elseif ($a1==2) $a1=$bkmenu_lang['verteidigung'].' ('.$zsec1.') '.$bkmenu_lang['reisezeit'].': '.$t1;
-elseif ($a1==3) $a1='&nbsp;&nbsp;'.$bkmenu_lang['rueckflug'].'&nbsp;&nbsp; '.$bkmenu_lang['reisezeit'].': '.$t1;
-
-if ($a1[0]=='V' && $t1==0) $a1=$bkmenu_lang['Verteidige'].' ('.$zsec1.') '.$bkmenu_lang['zeit'].': '.$at1;
-
-
-echo '<td class="cc">'.$a1.'</td>';
-echo '<td class="cc"><select name="af1" size=0><option value=0>'.$bkmenu_lang['befehlebeibehalten'].'</option><option value=1>'.$bkmenu_lang['heimkehr'].'</option><option value=2>'.$bkmenu_lang['angreifen'].'</option><option value=3>'.$bkmenu_lang['verteidige1woche'].'</option><option  value=4>'.$bkmenu_lang['verteidige2wochen'].'</option><option  value=5>'.$bkmenu_lang['verteidige3wochen'].'</option></select></td>';
-echo '<td class="cc"><input type="text" name="zsecf1" value="" size="3" maxlength="5"></td>';
-echo "</tr>";
-echo '<tr><td colspan="4" align="center"><input type="Submit" name="befehle" value="'.$bkmenu_lang['befehleerteilen'].'"></td></tr>';
-echo '</table>';
-rahmen_unten();
+	//flottenbefehle
+	echo '<form action="bkmenu.php" method="post" class="ally-abschnitt">';
+	echo '<div class="mod-typ">'.$bkmenu_lang['flottenbefehleerteilen'].'</div>';
+	echo '<div class="bk-formzeile">';
+	echo '<select name="af1" class="mod-eingabe bk-befehl">';
+	echo '<option value="0">'.$bkmenu_lang['befehlebeibehalten'].'</option><option value="1">'.$bkmenu_lang['heimkehr'].'</option><option value="2">'.$bkmenu_lang['angreifen'].'</option>';
+	echo '<option value="3">Verteidige 1 KT</option><option value="4">Verteidige 2 KT</option><option value="5">Verteidige 3 KT</option>';
+	echo '</select>';
+	echo '<input type="text" name="zsecf1" value="" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="'.$bkmenu_lang['zielsektor'].'" class="mod-eingabe bk-anzahl">';
+	echo '<button type="submit" name="befehle" value="'.$bkmenu_lang['befehleerteilen'].'" class="mod-btn">'.$bkmenu_lang['befehleerteilen'].'</button>';
+	echo '</div>';
+	echo '<div class="bk-hinweis">Es fliegt nur die Sektorflotte, die Wachflotte bleibt zu Hause. Das Ziel braucht eine Sektorraumbasis. Reisezeit 12 KT, beim Angriff auf einen Sektor mit Sprungfeldbegrenzer 13 KT.</div>';
+	echo '</form>';
+	echo '</div>';
+	rahmen_unten();
 
 }//ende if raumwerft vorhanden
 
 if ($techs[124]==1) //scannerphalanx vorhanden?
 {
-  echo '<br>';
-  rahmen_oben($bkmenu_lang['scannerphalanx']);
-?>
-<table border="0" cellpadding="0" cellspacing="1">
-<tr align="center">
-<td width="185" class="cell">Scanlevel:</td>
-<td width="120" class="cell"><input type="Submit" name="sc1" value=" 1 "></td>
-<td width="120" class="cell"><input type="Submit" name="sc2" value=" 2 "></td>
-<td width="140" class="cell"><?php echo $bkmenu_lang['zielsektor']?>: <input type="text" name="scansec" value="" size="3" maxlength="5"></td>
-</tr>
-<tr align="center">
-
-<td class="cell1"><?php echo $bkmenu_lang['tronickosten']?>:</td>
-<td class="cell1">5</td>
-<td class="cell1">10</td>
-<td class="cell1">&nbsp;</td>
-</tr>
-</table>
-<?php
-rahmen_unten();
+	rahmen_oben($bkmenu_lang['scannerphalanx']);
+	echo '<form action="bkmenu.php" method="post" class="mod bk">';
+	echo '<div class="bk-formzeile">';
+	echo '<input type="text" name="scansec" value="" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="'.$bkmenu_lang['zielsektor'].'" class="mod-eingabe bk-anzahl">';
+	echo '<button type="submit" name="sc1" value=" 1 " class="mod-btn mod-btn-leise">Level 1 &middot; 5 Tronic</button>';
+	echo '<button type="submit" name="sc2" value=" 2 " class="mod-btn mod-btn-leise">Level 2 &middot; 10 Tronic</button>';
+	echo '</div>';
+	echo '<div class="bk-hinweis">Level 1 zeigt Lager, Kollektoren und Schiffe des Sektors, Level 2 seine Flottenbewegungen. Bezahlt wird mit Tronic aus dem Sektorlager.</div>';
+	echo '</form>';
+	rahmen_unten();
 }//scannerphalanx ende
 
 ?>
-</div>
-</form>
+<script>
+//Summe des Energieverteilungsschlüssels beim Tippen
+document.querySelectorAll('.bk-schluessel').forEach(function(f){
+	f.addEventListener('input', function(){
+		var s = 0;
+		document.querySelectorAll('.bk-schluessel').forEach(function(g){ s += parseInt(g.value, 10) || 0; });
+		var z = document.getElementById('bk-summe');
+		z.textContent = s;
+		z.parentNode.classList.toggle('bk-summe-falsch', s != 100);
+	});
+});
+</script>
 </body>
 </html>
