@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\Hyperfunk\ComposeForm;
+
 include "inc/header.inc.php";
 include "lib/transaction.lib.php";
 include 'inc/lang/' . $sv_server_lang . '_details.lang.php';
@@ -323,292 +326,53 @@ if (($se == $sector || $zIsMetaOrAlly ) && $znpc == 2) {
     ');
 }
 
-//HF nur anzeigen, wenn es Spieler vom eigenen Server ist
-if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se > 0) {
-?>
-    <script>
-        function zeichenundsmiliecheck() {
+////////////////////////////////////////////////////////
+//Details nur anzeigen, wenn es der eigene Server ist; in Sektor 1 darf man die Details nicht einsehen
+////////////////////////////////////////////////////////
+if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spielername"]) && $sector != 1) {
+    //Anhand der Userid werden hier die Userdetails aus der DB ausgelesen.
+    $db_daten = mysqli_execute_query(
+        $GLOBALS['dbi'],
+        "SELECT * FROM de_user_info WHERE user_id=?",
+        [$zuser_id]
+    );
+    $row = mysqli_fetch_assoc($db_daten);
 
-            var nachricht = document.getElementById("nachricht").value;
-            var zeichen = document.getElementById("nachricht").value.length;
+    $ud_all = $row['ud_all'];
+    $sektor_sichtbar = ($rew['sector'] == $sector && $sector > 1);
+    $ally_sichtbar = ($rew['allytag'] == $allytag && $rew['status'] == 1 && $allytag != '');
+    $ud_sector = $sektor_sichtbar ? $row['ud_sector'] : '';
+    $ud_ally = $ally_sichtbar ? $row['ud_ally'] : '';
 
-            if (document.getElementById("nachricht").value.length > 10000) alert("<?php echo $details_lang['err_zu_viele_zeichen'] ?>");
-            if (document.getElementById("nachricht").value.length <= 10000) {
-                var temp = 0;
-            }
-            if (temp == 0) {
-                if (document.getElementById("zielsek").value == "" || document.getElementById("zielsys").value == "") {
-                    alert("<?php echo $details_lang['err_fehlerhaftekoords'] ?>");
-                    return false;
-                } else {
-                    return true;
-                }
-            } else {
-                return false;
-            }
+    //Text eines Abschnitts; leer oder ohne Berechtigung als leiser Hinweis
+    $det_text = function ($text, $sichtbar, $grund) {
+        if (!$sichtbar) {
+            return '<div class="det-text det-leise">' . $grund . '</div>';
         }
-
-        function check() {
-            var nachricht = document.getElementById("nachricht").value;
-            var zeichen = document.getElementById("nachricht").value.length;
-
-            if (document.getElementById("nachricht").value.length >= 10000) {
-                alert("<?php echo $details_lang['msg_zeichensmilie'] ?>");
-            } else {
-                alert("<?php echo $details_lang['msg_summezeichensmilie1'] ?> " + document.getElementById("nachricht").value.length + " <?php echo $details_lang['msg_summezeichensmilie2'] ?> " + (10000 - document.getElementById("nachricht").value.length) + " <?php echo $details_lang['msg_summezeichensmilie3'] ?> " + " <?php $details_lang['msg_summezeichensmilie4'] ?> " + " <?php echo $details_lang['msg_summezeichensmilie5'] ?>");
-            }
+        if (trim((string)$text) == '') {
+            return '<div class="det-text det-leise">keine Angaben</div>';
         }
+        return '<div class="det-text">' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</div>';
+    };
 
-        function leeren() {
-            (document.getElementById("nachricht").value) = "";
-            document.getElementById("nachricht").focus();
-        }
-
-        function hilfe() {
-            window.open("hfnlegende.php", "BitteBeachten", "width=572,height=314,left=34,top=75");
-        }
-
-        function cursor() {
-            if ((navigator.appName == "Netscape") || (navigator.userAgent.indexOf("Opera") != -1) || (navigator.userAgent.indexOf("Netscape") != -1)) {
-                text_before = document.getElementById("nachricht").value;
-                text_after = "";
-            } else {
-                document.getElementById("nachricht").focus();
-                var sel = document.selection.createRange();
-                sel.collapse();
-                var sel_before = sel.duplicate();
-                var sel_after = sel.duplicate();
-                sel.moveToElementText(document.getElementById("nachricht"));
-                sel_before.setEndPoint("StartToStart", sel);
-                sel_after.setEndPoint("EndToEnd", sel);
-                text_before = sel_before.text;
-                text_after = sel_after.text;
-            }
-        }
-
-        function insert(AddCode) {
-            cursor();
-            document.getElementById("nachricht").value = text_before + AddCode + text_after;
-            document.getElementById("nachricht").focus();
-        }
-
-        function init(thisCode) {
-            with(document.getElementById("nachricht").value) {
-                switch (thisCode) {
-
-                    case "fett":
-                        insert("[b] [/b]");
-                        break;
-
-                    case "kursiv":
-                        insert("[i] [/i]");
-                        break;
-
-                    case "under":
-                        insert("[u] [/u]");
-                        break;
-
-                    case "center":
-                        insert("[center] [/center]");
-                        break;
-
-                    case "mail":
-                        insert("[email] [/email]");
-                        break;
-
-                    case "www":
-                        insert("[url] [/url]");
-                        break;
-
-                    case "pre":
-                        insert("[pre] [/pre]");
-                        break;
-
-                    case "rot":
-                        insert("[CROT]");
-                        break;
-
-                    case "gelb":
-                        insert("[CGELB]");
-                        break;
-
-                    case "gruen":
-                        insert("[CGRUEN]");
-                        break;
-
-                    case "weiss":
-                        insert("[CW]");
-                        break;
-
-                    case "farbe":
-                        insert("[color=#] [/color]");
-                        break;
-
-                    case "size":
-                        insert("[size=] [/size]");
-                        break;
-
-                    case "smile1":
-                        insert(":)");
-                        break;
-
-                    case "smile2":
-                        insert(":D");
-                        break;
-
-                    case "smile3":
-                        insert(";)");
-                        break;
-
-                    case "smile4":
-                        insert(":x");
-                        break;
-
-                    case "smile5":
-                        insert(":(");
-                        break;
-
-                    case "smile6":
-                        insert("x(");
-                        break;
-
-                    case "smile7":
-                        insert(":p");
-                        break;
-
-                    case "smile8":
-                        insert("(?)");
-                        break;
-
-                    case "smile9":
-                        insert("(!)");
-                        break;
-
-                    case "smile10":
-                        insert(":{");
-                        break;
-
-                    case "smile11":
-                        insert(":}");
-                        break;
-
-                    case "smile12":
-                        insert(":L");
-                        break;
-
-                    case "smile13":
-                        insert(":nene:");
-                        break;
-
-                    case "smile14":
-                        insert(":eek:");
-                        break;
-
-                    case "smile15":
-                        insert(":applaus:");
-                        break;
-
-                    case "smile16":
-                        insert(":cry:");
-                        break;
-
-                    case "smile17":
-                        insert(":sleep:");
-                        break;
-
-                    case "smile18":
-                        insert(":rolleyes:");
-                        break;
-
-                    case "smile19":
-                        insert(":wand:");
-                        break;
-
-                    case "smile20":
-                        insert(":dead:");
-                        break;
-                }
-                document.getElementById("nachricht").focus();
-            }
-        }
-    </script>
-    <br>
-    <form action="hyperfunk.php" method="post">
-        <table border="0" width="586" cellspacing="0" cellpadding="0">
-            <tr>
-                <td width="13" height="37" class="rol">&nbsp;</td>
-                <td class="ro" align="center" colspan="2"><?php echo $details_lang['hfnverfassen'] ?></td>
-                <td width="13" height="37" class="ror">&nbsp;</td>
-            </tr>
-            <tr class="cell">
-                <td width="13" height="37" class="rl">&nbsp;</td>
-                <td width="110px"><?php echo $details_lang['zielkoordinaten'] ?>:</td>
-                <td>
-                    <input name="zielsek" tabindex="1" id="zielsek" size="4" style="border-style:solid;height:21;" value="<?php echo $se; ?>"> <input name="zielsys" tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" value="<?php echo $sy; ?>">
-                </td>
-                <td width="13" height="37" class="rr">&nbsp;</td>
-            </tr>
-            <tr class="cell">
-                <td width="13" height="37" class="rl">&nbsp;</td>
-                <td width="110px"><?php echo $details_lang['betreff'] ?>: </td>
-                <td><input name="betreff" tabindex="3" size="30" style="border-style:solid;height:21;">
-                </td>
-                <td width="13" height="37" class="rr">&nbsp;</td>
-            </tr>
-
-            <tr class="cell">
-                <td width="13" height="37" class="rl">&nbsp;</td>
-                <td colspan=2 align=center height="30px">
-
-                    <input type="button" value="&nbsp;b&nbsp;" onclick="init('fett')">
-                    <input type="button" value="&nbsp;u&nbsp;" onclick="init('under')">
-                    <input type="button" value="&nbsp;i&nbsp;" onclick="init('kursiv')">
-                    <input type="button" value="<?php echo $details_lang['rot'] ?>" onclick="init('rot')">
-                    <input type="button" value="<?php echo $details_lang['gelb'] ?>" onclick="init('gelb')">
-                    <input type="button" value="<?php echo $details_lang['gruen'] ?>" onclick="init('gruen')">
-                    <input type="button" value="<?php echo $details_lang['weiss'] ?>" onclick="init('weiss')">
-                    <input type="button" value="<?php echo $details_lang['farbe'] ?>" onclick="init('farbe')">
-
-                    <input type="button" value="<?php echo $details_lang['groesse'] ?>" onclick="init('size')">
-                    <input type="button" value="center" onclick="init('center')">
-                    <input type="button" value="pre" onclick="init('pre')">
-                    <input type="button" value="Link" onclick="init('www')">
-                    <input type="button" value="@" onclick="init('mail')">
-                    <input type="button" value="&nbsp;?&nbsp;" onclick="hilfe()">
-                    <input type="button" value="<?php echo $details_lang['leeren'] ?>" onclick="leeren()">
-                </td>
-                <td width='13' height='37' class='rr'>&nbsp;</td>
-            </tr>
-
-            <tr class="cell">
-                <td width="13" height="37" class="rl">&nbsp;</td>
-                <td colspan="2" align="center">
-                    <textarea rows="10" cols="64" tabindex="4" name="nachricht" id="nachricht"></textarea>
-                </td>
-                <td width="13" height="37" class="rr">&nbsp;</td>
-            </tr>
-
-            <tr class="cell">
-                <td width="13" height="37" class="rl">&nbsp;</td>
-                <td colspan="2" align=center><input type="button" value="<?php echo $details_lang['laengepruefen'] ?>" onClick="check()"> <input type="submit" tabindex="5" onclick="return zeichenundsmiliecheck()" name="antbut" value="<?php echo $details_lang['hfnabsenden'] ?>"></td>
-                <td width="13" height="37" class="rr">&nbsp;</td>
-            </tr>
-
-            <tr>
-                <td width="13" class="rul">&nbsp;</td>
-                <td class="ru" colspan="2">&nbsp;</td>
-                <td width="13" class="rur">&nbsp;</td>
-            </tr>
-        </table>
-    </form>
-    <br><br>
-
-<?php
+    rahmen_oben($details_lang['detailsvon'] . $rew["spielername"]);
+    echo '<div class="mod det">';
+    echo '<div class="det-kopf"><b>' . $rew["spielername"] . '</b><span class="mod-chip">' . $se . ':' . $sy . '</span>';
+    if ($rew['status'] == 1 && $rew['allytag'] != '') {
+        echo '<span class="mod-chip">' . $rew['allytag'] . '</span>';
+    }
+    echo '</div>';
+    echo '<div class="det-abschnitt"><div class="mod-typ">Informationen f&uuml;r alle</div>' . $det_text($ud_all, true, '') . '</div>';
+    echo '<div class="det-abschnitt"><div class="mod-typ">Sektorinformationen</div>' . $det_text($ud_sector, $sektor_sichtbar, 'Nur f&uuml;r Spieler aus demselben Sektor sichtbar.') . '</div>';
+    echo '<div class="det-abschnitt"><div class="mod-typ">Allianzinformationen</div>' . $det_text($ud_ally, $ally_sichtbar, 'Nur f&uuml;r Mitglieder derselben Allianz sichtbar.') . '</div>';
+    echo '</div>';
+    rahmen_unten();
 }
+
 ////////////////////////////////////////////////////////
 // Chat-Ignore verwalten
 ////////////////////////////////////////////////////////
-//m�chte man einen Eintrag l�schen
+//möchte man einen Eintrag löschen
 $del_ignore = isset($_REQUEST['del_ignore']) ? intval($_REQUEST['del_ignore']) : 0;
 if ($del_ignore > 0) {
     mysqli_execute_query(
@@ -616,6 +380,59 @@ if ($del_ignore > 0) {
         "DELETE FROM de_chat_ignore WHERE id=? AND owner_id=?",
         [$del_ignore, $_SESSION['ums_owner_id']]
     );
+}
+
+//Formular zum Ignorieren, gleich für Spieler vom eigenen und von einem anderen Server
+function det_ignorieren($zowner_id)
+{
+    //man kann sich nicht selbst ignorieren
+    if ($zowner_id == $_SESSION['ums_owner_id']) {
+        echo '<div class="mod-meldung mod-meldung-fehler">Du kannst Dich nicht selbst ignorieren.</div>';
+        return;
+    }
+
+    //möchte man einen Spieler zur Ignore-Liste hinzufügen?
+    if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
+        $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
+        $spielername = mb_substr($_REQUEST['ignore_name'] ?? $_REQUEST['sn'], 0, 20);
+        mysqli_execute_query(
+            $GLOBALS['dbi_ls'],
+            "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
+            [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]
+        );
+    }
+
+    //überprüfen ob der Spieler bereits auf der Ignore-Liste ist
+    $db_daten = mysqli_execute_query(
+        $GLOBALS['dbi_ls'],
+        "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
+        [$_SESSION['ums_owner_id'], $zowner_id, time()]
+    );
+    $num = mysqli_num_rows($db_daten);
+
+    if ($num == 1) {  // er steht schon drin
+        $row = mysqli_fetch_assoc($db_daten);
+        echo '<div class="mod-meldung mod-meldung-ok">' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . ' steht auf deiner Chat-Ignorierliste, bis ' . date("d.m.Y", $row['ignore_until']) . '.</div>';
+    } elseif ($zowner_id > 0) { //er steht noch nicht drin
+        if (!isset($_REQUEST['ignore_time'])) {
+            $_REQUEST['ignore_time'] = 30;
+        }
+        $ignore_times = array(2, 10, 20, 30, 60, 90, 180, 360);
+
+        echo '<div class="ally-hinweis">Nachrichten dieses Spielers werden dir im Chat nicht mehr angezeigt.</div>';
+        echo '<div class="ally-formular det-abstand">';
+        echo '<label class="ally-feld"><span class="mod-typ">Name in deiner Liste</span><input name="ignore_name" maxlength="20" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '" autocomplete="off" type="text" class="mod-eingabe"></label>';
+        echo '<label class="ally-feld"><span class="mod-typ">Dauer</span><select name="ignore_time" class="mod-eingabe">';
+        for ($i = 0; $i < count($ignore_times); $i++) {
+            $selected = ($ignore_times[$i] == $_REQUEST['ignore_time']) ? ' selected' : '';
+            echo '<option value="' . $ignore_times[$i] . '"' . $selected . '>' . $ignore_times[$i] . ' Tage</option>';
+        }
+        echo '</select></label>';
+        echo '</div>';
+        echo '<div class="ally-aktionen"><button type="submit" name="ignore_add" value="hinzuf&uuml;gen" class="mod-btn">Ignorieren</button></div>';
+    } else {
+        echo '<div class="mod-leer">Es wurde kein Spieler ausgew&auml;hlt.</div>';
+    }
 }
 
 if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
@@ -631,9 +448,10 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
         echo '<input type="hidden" name="cid" value="' . intval($_REQUEST['cid']) . '">';
     }
 
-    rahmen_oben('Verwaltung von Spielern die im Chat ignoriert werden');
+    rahmen_oben('Im Chat ignorieren: ' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8'));
+    echo '<div class="mod det">';
     if (isset($_REQUEST['ctyp']) && isset($_REQUEST['cid'])) { //anderer server
-        //aus dem Chat die dazugeh�rige owner_id holen
+        //aus dem Chat die dazugehörige owner_id holen
         $db_daten = mysqli_execute_query(
             $GLOBALS['dbi_ls'],
             "SELECT * FROM de_chat_msg WHERE id=? AND channeltyp=?",
@@ -643,142 +461,29 @@ if (isset($_REQUEST['sn']) && $_REQUEST['sn'] !== '') {
         if ($num == 1) {
             $row = mysqli_fetch_assoc($db_daten);
             $zowner_id = $row['owner_id'];
-            echo '<div class="cell" style="width: 560px; text-align: center;">';
-
-            //man kann sich nicht selbst ignorieren
-            if ($zowner_id != $_SESSION['ums_owner_id']) {
-
-                //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
-                if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
-                    $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
-                    $spielername = mb_substr($_REQUEST['ignore_name'] ?? $_REQUEST['sn'], 0, 20);
-                    mysqli_execute_query(
-                        $GLOBALS['dbi_ls'],
-                        "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
-                        [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]
-                    );
-                }
-
-                //�berpr�fen ob der Spieler bereits auf der Ignore-Liste ist
-                $db_daten = mysqli_execute_query(
-                    $GLOBALS['dbi_ls'],
-                    "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
-                    [$_SESSION['ums_owner_id'], $zowner_id, time()]
-                );
-                $num = mysqli_num_rows($db_daten);
-
-
-                if ($num == 1) {  // er steht schon drin
-                    $row = mysqli_fetch_assoc($db_daten);
-                    echo 'Dieser Spieler (' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
-                } elseif ($zowner_id > 0) { //er steht noch nicht drin
-                    echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-                    echo '<input name="ignore_name" maxlength="20" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '" autocomplete="off" type="text">';
-
-                    echo '<br>Zeitdauer der Blockierung: ';
-
-                    if (!isset($_REQUEST['ignore_time'])) {
-                        $_REQUEST['ignore_time'] = 30;
-                    }
-
-                    $ignore_times = array(2, 10, 20, 30, 60, 90, 180, 360);
-
-                    echo '<select name="ignore_time">';
-                    for ($i = 0; $i < count($ignore_times); $i++) {
-                        if ($ignore_times[$i] == $_REQUEST['ignore_time']) {
-                            $selected = ' selected';
-                        } else {
-                            $selected = '';
-                        }
-
-                        echo '<option value="' . $ignore_times[$i] . '"' . $selected . '>' . $ignore_times[$i] . ' Tage</option>';
-                    }
-                    echo '</select>';
-
-
-                    echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
-                } else {
-                    echo 'Es wurde kein Spieler ausgew&auml;hlt.';
-                }
-            } else {
-                echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
-            }
-
-            echo '</div>';
+            det_ignorieren($zowner_id);
         } else {
-            echo '<div class="cell" style="width: 560px;">Der Spieler konnte nicht gefunden werden.</div>';
+            echo '<div class="mod-meldung mod-meldung-fehler">Der Spieler konnte nicht gefunden werden.</div>';
         }
     } else { //eigener Server
-        echo '<div class="cell" style="width: 560px; text-align: center;">';
-
-        //man kann sich nicht selbst ignorieren
-        if ($zowner_id != $_SESSION['ums_owner_id']) {
-
-            //m�chte man einen Spieler zur Ignore-Liste hinzuf�gen?
-            if (isset($_REQUEST['ignore_add']) && $zowner_id > 0) {
-                $ignore_until = time() + (3600 * 24 * intval($_REQUEST['ignore_time']));
-                $spielername = mb_substr($_REQUEST['ignore_name'] ?? $_REQUEST['sn'], 0, 20);
-                mysqli_execute_query(
-                    $GLOBALS['dbi_ls'],
-                    "INSERT INTO de_chat_ignore SET owner_id=?, owner_id_ignore=?, score=1, ignore_until=?, spielername=?",
-                    [$_SESSION['ums_owner_id'], $zowner_id, $ignore_until, $spielername]
-                );
-            }
-
-            //überprüfen ob der Spieler bereits auf der Ignore-Liste ist
-            $db_daten = mysqli_execute_query(
-                $GLOBALS['dbi_ls'],
-                "SELECT * FROM de_chat_ignore WHERE owner_id=? AND owner_id_ignore=? AND ignore_until>?",
-                [$_SESSION['ums_owner_id'], $zowner_id, time()]
-            );
-            $num = mysqli_num_rows($db_daten);
-
-
-            if ($num == 1) {  // er steht schon drin
-                $row = mysqli_fetch_assoc($db_daten);
-                echo 'Dieser Spieler (' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . ') befindet sich aktuell auf der Chat-Ignore-Liste.';
-            } elseif ($zowner_id > 0) { //er steht noch nicht drin
-                echo 'Den Spieler unter folgendem Namen zur Chat-Ignoreliste hinzuf&uuml;gen : ';
-                echo '<input name="ignore_name" maxlength="20" value="' . htmlspecialchars($_REQUEST['sn'], ENT_QUOTES, 'UTF-8') . '" autocomplete="off" type="text">';
-
-                echo '<br>Zeitdauer der Blockierung: ';
-
-                if (!isset($_REQUEST['ignore_time'])) {
-                    $_REQUEST['ignore_time'] = 30;
-                }
-
-                $ignore_times = array(2, 10, 20, 30, 60, 90, 180, 360);
-
-                echo '<select name="ignore_time">';
-                for ($i = 0; $i < count($ignore_times); $i++) {
-                    if ($ignore_times[$i] == $_REQUEST['ignore_time']) {
-                        $selected = ' selected';
-                    } else {
-                        $selected = '';
-                    }
-
-                    echo '<option value="' . $ignore_times[$i] . '"' . $selected . '>' . $ignore_times[$i] . ' Tage</option>';
-                }
-                echo '</select>';
-
-
-                echo '<br><br><input name="ignore_add" value="hinzuf&uuml;gen" type="Submit"><br>';
-            } else {
-                echo 'Es wurde kein Spieler ausgew&auml;hlt.';
-            }
-        } else {
-            echo '<div class="cell" style="width: 560px;">Du kannst Dich nicht selbst ignorieren.</div>';
-        }
-
-        echo '</div>';
+        det_ignorieren($zowner_id);
     }
-    //�berpr�fen ob der Spieler auf Ignore steht
+    echo '</div>';
     rahmen_unten();
     echo '</form>';
 }
+
+//HF nur anzeigen, wenn es Spieler vom eigenen Server ist
+if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && $se > 0) {
+    rahmen_oben($details_lang['hfnverfassen']);
+    $formular = new ComposeForm('antbut', $details_lang['hfnabsenden']);
+    echo $formular->withCoordinates((string)$se, (string)$sy)->render();
+    rahmen_unten();
+}
+
 ////////////////////////////////////////////////////////
 // Eine Liste der im Chat ignorierten Spielern ausgeben
-// darüber soll ebenfalls eine LÖschung möglich sein
+// darüber soll ebenfalls eine Löschung möglich sein
 ////////////////////////////////////////////////////////
 $db_daten = mysqli_execute_query(
     $GLOBALS['dbi_ls'],
@@ -787,70 +492,16 @@ $db_daten = mysqli_execute_query(
 );
 $num = mysqli_num_rows($db_daten);
 if ($num >= 1) {
-    rahmen_oben('Folgende Spieler sind auf Deiner Chat-Ignore-Liste');
-    echo '<table class="cell" style="width: 560px;">';
-    echo '<tr style="font-weight: bold;"><td>Spielername</td><td>Blockiert bis</td><td>Aktion</td></tr>';
-    //aus dem Chat die dazugeh�rige owner_id holen
+    rahmen_oben('Deine Chat-Ignorierliste');
+    echo '<div class="mod det"><div class="det-liste">';
     while ($row = mysqli_fetch_assoc($db_daten)) {
-        echo '
-		<tr>
-			<td>' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . '</td>
-			<td>' . date("d.m.Y", $row['ignore_until']) . '</td>
-			<td><a href="details.php?del_ignore=' . $row['id'] . '">Eintrag l&ouml;schen</a></td>
-		</tr>';
+        echo '<div class="det-zeile"><b>' . htmlspecialchars($row['spielername'], ENT_QUOTES, 'UTF-8') . '</b>';
+        echo '<span class="det-leise">bis ' . date("d.m.Y", $row['ignore_until']) . '</span>';
+        echo '<a href="details.php?' . ($se > 0 ? 'se=' . $se . '&amp;sy=' . $sy . '&amp;' : '') . 'del_ignore=' . $row['id'] . '" class="mod-btn mod-btn-leise ally-btn-klein">entfernen</a></div>';
     }
-    echo '</table>';
+    echo '</div></div>';
     rahmen_unten();
 }
-////////////////////////////////////////////////////////
-//Details nur anzeigen, wenn es der eigene Server ist
-////////////////////////////////////////////////////////
-if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spielername"])) {
-
-    //in Sektor 1, darf man nicht die Details einsehen
-    if ($sector == 1) {
-        exit();
-    }
 ?>
-    <table border="0" cellspacing="0" cellpadding="0" width="400px">
-    <?php
-    //Anhand der Userid werden hier die Userdetails aus der DB ausgelesen.
-    $db_daten = mysqli_execute_query(
-        $GLOBALS['dbi'],
-        "SELECT * FROM de_user_info WHERE user_id=?",
-        [$zuser_id]
-    );
-    $row = mysqli_fetch_assoc($db_daten);
-
-    $ud_all = $row['ud_all'];
-    if ($rew['sector'] == $sector && $sector > 1) {
-        $ud_sector = $row['ud_sector'];
-    } else {
-        $ud_sector = 'keine Zugriffsrechte';
-    }
-    if ($rew['allytag'] == $allytag && $rew['status'] == 1 && $allytag != '') {
-        $ud_ally = $row['ud_ally'];
-    } else {
-        $ud_ally = 'keine Zugriffsrechte';
-    }
-
-    rahmen_oben($details_lang['detailsvon'] . $rew["spielername"]);
-    echo '<div class="cell" style="width: 560px;">';
-    //alle
-    echo '<div>Informationen für alle:</div>';
-    echo '<div class="mt4 mb15">' . htmlspecialchars($ud_all, ENT_QUOTES, 'UTF-8') . '</div>';
-    //sektor
-    echo '<div>Sektorinformationen:</div>';
-    echo '<div class="mt4 mb15">' . htmlspecialchars($ud_sector, ENT_QUOTES, 'UTF-8') . '</div>';
-    //allianz/allianzpartner
-    echo '<div>Allianzinformationen:</div>';
-    echo '<div class="mt4">' . htmlspecialchars($ud_ally, ENT_QUOTES, 'UTF-8') . '</div>';
-    echo '</div>';
-    rahmen_unten();
-}
-echo '<br><br>';
-    ?>
-
-    </body>
-
+</body>
 </html>

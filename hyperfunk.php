@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\Hyperfunk\ComposeForm;
+
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_hyperfunk.lang.php');
 
@@ -32,45 +35,34 @@ $l = $_REQUEST['l'] ?? '';
 include_once 'functions.php';
 // Sperre f&uuml;r den Fall, dass user das Script abbrechen.
 @ignore_user_abort();
-// eine Funktion, die die Statusmeldungen anzeigt.
+// eine Funktion, die die Statusmeldungen anzeigt; $color: r = Fehler, g/b = erledigt
 function insertmessage($message, $color, $lang_systemnachricht)
 {
-    if ($color == "r") {
-        $col = "FF0000";
+    $art = ($color == "r") ? 'fehler' : 'ok';
+    return '<div class="mod hf-meldungen"><div class="mod-meldung mod-meldung-' . $art . '">' . $message . '</div></div>';
+}
+
+//offene Formatierungen (b, i, u, center, font, a) am Ende einer Nachricht schließen, sonst gelten sie für alles danach
+function hf_schliessen($html)
+{
+    $offen = array();
+    preg_match_all('#<(/?)(b|i|u|center|font|a)\b[^>]*>#i', $html, $m, PREG_SET_ORDER);
+    foreach ($m as $tag) {
+        $name = strtolower($tag[2]);
+        if ($tag[1] == '') {
+            $offen[] = $name;
+        } else {
+            $pos = array_search($name, array_reverse($offen, true), true);
+            if ($pos !== false) {
+                unset($offen[$pos]);
+                $offen = array_values($offen);
+            }
+        }
     }
-    if ($color == "g") {
-        $col = "00FF00";
+    foreach (array_reverse($offen) as $name) {
+        $html .= '</' . $name . '>';
     }
-    if ($color == "b") {
-        $col = "3399FF";
-    }
-    $nachricht = '
-        <br><br>
-        <table border="0" cellpadding="0" cellspacing="0" width="586">
-            <tr>
-                <td width="13" height="35" class="rol"></td>
-                <td align="center" height="35" class="ro">
-                    <font size="3">
-                        <div class="cellu">' . $lang_systemnachricht . '</div>
-                    </font>
-                </td>
-                <td width="13" height="35" class="ror"></td>
-            </tr>
-            <tr>
-                <td width="13" class="rl" height="35"></td>
-                <td align="center" nowrap class="c">
-                    <font color="' . $col . '">' . $message . '</font>
-                </td>
-                <td width="13" class="rr" height="35"></td>
-            </tr>
-            <tr>
-                <td width="13" class="rul">&nbsp;</td>
-                <td class="ru">&nbsp;</td>
-                <td width="13" class="rur">&nbsp;</td>
-            </tr>
-        </table>
-        <br><br>';
-    return $nachricht;
+    return $html;
 }
 
 ?>
@@ -79,232 +71,18 @@ function insertmessage($message, $color, $lang_systemnachricht)
 <head>
 <title><?php echo $hyperfunk_lang['headtitle']?></title>
 <?php include "cssinclude.php";
-
-//ein bisschen CSS f&uuml;r die Buttons
-echo '
-<style type="text/css">
-<!--
-.fett{color: #FFFFFF;font-weight: bold;}
--->
-</style>';
-
 $action = $_REQUEST['action'] ?? 'eingang';
 $se = $_REQUEST['se'] ?? '';
 $sy = $_REQUEST['sy'] ?? '';
-
-if ($action == "ant" || $action == "weiter" || $action == "spieler" || $action == "sektor" || $action == "freunde" || $action == "alli") {
-    // Javascript, f&uuml;r die ueberpruefung, ob alle Felder ausgefuellt sind und um per klick den richtigen BB code in die Textarea einzufuegen
-
-    ?>
-    <script language="JavaScript" type="text/javascript">
-    <!--
-    
-    function zeichenundsmiliecheck() {
-        var nachricht = document.getElementById("nachricht").value;
-        var zeichen = document.getElementById("nachricht").value.length;
-
-        if (document.getElementById("nachricht").value.length > 10000) {
-            alert("<?php echo $hyperfunk_lang['err_zu_viele_zeichen']; ?>");
-        }
-
-        if (document.getElementById("nachricht").value.length <= 10000) {
-            var temp = 0;
-        }
-
-        if (temp == 0) {
-            <?php
-            if ($action == "ant" || $action == "weiter" || $action == "spieler") {
-                ?>
-                if (document.getElementById("zielsek").value == "" || document.getElementById("zielsys").value == "") {
-                    alert("<?php echo $hyperfunk_lang['err_fehlerhaftekoords']; ?>");
-                    return false;
-                } else {
-                    return true;
-                }
-                <?php
-            } else {
-                ?>
-                return true;
-                <?php
-            }
-            ?>
-        } else {
-            return false;
-        }
-    }
-
-    function check() {
-var nachricht =  document.getElementById("nachricht").value;
-var zeichen = document.getElementById("nachricht").value.length;
-
-if(document.getElementById("nachricht").value.length>=10000)
-{
-alert("<?php echo $hyperfunk_lang['msg_zeichensmilie']?>");
-}
-else
-{
-alert("<?php echo $hyperfunk_lang['msg_summezeichensmilie1']?> " + document.getElementById("nachricht").value.length + " <?php echo $hyperfunk_lang['msg_summezeichensmilie2']?> "+ (10000 - document.getElementById("nachricht").value.length) +" <?php echo $hyperfunk_lang['msg_summezeichensmilie3']?> " +  " <?php echo $hyperfunk_lang['msg_summezeichensmilie4']?> " + " <?php echo $hyperfunk_lang['msg_summezeichensmilie5']?>");
-}
-}
-
-function leeren() {(document.getElementById("nachricht").value) = "";document.getElementById("nachricht").focus();}
-
-function hilfe()
-{window.open("hfnlegende.php","BitteBeachten","width=572,height=314,left=34,top=75");}
-
-function cursor()
-{
-if ((navigator.appName=="Netscape")||(navigator.userAgent.indexOf("Opera") != -1)||(navigator.userAgent.indexOf("Netscape") != -1)) {
-text_before = document.getElementById("nachricht") .value;
-text_after = "";
-} else {
-document.getElementById("nachricht").focus();
-var sel = document.selection.createRange();
-sel.collapse();
-var sel_before = sel.duplicate();
-var sel_after = sel.duplicate();
-sel.moveToElementText(document.getElementById("nachricht"));
-sel_before.setEndPoint("StartToStart",sel);
-sel_after.setEndPoint("EndToEnd",sel);
-text_before = sel_before.text;
-text_after = sel_after.text;
-}
-}
-function insert(AddCode) {
-cursor();
-document.getElementById("nachricht").value = text_before + AddCode + text_after;
-document.getElementById("nachricht").focus();
-}
-
-function init(thisCode) {
-with ( document.getElementById("nachricht").value ) {
-switch(thisCode) {
-
-case "fett":
-insert("[b] [/b]");
-break;
-
-case "kursiv":
-insert("[i] [/i]");
-break;
-
-case "under":
-insert("[u] [/u]");
-break;
-
-case "center":
-insert("[center] [/center]");
-break;
-
-case "mail":
-insert("[email] [/email]");
-break;
-
-case "www":
-insert("[url] [/url]");
-break;
-
-case "pre":
-insert("[pre] [/pre]");
-break;
-
-case "rot":
-insert("[CROT]");
-break;
-
-case "gelb":
-insert("[CGELB]");
-break;
-
-case "gruen":
-insert("[CGRUEN]");
-break;
-
-case "weiss":
-insert("[CW]");
-break;
-
-case "farbe":
-insert("[color=#] [/color]");
-break;
-
-case "size":
-insert("[size=] [/size]");
-break;
-
-}
-document.getElementById("nachricht").focus();
-}
-}
-//-->
-</script>
-<?php
-}
 ?>
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-// das Menu
 
-echo '<br>';
-echo '
-<table border="0" cellspacing="0" cellpadding="0" width="586">
-    <tr>
-        <td width="13" height="25" class="rol"></td>
-        <td align="center" height="35" colspan="4" class="ro">
-            <div class="cellu">' . $hyperfunk_lang['tabtitle1'] . '</div>
-        </td>
-        <td width="13" height="25" class="ror"></td>
-    </tr>
-    <tr class="cell">
-        <td width="13" class="rl" height="35"></td>
-        <td align="center">
-            <a href="hyperfunk.php?action=eingang" class="btn">' . $hyperfunk_lang['eingang'] . '</a>
-        </td>
-        <td align="center">
-            <a href="hyperfunk.php?action=ausgang" class="btn">' . $hyperfunk_lang['ausgang'] . '</a>
-        </td>
-        <td align="center">
-            <a href="hyperfunk.php?action=archiv" class="btn">' . $hyperfunk_lang['archiv'] . '</a>
-        </td>
-        <td align="center">
-            <a href="hyperfunk.php?action=optionen" class="btn">' . $hyperfunk_lang['optionen'] . '</a>
-        </td>
-        <td width="13" height="25" class="rr"></td>
-    </tr>
-</table>';
-
-echo '
-<table border="0" cellspacing="0" cellpadding="0" width="586">
-    <tr>
-        <td width="13" height="25" class="rml"></td>
-        <td align="center" class="ro" colspan="4" height="35">
-            <div class="cellu">' . $hyperfunk_lang['tabtitle2'] . '</div>
-        </td>
-        <td width="13" height="25" class="rmr"></td>
-    </tr>
-    <tr class="cell">
-        <td width="13" height="25" class="rl"></td>
-        <td align="center">
-            <a href="hyperfunk.php?action=spieler" class="btn">' . $hyperfunk_lang['spieler'] . '</a>
-        </td>
-        <td align="center">
-            <a href="hyperfunk.php?action=sektor" class="btn">' . $hyperfunk_lang['sektor'] . '</a>
-        </td>
-        <td align="center">
-            <a href="hyperfunk.php?action=alli" class="btn">' . $hyperfunk_lang['allianz'] . '</a>
-        </td>
-        <td width="13" height="25" class="rr"></td>
-    </tr>
-    <tr>
-        <td width="13" class="rul">&nbsp;</td>
-        <td class="ru" colspan="4">&nbsp;</td>
-        <td width="13" class="rur">&nbsp;</td>
-    </tr>
-</table>';
-
+//Meldungen der Aktionen sammeln, sie stehen unter den Reitern
+ob_start();
 // Insert abschnitt f&uuml;r normale HFNs mit s&auml;mtlichen Ueberpruefungen (Ignore Urlaub falsche koords)
 if (isset($_POST['antbut'])) {
     $zielsek = intval($_POST['zielsek']);
@@ -517,10 +295,11 @@ if ($action == "del") {//nachricht l&ouml;schen
 
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE (id=? AND empfaenger=? AND sender=0) or (id=? AND absender=? AND sender=1)", [$id, $_SESSION['ums_user_id'], $id, $_SESSION['ums_user_id']]);
 
-    echo insertmessage($hyperfunk_lang['msg_14'], "r", $hyperfunk_lang['systemnachricht']);
+    echo insertmessage($hyperfunk_lang['msg_14'], "g", $hyperfunk_lang['systemnachricht']);
 
     $action = "";
 
+    $o = $_REQUEST['o'] ?? '';
     if ($o == "v") {
         $action = "archiv";
     }
@@ -531,50 +310,23 @@ if ($action == "del") {//nachricht l&ouml;schen
         $action = "ausgang";
     }
 }
-
 //Loeschen vieler HFNs aus einer Kategorie
 if ($action == "da" and ($l == "e" or $l == "a" or $l == "r")) {
-    echo '
-        <br><br>
-        <table border="0" cellpadding="0" cellspacing="0" width="400">
-            <tr>
-                <td width="13" height="35" class="rol"></td>
-                <td align="center" height="35" class="ro">
-                    <font size="3">
-                        <div class="cellu">' . $hyperfunk_lang['systemnachricht'] . '</div>
-                    </font>
-                </td>
-                <td width="13" height="35" class="ror"></td>
-            </tr>
-            <tr>
-                <td width="13" class="rl" height="35"></td>';
-    
     // Eingang
     if ($action == "da" and $l == "e") {
         mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and sender=0 and archiv=0 and gelesen=1", [$_SESSION['ums_user_id']]);
-        echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_15'] . '</td>';
+        echo insertmessage($hyperfunk_lang['msg_15'], "g", $hyperfunk_lang['systemnachricht']);
     }
     // Ausgang
     if ($action == "da" and $l == "a") {
         mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE absender=? and sender=1 and archiv=0", [$_SESSION['ums_user_id']]);
-        echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_16'] . '</td>';
+        echo insertmessage($hyperfunk_lang['msg_16'], "g", $hyperfunk_lang['systemnachricht']);
     }
     // Archiv
     if ($action == "da" and $l == "r") {
         mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_hyper WHERE empfaenger=? and archiv=1", [$_SESSION['ums_user_id']]);
-        echo '<td align="center" nowrap class="cellu">' . $hyperfunk_lang['msg_17'] . '</td>';
+        echo insertmessage($hyperfunk_lang['msg_17'], "g", $hyperfunk_lang['systemnachricht']);
     }
-
-    echo '
-                <td width="13" class="rr" height="35"></td>
-            </tr>
-            <tr>
-                <td width="13" class="rul">&nbsp;</td>
-                <td class="ru">&nbsp;</td>
-                <td width="13" class="rur">&nbsp;</td>
-            </tr>
-        </table>
-        <br>';
 }
 //Move Funktion der HFNs ins Archiv
 if ($action == "arc") {
@@ -599,38 +351,48 @@ if ($action == "arc") {
 
     $action = "eingang";
 }
+$hf_meldungen = ob_get_clean();
 
+//Reiter: Ordner mit Zählern, darunter neue Nachricht an Spieler, Sektor oder Allianz
+$db_zahl = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anz FROM de_user_hyper WHERE empfaenger=? AND sender=0 AND archiv=0 AND gelesen=0", [$_SESSION['ums_user_id']]);
+$hf_neu = (int)mysqli_fetch_assoc($db_zahl)['anz'];
+$db_zahl = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anz FROM de_user_hyper WHERE empfaenger=? AND archiv=1", [$_SESSION['ums_user_id']]);
+$hf_archiv = (int)mysqli_fetch_assoc($db_zahl)['anz'];
+
+$hf_aktiv = $action;
+if ($hf_aktiv == '') {
+    $hf_aktiv = 'eingang';
+} elseif ($hf_aktiv == 'ant' || $hf_aktiv == 'weiter') {
+    $hf_aktiv = 'spieler';
+} elseif ($hf_aktiv == 'delbuddy' || $hf_aktiv == 'delene') {
+    $hf_aktiv = 'optionen';
+}
+$hf_reiter = array(
+    'eingang' => $hyperfunk_lang['eingang'] . ($hf_neu > 0 ? ' <span class="hf-zahl">' . $hf_neu . '</span>' : ''),
+    'ausgang' => $hyperfunk_lang['ausgang'],
+    'archiv' => $hyperfunk_lang['archiv'] . ' <small>' . $hf_archiv . '/' . $sv_hf_archiv_p . '</small>',
+    'optionen' => 'Ignorierliste',
+);
+echo '<div class="mod ally-navi hf-navi">';
+foreach ($hf_reiter as $ziel => $text) {
+    echo '<a href="hyperfunk.php?action=' . $ziel . '" class="ally-reiter' . ($hf_aktiv == $ziel ? ' ally-reiter-aktiv' : '') . '">' . $text . '</a>';
+}
+echo '<span class="hf-navi-text">Neue Nachricht an</span>';
+foreach (array('spieler' => $hyperfunk_lang['spieler'], 'sektor' => $hyperfunk_lang['sektor'], 'alli' => $hyperfunk_lang['allianz']) as $ziel => $text) {
+    echo '<a href="hyperfunk.php?action=' . $ziel . '" class="ally-reiter' . ($hf_aktiv == $ziel ? ' ally-reiter-aktiv' : '') . '">' . $text . '</a>';
+}
+echo '</div>';
+
+echo $hf_meldungen;
 //Anzeige der s&auml;mtlichen HFNS der jeweiligen Kategorien
 if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action == "archiv") {
-    echo '
-        <br><br>
-        <table width="586" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td width="13" height="37" class="rol">&nbsp;</td>';
-
     if ($action == "eingang"  || $action == "") {
-        echo '
-                <td class="ro" align="center">
-                    <div class="cellu">' . $hyperfunk_lang['eingang'] . '</div>
-                </td>';
+        $titel = $hyperfunk_lang['eingang'];
     } elseif ($action == "ausgang") {
-        echo '
-                <td class="ro" align="center">
-                    <div class="cellu">' . $hyperfunk_lang['ausgang'] . '</div>
-                </td>';
-    } elseif ($action == "archiv") {
-        echo '
-                <td class="ro" align="center">
-                    <div class="cellu">' . $hyperfunk_lang['archiv'] . '</div>
-                </td>';
+        $titel = $hyperfunk_lang['ausgang'];
+    } else {
+        $titel = $hyperfunk_lang['archiv'];
     }
-
-    echo '
-                <td width="13" height="37" class="ror">&nbsp;</td>
-            </tr>
-            <tr>
-                <td width="13" class="rl"></td>
-                <td>';
 
     if ($action == "eingang"  || $action == "") {
         if ($l == "new") {
@@ -650,6 +412,8 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
 
     $anzahl = mysqli_num_rows($db_tfn);
 
+    rahmen_oben($titel);
+    echo '<div class="mod hf">';
 
     while ($row = mysqli_fetch_array($db_tfn)) {
 
@@ -688,164 +452,84 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
 
         $t = (string)$row['time'];
 
-        $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
+        $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' '.$t[8].$t[9].':'.$t[10].$t[11];
 
-        if ($l != "new") {
-            if ($row['gelesen'] == "0") {
-                $neuemsg = '<img src="' . 'gp/' . 'g/hfn/DENeu.gif" alt="'.$hyperfunk_lang['logo_neue_hfn'].'">';
-            } else {
-                $neuemsg = "&nbsp;";
-            }
+        $neu = ($l != "new" && $row['gelesen'] == "0");
 
+        //Absender bzw. Empfänger
+        if ($action == "ausgang") {
+            $empfa = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, spielername FROM de_user_data WHERE user_id=?", [$row['empfaenger']]);
+            $rowemp = mysqli_fetch_array($empfa);
+
+            $wer = '<span class="hf-richtung">an</span> <b>' . ($rowemp['spielername'] ?? '?') . '</b> <small>' . ($rowemp['sector'] ?? '') . ':' . ($rowemp['system'] ?? '') . '</small>';
+            $row['fromsec'] = $rowemp['sector'] ?? null;
+            $row['fromsys'] = $rowemp['system'] ?? null;
+        } elseif ($row['fromsec'] == "0"  and $row['fromsys'] == "0") {
+            $row['fromnic'] = str_replace("Leader", " ", $row['fromnic']);
+            $row['fromnic'] = trim($row['fromnic']);
+            $wer = '<span class="hf-richtung">von</span> <b>' . $row['fromnic'] . '</b>';
+        } else {
+            $wer = '<span class="hf-richtung">von</span> <b>' . $row['fromnic'] . '</b> <small>' . $row['fromsec'] . ':' . $row['fromsys'] . '</small>';
         }
-        ?>
 
-        <table width="566" border="0" cellspacing="1" cellpadding="0">
-            <tr>
-                <td width="80" class="cell1" style="text-align: left;">
-                    &nbsp;<?php 
-                    if ($action == "ausgang") {
-                        echo $hyperfunk_lang['empfaenger'];
-                    } else {
-                        echo $hyperfunk_lang['absender'];
-                    }
-                    ?>
-                </td>
-                <td>
-                    <table border="0" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <td class="cell" style="text-align: left;">
-                                <?php
-                                if ($action == "ausgang") {
-                                    $empfa = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, spielername FROM de_user_data WHERE user_id=?", [$row['empfaenger']]);
-                                    $rowemp = mysqli_fetch_array($empfa);
+        //Aktionen (Bedingungen wie bisher)
+        $links = array();
+        if ($action == "ausgang" and ($row['fromsec'] != "0" and $row['fromsys'] != "0")) {
+            $links[] = '<a href="details.php?se=' . $row['fromsec'] . '&amp;sy=' . $row['fromsys'] . '" class="mod-btn mod-btn-leise ally-btn-klein">' . $hyperfunk_lang['hfn_nav_1'] . '</a>';
+        }
+        if ($row['fromsec'] == "0" and $row['fromsys'] == "0") {
+            $links[] = '<a href="ally_message_leader.php?select=' . $row['fromnic'] . '" class="mod-btn mod-btn-leise ally-btn-klein">' . $row['fromnic'] . '-' . $hyperfunk_lang['hfn_nav_2'] . '</a>';
+        }
+        if ($action == "" or $action == "archiv" or $action == "eingang" and ($row['fromsec'] != "0" and $row['fromsys'] != "0")) {
+            $links[] = '<a href="hyperfunk.php?action=ant&amp;se=' . $row['fromsec'] . '&amp;sy=' . $row['fromsys'] . '&amp;id=' . $row['id'] . '" class="mod-btn mod-btn-leise ally-btn-klein">' . $hyperfunk_lang['hfn_nav_3'] . '</a>';
+        }
+        if ($action == "" or $action == "archiv" or $action == "ausgang" or $action == "eingang" and ($row['fromsec'] != "0"  and $row['fromsys'] != "0")) {
+            $links[] = '<a href="hyperfunk.php?action=weiter&amp;se=' . $row['fromsec'] . '&amp;sy=' . $row['fromsys'] . '&amp;id=' . $row['id'] . '" class="mod-btn mod-btn-leise ally-btn-klein">' . $hyperfunk_lang['hfn_nav_4'] . '</a>';
+        }
+        if ($action == "" or $action == "eingang") {
+            $links[] = '<a href="hyperfunk.php?action=arc&amp;se=' . $row['fromsec'] . '&amp;sy=' . $row['fromsys'] . '&amp;id=' . $row['id'] . '" class="mod-btn mod-btn-leise ally-btn-klein">' . $hyperfunk_lang['hfn_nav_5'] . '</a>';
+        }
+        $loeschen = '';
+        if ($action == "archiv" or $action == "" or $action == "eingang" or $action == "ausgang") {
+            $o = '';
+            if ($action == "archiv") {
+                $o = "v";
+            }
+            if ($action == "" or $action == "eingang") {
+                $o = "e";
+            }
+            if ($action == "ausgang") {
+                $o = "a";
+            }
+            $loeschen = '<a href="hyperfunk.php?action=del&amp;se=' . $row['fromsec'] . '&amp;sy=' . $row['fromsys'] . '&amp;id=' . $row['id'] . '&amp;o=' . $o . '" class="mod-btn mod-btn-leise mod-btn-gefahr ally-btn-klein" data-bestaetigen="Wirklich l&ouml;schen?">' . $hyperfunk_lang['loeschen'] . '</a>';
+        }
 
-                                    $empfaenger = $rowemp['spielername'];
-                                    $empsek = $rowemp['sector'];
-                                    $empsys = $rowemp['system'];
-
-                                    echo '&nbsp;' . $rowemp['sector'] . ':' . $rowemp['system'] . ' (' . $rowemp['spielername'] . ')';
-                                    $row['fromsec'] = $rowemp['sector'];
-                                    $row['fromsys'] = $rowemp['system'];
-                                } elseif ($row['fromsec'] == "0"  and $row['fromsys'] == "0") {
-                                    $row['fromnic'] = str_replace("Leader", " ", $row['fromnic']);
-                                    $row['fromnic'] = trim($row['fromnic']);
-                                } else {
-                                    echo '&nbsp;' . $row['fromsec'] . ':' . $row['fromsys'] . ' (' . $row['fromnic'] . ')';
-                                }
-                                ?>
-                            </td>
-                            <td align="right" class="cell" valign="middle">
-                                <?php echo $neuemsg ?? ''; ?>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td class="cell" style="text-align: left;">
-                    &nbsp;<?php echo $hyperfunk_lang['datum']; ?>
-                </td>
-                <td class="cell1" style="text-align: left;">
-                    &nbsp;<?php echo $time; ?>
-                </td>
-            </tr>
-            <tr>
-                <td class="cell1" style="text-align: left;">
-                    &nbsp;<?php echo $hyperfunk_lang['betreff']; ?>
-                </td>
-                <td class="cell" style="text-align: left;">
-                    &nbsp;<?php echo $row['betreff'] ?>
-                </td>
-            </tr>
-            <tr>
-                <td valign="top" class="cell" style="text-align: left;">
-                    &nbsp;<?php echo $hyperfunk_lang['nachricht']; ?>
-                </td>
-                <td class="cell1" style="text-align: left;">
-                    &nbsp;<?php echo $row['text']; ?>
-                </td>
-            </tr>
-            <tr>
-                <td class="cell1">&nbsp;</td>
-                <td class="cell">&nbsp;
-                    <?php
-                    if ($action == "ausgang" and ($row['fromsec'] != "0" and $row['fromsys'] != "0")) {
-                        echo '<a href="details.php?se=' . $row['fromsec'] . '&sy=' . $row['fromsys'] . '">' . $hyperfunk_lang['hfn_nav_1'] . '</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
-                    if ($row['fromsec'] == "0" and $row['fromsys'] == "0") {
-                        echo '<a href="ally_message_leader.php?select=' . $row['fromnic'] . '">' . $row['fromnic'] . '-' . $hyperfunk_lang['hfn_nav_2'] . '</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
-                    if ($action == "" or $action == "archiv" or $action == "eingang" and ($row['fromsec'] != "0" and $row['fromsys'] != "0")) {
-                        echo '<a href="hyperfunk.php?action=ant&se=' . $row['fromsec'] . '&sy=' . $row['fromsys'] . '&id=' . $row['id'] . '">' . $hyperfunk_lang['hfn_nav_3'] . '</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
-                    if ($action == "" or $action == "archiv" or $action == "ausgang" or $action == "eingang" and ($row['fromsec'] != "0"  and $row['fromsys'] != "0")) {
-                        echo '<a href="hyperfunk.php?action=weiter&se=' . $row['fromsec'] . '&sy=' . $row['fromsys'] . '&id=' . $row['id'] . '">' . $hyperfunk_lang['hfn_nav_4'] . '</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
-                    if ($action == "" or $action == "eingang") {
-                        echo '<a href="hyperfunk.php?action=arc&se=' . $row['fromsec'] . '&sy=' . $row['fromsys'] . '&id=' . $row['id'] . '">' . $hyperfunk_lang['hfn_nav_5'] . '</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
-                    if ($action == "archiv" or $action == "" or $action == "eingang" or $action == "ausgang") {
-                        echo '<a href="hyperfunk.php?action=del&se=' . $row['fromsec'] . '&sy=' . $row['fromsys'] . '&id=' . $row['id'] . '&o=';
-                        if ($action == "archiv") {
-                            echo "v";
-                        }
-                        if ($action == "" or $action == "eingang") {
-                            echo "e";
-                        }
-                        if ($action == "ausgang") {
-                            echo "a";
-                        }
-                        echo '" onclick="return confirm(\'' . $hyperfunk_lang['hfn_nav_6'] . '\')">' . $hyperfunk_lang['loeschen'] . '</a>';
-                    }
-                    ?>
-                </td>
-            </tr>
-        </table>
-        <br>
-
-        <?php
+        echo '<div class="hf-nachricht' . ($neu ? ' hf-nachricht-neu' : '') . '">';
+        echo '<div class="hf-nachricht-kopf"><span class="hf-wer">' . $wer . ($neu ? ' <span class="mod-chip mod-chip-gruen">neu</span>' : '') . '</span><span class="hf-zeit">' . $time . '</span></div>';
+        echo '<div class="hf-betreff">' . ($row['betreff'] != '' ? $row['betreff'] : '<span class="hf-leise">ohne Betreff</span>') . '</div>';
+        echo '<div class="hf-inhalt">' . hf_schliessen($row['text']) . '</div>';
+        echo '<div class="hf-aktionen">' . implode('', $links) . '<span class="hf-aktionen-rechts">' . $loeschen . '</span></div>';
+        echo '</div>';
     }
-
-    echo '
-        <table border="0" cellpadding="0" cellspacing="1" width="566" bgcolor="#000000">
-            <tr>';
 
     if ($anzahl != "0") {
-        echo '
-                <td class="c" width="50%">
-                    <a href="hyperfunk.php?action=da&l=';
         if ($action == "eingang" or $action == "") {
-            echo "e";
+            $l_alle = "e";
         }
         if ($action == "ausgang") {
-            echo "a";
+            $l_alle = "a";
         }
         if ($action == "archiv") {
-            echo "r";
+            $l_alle = "r";
         }
-        echo '" onclick="return confirm(unescape(\'' . $hyperfunk_lang['hfn_nav_7'] . '\'))">
-                        <font color="red">' . $hyperfunk_lang['alle_loeschen'] . '</font>
-                    </a>
-                </td>';
+        echo '<div class="hf-fuss"><span class="hf-leise">' . $anzahl . ' ' . ($anzahl == 1 ? 'Nachricht' : 'Nachrichten') . '</span>';
+        echo '<a href="hyperfunk.php?action=da&amp;l=' . $l_alle . '" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Wirklich alle l&ouml;schen?">' . $hyperfunk_lang['alle_loeschen'] . '</a></div>';
     } else {
-        echo '
-                <td class="c" width="50%" height="35">' . $hyperfunk_lang['nohfn'] . '</td>';
+        echo '<div class="mod-leer">' . $hyperfunk_lang['nohfn'] . '</div>';
     }
-    echo '
-            </tr>
-        </table>';
 
-    echo '
-            </td>
-            <td width="13" class="rr"></td>
-        </tr>
-        <tr>
-            <td width="13" class="rul">&nbsp;</td>
-            <td class="ru">&nbsp;</td>
-            <td width="13" class="rur">&nbsp;</td>
-        </tr>
-    </table>';
+    echo '</div>';
+    rahmen_unten();
 }
 
 
@@ -879,144 +563,43 @@ if ($action == "ant" or $action == "weiter" or $action == "spieler" or $action =
                 $anttfn = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_hyper WHERE (id=? AND empfaenger=?) or (id=? AND absender=? AND sender=1)", [$id, $_SESSION['ums_user_id'], $id, $_SESSION['ums_user_id']]);
                 $rowtfn = mysqli_fetch_array($anttfn);
 
-                $rowtfn['text'] = str_replace("<br />", " ", $rowtfn['text']);
+                $rowtfn['text'] = str_replace("<br />", " ", $rowtfn['text'] ?? '');
             }
-            ?>
-              <br><br>
-              <form action="hyperfunk.php" method="post">
-              <table border="0" width="586" cellspacing="0" cellpadding="0">
-              <tr>
-              <td width="13" height="37" class="rol">&nbsp;</td>
-              <td class="ro" align="center" colspan="2" nowrap><div class="cellu"><?php if ($action == "sektor") {
-                  echo $hyperfunk_lang['sektornachricht'];
-              } elseif ($action == "freunde") {
-                  echo $hyperfunk_lang['freundenachricht'];
-              } elseif ($action == "alli") {
-                  echo $hyperfunk_lang['allianznachricht'];
-              } else {
-                  echo $hyperfunk_lang['hyperfunknachricht'];
-              } if ($action == "ant") {
-                  echo $hyperfunk_lang['beantworten'];
-              } if ($action == "weiter") {
-                  echo $hyperfunk_lang['hfn_nav_4'];
-              } if ($action == "spieler" or $action == "sektor" or $action == "alli") {
-                  echo $hyperfunk_lang['verfassen'];
-              }?></div></td>
-              <td width="13" height="37" class="ror">&nbsp;</td>
-              </tr>
 
+            if ($action == "sektor") {
+                $titel = 'Sektornachricht verfassen';
+                $formular = (new ComposeForm('sekmsg', 'Sektornachricht absenden'))
+                    ->withHint('Die Nachricht geht an alle Spieler deines Sektors.');
+            } elseif ($action == "alli") {
+                $titel = 'Allianznachricht verfassen';
+                $formular = (new ComposeForm('allimsg', 'Allianznachricht absenden'))
+                    ->withHint('Die Nachricht geht an alle Mitglieder deiner Allianz.');
+            } elseif ($action == "freunde") {
+                $titel = trim($hyperfunk_lang['freundenachricht']);
+                $formular = (new ComposeForm('freundemsg', 'Nachricht absenden'))->withFriends($db_friends);
+            } elseif ($action == "ant") {
+                $titel = 'Hyperfunknachricht beantworten';
+                $formular = (new ComposeForm('antbut', 'Hyperfunknachricht absenden'))->withCoordinates((string)intval($se), (string)intval($sy));
+            } elseif ($action == "weiter") {
+                $titel = 'Hyperfunknachricht weiterleiten';
+                $formular = (new ComposeForm('antbut', 'Hyperfunknachricht absenden'))->withCoordinates();
+            } else {
+                $titel = 'Hyperfunknachricht verfassen';
+                $formular = (new ComposeForm('antbut', 'Hyperfunknachricht absenden'))->withCoordinates();
+            }
 
+            if ($action == "ant") {
+                $formular->withSubject($hyperfunk_lang['re'].' '.htmlspecialchars($rowtfn['betreff'] ?? '', ENT_QUOTES, 'UTF-8', false));
+            } elseif ($action == "weiter") {
+                $formular->withSubject($hyperfunk_lang['fw'].' '.htmlspecialchars($rowtfn['betreff'] ?? '', ENT_QUOTES, 'UTF-8', false));
+            }
+            if ($action == "ant" or $action == "weiter") {
+                $formular->withMessage('[i][b]'.($rowtfn['fromnic'] ?? '').' '.$hyperfunk_lang['schrieb'].': [/b]'.umlaut($rowtfn['text']).'[/i]');
+            }
 
-              <?php if ($action != "sektor" and $action != "alli") {
-                  ?>
-              <tr class="cellu">
-              <td width='13' height='37' class='rl'>&nbsp;</td>
-              <td width=100><?php echo $hyperfunk_lang['zielkoordinaten']; ?>:</td>
-              <td>
-              <?php
-              if ($action == "freunde") {
-                  $f_counter = 1;
-                  while ($row = mysqli_fetch_array($db_friends)) {
-                      echo '<input type="Checkbox" name="freund'.$f_counter.'" value="'.$row['sector'].':'.$row['system'].'">&nbsp;'.$row['sector'].':'.$row['system'].'&nbsp;&nbsp;('.$row['name'].')<br>';
-                      $f_counter++;
-                  }
-              } else {
-                  ?>
-              <input name="zielsek" id="zielsek" tabindex="1" size="4" style="border-style:solid;height:21;" <?php if ($action == "ant") {
-                  echo "value=\"".intval($se)."\"";
-              }?>><input name="zielsys"  tabindex="2" id="zielsys" size="4" style="border-style:solid;height:21;" <?php if ($action == "ant") {
-                  echo "value=\"".intval($sy)."\"";
-              }?>>
-              <?php
-              }
-                  ?>
-              </td>
-              <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-              <?php
-              }
-            ?>
-              <tr class="cellu">
-              <td width='13' height='37' class='rl'>&nbsp;</td>
-              <td width=100><?php echo $hyperfunk_lang['betreff']?>: </td>
-              <td><input name=betreff size=30 tabindex="3" style="border-style:solid;height:21;" <?php
-
-              if ($action == "ant") {
-                  echo 'value="'.$hyperfunk_lang['re'].' '.htmlspecialchars($rowtfn['betreff'], ENT_QUOTES, 'UTF-8', false).'">';
-              } elseif ($action == "weiter") {
-                  echo 'value="'.$hyperfunk_lang['fw'].' '.htmlspecialchars($rowtfn['betreff'], ENT_QUOTES, 'UTF-8', false).'">';
-              }
-
-            ?>
-              </td>
-              <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-
-              <tr class="cellu">
-              <td width='13' height='37' class='rl'>&nbsp;</td>
-              <td colspan=2 align=center height=50>
-
-              <input type="button" value="&nbsp;b&nbsp;"  onclick="init('fett')">
-              <input type="button" value="&nbsp;u&nbsp;"  onclick="init('under')">
-              <input type="button" value="&nbsp;i&nbsp;"  onclick="init('kursiv')">
-              <input type="button" value="<?php echo $hyperfunk_lang['rot']?>"  onclick="init('rot')">
-              <input type="button" value="<?php echo $hyperfunk_lang['gelb']?>"  onclick="init('gelb')">
-              <input type="button" value="<?php echo $hyperfunk_lang['gruen']?> "  onclick="init('gruen')">
-              <input type="button" value="<?php echo $hyperfunk_lang['weiss']?>"  onclick="init('weiss')">
-              <input type="button" value="<?php echo $hyperfunk_lang['Farbe']?> "  onclick="init('farbe')">
-              
-              <input type="button" value="<?php echo $hyperfunk_lang['groesse']?>"  onclick="init('size')">
-              <input type="button" value="center"  onclick="init('center')">
-              <!--<input type="button" value="pre"  onclick="init('pre')">-->
-              <input type="button" value="Link"  onclick="init('www')">
-              <input type="button" value="@"  onclick="init('mail')">
-              <input type="button" value="&nbsp;?&nbsp;"  onclick="hilfe()">
-              <!--<input type="button" value="<?php echo $hyperfunk_lang['leeren']?>"  onclick="leeren()">-->
-              </td>
-              <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-
-              <tr>
-              <td width='13' height='37' class='rl'>&nbsp;</td>
-              <td colspan=2 align="center"><textarea rows="15" cols="64" tabindex="4" name="nachricht" id="nachricht"><?php if ($action == "ant" or $action == "weiter") {
-                  echo '[i][b]'.$rowtfn['fromnic'].' '.$hyperfunk_lang['schrieb'].': [/b]'.umlaut($rowtfn['text']).'[/i]';
-              }?></textarea></td>
-              <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-
-              <tr>
-                  <td width='13' height='37' class='rl'>&nbsp;</td>
-                  <td colspan=2 align=center><input type="button"  value="<?php echo $hyperfunk_lang['laengepruefen']?>" onClick="check()"> <input type=submit tabindex="5" onclick="return zeichenundsmiliecheck()"  name=<?php if ($action == "sektor") {
-                      echo "sekmsg";
-                  } elseif ($action == "alli") {
-                      echo "allimsg";
-                  } elseif ($action == "freunde") {
-                      echo "freundemsg";
-                  } else {
-                      echo "antbut";
-                  }?> value="<?php if ($action == "sektor") {
-                      echo $hyperfunk_lang['sektornachricht'];
-                  } elseif ($action == "alli") {
-                      echo $hyperfunk_lang['allianznachricht'];
-                  } elseif ($action == "freunde") {
-                      echo $hyperfunk_lang['freundenachricht'];
-                  } else {
-                      echo $hyperfunk_lang['hyperfunknachricht'];
-                  }?> <?php print($hyperfunk_lang['msg_31']) ?>" ></td>
-                  <td width='13' height='37' class='rr'>&nbsp;</td>
-              </tr>
-
-                  <tr>
-                  <td width='13' class='rul'>&nbsp;</td>
-                  <td class='ru' colspan=2>&nbsp;</td>
-                  <td width='13' class='rur'>&nbsp;</td>
-                  </tr>
-              </table>
-              </form>
-<?php
-
-// if($action!="sektor" and $action!="alli" and $action!="freunde" ) echo " onclick=\"return checkobleer()\"";
-
+            rahmen_oben($titel);
+            echo $formular->render();
+            rahmen_unten();
         } else {
             echo insertmessage($hyperfunk_lang['msg_20'], "r", $hyperfunk_lang['systemnachricht']);
         }
@@ -1104,7 +687,7 @@ if ($action == "delbuddy") {
 
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=1", [$_SESSION['ums_user_id'], $sector, $system]);
 
-    echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
+    echo insertmessage($hyperfunk_lang['msg_28'], "g", $hyperfunk_lang['systemnachricht']);
 
     $action = "optionen";
 }
@@ -1115,66 +698,43 @@ if ($action == "delene") {
 
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_hfn_buddy_ignore WHERE user_id=? and sector=? and `system`=? and status=2", [$_SESSION['ums_user_id'], $sector, $system]);
 
-    echo insertmessage($hyperfunk_lang['msg_28'], "r", $hyperfunk_lang['systemnachricht']);
+    echo insertmessage($hyperfunk_lang['msg_28'], "g", $hyperfunk_lang['systemnachricht']);
 
     $action = "optionen";
 }
-
-//Optionen Menu
+//Optionen: Ignorierliste
 if ($action == "optionen") {
-    ?>
-<br>
-<form action="hyperfunk.php?action=optionen" method="post">
-<table border="0" cellspacing="0" cellpadding="0" width="300">
-<tr>
-<td width="13" height="25" class="rml"></td>
-<td align=center class="ro" colspan="2" height="35"><div class="cellu"><?php echo $hyperfunk_lang['ignorelist']?></div></td>
-<td width="13" height="25" class="rmr"></td>
-</tr>
-
-    <?php
     $db_enemy = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, name FROM de_hfn_buddy_ignore WHERE user_id=? and status=2", [$_SESSION['ums_user_id']]);
 
     $nume = mysqli_num_rows($db_enemy);
 
-    $counter = 1;
+    rahmen_oben('Ignorierliste');
+    echo '<div class="mod hf">';
+    echo '<div class="ally-hinweis">Von diesen Koordinaten nimmst du keine Hyperfunknachrichten an, auch keine Sektor- oder Allianznachrichten. Zieht ein Spieler um, gilt der Eintrag f&uuml;r ihn nicht mehr.</div>';
 
     if ($nume == "0") {
-        echo '<tr><td width="13" class="rl" height="25"></td><td align="center" colspan="2" class="cell"><div class="fett">'.$hyperfunk_lang['keine_feinde'].'</div></td><td width="13" height="25" class="rr"></td></tr>';
+        echo '<div class="mod-leer hf-abstand">' . $hyperfunk_lang['keine_feinde'] . '</div>';
     } else {
+        echo '<div class="ally-abschnitt"><div class="mod-typ">' . $nume . ' von ' . $sv_hf_ignore_p . ' Eintr&auml;gen</div><div class="hf-liste">';
         while ($row = mysqli_fetch_array($db_enemy)) {
-            if ($counter == 1) {
-                echo '<tr><td width="13" class="rl" height="25"></td><td align="right" class="cell">'.$row['sector'].':'.$row['system'].'&nbsp;&nbsp;&nbsp;('.$row['name'].')&nbsp;&nbsp;&nbsp;</td><td class="cell">&nbsp;&nbsp;&nbsp;<a href="hyperfunk.php?se='.$row['sector'].'&sy='.$row['system'].'&action=delene">'.$hyperfunk_lang['loeschen'].'</a></td><td width="13" height="25" class="rr"></td></tr>';
-                $counter = 0;
-            } else {
-                echo '<tr><td width="13" class="rl" height="25"></td><td align="right" class="cell1">'.$row['sector'].':'.$row['system'].'&nbsp;&nbsp;&nbsp;('.$row['name'].')&nbsp;&nbsp;&nbsp;</td><td class="cell1">&nbsp;&nbsp;&nbsp;<a href="hyperfunk.php?se='.$row['sector'].'&sy='.$row['system'].'&action=delene">'.$hyperfunk_lang['loeschen'].'</a></td><td width="13" height="25" class="rr"></td></tr>';
-                $counter = 1;
-            }
+            echo '<div class="hf-zeile"><span><b>' . $row['name'] . '</b> <small>' . $row['sector'] . ':' . $row['system'] . '</small></span>';
+            echo '<a href="hyperfunk.php?se=' . $row['sector'] . '&amp;sy=' . $row['system'] . '&amp;action=delene" class="mod-btn mod-btn-leise ally-btn-klein">entfernen</a></div>';
         }
+        echo '</div></div>';
     }
 
-    ?>
-<tr>
-    <td width="13" class="rl" height="20"></td>
-    <td class="cell" align="right" width="120" height="30"><div class="fett"><?php echo $hyperfunk_lang['koordinaten']?>&nbsp;&nbsp;&nbsp;</div></td><td class="cell">&nbsp;&nbsp;&nbsp;<input type="text" name="feindsector" size="3" style="border-style:solid;height:21;">&nbsp;:&nbsp;<input type="text" name="feindsystem" size="2" style="border-style:solid;height:21;"></td>
-    <td width="13" height="20" class="rr"></td>
-</tr>
-<tr>
-    <td width="13" class="rl" height="25"></td>
-    <td colspan="2" align="center" class="cell"><input type="submit" name="ignorebtn"  value="<?php echo $hyperfunk_lang['feind_adden']?>"></td>
-    <td width="13" height="25" class="rr"></td>
-</tr>
-<tr>
-<td width="13" class="rul">&nbsp;</td>
-<td class="ru" colspan="2">&nbsp;</td>
-<td width="13" class="rur">&nbsp;</td>
-</tr>
-</table>
-</form>
-<?php
+    echo '<form action="hyperfunk.php?action=optionen" method="post" class="ally-abschnitt">';
+    echo '<div class="mod-typ">' . $hyperfunk_lang['feind_adden'] . '</div>';
+    echo '<div class="hf-zeilenformular"><span class="hf-koords">';
+    echo '<input type="text" name="feindsector" class="mod-eingabe" inputmode="numeric" autocomplete="off" placeholder="Sek.">';
+    echo '<i>:</i>';
+    echo '<input type="text" name="feindsystem" class="mod-eingabe" inputmode="numeric" autocomplete="off" placeholder="Sys."></span>';
+    echo '<button type="submit" name="ignorebtn" value="' . $hyperfunk_lang['feind_adden'] . '" class="mod-btn">' . $hyperfunk_lang['feind_adden'] . '</button>';
+    echo '</div></form>';
+
+    echo '</div>';
+    rahmen_unten();
 }
 ?>
-<br><br>
-
 </body>
 </html>
