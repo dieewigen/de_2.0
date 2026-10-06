@@ -27,8 +27,14 @@ include('ally/ally.menu.inc.php');
 
 $a=$_REQUEST['a'] ?? -1;
 
+//Meldungen unter den Reitern
+function loeschen_meldung($text)
+{
+	return '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.$text.'</div></div>';
+}
+
 if(!$isleader){
-	echo $allydelete_lang['msg_1'];
+	echo loeschen_meldung($allydelete_lang['msg_1']);
 }
 else
 {
@@ -44,7 +50,7 @@ else
 		}
 		else
 		{
-			die($allydelete_lang['msg_1']);
+			die(loeschen_meldung($allydelete_lang['msg_1']));
 		}
 		$result = mysqli_execute_query($GLOBALS['dbi'],
             "SELECT MAX(kriegsstart) AS kriegsstart FROM de_ally_war, de_allys 
@@ -74,7 +80,7 @@ else
 						$minuten=0;
 					}
 
-					die("$allydelete_lang[msg_2_1] $stunden $allydelete_lang[msg_2_2] $minuten $allydelete_lang[msg_2_3]");
+					die(loeschen_meldung(preg_replace('/^(<br>\s*)+/i', '', "$allydelete_lang[msg_2_1] $stunden $allydelete_lang[msg_2_2] $minuten $allydelete_lang[msg_2_3]")));
 				}
 			}
 		}
@@ -104,8 +110,19 @@ else
 	}
 	else
 	{
-		echo '<div class="cell text2" style="width: 600px;">'.$allydelete_lang['msg_4'];
-		echo '<a href="ally_delete.php?a=1"><font face="tahoma" style="font-size:14pt;"><b>'.$allydelete_lang['msg_5'].'</a><br />';
+		//Rückfrage; der rote Knopf braucht zusätzlich einen zweiten Klick
+		rahmen_oben($allydelete_lang['title']);
+		echo '
+		<div class="ally mod">
+			<div class="ally-gefahr">
+				<div class="ally-gefahr-text">'.preg_replace('/^(<br>\s*)+|(<br>\s*)+$/i', '', $allydelete_lang['msg_4']).'</div>
+				<div class="ally-aktionen ally-aktionen-mitte">
+					<a href="ally_members.php" class="mod-btn mod-btn-leise">Leader-Amt abgeben</a>
+					<a href="ally_delete.php?a=1" class="mod-btn mod-btn-gefahr" data-bestaetigen="Endg&uuml;ltig l&ouml;schen?">'.$allydelete_lang['msg_5'].'</a>
+				</div>
+			</div>
+		</div>';
+		rahmen_unten();
 	}
 }
 

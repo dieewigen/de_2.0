@@ -48,30 +48,9 @@ if ($pd['allytag'] != "" && $pd['ally_status'] == 1) {
     $allyId = $pd['ally_id'];
 } else {
     // Wenn der Spieler keiner Allianz angehört, dann wird die Seite nicht angezeigt
-    echo '<div class="error">'.$allymembers_lang['msg_3'].'</div>';
+    echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.$allymembers_lang['msg_3'].'</div></div>';
     exit;
 }
-
-rahmen_oben($allymembers_lang['mitgliederliste']);
-
-echo '
-<table border="0" width="574px" cellspacing="1" cellpadding="0">
-
-    <tr>
-        <td class="tc"><a href="ally_members.php?ordermode=name">'.$allymembers_lang['name'].'</a></td>
-        <td class="tc"><a href="ally_members.php?ordermode=cols">'.$allymembers_lang['kollies'].'</a></td>
-        <td class="tc"><a href="ally_members.php?ordermode=points">'.$allymembers_lang['punkte'].'</a></td>
-        <td class="tc"><a href="ally_members.php?ordermode=koords">'.$allymembers_lang['koords'].'</a></td>
-        <td class="tc"><a href="ally_members.php?ordermode=race" title="Rasse">R</a></td>';
-
-if ($isleader) {
-    echo '<td class="tc">'.$allymembers_lang['kicken'].'</td>
-          <td class="tc">'.$allymembers_lang['leader'].'</td>';
-}
-if ($iscoleader) {
-    echo '<td class="tc">'.$allymembers_lang['kicken'].'</td>';
-}
-echo '</tr>';
 
 $ordermode = isset($_GET['ordermode']) ? $_GET['ordermode'] : '';
 
@@ -93,12 +72,29 @@ if (!empty($ordermode)) {
     $orderstring = "sector, `system` ASC";
 }
 
+//Spaltenköpfe sortieren die Liste, die aktive Sortierung ist hervorgehoben
+$sortierung = ($ordermode == '') ? 'koords' : $ordermode;
+function mitglieder_kopf($modus, $text, $sortierung, $klasse = '', $titel = '')
+{
+    return '<a href="ally_members.php?ordermode='.$modus.'" class="ally-sortieren'.($modus == $sortierung ? ' ally-sortieren-aktiv' : '').$klasse.'"'.($titel != '' ? ' title="'.$titel.'"' : '').'>'.$text.'</a>';
+}
+
+//Spalten je nach Rechten: Leader entlassen und ernennen, Co-Leader entlassen
+$zeilenklasse = 'ally-mitglied';
+if ($isleader) {
+    $zeilenklasse .= ' ally-mitglied-leader';
+} elseif ($iscoleader) {
+    $zeilenklasse .= ' ally-mitglied-coleader';
+}
+
 $result = mysqli_execute_query(
     $GLOBALS['dbi'],
     "SELECT * FROM de_user_data WHERE status=1 AND ally_id= ? ORDER BY $orderstring",
     [$allyId]
 );
 
+$zeilen = '';
+$anzahl = 0;
 while ($data = mysqli_fetch_assoc($result)) {
 
     $userid = $data['user_id'];
@@ -139,42 +135,58 @@ while ($data = mysqli_fetch_assoc($result)) {
     );
     $de_login_data = mysqli_fetch_assoc($de_login_result);
     $de_login_status = $de_login_data["status"];
+    //Namen sind bereits UTF-8 (früher hier ein zweites Mal umgewandelt: "TÃ¼rmchen")
+    $name_html = $name;
+    $inaktiv = '';
     if ($de_login_status != 1) {
-        $name = "<i>(".$name.")</i>";
+        $name_html = "<i>(".$name.")</i>";
+        $inaktiv = ' ally-mitglied-inaktiv';
     }
-    echo '
-		<form name="f'.$sector.'x'.$system.'" action="sector.php?sf='.$sectorjump.'" method="POST">
-			<tr>
-				<td class="cl"><a href="details.php?a=s&se='.$sector.'&sy='.$system.'">'.utf8_encode_fix($name).'</a></td>
-				<td class="cr">'.$kollies.'</td>
-				<td class="cr">'.number_format($score, 0, '', '.').'</td>
-				<td class="cc"><a href="javascript:document.f'.$sector.'x'.$system.'.submit()">'.$sector.':'.$system.'</a></font></a></td>
-				<td class="cc">'.$rasse.'</td>
-	    ';
 
+    //Entlassen/Leader übergeben mit Zwei-Klick-Bestätigung statt Rückfrage
+    $aktionen = '';
     if ($isleader) {
-        echo '
-						<td class="cr"><a onClick="return confirm(\''.$allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'].'\');" href="ally_kick.php?userid='.$userid.'"><font face="tahoma" style="font-size:8pt;">'.$allymembers_lang['entlassen'].'</font></a></td>
-						<td class="cr"><a onClick="return confirm(\''.$allymembers_lang['msg_2_1'].' '.$name.' '.$allymembers_lang['msg_2_2'].'\');" href="ally_leader.php?userid='.$userid.'"><font face="tahoma" style="font-size:8pt;">'.$allymembers_lang['toleader'].'</font></a></td>
-				';
+        $aktionen = '
+            <span class="ally-mitglied-aktionen">
+                <a href="ally_kick.php?userid='.$userid.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
+                <a href="ally_leader.php?userid='.$userid.'" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Abgeben?" title="'.htmlspecialchars($allymembers_lang['msg_2_1'].' '.$name.' '.$allymembers_lang['msg_2_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['toleader']).'</a>
+            </span>';
     }
-    //Erzeugen der Adminlinks f&uuml;r Co-Leader
     if ($iscoleader) {
-        echo '
-						<td class="cr"><a onClick="return confirm(\''.$allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'].'\');" href="ally_kick.php?userid='.$userid.'"><font face="tahoma" style="font-size:8pt;">'.$allymembers_lang['entlassen'].'</font></a></td>';
+        $aktionen = '
+            <span class="ally-mitglied-aktionen">
+                <a href="ally_kick.php?userid='.$userid.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
+            </span>';
     }
 
-    echo '
-    	</tr>
-	</form>';
-
-
+    //je Zeile ein Formular: die Koordinaten öffnen den Sektor
+    $zeilen .= '
+        <form name="f'.$sector.'x'.$system.'" action="sector.php?sf='.$sectorjump.'" method="POST" class="'.$zeilenklasse.$inaktiv.'">
+            <a href="details.php?a=s&se='.$sector.'&sy='.$system.'" class="ally-mitglied-name">'.$name_html.'</a>
+            <span class="ally-zahl">'.$kollies.'</span>
+            <span class="ally-zahl">'.number_format($score, 0, '', '.').'</span>
+            <a href="javascript:document.f'.$sector.'x'.$system.'.submit()" class="ally-zahl">'.$sector.':'.$system.'</a>
+            <span class="ally-rasse">'.$rasse.'</span>
+            '.$aktionen.'
+        </form>';
+    $anzahl++;
 }
 
-
+rahmen_oben($allymembers_lang['mitgliederliste']);
 
 echo '
-	</table>';
+<div class="ally mod">
+    <div class="'.$zeilenklasse.' ally-zeilenkopf">
+        '.mitglieder_kopf('name', $allymembers_lang['name'], $sortierung).'
+        '.mitglieder_kopf('cols', $allymembers_lang['kollies'], $sortierung, ' ally-rechts').'
+        '.mitglieder_kopf('points', $allymembers_lang['punkte'], $sortierung, ' ally-rechts').'
+        '.mitglieder_kopf('koords', $allymembers_lang['koords'], $sortierung, ' ally-rechts').'
+        '.mitglieder_kopf('race', 'R', $sortierung, ' ally-rasse', 'Rasse').'
+        '.(($isleader || $iscoleader) ? '<span></span>' : '').'
+    </div>
+    <div class="ally-zeilen">'.$zeilen.'</div>
+    <div class="ally-fuss"><span class="mod-chip">Mitglieder <b>'.$anzahl.'</b></span></div>
+</div>';
 
 rahmen_unten();
 

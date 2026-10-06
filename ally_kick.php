@@ -38,13 +38,16 @@ include('lib/basefunctions.lib.php');
 
 $userid = $_GET['userid'] ?? 0;
 
+//Ergebnis als Meldung unter den Reitern, darunter zurück zur Mitgliederliste
+echo '<div class="mod ally-meldung">';
+
 //Erweiterung des Querys auf Abfrage von Coleadern von Ascendant (05.09.2002)
 $allys = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?",
     [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 if(mysqli_num_rows($allys) < 1)
 {
-	echo $allykick_lang['msg_1'];
+	echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_1'].'</div>';
 }
 else
 {
@@ -79,7 +82,7 @@ else
 	
 	if($leaderid == $userid)
 	{
-		echo $allykick_lang['msg_2'];
+		echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_2'].'</div>';
 	}
 	else
 	{
@@ -94,7 +97,7 @@ else
 					[$userid]);
 				
 				notifyUser($userid, $allykick_lang['msg_3_1'].' <b>'.$clantag.'</b> '.$allykick_lang['msg_3_2'], 6);
-				echo '<div class="info_box text3">'.$allykick_lang['msg_4_1'].' '.$kick_fee.' '.$allykick_lang['msg_4_2'].'</div>';
+				echo '<div class="mod-meldung mod-meldung-ok">'.$allykick_lang['msg_4_1'].' '.$kick_fee.' '.$allykick_lang['msg_4_2'].'</div>';
 				
 				//Wenn ein Coleader gekickt wird, wird diese Änderung zusätzlich im Allianzdatensatz vermerkt
 				if($coleaderid1 == $userid)
@@ -130,15 +133,16 @@ else
 			}
 			else
 			{
-				echo $allykick_lang['msg_6'];
+				echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_6'].'</div>';
 			}
 		}
 		else
 		{
 			$t_need = $kick_fee-$t_depot;
-			echo '<div class="info_box text2">'.$allykick_lang['msg_7_1'].' ('.$t_need.') '.$allykick_lang['msg_7_2'].'</div>';
+			echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_7_1'].' ('.$t_need.') '.$allykick_lang['msg_7_2'].'</div>';
 		}
 	}
 }
+echo '<div class="ally-aktionen"><a href="ally_members.php" class="mod-btn mod-btn-leise">Zur Mitgliederliste</a></div></div>';
 ?>
 <?php include('ally/ally.footer.inc.php'); ?>

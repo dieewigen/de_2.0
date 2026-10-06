@@ -1,24 +1,15 @@
 <?php
-//        --------------------------------- allymain.php ---------------------------------
-//        Funktion der Seite:                Anzeige der Allianz&uuml;bersicht
-//        Letzte &Auml;nderung:                05.09.2002
-//        Letzte &Auml;nderung von:        Ascendant
-//
-//        &Auml;nderungshistorie:
-//
-//        05.02.2002 (Ascendant)        - Erweiterung der &Auml;nderungsbefugnis der Allianzdaten
-//                                                          auf Coleader
-//                                                        - Erweiterung der Seite um Anzeige des Leaders und der
-//                                                          Coleader. Per Klick auf die Namen kann dem Leader und
-//                                                          den Co-Leadern eine Nachricht gesendet werden.
+//        --------------------------------- ally_detail.php ---------------------------------
+//        Funktion der Seite:                Öffentliche Informationen zu einer Allianz
+//                                           (aus der Rangliste und der Sektoransicht)
 //  --------------------------------------------------------------------------------
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.detail.lang.php';
 include_once 'functions.php';
 
 
-$result = mysqli_execute_query($GLOBALS['dbi'], 
-    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status 
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, status
      FROM de_user_data WHERE user_id=?",
     [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_array($result);
@@ -48,14 +39,14 @@ include ("ally/ally.menu.inc.php");
 $allytag=$_REQUEST['allytag'] ?? '';
 $allyid=$_REQUEST['allyid'] ?? '';
 
-$result = mysqli_execute_query($GLOBALS['dbi'], 
+$result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE id=? OR allytag=? LIMIT 0,1",
     [$allyid, $allytag]);
 $num = mysqli_num_rows($result);
 if($num==1)
 {
 	$row = mysqli_fetch_assoc($result);
-	
+
 	$clanid 		= $row["id"];
 	//alle Texte stammen von Spielern und werden für die Ausgabe escaped bzw. gesäubert
 	$clanname 		= html_text($row["allyname"]);
@@ -65,122 +56,87 @@ if($num==1)
 	$memberlimit 	= $row["memberlimit"];
 	$openirc	 	= discord_invite_code($row["openirc"]);
 	$bewerberinfo 	= safe_basic_html($row["bewerberinfo"]);
-	
-	$result2 = mysqli_execute_query($GLOBALS['dbi'], 
+
+	$result2 = mysqli_execute_query($GLOBALS['dbi'],
 	    "SELECT COUNT(*) as count FROM de_user_data WHERE allytag=? AND status=1",
 	    [$clankuerzel]);
 	$count_row = mysqli_fetch_assoc($result2);
 	$membercount = $count_row['count'];
-	
+
 	$bio = formatString($row["besonderheiten"]);
 	$ausrichtung = html_text($row["ausrichtung"]);
 	$regierungsform = html_text($row["regierungsform"]);
 	$allianzform = $row["allianzform"];
-	
-	
-	
-	print("<br>");
+
 	rahmen_oben('Allianzinformationen');
-	echo '<div align="center"><table width="574px">';
-	//print("<tr class=\"cell\"><td><h2>$allydetail_lang[willkommen], $_SESSION['ums_spielername']</h2></td></tr>");
-	print("<tr><td>
-			<table border=\"0\" width=\"100%\" cellspacing=\"1\" cellpadding=\"0\">
-	    		<tr>
-	      			<td width=100% height=21 colspan=2 class=\"cellu\"><h3>$allydetail_lang[info] ".$clanname." ($clankuerzel):</h3></td>
-	    		</tr>
-	    		<tr class=cl>
-	      			<td height=21>$allydetail_lang[allyname]:</td>
-	      			<td height=21><b>".$clanname."</b></td>
-	    		</tr>
-	    		<tr class=cl>
-	      			<td height=21>$allydetail_lang[allytag]:</td>
-	      			<td height=21><b>".$clankuerzel."</b></td>
-	    		</tr>");
-	//allyleader inkl. hf-möglichkeit 
-	$result = mysqli_execute_query($GLOBALS['dbi'], 
+	echo '<div class="ally mod">';
+
+	//allyleader inkl. hf-möglichkeit
+	$leader='';
+	$result = mysqli_execute_query($GLOBALS['dbi'],
 	    "SELECT spielername, sector, system FROM de_user_data WHERE user_id=?",
 	    [$leaderid]);
 	$num = mysqli_num_rows($result);
 	if($num==1)
 	{
 		$row = mysqli_fetch_array($result);
-		echo '	<tr class=cl>
-	      			<td height=21>Allianzleader:</td>
-	      			<td height=21><a href="details.php?se='.$row['sector'].'&sy='.$row['system'].'"><b>'.$row['spielername'].'</b></a></td>
-	    		</tr>';	
-		
+		$leader='<span class="mod-chip">Allianzleader <a href="details.php?se='.$row['sector'].'&sy='.$row['system'].'" class="ally-person">'.$row['spielername'].'</a></span>';
 	}
-	
-	$discord_open_link='';
-	if(!empty(trim($openirc))){
-		$discord_open_link='<a href="https://discord.gg/'.$openirc.'" target="_blank">zu Discord</a>';
-	}	
-	
-	print("		<tr class=cl>
-	      			<td height=21>$allydetail_lang[memberlimit]:</td>
-	      			<td height=21><b>$memberlimit</b></td>
-	    		</tr>
-	 			<tr class=cl>
-	      			<td height=21>$allydetail_lang[regierungsform]:</td>
-	      			<td height=21><b>$regierungsform</b></td>
-	    		</tr>
-	 			<tr class=cl>
-	      			<td height=21>$allydetail_lang[politischeausrichtung]:</td>
-	      			<td height=21><b>".$ausrichtung."</b></td>
-	    		</tr>
-	    		<tr class=cl>
-	      			<td height=21>$allydetail_lang[mitglieder]:</td>
-	      			<td height=21><b>$membercount</b></td>
-	    		</tr>
-	    		<tr class=cl>
-	      			<td height=21>$allydetail_lang[ircchannel]:</td>
-	      			<td height=21>".$discord_open_link."</td>
-	    		</tr>
-	    		<tr class=cl>
-	      			<td height=21>$allydetail_lang[homepage]:</td>
-	      			<td height=21><b><a href=\"$homepageurl\" target=_blank>$homepageurl</a></b></td>
-	    		</tr>
-	");
-	print("
-	    		<tr>
-	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[allianzbiografie]:</h3></td>
-	    		</tr>
-	    		<tr>
-	      			<td class=cl height=21 colspan=2>".nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8'))."</td>
-	    		</tr>
-	    		<tr>
-	      			<td height=21 colspan=2 class=cellu><h3>$allydetail_lang[bewerberinfo]:</h3></td>
-	    		</tr>
-	    		<tr>
-	      			<td class=cl height=21 colspan=2>".$bewerberinfo."</td>
-	    		</tr>
-	    		<tr>
-	      			<td height=21 colspan=2><hr></td>
-	    		</tr>
-	    		");
+
+	echo '
+	<div class="ally-kopf">
+		<div class="ally-tag">'.$clankuerzel.'</div>
+		<div class="ally-kopf-text">
+			<div class="ally-name">'.$clanname.'</div>
+			<div class="ally-chips">
+				'.$leader.'
+				<span class="mod-chip">'.$allydetail_lang['regierungsform'].' <b>'.$regierungsform.'</b></span>
+				<span class="mod-chip">'.$allydetail_lang['politischeausrichtung'].' <b>'.$ausrichtung.'</b></span>
+			</div>
+		</div>
+	</div>
+	<div class="ally-kacheln ally-kacheln-2">
+		<div class="ov-wert"><span class="mod-typ">'.$allydetail_lang['mitglieder'].'</span><b>'.$membercount.' / '.$memberlimit.'</b></div>
+		<div class="ov-wert"><span class="mod-typ">Kontakt</span><span class="ally-links">'.
+			(!empty(trim($openirc)) ? '<a href="https://discord.gg/'.$openirc.'" target="_blank" class="mod-btn mod-btn-leise">Discord</a>' : '').
+			($homepageurl != '' ? '<a href="'.$homepageurl.'" target="_blank" class="mod-btn mod-btn-leise" title="'.$homepageurl.'">'.$allydetail_lang['homepage'].'</a>' : '').
+			((empty(trim($openirc)) && $homepageurl == '') ? '<small>keine Angaben</small>' : '').'</span></div>
+	</div>';
+
+	echo '
+	<div class="ally-abschnitt">
+		<div class="mod-typ">'.$allydetail_lang['allianzbiografie'].'</div>
+		'.(trim($bio) != '' ? '<div class="ally-text">'.nl2br(htmlspecialchars($bio, ENT_QUOTES, 'UTF-8')).'</div>' : '<div class="ally-hinweis">Keine Angaben.</div>').'
+	</div>
+	<div class="ally-abschnitt">
+		<div class="mod-typ">'.$allydetail_lang['bewerberinfo'].'</div>
+		'.(trim($bewerberinfo) != '' ? '<div class="ally-text">'.$bewerberinfo.'</div>' : '<div class="ally-hinweis">Keine Angaben.</div>').'
+	</div>';
+
+	//bewerben, falls möglich
+	$join_link = '';
 	if ($status != 1 && $memberlimit>$membercount){
-		$join_link="&middot; <a href=\"ally_join.php?ally_id=".$clanid."\">$allydetail_lang[msg_1]</a>";
-		//$join_link="&middot; <a href=\"ally_join.php?a_id=$clanid\">$allydetail_lang[msg_1]</a>";
+		$join_link='<a href="ally_join.php?ally_id='.$clanid.'" class="mod-btn">'.rtrim($allydetail_lang['msg_1'], '.').'</a>';
 	}
 	elseif ($status == 1)
 	{
-		$join_link = "&middot; $allydetail_lang[msg_2]";
+		$join_link = '<span class="mod-feld">'.$allydetail_lang['msg_2'].'</span>';
 	}
 	elseif ($memberlimit<=$membercount)
 	{
-		$join_link = "&middot; $allydetail_lang[msg_3]";
+		$join_link = '<span class="mod-feld mod-feld-grund">'.$allydetail_lang['msg_3'].'</span>';
 	}
-	print("
-		    		<tr class=\"cell\">
-		      			<td align=right height=21 colspan=2><a href=\"javascript:history.back()\">$allydetail_lang[msg_4]</a> $join_link</td>
-		    		</tr>
-		");
-	print("</table></td></tr></table>");
+	echo '
+	<div class="ally-aktionen">
+		<a href="javascript:history.back()" class="mod-btn mod-btn-leise">'.$allydetail_lang['msg_4'].'</a>
+		'.$join_link.'
+	</div>';
+
+	echo '</div>';
 	rahmen_unten();
 }
-else echo '<div class="info_box text2">Diese Allianz konnte nicht gefunden werden.</a>';
+else echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Diese Allianz konnte nicht gefunden werden.</div></div>';
 ?>
-<br>
 <?php include("ally/ally.footer.inc.php") ?>
 
 </body>

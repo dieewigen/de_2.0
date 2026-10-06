@@ -161,7 +161,7 @@ if($num==1){
 				//hat man bei den späteren Gebäuden die Allianzsektorraumbasis als Vorbedingung erfüllt?
 				if($build==0 || $def_allybldg[0]['haslevel']>0){
 
-					//nochmal die geb�udestufe auslesen, damit alles konsistent ist
+					//nochmal die gebäudestufe auslesen, damit alles konsistent ist
 					$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 						"SELECT * FROM de_allys WHERE id = ?",
 						[$allyid]
@@ -207,7 +207,7 @@ if($num==1){
 										changeAllyStorageAmount($ownallyid, $key, $value*-1);
 									}
 
-									//artefakte abziehen und das geb�ude in der db hinterlegen, dazu questpoints gutschreiben
+									//artefakte abziehen und das gebäude in der db hinterlegen, dazu questpoints gutschreiben
 									mysqli_execute_query($GLOBALS['dbi'],
 										"UPDATE de_allys SET t_depot = t_depot - ?, artefacts = artefacts - ?, 
 										 bldg".$build." = bldg".$build." + 1, questpoints = questpoints + 10 
@@ -226,7 +226,7 @@ if($num==1){
 									writeHistory($allytag, $entry);
 							
 									//meldung für den bauer
-									echo '<br><div class="info_box text1">'.$entry.'</div>';
+									echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$entry.'</div></div>';
 
 									///////////////////////////////////////////////////////////////
 									// das Gebäude kann eine Direktwirkung haben
@@ -249,23 +249,23 @@ if($num==1){
 
 								}else{
 									//fehlermeldung zu wenig Rohstoffe
-									echo '<br><div class="info_box text2">Die Allianz hat nicht genug Rohstoffe.</div>';
+									echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Die Allianz hat nicht genug Rohstoffe.</div></div>';
 								}
 							}else{
 							//fehlermeldung zu wenig artefakte
-							echo '<br><div class="info_box text2">Die Allianz hat nicht genug Tronic.</div>';
+							echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Die Allianz hat nicht genug Tronic.</div></div>';
 							}
 						}else{
 						//fehlermeldung zu wenig artefakte
-						echo '<br><div class="info_box text2">Die Allianz hat nicht genug Allianzartefakte.</div>';
+						echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Die Allianz hat nicht genug Allianzartefakte.</div></div>';
 						}
 					}
 				}
 			}else{
-				echo '<br><div class="info_box text2">Nur der Allianzleiter kann Allianzprojekte in Auftrag geben.</div>';
+				echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Nur der Allianzleiter kann Allianzprojekte in Auftrag geben.</div></div>';
 			}    
 			//transaktionsende
-			$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+			$erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
 			if ($erg){
 			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			}
@@ -273,7 +273,7 @@ if($num==1){
 			print('Datensatz Nr. '.$_SESSION['ums_user_id'].' Konnte nicht entsperrt werden.<br><br>');
 			}
 		}// if setlock-ende
-		else echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
+		else echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</div></div>';
     }
     
     //////////////////////////////////////////////////////
@@ -286,94 +286,116 @@ if($num==1){
 	$GLOBALS['as']=$as;
 
 	//print_r($GLOBALS['as']);
-    
-    echo '<br>';
-	rahmen_oben('Allianzprojekte');
-	$cssheight=180;
 
-	echo '<div class="cell" style="width: 574px; height: '.$cssheight.'px; position: relative; font-size: 10px; text-align: center;">';
-	echo '<div class="cell" style="width: 560px; height: 20px; top: 0px; position: relative; font-size: 10px; text-align: left;">
-	Allianzartefakte: '.number_format($row['artefacts'],0,",",".").
-	' - Allianztronic: '.number_format($row['t_depot'],0,",",".").
-	' - '.$as[13]['item_name'].': '.number_format($as[13]['item_amount'],0,",",".").' 
-	
-	</div>';    
+	rahmen_oben('Allianzprojekte');
+	echo '<div class="ally mod">';
+
+	//Bestand der Allianz
+	echo '
+	<div class="ally-kacheln ally-kacheln-3">
+		<div class="ov-wert"><span class="mod-typ">Allianzartefakte</span><b>'.number_format($row['artefacts'],0,",",".").'</b></div>
+		<div class="ov-wert"><span class="mod-typ">Allianztronic</span><b>'.number_format($row['t_depot'],0,",",".").'</b></div>
+		<div class="ov-wert"><span class="mod-typ">'.$as[13]['item_name'].'</span><b>'.number_format($as[13]['item_amount'],0,",",".").'</b></div>
+	</div>';
+
+	$ist_leader = ($_SESSION['ums_user_id']==$leaderid);
+	if(!$ist_leader){
+		echo '<div class="mod-hinweis ally-abstand">Nur der Allianzleiter kann Allianzprojekte in Auftrag geben.</div>';
+	}
+
+	echo '<div class="ally-projekte">';
 	for($i=0;$i<count($def_allybldg);$i++){
 		//Test ob man als Voraussetzung bereits die Allianzsektorraumbasis hat
 		if($i==0 || ($def_allybldg[0]['haslevel']>0 && $i>0)){
 
+			$haslevel=$def_allybldg[$i]['haslevel'];
+			$maxlevel=$def_allybldg[$i]['maxlevel'];
+
 			//////////////////////////////////////////
-			//Tooltip zusammenbauen
+			//Kosten der nächsten Stufe, fehlende rot
 			//////////////////////////////////////////
-			$title=$def_allybldg[$i]['name'].'&'.$def_allybldg[$i]['desc'];
-			//alte baukosten
-			if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){
-				$title.='<br>Baukosten:<br>'.($def_allybldg[$i]['artpreis']*($def_allybldg[$i]['haslevel']+1)).' Allianzartefakte';
-				$title.='<br>'.($def_allybldg[$i]['tronicpreis']*($def_allybldg[$i]['haslevel']+1)).' Tronic';
+			$kosten='';
+			$kann_bauen=true;
+			if($haslevel<$maxlevel){
+				$artpreis=$def_allybldg[$i]['artpreis']*($haslevel+1);
+				$tronicpreis=$def_allybldg[$i]['tronicpreis']*($haslevel+1);
+				$fehlt=($row['artefacts']<$artpreis);
+				$kann_bauen=$kann_bauen && !$fehlt;
+				$kosten.='<span class="mod-chip'.($fehlt ? ' ally-chip-fehlt' : '').'"><b>'.number_format($artpreis,0,",",".").'</b> Allianzartefakte</span>';
+				$fehlt=($row['t_depot']<$tronicpreis);
+				$kann_bauen=$kann_bauen && !$fehlt;
+				$kosten.='<span class="mod-chip'.($fehlt ? ' ally-chip-fehlt' : '').'"><b>'.number_format($tronicpreis,0,",",".").'</b> Tronic</span>';
 			}
 
 			$has_all=true;
 
 			//Item-Baukosten
-			$kosten='';
-			$cost_string = isset($def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']]) 
-				? $def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']] 
+			$cost_string = isset($def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']])
+				? $def_allybldg[$i]['bldg_cost'][$def_allybldg[$i]['haslevel']]
 				: '';
 			$einzelkosten = $cost_string ? explode(';', $cost_string) : array();
 			foreach ($einzelkosten as $value) {
-				/*
-				if($kosten!='<span style="color: #00AA00;">'){
-					$kosten.='<br>';
-				}*/
-				$kosten.='<br>';
-
 				$parts=explode("x", $value);
 
 				if($value[0]=='I'){
 					$value1=str_replace('I','',$parts[0]);
+					$fehlt=false;
 					if($as[$value1]['item_amount']<$parts[1]){
 						$has_all=false;
+						$fehlt=true;
 					}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' '.$as[$value1]['item_name'];
+					$kosten.='<span class="mod-chip'.($fehlt ? ' ally-chip-fehlt' : '').'"><b>'.number_format($parts[1],0,",",".").'</b> '.$as[$value1]['item_name'].'</span>';
 				}
 			}
-			
-			$title.=$kosten;
+			$kann_bauen=$kann_bauen && $has_all;
 
 			$allyidpartner=get_allyid_partner($ownallyid);
 			if($allyidpartner>0){
 				$allybldgpartner=get_allybldg($allyidpartner);
 			}
-			
+
+			$partner='';
 			if(isset($allybldgpartner)){
-				$title.='<br>Partnerfortschritt: '.$allybldgpartner[$i].'/'.$def_allybldg[$i]['maxlevel'];
+				$partner='<span class="mod-chip mod-chip-gruen">Partner <b>'.$allybldgpartner[$i].'/'.$maxlevel.'</b></span>';
 			}
 
 			//////////////////////////////////////////
-			// Baulink
+			// Projekt ausgeben
 			//////////////////////////////////////////
 			if($sv_deactivate_vsystems==1 && $i==8){
 
 			}
 			else{
-				if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){
-					echo '<a style="font-size: 10px;" href="ally_bldg.php?build='.$i.'">';
+				if($haslevel>=$maxlevel){
+					$aktion='<span class="mod-feld mod-feld-ok">Fertig</span>';
+				}elseif(!$ist_leader){
+					$aktion='';
+				}elseif($kann_bauen){
+					$aktion='<a href="ally_bldg.php?build='.$i.'" class="mod-btn">Ausbauen</a>';
+				}else{
+					$aktion='<span class="mod-feld mod-feld-grund">Zu wenig Mittel</span>';
 				}
 
-				//////////////////////////////////////////
-				// Projekt ausgeben
-				//////////////////////////////////////////			
-
-				echo '<div id="bc'.$i.'" title="'.$title.'" style="position: relative; margin-left: 5.5px; margin-top: 4px; width: 50px; height: 64px; border: 1px solid #333333; float: left; background-color: #000000;">';
-				echo '<span style="position: absolute; left: 0px; top: 0px; height: 50px; width: 100%;"><img src="'.'gp/'.'g/'.$def_allybldg[$i]['grafikfile'].'" border="0" alt="'.$def_allybldg[$i]['name'].'" width="100%" height="100%"></span>';
-				echo '<span style="position: absolute; left: 0px; top: 50px; width: 100%;">'.$def_allybldg[$i]['haslevel'].'/'.$def_allybldg[$i]['maxlevel'].'</span>';
-				echo '</div>';
-				if($def_allybldg[$i]['haslevel']<$def_allybldg[$i]['maxlevel']){
-					echo '</a>';
-				}
+				echo '
+				<div class="ally-projekt'.($haslevel>=$maxlevel ? ' ally-projekt-fertig' : '').'" id="bc'.$i.'">
+					<img src="gp/g/'.$def_allybldg[$i]['grafikfile'].'" alt="">
+					<div class="ally-projekt-text">
+						<div class="ally-projekt-kopf">
+							<span class="ally-projekt-name">'.$def_allybldg[$i]['name'].'</span>
+							<span class="ally-projekt-stufe">Stufe <b>'.$haslevel.'</b> / '.$maxlevel.'</span>
+						</div>
+						<div class="mod-balken"><span style="width: '.round(min(100, $haslevel/$maxlevel*100), 1).'%;"></span></div>
+						<div class="ally-projekt-desc">'.$def_allybldg[$i]['desc'].'</div>
+						<div class="ally-chips">'.($kosten!='' ? '<span class="ally-leise-text">N&auml;chste Stufe:</span>'.$kosten : '').$partner.'</div>
+					</div>
+					<div class="ally-projekt-aktion">'.$aktion.'</div>
+				</div>';
 			}
 		}
+	}
+	echo '</div>';
+	if($def_allybldg[0]['haslevel']==0){
+		echo '<div class="mod-hinweis ally-abstand">Weitere Projekte werden nach dem Bau der Allianzsektorraumbasis freigeschaltet.</div>';
 	}
 	echo '</div>';
 	rahmen_unten();

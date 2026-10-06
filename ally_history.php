@@ -36,18 +36,16 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 
-print('<div align="center" class="cell" style="width: 600px;"><table width="100%">');
-print('<tr><td><h2>'.$allyhistory_lang['msg_1'].', '.$spielername.'</h2></td></tr>');
-print('<tr><td><hr></td></tr>');
-print('</table>');
-print('<table width="600">');
-
 include('ally/allyfunctions.inc.php');
 
+rahmen_oben('Allianzhistorie');
+echo '<div class="ally mod">';
+
 $ally_id = getAllyId($allytag);
-$history_result = mysqli_execute_query($GLOBALS['dbi'], 
+$history_result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_ally_history WHERE allyid = ? ORDER BY timestamp DESC",
     [$ally_id]);
+$eintraege = '';
 if ($history_result){
 	$numrows = mysqli_num_rows($history_result);
 	for ($i=0;$i<$numrows;$i++)	{
@@ -55,15 +53,15 @@ if ($history_result){
 		$datum = $data['displaydate'];
 		//ältere Einträge können noch ungefilterte Namen enthalten
 		$entry = safe_basic_html($data['entry']);
-		print('<tr><td width="110" valign="top">'.$datum.'</td><td valign="top">&nbsp; &nbsp;</td><td valign="top">'.$entry.'</td></tr>');
+		$eintraege .= '<div class="ally-verlauf"><span class="ally-verlauf-datum">'.$datum.'</span><span>'.$entry.'</span></div>';
 	}
 }
-print('</table>');
+echo ($eintraege != '') ? '<div class="ally-zeilen">'.$eintraege.'</div>' : '<div class="mod-leer">Es gibt noch keine Eintr&auml;ge.</div>';
 
-
+echo '</div>';
+rahmen_unten();
 
 ?>
-<br>
 <?php include('ally/ally.footer.inc.php'); ?>
 
 </body>

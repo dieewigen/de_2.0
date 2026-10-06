@@ -55,7 +55,7 @@ if($a == 1)
 	//Falls ein aktiver Leader die Allianz verlassen will, wird ein Fehler ausgegeben
 	if ($leaderid == $_SESSION['ums_user_id'])
 	{
-		print($allyaustritt_lang['msg_1']);
+		echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.$allyaustritt_lang['msg_1'].'</div><div class="ally-aktionen"><a href="ally_members.php" class="mod-btn mod-btn-leise">Zur Mitgliederliste</a></div></div>';
 	}
 	else
 	{
@@ -96,24 +96,29 @@ if($a == 1)
 			notifyUser($coleaderid2, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
 			notifyUser($coleaderid3, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
 			
-			echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-			echo $allyaustritt_lang['msg_3_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_3_2'];
-			echo '<div>';
+			echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allyaustritt_lang['msg_3_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_3_2'].'</div></div>';
 			
 			include('ally/allyfunctions.inc.php');
 			writeHistory($clantag, $allyaustritt_lang['msg_4_1'].' <i>'.$username.'</i> '.$allyaustritt_lang['msg_4_2'],true);
 
 		}else{
-			echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-			print(str_replace('{VALUE}', $leave_fee, $allyaustritt_lang['msg_5']));
-			echo '<div>';
+			echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.str_replace('{VALUE}', $leave_fee, $allyaustritt_lang['msg_5']).'</div></div>';
 		}
 	}
 }else{
-	echo '<div class="cell" style="width: 552px; margin-top: 20px; padding: 20px;">';
-	echo $allyaustritt_lang['msg_6_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_6_2'].'<br /><br />';
-	echo '<a href="ally_austritt.php?a=1"><font style="font-size:14pt;"><b>'.$allyaustritt_lang['msg_7'].'</a><br />';
-	echo '<div>';
+	//Rückfrage mit Gebühr, Austritt erst über den roten Knopf
+	rahmen_oben($allyaustritt_lang['title']);
+	echo '
+	<div class="ally mod">
+		<div class="ally-gefahr">
+			<div class="ally-gefahr-text">'.$allyaustritt_lang['msg_6_1'].' <b>'.$leave_fee.'</b> '.$allyaustritt_lang['msg_6_2'].'</div>
+			<div class="ally-aktionen ally-aktionen-mitte">
+				<a href="allymain.php" class="mod-btn mod-btn-leise">Abbrechen</a>
+				<a href="ally_austritt.php?a=1" class="mod-btn mod-btn-gefahr">'.$allyaustritt_lang['msg_7'].'</a>
+			</div>
+		</div>
+	</div>';
+	rahmen_unten();
 }
 
 

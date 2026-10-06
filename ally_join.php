@@ -4,9 +4,9 @@ include('lib/basefunctions.lib.php');
 include('inc/lang/'.$sv_server_lang.'_ally.join.lang.php');
 include_once('functions.php');
 
-$result = mysqli_execute_query($GLOBALS['dbi'], 
-    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, col, npc 
-     FROM de_user_data 
+$result = mysqli_execute_query($GLOBALS['dbi'],
+    "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, techs, sector, `system`, newtrans, newnews, allytag, col, npc
+     FROM de_user_data
      WHERE user_id=?",
     [$_SESSION['ums_user_id']]);
 $row = mysqli_fetch_assoc($result);
@@ -57,21 +57,16 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 
-
-echo '<div align=center><div style="width: 592px" class="cell">';
-
-if($ally_id<1){
-	print('<tr><td><strong>'.$allyjoin_lang['msg_2_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_2_2'].'</strong></td></tr>');
-	if ($sum > 0){
-		$msg=str_replace('{VALUE1}', $sum, $allyjoin_lang['msg_3']);
-		print('<tr><td><strong>'.$msg.'</strong></td></tr>');
-	}
+//Kosten des Beitritts; ein Guthaben aus einer früheren Bewerbung wird angerechnet
+$kosten = '<span class="mod-chip">'.$allyjoin_lang['msg_2_1'].' <b>'.$t_tojoin.'</b>'.$allyjoin_lang['msg_2_2'].'</span>';
+if ($sum > 0){
+	$kosten .= '<span class="mod-chip mod-chip-gruen">'.str_replace('{VALUE1}', $sum, $allyjoin_lang['msg_3']).'</span>';
 }
 
 $quit_script = false;
 if (($restyp05 + $sum) < $t_tojoin){
 	$t_missing = $t_tojoin - $restyp05 + $sum;
-	print('<tr><td><font color="red"><strong>'.$allyjoin_lang['msg_5_1'].' '.$t_missing.' '.$allyjoin_lang['msg_5_2'].'</strong></font></tr></td>');
+	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.$allyjoin_lang['msg_5_1'].' '.$t_missing.' '.$allyjoin_lang['msg_5_2'].'</div></div>';
 	$quit_script = true;
 }
 
@@ -82,6 +77,8 @@ if ($quit_script && $npc != 2){
 $ok=$_POST['ok'] ?? false;
 $warnung=$_POST['warnung'] ?? false;
 if($ok || $warnung || $npc==2){
+	//Ergebnisse in einem Kasten unter den Reitern; Abbrüche (die) schließen ihn selbst
+	echo '<div class="mod ally-meldung">';
 	$error=false;
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT * FROM de_user_data WHERE user_id=?",
@@ -98,7 +95,7 @@ if($ok || $warnung || $npc==2){
 		[$_SESSION['ums_user_id']]);
 	if(mysqli_num_rows($leader_result))
 	{
-		die("$allyjoin_lang[msg_4]");
+		die('<div class="mod-meldung mod-meldung-fehler">'.$allyjoin_lang['msg_4'].'</div></div>');
 	}
 
 	//Mitglieder einer Allianz müssen zuerst regulär austreten (ally_austritt.php): dort fallen die Austrittsgebühr,
@@ -114,13 +111,13 @@ if($ok || $warnung || $npc==2){
 			echo '
 				<form name="register" method="POST" action="ally_join.php">'.$allyjoin_lang['msg_6'].'
 					<input type="hidden" name="ally_id" value="'.$ally_id.'">
-					<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung"></form>';
+					<input type="submit" value="'.$allyjoin_lang['fertig'].'" name="warnung" class="mod-btn"></form>';
 		}else{
-			echo '<div class="info_box text2">'.$allyjoin_lang['msg_17'].' <a href="ally_austritt.php">'.$allyjoin_lang['zumaustritt'].'</a></div>';
+			echo '<div class="mod-meldung mod-meldung-fehler">'.$allyjoin_lang['msg_17'].'</div><div class="ally-aktionen"><a href="ally_austritt.php" class="mod-btn mod-btn-leise">'.$allyjoin_lang['zumaustritt'].'</a></div>';
 		}
 	}else{
 		if($ally_id<1){
-			echo $allyjoin_lang['msg_7'];
+			echo '<div class="mod-meldung mod-meldung-fehler">'.$allyjoin_lang['msg_7'].'</div>';
 		}else{
 			//wenn der Spieler der sich bewirbt ein NPC Typ 2 ist, dann wird überprüft ob der Allianzleader auch NPC Typ 2 ist
 			if($npc==2){
@@ -147,7 +144,7 @@ if($ok || $warnung || $npc==2){
 						$sql,
 						[$ally_id, $a_tag, $_SESSION['ums_user_id']]);
 					echo $allyjoin_lang['msg_16'];
-					die();					
+					die();
 				}
 
 			}else{
@@ -184,15 +181,26 @@ if($ok || $warnung || $npc==2){
 					$antrag= $_POST['antrag'];
 					$antrag = htmlentities($antrag, ENT_QUOTES);
 					$antrag = str_replace("\n","<br>",$antrag);
-					$result = mysqli_execute_query($GLOBALS['dbi'],
-						"INSERT into de_ally_antrag (user_id, ally_id, antrag) VALUES (?, ?, ?)",
-						[$_SESSION['ums_user_id'], $clanid, $antrag]);
-					if (!$result){
-						$result = mysqli_execute_query($GLOBALS['dbi'],
-							"UPDATE de_ally_antrag SET ally_id=?, antrag=? WHERE user_id=?",
-							[$clanid, $antrag, $_SESSION['ums_user_id']]);
+					//läuft schon eine Bewerbung bei einer anderen Allianz, erfährt deren Führung wie beim Zurückziehen davon
+					$alt_antrag = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'],
+						"SELECT a.ally_id, y.leaderid, y.coleaderid1, y.coleaderid2, y.coleaderid3 FROM de_ally_antrag a JOIN de_allys y ON y.id=a.ally_id WHERE a.user_id=?",
+						[$_SESSION['ums_user_id']]));
+					if ($alt_antrag && $alt_antrag['ally_id'] != $clanid) {
+						foreach (array('leaderid', 'coleaderid1', 'coleaderid2', 'coleaderid3') as $posten) {
+							if ($alt_antrag[$posten] > 0) {
+								notifyUser($alt_antrag[$posten], 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
+							}
+						}
 					}
-					
+
+					//nur eine Bewerbung je Spieler (eindeutiger Schlüssel user_id): eine neue ersetzt die laufende;
+					//früher INSERT mit UPDATE als Ausweichweg, seit PHP 8.1 bricht der doppelte Schlüssel aber mit einer Exception ab,
+					//nachdem de_user_data schon auf die neue Allianz zeigt
+					$result = mysqli_execute_query($GLOBALS['dbi'],
+						"INSERT into de_ally_antrag (user_id, ally_id, antrag) VALUES (?, ?, ?)
+						 ON DUPLICATE KEY UPDATE ally_id=VALUES(ally_id), antrag=VALUES(antrag)",
+						[$_SESSION['ums_user_id'], $clanid, $antrag]);
+
 					notifyUser($leaderid, $allyjoin_lang['msg_8'], "6");
 					notifyUser($coleaderid1, $allyjoin_lang['msg_8'], "6");
 					notifyUser($coleaderid2, $allyjoin_lang['msg_8'], "6");
@@ -214,7 +222,7 @@ if($ok || $warnung || $npc==2){
 							mysqli_execute_query($GLOBALS['dbi'],
 								"UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?",
 								[$t_tojoin, $_SESSION['ums_user_id']]);
-							print('<strong>'.$allyjoin_lang['msg_9_1'].' '.$sum.' '.$allyjoin_lang['msg_9_2'].'</strong><br />');
+							echo '<div class="mod-meldung mod-meldung-ok">'.$allyjoin_lang['msg_9_1'].' '.$sum.' '.$allyjoin_lang['msg_9_2'].'</div>';
 						}else{
 							mysqli_execute_query($GLOBALS['dbi'],
 								"INSERT INTO de_transactions (user_id, type, identifier, name, amount) VALUES(?, 'C.A.R.S.', 'reg_fee', 'Tronic', ?)",
@@ -224,18 +232,20 @@ if($ok || $warnung || $npc==2){
 								[$t_tojoin, $_SESSION['ums_user_id']]);
 						}
 					}
-					echo '<strong>'.$allyjoin_lang['msg_10_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_10_2'].'</strong>';
+					echo '<div class="mod-meldung mod-meldung-ok">'.$allyjoin_lang['msg_10_1'].' '.$t_tojoin.' '.$allyjoin_lang['msg_10_2'].'</div>';
 				}
 				else
 				{
-					echo $allyjoin_lang['msg_11'].' !';
+					echo '<div class="mod-meldung mod-meldung-fehler">'.$allyjoin_lang['msg_11'].' !</div>';
 				} // else $nb>0
 			}
 		}  // else $clan
 
 
 	} // $ok check
+	echo '</div>';
 }else{ // else $ok
+
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT allyname, antrag FROM de_ally_antrag antrag, de_allys allys WHERE allys.id=antrag.ally_id AND user_id=?",
 		[$_SESSION['ums_user_id']]);
@@ -248,47 +258,37 @@ if($ok || $warnung || $npc==2){
 		"SELECT * FROM de_allys ORDER BY allyname ASC");
 	$nb = mysqli_num_rows($result);
 
+	rahmen_oben($allyjoin_lang['neuebewerbung']);
+	echo '<div class="ally mod">';
+
+	//laufende Bewerbung
+	echo '<div class="mod-typ ally-typ-abstand">'.$allyjoin_lang['aktivebewerbung'].'</div>';
 	if ($antrag_allyname == "")
 	{
-		$active_a_request = $allyjoin_lang['msg_12'];
+		echo '<div class="ally-hinweis">'.$allyjoin_lang['msg_12'].'</div>';
 	}
 	else
 	{
-		$active_a_request = $allyjoin_lang['msg_13_1'].' <strong>'.$antrag_allyname.'</strong> '.$allyjoin_lang['msg_13_2'].':<br /><br />'.$antrag_antrag;
+		echo '<div class="ally-text">'.$allyjoin_lang['msg_13_1'].' <strong>'.$antrag_allyname.'</strong> '.$allyjoin_lang['msg_13_2'].':<br /><br />'.$antrag_antrag.'</div>';
 	}
 
-	print('<table width="600" class="cell">
-				<tr>
-					<td><h3>'.$allyjoin_lang['aktivebewerbung'].': </h3></td>
-				</tr>
-				<tr>
-					<td>
-						'.$active_a_request.'
-					</td>
-				</tr>
-				<tr>
-					<td><hr></td>
-				</tr>
-			</table>
-	');
+	//neue Bewerbung
+	echo '
+		<form name="register" method="POST" action="ally_join.php" class="ally-abschnitt">
+			<div class="mod-typ ally-typ-abstand">'.$allyjoin_lang['neuebewerbung'].'</div>
+			<input type="hidden" name="ally_id" value="'.$ally_id.'">
+			<label class="ally-feld">
+				<span>'.str_replace('<br><br> ', ' ', $allyjoin_lang['msg_14_1'].' <strong>'.$a_name.'</strong> '.$allyjoin_lang['msg_14_2']).':</span>
+				<textarea name="antrag" rows="7" wrap="virtual" class="mod-eingabe"></textarea>
+			</label>
+			<div class="ally-aktionen">
+				<span class="ally-chips ally-aktionen-text">'.$kosten.'</span>
+				<input type="submit" value="'.$allyjoin_lang['bewerbungsenden'].'" name="ok" class="mod-btn">
+			</div>
+		</form>';
 
-	print('
-			<table width="600" class="cell">
-				<tr>
-					<td><h3>'.$allyjoin_lang['neuebewerbung'].': </h3></td>
-				</tr>
-				<tr>
-					<td>
-						<form name="register" method="POST" action="ally_join.php">
-						<input type="hidden" name="ally_id" value="'.$ally_id.'">
-						'.$allyjoin_lang['msg_14_1'].' <strong>'.$a_name.'</strong> '.$allyjoin_lang['msg_14_2'].':<br>
-						<textarea name="antrag" cols="70" rows="7" wrap="virtual"></textarea>
-						<br><br><input type="submit" value="'.$allyjoin_lang['bewerbungsenden'].'" name="ok">
-					</td>
-				</tr>
-			</table>
-	');
+	echo '</div>';
+	rahmen_unten();
 
 }
 
-print('</div><br><br>');

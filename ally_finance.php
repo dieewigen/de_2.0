@@ -76,12 +76,16 @@ if(isset($_POST['changetzz']))
 	    [$tronic_zahlungsziel, $allytag, $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 }
 
+//Mahnung aus der Liste (ally_finance.php?memberid=…); $memberid kam früher über register_globals,
+//seitdem war der Knopf ohne Wirkung
+$memberid = intval($_GET['memberid'] ?? 0);
 if (isset($memberid) && $memberid > 0)
 {
 	if ($isleader || $iscoleader)
 	{
-		$result = mysqli_execute_query($GLOBALS['dbi'], 
-		    "SELECT spielername FROM de_user_data WHERE user_id=? AND allytag=?",
+		//nur Mitglieder der eigenen Allianz, keine Bewerber (gleicher allytag, status 0)
+		$result = mysqli_execute_query($GLOBALS['dbi'],
+		    "SELECT spielername FROM de_user_data WHERE user_id=? AND allytag=? AND status=1",
 		    [$memberid, $allytag]);
 		if ($result)
 		{
@@ -118,9 +122,9 @@ include "resline.php";
 include ("ally/ally.menu.inc.php");
 if (strlen($message) > 0)
 {
-	print("<br><table width=600 class=\"cell\"><tr>");
-	print("<td width=30 align=left valign=top><img src=\"gp/g/".$_SESSION['ums_rasse']."_arz.gif\" alt=Information border=0> </td><td align=left><font size=1> $message</font><br>");
-	print("</td></tr></table>");
+	//Erfolg (Überweisung, Mahnung zugestellt) grün, sonst rot
+	$erfolg = strpos($message, $allyfinance_lang['msg_1_1']) === 0 || strpos($message, $allyfinance_lang['msg_8_1']) === 0;
+	echo '<div class="mod ally-meldung"><div class="mod-meldung '.($erfolg ? 'mod-meldung-ok' : 'mod-meldung-fehler').'">'.$message.'</div></div>';
 }
 
 // Abfrage auf $iscoleader hinzugef&uuml;gt von Ascendant (01.09.2002)
@@ -149,51 +153,64 @@ $coleaderid2 = $row["coleaderid2"];
 $t_depot = $row["t_depot"];
 $tronic_zahlungsziel = $row["tronic_zahlungsziel"];
 
-print('<div align="center" class="cell" style="width: 600px;"><table width="100%" class="cell">');
-print('<tr><td><h2>'.$allyfinance_lang['welcome'].', '.$_SESSION['ums_spielername'].'</h2></td></tr>');
-print('<tr><td><hr></td></tr>');
-print('<tr><td>'.$allyfinance_lang['aktuellerstand'].': '.$t_depot.' '.$allyfinance_lang['tronic'].'</strong></td></tr>');
-print('<tr><td><hr></td></tr>');
-print('<tr><td>'.$allyfinance_lang['ihraktuellerstand'].': '.$t_level.' '.$allyfinance_lang['tronic'].'</strong> (Dein Allianz-Zahlungsziel: '.$tronic_zahlungsziel.')</td></tr>');
+rahmen_oben('Finanzen');
+echo '<div class="ally mod">';
+
+//Allianzdepot, eigener Einzahlungsstand, Zahlungsziel
+echo '
+	<div class="ally-kacheln ally-kacheln-3">
+		<div class="ov-wert"><span class="mod-typ">Allianzdepot</span><b>'.number_format($t_depot, 0, '', '.').'</b><small>'.$allyfinance_lang['tronic'].'</small></div>
+		<div class="ov-wert"><span class="mod-typ">Dein Einzahlungsstand</span><b>'.number_format($t_level, 0, '', '.').'</b><small>'.$allyfinance_lang['tronic'].'</small></div>
+		<div class="ov-wert"><span class="mod-typ">Zahlungsziel</span><b>'.number_format($tronic_zahlungsziel, 0, '', '.').'</b><small>'.$allyfinance_lang['tronic'].' je Mitglied</small></div>
+	</div>';
 if ($t_level < $tronic_zahlungsziel)
 {
 	$t_value = abs($t_level);
 	$t_diff = $tronic_zahlungsziel-$t_level;
-	print('<tr><td style="color: #FF0000;">'.$allyfinance_lang['msg_13_1'].' '.$t_diff.' '.$allyfinance_lang['tronic'].', '.$allyfinance_lang['msg_13_2'].'</td></tr>');
+	echo '<div class="mod-meldung mod-meldung-fehler ally-abstand">'.$allyfinance_lang['msg_13_1'].' '.$t_diff.' '.$allyfinance_lang['tronic'].', '.$allyfinance_lang['msg_13_2'].'</div>';
 }
-print('<tr><td><hr></td></tr>');
-print('<tr><td><strong>'.$allyfinance_lang['tueberweisen'].'</strong></td></tr>');
-print('<tr><td><form action="ally_finance.php" method="post" name="transfer">');
-print($allyfinance_lang['ueberweisungssumme'].' <input type="text" name="t_transfer" value="0" size="6"> <input type="submit" name="submit" value="'.$allyfinance_lang['ueberweisen'].'">');
-print('<input type=hidden name=transfer value=1>');
-print('</form></td></tr>');
-if ($isleader || $iscoleader)
-{
-	print('<tr><td><hr></td></tr>');
-	print('<tr><td><strong>Tronic Zahlungsziel</strong></td></tr>');
-	print('<tr><td><form action="ally_finance.php" method="post" name="tax">');
 
-	echo 'Zahlungsziel: <input type="text" name="tzz" value="'.$tronic_zahlungsziel.'" size="8" maxlength="8">&nbsp;';
-	echo '<input type=submit name="changetzz" value="Zahlungsziel &auml;ndern">';
-	
-	print('</form></td></tr>');
-}
+//Überweisung ins Allianzdepot
+echo '
+	<div class="ally-abschnitt">
+		<div class="mod-typ">'.$allyfinance_lang['tueberweisen'].'</div>
+		<form action="ally_finance.php" method="post" name="transfer" class="ally-zeilenformular">
+			<input type="text" name="t_transfer" value="0" size="6" class="mod-eingabe" title="'.$allyfinance_lang['ueberweisungssumme'].'">
+			<span class="ally-leise-text">Tronic</span>
+			<input type="submit" name="submit" value="'.$allyfinance_lang['ueberweisen'].'" class="mod-btn">
+			<input type=hidden name=transfer value=1>
+		</form>
+	</div>';
 
 if ($isleader || $iscoleader)
 {
-	print('<tr><td><hr></td></tr>');
-	print('<tr><td><strong>'.$allyfinance_lang['status'].'</strong></td></tr>');
-	print('<tr><td>');
-	print('
-			<table width="100%">
-				<tr>
-					<td align="center" bgcolor="#1c1c1c"><strong>'.$allyfinance_lang['name'].'</strong></td><td align="center" bgcolor="#1c1c1c"><strong>'.$allyfinance_lang['kollektoren'].'</strong></td><td align="center" bgcolor="#1c1c1c"><strong>'.$allyfinance_lang['koordinaten'].'</strong></td><td align="center" bgcolor="#1c1c1c"><strong>'.$allyfinance_lang['kontostand'].'</strong></td><td bgcolor="#1c1c1c">&nbsp;</td>
-				</tr>
+	echo '
+	<div class="ally-abschnitt">
+		<div class="mod-typ">Tronic-Zahlungsziel</div>
+		<form action="ally_finance.php" method="post" name="tax" class="ally-zeilenformular">
+			<input type="text" name="tzz" value="'.$tronic_zahlungsziel.'" size="8" maxlength="8" class="mod-eingabe">
+			<span class="ally-leise-text">Tronic je Mitglied</span>
+			<input type=submit name="changetzz" value="Zahlungsziel &auml;ndern" class="mod-btn mod-btn-leise">
+		</form>
+	</div>';
+}
 
-	');
-	$member_result = mysqli_execute_query($GLOBALS['dbi'], 
-	    "SELECT user_id, spielername, col, sector, `system`, ally_tronic 
-	     FROM de_user_data WHERE allytag=? AND status='1' 
+if ($isleader || $iscoleader)
+{
+	echo '
+	<div class="ally-abschnitt">
+		<div class="mod-typ">'.$allyfinance_lang['status'].'</div>
+		<div class="ally-finanz ally-zeilenkopf">
+			<span>'.$allyfinance_lang['name'].'</span>
+			<span class="ally-rechts">'.$allyfinance_lang['kollektoren'].'</span>
+			<span class="ally-rechts">'.$allyfinance_lang['koordinaten'].'</span>
+			<span class="ally-rechts">'.$allyfinance_lang['kontostand'].'</span>
+			<span></span>
+		</div>
+		<div class="ally-zeilen">';
+	$member_result = mysqli_execute_query($GLOBALS['dbi'],
+	    "SELECT user_id, spielername, col, sector, `system`, ally_tronic
+	     FROM de_user_data WHERE allytag=? AND status='1'
 	     ORDER BY ally_tronic, sector, `system` ASC",
 	    [$allytag]);
 	if ($member_result)
@@ -207,23 +224,31 @@ if ($isleader || $iscoleader)
 			$member_kollektoren = $member_data["col"];
 			$member_sector = $member_data["sector"];
 			$member_system = $member_data["system"];
-			$member_koordinaten = "[".$member_sector.":".$member_system."]";
+			$member_koordinaten = $member_sector.":".$member_system;
 			$member_kontostand = $member_data["ally_tronic"];
 			$mahnlink = "";
+			$rueckstand = '';
 			if ($member_kontostand < $tronic_zahlungsziel)
 			{
-				$member_kontostand = "<font color=red>$member_kontostand</font>";
-				$mahnlink = "<a href=\"ally_finance.php?memberid=$member_id\">$allyfinance_lang[mahnen]</a>";
+				$rueckstand = ' ally-rueckstand';
+				$mahnlink = '<a href="ally_finance.php?memberid='.$member_id.'" class="mod-btn mod-btn-leise ally-btn-klein">'.$allyfinance_lang['mahnen'].'</a>';
 			}
-			
-			print('<tr><td align="center" bgcolor="#222222">'.$member_spielername.'</td><td align="center" bgcolor="#222222">'.$member_kollektoren.'</td><td align="center" bgcolor="#222222">'.$member_koordinaten.'</td><td align="center" bgcolor="#222222">'.$member_kontostand.'</td><td align="center" bgcolor="#222222">'.$mahnlink.'</td></tr>');
+
+			echo '
+			<div class="ally-finanz">
+				<span class="ally-finanz-name">'.$member_spielername.'</span>
+				<span class="ally-zahl">'.$member_kollektoren.'</span>
+				<span class="ally-zahl">'.$member_koordinaten.'</span>
+				<span class="ally-zahl'.$rueckstand.'">'.$member_kontostand.'</span>
+				<span class="ally-rechts">'.$mahnlink.'</span>
+			</div>';
 		}
 	}
-	print('</table></td></td>');
+	echo '</div></div>';
 }
-print('</table>');
+echo '</div>';
+rahmen_unten();
 ?>
-<br>
 <?php include('ally/ally.footer.inc.php'); ?>
 
 </body>

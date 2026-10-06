@@ -37,6 +37,9 @@ include('ally/ally.menu.inc.php');
 
 $userid = $_REQUEST['userid'] ?? -1;
 
+//Ergebnis als Meldung unter den Reitern, darunter zurück zur Mitgliederliste
+echo '<div class="mod ally-meldung">';
+
 $allys = mysqli_execute_query(
     $GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid=?",
@@ -44,7 +47,7 @@ $allys = mysqli_execute_query(
 );
 
 if (mysqli_num_rows($allys) < 1) {
-    echo $allyleader_lang['msg_1'];
+    echo '<div class="mod-meldung mod-meldung-fehler">'.$allyleader_lang['msg_1'].'</div>';
 } else {
     $result = mysqli_execute_query(
         $GLOBALS['dbi'],
@@ -82,17 +85,18 @@ if (mysqli_num_rows($allys) < 1) {
             [$userid, $clanid]
         );
 
-        echo $allyleader_lang['msg_2'];
+        echo '<div class="mod-meldung mod-meldung-ok">'.$allyleader_lang['msg_2'].'</div>';
 
     } else {
 
-        echo $allyleader_lang['msg_3'];
+        echo '<div class="mod-meldung mod-meldung-fehler">'.$allyleader_lang['msg_3'].'</div>';
 
     }
 
 
 
 }
+echo '<div class="ally-aktionen"><a href="ally_members.php" class="mod-btn mod-btn-leise">Zur Mitgliederliste</a></div></div>';
 
 ?>
 <?php include('ally/ally.footer.inc.php'); ?>

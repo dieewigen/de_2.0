@@ -28,7 +28,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include "resline.php";
 
 if($allytag!=''){
-	echo '<div class="info_box text2">Du kannst keine Allianz gr&uuml;nden, da Du Dich bereits in einer Allianz befindest bzw. beworben hast.</div></body></html>';
+	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Du kannst keine Allianz gr&uuml;nden, da Du Dich bereits in einer Allianz befindest bzw. beworben hast.</div></div></body></html>';
 	exit;	
 }
 
@@ -106,7 +106,8 @@ if($eintragung==1){
 		[$clanname, $clankuerzel, $regierungsform, $allianzform, $ausrichtung, $_SESSION['ums_user_id'], $hp, $bio]);
 	$ally_id = mysqli_insert_id($GLOBALS['dbi']);
 
-	echo '<div class="info_box text3">'.$allyregisterzwei_lang['msg_7'].'</div><br><br>';
+	//die Meldung steht unter dem Menü, das erst nach der Gründung die Leader-Reiter zeigt
+	$meldung = '<div class="mod-meldung mod-meldung-ok">'.$allyregisterzwei_lang['msg_7'].'</div>';
 
 	//beim Allyleader die entsprechenden Daten hinterlegen
 	mysqli_execute_query($GLOBALS['dbi'],
@@ -123,16 +124,18 @@ if($eintragung==1){
         //echo "<br>Allianz-memberlimit aktualisiert, neues Limit: {$affected['memberlimit']}<br>";
     } catch (\Throwable $e) {
         // Logging oder Fallback
-        echo "<br>Fehler beim Aktualisieren des Allianz-Memberlimits: " . $e->getMessage() . "<br>";
+        $meldung .= '<div class="mod-meldung mod-meldung-fehler ally-abstand">Fehler beim Aktualisieren des Allianz-Memberlimits: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
     }
 
 	include('ally/ally.menu.inc.php');
 
+	echo '<div class="mod ally-meldung">'.$meldung.'<div class="ally-aktionen"><a href="allymain.php" class="mod-btn">Zur Allianz</a></div></div>';
+
 }else{
 
-	echo '<div class="info_box text2">'.$allyregisterzwei_lang['msg_9'].' '.$errormessage.'</div>';
+	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.$allyregisterzwei_lang['msg_9'].' '.$errormessage.'</div>';
 
-	echo '<br><a href="allymain.php" class="btn">zur&uuml;ck</a>';
+	echo '<div class="ally-aktionen"><a href="javascript:history.back()" class="mod-btn mod-btn-leise">Zur&uuml;ck zum Formular</a></div></div>';
 
 }
 

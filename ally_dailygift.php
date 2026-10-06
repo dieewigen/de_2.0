@@ -37,7 +37,6 @@ $freeartefactplaces = get_free_artefact_places($_SESSION['ums_user_id']);
 <title><?php echo $allydailygift_lang['title']?></title>
 <?php include('cssinclude.php'); ?>
 </head>
-<body>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 echo '<div style="width: 600px; margin-left: auto; margin-right: auto;">';
@@ -294,14 +293,14 @@ if ($ally_id > 0 && $allystatus == 1) {
 
 
                 //info an den spieler, dass er den bonus erhalten hat
-                $msg = '<div class="info_box"><span class="text3">'.$allydailygift_lang['bonuserhalten'].$bonusstr.'</span></div><br><br>';
+                $msg = '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok"><b>'.$allydailygift_lang['bonuserhalten'].'</b>'.$bonusstr.'</div></div>';
                 //info für den allychat
                 $allydailygift_lang['bonuserhaltenchat'] = '<font color="#802ec1">'.str_replace("{WERT1}", $_SESSION['ums_spielername'], $allydailygift_lang['bonuserhaltenchat']).'</font>';
                 insert_chat_msg($ally_id, 1, '', $allydailygift_lang['bonuserhaltenchat']);
             }
 
             //lock wieder entfernen
-            $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+            $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
             if ($erg) {
                 //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
             } else {
@@ -322,165 +321,85 @@ if ($ally_id > 0 && $allystatus == 1) {
     /////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////
 
-    echo '<div class="info_box"><span class="text1" style=" font-size: 14px;">Die Gr&ouml;&szlig;e des t&auml;glichen Allianz-Bonus h&auml;ngt von der Anzahl der Rundensiegartefakte deiner Allianz ab.<br>'.$allydailygift_lang['freieartefaktplaetze'].': '.
-    $freeartefactplaces.'</span>
-	</div><br>';
-
-    //die Hintergrundfarbe bestimmen
-    $css = array();
+    //Stufen: erreicht und überholt, aktuelle Stufe, noch nicht erreicht
+    $stufe = array();
     for ($i = 0;$i <= 5;$i++) {
         if ($allyrelverbreitung >= $allyrelverbreitung_need[$i]) {
             if ($allyrelverbreitung >= $allyrelverbreitung_need[$i + 1] && $i < count($allydailygift_lang['bonusname']) - 1) {
-                //grau
-                $css[] = ' style="background-color: rgba(50,50,50, 0.5);"';
+                $stufe[] = 'ally-stufe-vorbei';
             } else {
-                //grün
-                $css[] = ' style="background-color: rgba(0,210,0, 0.5);"';
+                $stufe[] = 'ally-stufe-aktiv';
             }
         } else {
-            //rot
-            $css[] = ' style="background-color: rgba(230,0,0, 0.5);"';
-
+            $stufe[] = 'ally-stufe-offen';
         }
     }
 
+    //Belohnungen je Stufe
+    $belohnungen = array(
+        'Kriegsartefakt' => array(1, 1, 1, 1, 1, 1),
+        'Allianzartefakt' => array(1, 2, 2, 3, 3, 4),
+        'Tronic' => array(1, 2, 3, 4, 5, 6),
+        'Verteidigungsanlagen-XP' => array('1.000', '2.000', '3.000', '4.000', '5.000', '6.000'),
+        'Zufallsartefakt<sup>1</sup>' => array(1, 2, 2, 2, 3, 3),
+        'Auktion<sup>2</sup>' => array(1, 1, 1, 1, 1, 1),
+        'Titanen-Energiekern' => array(1, 2, 2, 3, 3, 4),
+        'Allianz-Quantenglimmer' => array(0, 1, 2, 3, 4, 5),
+    );
 
-    //neues Design
     rahmen_oben('Allianzbonus');
+    echo '<div class="ally mod">';
+
     echo '
-	<table style="width: 560px" cellspacing="1">
-		<tr style="font-weight: bold; text-align: center;" class="cell">
-			<td style="text-align: left;">Rundensiegartefakte:</td>
-			<td'.$css[0].'>'.$allyrelverbreitung.'/0</td>
-			<td'.$css[1].'>'.$allyrelverbreitung.'/1000</td>
-			<td'.$css[2].'>'.$allyrelverbreitung.'/2000</td>
-			<td'.$css[3].'>'.$allyrelverbreitung.'/3000</td>
-			<td'.$css[4].'>'.$allyrelverbreitung.'/4000</td>
-			<td'.$css[5].'>'.$allyrelverbreitung.'/5000</td>
-		</tr>
+	<div class="ally-kacheln ally-kacheln-2">
+		<div class="ov-wert"><span class="mod-typ">Rundensiegartefakte der Allianz</span><b>'.number_format($allyrelverbreitung, 0, '', '.').'</b></div>
+		<div class="ov-wert"><span class="mod-typ">'.$allydailygift_lang['freieartefaktplaetze'].'</span><b>'.$freeartefactplaces.'</b></div>
+	</div>
+	<div class="mod-hinweis ally-abstand">Die Gr&ouml;&szlig;e des t&auml;glichen Allianz-Bonus h&auml;ngt von der Anzahl der Rundensiegartefakte Deiner Allianz ab. Die hervorgehobene Spalte zeigt Euren aktuellen Bonus.</div>';
 
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Kriegsartefakt:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>1</td>
-			<td'.$css[2].'>1</td>
-			<td'.$css[3].'>1</td>
-			<td'.$css[4].'>1</td>
-			<td'.$css[5].'>1</td>
-		</tr>
-
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Allianzartefakt:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>2</td>
-			<td'.$css[2].'>2</td>
-			<td'.$css[3].'>3</td>
-			<td'.$css[4].'>3</td>
-			<td'.$css[5].'>4</td>
-		</tr>		
-
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Tronic:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>2</td>
-			<td'.$css[2].'>3</td>
-			<td'.$css[3].'>4</td>
-			<td'.$css[4].'>5</td>
-			<td'.$css[5].'>6</td>
-		</tr>
-		
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Verteidigungsanlagen-XP:</td>
-			<td'.$css[0].'>1.000</td>
-			<td'.$css[1].'>2.000</td>
-			<td'.$css[2].'>3.000</td>
-			<td'.$css[3].'>4.000</td>
-			<td'.$css[4].'>5.000</td>
-			<td'.$css[5].'>6.000</td>
-		</tr>
-
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Zufallsartefakt<sup>1</sup>:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>2</td>
-			<td'.$css[2].'>2</td>
-			<td'.$css[3].'>2</td>
-			<td'.$css[4].'>3</td>
-			<td'.$css[5].'>3</td>
-		</tr>
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Auktion<sup>2</sup>:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>1</td>
-			<td'.$css[2].'>1</td>
-			<td'.$css[3].'>1</td>
-			<td'.$css[4].'>1</td>
-			<td'.$css[5].'>1</td>
-		</tr>		
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Titanen-Energiekern:</td>
-			<td'.$css[0].'>1</td>
-			<td'.$css[1].'>2</td>
-			<td'.$css[2].'>2</td>
-			<td'.$css[3].'>3</td>
-			<td'.$css[4].'>3</td>
-			<td'.$css[5].'>4</td>
-		</tr>		
-
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;">Allianz-Quantenglimmer:</td>
-			<td'.$css[0].'>0</td>
-			<td'.$css[1].'>1</td>
-			<td'.$css[2].'>2</td>
-			<td'.$css[3].'>3</td>
-			<td'.$css[4].'>4</td>
-			<td'.$css[5].'>5</td>
-		</tr>		
-
-		<tr style="text-align: center;" class="cell">
-			<td style="text-align: left;" colspan="8">
-				<sup>1</sup> zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
-				<br><sup>2</sup> gestartete Auktion im Auktionshaus mit einem Preisnachlass		
-			</td>
-		</tr>
-		';
-
-    //
+    //Raster: Kopf mit den Schwellen, je Zeile eine Belohnung
+    echo '<div class="ally-bonusraster">';
+    echo '<span class="ally-bonus-label mod-typ">ab Rundensiegartefakten</span>';
+    for ($i = 0;$i <= 5;$i++) {
+        echo '<span class="ally-bonus-kopf '.$stufe[$i].'">'.number_format($allyrelverbreitung_need[$i], 0, '', '.').'</span>';
+    }
+    foreach ($belohnungen as $name => $werte) {
+        echo '<span class="ally-bonus-label">'.$name.'</span>';
+        foreach ($werte as $i => $wert) {
+            echo '<span class="ally-bonus-wert '.$stufe[$i].'">'.$wert.'</span>';
+        }
+    }
+    echo '</div>';
 
     if ($dailyallygift == 0) {
-        echo '
-			<tr style="text-align: center;" class="cell">
-				<td style="text-align: center; vertical-align; center; height: 50px;" colspan="8">
-					Der Bonus wurde heute bereits abgeholt.
-				</td>
-			</tr>
-			';
+        echo '<div class="ally-aktionen ally-aktionen-mitte"><span class="mod-feld">Der Bonus wurde heute bereits abgeholt.</span></div>';
     } else {
-        echo '
-			<tr style="text-align: center;" class="cell">
-				<td style="text-align: center; vertical-align; center; height: 50px;" colspan="8">
-					<a class="btn" style="display: inline-block;" href="?getdailybonus=1">abholen</a>
-				</td>
-			</tr>
-			';
+        echo '<div class="ally-aktionen ally-aktionen-mitte"><a class="mod-btn" href="?getdailybonus=1">Bonus abholen</a></div>';
     }
 
-    echo '</table>';
+    echo '
+	<div class="ally-fussnoten">
+		<sup>1</sup> zuf&auml;lliges Stufe-1-Artefakt aus folgender Liste: Pesara, Vakara, Geangrus, Geabwus, Agsora, Feuroka, Bloroka, Turak, Turla, Recarion, Pekasch, Pekek, Empala, Empdestro, Recadesto (Es wird der Artefakthort mit einem freien Platz ben&ouml;tigt, ansonsten wird das Artefakt nicht gutgeschrieben)
+		<br><sup>2</sup> gestartete Auktion im Auktionshaus mit einem Preisnachlass
+	</div>';
 
-
-
-
-
+    echo '</div>';
     rahmen_unten();
 
 
 } else {
     include('resline.php');
     //ohne Allianz erklären, wofür der Bonus da ist und wie man zu einer Allianz kommt
-    echo '<div class="info_box" style="padding: 10px; font-size: 14px; color: #DDDDDD;">
-        <div class="text2" style="margin-bottom: 8px;">'.$allydailygift_lang['keineally'].'</div>
-        '.$allydailygift_lang['keineally_info'].'<br><br>
-        <a href="allymain.php">'.$allydailygift_lang['zurallianz'].'</a></div><br>';
+    rahmen_oben('Allianzbonus');
+    echo '
+	<div class="ally mod">
+		<div class="mod-leer">
+			<b>'.$allydailygift_lang['keineally'].'</b><br><br>
+			'.$allydailygift_lang['keineally_info'].'
+			<div class="ally-aktionen ally-aktionen-mitte"><a href="allymain.php" class="mod-btn">'.$allydailygift_lang['zurallianz'].'</a></div>
+		</div>
+	</div>';
+    rahmen_unten();
 }
 
 ?>

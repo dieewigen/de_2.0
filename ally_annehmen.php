@@ -33,7 +33,12 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');
-//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
+
+//Ergebnis als Meldung unter den Reitern, darunter zurück zu den Anträgen
+$zurueck = '<div class="ally-aktionen"><a href="ally_antrag.php" class="mod-btn mod-btn-leise">Zur&uuml;ck zu den Antr&auml;gen</a></div>';
+echo '<div class="mod ally-meldung">';
+
+//Prüfung auf coleader hinzugefügt von Ascendant (4.9.2002)
 $allys = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
     [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]
@@ -41,11 +46,11 @@ $allys = mysqli_execute_query($GLOBALS['dbi'],
 
 if(mysqli_num_rows($allys) < 1)
 {
-	echo $allyablehnen_lang['msg_1'];
+	echo '<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_1'].'</div>';
 }
 else
 {
-	//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
+	//Prüfung auf coleader hinzugefügt von Ascendant (4.9.2002)
 	$result = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT id, allytag, memberlimit FROM de_allys 
          WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
@@ -117,18 +122,18 @@ else
 				}
 				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Deinem Antrag zugestimmt und Dich aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachte, dass Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
 
-				echo '<div class="info_box text3">'.$allyablehnen_lang['msg_2_1'].' '.$sum.' '.$allyablehnen_lang['msg_2_2'].'.</div>';
+				echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_2_1'].' '.$sum.' '.$allyablehnen_lang['msg_2_2'].'.</div>';
 				include('ally/allyfunctions.inc.php');
 				writeHistory($clantag, $allyablehnen_lang['msg_3'].' <i>'.$u_name.'</i>',true);
 			}
 			else
 			{
-				echo '<div class="info_box text3">'.$allyablehnen_lang['msg_4'].'</div>';
+				echo '<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_4'].'</div>';
 			}
 		}
 		else
 		{
-			print('<div class="info_box text3">'.$allyablehnen_lang['msg_5'].'</div>');
+			print('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_5'].'</div>');
 		}
 	}
 	elseif($allyid)
@@ -140,7 +145,7 @@ else
         $row = mysqli_fetch_assoc($result);
         $alreadyinXallys = $row['count'];
         if ($alreadyinXallys >= 2)
-            die ($allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3']);
+            die ('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_6_1'].' '.$alreadyinXallys.' '.$allyablehnen_lang['msg_6_2'].' '.$alreadyinXallys.''.$allyablehnen_lang['msg_6_3'].'</div>'.$zurueck.'</div>');
 
         $result = mysqli_execute_query($GLOBALS['dbi'],
             "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ? AND ally_id_partner = ?",
@@ -149,7 +154,7 @@ else
         $row = mysqli_fetch_assoc($result);
         $antragexists = $row['count'];
 		if ($antragexists == 0)
-			die($allyablehnen_lang['msg_7']);
+			die('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_7'].'</div>'.$zurueck.'</div>');
 			
 		//überprüfen ob man mit dem gewünschten bündnispartner evtl. im krieg ist
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
@@ -160,7 +165,7 @@ else
         );
         $num = mysqli_num_rows($db_daten);
         if ($num > 0) {
-            die ('<div class="info_box text2">Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.</div></body></html>');
+            die ('<div class="mod-meldung mod-meldung-fehler">Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.</div>'.$zurueck.'</div></body></html>');
         }
 
         //Test auf Diplomatiezentrum
@@ -176,7 +181,7 @@ else
 
 		//test auf vorhandenes allianzprojekt Diplomatiezentrum
 		if($bldg<1){
-		die('<br><div class="info_box text2">F&uuml;r ein Allianzb&uuml;ndnis wird ein Diplomatiezentrum ben&ouml;tigt.</div></body></html>');
+		die('<div class="mod-meldung mod-meldung-fehler">F&uuml;r ein Allianzb&uuml;ndnis wird ein Diplomatiezentrum ben&ouml;tigt.</div>'.$zurueck.'</div></body></html>');
 		}
 
 		mysqli_execute_query($GLOBALS['dbi'],
@@ -190,7 +195,7 @@ else
              OR (ally_id_antragsteller = ? AND ally_id_partner = ?)",
             [$allyid, $clanid, $clanid, $allyid]
         );
-		echo $allyablehnen_lang['msg_8'];
+		echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_8'].'</div>';
 		include("ally/allyfunctions.inc.php");
 		$delallyid1_tag = getAllyTag($clanid);
 		$delallyid2_tag = getAllyTag($allyid);
@@ -200,6 +205,7 @@ else
 
 	}
 }
+echo $zurueck.'</div>';
 
 ?>
 <?php include('ally/ally.footer.inc.php'); ?>

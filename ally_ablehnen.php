@@ -1,12 +1,12 @@
 <?php
 //	--------------------------------- ally_ablehnen.php ---------------------------------
 //	Funktion der Seite:		Ablehnen eines Beitrittgesuchs
-//	Letzte �nderung:		05.09.2002
-//	Letzte �nderung von:	Ascendant
+//	Letzte Änderung:		05.09.2002
+//	Letzte Änderung von:	Ascendant
 //
-//	�nderungshistorie:
+//	Änderungshistorie:
 //
-//	05.02.2002 (Ascendant)	- Erweiterung der �nderungsbefugnis
+//	05.02.2002 (Ascendant)	- Erweiterung der Änderungsbefugnis
 //							  auf Coleader
 //  -------------------------------------------------------------------------------------
 include('inc/header.inc.php');
@@ -40,7 +40,12 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');
-//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
+
+//Ergebnis als Meldung unter den Reitern, darunter zurück zu den Anträgen
+$zurueck = '<div class="ally-aktionen"><a href="ally_antrag.php" class="mod-btn mod-btn-leise">Zur&uuml;ck zu den Antr&auml;gen</a></div>';
+echo '<div class="mod ally-meldung">';
+
+//Prüfung auf coleader hinzugefügt von Ascendant (4.9.2002)
 $allys = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
     [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]
@@ -48,11 +53,11 @@ $allys = mysqli_execute_query($GLOBALS['dbi'],
 
 if($allys->num_rows < 1)
 {
-	echo $allyablehnen_lang['msg_1'];
+	echo '<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_1'].'</div>';
 }
 else
 {
-	//Pr�fung auf coleader hinzugef�gt von Ascendant (4.9.2002)
+	//Prüfung auf coleader hinzugefügt von Ascendant (4.9.2002)
 	$result = mysqli_execute_query($GLOBALS['dbi'],
         "SELECT id, allytag FROM de_allys WHERE leaderid = ? OR coleaderid1 = ? OR coleaderid2 = ? OR coleaderid3 = ?",
         [$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]
@@ -108,11 +113,11 @@ else
 				}
 			}
 			notifyUser($userid, $allyablehnen_lang['msg_2_1'].' '.$clantag.' '.$allyablehnen_lang['msg_2_2'].' '.$sum.' '.$allyablehnen_lang['msg_2_3'], 6);
-			echo $allyablehnen_lang['msg_3'];
+			echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_3'].'</div>';
 		}
 		else
 		{
-			echo $allyablehnen_lang['msg_4'];
+			echo '<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_4'].'</div>';
 		}
 	}
 	elseif($allyid)
@@ -124,16 +129,17 @@ else
         $row = $result->fetch_assoc();
         $antragexists = $row['count'];
         if ($antragexists == 0)
-            die($allyablehnen_lang['msg_5']);
+            die('<div class="mod-meldung mod-meldung-fehler">'.$allyablehnen_lang['msg_5'].'</div>'.$zurueck.'</div>');
 
         mysqli_execute_query($GLOBALS['dbi'],
             "DELETE FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ? AND ally_id_partner = ?",
             [$allyid, $clanid]
         );
-		echo $allyablehnen_lang['msg_6'];
+		echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_6'].'</div>';
 	}
 
 }
+echo $zurueck.'</div>';
 
 
 

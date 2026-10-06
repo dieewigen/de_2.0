@@ -3493,6 +3493,893 @@ a.art-kachel-zurueck:hover::after {
   background: rgba(205, 127, 50, 0.14);
 }
 
+.ally-navi {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  width: 602px;
+  margin-bottom: 6px;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.ally-navi-frei {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mod .ally-reiter,
+.mod .ally-reiter:link,
+.mod .ally-reiter:visited {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 3px 4px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  color: #9da7b1;
+}
+
+.mod .ally-reiter:hover {
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.mod .ally-reiter-aktiv,
+.mod .ally-reiter-aktiv:link,
+.mod .ally-reiter-aktiv:visited,
+.mod .ally-reiter-aktiv:hover {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  color: #ffffff;
+}
+
+.mod .ally-reiter-gefahr,
+.mod .ally-reiter-gefahr:link,
+.mod .ally-reiter-gefahr:visited {
+  color: #ff8a8a;
+}
+
+.mod .ally-reiter-gefahr:hover {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ffb3b3;
+}
+
+.mod .ally-reiter-gefahr.ally-reiter-aktiv {
+  border-color: rgba(255, 107, 107, 0.7);
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.ally-meldung {
+  width: 602px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+}
+.ally-meldung .mod-meldung {
+  margin-bottom: 0;
+}
+
+.ally-bewerbung {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ally-bewerbung-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ally-bewerbung-text b {
+  color: #ffffff;
+}
+
+.ally {
+  width: 572px;
+}
+
+.ally-abschnitt {
+  margin-top: 12px;
+}
+.ally-abschnitt > .mod-typ {
+  margin-bottom: 5px;
+}
+
+.ally-hinweis {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.ally-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ally-aktionen-mitte {
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.ally-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ally-kopf {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ally-tag {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  height: 58px;
+  padding: 0 10px;
+  border: 1px solid var(--akzent);
+  border-radius: 12px;
+  background: var(--akzent-weich);
+  box-shadow: 0 0 14px var(--akzent-weich);
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ally-kopf-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ally-name {
+  font-size: 18px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+}
+
+.ally-kacheln {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.ally-mission {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+.ally-mission img {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+.ally-mission > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mod .ally-bonus,
+.mod .ally-bonus:link,
+.mod .ally-bonus:visited {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  text-decoration: none;
+  color: #c9d1d9;
+}
+.mod .ally-bonus img,
+.mod .ally-bonus:link img,
+.mod .ally-bonus:visited img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.mod .ally-bonus:hover {
+  border-color: var(--akzent);
+  text-decoration: none;
+}
+
+.mod .ally-bonus-bereit,
+.mod .ally-bonus-bereit:link,
+.mod .ally-bonus-bereit:visited {
+  border-color: rgba(62, 207, 106, 0.5);
+  background: rgba(62, 207, 106, 0.08);
+}
+
+.ally-bonus-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.ally-bonus-text b {
+  color: #ffffff;
+}
+.ally-bonus-text small {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.ally-bonus-bereit .ally-bonus-text small {
+  color: #5fe08a;
+}
+
+.ally-aufgabe {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ally-aufgabe-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ally-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mod .ally-links .mod-btn {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.ally-posten {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  align-items: center;
+  row-gap: 2px;
+}
+.ally-posten > span {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ally-posten-name {
+  color: #8b949e;
+  overflow-wrap: anywhere;
+}
+
+.mod .ally-person,
+.mod .ally-person:link,
+.mod .ally-person:visited {
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #ffffff;
+}
+.mod .ally-person small,
+.mod .ally-person:link small,
+.mod .ally-person:visited small {
+  margin-left: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.mod .ally-person:hover {
+  color: var(--akzent);
+  text-decoration: none;
+}
+
+.ally-text {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  color: #dddddd;
+}
+
+.ally-formular {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+}
+
+.ally-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ally-feld .mod-eingabe {
+  width: 100%;
+}
+.ally-feld textarea.mod-eingabe {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.ally-feld-breit {
+  grid-column: 1/-1;
+}
+
+.ally-feld-hinweis {
+  font-size: 10px;
+  color: #8b949e;
+}
+
+.ally-aktionen-text {
+  margin-right: auto;
+  align-self: center;
+}
+
+.ally-praefix {
+  display: flex;
+  align-items: center;
+}
+.ally-praefix > span {
+  flex: 0 0 auto;
+  padding: 6px 6px 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-right: 0;
+  border-radius: 6px 0 0 6px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  color: #8b949e;
+}
+.ally-praefix .mod-eingabe {
+  min-width: 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.ally-zeilen > :nth-child(odd) {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ally-zeilenkopf {
+  min-height: 22px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.mod .ally-sortieren,
+.mod .ally-sortieren:link,
+.mod .ally-sortieren:visited {
+  font-size: 10px;
+  text-decoration: none;
+  color: #8b949e;
+}
+
+.mod .ally-sortieren:hover {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.mod .ally-sortieren-aktiv,
+.mod .ally-sortieren-aktiv:link,
+.mod .ally-sortieren-aktiv:visited {
+  color: #ffffff;
+}
+.mod .ally-sortieren-aktiv::before,
+.mod .ally-sortieren-aktiv:link::before,
+.mod .ally-sortieren-aktiv:visited::before {
+  content: "▾ ";
+  color: var(--akzent);
+}
+
+.ally-zahl,
+.ally-rechts {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ally-rasse {
+  text-align: center;
+}
+.ally-rasse img {
+  vertical-align: middle;
+}
+
+.ally-fuss {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.mod .ally-btn-klein,
+.mod .ally-btn-klein:link,
+.mod .ally-btn-klein:visited {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.ally-mitglied {
+  display: grid;
+  grid-template-columns: 1fr 50px 84px 56px 20px;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+
+.ally-mitglied-leader {
+  grid-template-columns: 1fr 50px 84px 56px 20px 160px;
+}
+
+.ally-mitglied-coleader {
+  grid-template-columns: 1fr 50px 84px 56px 20px 80px;
+}
+
+.mod .ally-mitglied-name,
+.mod .ally-mitglied-name:link,
+.mod .ally-mitglied-name:visited {
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+}
+
+.mod .ally-mitglied-name:hover {
+  text-decoration: none;
+  color: var(--akzent);
+}
+
+.mod .ally-mitglied-inaktiv .ally-mitglied-name {
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.mod a.ally-zahl:link,
+.mod a.ally-zahl:visited {
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--akzent);
+}
+
+.ally-mitglied-aktionen {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.ally-karten {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ally-karte {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+}
+.ally-karte .ally-text {
+  margin-top: 6px;
+}
+.ally-karte .ally-aktionen {
+  margin-top: 8px;
+}
+
+.ally-karte-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ally-karte-kopf .ally-chips {
+  margin-left: auto;
+}
+.ally-karte-kopf .mod-chip img {
+  margin: -2px 0 0 2px;
+}
+
+.mod .ally-karte-kopf .ally-person,
+.mod .ally-karte-kopf .ally-person:link,
+.mod .ally-karte-kopf .ally-person:visited {
+  font-size: 14px;
+}
+
+.ally-leise {
+  font-style: italic;
+  color: #8b949e;
+}
+
+.ally-postenzeile {
+  display: grid;
+  grid-template-columns: 112px 118px 1fr 150px;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 32px;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.ally-postenzeile .mod-eingabe {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.ally-posten-funktion {
+  font-size: 12px;
+  color: #c9d1d9;
+}
+
+.ally-posten-leader {
+  padding: 0 6px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ally-kacheln-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ally-abstand {
+  margin-top: 8px;
+}
+
+.ally-zeilenformular {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ally-zeilenformular .mod-eingabe {
+  width: 110px;
+  text-align: right;
+}
+
+.ally-leise-text {
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.ally-finanz {
+  display: grid;
+  grid-template-columns: 1fr 88px 88px 88px 120px;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.ally-finanz-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+}
+
+.ally-rueckstand {
+  font-weight: 700;
+  color: #ff8a8a;
+}
+
+.ally-fl-angriff,
+.ally-fl-angriff b {
+  color: #ff8a8a;
+}
+
+.ally-fl-verteidigung,
+.ally-fl-verteidigung b {
+  color: #5fe08a;
+}
+
+.ally-fl-rueckflug,
+.ally-fl-rueckflug b {
+  color: #6cb6ff;
+}
+
+.ally-fl-mission,
+.ally-fl-mission b {
+  color: #e27bf0;
+}
+
+.ally-flottensummen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.ally-flottensummen .ov-wert b {
+  font-size: 16px;
+}
+
+.ally-flotte-summe {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+}
+
+.ally-flotte {
+  display: grid;
+  grid-template-columns: 1fr 18px 44px repeat(5, 66px);
+  align-items: center;
+  column-gap: 6px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.ally-flotte small {
+  display: block;
+  font-size: 9px;
+  line-height: 1.1;
+  opacity: 0.75;
+}
+
+.ally-flotte-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+}
+
+.ally-flotte-gesamt {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ally-legende {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.ally-typ-abstand {
+  margin-bottom: 5px;
+}
+
+.ally-diplozeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.ally-diplo-paar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.ally-diplo-paar b {
+  color: #ffffff;
+}
+
+.ally-diplo-zeichen {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ally-diplo-buendnis {
+  color: #5fe08a;
+}
+
+.ally-diplo-krieg {
+  color: #ff8a8a;
+}
+
+.ally-zeilenformular .ally-auswahl {
+  width: auto;
+  min-width: 160px;
+  text-align: left;
+}
+
+.ally-chip-fehlt {
+  background: rgba(255, 107, 107, 0.14);
+  color: #ff8a8a;
+}
+.ally-chip-fehlt b {
+  color: #ffb3b3;
+}
+
+.ally-projekte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ally-projekt {
+  display: grid;
+  grid-template-columns: 44px 1fr 112px;
+  align-items: center;
+  column-gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+}
+.ally-projekt > img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.ally-projekt-fertig {
+  border-color: rgba(62, 207, 106, 0.35);
+}
+
+.ally-projekt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ally-projekt-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ally-projekt-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ally-projekt-stufe {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: #8b949e;
+}
+.ally-projekt-stufe b {
+  color: #ffffff;
+}
+
+.ally-projekt-desc {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9da7b1;
+}
+
+.ally-projekt-aktion {
+  text-align: right;
+}
+
+.mod .ally-projekt-aktion .mod-btn {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.ally-kacheln-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ally-bonusraster {
+  display: grid;
+  grid-template-columns: 150px repeat(6, 1fr);
+  margin-top: 10px;
+  font-size: 12px;
+}
+.ally-bonusraster > span {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ally-bonus-label {
+  color: #9da7b1;
+}
+
+.ally-bonus-kopf,
+.ally-bonus-wert {
+  text-align: center;
+  color: #c9d1d9;
+}
+
+.ally-bonus-kopf {
+  font-weight: 700;
+}
+
+.ally-stufe-vorbei {
+  color: #6e7681;
+}
+
+.ally-stufe-offen {
+  color: #6e7681;
+  background: rgba(255, 107, 107, 0.05);
+}
+
+.ally-bonusraster .ally-stufe-aktiv {
+  background: rgba(62, 207, 106, 0.16);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ally-bonusraster .ally-bonus-kopf.ally-stufe-aktiv {
+  border-radius: 6px 6px 0 0;
+  color: #5fe08a;
+}
+
+.ally-fussnoten {
+  margin-top: 10px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #8b949e;
+}
+
+.ally-gefahr {
+  padding: 16px 14px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 10px;
+  background: rgba(255, 107, 107, 0.06);
+  text-align: center;
+}
+
+.ally-gefahr-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #dddddd;
+}
+.ally-gefahr-text b {
+  color: #ffffff;
+}
+
+.ally-verlauf {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  column-gap: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #c9d1d9;
+}
+
+.ally-verlauf-datum {
+  font-size: 11px;
+  color: #8b949e;
+}
+
 body.mobile {
   height: 100vh;
   height: 100dvh;
