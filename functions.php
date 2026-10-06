@@ -37,99 +37,54 @@ function write2agentlog($uid, $reason, $change_amount)
 function getInfocenter()
 {
     //mögliche Punkte: Flotten, Rohstofflieferung, Spezialisierung,  Sabotage, Missionen/VS-Missionen, Anzahl erforschte VS, Technologien(erforsch/offen)
+    //die Zustände liefert DieEwigen\DE2\Model\Infocenter\Infocenter, das Mobilmenü (menu.php) nutzt dieselben
     $content = '';
     $pt = loadPlayerTechs($_SESSION['ums_user_id']);
+    $infocenter = new \DieEwigen\DE2\Model\Infocenter\Infocenter($GLOBALS['dbi']);
 
     /////////////////////////////////////////////////
     // Missionen
     /////////////////////////////////////////////////
     $targetId='tb_infocenter_missions';
-    //$content .= '<div class="header">Missionen</div>';
-    if (!hasTech($pt, 29)) {
-        //Icon ausblenden
+    $missionen = $infocenter->missionen((int)$_SESSION['ums_user_id'], $pt);
+    if ($missionen === null) {
+        //ohne Missionszentrum Icon ausblenden
         $content .= '$("#'.$targetId.'").hide();';
+    } elseif ($missionen['abholbereit'] > 0) {
+        $content .= '$("#'.$targetId.'").show();';
+        $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>abholbereit: '.$missionen['abholbereit'].'");';
+        //pulsierende Klasse
+        $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
+    } elseif ($missionen['laufen'] == 0) {
+        //Warnung, wenn keine Missionen laufen
+        $content .= '$("#'.$targetId.'").show();';
+        $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: 0");';
+        $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
     } else {
-        //die Missionsdatensätze auslesen
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".$_SESSION['ums_user_id'].";");
-        $m_abholbereit = 0;
-        $m_laufen = 0;
-        while ($row = mysqli_fetch_array($db_daten)) {
-            if ($row['end_time'] <= time() && $row['get_reward'] == 0) {
-                $m_abholbereit++;
-            }
-
-            if ($row['end_time'] > time()) {
-                $m_laufen++;
-            }
-
-        }
-
-        if ($m_abholbereit > 0) {
-            //$content .= '<div class="green">abholbereit: '.$m_abholbereit.'</div>';
-            $content .= '$("#'.$targetId.'").show();';
-            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>abholbereit: '.$m_abholbereit.'");';
-            //pulsierende Klasse
-            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
-        } else {
-            if ($m_laufen == 0) {
-                //Warnung, wenn keine Missionen laufen
-                //$content .= '<div class="red">aktiv: 0</div>';
-            $content .= '$("#'.$targetId.'").show();';
-            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: 0");';
-            //pulsierende Klasse
-            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';                
-            } else {
-                //Hinweis wie viele Missionen laufen
-                //$content .= '<div>aktiv: '.$m_laufen.'</div>';
-            $content .= '$("#'.$targetId.'").show();';
-            $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: '.$m_laufen.'");';
-            //keine pulsierende Klasse
-            $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';                
-            }
-
-        }
+        //Hinweis wie viele Missionen laufen, keine pulsierende Klasse
+        $content .= '$("#'.$targetId.'").show();';
+        $content .= '$("#'.$targetId.'").prop("title", "Missionen<br>aktiv: '.$missionen['laufen'].'");';
+        $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';
     }
 
     /////////////////////////////////////////////////
     // Technologien
     /////////////////////////////////////////////////
     $targetId='tb_infocenter_technology';
-
-    //zuerst checken ob man evtl. schon alle Techs hat, dann braucht man den Punkt gar nicht mehr anzeigen
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_tech_data WHERE tech_sort_id < 1000");
-    $row = mysqli_fetch_array($db_daten);
-    $tech_max = $row['anzahl'];
-    $tech_anzahl = count($pt);
-
-    if ($tech_anzahl < $tech_max) {
-        //$content .= '<div class="header mt10">Technologien</div>';
-        //wird aktuell etwas erforscht?
-        $t_aktiv = 0;
-        foreach ($pt as $tech) {
-            if (is_array($tech) && $tech['time_finished'] > time()) {
-                $t_aktiv++;
-            }
-        }
-
-        if ($t_aktiv > 0) {
-            //anzeigen wie viel erforscht wird
-            //$content .= '<div>aktiv: '.$t_aktiv.'</div>';
-            $content .= '$("#'.$targetId.'").show();';
-            $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: '.$t_aktiv.'");';
-            //keine pulsierende Klasse
-            $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';
-
-        } else {
-            //Warnung, dass gerade nichts geforscht wird
-            //$content .= '<div class="red">aktiv: 0</div>';
-            $content .= '$("#'.$targetId.'").show();';
-            $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: 0");';
-            //pulsierende Klasse
-            $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
-        }
-    }else{
+    $technologien = $infocenter->technologien($pt);
+    if ($technologien === null) {
         //alle Techs erforscht, Punkt nicht mehr anzeigen
         $content .= '$("#'.$targetId.'").hide();';
+    } elseif ($technologien['aktiv'] > 0) {
+        //anzeigen wie viel erforscht wird, keine pulsierende Klasse
+        $content .= '$("#'.$targetId.'").show();';
+        $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: '.$technologien['aktiv'].'");';
+        $content .= '$("#'.$targetId.'").removeClass("pulse-icon");';
+    } else {
+        //Warnung, dass gerade nichts geforscht wird
+        $content .= '$("#'.$targetId.'").show();';
+        $content .= '$("#'.$targetId.'").prop("title", "Technologien<br>aktiv: 0");';
+        $content .= '$("#'.$targetId.'").addClass("pulse-icon");';
     }
 
     if(!empty($content)){
@@ -1531,7 +1486,7 @@ function get_allybldg($allyid)
 
 function get_free_artefact_places($user_id)
 {
-    //gebäudestufe und test auf geb�ude
+    //gebäudestufe und test auf gebäude
     $pt = loadPlayerTechs($user_id);
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT artbldglevel FROM de_user_data WHERE user_id=?", [$user_id]);
     $row = mysqli_fetch_assoc($db_daten);
@@ -1587,7 +1542,7 @@ function get_player_allyid($user_id)
     $row = mysqli_fetch_array($db_daten);
     $allytag = $row['allytag'];
     $allystatus = $row['status'];
-    //�berpr�fen ob man in einer allianz ist
+    //überprüfen ob man in einer allianz ist
     if ($allytag != '' and $allystatus == 1) {
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_allys WHERE allytag=?", [$allytag]);
         $row = mysqli_fetch_array($db_daten);
@@ -1865,7 +1820,7 @@ function showtech($techname, $gebnr, $rt01, $rt02, $rt03, $rt04, $rt05, $buildgt
                 echo '<td class="'.$bg.'">'.$functions['wirderforscht'].' ('.$verbtime.')
 			 <a href="research.php?cancel='.$gebnr.'" onclick="return confirm(unescape(\'Soll die Forschung wirklich abgebrochen werden? Die Rohstoffkosten werden erstattet.\'))" class="btn2" style="margin: 4px; display: inline-block;">Abbruch</a></td>';
             }
-        } else { //Sektorgeb�ude
+        } else { //Sektorgebäude
             echo  '<td class="'.$bg.'">'.$functions['imbau'].' ('.$verbtime.')</td>';
         }
     } elseif ($techs[$gebnr] == 1) { //schon gebaut/geforscht
@@ -2123,7 +2078,7 @@ function get_fleet_ground_speed($ez, $rasse, $uid)
         $schiffe_btkrest[0][0] = 0;
     }
 
-    //�berpr�fen ob zu transportierende einheiten �brig sind
+    //überprüfen ob zu transportierende einheiten �brig sind
     if ($schiffe_btkrest[0][0] > 0) {
         $rz1 = $schiffsdaten[$rasse - 1][0][0];
     }//j�ger

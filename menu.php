@@ -18,6 +18,41 @@ if ($_SESSION['ums_mobi'] == 1) {
     ];
     $accent = $accentMap[$_SESSION['ums_rasse'] ?? 1];
 
+    //Hinweise auf den Kacheln nach denselben Regeln wie im Desktop-Menü (Symbole aus resline.php und getInfocenter())
+    $menu_uid = (int)$_SESSION['ums_user_id'];
+    $menu_pd = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT sector, `system`, newtrans, newnews, dailyallygift FROM de_user_data WHERE user_id=?", [$menu_uid]));
+    $menu_pt = loadPlayerTechs($menu_uid);
+    $infocenter = new \DieEwigen\DE2\Model\Infocenter\Infocenter($GLOBALS['dbi']);
+    $hinweise = array();
+    if ($menu_pd['newtrans'] == 1) {
+        $hinweise['hyperfunk.php'] = array('neu', 'akzent');
+    }
+    if ($menu_pd['newnews'] == 1) {
+        $hinweise['sysnews.php'] = array('neu', 'akzent');
+    }
+    $flotten = $infocenter->flotten((int)$menu_pd['sector'], (int)$menu_pd['system']);
+    if ($flotten['angreifer'] > 0) {
+        $hinweise['secstatus.php'] = array('Angriff', 'gefahr');
+    } elseif ($flotten['verteidiger'] > 0) {
+        $hinweise['secstatus.php'] = array('Verteidiger', 'gut');
+    }
+    if ($menu_pd['dailyallygift'] == 1) {
+        $hinweise['allymain.php'] = array('Geschenk', 'gut');
+    }
+    $missionen = $infocenter->missionen($menu_uid, $menu_pt);
+    if ($missionen !== null && $missionen['abholbereit'] > 0) {
+        $hinweise['missions.php'] = array($missionen['abholbereit'].' abholbereit', 'gut');
+    } elseif ($missionen !== null && $missionen['laufen'] == 0) {
+        $hinweise['missions.php'] = array('keine aktiv', 'warn');
+    }
+    $technologien = $infocenter->technologien($menu_pt);
+    if ($technologien !== null && $technologien['aktiv'] == 0) {
+        $hinweise['ang_techs.php'] = array('nichts läuft', 'warn');
+    }
+    $hinweis = function ($seite) use ($hinweise) {
+        return isset($hinweise[$seite]) ? '<span class="menu-hinweis menu-hinweis-'.$hinweise[$seite][1].'">'.$hinweise[$seite][0].'</span>' : '';
+    };
+
     echo '<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -116,6 +151,27 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
   .menu-btn:hover{transform:none;}
 }
 .swipe-hint{margin-top:16px;font-size:.7rem;opacity:.55;text-align:center;letter-spacing:.08em;}
+/* Hinweis oben rechts auf der Kachel: neu, Angriff, abholbereit, nichts läuft */
+.menu-hinweis{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:2;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.02em;
+  line-height:1.4;
+  color:var(--hinweis);
+  background:color-mix(in srgb,var(--hinweis) 18%, transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--hinweis) 45%, transparent);
+}
+.menu-hinweis-akzent{--hinweis:var(--accent);color:#fff;background:color-mix(in srgb,var(--accent) 45%, transparent);}
+.menu-hinweis-gut{--hinweis:#5fe08a;}
+.menu-hinweis-warn{--hinweis:#ffb45c;}
+.menu-hinweis-gefahr{--hinweis:#ff6b6b;animation:menu-puls 1.6s ease-in-out infinite;}
+@keyframes menu-puls{50%{opacity:.55;}}
 </style>
 </head>
 <body>';
@@ -159,21 +215,21 @@ document.addEventListener("DOMContentLoaded",()=>{
   <nav class="menu-grid">
     <a class="menu-btn" data-icon="💬" href="chat.php">DE-Chat</a>
     <a class="menu-btn" data-icon="🛰" href="overview.php">&Uuml;bersicht</a>
-    <a class="menu-btn" data-icon="📡" href="hyperfunk.php">'.$menu_lang['eintrag_2'].'</a>
-    <a class="menu-btn" data-icon="🗞" href="sysnews.php">'.$menu_lang['eintrag_3'].'</a>
-    <a class="menu-btn" data-icon="⚙" href="ang_techs.php">Technologien</a>
+    <a class="menu-btn" data-icon="📡" href="hyperfunk.php">'.$menu_lang['eintrag_2'].$hinweis('hyperfunk.php').'</a>
+    <a class="menu-btn" data-icon="🗞" href="sysnews.php">'.$menu_lang['eintrag_3'].$hinweis('sysnews.php').'</a>
+    <a class="menu-btn" data-icon="⚛" href="ang_techs.php">Technologien'.$hinweis('ang_techs.php').'</a>
     <a class="menu-btn" data-icon="🧬" href="specialization.php">Spezialisierung</a>
     <a class="menu-btn" data-icon="⛃" href="resource.php">'.$menu_lang['eintrag_6'].'</a>
     <a class="menu-btn" data-icon="✧" href="artefacts.php">'.$menu_lang['eintrag_18'].'</a>
     <a class="menu-btn" data-icon="⚖" href="auction.php">Auktion</a>
-    <a class="menu-btn" data-icon="✪" href="missions.php">Missionen</a>'.
+    <a class="menu-btn" data-icon="✪" href="missions.php">Missionen'.$hinweis('missions.php').'</a>'.
     ($sv_deactivate_vsystems!=1?'<a class="menu-btn" data-icon="✸" href="map_mobile.php">V-Systeme</a>':'').'
     <a class="menu-btn" data-icon="🏭" href="production.php">'.$menu_lang['eintrag_8'].'</a>
     <a class="menu-btn" data-icon="🚀" href="military.php">Flotten</a>
     <a class="menu-btn" data-icon="🕵️" href="secret.php">'.$menu_lang['eintrag_11'].'</a>
     <a class="menu-btn" data-icon="⌬" href="sector.php">'.$menu_lang['eintrag_12'].'</a>
-    <a class="menu-btn" data-icon="🛸" href="secstatus.php">'.$menu_lang['eintrag_13'].'</a>
-    <a class="menu-btn" data-icon="∞" href="allymain.php">'.$menu_lang['eintrag_16'].'</a>
+    <a class="menu-btn" data-icon="🛸" href="secstatus.php">'.$menu_lang['eintrag_13'].$hinweis('secstatus.php').'</a>
+    <a class="menu-btn" data-icon="∞" href="allymain.php">'.$menu_lang['eintrag_16'].$hinweis('allymain.php').'</a>
     <a class="menu-btn" data-icon="📊" href="statistics.php">'.$menu_lang['eintrag_21'].'</a>
     <a class="menu-btn" data-icon="★" href="toplist.php">'.$menu_lang['eintrag_22'].'</a>
     <a class="menu-btn" data-icon="⚙" href="options.php">'.$menu_lang['eintrag_24'].'</a>
