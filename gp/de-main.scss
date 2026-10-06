@@ -5220,6 +5220,329 @@ a.art-kachel-zurueck:hover::after {
 	margin-top: 10px;
 }
 
+// Statistik (statistics.php): Verlaufsdiagramme als SVG, Aktivität, Kollektoren, Ereignisse
+.stat {
+	width: 572px;
+}
+
+// vier Reiter statt sechs wie bei der Allianz
+.stat-navi {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-karte {
+	margin-bottom: 8px;
+	padding: 8px 10px 6px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.03);
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	> .mod-leer {
+		margin-top: 6px;
+		padding: 14px 12px;
+	}
+}
+
+// Titel, aktueller Wert, Veränderung seit Beginn
+.stat-kopf {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 2px 8px;
+
+	.mod-typ {
+		flex-basis: 100%;
+	}
+}
+
+.stat-wert {
+	font-size: 18px;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+.stat-chip-rot {
+	background: rgba(255, 107, 107, 0.14);
+	color: #ff8a8a;
+}
+
+.stat-diagramm {
+	position: relative;
+	margin-top: 4px;
+	border-radius: 6px;
+	outline: none;
+
+	&:focus-visible {
+		box-shadow: 0 0 0 2px var(--akzent-weich);
+	}
+
+	svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		touch-action: pan-y;
+	}
+}
+
+.stat-raster {
+	stroke: rgba(255, 255, 255, 0.08);
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+
+.stat-achse {
+	font-size: 10px;
+	fill: #8b949e;
+}
+
+.stat-flaeche {
+	fill: var(--akzent);
+	fill-opacity: 0.1;
+}
+
+.stat-linie {
+	fill: none;
+	stroke: var(--akzent);
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+// Endpunkt und Hover-Punkt mit Ring in der Hintergrundfarbe
+.stat-punkt {
+	fill: var(--akzent);
+	stroke: #0e1218;
+	stroke-width: 2;
+}
+
+.stat-endwert {
+	font-size: 11px;
+	font-weight: 700;
+	fill: #ffffff;
+}
+
+.stat-fadenkreuz {
+	stroke: rgba(255, 255, 255, 0.35);
+	stroke-width: 1;
+	stroke-dasharray: 2 2;
+}
+
+.stat-tip {
+	position: absolute;
+	top: 2px;
+	padding: 4px 8px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 6px;
+	background: #161b22;
+	white-space: nowrap;
+	pointer-events: none;
+
+	b {
+		display: block;
+		font-size: 13px;
+		color: #ffffff;
+	}
+
+	small {
+		font-size: 10px;
+		color: #8b949e;
+	}
+}
+
+// alle Messwerte zum Nachlesen, standardmäßig zugeklappt
+.stat-tabelle {
+	margin-top: 2px;
+
+	summary {
+		font-size: 11px;
+		color: #8b949e;
+		cursor: pointer;
+
+		&:hover {
+			color: #c9d1d9;
+		}
+	}
+}
+
+.stat-werteliste {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+	gap: 1px 10px;
+	max-height: 150px;
+	margin-top: 4px;
+	overflow-y: auto;
+	font-size: 11px;
+
+	span {
+		display: flex;
+		justify-content: space-between;
+		gap: 6px;
+		color: #c9d1d9;
+	}
+
+	small {
+		color: #6e7681;
+	}
+}
+
+// Aktivität: je Tag 24 Stunden, abgestuft in der Rassenfarbe
+.stat-aktivitaet {
+	display: grid;
+	grid-template-columns: 44px repeat(24, 1fr);
+	gap: 2px;
+	align-items: center;
+}
+
+.stat-tag {
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.stat-stunde {
+	font-size: 9px;
+	color: #6e7681;
+}
+
+.stat-zelle {
+	display: block;
+	height: 18px;
+	border-radius: 3px;
+	cursor: help;
+}
+
+.stat-stufe0 {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-stufe1 {
+	background: var(--akzent-mittel);
+}
+
+.stat-stufe2 {
+	background: var(--akzent);
+}
+
+.stat-legende {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 16px;
+	margin-top: 8px;
+	font-size: 11px;
+	color: #9da7b1;
+
+	span {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.stat-zelle {
+		width: 12px;
+		height: 12px;
+		cursor: default;
+	}
+}
+
+.stat-kacheln {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+}
+
+.stat-abschnitt {
+	margin-top: 12px;
+
+	> .mod-typ {
+		margin-bottom: 4px;
+	}
+}
+
+// Listen: Kollektoren und Ereignisse
+.stat-zeile {
+	display: grid;
+	gap: 8px;
+	align-items: center;
+	padding: 5px 8px;
+	border-radius: 6px;
+}
+
+.stat-liste > .stat-zeile:nth-child(odd) {
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-kol {
+	grid-template-columns: 104px 52px 64px 1fr;
+}
+
+.stat-ereignis {
+	grid-template-columns: 56px 1fr;
+}
+
+.stat-kopfzeile {
+	padding-top: 0;
+	padding-bottom: 2px;
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #8b949e;
+
+	span:first-child {
+		text-align: right;
+	}
+}
+
+.stat-zahl {
+	text-align: right;
+	white-space: nowrap;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.stat-leise {
+	color: #8b949e;
+}
+
+.stat-details {
+	display: block;
+	font-size: 11px;
+	color: #8b949e;
+
+	b {
+		font-weight: 500;
+		color: #c9d1d9;
+	}
+}
+
+.mod a.stat-spieler,
+.mod a.stat-spieler:link,
+.mod a.stat-spieler:visited {
+	font-size: 12px;
+	text-decoration: none;
+	color: #ffffff;
+
+	small {
+		color: #8b949e;
+	}
+}
+
+.mod a.stat-spieler:hover {
+	color: var(--akzent);
+}
+
+.stat-hinweis {
+	margin-top: 8px;
+	font-size: 11px;
+	color: #8b949e;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;
