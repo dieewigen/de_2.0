@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\RealTime;
+
 include('inc/header.inc.php');
 include('lib/transaction.lib.php');
 include('inc/schiffsdaten.inc.php');
@@ -447,8 +450,6 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 </script>
 <?php
 echo '<script language="javascript" type="text/javascript" src="js/military.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/military.js').'"></script>';
-//Countdown für Flotten auf Mission
-echo '<script type="text/javascript" src="js/ang_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js').'"></script>';
 ?>
 </head>
 <?php
@@ -824,14 +825,6 @@ function recall($fleet_id, $sector, $system, $db){
 	}//ende der if ($akttyp==1 OR $akttyp==2)
 }
 
-//Restzeit einer Mission wie auf der Missionsseite (Missionen laufen in Echtzeit)
-function mil_uhr($sekunden){
-	$sekunden=max(0, (int)ceil($sekunden));
-	$tage=floor($sekunden/86400);
-	$stunden=floor($sekunden/3600)%24;
-	return ($tage>0 ? $tage.':' : '').($tage>0 || $stunden>0 ? sprintf('%02d:', $stunden) : '').sprintf('%02d:%02d', floor($sekunden/60)%60, $sekunden%60);
-}
-
 if ($techs[13]==0 AND 1==2){
 	$techcheck="SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=13";
 	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
@@ -901,7 +894,6 @@ if ($techs[13]==0 AND 1==2){
 
 	//Kopf je Flotte: Auftrag als Farbe und Chip, darunter Ziel und Zeit
 	$kopf=array(0 => array('heim', '<span class="mil-status">im System</span>', ''));
-	$laufend=array();
 	for($f=1;$f<=3;$f++){
 		$fd=$einheiten_daten[$f];
 		if($fd['showfleettarget']==1){
@@ -925,12 +917,8 @@ if ($techs[13]==0 AND 1==2){
 				$kopf[$f]=array('rueckflug', '<span class="mil-status mil-status-rueckflug">'.$military_lang['status4'].'</span>', $fd['zeit'].' KT');
 				break;
 			case 4:
-				//Missionen laufen in Echtzeit: Restzeit wie auf der Missionsseite
-				$rest=$fleet_mission_time[$f]-time();
-				$kopf[$f]=array('mission', '<span class="mil-status mil-status-mission">'.$military_lang['status5'].'</span>', 'noch <span id="mil-uhr'.$f.'">'.mil_uhr($rest).'</span>');
-				if($rest>0){
-					$laufend[]=array('mil-uhr'.$f, $rest);
-				}
+				//Missionen laufen in Echtzeit: Ende als Uhrzeit
+				$kopf[$f]=array('mission', '<span class="mil-status mil-status-mission">'.$military_lang['status5'].'</span>', RealTime::until($fleet_mission_time[$f]));
 				break;
 			default:
 				$kopf[$f]=array('heim', '<span class="mil-status mil-status-heim">daheim</span>', '');
@@ -1095,11 +1083,6 @@ if ($techs[13]==0 AND 1==2){
 	</div>
 	</div>';
 	rahmen_unten();
-
-	//Countdown der Missionen
-	if(count($laufend)>0){
-		echo '<script>'.json_encode($laufend).'.forEach(function(l){ ang_countdown(l[1], l[0], 0); });</script>';
-	}
 } //raumwerftbedinung ende
 ?>
 <script language="javascript">

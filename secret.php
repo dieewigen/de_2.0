@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\RealTime;
+
 include "inc/header.inc.php";
 include 'lib/transaction.lib.php';
 include "lib/kampfbericht.lib.php";
@@ -1372,7 +1375,7 @@ if (!hasTech($pt, 9)) {
                             }
                             //elseif ($a1==4) $a1='&nbsp;&nbsp;'.$secret_lang[archaeologie].'&nbsp;&nbsp;'.$secret_lang[reisezeit2].$t1;
                             elseif ($a1 == 4) {
-                                $a1 = '&nbsp;&nbsp;Mission bis: '.date("H:i:s d.m.Y", $mission_time1);
+                                $a1 = '&nbsp;&nbsp;Mission '.RealTime::until($mission_time1);
                             }
 
                             if ($a1[0] == 'V' && $t1 == 0) {
@@ -1390,7 +1393,7 @@ if (!hasTech($pt, 9)) {
                             }
                             //elseif ($a2==4) $a2='&nbsp;&nbsp;'.$secret_lang[archaeologie].'&nbsp;&nbsp;'.$secret_lang[reisezeit2].$t2;
                             elseif ($a2 == 4) {
-                                $a2 = '&nbsp;&nbsp;Mission bis: '.date("H:i:s d.m.Y", $mission_time2);
+                                $a2 = '&nbsp;&nbsp;Mission '.RealTime::until($mission_time2);
                             }
 
                             if ($a2[0] == 'V' && $t2 == 0) {
@@ -1408,7 +1411,7 @@ if (!hasTech($pt, 9)) {
                             }
                             //elseif ($a3==4) $a3='&nbsp;&nbsp;'.$secret_lang[archaeologie].'&nbsp;&nbsp;'.$secret_lang[reisezeit2].$t3;
                             elseif ($a3 == 4) {
-                                $a3 = '&nbsp;&nbsp;Mission bis: '.date("H:i:s d.m.Y", $mission_time3);
+                                $a3 = '&nbsp;&nbsp;Mission '.RealTime::until($mission_time3);
                             }
 
                             if ($a3[0] == 'V' && $t3 == 0) {

@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\RealTime;
+
 $GLOBALS['deactivate_old_design'] = true;
 include "inc/header.inc.php";
 include "inc/lang/".$sv_server_lang."_secstatus.lang.php";
@@ -75,6 +78,110 @@ checkMissionEnd();
 //beim aufruf der seite alle sichtbaren flotten automatisch für den gesamten sektor sichtbar machen
 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_fleet SET entdecktsec = 1 WHERE zielsec=? AND zielsys=? AND entdeckt=1 AND entdecktsec=0", [$sector, $system]);
 
+//Rassenbild
+function ss_rasse($rasse_id)
+{
+    $bilder = array(1 => array('raceE.png', 'Die Ewigen'), 2 => array('raceI.png', 'Ishtar'), 3 => array('raceK.png', 'K&#180;Tharr'), 4 => array('raceZ.png', 'Z&#180;tah-ara'), 5 => array('raceD.png', 'DX61a23'));
+    if (!isset($bilder[$rasse_id])) {
+        return '';
+    }
+    return '<img src="gp/g/r/'.$bilder[$rasse_id][0].'" title="'.$bilder[$rasse_id][1].'" width="16" height="16" alt="">';
+}
+
+//Sonde, Agenten, Flotte und Hyperfunk für ein System
+function ss_links($sec, $sys)
+{
+    return '<span class="ss-links"><a href="secret.php?a=s&amp;zsec1='.$sec.'&amp;zsys1='.$sys.'" title="Sonde">S</a><a href="secret.php?a=a&amp;zsec2='.$sec.'&amp;zsys2='.$sys.'" title="Agenteneinsatz">A</a><a href="military.php?se='.$sec.'&amp;sy='.$sys.'" title="Flotte">F</a><a href="details.php?se='.$sec.'&amp;sy='.$sys.'" title="Hyperfunk">H</a></span>';
+}
+
+//Auftrag als Chip; $cl ist die bisherige Einfärbung: ccr Angriff, ccg Verteidigung im Anflug, ccy verteidigt vor Ort, cc Rückflug/Mission
+function ss_auftrag($cl, $as1, $at1)
+{
+    global $ss_lang;
+    if ($cl == 'ccr') {
+        return '<span class="mil-status mil-status-angriff">'.$ss_lang['angriff'].'</span>';
+    }
+    if ($cl == 'ccg') {
+        return '<span class="mil-status mil-status-verteidigung">'.$ss_lang['verteidigung'].'</span><small>bleibt '.$at1.' KT</small>';
+    }
+    if ($cl == 'ccy') {
+        return '<span class="mil-status mil-status-verteidigung">verteidigt</span>';
+    }
+    if ($as1 == 4) {
+        return '<span class="mil-status mil-status-mission">'.$ss_lang['archaeologie'].'</span>';
+    }
+    return '<span class="mil-status mil-status-rueckflug">'.$ss_lang['rueckflug'].'</span>';
+}
+
+
+//Zeile einer anfliegenden Flotte (eigener Sektor und Allianzmitglieder)
+function ss_flottenzeile($hsec, $hsys, $rasse, $allytagscan, $cl, $as1, $at1, $t1, $ge, $fp)
+{
+    global $sv_hide_fp_in_secstatus;
+    $html = '<div class="ss-zeile ss-flotte">';
+    $html .= '<span class="ss-herkunft"><b>'.$hsec.':'.$hsys.'</b></span>';
+    $html .= '<span class="ss-rasse">'.$rasse.'</span>';
+    //Allianztags sind in der DB UTF-8, utf8_encode_fix würde sie doppelt kodieren (aus Z² wurde ZÂ²)
+    $html .= '<span class="ss-ally">'.$allytagscan.'</span>';
+    $html .= '<span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
+    $html .= '<span class="ss-zahl">'.$t1.' KT</span>';
+    $html .= '<span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span>';
+    if ($sv_hide_fp_in_secstatus != 1) {
+        $html .= '<span class="ss-zahl" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</span>';
+    } else {
+        $html .= '<span class="ss-zahl">N/A</span>';
+    }
+    $html .= ss_links($hsec, $hsys);
+    $html .= '</div>';
+    return $html;
+}
+
+//Kopfzeile der Flottenliste
+function ss_flottenkopf()
+{
+    global $ss_lang;
+    return '<div class="ss-zeile ss-flotte ss-kopfzeile"><span>'.$ss_lang['herkunft'].'</span><span></span><span>'.$ss_lang['allianz'].'</span><span>'.$ss_lang['status'].'</span><span>'.$ss_lang['zeit'].'</span><span>'.$ss_lang['schiffe'].'</span><span title="Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP</span><span></span></div>';
+}
+
+//ETA-Übersicht eines Systems: Schiffe und Flottenpunkte je Kampftick, Balken für das Verhältnis
+function ss_etazeile($j, $inc, $def, $fp_atter, $fp_deffer, $angreifer, $verteidiger)
+{
+    $gesamt = $fp_atter + $fp_deffer;
+    $anteil = $gesamt > 0 ? round($fp_atter * 100 / $gesamt, 1) : 0;
+    $html = '<div class="ss-zeile ss-eta">';
+    $html .= '<span class="ss-zahl"><b>'.$j.'</b></span>';
+    $html .= '<span class="ss-zahl ss-rot">'.number_format($inc, 0, "", ".").'</span>';
+    $html .= '<span class="ss-zahl ss-gruen">'.number_format($def, 0, "", ".").'</span>';
+    $html .= '<span class="ss-kraft"><span class="ss-kraft-werte"><span class="ss-rot" title="'.number_format($fp_atter, 0, "", ".").'">'.formatMasseinheit($fp_atter, 2).'</span><span class="ss-gruen" title="'.number_format($fp_deffer, 0, "", ".").'">'.formatMasseinheit($fp_deffer, 2).'</span></span>';
+    if ($gesamt > 0) {
+        $html .= '<span class="ss-anteil"><i style="width: '.$anteil.'%;"></i></span>';
+    }
+    $html .= '</span>';
+    $html .= '<span class="ss-liste ss-rot">'.$angreifer.'</span>';
+    $html .= '<span class="ss-liste ss-gruen">'.$verteidiger.'</span>';
+    $html .= '</div>';
+    return $html;
+}
+
+function ss_etakopf()
+{
+    global $ss_lang;
+    return '<div class="ss-zeile ss-eta ss-kopfzeile"><span>'.$ss_lang['eta'].'</span><span>'.$ss_lang['inc'].'</span><span>'.$ss_lang['def'].'</span><span title="Flottenpunkte Angreifer / Verteidiger. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP Angr. / Vert.</span><span>'.$ss_lang['angreifer'].'</span><span>'.$ss_lang['verteidiger'].'</span></div>';
+}
+
+//Text/WhatsApp für ein System; deirc() ersetzt diesen Bereich durch das Textfeld
+function ss_export($sector, $sys, $jsirc1, $jsirc2, $jsirc3)
+{
+    global $ss_lang;
+    $html = '<div class="ss-export" id="s'.$sector.'_'.$sys.'">';
+    $html .= "<button type=\"button\" class=\"mod-btn mod-btn-leise ally-btn-klein\" onclick=\"deirc(1,$sector,$sys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\">Als ".$ss_lang['text']."</button>";
+    $html .= "<button type=\"button\" class=\"mod-btn mod-btn-leise ally-btn-klein\" onclick=\"deirc(3,$sector,$sys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\">WhatsApp</button>";
+    $html .= '<label class="ss-haken"><input type="checkbox" name="a'.$sector.'_'.$sys.'" checked>'.$ss_lang['angreiferanzeigen'].'</label>';
+    $html .= '<label class="ss-haken"><input type="checkbox" name="d'.$sector.'_'.$sys.'">Verteidiger anzeigen</label>';
+    $html .= '</div>';
+    return $html;
+}
+
 ?>
 <!doctype html>
 <html>
@@ -93,10 +200,27 @@ function deirc(f,se,sy,a1,a2,a3) {
 	if(document.getElementsByName("d"+se+"_"+sy)[0].checked == true){t=t+"<?php echo $ss_lang['verteidiger']?>: "+a3+lb; i++;}
 
 	if(f==3){
-		window.location.href="whatsapp://send?text="+encodeURIComponent(t);
+		//offizieller Teilen-Link: öffnet am Handy die App, am PC WhatsApp Web bzw. die Desktop-App;
+		//whatsapp:// lief ohne installierte App oder aus dem Spiel-iframe heraus ins Leere
+		var url="https://wa.me/?text="+encodeURIComponent(t);
+		var wa=window.open(url, "_blank");
+		if(wa){
+			wa.opener=null;
+		}else{
+			//Popup blockiert: im ganzen Fenster öffnen
+			window.top.location.href=url;
+		}
 	}else{
-		document.getElementById("s"+se+"_"+sy).innerHTML = "<textarea id='k"+se+"_"+sy+"' rows='"+(i+1)+"' wrap='off' style='overflow:hidden;width:558px'>"+t+"</textarea>";
-		document.getElementById("k"+se+"_"+sy).select();
+		var feld=document.createElement("textarea");
+		feld.id="k"+se+"_"+sy;
+		feld.className="mod-eingabe ss-text";
+		feld.rows=i+1;
+		feld.wrap="off";
+		feld.value=t;
+		var ziel=document.getElementById("s"+se+"_"+sy);
+		ziel.innerHTML="";
+		ziel.appendChild(feld);
+		feld.select();
 	}
 }
 </script>
@@ -104,62 +228,19 @@ function deirc(f,se,sy,a1,a2,a3) {
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-//wurde ein button gedrueckt??
 //stelle die ressourcenleiste dar
 include "resline.php";
 
+echo '<div class="mod ss-leiste"><span>'.$ss_lang['title'].' <b>'.$ss_lang['sektor'].' '.$sector.'</b></span><a href="secstatus.php" class="mod-btn mod-btn-leise ally-btn-klein">Aktualisieren</a></div>';
+
 if ($secstatdisable == 1) {
-    echo '<table width=600><tr><td class="ccr">'.$ss_lang['secstatdisable'].'</td></tr></table><br>';
+    echo '<div class="mod pol-meldungen"><div class="mod-meldung mod-meldung-warn">'.$ss_lang['secstatdisable'].'</div></div>';
 }
 
-//f�r die mobile Seite einen refresh-Button
-if ($_SESSION['ums_mobi'] == 1) {
-    echo '<a href="secstatus.php"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Sektorstatusansicht aktualisieren</div></a>';
-}
-
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //angreifer - verteidiger
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
-?>
-
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td colspan="8" class="ro" align="center"><div class="cellu"><b><?php echo $ss_lang['angreifer']?> - <?php echo $ss_lang['verteidiger']?></b></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="8">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="50">
-<col width="50">
-<col width="16">
-<col width="50">
-<col width="100">
-<col width="30">
-<col width="100">
-<col width="85">
-<col width="80">
-</colgroup>
-
-<tr style="text-align: center; line-height: 20px; font-weight: bold;">
-<td><div class="cell"><?php echo $ss_lang['ziel'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['herkunft'];?></div></td>
-<td><div class="cell" title="Rasse">R</div></td>
-<td><div class="cell"><?php echo $ss_lang['allianz'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['status'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['zeit'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['schiffe'];?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
-<td><div class="cell"><?php echo $ss_lang['aktion'];?></div></td>
-</tr>
-
-<?php
 $eta = -1;
 $ssc = 0;
 if ($secstatdisable == 1) {
@@ -170,6 +251,7 @@ if ($secstatdisable == 1) {
 $zsecold = 0;
 $zsysold = 0;
 $sc = array();
+$ss_zeilen = array();
 $fa = mysqli_num_rows($flotten);
 
 //alle gefunden Atter/Deffer-Flotten in ein Array laden
@@ -181,7 +263,6 @@ while ($fleet_row = mysqli_fetch_assoc($flotten)) {
 //alle gefunden Atter/Deffer-Flotten durchgehen
 for ($i = 0; $i < $fa; $i++) {
     $row_fleet = $fleet_data[$i];
-    //$zsec1=$row_fleet["zielsec"];
     $user_id = $row_fleet["user_id"];
     $zsec1 = $sector;
     $zsys1 = $row_fleet["zielsys"];
@@ -194,7 +275,6 @@ for ($i = 0; $i < $fa; $i++) {
 
     if ($zsec1 == $zsecold and $zsys1 == $zsysold) {
         //es ist noch das gleiche system
-        $sss = '&nbsp;';
         $eta = $t1;
         if (isset($sc[$ssc][1][1]) && $eta > $sc[$ssc][1][1]) {
             $sc[$ssc][1][1] = $eta;//maxeta
@@ -264,8 +344,6 @@ for ($i = 0; $i < $fa; $i++) {
             $ssc++;
         }
 
-        //$sss=$zsec1.':'.$zsys1;
-        $sss = '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'" title="Flotten">'.$zsec1.':'.$zsys1.'</a>';
         $eta = $t1;
         if ($a1 == 1) {
             $sc[$ssc][0][$eta][0] = $ge;
@@ -323,18 +401,13 @@ for ($i = 0; $i < $fa; $i++) {
         $cl = 'ccy';
     }
 
-    ///////////////////////////////////////////////
-    ///////////////////////////////////////////////
     //rasse und allytag auslesen
-    ///////////////////////////////////////////////
-    ///////////////////////////////////////////////
-
     $allytagscan = '';
     $zally = '';
     $hv = explode("-", $user_id);
     $uid = $hv[0]; //so stellt man die user_id der flotte fest, einfach splitten
     if ($uid != $_SESSION['ums_user_id']) {
-        //allygegner/-verb�ndete
+        //allygegner/-verbündete
         //allytag des deffers/atters auslesen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, rasse, status FROM de_user_data WHERE user_id=?", [$uid]);
         $row = mysqli_fetch_assoc($db_daten);
@@ -369,31 +442,13 @@ for ($i = 0; $i < $fa; $i++) {
         $allytagscan = $ownally;
     }
 
-    $rasse = '&nbsp;';
-    if ($rasse_id == 1) {
-        $rasse = '<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-    }
-    if ($rasse_id == 2) {
-        $rasse = '<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-    }
-    if ($rasse_id == 3) {
-        $rasse = '<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
-    }
-    if ($rasse_id == 4) {
-        $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
-    }
-    if ($rasse_id == 5) {
-        $rasse = '<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
-    }
-
     //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
     $fp = 0;
     for ($s = 81;$s <= 90;$s++) {
 
         if ($as1 == 1) { //Atter
             if ($rasse_id == 4 && $s == 83) {
-                //gatarnte Einheiten
-                //$fp=$fp+$unit[$rasse_id-1][$s-81][4]*$row_fleet['e'.$s];
+                //getarnte Einheiten
             } else {
                 $fp = $fp + $unit[$rasse_id - 1][$s - 81][4] * $row_fleet['e'.$s];
             }
@@ -430,41 +485,14 @@ for ($i = 0; $i < $fa; $i++) {
 
     }
 
+    $ss_zeilen[$ssc][] = ss_flottenzeile($hsec, $hsys, ss_rasse($rasse_id), $allytagscan, $cl, $as1, $at1, $t1, $ge, $fp);
 
-    echo '<tr>';
-    echo '<td class="cc"><b>'.$sss.'</b></td>';
-    echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
-    echo '<td class="'.$cl.'">'.$rasse.'</td>';
-    echo '<td class="'.$cl.'">'.utf8_encode_fix($allytagscan).'</td>';
-    echo '<td class="'.$cl.'">'.$a1.'</td>';
-    echo '<td class="'.$cl.'">'.$t1.'</td>';
-    echo '<td class="'.$cl.'">'.number_format($ge, 0, "", ".").'</td>';
-    if ($sv_hide_fp_in_secstatus != 1) {
-        echo '<td class="'.$cl.'" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</td>';
-    } else {
-        echo '<td class="'.$cl.'">N/A</td>';
-    }
-    //SAMH
-    echo '<td class="'.$cl.'">
-		<a href="secret.php?a=s&zsec1='.$hsec.'&zsys1='.$hsys.'" title="Sonde">S</a>
-		&nbsp;<a href="secret.php?a=a&zsec2='.$hsec.'&zsys2='.$hsys.'" title="Agenteneinsatz">A</a>
-		&nbsp;<a href="military.php?se='.$hsec.'&sy='.$hsys.'" title="Flotte">F</a>
-		&nbsp;<a href="details.php?se='.$hsec.'&sy='.$hsys.'" title="Hyperfunk">H</a></td>';
-    echo '</tr>';
-
-    //schauen ob eine neue eta kommt, bzw. ob es der letzte datensatz ist
-    if ($t1 != $eta || $i == $fa - 1) {
-        //neue eta, schauen ob man eine vorhergehende zusammenrechnen mu�
-        //if ($eta!=-1)
-    }
     $zsecold = $zsec1;
     $zsysold = $zsys1;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//ankommende sektorflotten (BK) anzeigen
-//////////////////////////////////////////////////////////////////////////////
+//ankommende sektorflotten (BK)
 //////////////////////////////////////////////////////////////////////////////
 
 $flotten = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE zielsec = ? AND (aktion = 1 OR aktion = 2)", [$sector]);
@@ -476,9 +504,9 @@ while ($sector_row = mysqli_fetch_assoc($flotten)) {
     $sector_fleet_data[] = $sector_row;
 }
 
+$ss_sektoranflug = '';
 for ($i = 0; $i < $fa; $i++) {
     $row_sector = $sector_fleet_data[$i];
-    //$zsec1=$row_sector["zielsec"];
     $sec_id = $row_sector["sec_id"];
     $a1 = $row_sector["aktion"];
     $t1 = $row_sector["zeit"];
@@ -507,61 +535,33 @@ for ($i = 0; $i < $fa; $i++) {
         $cl = 'ccy';
     }
 
-    //einheiten z�hlen
+    //einheiten zählen
     $ge = $row_sector["e2"];
 
-    echo '<tr>';
-    echo '<td class="'.$cl.'">'.$ss_lang['sektor'].'</td>';
-    echo '<td class="'.$cl.'">['.$sec_id.']</td>';
-    echo '<td class="'.$cl.'">-</td>';
-    echo '<td class="'.$cl.'">-</td>';
-    echo '<td class="'.$cl.'">'.$a1.'</td>';
-    echo '<td class="'.$cl.'">'.$t1.'</td>';
-    echo '<td class="'.$cl.'">'.number_format($ge, 0, "", ".").'</td>';
-    echo '<td class="'.$cl.'">-</td>';
-    echo '</tr>';
+    $ss_sektoranflug .= '<div class="ss-zeile ss-sektorflug"><span><b>'.$ss_lang['sektor'].' '.$sec_id.'</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span><span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span></div>';
 }
-//leere Tabelle erklären, sonst sieht es nach einem Fehler aus
-if (count($fleet_data) == 0 && count($sector_fleet_data) == 0) {
-    echo '<tr><td colspan="9" class="cell leer-hinweis">Es wurden keine anfliegenden Angreifer oder Verteidiger entdeckt.</td></tr>';
-}
-//echo '</table><br><br>';
-?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td colspan="8" class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
 
-<?php
 //////////////////////////////////////////////////////////////////////////////
+//je angegriffenem bzw. verteidigtem System eine Karte: Flotten, ETA-Übersicht, Text/WhatsApp
 //////////////////////////////////////////////////////////////////////////////
-//jetzt den status der einzelnen system ausgeben
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+rahmen_oben($ss_lang['angreifer'].' &ndash; '.$ss_lang['verteidiger']);
+echo '<div class="mod ss">';
+
+if (count($fleet_data) == 0 && count($sector_fleet_data) == 0) {
+    echo '<div class="mod-leer">Es wurden keine anfliegenden Angreifer oder Verteidiger entdeckt.</div>';
+}
+
 if (count($sc) > 0) {
     for ($i = 0;$i <= $ssc;$i++) {
         $jsirc1 = '';
         $jsirc2 = '';
         $jsirc3 = '';
-        echo '<br><table border="0" cellpadding="0" cellspacing="0">';
-        echo '<tr align="center">';
-        echo '<td width="13" height="37" class="rol">&nbsp;</td>';
-        echo '<td align="center" class="ro"><div class="cellu">'.$ss_lang['systemstatus'].' '.$sector.':'.$sc[$i][1][0].
-            ' - <a href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$sc[$i][1][0].'" title="Sonde">S</a>
-			&nbsp;<a href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$sc[$i][1][0].'" title="Agenteneinsatz">A</a>
-			&nbsp;<a href="military.php?se='.$sector.'&sy='.$sc[$i][1][0].'" title="Flotte">F</a>
-			&nbsp;<a href="details.php?se='.$sector.'&sy='.$sc[$i][1][0].'" title="Hyperfunk">H</a>';
 
         //inc soll an die allianz meldbar sein, wenn der spieler in einer allianz ist und es noch nicht gemeldet worden ist
         //test auf ally
-        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, ally_id, status, show_ally_secstatus FROM de_user_data WHERE sector=? AND system=?", [$sector, $sc[$i][1][0]]);
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, allytag, ally_id, status, show_ally_secstatus FROM de_user_data WHERE sector=? AND system=?", [$sector, $sc[$i][1][0]]);
         $row = mysqli_fetch_assoc($db_daten);
+        $ss_name = $row['spielername'] ?? '';
         if ($row["status"] == 1) {
             $ally_id = $row['ally_id'];
             $allytag = $row['allytag'];
@@ -570,23 +570,20 @@ if (count($sc) > 0) {
             $allytag = '';
         }
         $show_ally_secstatus = $row['show_ally_secstatus'];
+        $ss_ai = '';
         if ($ally_id > 0) {
 
             //test ob der status aktuell bereits übermittelt wird
             if ($show_ally_secstatus > time()) {//wird übermittelt
-                //anzeigen bis wann es übermittelt wird
-                echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $show_ally_secstatus).')';
+                $ss_ai = '<span class="mod-chip">Allianzeinsicht '.RealTime::until($show_ally_secstatus).'</span>';
             } else {//wird nicht übermittelt, melden link einblenden/überprüfen
                 //test auf aktivierung
                 if (isset($_REQUEST['sassys']) && $_REQUEST['sassys'] == $sc[$i][1][0]) {
                     //Sichtbarkeit berechnen
-                    //$sichtbarkeit=3600/$anzkticksprostunde;
                     $sichtbarkeit = $GLOBALS['sv_show_ally_secstatus'];
                     //Sichtbarkeit um Allianzgebäude verlängern
                     $allybldg = get_allybldg($ally_id);
                     $geb_stufe = $allybldg[7];
-                    //echo '<br>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: '.$allybldg[0].'<br>';
-                    //print_r($allybldg);
                     //boni durch allianzpartner
                     $allyidpartner = get_allyid_partner($ally_id);
                     if ($allyidpartner > 0) {
@@ -596,11 +593,9 @@ if (count($sc) > 0) {
 
                     $sichtbarkeit = $sichtbarkeit + ($sichtbarkeit / 100 * $geb_stufe);
 
-                    //echo 'AAA:'.$sichtbarkeit;
                     $show_ally_secstatus = time() + $sichtbarkeit;
 
-                    //anzeigen bis wann es übermittelt wird
-                    echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $show_ally_secstatus).')';
+                    $ss_ai = '<span class="mod-chip mod-chip-gruen">Allianzeinsicht '.RealTime::until($show_ally_secstatus).'</span>';
                     //db updaten
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET show_ally_secstatus=? WHERE sector=? AND `system`=?", [$show_ally_secstatus, $sector, $sc[$i][1][0]]);
                     //eintrag im allianzchat
@@ -610,31 +605,21 @@ if (count($sc) > 0) {
 
                 } else {
                     //aktivierungslink anzeigen
-                    echo '&nbsp;<a href="secstatus.php?sassys='.$sc[$i][1][0].'" 
-							title="Die Allianz '.utf8_encode_fix($allytag).' f&uuml;r die Dauer eines KT &uuml;ber den Status ihres Mitgliedes informieren.">AI</a>';
+                    $ss_ai = '<a href="secstatus.php?sassys='.$sc[$i][1][0].'" class="mod-btn mod-btn-leise ally-btn-klein"
+							title="Die Allianz '.$allytag.' f&uuml;r einige Zeit &uuml;ber den Status ihres Mitgliedes informieren.">Allianz informieren</a>';
                 }
             }
         }
 
-        echo '</div></td>';
-        echo '<td width="13" class="ror">&nbsp;</td>';
-        echo '</tr>';
-        echo '<tr>';
-        echo '<td width="13" class="rl">&nbsp;</td>';
-        echo '<td colspan="1">';
+        echo '<div class="ss-system">';
+        echo '<div class="ss-system-kopf"><a href="military.php?se='.$sector.'&amp;sy='.$sc[$i][1][0].'" class="ss-koords" title="Flotten">'.$sector.':'.$sc[$i][1][0].'</a>';
+        echo '<span class="ss-name">'.$ss_name.'</span>'.$ss_ai.ss_links($sector, $sc[$i][1][0]).'</div>';
 
-        echo '<table width="570" border="0" cellpadding="0" cellspacing="1">';
-        echo '<tr>';
-        echo '<td width="30" class="tc"><b>'.$ss_lang['eta'].'</td>';
-        echo '<td width="100" class="tc"><b>'.$ss_lang['inc'].'</td>';
-        echo '<td width="100" class="tc"><b>'.$ss_lang['def'].'</td>';
-        //echo '<td width="90" class="tc"><b>'.$ss_lang['def'].'(3)</td>';
-        echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
-        echo '<td width="80" class="tc"><b>'.$ss_lang['angreifer'].'</td>';
-        echo '<td width="80" class="tc"><b>'.$ss_lang['verteidiger'].'</td>';
-        echo '</tr>';
+        //anfliegende Flotten
+        echo ss_flottenkopf().'<div class="ss-liste-zeilen">'.implode('', $ss_zeilen[$i] ?? array()).'</div>';
+
         //die einzelne etas ausgeben
-        //print_r($sc);
+        $etazeilen = '';
         for ($j = 0; $j <= $sc[$i][1][1];$j++) {
             //wenn es schiffe bei der eta gibt, dann eine zeile ausgeben
             if ((isset($sc[$i][0][$j][0]) && $sc[$i][0][$j][0] > 0) || (isset($sc[$i][0][$j][1]) && $sc[$i][0][$j][1] > 0) || (isset($sc[$i][0][$j][4]) && $sc[$i][0][$j][4] > 0) || (isset($sc[$i][0][$j][2]) && $sc[$i][0][$j][2] > 0) || (isset($sc[$i][0][$j][3]) && $sc[$i][0][$j][3] > 0)) {
@@ -696,28 +681,9 @@ if (count($sc) > 0) {
                     $sc[$i][0][$j]['fp_deffer_3'] = 0;
                 }
 
-                echo '<tr>';
-                echo '<td class="cc">'.$j.'</td>'; //ETA
-                echo '<td class="ccr">'.number_format($sc[$i][0][$j][0], 0, "", ".").'</td>';//INC
-                //echo '<td class="ccg">'.number_format($sc[$i][0][$j][1], 0,"",".").'</td>';//DEFF
-                //echo '<td class="cc">'.$v1.'</td>';//Verhältnis Atter/Deffer in der ETA
-                echo '<td class="ccg">'.number_format($sc[$i][0][$j][4], 0, "", ".").'</td>';//DEFF3
-                //echo '<td class="cc">'.$v3.'</td>';//Verhältnis Atter/Deffer in der 3er ETA
-                echo '<td class="ccr" title="'.number_format($sc[$i][0][$j]['fp_atter'], 0, "", ".").'">'.formatMasseinheit($sc[$i][0][$j]['fp_atter'], 2).'</td>';
-                echo '<td class="ccg" title="'.number_format($sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], 0, "", ".").'">'.formatMasseinheit($sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], 2).'</td>';
+                $etazeilen .= ss_etazeile($j, $sc[$i][0][$j][0], $sc[$i][0][$j][4], $sc[$i][0][$j]['fp_atter'], $sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], $sc[$i][0][$j][2], $sc[$i][0][$j][3]);
 
-                echo '<td class="ccr">'.$sc[$i][0][$j][2].'</td>';
-                echo '<td class="ccg">'.$sc[$i][0][$j][3].'</td>';
-                echo '</tr>';
-
-                //javascript fürs irc
-                //if ($v1=='')$v1='(1:0,0)';
-                //if ($v3=='')$v3='(1:0,0)';
-
-                //////////////////////////////////////////////
                 //Text/WA JS-Daten
-                //////////////////////////////////////////////
-
                 //Array: ETA,Atter, Deffer, Einheiten-Verhältnis, Deffer3, Einheiten3-Verhältnis
                 if ($sc[$i][0][$j][0] > 0 || $sc[$i][0][$j][2] > 0 || $sc[$i][0][$j][3] > 0) {
                     $gesamt_fp = $sc[$i][0][$j]['fp_atter'] + $sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'];
@@ -756,81 +722,27 @@ if (count($sc) > 0) {
                     }
                     $jsirc3 .= "'(".$ss_lang['eta'].$j.") ".$sc[$i][0][$j][3]."'";
                 }
-
-
             }
         }
 
-        echo '</table>';
-        echo '</td>';
-        echo '<td width="13" class="rr">&nbsp;</td>';
-        echo '</tr>';
-
-        echo '<tr>';
-        echo '<td width="13" class="rl">&nbsp;</td>';
-        echo '<td align="center" id="s'.$sector.'_'.$sc[$i][1][0].'">';
-        echo '<table border="0" cellpadding="0" cellspacing="1" width="100%">';
-        echo '<tr>';
-        $hzsys = $sc[$i][1][0];
-        //echo "<td class=\"cc\"><input type=\"button\" value=\"".$ss_lang['irc']."\" onclick=\"deirc(0,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-        echo "<td class=\"cc\"><input type=\"button\" value=\"".$ss_lang['text']."\" onclick=\"deirc(1,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-        echo "<td class=\"cc\"><input type=\"button\" value=\"WhatsApp\" onclick=\"deirc(3,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-        //echo "<td class=\"cc\"><input type=\"button\" value=\"einzeilig\" onclick=\"deirc(2,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-        echo '<td class="cc"><input type="checkbox" name="a'.$sector.'_'.$sc[$i][1][0].'" checked> '.$ss_lang['angreiferanzeigen'].'</td>';
-        echo '<td class="cc"><input type="checkbox" name="d'.$sector.'_'.$sc[$i][1][0].'"> '.$ss_lang['verteidigeranzeigen'].'</td>';
-        echo '</tr>';
-        echo '</table>';
-        echo '</td>';
-        echo '<td width="13" class="rr">&nbsp;</td>';
-        echo '</tr>';
-
-        echo '<tr height="20">';
-        echo '<td class="rul" width="13">&nbsp;</td>';
-        echo '<td class="ru">&nbsp;</td>';
-        echo '<td class="rur" width="13">&nbsp;</td>';
-        echo '</tr>';
-        echo '</table>';
+        echo '<div class="ss-abschnitt"><div class="mod-typ">Verlauf je Kampftick</div>'.ss_etakopf().'<div class="ss-liste-zeilen">'.$etazeilen.'</div></div>';
+        echo ss_export($sector, $sc[$i][1][0], $jsirc1, $jsirc2, $jsirc3);
+        echo '</div>';
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+if ($ss_sektoranflug != '') {
+    echo '<div class="ss-system"><div class="ss-system-kopf"><span class="ss-name">Sektorflotten im Anflug</span></div>';
+    echo '<div class="ss-zeile ss-sektorflug ss-kopfzeile"><span>'.$ss_lang['herkunft'].'</span><span>'.$ss_lang['status'].'</span><span>'.$ss_lang['zeit'].'</span><span>'.$ss_lang['schiffe'].'</span></div>';
+    echo '<div class="ss-liste-zeilen">'.$ss_sektoranflug.'</div></div>';
+}
+
+echo '</div>';
+rahmen_unten();
+
 //////////////////////////////////////////////////////////////////////////////
 //alle flotten des sektors selbst anzeigen
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-?>
-<br>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td colspan="5" class="ro" align="center"><div class="cellu"><b><?php echo $ss_lang['sektorflotten']?></b></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="5">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="60">
-<col width="60">
-<col width="140">
-<col width="50">
-<col width="100">
-<col width="85">
-</colgroup>
-
-<tr style="text-align: center; line-height: 20px; font-weight: bold;">
-<td><div class="cell"><?php echo $ss_lang['ziel']?></div></td>
-<td><div class="cell"><?php echo $ss_lang['herkunft']?></div></td>
-<td><div class="cell"><?php echo $ss_lang['status']?></div></td>
-<td><div class="cell"><?php echo $ss_lang['zeit']?></div></td>
-<td><div class="cell"><?php echo $ss_lang['schiffe']?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten werden mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
-</tr>
-
-
-<?php
 if ($secstatdisable == 1) {
     $flotten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE hsec=? AND hsys=? AND aktion>0 ORDER BY hsys, aktion, zeit ASC", [$sector, $system]);
 } else {
@@ -843,6 +755,7 @@ while ($outgoing_row = mysqli_fetch_assoc($flotten)) {
     $outgoing_fleet_data[] = $outgoing_row;
 }
 
+$ss_eigene = '';
 $fa = count($outgoing_fleet_data);
 for ($i = 0; $i < $fa; $i++) {
     $row_fleet = $outgoing_fleet_data[$i];
@@ -892,13 +805,11 @@ for ($i = 0; $i < $fa; $i++) {
         $cl = 'ccy';
     }
 
-    //einheiten z�hlen
+    //einheiten zählen
     $ge = 0;
     for ($z = 81;$z <= 90;$z++) {
         $erg = $row_fleet["e$z"];
         $ez[$z - 81] = $erg;
-        //fix um die zerst�rer der 4. rasse unsichtbar zu machen
-        //if($rasse==4 AND $z==83)$erg=0;
         $ge = $ge + $erg;
     }
 
@@ -922,7 +833,7 @@ for ($i = 0; $i < $fa; $i++) {
 
         if ($as1 == 1) { //Atter
             if ($rasse_id == 4 && $s == 83) {
-                //$fp=$fp+$unit[$rasse_id-1][$s-81][4]*$row_fleet['e'.$s];
+                //getarnte Einheiten
             } else {
                 $fp = $fp + $unit[$rasse_id - 1][$s - 81][4] * $row_fleet['e'.$s];
             }
@@ -931,52 +842,23 @@ for ($i = 0; $i < $fa; $i++) {
         }
     }
 
-    if ($mission_aktiv) {
-        echo '<tr>';
-        echo '<td class="'.$cl.'">-</td>';
-        echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
-        echo '<td class="'.$cl.'">'.$a1.'</td>';
-        echo '<td class="'.$cl.'">'.date("H:i:s d.m.Y", $mission_time).'</td>';
-        echo '<td class="'.$cl.'">'.number_format($ge, 0, "", ".").'</td>';
-        if ($sv_hide_fp_in_secstatus != 1) {
-            echo '<td class="'.$cl.'" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</td>';
-        } else {
-            echo '<td class="'.$cl.'">N/A</td>';
-        }
-        echo '</tr>';
-    } else {
-        //bei angriffen nicht mehr die zielkoordinaten anzeigen
-        echo '<tr>';
-        echo '<td class="'.$cl.'">'.$zsec1.':'.$zsys1.'</td>';
-        if ($a1 == $ss_lang['rueckflug']) {
-            echo '<td class="'.$cl.'">&nbsp;</td>';
-        } else {
-            echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
-        }
-        echo '<td class="'.$cl.'">'.$a1.'</td>';
-        echo '<td class="'.$cl.'">'.$t1.'</td>';
-        echo '<td class="'.$cl.'">'.number_format($ge, 0, "", ".").'</td>';
-        if ($sv_hide_fp_in_secstatus != 1) {
-            echo '<td class="'.$cl.'" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</td>';
-        } else {
-            echo '<td class="'.$cl.'">N/A</td>';
-        }
-        echo '</tr>';
-    }
+    $fp_html = ($sv_hide_fp_in_secstatus != 1) ? '<span class="ss-zahl" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</span>' : '<span class="ss-zahl">N/A</span>';
 
+    if ($mission_aktiv) {
+        $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>'.$hsec.':'.$hsys.'</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span><span class="ss-leise">&ndash;</span>';
+        $ss_eigene .= '<span class="ss-zahl ss-uhrzeit" title="Ende der Mission">'.RealTime::until($mission_time).'</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span>'.$fp_html.'</div>';
+    } else {
+        $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>'.$hsec.':'.$hsys.'</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
+        //beim Rückflug ist das Ziel die Heimat
+        $ss_eigene .= '<span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : $zsec1.':'.$zsys1).'</span>';
+        $ss_eigene .= '<span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span>'.$fp_html.'</div>';
+    }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 //sektorflotte in bewegung anzeigen
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
 $sql = "SELECT zielsec, sec_id, aktion, aktzeit, zeit, e2 FROM de_sector WHERE aktion<>0 AND sec_id=?";
 $flotten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
 $fa = mysqli_num_rows($flotten);
-// Variablen initialisieren um Warnings zu vermeiden
-$zsys1 = 0;
 for ($i = 0; $i < $fa; $i++) {
     $row_sector = mysqli_fetch_assoc($flotten);
     $zsec1 = $row_sector["zielsec"];
@@ -1011,105 +893,43 @@ for ($i = 0; $i < $fa; $i++) {
     //einheiten zählen
     $ge = $row_sector["e2"];
 
-    echo '<tr>';
-    echo '<td class="'.$cl.'" width="14%">['.$zsec1.']</td>';
-    echo '<td class="'.$cl.'" width="16%">'.$ss_lang['sektor'].'</td>';
-    echo '<td class="'.$cl.'" width="40%">'.$a1.'</td>';
-    echo '<td class="'.$cl.'" width="10%">'.$t1.'</td>';
-    echo '<td class="'.$cl.'" width="20%">'.number_format($ge, 0, "", ".").'</td>';
-    echo '</tr>';
-    $zsecold = $zsec1;
-    $zsysold = $zsys1;
+    $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>Sektorflotte</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
+    $ss_eigene .= '<span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : $ss_lang['sektor'].' '.$zsec1).'</span><span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span><span class="ss-zahl">&ndash;</span></div>';
 }
 
+rahmen_oben($ss_lang['sektorflotten']);
+echo '<div class="mod ss">';
 if (count($outgoing_fleet_data) == 0 && $fa == 0) {
-    echo '<tr><td colspan="6" class="cell leer-hinweis">'.($secstatdisable == 1 ? 'Zurzeit sind keine deiner Flotten unterwegs.' : 'Zurzeit sind keine Flotten deines Sektors unterwegs.').'</td></tr>';
+    echo '<div class="mod-leer">'.($secstatdisable == 1 ? 'Zurzeit sind keine deiner Flotten unterwegs.' : 'Zurzeit sind keine Flotten deines Sektors unterwegs.').'</div>';
+} else {
+    echo '<div class="ss-zeile ss-eigen ss-kopfzeile"><span>'.$ss_lang['herkunft'].'</span><span>'.$ss_lang['status'].'</span><span>'.$ss_lang['ziel'].'</span><span>'.$ss_lang['zeit'].'</span><span>'.$ss_lang['schiffe'].'</span><span title="Flottenpunkte. Getarnte Einheiten werden mit eingerechnet.">FP</span></div>';
+    echo '<div class="ss-liste-zeilen">'.$ss_eigene.'</div>';
 }
+echo '</div>';
+rahmen_unten();
 
-//echo '</table>';
-?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-<br>
-<?php
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //der sektorstatus der allianz(bündnis)mitglieder
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 //nur anzeigen, wenn man selbst in einer allianz ist
 if ($ownally != '') {
-    ?>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td colspan="8" class="ro" align="center"><div class="cellu"><b>Allianzmitglieder</b></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="8">
-<table border="0" cellpadding="0" cellspacing="1" width="100%">
-<colgroup>
-<col width="50">
-<col width="50">
-<col width="16">
-<col width="50">
-<col width="100">
-<col width="30">
-<col width="100">
-<col width="85">
-<col width="80">
-</colgroup>
-
-<tr style="text-align: center; line-height: 20px; font-weight: bold;">
-<td><div class="cell"><?php echo $ss_lang['ziel'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['herkunft'];?></div></td>
-<td><div class="cell" title="Rasse">R</div></td>
-<td><div class="cell"><?php echo $ss_lang['allianz'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['status'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['zeit'];?></div></td>
-<td><div class="cell"><?php echo $ss_lang['schiffe'];?></div></td>
-<td title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet."><div class="cell">FP <img id="info" style="vertical-align: middle;" src="<?php echo 'gp/'.'g/'.$_SESSION['ums_rasse'];?>_hilfe.gif"></div></td>
-<td><div class="cell"><?php echo $ss_lang['aktion'];?></div></td>
-</tr>
-
-
-<?php
     $eta = -1;
     $ssc = 0;
     unset($sc);
+    $ss_zeilen = array();
 
-    /////////////////////////////////////////////////////////////////
     //allytag von einer evtl. partnerallianz auslesen
-    /////////////////////////////////////////////////////////////////
     $allypartnertag = isset($allypartner[0]) ? $allypartner[0] : '';
     $time = time();
 
     // Erstelle einen dynamischen SQL-String für die Partner-Allianz-Bedingung
     $partnerCondition = $allypartnertag != '' ? " OR de_user_data.allytag=?" : "";
 
-    $sql = "SELECT *, de_user_fleet.user_id, de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.aktion, de_user_fleet.aktzeit, de_user_fleet.hsec, 
+    $sql = "SELECT *, de_user_fleet.user_id, de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.aktion, de_user_fleet.aktzeit, de_user_fleet.hsec,
 de_user_fleet.hsys, de_user_fleet.zeit, de_user_fleet.fleetsize, de_user_data.show_ally_secstatus
-FROM de_user_fleet LEFT JOIN de_user_data ON(de_user_data.sector=de_user_fleet.zielsec AND de_user_data.`system`=de_user_fleet.zielsys) 
-WHERE de_user_fleet.zielsec != ? AND (de_user_fleet.aktion = 1 OR de_user_fleet.aktion = 2) AND de_user_fleet.entdeckt > 0 
-AND de_user_fleet.entdecktsec > 0 AND de_user_data.show_ally_secstatus>? AND de_user_data.status=1 AND de_user_data.allytag<>'' AND 
+FROM de_user_fleet LEFT JOIN de_user_data ON(de_user_data.sector=de_user_fleet.zielsec AND de_user_data.`system`=de_user_fleet.zielsys)
+WHERE de_user_fleet.zielsec != ? AND (de_user_fleet.aktion = 1 OR de_user_fleet.aktion = 2) AND de_user_fleet.entdeckt > 0
+AND de_user_fleet.entdecktsec > 0 AND de_user_data.show_ally_secstatus>? AND de_user_data.status=1 AND de_user_data.allytag<>'' AND
 (de_user_data.allytag=?" . $partnerCondition . ")
 ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_user_fleet.hsec, de_user_fleet.hsys ASC";
 
@@ -1140,7 +960,6 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
 
         if ($zsec1 == $zsecold and $zsys1 == $zsysold) {
             //es ist noch das gleiche system
-            $sss = '&nbsp;';
             $eta = $t1;
             if ($eta > $sc[$ssc][1][1]) {
                 $sc[$ssc][1][1] = $eta;
@@ -1185,13 +1004,11 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             }
         } else {
             //es ist ein neues system
-            //counter f�r die anzahl der angegriffenen systeme im sektor
+            //counter für die anzahl der angegriffenen systeme im sektor
             if ($zsecold > 0) {
                 $ssc++;
             }
 
-            //$sss=$zsec1.':'.$zsys1;
-            $sss = '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'" title="Milit&auml;r">'.$zsec1.':'.$zsys1.'</a>';
             $eta = $t1;
             if ($a1 == 1) {
                 if (!isset($sc[$ssc][0][$eta][0])) { $sc[$ssc][0][$eta][0] = 0; }
@@ -1204,6 +1021,7 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             $sc[$ssc][1][0] = $zsys1;//system
             $sc[$ssc][1]['sector'] = $zsec1;//sector
             $sc[$ssc][1]['show_ally_secstatus'] = $show_ally_secstatus;//show_ally_secstatus
+            $sc[$ssc][1]['spielername'] = $row_ally_fleet['spielername'] ?? '';
 
             if (!isset($sc[$ssc][1][1])) {
                 $sc[$ssc][1][1] = 0;
@@ -1251,18 +1069,13 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             $cl = 'ccy';
         }
 
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
         //rasse und allytag auslesen
-        ///////////////////////////////////////////////
-        ///////////////////////////////////////////////
-
         $allytagscan = '';
         $zally = '';
         $hv = explode("-", $user_id);
         $uid = $hv[0]; //so stellt man die user_id der flotte fest, einfach splitten
         if ($uid != $_SESSION['ums_user_id']) {
-            //allygegner/-verb�ndete
+            //allygegner/-verbündete
             //allytag des deffers/atters auslesen
             $sql = "SELECT allytag, rasse, status FROM de_user_data WHERE user_id=?";
             $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid]);
@@ -1300,32 +1113,13 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
             $allytagscan = $ownally;
         }
 
-        $rasse = '&nbsp;';
-        if ($rasse_id == 1) {
-            $rasse = '<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-        }
-        if ($rasse_id == 2) {
-            $rasse = '<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-        }
-        if ($rasse_id == 3) {
-            $rasse = '<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
-        }
-        if ($rasse_id == 4) {
-            $rasse = '<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
-        }
-        if ($rasse_id == 5) {
-            $rasse = '<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
-        }
-
-
         //die Flottenpunkte zusammenrechnen, wobei feindliche Z-Zerren nicht erkannt werden können
         $fp = 0;
         for ($s = 81;$s <= 90;$s++) {
 
             if ($as1 == 1) { //Atter
                 if ($rasse_id == 4 && $s == 83) {
-                    //gatarnte Einheiten
-                    //$fp=$fp+$unit[$rasse_id-1][$s-81][4]*$row_ally_fleet['e'.$s];
+                    //getarnte Einheiten
                 } else {
                     $fp = $fp + $unit[$rasse_id - 1][$s - 81][4] * $row_ally_fleet['e'.$s];
                 }
@@ -1362,109 +1156,36 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
 
         }
 
+        $ss_zeilen[$ssc][] = ss_flottenzeile($hsec, $hsys, ss_rasse($rasse_id), $allytagscan, $cl, $as1, $at1, $t1, $ge, $fp);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        echo '<tr>';
-        echo '<td class="cc"><b>'.$sss.'</b></td>';
-        echo '<td class="'.$cl.'">'.$hsec.':'.$hsys.'</td>';
-        echo '<td class="'.$cl.'">'.$rasse.'</td>';
-        echo '<td class="'.$cl.'">'.utf8_encode_fix($allytagscan).'</td>';
-        echo '<td class="'.$cl.'">'.$a1.'</td>';
-        echo '<td class="'.$cl.'">'.$t1.'</td>';
-        echo '<td class="'.$cl.'">'.number_format($ge, 0, "", ".").'</td>';
-        if ($sv_hide_fp_in_secstatus != 1) {
-            echo '<td class="'.$cl.'" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</td>';
-        } else {
-            echo '<td class="'.$cl.'">N/A</td>';
-        }
-        //SAMH
-        echo '<td class="'.$cl.'">
-	<a href="secret.php?a=s&zsec1='.$hsec.'&zsys1='.$hsys.'" title="Sonde">S</a>
-	&nbsp;<a href="secret.php?a=a&zsec2='.$hsec.'&zsys2='.$hsys.'" title="Agenteneinsatz">A</a>
-	&nbsp;<a href="military.php?se='.$hsec.'&sy='.$hsys.'" title="Flotte">F</a>
-	&nbsp;<a href="details.php?se='.$hsec.'&sy='.$hsys.'" title="Hyperfunk">H</a></td>';
-        echo '</tr>';
-
-        //schauen ob eine neue eta kommt, bzw. ob es der letzte datensatz ist
-        if ($t1 != $eta or $i == $fa - 1) {
-            //neue eta, schauen ob man eine vorhergehende zusammenrechnen muß
-            //if ($eta!=-1)
-        }
         $zsecold = $zsec1;
         $zsysold = $zsys1;
     }
 
+    rahmen_oben('Allianzmitglieder');
+    echo '<div class="mod ss">';
     if ($fa == 0) {
-        echo '<tr><td colspan="9" class="cell leer-hinweis">Bei deinen Allianzmitgliedern wurden keine anfliegenden Flotten entdeckt.</td></tr>';
+        echo '<div class="mod-leer">Bei deinen Allianzmitgliedern wurden keine anfliegenden Flotten entdeckt.</div>';
     }
 
-    //echo '</table><br><br>';
-    ?>
-</table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td colspan="8" class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-
-<?php
-    //////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
     //jetzt die Übersicht der einzelnen system ausgeben
-    //////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
     if (isset($sc) && $sc != '') {
         for ($i = 0;$i <= $ssc;$i++) {
             $jsirc1 = '';
             $jsirc2 = '';
             $jsirc3 = '';
-            echo '<br><table border="0" cellpadding="0" cellspacing="0">';
-            echo '<tr align="center">';
-            echo '<td width="13" height="37" class="rol">&nbsp;</td>';
-            echo '<td align="center" class="ro"><div class="cellu">'.$ss_lang['systemstatus'].' '.$sc[$i][1]['sector'].':'.$sc[$i][1][0].
-              ' - <a href="secret.php?a=s&zsec1='.$sc[$i][1]['sector'].'&zsys1='.$sc[$i][1][0].'" title="Sonde">S</a>
-	&nbsp;<a href="secret.php?a=a&zsec2='.$sc[$i][1]['sector'].'&zsys2='.$sc[$i][1][0].'" title="Agenteneinsatz">A</a>
-	&nbsp;<a href="military.php?se='.$sc[$i][1]['sector'].'&sy='.$sc[$i][1][0].'" title="Flotte">F</a>
-	&nbsp;<a href="details.php?se='.$sc[$i][1]['sector'].'&sy='.$sc[$i][1][0].'" title="Hyperfunk">H</a>';
+            $ally_sec = $sc[$i][1]['sector'];
+            $hzsys = $sc[$i][1][0];
 
-            echo '&nbsp;(Allianzeinsicht bis: '.date("H:i:s d.m.Y", $sc[$i][1]['show_ally_secstatus']).')';
+            echo '<div class="ss-system">';
+            echo '<div class="ss-system-kopf"><a href="military.php?se='.$ally_sec.'&amp;sy='.$hzsys.'" class="ss-koords" title="Flotten">'.$ally_sec.':'.$hzsys.'</a>';
+            echo '<span class="ss-name">'.$sc[$i][1]['spielername'].'</span>';
+            echo '<span class="mod-chip">Allianzeinsicht '.RealTime::until($sc[$i][1]['show_ally_secstatus']).'</span>'.ss_links($ally_sec, $hzsys).'</div>';
 
-            echo '</div></td>';
-            echo '<td width="13" class="ror">&nbsp;</td>';
-            echo '</tr>';
-            echo '<tr>';
-            echo '<td width="13" class="rl">&nbsp;</td>';
-            echo '<td colspan="1">';
+            echo ss_flottenkopf().'<div class="ss-liste-zeilen">'.implode('', $ss_zeilen[$i] ?? array()).'</div>';
 
-            echo '<table width="560" border="0" cellpadding="0" cellspacing="1">';
-
-            echo '<tr>';
-            echo '<td width="30" class="tc"><b>'.$ss_lang['eta'].'</td>';
-            echo '<td width="100" class="tc"><b>'.$ss_lang['inc'].'</td>';
-            echo '<td width="100" class="tc"><b>'.$ss_lang['def'].'</td>';
-            //echo '<td width="90" class="tc"><b>'.$ss_lang['def'].'(3)</td>';
-            echo '<td width="180" colspan="2" class="tc" title="Dieser Wert sind die Flottenpunkte. Getarnte Einheiten der Angreifer, wie die Z-Zerst&ouml;rer, werden nicht mit eingerechnet.">FP <img id="info" style="vertical-align: middle;" src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif"></td>';
-            echo '<td width="80" class="tc"><b>'.$ss_lang['angreifer'].'</td>';
-            echo '<td width="80" class="tc"><b>'.$ss_lang['verteidiger'].'</td>';
-            echo '</tr>';
             //die einzelne etas ausgeben
+            $etazeilen = '';
             for ($j = 0; $j <= $sc[$i][1][1];$j++) {
                 //wenn es schiffe bei der eta gibt, dann eine zeile ausgeben
                 if ((isset($sc[$i][0][$j][0]) && $sc[$i][0][$j][0] > 0) ||
@@ -1473,7 +1194,7 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                     (isset($sc[$i][0][$j][2]) && $sc[$i][0][$j][3] > 0) ||
                     (isset($sc[$i][0][$j][4]) && $sc[$i][0][$j][4] > 0)
                 ) {
-                    //verh�ltniss atter/deffer berechnen
+                    //verhältniss atter/deffer berechnen
                     //nur berechnen, wenn es atter gibt
 
                     if (!isset($sc[$i][0][$j][1])) {
@@ -1520,20 +1241,6 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                         $sc[$i][0][$j][3] = 0;
                     }
 
-
-                    /*
-                    echo '<tr>';
-                    echo '<td class="cc">'.$j.'</td>';
-                    echo '<td class="ccr">'.number_format($sc[$i][0][$j][0], 0,"",".").'</td>';
-                    echo '<td class="ccg">'.number_format($sc[$i][0][$j][1], 0,"",".").'</td>';
-                    echo '<td class="cc">'.$v1.'</td>';
-                    echo '<td class="ccg">'.number_format($sc[$i][0][$j][4], 0,"",".").'</td>';
-                    echo '<td class="cc">'.$v3.'</td>';
-                    echo '<td class="ccr">'.$sc[$i][0][$j][2].'</td>';
-                    echo '<td class="ccg">'.$sc[$i][0][$j][3].'</td>';
-                    echo '</tr>';
-                    */
-
                     if (!isset($sc[$i][0][$j][0])) {
                         $sc[$i][0][$j][0] = 0;
                     }
@@ -1558,31 +1265,9 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                         $sc[$i][0][$j]['fp_deffer_3'] = 0;
                     }
 
-                    echo '<tr>';
-                    echo '<td class="cc">'.$j.'</td>'; //ETA
-                    echo '<td class="ccr">'.number_format($sc[$i][0][$j][0], 0, "", ".").'</td>';//INC
-                    //echo '<td class="ccg">'.number_format($sc[$i][0][$j][1], 0,"",".").'</td>';//DEFF
-                    //echo '<td class="cc">'.$v1.'</td>';//Verhältnis Atter/Deffer in der ETA
-                    echo '<td class="ccg">'.number_format($sc[$i][0][$j][4], 0, "", ".").'</td>';//DEFF3
-                    //echo '<td class="cc">'.$v3.'</td>';//Verhältnis Atter/Deffer in der 3er ETA
-                    echo '<td class="ccr" title="'.number_format($sc[$i][0][$j]['fp_atter'], 0, "", ".").'">'.formatMasseinheit($sc[$i][0][$j]['fp_atter'], 2).'</td>';
-                    echo '<td class="ccg" title="'.number_format($sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], 0, "", ".").'">'.formatMasseinheit($sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], 2).'</td>';
+                    $etazeilen .= ss_etazeile($j, $sc[$i][0][$j][0], $sc[$i][0][$j][4], $sc[$i][0][$j]['fp_atter'], $sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'], $sc[$i][0][$j][2], $sc[$i][0][$j][3]);
 
-                    echo '<td class="ccr">'.$sc[$i][0][$j][2].'</td>';
-                    echo '<td class="ccg">'.$sc[$i][0][$j][3].'</td>';
-                    echo '</tr>';
-
-
-                    //javascript f�rs irc
-                    //if ($v1=='')$v1='(1:0,0)';
-                    //if ($v3=='')$v3='(1:0,0)';
                     if ($sc[$i][0][$j][0] > 0 || $sc[$i][0][$j][2] > 0 || $sc[$i][0][$j][3] > 0) {
-
-                        /*
-                        if ($jsirc1!='')$jsirc1.=",";
-                        $jsirc1.="'".$j."','".number_format($sc[$i][0][$j][0], 0,"",".")."','".number_format($sc[$i][0][$j][1], 0,"",".")."','".
-                         $v1."','".number_format($sc[$i][0][$j][4], 0,"",".")."','".$v3."'";
-                        */
 
                         $gesamt_fp = $sc[$i][0][$j]['fp_atter'] + $sc[$i][0][$j]['fp_deffer'] + $sc[$i][0][$j]['fp_deffer_3'];
 
@@ -1625,48 +1310,16 @@ ORDER BY de_user_fleet.zielsec, de_user_fleet.zielsys, de_user_fleet.zeit, de_us
                 }
             }
 
-            echo '</table>';
-            echo '</td>';
-            echo '<td width="13" class="rr">&nbsp;</td>';
-            echo '</tr>';
-
-            $hzsys = $sc[$i][1][0];
-            $sector = $sc[$i][1]['sector'];
-            echo '<tr>';
-            echo '<td width="13" class="rl">&nbsp;</td>';
-            echo '<td align="center" id="s'.$sector.'_'.$sc[$i][1][0].'">';
-            echo '<table border="0" cellpadding="0" cellspacing="1" width="100%">';
-            echo '<tr>';
-
-
-            echo "<td class=\"cc\"><input type=\"button\" value=\"".$ss_lang['text']."\" onclick=\"deirc(1,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-            echo "<td class=\"cc\"><input type=\"button\" value=\"WhatsApp\" onclick=\"deirc(3,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-
-            /*
-            echo "<td class=\"cc\"><input type=\"button\" value=\"".$ss_lang['irc']."\" onclick=\"deirc(0,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-            echo "<td class=\"cc\"><input type=\"button\" value=\"".$ss_lang['text']."\" onclick=\"deirc(1,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-            echo "<td class=\"cc\"><input type=\"button\" value=\"einzeilig\" onclick=\"deirc(2,$sector,$hzsys,new Array($jsirc1),new Array($jsirc2),new Array($jsirc3))\"></td>";
-            */
-
-            echo '<td class="cc"><input type="checkbox" name="a'.$sector.'_'.$sc[$i][1][0].'" checked> '.$ss_lang['angreiferanzeigen'].'</td>';
-            echo '<td class="cc"><input type="checkbox" name="d'.$sector.'_'.$sc[$i][1][0].'"> '.$ss_lang['verteidigeranzeigen'].'</td>';
-            echo '</tr>';
-            echo '</table>';
-            echo '</td>';
-            echo '<td width="13" class="rr">&nbsp;</td>';
-            echo '</tr>';
-
-            echo '<tr height="20">';
-            echo '<td class="rul" width="13">&nbsp;</td>';
-            echo '<td class="ru">&nbsp;</td>';
-            echo '<td class="rur" width="13">&nbsp;</td>';
-            echo '</tr>';
-            echo '</table>';
+            echo '<div class="ss-abschnitt"><div class="mod-typ">Verlauf je Kampftick</div>'.ss_etakopf().'<div class="ss-liste-zeilen">'.$etazeilen.'</div></div>';
+            echo ss_export($ally_sec, $hzsys, $jsirc1, $jsirc2, $jsirc3);
+            echo '</div>';
         }
     }
+    echo '</div>';
+    rahmen_unten();
 }
+
 ?>
-</div>
 
 </body>
 </html>

@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\RealTime;
+
 include 'inc/header.inc.php';
 include 'lib/transaction.lib.php';
 include 'functions.php';
@@ -481,7 +484,7 @@ if(setLock($_SESSION['ums_user_id'])){
 			<div class="tech_bg'.$tech_typ.'"></div>
 			';
 
-			$content.='<div class="tech_name uppercase" rel="tooltip" title="Fertigstellung: '.date("H:i:s d.m.Y", $active_tech_types_row[$i]['time_finished']).'">'.$tech_name.' (<span id="tech_counter'.$i.'"></span>) <a href="ang_techs.php?cancel_tech='.$active_tech_types_row[$i]['tech_id'].'" class="btn2" onclick="return confirm(unescape(\'Auftrag abbrechen? Die Rohstoffkosten werden erstattet.\'))" >Abbruch</a></div>';
+			$content.='<div class="tech_name uppercase" rel="tooltip" title="Fertigstellung: '.date("H:i:s d.m.Y", $active_tech_types_row[$i]['time_finished']).'">'.$tech_name.' (<span id="tech_ende'.$i.'">'.RealTime::until($active_tech_types_row[$i]['time_finished']).'</span><span id="tech_counter'.$i.'" hidden></span>) <a href="ang_techs.php?cancel_tech='.$active_tech_types_row[$i]['tech_id'].'" class="btn2" onclick="return confirm(unescape(\'Auftrag abbrechen? Die Rohstoffkosten werden erstattet.\'))" >Abbruch</a></div>';
 			if($tech_sound==0){
 				$sound_id=1;
 			}else{
@@ -491,8 +494,9 @@ if(setLock($_SESSION['ums_user_id'])){
 
 			$content.='</div>';
 
-			//nach Ablauf die Technologie in der Liste unten wie eine erledigte behandeln
-			$on_finish='function(){ tech_finished('.intval($active_tech_types_row[$i]['tech_id']).', '.($tech_erledigte_techs==0 ? 'true' : 'false').'); }';
+			//nach Ablauf die Technologie in der Liste unten wie eine erledigte behandeln; angezeigt wird die Endzeit
+			//(Forschung läuft in Echtzeit), der Countdown läuft dafür unsichtbar mit
+			$on_finish='function(){ tech_finished('.intval($active_tech_types_row[$i]['tech_id']).', '.($tech_erledigte_techs==0 ? 'true' : 'false').'); var z=document.getElementById("tech_ende'.$i.'"); if(z){ z.textContent="fertig"; } }';
 			$content.='<script type="text/javascript">ang_countdown('.($active_tech_types_row[$i]['time_finished']-time()).',"tech_counter'.$i.'",'.$sound_id.','.$on_finish.')</script>';
 		}
 	}

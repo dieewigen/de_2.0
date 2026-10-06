@@ -1,4 +1,7 @@
 <?php
+
+use DieEwigen\DE2\View\RealTime;
+
 include "inc/header.inc.php";
 include "lib/transaction.lib.php";
 include "functions.php";
@@ -886,8 +889,8 @@ if(!hasTech($pt,29)){
 		if(!$daheim){
 			$status='unterwegs';
 			if($flotten_daten[$f]['aktion']==4 && $flotten_daten[$f]['mission_time']>time()){
-				$status.=' &middot; <span id="mis-flotte-uhr'.$f.'">'.mission_uhr($flotten_daten[$f]['mission_time']-time()).'</span>';
-				$laufend[]=array('mis-flotte-uhr'.$f, $flotten_daten[$f]['mission_time']-time(), -1);
+				//Missionen laufen in Echtzeit: Ende als Uhrzeit
+				$status.=' &middot; '.RealTime::until($flotten_daten[$f]['mission_time']);
 			}
 		}elseif($frachter==0){
 			$status='keine Frachter';
@@ -989,7 +992,8 @@ if(!hasTech($pt,29)){
 			$belohnung_prozent=isset($um[$m]['reward_percentage']) ? (float)$um[$m]['reward_percentage'] : 100;
 
 			if($rest>0){
-				$aktion='<span class="mod-feld" id="mis-laeuft'.$m.'">noch <span id="mission_counter'.$m.'">'.mission_uhr($rest).'</span></span>'
+				//Ende als Uhrzeit; der Countdown läuft unsichtbar weiter und zeigt am Ende den Abholknopf
+				$aktion='<span class="mod-feld" id="mis-laeuft'.$m.'">'.RealTime::until($um[$m]['end_time']).'<span id="mission_counter'.$m.'" hidden></span></span>'
 					.'<a href="?end_mission='.$m.'" class="mod-btn" id="mis-abholen'.$m.'" hidden>Abholen</a>';
 				$laufend[]=array('mission_counter'.$m, $rest, $m);
 			}else{
