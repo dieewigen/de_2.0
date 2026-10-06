@@ -7110,6 +7110,191 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
+// Umfrage (vote.php): steht statt der Rohstoffleiste, bis der Spieler abgestimmt hat
+.vt-seite {
+	margin-top: 10px;
+}
+
+.vt-einleitung {
+	margin-bottom: 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+
+	+ .mod-meldung {
+		margin-top: 8px;
+	}
+}
+
+.vt {
+	width: 572px;
+}
+
+// eine offene Umfrage in der Übersicht
+.vt-zeile {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+	&:first-child {
+		padding-top: 0;
+	}
+
+	&:last-child {
+		padding-bottom: 0;
+		border-bottom: 0;
+	}
+}
+
+.vt-frage {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 13px;
+	font-weight: 700;
+	color: #ffffff;
+	overflow-wrap: anywhere;
+}
+
+// beendete Umfrage in der Liste (vote_overview.php): ganze Zeile ist der Link zum Ergebnis
+.mod a.vt-link,
+.mod a.vt-link:link,
+.mod a.vt-link:visited {
+	margin: 0 -8px;
+	padding-left: 8px;
+	padding-right: 8px;
+	border-radius: 6px;
+	text-decoration: none;
+	color: #ffffff;
+}
+
+.mod a.vt-link:hover {
+	background: var(--akzent-weich);
+}
+
+.vt-meta {
+	flex: 0 0 auto;
+	font-size: 11px;
+	color: #9da7b1;
+}
+
+.vt-hinweis {
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+}
+
+// Antworten als große Flächen, die gewählte in Rassenfarbe
+.vt-antworten {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.vt-antwort {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.03);
+	font-size: 13px;
+	color: #ffffff;
+	cursor: pointer;
+
+	input {
+		flex: 0 0 auto;
+		width: 16px;
+		height: 16px;
+		margin: 0;
+		accent-color: var(--akzent);
+	}
+
+	span {
+		overflow-wrap: anywhere;
+	}
+
+	&:hover {
+		border-color: var(--akzent-mittel);
+	}
+
+	&:has(input:checked) {
+		border-color: var(--akzent);
+		background: var(--akzent-weich);
+	}
+}
+
+.vt-fuss {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	margin-top: 12px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.mod-leer + .vt-fuss {
+	justify-content: center;
+}
+
+.vt-zurueck {
+	margin-right: auto;
+}
+
+// beendete Umfrage: Zeitraum, je Antwort Anteil und Stimmen
+.vt-daten {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 16px;
+	margin-bottom: 10px;
+	font-size: 12px;
+	color: #9da7b1;
+
+	b {
+		font-weight: 600;
+		color: #ffffff;
+	}
+}
+
+.vt-ergebnisse {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.vt-ergebnis-kopf {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 4px;
+	font-size: 12px;
+	color: #ffffff;
+}
+
+.vt-zahl {
+	flex: 0 0 auto;
+	color: #9da7b1;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.vt-ergebnis .mod-balken {
+	height: 8px;
+	border-radius: 4px;
+
+	span {
+		border-radius: 4px;
+	}
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

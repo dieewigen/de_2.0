@@ -18,12 +18,7 @@ if(isset($newnews) && $newnews==1){
 
 
 if($_SESSION['ums_vote']=="1"){
-
-	echo '
-	<br>
-	<center>
-		<div class="info_box"><span class="text3">'.$resline_lang['vote'].'</span></div>';
-
+	//die Einleitung gibt vote.php selbst aus
 	include("vote.php");
 	exit();
 }

@@ -2,7 +2,7 @@
 $vote_lang['title']='Umfragen';
 $vote_lang['alteumfragen']='alte Umfragen';
 $vote_lang['aktuelleumfragen']='aktuelle Umfragen';
-$vote_lang['zzu']='zurück zur übersicht';
+$vote_lang['zzu']='zurück zur Übersicht';
 $vote_lang['start']='Start';
 $vote_lang['ende']='Ende';
 $vote_lang['hinweis']='Hinweis';
