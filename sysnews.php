@@ -47,32 +47,18 @@ for ($rasse = 1;$rasse <= 5;$rasse++) {
 
 //echo serialize($schiffspunkte);
 
-?>
-<!DOCTYPE HTML>
-<html>
-<head>
-<?php
-echo '<title>'.$sn_lang['nachrichten'].'</title>';
-
-include "cssinclude.php"; ?>
-</head>
-<?php
-
-echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-
-//stelle die ressourcenleiste dar
-include "resline.php";
-
 //wurde ein button gedrueckt??
-if (isset($_GET["a"]) && $_GET["a"] == "d") {//alle nachricht l&ouml;schen
+$sn_meldung = '';
+if (isset($_GET["a"]) && $_GET["a"] == "d") {//alle gelesenen nachrichten löschen
     $sql = "DELETE FROM de_user_news WHERE user_id=? AND seen=1";
     mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    echo '<div class="info_box text3" style="margin-bottom: 5px; font-size: 14px;">'.$sn_lang["geloescht"].'</div>';
+    $sn_meldung = '<div class="mod-meldung mod-meldung-ok">'.$sn_lang["geloescht"].'</div>';
 }
 
 
 //////////////////////////////////////////////////
 // Nachrichten als HTML-Datei herunterladen
+// vor jeder Ausgabe, damit die Download-Header gesetzt werden können
 //////////////////////////////////////////////////
 if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
     $bodyTag = '<body class="theme-rasse'.$_SESSION['ums_rasse'].' mobile">';
@@ -185,28 +171,34 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 
     // HTML-Datei zum Download bereitstellen
     $filename = 'nachrichten_'.date('Ymd_His').'.html';
-    
+
     // Header für Download setzen
     header('Content-Type: text/html; charset=UTF-8');
     header('Content-Disposition: attachment; filename="'.$filename.'"');
     header('Content-Length: ' . strlen($allenachrichten));
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: 0');
-    
+
     // HTML-Inhalt ausgeben und Script beenden
     echo $allenachrichten;
     exit();
 }//mailnews ende
 
+?>
+<!DOCTYPE HTML>
+<html>
+<head>
+<?php
+echo '<title>'.$sn_lang['nachrichten'].'</title>';
 
-$th0 = '<a href="sysnews.php?option=0">['.$sn_lang["neue"].']</a>';
-$th1 = '<a href="sysnews.php?option=1">['.$sn_lang["alle"].']</a>';
-$th2 = '<a href="sysnews.php?option=2">['.$sn_lang["kampf"].']</a>';
-$th3 = '<a href="sysnews.php?option=3">['.$sn_lang["handel"].']</a>';
-$th4 = '<a href="sysnews.php?option=4">['.$sn_lang["gebaeude"].']</a>';
-$th5 = '<a href="sysnews.php?option=5">['.$sn_lang["sonstige"].']</a>';
-$th6 = '<a href="sysnews.php?option=6">['.$sn_lang["allianz"].']</a>';
-$th7 = '<a href="sysnews.php?option=7">[BG]</a>';
+include "cssinclude.php"; ?>
+</head>
+<?php
+
+echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+
+//stelle die ressourcenleiste dar
+include "resline.php";
 
 if (!isset($_GET["option"])) {
     $_GET["option"] = 0;
@@ -226,7 +218,6 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th7 = '<a href="sysnews.php?option=7"><font color="#00DF00">[BG]</font></a>';
 } elseif ($_GET["option"] == "6") {
     $nachrichten = array(6);
     for ($i = 0;$i < count($nachrichten);$i++) {
@@ -239,7 +230,6 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th6 = '<a href="sysnews.php?option=6"><font color="#00DF00">['.$sn_lang["allianz"].']</font></a>';
 } elseif ($_GET["option"] == "5") {
     $nachrichten = array(3,7,60);
     for ($i = 0;$i < count($nachrichten);$i++) {
@@ -252,7 +242,6 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th5 = '<a href="sysnews.php?option=5"><font color="#00DF00">['.$sn_lang["sonstige"].']</font></a>';
 } elseif ($_GET["option"] == "4") {
     $nachrichten = array(1,2);
     for ($i = 0;$i < count($nachrichten);$i++) {
@@ -265,7 +254,6 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th4 = '<a href="sysnews.php?option=4"><font color="#00DF00">['.$sn_lang["gebaeude"].']</font></a>';
 } elseif ($_GET["option"] == "3") {
     $nachrichten = array(10,11,12);
     for ($i = 0;$i < count($nachrichten);$i++) {
@@ -278,7 +266,6 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th3 = '<a href="sysnews.php?option=3"><font color="#00DF00">['.$sn_lang["handel"].']</font></a>';
 } elseif ($_GET["option"] == "2") {
     $nachrichten = array(4,5,50,51,52,53,54,55,56,57);
     for ($i = 0;$i < count($nachrichten);$i++) {
@@ -291,71 +278,51 @@ if ($_GET["option"] == "7") {
 
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? and (".$typ.") ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th2 = '<a href="sysnews.php?option=2"><font color="#00DF00">['.$sn_lang["kampf"].']</font></u></a>';
 } elseif ($_GET["option"] == "1") {
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th1 = '<a href="sysnews.php?option=1"><font color="#00DF00">['.$sn_lang["alle"].']</font></a>';
 } elseif (empty($_GET["option"])) {
     $query = "SELECT time, typ, text FROM de_user_news WHERE user_id=? AND seen=0 ORDER BY time DESC";
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], $query, [$_SESSION['ums_user_id']]);
-    $th0 = '<a href="sysnews.php?option=0"><font color="#00DF00">['.$sn_lang["neue"].']</font></a>';
     $sql = "UPDATE de_user_news set seen=1 WHERE user_id=? AND seen=0";
     mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 }
 
+//Reiter in der bisherigen Reihenfolge, der gewählte hervorgehoben
+$reiter = array(0 => $sn_lang["neue"], 1 => $sn_lang["alle"], 4 => $sn_lang["gebaeude"], 2 => $sn_lang["kampf"], 3 => $sn_lang["handel"], 6 => $sn_lang["allianz"], 5 => $sn_lang["sonstige"], 7 => 'BG');
+echo '<div class="mod sn-navi">';
+foreach ($reiter as $opt => $name) {
+    echo '<a href="sysnews.php?option='.$opt.'" class="ally-reiter'.($_GET["option"] == $opt ? ' ally-reiter-aktiv' : '').'">'.$name.'</a>';
+}
+echo '</div>';
 
+if ($sn_meldung != '') {
+    echo '<div class="mod pol-meldungen">'.$sn_meldung.'</div>';
+}
 
-?>
-<br>
-<form action="sysnews.php" method="POST">
-<table border="0" cellpadding="0" cellspacing="0">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="560" class="ro" align="center" nowrap><div class="cell"><?php echo $th0.$th1.$th4.$th2.$th3.$th6.$th5.$th7;?></div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
+//Art einer Nachricht nach de_user_news.typ
+$sn_arten = array(1 => 'Geb&auml;ude', 2 => 'Forschung', 3 => 'Ereignis', 4 => 'Sonde', 5 => 'Agent', 6 => 'Allianz', 7 => 'Sektorspende', 8 => 'Tronic', 9 => 'Zufallsereignis',
+    10 => 'Handel: eingekauft', 11 => 'Handel: verkauft', 12 => 'Handel: zur&uuml;ckgebucht', 50 => 'Kampfbericht', 51 => 'Angriff', 52 => 'Angriff zieht ab', 53 => 'Verteidigung',
+    54 => 'Verteidigung zieht ab', 55 => 'Recycling', 56 => 'Sektorkampf', 57 => 'Kampfbericht', 60 => 'Gro&szlig;es Ereignis', 70 => 'Battleground');
 
+//Kopf einer Nachricht: das (alte) Symbol je Art, Art und Zeit
+function sn_kopf($bild, $art, $time)
+{
+    return '<div class="sn-kopf"><img src="'.$bild.'" alt="" class="sn-bild"><div><span class="mod-typ">'.$art.'</span><span class="sn-zeit">'.$time.'</span></div></div>';
+}
 
+rahmen_oben(trim($sn_lang['nachrichten']));
+echo '<div class="mod sn">';
 
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="1">
-<div class="cell">
-<table width="560" border="0" cellpadding="0" cellspacing="1" width="100%">
-<?php
-$hrstr = '';
+$anzahl = 0;
+if (isset($db_daten)) {
 while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird ausgegeben
     $t = $row["time"];
     $n = $row["typ"];
-    $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
-    //if ($n==0) $typ='';
-    //if ($n==1) $typ='Geb&auml;ude';
-    //if ($n==2) $typ='Forschung';
-    //if ($n==3) $typ='Ereignis';
-    //if ($n==4) $typ='Sonde';
-    //if ($n==5) $typ='Agent';
-    //if ($n==6) $typ='Allianz';
-    //if ($n==7) $typ='Sektorspende';
-    //if ($n==8) $typ='Tronic';
-    //if ($n==9) $typ='Zufallsereignis';
+    $art = $sn_arten[$n] ?? '';
+    $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
 
-    //if ($n==10) $typ='eingekauft';
-    //if ($n==11) $typ='verkauft';
-    //if ($n==12) $typ='zurückgebucht';
-
-    //if ($n==50) $typ='Kampfbericht V0';
-    //if ($n==51) $typ='Angriff';
-    //if ($n==52) $typ='Angriff zieht ab';
-    //if ($n==53) $typ='Deff';
-    //if ($n==54) $typ='Deff zieht ab';
-    //if ($n==55) $typ='Recycling';
-    //if ($n==56) $typ='Sektorkampf';
-    //if ($n==57) $typ='Kampfbericht V1';
-    //if ($n==60) $typ='Großes Ereignis';
-    //if ($n==70) $typ='Battleground KB';
-
-    //echo '<table border="0" cellpadding="0" cellspacing="1" width="500" bgcolor="#000000">';
+    echo '<div class="sn-eintrag">';
     switch ($n) {
         case 8:
             if ($n == 8) {
@@ -369,111 +336,53 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
 
             $nachricht = $na[$werte[1]];
 
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-            echo '</tr>';
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$nachricht.'<br><br></td>';
-            echo '</tr>';
+            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif', $art, $time);
+            echo '<div class="sn-text">'.$nachricht.'</div>';
             break;
         case 50:
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-            echo '</tr>';
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
-            echo '</tr>';
+            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif', $art, $time);
+            echo '<div class="sn-bericht">'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</div>';
             break;
         case 57: //Kampfbericht V1
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-            echo '</tr>';
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
-            echo '</tr>';
+            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e50.gif', $art, $time);
+            echo '<div class="sn-bericht">'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</div>';
             break;
         case 70: //Battleground
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-            echo '</tr>';
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.showkampfberichtBG($row["text"]).'</td>';
-            echo '</tr>';
+            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e50.gif', $art, $time);
+            echo '<div class="sn-bericht">'.showkampfberichtBG($row["text"]).'</div>';
             break;
         default:
             //sektorkampfsymbol setzen, wenn nötigt
             if ($n == 56) {
                 $n = 50;
             }
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$hrstr.'<br><img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-            echo '</tr>';
-            echo '<tr style="text-align: left;">';
-            echo '<td>'.$row["text"].'<br><br></td>';
-            echo '</tr>';
+            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif', $art, $time);
+            echo '<div class="sn-text">'.$row["text"].'</div>';
             break;
     }
-    $hrstr = '<hr>';
+    echo '</div>';
+    $anzahl++;
+}
 }
 
+if ($anzahl == 0) {
+    echo '<div class="mod-leer">'.($_GET["option"] == 0 ? 'Es gibt keine neuen Nachrichten.' : 'Hier gibt es keine Nachrichten.').'</div>';
+}
+
+//////////////////////////////////////////////
+// Nachrichten herunterladen, gelesene löschen
+//////////////////////////////////////////////
+$sql = "SELECT user_id FROM de_user_news WHERE user_id=?";
+$db_archiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
+$nummer = mysqli_num_rows($db_archiv);
+
+echo '<div class="sn-fuss">';
+echo '<form action="sysnews.php" method="post"><button type="submit" name="mailnews" value="Nachrichten herunterladen" class="mod-btn mod-btn-leise"'.($nummer == "0" ? ' disabled' : '').'>Nachrichten herunterladen</button></form>';
+echo '<a href="sysnews.php?a=d" class="mod-btn mod-btn-gefahr" data-bestaetigen="Wirklich l&ouml;schen?">Gelesene Nachrichten l&ouml;schen</a>';
+echo '</div>';
+
+echo '</div>';
+rahmen_unten();
 ?>
-</table>
-</div>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table>
-
-<?php
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-// alle nachrichten per e-mail versenden
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-echo '
-<br><br>
-<form action="sysnews.php" method="post">
-<table border="0" cellspacing="0" cellpadding="0" width="300">
-<tr>
-<td width="13" height="25" class="rol"></td>
-<td align=center height="35" colspan="2" class="ro"><div class="cell">Nachrichtenservice</div></td>
-<td width="13" height="25" class="ror"></td>
-</tr>
-
-<tr>
-<td width="13" height="25" class="rl">&nbsp;</td>
-<td align=center height="45" colspan="2" class="cell"><input type="submit" name="mailnews" value="Nachrichten herunterladen"';
-
-    $sql = "SELECT user_id FROM de_user_news WHERE user_id=?";
-    $db_archiv = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $nummer = mysqli_num_rows($db_archiv);
-    if ($nummer == "0") {
-        echo " disabled ";
-    }
-
-    echo '></td>
-<td width="13" height="25" class="rr"></td>
-</tr>
-<tr>
- <td width="13" class="rul">&nbsp;</td>
- <td colspan="2" class="ru">&nbsp;</td>
- <td width="13" class="rur">&nbsp;</td>
-</tr>
-</table>
-</form>';
-
-
-echo '<br>';
-
-echo "<a href=sysnews.php?a=d onclick=\"return confirm('".$sn_lang["deletewarning"]."')\"><div class=\"cell\" style=\"width:400px;\"><font color=red>".$sn_lang["deletenews"]."</font></div></a><br><br>";
-
-?>
-</div>
-</form>
-
+</body>
 </html>

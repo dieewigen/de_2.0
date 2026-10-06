@@ -1,6 +1,6 @@
 <?php
 $sn_lang['nachrichten']='Nachrichten ';
-$sn_lang['geloescht']='Alle Nachrichten wurden gelöscht.';
+$sn_lang['geloescht']='Die gelesenen Nachrichten wurden gelöscht.';
 $sn_lang['mailhallo']='Hallo,<br><br>mit dieser Mail bekommst du deine Angeforderten Systemnachrichten.<br><br>';
 $sn_lang['mailende']='Hinweis: Diese E-Mail wurde automatisch generiert, eine Antwort an diese Absenderadresse werden nicht beantwortet.';
 $sn_lang['mailbetreff']='Die Ewigen - Nachrichten';

@@ -8573,6 +8573,92 @@ a.art-kachel-zurueck:hover::after {
 	color: #8b949e;
 }
 
+// Nachrichten (sysnews.php): Reiter je Art, je Nachricht das alte Symbol (gp/g/{rasse}_e{typ}.gif, bleibt bewusst),
+// Kampfberichte aus lib/kampfbericht.lib.php in voller Breite (ihre Tabellen sind 555px breit)
+.sn-navi {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	width: 602px;
+	margin-bottom: 6px;
+	padding: 4px;
+	border-radius: 10px;
+
+	.ally-reiter {
+		flex: 1 1 auto;
+		min-height: 26px;
+		padding: 2px 10px;
+	}
+}
+
+.sn {
+	width: 572px;
+}
+
+.sn-eintrag {
+	padding: 8px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.07);
+
+	&:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+}
+
+.sn-kopf {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	.mod-typ {
+		display: block;
+	}
+}
+
+.sn-bild {
+	flex: 0 0 auto;
+	width: 41px;
+	height: 41px;
+}
+
+.sn-zeit {
+	display: block;
+	font-size: 12px;
+	color: #c9d1d9;
+}
+
+.sn-text {
+	margin: 6px 0 0 51px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+	overflow-wrap: anywhere;
+}
+
+.sn-bericht {
+	margin-top: 6px;
+	overflow-x: auto;
+}
+
+.sn-fuss {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+	form {
+		margin: 0;
+	}
+
+	.mod-btn[disabled] {
+		opacity: 0.45;
+		cursor: default;
+	}
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;
