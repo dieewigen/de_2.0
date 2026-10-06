@@ -42,17 +42,11 @@ if (!isset($_SESSION['ums_user_id'])) {
 	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 	
 	echo '
-		<div style="width: 100%;">
-			<div class="info_box text3" style="margin: 30px auto 0 auto; font-size: 14px;">		
-				<div style="color: #FF0000; margin-bottom: 25px; margin-top: 20px;">
-					'.$session_lang['error1'].'
-				</div>
-
-				<div style="color: #00FF00; margin-bottom: 20px;">
-					'.$session_lang['error3'].' <a href="'.$sv_link[1].'">'.$session_lang['error4'].'</a>
-				<div>
-
-			</div>
+		<div class="mod bc-seite">
+			<div class="bc-kopf"><span class="mod-typ">Sitzung</span><b>Nicht eingeloggt</b></div>
+			<div class="mod-meldung mod-meldung-fehler">'.$session_lang['error1'].'</div>
+			<p class="bc-text">'.$session_lang['error3'].' '.$session_lang['error4'].'.</p>
+			<div class="bc-aktionen"><a href="'.$sv_link[1].'" class="mod-btn">Zur Accountverwaltung</a></div>
 		</div>
 	</body>
 </html>';
@@ -128,8 +122,7 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 	</head>';
 	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 	echo '
-	<script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>
-	<div align="center">';
+	<script src="js/'.$sv_server_lang.'_jssammlung.js" type="text/javascript"></script>';
 
 	if ($GLOBALS['sv_ang'] == 1) {
 		echo '
@@ -141,45 +134,29 @@ if ((($_SESSION['ums_session_start'] + $sv_session_lifetime) < time()) && ($efta
 		';
 	}
 
-	echo'
-	<table border="0" cellpadding="0" cellspacing="0" class="cell">
-	<tr align="center">
-	<td width="13" height="37" class="rol">&nbsp;</td>
-	<td colspan="4" align="center" class="ro text2">'.$session_lang['botschutzabfrage'].': '.$session_lang['botschutzinfo'].'</td>
-	<td width="13" class="ror">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td height="25" class="rl">&nbsp;</td>
-	<td colspan="4"><a href="'.htmlspecialchars($_SESSION['ums_bot_protection_filename']).'"><img src="imagegenerator.php?dummy='.$_SESSION['botcheck_token'].'" alt="Bild" border="0"></a></td>
-	<td class="rr">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td class="rl">&nbsp;</td>
-	<td colspan="4" style="padding: 4px 10px; font-size: 13px; color: #DDDDDD;"><div style="width: 500px; margin: 0 auto;">'.$session_lang['botschutzhinweis'].'</div></td>
-	<td class="rr">&nbsp;</td>
-	</tr>
-	<tr align="center">
-	<td height="25" class="rl">&nbsp;</td>
-	<td colSpan="4">
-	<div style="width: 500px;">';
+	//Abfrage: Bild (Klick lädt die Seite neu und bringt eine neue Aufgabe), Hinweis, Zahlen 1-100 in Zehnerreihen
+	echo '
+	<div class="mod bc-seite">
+		<div class="bc-kopf">
+			<span class="mod-typ">'.$session_lang['botschutzabfrage'].'</span>
+			<b>'.$session_lang['botschutzinfo'].'</b>
+		</div>
+		<a href="'.htmlspecialchars($_SESSION['ums_bot_protection_filename']).'" class="bc-bild"><img src="imagegenerator.php?dummy='.$_SESSION['botcheck_token'].'" alt="Rechenaufgabe" width="500" height="160"></a>
+		<div class="mod-hinweis bc-hinweis">'.$session_lang['botschutzhinweis'].'</div>
+		<div class="bc-zahlen">';
 
 	for ($botschutz_c = 1;$botschutz_c <= 100;$botschutz_c++) {
-		echo '<a href="botcheck.php?nummer='.$botschutz_c.'&t='.$_SESSION['botcheck_token'].'">
-		<div style="float:left; width: 48px;
-		border: 2px solid #666666; padding: 0px; margin-top: 3px; margin-left: 1px; margin-right: 1px; font-size: 26px; background-color: #111111; color: #FFFFFF; text-decoration: none; white-space:nowrap;
-		">'.$botschutz_c.'</div></a>';
+		if ($botschutz_c % 10 == 1) {
+			echo '<div class="bc-reihe">';
+		}
+		echo '<a href="botcheck.php?nummer='.$botschutz_c.'&amp;t='.$_SESSION['botcheck_token'].'">'.$botschutz_c.'</a>';
+		if ($botschutz_c % 10 == 0) {
+			echo '</div>';
+		}
 	}
 
 	echo '</div>
-	</td>
-	<td class="rr">&nbsp;</td>
-	</tr>
-	<tr>
-	<td class="rul">&nbsp;</td>
-	<td class="ru" colspan="4">&nbsp;</td>
-	<td class="rur">&nbsp;</td>
-	</tr>
-	</table>
+	</div>
 	</body></html>';
 	exit;
 }

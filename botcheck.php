@@ -122,8 +122,12 @@ if (!$zuschnell && (int)($_REQUEST['nummer'] ?? -1) === (int)$antwort) {
         include "cssinclude.php";
         echo '</head>';
         echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-        echo '<br><center><div class="info_box text2">'.$botcheck_lang['gesperrt'].'<br><br>
-  		'.$botcheck_lang['support'].' <a href="https://discord.gg/qBpCPx4" target="_blank">Discord</a>.</div>';
+        echo '<div class="mod bc-seite">
+            <div class="bc-kopf"><span class="mod-typ">Botschutz</span><b>Account gesperrt</b></div>
+            <div class="mod-meldung mod-meldung-fehler">'.$botcheck_lang['gesperrt'].'</div>
+            <p class="bc-text">'.$botcheck_lang['support'].' Discord.</p>
+            <div class="bc-aktionen"><a href="https://discord.gg/qBpCPx4" target="_blank" rel="noopener" class="mod-btn">Zum Discord</a></div>
+        </div>';
         echo '</body></html>';
         session_destroy();
         exit;
@@ -139,12 +143,17 @@ echo '<!DOCTYPE html>
 
     //verständlich erklären, was passiert ist und wie man es beim nächsten Mal vermeidet
     $grund = $zuschnell ? $botcheck_lang['zuschnell'] : $botcheck_lang['falsch'];
-    echo '<br><center><div class="info_box" style="padding: 10px; font-size: 14px; color: #DDDDDD;">
-        <div class="text2" style="margin-bottom: 8px;">'.$grund.'</div>
-        '.$botcheck_lang['logout'].'<br><br>
-        '.str_replace('{N}', $fehlversuche, $botcheck_lang['versuche']).'<br><br>
-        '.$botcheck_lang['tipp'].'<br><br>
-        <a href="'.$sv_link[1].'">Zum Login</a></div>';
+    echo '<div class="mod bc-seite">
+        <div class="bc-kopf"><span class="mod-typ">Botschutz</span><b>Abgemeldet</b></div>
+        <div class="mod-meldung mod-meldung-fehler">'.$grund.'</div>
+        <p class="bc-text">'.$botcheck_lang['logout'].'</p>
+        <div class="bc-versuche">
+            <div class="mod-balken bc-balken"><span style="width: '.min(100, $fehlversuche * 10).'%;"></span></div>
+            <span>'.str_replace('{N}', '<b>'.$fehlversuche.'</b>', $botcheck_lang['versuche']).'</span>
+        </div>
+        <div class="mod-hinweis">'.$botcheck_lang['tipp'].'</div>
+        <div class="bc-aktionen"><a href="'.$sv_link[1].'" class="mod-btn">Zum Login</a></div>
+    </div>';
     echo '</body></html>';
     @session_destroy();
     exit;

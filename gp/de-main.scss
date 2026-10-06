@@ -6938,6 +6938,122 @@ a.art-kachel-zurueck:hover::after {
 	white-space: normal;
 }
 
+// Botschutz: Abfrage und „nicht eingeloggt“ (inc/session.inc.php), abgemeldet und gesperrt (botcheck.php)
+.bc-seite {
+	width: 572px;
+	margin: 16px auto 0;
+	border-radius: 12px;
+
+	.mod-hinweis {
+		margin: 12px 0 0;
+	}
+}
+
+.bc-kopf {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin-bottom: 10px;
+
+	b {
+		font-size: 15px;
+		color: #ffffff;
+	}
+}
+
+// Klick aufs Bild lädt die Seite neu und bringt eine neue Aufgabe
+.bc-bild {
+	display: block;
+	width: 500px;
+	margin: 0 auto;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 8px;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	&:hover {
+		border-color: var(--akzent);
+	}
+}
+
+// Zahlen 1-100, je Zehnerreihe eine Zeile
+.bc-zahlen {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin-top: 12px;
+}
+
+.bc-reihe {
+	display: grid;
+	grid-template-columns: repeat(10, 1fr);
+	gap: 4px;
+	padding: 3px;
+	border-radius: 8px;
+
+	&:nth-child(even) {
+		background: rgba(255, 255, 255, 0.035);
+	}
+}
+
+.mod .bc-reihe a,
+.mod .bc-reihe a:link,
+.mod .bc-reihe a:visited {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: 7px;
+	background: rgba(0, 0, 0, 0.35);
+	font-size: 18px;
+	font-weight: 700;
+	text-decoration: none;
+	color: #ffffff;
+}
+
+.mod .bc-reihe a:hover {
+	border-color: var(--akzent);
+	background: var(--akzent-weich);
+}
+
+.bc-text {
+	margin: 10px 0 0;
+	font-size: 13px;
+	line-height: 1.5;
+	color: #c9d1d9;
+}
+
+// Fehlversuche in Folge, beim 10. wird gesperrt
+.bc-versuche {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 12px;
+	font-size: 12px;
+	line-height: 1.45;
+	color: #9da7b1;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.bc-balken span {
+	background: #ff6b6b;
+}
+
+.bc-aktionen {
+	display: flex;
+	justify-content: center;
+	margin-top: 14px;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;
