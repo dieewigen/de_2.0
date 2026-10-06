@@ -27,42 +27,81 @@ include "functions.php";
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-include "resline.php";?><br>
-<?php
+include "resline.php";
+
+//Art einer Technologie anhand der bekannten Bereiche der tech_id
+function hlp_art($tech_id)
+{
+    if ($tech_id == 80) {
+        return 'Kollektor';
+    }
+    if ($tech_id >= 81 && $tech_id <= 99) {
+        return 'Raumschiff';
+    }
+    if ($tech_id >= 100 && $tech_id <= 109) {
+        return 'Verteidigungsanlage';
+    }
+    if ($tech_id == 110) {
+        return 'Sonde';
+    }
+    if ($tech_id == 111) {
+        return 'Agent';
+    }
+    if ($tech_id >= 120 && $tech_id <= 129) {
+        return 'Sektorgeb&auml;ude';
+    }
+    return '';
+}
+
 if (isset($_GET["t"])) {
     $t = intval($_GET["t"]);
     $db_daten = mysqli_execute_query($GLOBALS['dbi'],
-      "SELECT tech_name, des FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?",
+      "SELECT tech_name, des, tech_vor FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?",
       [$t]);
     $row = mysqli_fetch_assoc($db_daten);
-    $tech_name = $row["tech_name"];
-    $des = $row["des"];
 
-    echo '
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="500" align="center" class="ro"><div class="cellu">'.$tech_name.'</div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td width="500" align="center"><div class="cell">'.$des.'</div></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td width="13" class="rur">&nbsp;</td>
-</tr>
-</table>';
+    if ($row) {
+        rahmen_oben($row["tech_name"]);
+        echo '<div class="mod hlp">';
+        $art = hlp_art($t);
+        if ($art != '') {
+            echo '<div class="mod-typ">'.$art.'</div>';
+        }
+        echo '<div class="hlp-text">'.$row["des"].'</div>';
+
+        //Voraussetzungen, je als Link auf deren Beschreibung
+        $voraussetzungen = array();
+        foreach (explode(';', (string)$row['tech_vor']) as $vor) {
+            $vor = (int)$vor;
+            if ($vor > 0) {
+                $db_vor = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?", [$vor]);
+                $row_vor = mysqli_fetch_assoc($db_vor);
+                if ($row_vor) {
+                    $voraussetzungen[] = '<a href="help.php?t='.$vor.'" class="mod-chip hlp-chip">'.$row_vor['tech_name'].'</a>';
+                }
+            }
+        }
+        if (count($voraussetzungen) > 0) {
+            echo '<div class="hlp-abschnitt"><div class="mod-typ">Voraussetzungen</div><div class="hlp-chips">'.implode('', $voraussetzungen).'</div></div>';
+        }
+
+        echo '<div class="hlp-fuss"><a href="javascript:history.back();" class="mod-btn mod-btn-leise ally-btn-klein">'.ucfirst($help_lang['zurueck']).'</a></div>';
+        echo '</div>';
+        rahmen_unten();
+    } else {
+        rahmen_oben($help_lang['title']);
+        echo '<div class="mod hlp"><div class="mod-leer">Zu diesem Eintrag gibt es keine Beschreibung.</div></div>';
+        rahmen_unten();
+    }
 }
 
 if (!empty($_GET["a"])) {
-    //echo '<a href="javascript:history.back();">'.$help_lang['zurueck'].'</a><br><br>';
     $a = (int)$_GET["a"];
-    $artresult = mysqli_execute_query($GLOBALS['dbi'], 
+    $artresult = mysqli_execute_query($GLOBALS['dbi'],
       "SELECT id, artname, artdesc, color FROM de_artefakt ORDER by id");
+
+    rahmen_oben('Artefakte');
+    echo '<div class="mod hlp">';
     while ($row = mysqli_fetch_assoc($artresult)) {
 
         $desc = $row["artdesc"];
@@ -73,31 +112,18 @@ if (!empty($_GET["a"])) {
         $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
         $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
 
-        //Artefaktfarbe nur als Randmarkierung, der Text selbst hell (farbiger Text auf rotem Grund war kaum lesbar)
+        //Artefaktfarbe nur als Randmarkierung und Punkt, der Text selbst hell
         $farbe = preg_match('/^[0-9a-fA-F]{6}$/', $row["color"]) ? $row["color"] : '777777';
 
-        echo '
-<table border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="500" align="center" class="ro"><div class="cellu">'.$row["artname"].'</div></td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td width="500" align="center"><div class="cell help-art" style="border-left-color: #'.$farbe.';">'.$desc.'</div></td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td width="13" class="rur">&nbsp;</td>
-</tr>
-</table><br>';
+        echo '<div class="hlp-art" id="art'.$row["id"].'" style="border-left-color: #'.$farbe.';">';
+        echo '<div class="hlp-art-name"><i style="background: #'.$farbe.';"></i>'.$row["artname"].'</div>';
+        echo '<div class="hlp-text">'.$desc.'</div>';
+        echo '</div>';
     }
+    echo '</div>';
+    rahmen_unten();
 }
 ?>
-<br><br>
 
 </body>
 </html>
