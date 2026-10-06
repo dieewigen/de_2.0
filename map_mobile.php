@@ -22,7 +22,7 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 <html lang="de">
 <head>
 <title>Vergessene Systeme</title>
-<?php 
+<?php
 include "cssinclude.php";
 ?>
 <script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
@@ -32,7 +32,9 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 if(isset($sv_deactivate_vsystems) && $sv_deactivate_vsystems==1){
 	include "resline.php";
-	echo '<br><div class="info_box text2">Auf diesem Server sind die Vergessenen Systeme deaktiviert.</div>';
+	rahmen_oben('Vergessene Systeme');
+	echo '<div class="mod vs"><div class="mod-leer">Auf diesem Server sind die Vergessenen Systeme deaktiviert.</div></div>';
+	rahmen_unten();
 
 	die('</body></html>');
 }
@@ -45,18 +47,12 @@ if(!hasTech($pt,25)){
 	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
 	$row_techcheck = mysqli_fetch_array($db_tech);
 
-
-	echo '<br>';
 	rahmen_oben('Fehlende Technologie');
-	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=28" target="_blank"><img src="gp/g/t/'.$_SESSION['ums_rasse'].'_25.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
-	</tr>';
-	echo '</table>';
-	rahmen_unten();  
+	echo '<div class="mod vs"><div class="mod-hinweis vs-fehlt">F&uuml;r die Vergessenen Systeme ben&ouml;tigst Du folgende Technologie: <a href="help.php?t=25">'.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</a></div></div>';
+	rahmen_unten();
 }else{
 	rahmen_oben('Vergessene Systeme');
+	echo '<div class="mod vs">';
 
 	///////////////////////////////////////////////////////////////////////////
 	// automatisches erkunden, nur anzeigen, wenn man noch nicht alles erkundet hat
@@ -64,10 +60,10 @@ if(!hasTech($pt,25)){
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT COUNT(*) AS anzahl FROM de_map_objects");
 	$row = mysqli_fetch_array($db_daten);
 	$anzahl_systeme=$row['anzahl'];
-	
+
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT COUNT(*) AS anzahl FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."';");
 	$row = mysqli_fetch_array($db_daten);
-	$anzahl_systeme_entdeckt=$row['anzahl'];	
+	$anzahl_systeme_entdeckt=$row['anzahl'];
 
 	if($anzahl_systeme_entdeckt<$anzahl_systeme && $anzahl_systeme_entdeckt>0){
 
@@ -87,70 +83,21 @@ if(!hasTech($pt,25)){
 			$target_value=1;
 		}
 
-		echo '
-		<div class="cell fett">
-			<div style="display: flex; padding-bottom: 20px;">
-				<div style="width: 160px;">Automatische Erkundung </div>
-				<div style="flex-grow: 1; text-align: left; margin-top: -4px;"><a href="?set_auto_explore='.$target_value.'" class="btn">'.$btn_text.'</a></div>
-		</div>';
+		echo '<div class="vs-zeile"><span>Automatische Erkundung '.($pd['vs_auto_explore']==1 ? '<span class="mod-chip mod-chip-gruen">aktiv</span>' : '<span class="mod-chip">aus</span>').'</span>';
+		echo '<a href="?set_auto_explore='.$target_value.'" class="mod-btn mod-btn-leise ally-btn-klein">'.ucfirst($btn_text).'</a></div>';
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	// Filter für die einzelnen Systeme
+	// Boni auf die Vergessenen Systeme
 	///////////////////////////////////////////////////////////////////////////
-	echo '
-	<div class="" style="display: flex; border-top: 1px solid #999999; padding-top: 10px;">
-		<div style="flex-grow: 1; padding-top: 6px;">Filterkriterien:</div>
-		<div style="flex-grow: 1;">
-		<select name="vsf0a" id="vsf0a" onChange="vs_filter(1);">';
-	for($i=0; $i<count($GLOBALS['map_buildings']);$i++){
-		if(!empty($GLOBALS['map_buildings'][$i]['bldg_filter_tag'])){
-			echo '<option value="'.$GLOBALS['map_buildings'][$i]['bldg_filter_tag'].'">'.$GLOBALS['map_buildings'][$i]['name'].'</option>';
-		}
-	}
-	echo '<option value="f_unsy">Unerforschte Systeme</option>';
-	echo'
-	  	</select>		
-		
-		  <select name="vsf0b" id="vsf0b" onChange="vs_filter(1);">
-			<option value="gg">Stufe gr&ouml;&szlig;er gleich</option>
-			<option value="kg">Stufe kleiner gleich</option>
-			<option value="g">Stufe gleich</option>
-		  </select>
-
-		  <select name="vsf0c" id="vsf0c" onChange="vs_filter(1);">
-			<option value="0">0</option>
-			<option value="1">1</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-			<option value="5">5</option>
-			<option value="6">6</option>
-			<option value="7">7</option>
-		  	<option value="8">8</option>
-		  	<option value="9">9</option>
-			<option value="10">10</option>
-		  </select>		  
-
-		  <img src="gp/g/close_icon.png" style="height: 26px; width: auto; margin-left: 30px; margin-bottom: -7px;" onclick="vs_filter(0);" title="Filter zur&uuml;cksetzen">
-		  <script>
-		  $(document).ready(function() {
-			vs_filter_init();
-		  });		  
-		  </script>
-		</div>
-	</div>
-
-
-	<div style="border-bottom: 1px solid #999999; margin-bottom: 20px; margin-top: 13px;"></div>';
-
 	$col_stolen=getStolenColByUID($_SESSION['ums_user_id']);
 	$prozentwert=$col_stolen*5;
 	if($prozentwert>500){
 		$prozentwert=500;
 	}
 
-	echo '<div>Rohstoffbonus durch eroberte Kollektoren (pro Kollektor 5%, max 500% insgesamt): '.number_format($prozentwert, 2, ',' ,'.').'%</div>';
+	echo '<div class="vs-boni">';
+	echo '<div class="ov-wert"><span class="mod-typ">Rohstoffbonus durch eroberte Kollektoren</span><b>'.number_format($prozentwert, 2, ',' ,'.').' %</b><small>5 % je Kollektor, h&ouml;chstens 500 %</small></div>';
 
 	//Hekates Gunst und Pfad des Thanatos, nur anzeigen, wenn etwas wirkt
 	$vs_boni=vs_bonus_info($_SESSION['ums_user_id']);
@@ -166,20 +113,42 @@ if(!hasTech($pt,25)){
 		$vs_boni_teile[]='Pfad des Thanatos Stufe '.$vs_boni['thanatos'].': Industrie +'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($vs_boni['thanatos']).'%, Bauzeit -'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($vs_boni['thanatos']).'%';
 	}
 	if(!empty($vs_boni_teile)){
-		echo '<div style="margin-top: 5px;">'.implode('<br>', $vs_boni_teile).'</div>';
+		echo '<div class="ov-wert"><span class="mod-typ">Weitere Boni</span><span class="vs-boni-liste">'.implode('<br>', $vs_boni_teile).'</span></div>';
 	}
+	echo '</div>';
 
-	echo '
-	<div style="border-bottom: 1px solid #999999; margin-bottom: 20px; margin-top: 20px;"></div>
-	';
-	
+	///////////////////////////////////////////////////////////////////////////
+	// Filter für die einzelnen Systeme (vs_filter in ang_fn.js, Auswahl bleibt per Cookie erhalten)
+	///////////////////////////////////////////////////////////////////////////
+	echo '<div class="vs-filter"><span class="mod-typ">Filter</span>';
+	echo '<select name="vsf0a" id="vsf0a" onChange="vs_filter(1);" class="mod-eingabe">';
+	for($i=0; $i<count($GLOBALS['map_buildings']);$i++){
+		if(!empty($GLOBALS['map_buildings'][$i]['bldg_filter_tag'])){
+			echo '<option value="'.$GLOBALS['map_buildings'][$i]['bldg_filter_tag'].'">'.$GLOBALS['map_buildings'][$i]['name'].'</option>';
+		}
+	}
+	echo '<option value="f_unsy">Unerforschte Systeme</option>';
+	echo '</select>';
+	echo '<select name="vsf0b" id="vsf0b" onChange="vs_filter(1);" class="mod-eingabe">
+			<option value="gg">Stufe gr&ouml;&szlig;er gleich</option>
+			<option value="kg">Stufe kleiner gleich</option>
+			<option value="g">Stufe gleich</option>
+		</select>';
+	echo '<select name="vsf0c" id="vsf0c" onChange="vs_filter(1);" class="mod-eingabe">';
+	for($i=0; $i<=10; $i++){
+		echo '<option value="'.$i.'">'.$i.'</option>';
+	}
+	echo '</select>';
+	echo '<button type="button" class="mod-btn mod-btn-leise ally-btn-klein" onclick="vs_filter(0);">Zur&uuml;cksetzen</button>';
+	echo '<script>
+		$(document).ready(function() {
+			vs_filter_init();
+		});
+		</script>';
+	echo '</div>';
 
-	
-	echo '<table width="572" border="0" cellpadding="0" cellspacing="1">';
-	echo '<tr class="cell"><td>System</td><td style="text-align: center;">Aktion</td></tr>';
+	echo '<table class="vs-tabelle">';
 
-
-	
 	///////////////////////////////////////////////////////////////////////////
 	// erforschbare/erforschte Systeme für Handel/Missionen/Events
 	///////////////////////////////////////////////////////////////////////////
@@ -188,14 +157,14 @@ if(!hasTech($pt,25)){
 	$immer_sichtbare_systeme=array();
 	$erforschte_systeme=array();
 	$erforschte_systeme_koordinaten=array();
-	
+
 	//Kanten laden
 	$kanten=array();
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_kanten");
 	while($row = mysqli_fetch_array($db_daten)){
 		$kanten[]=array($row['knoten_id1'],$row['knoten_id2']);
 	}
-	
+
 	//die erforschten Systeme laden
 	$sql="SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>0 AND known_since<'".time()."';";
 	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
@@ -204,7 +173,7 @@ if(!hasTech($pt,25)){
 		$sichtbare_systeme[]=$row['map_id'];
 		$erforschte_systeme[]=$row['map_id'];
 	}
-	
+
 	//die sichtbaren Systeme um Systeme ergänzen, die immer sichtbar sind
 	$sql="SELECT id FROM de_map_objects WHERE always_visible=1 OR system_typ=4;";
 	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
@@ -215,38 +184,27 @@ if(!hasTech($pt,25)){
 		$immer_sichtbare_systeme[]=$row['id'];
 	}
 
-	//print_r($immer_sichtbare_systeme);
-	
 	//die sichtbaren Systeme um die Systeme ergänzen, die über Kanten mit erforschten Systemen verknüpft sind
 	for($i=0;$i<count($erforschte_systeme);$i++){
 		//für jedes System alle Kanten durchgehen
 		$map_id=$erforschte_systeme[$i];
-		//echo 'map_id: '.$map_id;
 		for($k=0; $k<count($kanten);$k++){
-			//echo ' kanten_ids: '.$kanten[$k][0].'/'.$kanten[$k][1];
 			//knoten1 testen
 			if($map_id==$kanten[$k][0]){
-				//echo 'gefunden 1';
 				if(!in_array($kanten[$k][1],$sichtbare_systeme)){
 					$sichtbare_systeme[]=$kanten[$k][1];
-					//echo 'gefunden 1a';
 				}
 			}
-	
+
 			//knoten2 testen
 			if($map_id==$kanten[$k][1]){
-				//echo 'gefunden 2';
 				if(!in_array($kanten[$k][0],$sichtbare_systeme)){
 					$sichtbare_systeme[]=$kanten[$k][0];
-					//echo 'gefunden 2a';
 				}
-			}		
+			}
 		}
 	}
-	
-	//Kanten Koordinaten bestimmen, nur erforschte Systeme haben Kanten
-	$kanten_koordinaten=array();
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// allge Gebäude der Karte laden und in ein Array packen
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,8 +217,6 @@ if(!hasTech($pt,25)){
 		$bldg[$row['map_id']][$row['field_id']]['bldg_time']=$row['bldg_time'];
 	}
 
-	//print_r($bldg);
-	
 	//Systeme laden
 	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects");
 	while($row = mysqli_fetch_array($db_daten)){
@@ -276,11 +232,10 @@ if(!hasTech($pt,25)){
 	}
 
 	echo '</table>';
-	rahmen_unten();  
-	
+	echo '</div>';
+	rahmen_unten();
+
 }
 ?>
-
-<br>
 </body>
 </html>

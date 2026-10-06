@@ -523,6 +523,12 @@ function substractMissionCost($cost, $percent)
     }
 }
 
+/**
+ * Navigationsleiste einer Systemansicht der Vergessenen Systeme (map_system.php): erstes/vorheriges System,
+ * Sprung per Nummer, zur Übersicht, nächstes/letztes System. Die IDs link_lower, link_higher, link_map und
+ * input_system_id nutzt die Tastatursteuerung in vs_system_init() (js/ang_fn.js).
+ * Der Systemname gehört in den Rahmentitel, $sytem_name bleibt für ältere Aufrufer erhalten.
+ */
 function generate_vsystem_kopfzeile($system_id, $sytem_name)
 {
     //////////////////////////////////////////////////////////////
@@ -536,69 +542,63 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
     $tooltip_higher = '';
     $tooltip_map = '';
     if ($_SESSION['ums_mobi'] != 1) {
-        $tooltip_lower = ' title="Hotkeys: a, &larr;"';
-        $tooltip_higher = ' title="Hotkeys: d, &rarr;"';
-        $tooltip_map = ' title="Hotkeys: w, &uarr;"';
+        $tooltip_lower = ' title="Voriges System&Hotkeys: a, &larr;"';
+        $tooltip_higher = ' title="N&auml;chstes System&Hotkeys: d, &rarr;"';
+        $tooltip_map = ' title="&Uuml;bersicht&Hotkeys: w, &uarr;"';
 
     }
 
     //erste
-    $link_first = '';
+    $link_first = '<span class="ms-nav ms-nav-aus">&laquo;</span>';
     $sql = "SELECT MIN(map_id) AS map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' LIMIT 1;";
     $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
     $row = mysqli_fetch_array($db_daten);
     $id_first = $row['map_id'];
     if ($id_first > 0) {
-        $link_first = '<a href="?id='.$id_first.'" style="display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;">&lt;&lt;</a>';
+        $link_first = '<a href="?id='.$id_first.'" class="ms-nav" title="Erstes System">&laquo;</a>';
     }
 
     //letzte
-    $link_last = '';
+    $link_last = '<span class="ms-nav ms-nav-aus">&raquo;</span>';
     $sql = "SELECT MAX(map_id) AS map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' LIMIT 1;";
     $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
     $row = mysqli_fetch_array($db_daten);
     $id_last = $row['map_id'];
     if ($id_last > 0) {
-        $link_last = '<a href="?id='.$id_last.'" style="display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;">&gt;&gt;</a>';
+        $link_last = '<a href="?id='.$id_last.'" class="ms-nav" title="Letztes System">&raquo;</a>';
     }
 
     //niedriger
+    $link_lower = '<span class="ms-nav ms-nav-aus">&lsaquo;</span>';
     $sql = "SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND map_id < '".$system_id."' ORDER BY map_id DESC LIMIT 1;";
     $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
     $row = mysqli_fetch_array($db_daten);
     $id_lower = $row['map_id'] ?? -1;
     if ($id_lower > 0) {
-        $link_lower = '<a id="link_lower" href="?id='.$id_lower.'" style="margin-left: 8px; display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;"'.$tooltip_lower.'>&lt;</a>';
+        $link_lower = '<a id="link_lower" href="?id='.$id_lower.'" class="ms-nav"'.$tooltip_lower.'>&lsaquo;</a>';
     }
 
     //höher
+    $link_higher = '<span class="ms-nav ms-nav-aus">&rsaquo;</span>';
     $sql = "SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND map_id > '".$system_id."' ORDER BY map_id ASC LIMIT 1;";
     $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
     $row = mysqli_fetch_array($db_daten);
     $id_higher = $row['map_id'] ?? -1;
     if ($id_higher > 0) {
-        $link_higher = '<a id="link_higher" href="?id='.$id_higher.'" style="margin-right: 8px; display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;"'.$tooltip_higher.'>&gt;</a>';
+        $link_higher = '<a id="link_higher" href="?id='.$id_higher.'" class="ms-nav"'.$tooltip_higher.'>&rsaquo;</a>';
     }
 
     //////////////////////////////////////////////////////////////
     // Kopfzeile
     //////////////////////////////////////////////////////////////
     // Kopfzeile zusammenbauen
-    $kopfzeile = '';
-
-    $kopfzeile .= '<div style="display: flex;">';
-    $kopfzeile .= '<div style="width: 90px; text-align: left;">'.$link_first.$link_lower.'</div>';
-    $kopfzeile .= '
-	<div style="flex-grow: 1;">'.$sytem_name.' 
-		(#<input id="input_system_id"type="text" style="height: 12px; width: 30px; text-align: center;" value="'.$system_id.'">&nbsp;
-		<span style="display: inline-block; width: 30px; cursor: pointer; height: 18px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;" onclick="vs_navigate(\'map_system.php?id=\'+$(\'#input_system_id\').val())">OK</span>)
-		<a id="link_map" href="map_mobile.php#sysid'.$system_id.'" style="margin-right: 8px; display: inline-block; width: 40px; background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box;"'.$tooltip_map.'>&there4;</a>
-	</div>';
-
-
-
-    $kopfzeile .= '<div style="width: 90px; text-align: right;">'.$link_higher.$link_last.'</div>';
-    $kopfzeile .= '</div>';//close flex
+    $kopfzeile = '<div class="ms-navi">';
+    $kopfzeile .= $link_first.$link_lower;
+    $kopfzeile .= '<span class="ms-sprung">System #<input id="input_system_id" type="text" inputmode="numeric" autocomplete="off" class="mod-eingabe" value="'.$system_id.'">';
+    $kopfzeile .= '<button type="button" class="mod-btn mod-btn-leise ally-btn-klein" onclick="vs_navigate(\'map_system.php?id=\'+$(\'#input_system_id\').val())">OK</button></span>';
+    $kopfzeile .= '<a id="link_map" href="map_mobile.php#sysid'.$system_id.'" class="mod-btn mod-btn-leise ally-btn-klein ms-zur-uebersicht"'.$tooltip_map.'>&Uuml;bersicht</a>';
+    $kopfzeile .= $link_higher.$link_last;
+    $kopfzeile .= '</div>';
 
     $kopfzeile .= '
 	<script type="text/javascript">
@@ -667,7 +667,7 @@ function vs_flash_html()
     if (!is_array($flash)) {
         return '';
     }
-    return '<div style="color: '.($flash['ok'] ? '#00FF00' : '#FF0000').'; font-weight: bold; margin: 10px 0;">'.$flash['msg'].'</div>';
+    return '<div class="mod-meldung mod-meldung-'.($flash['ok'] ? 'ok' : 'fehler').'">'.$flash['msg'].'</div>';
 }
 
 /**

@@ -7115,6 +7115,500 @@ a.art-kachel-zurueck:hover::after {
   justify-content: center;
 }
 
+.vs {
+  width: 572px;
+}
+
+.vs-fehlt {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+.mod .vs-fehlt a,
+.mod .vs-fehlt a:link,
+.mod .vs-fehlt a:visited {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.vs-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.vs-zeile .mod-chip {
+  margin-left: 6px;
+}
+
+.vs-boni {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.vs-boni .ov-wert b {
+  font-size: 15px;
+}
+.vs-boni small,
+.vs-boni .vs-boni-liste {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #9da7b1;
+}
+
+.vs-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.vs-filter .mod-typ {
+  margin-right: 2px;
+}
+.vs-filter select.mod-eingabe {
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.vs-filter #vsf0a {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+.vs-tabelle,
+.vs-tabelle > tbody {
+  display: block;
+  width: 100%;
+}
+
+.vs-tabelle > tbody {
+  margin-bottom: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.vs-tabelle tr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+}
+
+.vs-tabelle td {
+  display: block;
+  padding: 0;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+
+.vs-tabelle .vs-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+.vs-tabelle .vs-name span {
+  font-weight: 400;
+}
+
+.vs-symbol {
+  width: 16px;
+  height: auto;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.vs-tabelle .vs-aktion {
+  flex: 0 0 auto;
+}
+
+.vs-tabelle .vs-felder {
+  padding-top: 0;
+}
+.vs-tabelle .vs-felder td {
+  width: 100%;
+}
+
+.vs-feldliste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.vs-feld {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  cursor: help;
+}
+.vs-feld img {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+}
+
+.vs-feld-box,
+.vs-feld-leer {
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  font-weight: 700;
+  color: #e6edf3;
+}
+
+.vs-feld-leer {
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 400;
+  color: #6e7681;
+}
+
+.vs-feld-blockiert img {
+  box-shadow: 0 0 0 2px #ff6b6b;
+}
+
+.vs-stufe {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 16px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  background: #1c2128;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.vs-stufe-bau {
+  background: #6b4e12;
+  color: #ffd56b;
+}
+
+.vs-upgrade-all {
+  width: 38px;
+  height: 38px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.ms {
+  width: 572px;
+}
+
+.ms-nummer {
+  font-size: 0.85em;
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.ms-navi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mod .ms-nav,
+.mod a.ms-nav:link,
+.mod a.ms-nav:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  text-decoration: none;
+  color: #e6edf3;
+}
+
+.mod a.ms-nav:hover {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+}
+
+.mod .ms-nav-aus {
+  opacity: 0.3;
+}
+
+.ms-sprung {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #8b949e;
+}
+.ms-sprung .mod-eingabe {
+  width: 56px;
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.ms-felder {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 6px;
+}
+
+.ms-feld {
+  display: grid;
+  grid-template-columns: 38px 30px;
+  column-gap: 4px;
+  row-gap: 3px;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+.ms-feld .ms-fertig {
+  grid-column: 1/span 2;
+}
+
+.ms-feld-aktiv {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+}
+
+.mod a.vs-feld,
+.mod a.vs-feld:link,
+.mod a.vs-feld:visited {
+  font-family: inherit;
+  text-decoration: none;
+  color: #e6edf3;
+  cursor: pointer;
+}
+
+.mod a.vs-feld:hover {
+  box-shadow: 0 0 0 2px var(--akzent-mittel);
+}
+
+.vs-feld-leer.vs-feld-blockiert {
+  box-shadow: 0 0 0 2px #ff6b6b;
+}
+
+.ms-up-form {
+  margin: 0;
+}
+
+.ms-up {
+  display: block;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.ms-up img {
+  width: 30px;
+  height: 30px;
+}
+.ms-up:hover img {
+  filter: brightness(1.4);
+}
+
+.ms-fertig {
+  font-size: 10px;
+  color: #ffd56b;
+}
+
+.ms-alle {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 0;
+}
+
+.ms-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  color: #c9d1d9;
+}
+
+.ms-titel {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ms-zeile {
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.ms-zeile b {
+  color: #ffffff;
+}
+
+.ms-abschnitt {
+  margin-top: 10px;
+}
+.ms-abschnitt > .mod-typ {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ms-kosten {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 4px 0;
+  font-size: 12px;
+  color: #ffffff;
+}
+.ms-kosten small {
+  color: #8b949e;
+}
+
+.ms-fehlt,
+.ms-kosten .ms-fehlt {
+  color: #ff8a8a;
+}
+
+.ms-voraussetzung,
+.ms-hinweis {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.ms-aktion {
+  margin: 8px 0 0;
+}
+
+.ms-warnung {
+  margin-top: 10px;
+}
+
+.ms-leer {
+  padding: 16px 12px;
+}
+
+.ms-stufen {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+.ms-stufen span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  color: #ffffff;
+}
+.ms-stufen small {
+  font-size: 9px;
+  color: #8b949e;
+}
+.ms-stufen .ms-stufe-aktiv {
+  background: var(--akzent-weich);
+  box-shadow: inset 0 0 0 1px var(--akzent);
+}
+
+.ms-bau {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ms-bau .ms-abschnitt {
+  margin-top: 6px;
+}
+
+.ms-bau-name {
+  margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.ms-bau-name small {
+  font-weight: 400;
+}
+.ms-bau-name.ms-fehlt {
+  color: #ff8a8a;
+}
+
+.ms-flotte {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+.ms-fund {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: #ffffff;
+}
+.ms-fund small {
+  color: #8b949e;
+}
+
+.ms-fund-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ms-kacheln {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 8px 0;
+}
+.ms-kacheln .ov-wert b {
+  font-size: 15px;
+}
+.ms-kacheln small {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.ms-sonder-inhalt {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #c9d1d9;
+}
+
 body.mobile {
   height: 100vh;
   height: 100dvh;

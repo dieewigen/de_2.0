@@ -178,6 +178,31 @@ class map_system{
 		}
 	}
 
+	/**
+	 * Dauer eines Bauauftrags in Echtzeit, z. B. "45 Sekunden" oder "12 Minuten".
+	 */
+	private function msDauer($sekunden){
+		$sekunden=(int)$sekunden;
+		if($sekunden<120){
+			return $sekunden.' Sekunden';
+		}
+		if($sekunden<7200){
+			return round($sekunden/60).' Minuten';
+		}
+		return floor($sekunden/3600).' Std. '.round(($sekunden%3600)/60).' Min.';
+	}
+
+	/**
+	 * Werte je Stufe (Produktionsmenge, Fertigungskapazität) als kleines Raster, die aktuelle Stufe hervorgehoben.
+	 */
+	private function msStufenliste($titel, $werte, $anzahl, $aktuell){
+		$html='<div class="ms-abschnitt"><span class="mod-typ">'.$titel.'</span><div class="ms-stufen">';
+		for($p=0;$p<$anzahl;$p++){
+			$html.='<span'.($p+1 == $aktuell ? ' class="ms-stufe-aktiv"' : '').'><small>'.($p+1).'</small>'.$werte[$p].'</span>';
+		}
+		return $html.'</div></div>';
+	}
+
 	public function showFields(){
 		//für alle Gebäude ein Upgradeauftrag starten
 		if(isset($_POST['upgradeallbuildings']) && $_POST['upgradeallbuildings']==1){
@@ -185,62 +210,29 @@ class map_system{
 			vs_redirect($this->system_id, $_REQUEST['fieldid'] ?? null);
 		}
 
-		$content='<div style="display: flex; margin-top: 16px;">';
+		//gewähltes Feld nur zum Hervorheben, geprüft wird es unten in der rechten Spalte
+		$feld_gewaehlt=isset($_REQUEST['fieldid']) ? intval($_REQUEST['fieldid']) : -1;
 
-		//linke Spalte
-		$content.='<div style="width: 400px;">';
+		$content='<div class="ms-system">';
 
-		//print_r($this->playerBldg);
+		//linke Spalte: die Felder, je mit Upgrade-Pfeil
+		$content.='<div class="ms-links"><div class="ms-felder">';
 
 		///////////////////////////////////////////
 		//Felder durchgehen und anzeigen
 		///////////////////////////////////////////
-		$content.='<div style="display: flex;">';
 		for($i=0;$i<count($this->fields);$i++){
-
-			//maximal X in einer Zeile
-
-			if($i % 4==0){
-				$content.='</div>';
-				$content.='<div style="display: flex;">';
-			}
-
 			$bldg_level=0;
 
-			///////////////////////////////////////////
-			//Rahmenfarbe definieren
-			///////////////////////////////////////////
-			/*
-			$bordercolor='#FFFFFF';
 			//Blocker
-			if(isset($this->fields[$i][1])){
-				$bordercolor='#FF0000';
-			}
-			*/
+			$blockiert=isset($this->fields[$i][1]);
 
 			///////////////////////////////////////////
-			//Feld anzeigen
+			//Gebäude auf dem Feld: Stufe als Abzeichen, im Ausbau gelb mit der Uhrzeit, zu der er fertig ist
 			///////////////////////////////////////////
-			
-			//$content.='<div style="height: 50px; width: 300px; border: 1px solid '.$bordercolor.'; margin-bottom: 10px; box-sizing: border-box; padding: 5px; cursor: pointer;" onclick="location.href=\'map_system.php?id='.$this->system_id.'&fieldid='.$i.'\'">';
-			$content.='<div style="width: 40px; box-sizing: border-box; cursor: pointer; text-align: center;" onclick="vs_navigate(\'map_system.php?id='.$this->system_id.'&fieldid='.$i.'\')">';
-
-			///////////////////////////////////////////
-			//Rahmenfarbe definieren
-			///////////////////////////////////////////
-			//Blocker
-			if(isset($this->fields[$i][1])){
-				$border='border: 1px solid #FF0000;';
-			}else{
-				$border='';
-			}
-
-			///////////////////////////////////////////
-			//Feld-Ressource anzeigen
-			///////////////////////////////////////////
-			$stufeninfo ='<div id="build_level'.$i.'"></div>';
-			$stufeninfo.='<div id="build_counter'.$i.'" style="font-size: 12px;"></div>';
-			//testen ob es gerade im Bau ist, dann die Farbe ändern
+			$stufeninfo='';
+			$fertig='';
+			$titel_stufe='';
 			$factory_id=-1;
 			$bldg_id=-1;
 			for($b=0;$b<count($this->playerBldg);$b++){
@@ -250,162 +242,88 @@ class map_system{
 					$bldg_level=$this->playerBldg[$b]['bldg_level'];
 					//wird das Gebäude gerade ausgebaut?
 					if(time()<$this->playerBldg[$b]['bldg_time']){
-						//Ausbau läuft
-						//$content.=$GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['name'].' (Ausbau auf Stufe '.($this->playerBldg[$b]['bldg_level']).': <span id="build_counter'.$i.'"></span>)';
-						//$content.='<script type="text/javascript">ang_countdown('.($this->playerBldg[$b]['bldg_time']-time()).',"build_counter'.$i.'",0)</script>';
-						//$content.='<br>';
-						$stufeninfo ='<div style="color: yellow;" id="build_level'.$i.'">'.$this->playerBldg[$b]['bldg_level'].'</div>';
-						$stufeninfo.='<div id="build_counter'.$i.'" style="font-size: 12px;">&nbsp;</div>';
-						$stufeninfo.='<script>ang_countdown('.($this->playerBldg[$b]['bldg_time']-time()).',"build_counter'.$i.'",0)</script>';
+						$bis=$this->playerBldg[$b]['bldg_time'];
+						$stufeninfo='<span class="vs-stufe vs-stufe-bau" id="build_level'.$i.'">'.$this->playerBldg[$b]['bldg_level'].'</span>';
+						$fertig='<span class="ms-fertig" id="build_counter'.$i.'">'.date(date('Y-m-d', $bis)==date('Y-m-d') ? 'H:i' : 'd.m.', $bis).'</span>';
+						$titel_stufe='&Ausbau auf Stufe '.$this->playerBldg[$b]['bldg_level'].' '.\DieEwigen\DE2\View\RealTime::until($bis);
 					}else{
-						//wird nicht ausgebaut
-						//$content.=$GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['name'].' (Stufe '.$this->playerBldg[$b]['bldg_level'].')<br>';
-						$stufeninfo ='<div id="build_level'.$i.'">'.$this->playerBldg[$b]['bldg_level'].'</div>';
-						$stufeninfo.='<div id="build_counter'.$i.'" style="font-size: 12px;"></div>';
+						$stufeninfo='<span class="vs-stufe" id="build_level'.$i.'">'.$this->playerBldg[$b]['bldg_level'].'</span>';
+						$titel_stufe='&Stufe '.$this->playerBldg[$b]['bldg_level'];
 					}
 				}
 			}
-
-			/*
-			$stufeninfo='<br>'.$bldg[$row['id']][$i]['bldg_level'];
-			//testen ob es gerade im Bau ist, dann die Farbe ändern
-			if($bldg[$row['id']][$i]['bldg_time']>time()){
-				$stufeninfo='<span style="color: yellow;">'.$stufeninfo.'</span>';
-			}
-			*/
-
-			if($i>0){
-				if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
-					//Gebäudestufe bestimmen
-					//Grafik bestimmen
-					$filename_nr=$this->fields[$i][0];
-					if($filename_nr<10){
-						$filename_nr='0'.$filename_nr;
-					}
-					$content.='
-					<div style="text-align:center; font-size: 20px;">
-						<img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">
-						'.$stufeninfo.
-					'</div>';
-				}else{
-					//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
-					if($factory_id>-1){
-
-						$content.='
-						<div style="font-size: 20px; text-align:center;">
-							<div style="display: inline-block; margin-bottom: 4px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;" title="'.$GLOBALS['map_buildings'][$bldg_id]['name'].'">'.$GLOBALS['greek_chars'][$factory_id].'</div>
-							'.$stufeninfo.'
-						</div>';
-
-
-					}else{
-						$content.='
-						<div style="font-size: 20px; text-align:center;">
-							<div title="keine Rohstoffe" style="line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; border-radius: 5px;'.$border.'">-</div>
-							'.$stufeninfo.'
-						</div>
-						';
-					}
-
-				}
-			}else{
-
-				//Außenposten
-				$content.='
-				<div style="font-size: 20px; text-align:center;">
-					<div style="display: inline-block; margin-bottom: 3px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;" title="Au&szlig;enposten">A</div>
-					'.$stufeninfo.'
-				</div>';
-
-
-			}
-
-			/*
-
-			///////////////////////////////////////////
-			//Blocker anzeigen
-			///////////////////////////////////////////
-			if(isset($this->fields[$i][1])){
-				$content.='Feldblocker: '.$this->fields[$i][1][1].'x '.$GLOBALS['map_field_blocker'][$this->fields[$i][1][0]]['name'].'<br>';
-			}
-
-			///////////////////////////////////////////
-			//Gebäude anzeigen
-			///////////////////////////////////////////
-			for($b=0;$b<count($this->playerBldg);$b++){
-				if($this->playerBldg[$b]['field_id']==$i){
-					//wird das Gebäude gerade ausgebaut?
-					if(time()<$this->playerBldg[$b]['bldg_time']){
-						//Ausbau läuft
-						$content.=$GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['name'].' (Ausbau auf Stufe '.($this->playerBldg[$b]['bldg_level']).': <span id="build_counter'.$i.'"></span>)';
-						$content.='<script type="text/javascript">ang_countdown('.($this->playerBldg[$b]['bldg_time']-time()).',"build_counter'.$i.'",0)</script>';
-						$content.='<br>'; 
-					}else{
-						//wird nicht ausgebaut
-						$content.=$GLOBALS['map_buildings'][$this->playerBldg[$b]['bldg_id']]['name'].' (Stufe '.$this->playerBldg[$b]['bldg_level'].')<br>';
-					}
-				}
-			}
-			
 
 			///////////////////////////////////////////
 			//Feld-Ressource anzeigen
 			///////////////////////////////////////////
 			if($i>0){
 				if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
-					$content.='Feldressource: '.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'<br>';
+					//Grafik bestimmen
+					$filename_nr=$this->fields[$i][0];
+					if($filename_nr<10){
+						$filename_nr='0'.$filename_nr;
+					}
+					$titel=$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'];
+					$inhalt='<img src="gp/g/ele'.$filename_nr.'.gif" alt="">';
+					$klasse='vs-feld'.($blockiert ? ' vs-feld-blockiert' : '');
+				}else{
+					//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
+					if($factory_id>-1){
+						$titel=$GLOBALS['map_buildings'][$bldg_id]['name'];
+						$inhalt=$GLOBALS['greek_chars'][$factory_id];
+						$klasse='vs-feld vs-feld-box';
+					}else{
+						$titel='keine Rohstoffe';
+						$inhalt='&ndash;';
+						$klasse='vs-feld vs-feld-leer'.($blockiert ? ' vs-feld-blockiert' : '');
+					}
 				}
+			}else{
+				//Außenposten
+				$titel='Au&szlig;enposten';
+				$inhalt='A';
+				$klasse='vs-feld vs-feld-box';
 			}
-			*/
 
-			$content.='</div>';
-			
+			$content.='<div class="ms-feld'.($feld_gewaehlt==$i ? ' ms-feld-aktiv' : '').'">';
+			$content.='<a href="map_system.php?id='.$this->system_id.'&amp;fieldid='.$i.'" class="'.$klasse.'" title="'.$titel.$titel_stufe.'">'.$inhalt.$stufeninfo.'</a>';
+
 			//Upgrade-Pfeil
 			if($bldg_level>0){
 				$content.='
-				<div style="width: 40px; height: 40px; box-sizing: border-box; cursor: pointer; text-align: center; margin-right: 20px;" title="upgrade">
-					<form method="post">
-						<input name="id" value="'.$this->system_id.'" type="hidden">
-						<input name="fieldid" value="'.$i.'" type="hidden">
-						<input name="upgrade" value="1" type="hidden">
-						<img src="gp/g/icon12.png" style="width: 100%; height: 100%;" onclick="$(this).parents(\'form:first\').submit();">
-					</form>			
-				</div>
-				';
-			}else{
-				$content.='<div style="width: 40px; height: 40px; box-sizing: border-box; cursor: pointer; text-align: center; margin-right: 20px;"></div>';
-
+				<form method="post" class="ms-up-form">
+					<input name="id" value="'.$this->system_id.'" type="hidden">
+					<input name="fieldid" value="'.$i.'" type="hidden">
+					<input name="upgrade" value="1" type="hidden">
+					<button type="submit" class="ms-up" title="Upgrade&'.$titel.' eine Stufe ausbauen"><img src="gp/g/icon12.png" alt="Upgrade"></button>
+				</form>';
 			}
-
-
-
+			$content.=$fertig;
+			$content.='</div>';
 		}
 
 		$content.='</div>';
 
 		$content.='
-		<form method="post">
+		<form method="post" class="ms-alle">
 			<input name="id" value="'.$this->system_id.'" type="hidden">
 			<input name="upgradeallbuildings" value="1" type="hidden">
-	
-			<div style="margin-top: 30px; margin-bottom: 20px; width: 100%; text-align: center;">
-			<a id="upgrade_all" href="javascript: void(0);" onclick="$(this).parents(\'form:first\').submit();" style="background-color: #FFFFFF; color: #000000; text-decoration: none; text-align: center; border: 1px solid #888888; box-sizing: border-box; padding: 8px;" title="Hotkey: Leertaste">Alle Geb&auml;ude upgraden</a>
-			</div>
+			<button type="submit" id="upgrade_all" class="mod-btn" title="Alle Geb&auml;ude upgraden&Hotkey: Leertaste">Alle Geb&auml;ude upgraden</button>
 		</form>';
 
-
 		///////////////////////////////////////////
-		//recht Spalte
+		//rechte Spalte
 		///////////////////////////////////////////
-		$content.='</div><div style="flex-grow: 1; padding-left: 20px;">';
+		$content.='</div><div class="ms-detail">';
 
 		//nur Felder, die es in diesem System gibt: sonst ließen sich auf erfundenen Feld-IDs beliebig viele Gebäude bauen
 		if(isset($_REQUEST['fieldid']) && isset($this->fields[intval($_REQUEST['fieldid'])])){
 			$fieldid=intval($_REQUEST['fieldid']);
 
 			if(isset($this->fields[$fieldid][1])){
-				$content.='Feldblocker: '.$this->fields[$fieldid][1][1].'x '.$GLOBALS['map_field_blocker'][$this->fields[$fieldid][1][0]]['name'].'<br>';
-				$content.='Dieses Feld ist blockiert und mu&szlig; erst nutzbar gemacht werden. (das wird erst mit einem Folgeupdate m&ouml;glich sein)';
+				$content.='<div class="ms-titel">Feld '.$fieldid.'</div>';
+				$content.='<div class="mod-meldung mod-meldung-warn">Feldblocker: '.$this->fields[$fieldid][1][1].'x '.$GLOBALS['map_field_blocker'][$this->fields[$fieldid][1][0]]['name'].'<br>';
+				$content.='Dieses Feld ist blockiert und mu&szlig; erst nutzbar gemacht werden. (das wird erst mit einem Folgeupdate m&ouml;glich sein)</div>';
 			}else{
 				//wenn es ein Gebäude gibt, dann dieses anzeigen und die weiteren Möglichkeiten anbieten
 				$bldg_exist=false;
@@ -418,60 +336,23 @@ class map_system{
 
 				if($bldg_exist){
 					$destroyed=false;
-					$content.=$GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['name'];
-
-					//Gebäudestufe Aktuell/Maximum
-					//$content.='<br>Stufe: '.$this->playerBldg[$bldg_index]['bldg_level'].'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']);
+					$content.='<div class="ms-titel">'.$GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['name'].'</div>';
 
 					//wird das Gebäude gerade ausgebaut?
 					if(time()<$this->playerBldg[$bldg_index]['bldg_time']){
 						//Ausbau läuft
-						$content.='<br>Ausbau auf Stufe '.($this->playerBldg[$bldg_index]['bldg_level']).'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']);
+						$content.='<div class="ms-zeile"><span class="mod-chip mod-chip-warn">Ausbau auf Stufe '.($this->playerBldg[$bldg_index]['bldg_level']).'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']).'</span>';
+						$content.=' <span class="bk-leise">'.\DieEwigen\DE2\View\RealTime::until($this->playerBldg[$bldg_index]['bldg_time']).'</span></div>';
 						$akt_level=$this->playerBldg[$bldg_index]['bldg_level']-1;
 					}else{
 						//wird nicht ausgebaut
 						$akt_level=$this->playerBldg[$bldg_index]['bldg_level'];
-						$content.='<br>Stufe: '.$this->playerBldg[$bldg_index]['bldg_level'].'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']);
+						$content.='<div class="ms-zeile"><span class="mod-chip">Stufe '.$this->playerBldg[$bldg_index]['bldg_level'].'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']).'</span></div>';
 					}
-
-					//////////////////////////////
-					//läuft ein Bau/Upgrade
-					//////////////////////////////
-					/*
-					if(time()<$this->playerBldg[$bldg_index]['bldg_time']){
-						$content.='<br><br>Verbleibende Bauzeit: <span id="build_counter"></span>';
-						$content.='<script type="text/javascript">ang_countdown('.($this->playerBldg[$bldg_index]['bldg_time']-time()).',"build_counter",0)</script>';
-					}
-					*/
-
-					////////////////////////////////////////////////////////////
-					//Gebäude abreißen, geht erst ab Feld 1, Feld 0 ist fix
-					////////////////////////////////////////////////////////////
-					//Abreißbefehl wurde erteilt
-					/*
-					if($_REQUEST['destroy']==1){
-						$content.='<br><br>Der Abri&szlig; wurde durchgef&uuml;hrt.';
-						$content.='<br><a href="?id='.$this->system_id.'&fieldid='.$fieldid.'">weiter</a>';
-						$destroyed=true;
-						removeBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fieldid);
-
-						$content.='
-						<script>
-						location.href=\'map_system.php?id='.$this->system_id.'\';
-						</script>';						
-					}
-
-					//Abreißbefehl anbieten
-					if(!$destroyed && $fieldid>0){
-						$content.='<br><br><a href="?id='.$this->system_id.'&fieldid='.$fieldid.'&destroy=1" onclick="return confirm(\'Wirklich abrei&szlig;en? Es werden keine Rohstoffe erstattet.\')">abrei&szlig;en</a>';
-					}
-
-					*/
 
 					//////////////////////////////
 					//Gebäudeupgrade
 					//////////////////////////////
-					//if(!$destroyed && time()>=$this->playerBldg[$bldg_index]['bldg_time'] && $this->playerBldg[$bldg_index]['bldg_level'] < count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost'])){
 					if(!$destroyed && $this->playerBldg[$bldg_index]['bldg_level'] < count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost'])){
 						//Baukosten laden
 						$baukosten=$this->formatBaukosten($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost'][$this->playerBldg[$bldg_index]['bldg_level']]);
@@ -480,22 +361,15 @@ class map_system{
 							if($fieldid>0){
 								$mainbuilding_level=$this->playerBldg[0]['bldg_level'];
 
-								/*
-								if($this->playerBldg[0]['bldg_time'] > time()){
-									$mainbuilding_level--;
-								}
-								*/
-
 								if($mainbuilding_level > $this->playerBldg[$bldg_index]['bldg_level']){
 									$mainbuilding_ok=true;
 								}else{
 									$mainbuilding_ok=false;
-									$content.='<br><br>Voraussetzung:';
-									$content.='<br>'.($GLOBALS['map_buildings'][$this->playerBldg[0]['bldg_id']]['name']).' Stufe '.($this->playerBldg[$bldg_index]['bldg_level']+1);
+									$content.='<div class="mod-hinweis ms-voraussetzung">Voraussetzung: '.($GLOBALS['map_buildings'][$this->playerBldg[0]['bldg_id']]['name']).' Stufe '.($this->playerBldg[$bldg_index]['bldg_level']+1).'</div>';
 								}
 							}else{
 								$mainbuilding_ok=true;
-							}						
+							}
 
 						//man will es bauen und man hat alles (upgrade angefordert)
 						if($baukosten['has_all'] && isset($_POST['upgrade']) && $_POST['upgrade']==1 && $mainbuilding_ok){
@@ -503,11 +377,9 @@ class map_system{
 							if(time()<$this->playerBldg[$bldg_index]['bldg_time']){
 								//es läuft ein Upgrade
 								$upgrade_time=$this->playerBldg[$bldg_index]['bldg_time']+(round($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']*($this->playerBldg[$bldg_index]['bldg_level']+1)));
-								//die('AAAAAAAAA');
 							}else{
 								//es läuft kein Upgrade
 								$upgrade_time=time()+(round($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']*($this->playerBldg[$bldg_index]['bldg_level']+1)));
-								//die('BBBBBBBBB');
 							}
 
 							setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fieldid, $this->playerBldg[$bldg_index]['bldg_id'], $this->playerBldg[$bldg_index]['bldg_level']+1, $upgrade_time);
@@ -518,38 +390,28 @@ class map_system{
 							//neu laden, das Feld bleibt ausgewählt
 							vs_redirect($this->system_id, $fieldid);
 
-							/*
-							ang_countdown('.(round($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*($this->playerBldg[$bldg_index]['bldg_level']+1))).',"build_counter'.$fieldid.'",0);
-							$("build_level'.$fieldid.'").html("'.($this->playerBldg[$bldg_index]['bldg_level']+1).'");
-							$("build_level'.$fieldid.'").css("color","yellow");
-							*/
-
 						}else{
-							//Bauzeit ausgeben
-							$content.='<div><br>Bauzeit: '.round($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']*($this->playerBldg[$bldg_index]['bldg_level']+1)).' Sekunden</div>';
-							//$content.='<br>A: '.$GLOBALS['duration_factor'];
+							//Bauzeit ausgeben; ein neuer Ausbau beginnt nach einem laufenden
+							$dauer=round($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']*($this->playerBldg[$bldg_index]['bldg_level']+1));
+							$content.='<div class="ms-abschnitt"><span class="mod-typ">N&auml;chste Stufe</span>';
+							$content.='<div class="ms-zeile">Bauzeit: <b>'.$this->msDauer($dauer).'</b> <span class="bk-leise">&middot; fertig '.\DieEwigen\DE2\View\RealTime::at(max(time(), $this->playerBldg[$bldg_index]['bldg_time'])+$dauer).'</span></div>';
 
 							//Baukosten ausgeben
-							$content.='<br>Baukosten:';
-							$content.=$baukosten['kosten'];
-
-
+							$content.='<div class="ms-kosten">'.$baukosten['kosten'].'</div>';
 
 							//wenn man die Rohstoffe hat, den upgrade-link anzeigen
 							if($baukosten['has_all'] && $mainbuilding_ok){
-								//$content.='<br><a href="?id='.$this->system_id.'&fieldid='.$fieldid.'&upgrade=1&fastbuild=2">upgraden</a>';
-								$content.='<br>
-								<form method="post">
+								$content.='
+								<form method="post" class="ms-aktion">
 									<input name="id" value="'.$this->system_id.'" type="hidden">
 									<input name="fieldid" value="'.$fieldid.'" type="hidden">
 									<input name="upgrade" value="1" type="hidden">
-							
-									<a href="javascript: void(0);" onclick="$(this).parents(\'form:first\').submit();">upgraden</a>
+									<button type="submit" class="mod-btn">Upgraden</button>
 								</form>';
 							}else{
-								$content.='<div style="color: #FF0000;">Es sind nicht alle Voraussetzungen erf&uuml;llt.</div>';
-
+								$content.='<div class="ms-fehlt">Es sind nicht alle Voraussetzungen erf&uuml;llt.</div>';
 							}
+							$content.='</div>';
 						}
 					}
 
@@ -558,46 +420,23 @@ class map_system{
 					//////////////////////////////
 					if(!$destroyed){
 						if(!in_array($bldg_index, (array(0)))){
-							//$content.=$bldg_index;
 							//Poduktionsmenge anzeigen, wenn vorhnaden
 							if(isset($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_amount'])){
-								$content.='<br><br><div>Produktionsmenge:</div>';
-								for($p=0;$p<count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']);$p++){
-									//die aktuelle Stufe hervorheben
-									if($p+1 == $akt_level){
-										$style='color: #00FF00;';
-									}else{
-										$style='';
-									}
-									//$produktionsmenge=(($p+1)*($p+1));
-									
-									$produktionsmenge=$GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_amount'][$p];
-									$content.='<div style="'.$style.'">Stufe '.($p+1).': '.$produktionsmenge.'</div>';
-								}
+								$content.=$this->msStufenliste('Produktionsmenge', $GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_amount'], count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']), $akt_level);
 							}
 
 							//Fertigungskapazität anzeigen, wenn vorhnaden
 							if(isset($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_capacity'])){
-								$content.='<br><br><div>Fertigungskapazit&auml;t:</div>';
-								for($p=0;$p<count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']);$p++){
-									//die aktuelle Stufe hervorheben
-									if($p+1 == $akt_level){
-										$style='color: #00FF00;';
-									}else{
-										$style='';
-									}
-									//$produktionsmenge=(($p+1)*($p+1));
-									
-									$produktionsmenge=$GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_capacity'][$p];
-									$content.='<div style="'.$style.'">Stufe '.($p+1).': '.$produktionsmenge.'</div>';
-								}
+								$content.=$this->msStufenliste('Fertigungskapazit&auml;t', $GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['production_capacity'], count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']), $akt_level);
 							}
 
 						}
 					}
 
 				}else{//wenn es kein Gebäude gibt, dann den Bau anbieten
-					$content.='<div>Folgendes kann hier gebaut werden:</div><br>';
+					$feldname=$GLOBALS['map_field_typ'][$this->fields[$fieldid][0]]['name'];
+					$content.='<div class="ms-titel">Feld '.$fieldid.' &middot; '.($feldname!='-' ? $feldname : 'keine Rohstoffe').'</div>';
+					$content.='<div class="ms-zeile bk-leise">Folgendes kann hier gebaut werden:</div>';
 
 					//alle vorhandenen Gebäudetypen durchgehen und deren Voraussetzungen checken
 					$ignore_bids=array(0,1,2);
@@ -612,22 +451,20 @@ class map_system{
 							){
 								if(!isset($_POST['build']) || $_POST['build']==$g){
 									//Technologie anzeigen
-									$content.='<div style="width: 100%; border: 1px solid #FFFFFF;padding: 5px; box-sizing: border-box; margin-bottom: 8px;">';
-									//Textfarbe für Tech-Name, damit erkennbar ist, ob man sie erforscht hat
+									$content.='<div class="ms-bau">';
+									//Name rot, wenn die Technologie fehlt
 									if(!isset($GLOBALS['map_buildings'][$g]['need_tech']) || hasTech($GLOBALS['pt'], $GLOBALS['map_buildings'][$g]['need_tech'])){
-										$tech_name_color='#FFFFFF';
 										$has_tech=true;
 									}else{
-										$tech_name_color='#FF0000';
 										$has_tech=false;
 									}
-									
-									$content.='<div style="color: '.$tech_name_color.';">'.$GLOBALS['map_buildings'][$g]['name'].'</div>';
+
+									$content.='<div class="ms-bau-name'.($has_tech ? '' : ' ms-fehlt').'">'.$GLOBALS['map_buildings'][$g]['name'].($has_tech ? '' : ' <small>(Technologie fehlt)</small>').'</div>';
 
 									//Baukosten laden
 									$baukosten=$this->formatBaukosten($GLOBALS['map_buildings'][$g]['bldg_cost'][0]);
 
-											//man will es bauen und man hat alles 
+											//man will es bauen und man hat alles
 									if($baukosten['has_all'] && $has_tech && isset($_POST['build']) && $_POST['build']==$g){
 										//Bauauftrag in der DB hinterlegen
 										setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fieldid, $g, 1, time()+($GLOBALS['map_buildings'][$g]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']));
@@ -641,46 +478,32 @@ class map_system{
 
 										if(isset($GLOBALS['map_buildings'][$g]['production_amount'])){
 											//Produktionsmenge
-											$content.='<br><div>Produktionsmenge:</div>';
-											for($p=0;$p<count($GLOBALS['map_buildings'][$g]['bldg_cost']);$p++){
-												//$produktionsmenge=(($p+1)*($p+1));
-												$produktionsmenge=$GLOBALS['map_buildings'][$g]['production_amount'][$p];
-												$content.='<div>Stufe '.($p+1).': '.$produktionsmenge.'</div>';
-											}
+											$content.=$this->msStufenliste('Produktionsmenge', $GLOBALS['map_buildings'][$g]['production_amount'], count($GLOBALS['map_buildings'][$g]['bldg_cost']), 0);
 										}
 
 										if(isset($GLOBALS['map_buildings'][$g]['production_capacity'])){
 											//Fertigungskapazität
-											$content.='<br><div>Fertigungskapazit&auml;t:</div>';
-											for($p=0;$p<count($GLOBALS['map_buildings'][$g]['bldg_cost']);$p++){
-												//$produktionsmenge=(($p+1)*($p+1));
-												$produktionsmenge=$GLOBALS['map_buildings'][$g]['production_capacity'][$p];
-												$content.='<div>Stufe '.($p+1).': '.$produktionsmenge.'</div>';
-											}
+											$content.=$this->msStufenliste('Fertigungskapazit&auml;t', $GLOBALS['map_buildings'][$g]['production_capacity'], count($GLOBALS['map_buildings'][$g]['bldg_cost']), 0);
 										}
 
-
 										//Bauzeit ausgeben
-										$content.='<div><br>Bauzeit: '.round($GLOBALS['map_buildings'][$g]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']).' Sekunden</div>';
-										//$content.='<br>B: '.$GLOBALS['duration_factor'];
+										$dauer=round($GLOBALS['map_buildings'][$g]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']);
+										$content.='<div class="ms-zeile">Bauzeit: <b>'.$this->msDauer($dauer).'</b> <span class="bk-leise">&middot; fertig '.\DieEwigen\DE2\View\RealTime::at(time()+$dauer).'</span></div>';
 
 										//Baukosten ausgeben
-										$content.='<br>Baukosten:';
-										$content.=$baukosten['kosten'];
+										$content.='<div class="ms-kosten">'.$baukosten['kosten'].'</div>';
 
 										//wenn man die Rohstoffe/Technologie hat, den bauen-link anzeigen
 										if($baukosten['has_all'] && $has_tech){
-											//$content.='<br><a href="?id='.$this->system_id.'&fieldid='.$fieldid.'&build='.$g.'&fastbuild=1">bauen</a>';
-											$content.='<br>
-											<form method="post">
+											$content.='
+											<form method="post" class="ms-aktion">
 												<input name="id" value="'.$this->system_id.'" type="hidden">
 												<input name="fieldid" value="'.$fieldid.'" type="hidden">
 												<input name="build" value="'.$g.'" type="hidden">
-										
-												<a href="javascript: void(0);" onclick="$(this).parents(\'form:first\').submit();">bauen</a>
-											</form>';											
+												<button type="submit" class="mod-btn">Bauen</button>
+											</form>';
 										}else{
-											$content.='<div style="color: #FF0000;">Es sind nicht alle Voraussetzungen erf&uuml;llt.</div>';
+											$content.='<div class="ms-fehlt">Es sind nicht alle Voraussetzungen erf&uuml;llt.</div>';
 
 										}
 
@@ -694,13 +517,13 @@ class map_system{
 				}
 			}
 		}else{
-			$content.='W&auml;hle links ein Feld f&uuml;r weitere Informationen aus.';
+			$content.='<div class="mod-leer ms-leer">W&auml;hle links ein Feld f&uuml;r weitere Informationen aus.</div>';
 		}
 
 
 		$content.='</div>';//close rechte Spalte
 
-		$content.='</div>';//close flex
+		$content.='</div>';//close ms-system
 
 		return $content;
 	}
@@ -847,34 +670,23 @@ class map_system{
 			}
 		}
 
-		$output='<tbody id="vsrow'.$system_id.'">';
-		$output.='
-		<tr class="cell'.$filter_class.'" style="height: 30px;"><td><img id="sysid'.$system_id.'" src="'.$bg_image.'" style="vertical-align:middle; width: 16px; height: auto;"> '.$system_name.'</td>
-			<td style="text-align: center;"><a href="map_system.php?id='.$system_id.'">zum System</a></td>
-		</tr>';
-
-		$output.='
-		<tr class="cell'.$filter_class.'">
-			<td colspan="2">';
+		//eine Karte je System; die Filterklassen sitzen am tbody, damit der Filter (vs_filter in ang_fn.js) die ganze Karte
+		//ein- und ausblendet. vs_upgrade_row() ersetzt das tbody und hängt seine Meldung an die erste Zelle an.
+		$output='<tbody id="vsrow'.$system_id.'" class="vs-system'.$filter_class.'">';
+		$output.='<tr class="vs-kopf"><td class="vs-name"><img id="sysid'.$system_id.'" src="'.$bg_image.'" class="vs-symbol" alt=""> '.$system_name.'</td>';
+		$output.='<td class="vs-aktion"><a href="map_system.php?id='.$system_id.'" class="mod-btn mod-btn-leise ally-btn-klein">Zum System</a></td></tr>';
 
 		///////////////////////////////////////////
 		//Felder durchgehen und anzeigen
 		///////////////////////////////////////////
-		$output.='<div style="display: flex;">';
 		if($show_details){
+			$output.='<tr class="vs-felder"><td colspan="2"><div class="vs-feldliste">';
 			for($i=0;$i<count($this->fields);$i++){
-				//Blocker
-				if(isset($this->fields[$i][1])){
-					$border='border: 1px solid #FF0000;';
-				}else{
-					$border='';
-				}
-
-				//Stufe, gelb wenn gerade im Bau
-				$stufeninfo='<br>'.($bldg[$i]['bldg_level'] ?? 0);
-				if(isset($bldg[$i]['bldg_time']) && $bldg[$i]['bldg_time'] > time()){
-					$stufeninfo='<span style="color: yellow;">'.$stufeninfo.'</span>';
-				}
+				//Stufe als Abzeichen, gelb wenn gerade im Bau
+				$stufe=$bldg[$i]['bldg_level'] ?? 0;
+				$im_bau=isset($bldg[$i]['bldg_time']) && $bldg[$i]['bldg_time'] > time();
+				$stufeninfo='<span class="vs-stufe'.($im_bau ? ' vs-stufe-bau' : '').'">'.$stufe.'</span>';
+				$stufentitel='&Stufe '.$stufe.($im_bau ? ', im Ausbau' : '');
 
 				if($i>0){
 					if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
@@ -883,42 +695,30 @@ class map_system{
 						if($filename_nr<10){
 							$filename_nr='0'.$filename_nr;
 						}
-						$output.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" class="rounded-borders" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+						//Blocker: rot umrandet
+						$output.='<div class="vs-feld'.(isset($this->fields[$i][1]) ? ' vs-feld-blockiert' : '').'" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].$stufentitel.'"><img src="gp/g/ele'.$filename_nr.'.gif" alt="">'.$stufeninfo.'</div>';
 					}else{
 						//Keine Rohstoffe, es könnte aber eine Fabrik&Co vorhanden sein
 						if(isset($bldg[$i]['bldg_id']) && isset($GLOBALS['map_buildings'][$bldg[$i]['bldg_id']]['factory_id'])){
-							$output.='
-							<div style="font-size: 20px; line-height: 10px; text-align:center; margin-left: 10px;">
-								<div style="line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;" title="'.$GLOBALS['map_buildings'][$bldg[$i]['bldg_id']]['name'].'">'.$GLOBALS['greek_chars'][$GLOBALS['map_buildings'][$bldg[$i]['bldg_id']]['factory_id']].'</div>
-								'.$stufeninfo.'
-							</div>';
+							$output.='<div class="vs-feld vs-feld-box" title="'.$GLOBALS['map_buildings'][$bldg[$i]['bldg_id']]['name'].$stufentitel.'">'.$GLOBALS['greek_chars'][$GLOBALS['map_buildings'][$bldg[$i]['bldg_id']]['factory_id']].$stufeninfo.'</div>';
 						}else{
-							$output.='<div title="keine Rohstoffe" class="rounded-borders" style="margin-left: 10px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center;">-</div>';
+							$output.='<div class="vs-feld vs-feld-leer" title="keine Rohstoffe">&ndash;</div>';
 						}
 					}
 				}else{
 					//Außenposten
-					$output.='
-					<div style="font-size: 20px; line-height: 10px; text-align:center;">
-						<div style="line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; box-sizing: border-box; border-radius: 5px;" title="Au&szlig;enposten">A</div>
-						'.$stufeninfo.'
-					</div>';
+					$output.='<div class="vs-feld vs-feld-box" title="Au&szlig;enposten'.$stufentitel.'">A'.$stufeninfo.'</div>';
 				}
 			}
 
 			//alle upgraden, gleiches Symbol wie die Upgrade-Pfeile auf der Systemseite
 			if($this->canUpgradeAllFromOverview($bldg, $is_explored, $is_always_visible)){
-				$output.='<div style="margin-left: auto; padding-left: 10px;"><img class="vs-upgrade-all" src="gp/g/icon12.png" style="width: 40px; height: 40px; cursor: pointer;" onclick="vs_upgrade_row('.$system_id.', this);" title="Alle Geb&auml;ude in diesem System upgraden"></div>';
+				$output.='<img class="vs-upgrade-all" src="gp/g/icon12.png" onclick="vs_upgrade_row('.$system_id.', this);" title="Alle upgraden&Startet f&uuml;r alle Geb&auml;ude in diesem System ein Upgrade, soweit Rohstoffe und Au&szlig;enposten es erlauben." alt="Alle upgraden">';
 			}
+			$output.='</div></td></tr>';
 		}
 
-		$output.='</div>';
-
-		$output.='
-			</td>
-		</tr>
-		</tbody>
-		';
+		$output.='</tbody>';
 
 		return $output;
 	}
@@ -933,31 +733,24 @@ class map_system{
 		include_once('lib/map_system_defs.inc.php');
 		$content='';
 
-		//Kopfzeile ausgeben
+		//Kopfzeile: Name im Rahmentitel, darunter die Navigation zwischen den Systemen
 		//////////////////////////////////////////////////////////////
-		$content.=rahmen_oben(generate_vsystem_kopfzeile($this->system_id, $this->getSystemName()),false);
+		$sonder=isset($this->special_system) && $this->special_system>0;
+		$content.=rahmen_oben($this->getSystemName().' <span class="ms-nummer">#'.$this->system_id.'</span>',false);
 
-		$content.='<div class="cell" style="width: 576px;">';
+		$content.='<div class="mod ms'.($sonder ? ' ms-sonder' : '').'">';
+		$content.=generate_vsystem_kopfzeile($this->system_id, $this->getSystemName());
 
 		//////////////////////////////////////////////////////////////
 		//Test auf besonderes System
 		//////////////////////////////////////////////////////////////
-		if(isset($this->special_system) && $this->special_system>0){
-			$content.=$this->showSpecialSystem($this->system_id,$ps);
+		if($sonder){
+			$content.='<div class="ms-sonder-inhalt">'.$this->showSpecialSystem($this->system_id,$ps).'</div>';
 		}else{
-
-			/*
-			$content.='<div style="width: 572px;">Systemtyp: ';
-			$content.=$map_system_typen[$this->getSystemTyp()];
-			if(isset($map_system_subtypen[$this->getSystemTyp()])){
-				$content.=' ('.$map_system_subtypen[$this->getSystemTyp()][$this->getSystemSubTyp()].')';
-			}
-			$content.='</div>';
-			*/
 
 			//vorhandene Gebäude laden
 			$this->playerBldg=loadPlayerBuildings($_SESSION['ums_user_id'], $this->system_id);
-		
+
 
 			$hasOutpost=false;
 
@@ -970,10 +763,10 @@ class map_system{
 				if(!$hasOutpost){
 					$content.=$this->buildOutpost($this->system_id);
 				}
-			
+
 
 			}else{
-				$content.='in Vorbereitung';
+				$content.='<div class="mod-leer">in Vorbereitung</div>';
 			}
 
 			//gibt es bereits einen Außenposten/Botschaft
@@ -987,16 +780,16 @@ class map_system{
 				}
 
 				if(in_array($this->system_typ,array(4))){//Battleground
-					$content.='Durch den Weltraumhafen hast Du Zugriff auf dieses Battleground-System.<br>Deinen Basisstern erreichst Du auf der Produktionsseite &uuml;ber das Symbol "Basisstern".';
+					$content.='<div class="mod-hinweis ms-hinweis">Durch den Weltraumhafen hast Du Zugriff auf dieses Battleground-System.<br>Deinen Basisstern erreichst Du auf der Produktionsseite &uuml;ber das Symbol "Basisstern".</div>';
 				}
 
 			}
 		}
-		
+
 
 
 		$content.='</div>';//hintergrund
-		
+
 		$content.=rahmen_unten(false);
 
 		return $content;
@@ -1021,19 +814,22 @@ class map_system{
 		}
 
 
-		$content.='<br>Folgendes kann hier errichtet werden: '.$GLOBALS['map_buildings'][$bldg_id]['name'];
+		$content.='<div class="ms-titel">'.$GLOBALS['map_buildings'][$bldg_id]['name'].'</div>';
+		$content.='<div class="ms-zeile bk-leise">Hier kann ein '.$GLOBALS['map_buildings'][$bldg_id]['name'].' errichtet werden, danach lassen sich die Felder nutzen.</div>';
 
 		//zuerst checken ob man die Technologie erforscht hat
 		if(hasTech($GLOBALS['pt'],$tech_id)){
 
 			//kosten
-			$content.='<br>Daf&uuml;r benötigt wird:';
 			$baukosten=$this->formatBaukosten($GLOBALS['map_buildings'][$bldg_id]['bldg_cost'][0]);
-			$content.=$baukosten['kosten'];
-			$content.='<br>Flotten-Frachtkapazit&auml;t: '.$GLOBALS['map_buildings'][$bldg_id]['bldg_need_fk'];
+			$dauer=round($GLOBALS['map_buildings'][$bldg_id]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']);
+			$content.='<div class="ms-abschnitt"><span class="mod-typ">Daf&uuml;r ben&ouml;tigt</span>';
+			$content.='<div class="ms-kosten">'.$baukosten['kosten'].'</div>';
+			$content.='<div class="ms-zeile">Flotten-Frachtkapazit&auml;t: <b>'.$GLOBALS['map_buildings'][$bldg_id]['bldg_need_fk'].'</b></div>';
 
 			//dauer
-			$content.='<br><br>Flotten-Missionsdauer: '.round($GLOBALS['map_buildings'][$bldg_id]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']).' Sekunden';
+			$content.='<div class="ms-zeile">Flotten-Missionsdauer: <b>'.$this->msDauer($dauer).'</b></div>';
+			$content.='</div>';
 
 			//Flotten-Aktionen laden
 			$fleet_data=getFleetData($_SESSION['ums_user_id']);
@@ -1054,10 +850,11 @@ class map_system{
 
 					//Flotten-Frachtkapazität laden
 					$fleet_fk=getFleetFK($_SESSION['ums_user_id']);
-					
+
 					//Flotten durchgehen
+					$content.='<div class="ms-abschnitt ms-flotten"><span class="mod-typ">Mission zur Errichtung starten</span>';
 					for($f=1;$f<=3;$f++){
-						$content.='<br>Flotte '.$f.': ';
+						$content.='<div class="ms-flotte"><span>Flotte '.$f.'</span>';
 						//geht nur wenn aktion=0 ist, sonst hat die Flotte schon einen Auftrag
 						if($fleet_data[$f]['aktion']==0){
 							//geht nur, wenn genug Frachkapazität vorhanden ist
@@ -1076,75 +873,64 @@ class map_system{
 									$mission_data['system_id']=$this->system_id;
 									startFleetMission($_SESSION['ums_user_id'].'-'.$f, $time, $mission_data);
 
-									$content.='die Mission wurde gestartet <a href="?id='.$this->system_id.'">weiter</a>';
+									$content.='<span class="mod-chip mod-chip-gruen">Mission gestartet</span> <a href="?id='.$this->system_id.'" class="mod-btn mod-btn-leise ally-btn-klein">Weiter</a>';
 								}else{
-									$content.='<a href="?id='.$this->system_id.'&action=createoutpost&fleet_id='.$f.'">Mission zur Errichtung eines Au&szlig;enpostens starten</a>';
+									$content.='<a href="?id='.$this->system_id.'&amp;action=createoutpost&amp;fleet_id='.$f.'" class="mod-btn ally-btn-klein">Mission starten</a>';
 								}
 
 							}else{
-								$content.='die Frachtkapazit&auml;t ist zu gering ('.$fleet_fk[$f].'/'.$GLOBALS['map_buildings'][$bldg_id]['bldg_need_fk'].')';
+								$content.='<span class="ms-fehlt">Frachtkapazit&auml;t zu gering ('.$fleet_fk[$f].'/'.$GLOBALS['map_buildings'][$bldg_id]['bldg_need_fk'].')</span>';
 							}
 						}else{
-							$content.='hat bereits einen Auftrag';
+							$content.='<span class="bk-leise">hat bereits einen Auftrag</span>';
 						}
+						$content.='</div>';
 					}
+					$content.='</div>';
 					//auf freie flotte mit frachttkapazität checken
 
 				}else{
 					//Info bzgl. fehlender Rohstoffe
-					$content.='<div style="color: red;">Es sind nicht alle ben&ouml;tigten Rohstoffe vorhanden.</div>';
-				
+					$content.='<div class="ms-fehlt">Es sind nicht alle ben&ouml;tigten Rohstoffe vorhanden.</div>';
+
 				}
 
-				$content.='<br><br><div style="color: red;">ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.</div>';
+				$content.='<div class="mod-meldung mod-meldung-warn ms-warnung">ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.</div>';
 
 				//Die Felder anzeigen
-				$content.='<br><div style="display: flex;">';
+				$content.='<div class="ms-abschnitt"><span class="mod-typ">Felder des Systems</span><div class="vs-feldliste">';
 				for($i=0;$i<count($this->fields);$i++){
-					
-					///////////////////////////////////////////
-					//Rahmenfarbe definieren
-					///////////////////////////////////////////
-					if(isset($this->fields[$i][1])){
-						$border='border: 1px solid #FF0000;';
-					}else{
-						$border='';
-					}
-	
+
 					///////////////////////////////////////////
 					//Feld-Ressource anzeigen
 					///////////////////////////////////////////
 					if($i>0){
-	
+						$blockiert=isset($this->fields[$i][1]) ? ' vs-feld-blockiert' : '';
+
 						if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
-							//Gebäudestufe bestimmen
-							$stufeninfo='';
-	
 							//Grafik bestimmen
 							$filename_nr=$this->fields[$i][0];
 							if($filename_nr<10){
 								$filename_nr='0'.$filename_nr;
 							}
-							$content.='<div style="text-align:center; padding-left: 10px; font-weight: bold; font-size: 20px;"><img style="width: 40px; border-radius: 5px;'.$border.'" src="gp/g/ele'.$filename_nr.'.gif" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'">'.$stufeninfo.'</div>';
+							$content.='<div class="vs-feld'.$blockiert.'" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'"><img src="gp/g/ele'.$filename_nr.'.gif" alt=""></div>';
 						}else{
-							$content.='<div title="keine Rohstoffe" style="margin-left: 10px; line-height: 40px; width: 40px; height: 40px; background-color: #666666; text-align: center; border-radius: 5px;'.$border.'">-</div>';
+							$content.='<div class="vs-feld vs-feld-leer'.$blockiert.'" title="keine Rohstoffe">&ndash;</div>';
 						}
 					}
-	
+
 				}
 
-				$content.='</div>';
+				$content.='</div></div>';
 
 			}else{
-				//die Mission läuft schon, daher Restzeit angeben
-				$content.='<br><br><div style="color: green;">Die Mission l&auml;uft bereits.</div>';
-				$content.='<br><br>Verbleibende Zeit: <span id="explore_counter"></span>';
-				$content.='<script type="text/javascript">ang_countdown('.$mission_time.',"explore_counter",0)</script>';
+				//die Mission läuft schon, daher die Uhrzeit angeben, zu der sie endet
+				$content.='<div class="mod-meldung mod-meldung-ok ms-warnung">Die Mission l&auml;uft bereits, '.\DieEwigen\DE2\View\RealTime::until(time()+$mission_time).'.</div>';
 			}
 
 		}else{
 			//Info bzgl. fehlender Technologie
-			$content.='<div style="color: red;">Die Technologie wurde noch nicht erforscht.</div>';
+			$content.='<div class="ms-fehlt">Die Technologie wurde noch nicht erforscht.</div>';
 
 		}
 
@@ -1250,53 +1036,27 @@ class map_system{
 		$has_all=true;
 		$kosten='';
 
+		//je Posten eine Zeile, rot wenn er nicht reicht
 		$einzelkosten=explode(';', $baukosten);
 		foreach ($einzelkosten as $value) {
 			$parts=explode("x", $value);
 
-			$kosten.='<br>';
-
 			//5 Grundrohstoffe
 			if($value[0]=='R'){
-				if($value[1]==1){
-					if($pd['restyp01']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' M';
-					if($pd['restyp01']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==2){
-					if($pd['restyp02']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' D';
-					if($pd['restyp02']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==3){
-					if($pd['restyp03']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' I';
-					if($pd['restyp03']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==4){
-					if($pd['restyp04']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' E';
-					if($pd['restyp04']<$parts[1]){$kosten.='</span>';}
-				}elseif($value[1]==5){
-					if($pd['restyp05']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>';$has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' T';
-					if($pd['restyp05']<$parts[1]){$kosten.='</span>';}
+				$kurz=array(1 => 'M', 2 => 'D', 3 => 'I', 4 => 'E', 5 => 'T');
+				if(isset($kurz[$value[1]])){
+					$reicht=!($pd['restyp0'.$value[1]]<$parts[1]);
+					if(!$reicht){$has_all=false;}
+					$kosten.='<span class="ms-posten'.($reicht ? '' : ' ms-fehlt').'">'.number_format($parts[1],0,",",".").' '.$kurz[$value[1]].'</span>';
 				}
 			}elseif($value[0]=='I'){
-				//if($value[1]==1){
-					$value1=str_replace('I','',$parts[0]);
-					if($ps[$value1]['item_amount']<$parts[1]){$kosten.='<span style=\'color: #AA0000;\'>'; $has_all=false;}
-					$kosten.=number_format($parts[1],0,",",".");
-					$kosten.=' '.$ps[$value1]['item_name'].' (Lager: '.number_format($ps[$value1]['item_amount'],0,",",".").')';
-					if($ps[$value1]['item_amount']<$parts[1]){$kosten.='</span>';}
-				//}
+				$value1=str_replace('I','',$parts[0]);
+				$reicht=!($ps[$value1]['item_amount']<$parts[1]);
+				if(!$reicht){$has_all=false;}
+				$kosten.='<span class="ms-posten'.($reicht ? '' : ' ms-fehlt').'">'.number_format($parts[1],0,",",".").' '.$ps[$value1]['item_name'].' <small>(Lager: '.number_format($ps[$value1]['item_amount'],0,",",".").')</small></span>';
 			}
 		}
 
-
-				
 		return array('kosten' => $kosten, 'has_all' => $has_all);
 	}
 
@@ -1307,9 +1067,6 @@ class map_system{
 
 		//alle geborgenen Items aus der DB holen
 		$looted=getUserLootByMapID($_SESSION['ums_user_id'],$this->system_id);
-
-		//echo 'A: ';
-		//print_r($looted);
 
 		//Loot ist in in Feldern hinterlegt
 		$fields=$this->fields;
@@ -1351,39 +1108,34 @@ class map_system{
 				if($amount>0 && $inlevel>$bldg_level){
 					if($GLOBALS['allyid']>0 && $GLOBALS['ally_fundbuero_level']>=$inlevel){
 						$sql="SELECT de_user_data.user_id FROM de_user_data LEFT JOIN de_user_map_loot ON (de_user_data.user_id=de_user_map_loot.user_id) WHERE de_user_data.allytag='".$GLOBALS['pd']['allytag']."' and de_user_data.status=1 AND de_user_map_loot.map_id=".$this->system_id." AND de_user_map_loot.field_id=".$i;
-						//echo $sql;
 						$db_data=mysqli_query($GLOBALS['dbi'], $sql);
 						$num = mysqli_num_rows($db_data);
-						//echo 'A: '.$num;
 						if($num>0){
 							$ally_know_it=true;
 						}
 					}
 				}
 
-				//$content.='<br>A: '.$inlevel.'/'.$bldg_level;
-
 				if($inlevel<=$bldg_level || $ally_know_it){
-					$content.='<div>Feld '.$i.': ';
+					$content.='<div class="ms-fund"><span class="bk-leise">Feld '.$i.'</span><span>';
 
 					switch($typ){
-						
+
 						case 1:
 							$content.=$amount.'x '.$GLOBALS['ps'][$subtyp]['item_name'];
 							$loot_msg=$amount.'x '.$GLOBALS['ps'][$subtyp]['item_name'];
 						break;
-		
+
 						case 2:
 							$content.=$amount.'x Tronic';
 							$loot_msg=$amount.'x Tronic';
 						break;
-							
+
 						case 3:
 							$content.=$amount.'x '.$ua_name[$subtyp].'-Artefakt';
 							$loot_msg=$amount.'x '.$ua_name[$subtyp].'-Artefakt';
-							//echo $subtyp;
 						break;
-							
+
 						case 4:
 							$content.=$amount.'x Credit';
 							$loot_msg=$amount.'x Credit';
@@ -1394,40 +1146,39 @@ class map_system{
 						break;
 					}
 
-					$content.=' auf Level '.$inlevel;
+					$content.=' <small>ab Stufe '.$inlevel.'</small></span><span class="ms-fund-status">';
 
 					//wurde es schon geborgen?
 					if(in_array($i,$looted)){
 						//ja, also Info ausgeben
-						$content.=' (bereits geborgen)';
+						$content.='<span class="mod-chip">bereits geborgen</span>';
 					}else{
 						//möchte man es bergen?
 						$geborgen=false;
 						if(isset($_REQUEST['collectid']) && $_REQUEST['collectid']==$i && $inlevel<=$bldg_level){
 							//die Sachen in der DB hinterlegen
 							switch($typ){
-						
+
 								case 1://Itemdata
 									change_storage_amount($_SESSION['ums_user_id'], $subtyp, $amount);
 									$geborgen=true;
 								break;
-				
+
 								case 2: //Tronic
 									$sql="UPDATE de_user_data SET restyp05=restyp05+'".$amount."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-									//echo $sql;
 									mysqli_query($GLOBALS['dbi'], $sql);
 									$geborgen=true;
 								break;
-									
+
 								case 3://Spielerartefakt
 									if(get_free_artefact_places($_SESSION['ums_user_id'])>0){
 										mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES ('".$_SESSION['ums_user_id']."', '".($subtyp+1)."', '1')");
 										$geborgen=true;
 									}else{
-										$content.='<span style="color: #FF0000;"> (im Artefaktgeb&auml;ude ist kein freier Platz) </span>';
+										$content.='<span class="ms-fehlt">Im Artefaktgeb&auml;ude ist kein freier Platz.</span> ';
 									}
 								break;
-									
+
 								case 4://Credits
 									changeCredits($_SESSION['ums_user_id'], $amount, 'VS Loot System '.$this->system_id.' -  field_id: '.$i);
 									$geborgen=true;
@@ -1437,30 +1188,23 @@ class map_system{
 							if($geborgen){
 								//Flag setzen, dass man es geborgen hat
 								setUserLoot($_SESSION['ums_user_id'], $this->system_id, $i);
-
-								//temporär msg an chat
-								/*
-								$text='<font color="#9f2ebd">'.$_SESSION['ums_spielername'].' lootet '.$loot_msg.'</font>';
-								$channel=0;$channeltyp=2;$spielername='[SYSTEM]'; $chat_message=$text;
-								insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);	
-								*/
 							}
 						}
 
 						//noch nicht geborgen, also Link anzeigen
 						if(!$geborgen && $inlevel<=$bldg_level){
-							$content.=' <a href="?id='.$this->system_id.'&collectid='.$i.'">bergen</a>';
+							$content.='<a href="?id='.$this->system_id.'&amp;collectid='.$i.'" class="mod-btn ally-btn-klein">Bergen</a>';
 						}else{
 							if($ally_know_it){
-								$content.=' <span style="color: #FF0000;">(Bergung noch nicht m&ouml;glich)</span>';
+								$content.='<span class="ms-fehlt">Bergung noch nicht m&ouml;glich</span>';
 							}else{
-								$content.=' (bereits geborgen)';
+								$content.='<span class="mod-chip mod-chip-gruen">geborgen</span>';
 							}
 						}
 
 					}
 
-					$content.='</div>';
+					$content.='</span></div>';
 
 				}
 
@@ -1468,7 +1212,7 @@ class map_system{
 		}
 
 		if(!empty($content)){
-			$content='<br><div style="font-weight: bold;">Fundst&uuml;cke:</div>'.$content;
+			$content='<div class="ms-abschnitt ms-funde"><span class="mod-typ">Fundst&uuml;cke</span>'.$content.'</div>';
 
 		}
 
