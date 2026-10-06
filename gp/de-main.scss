@@ -8331,6 +8331,125 @@ a.art-kachel-zurueck:hover::after {
 	color: #c9d1d9;
 }
 
+// Optionen (options.php): Konto/Darstellung, allgemeine Einstellungen, nächste Runde, Urlaubsmodus, Account löschen
+.opt {
+	width: 572px;
+}
+
+.opt-zeile {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 6px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+	font-size: 12px;
+	color: #c9d1d9;
+
+	&:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	small {
+		color: #8b949e;
+	}
+
+	.mod-chip {
+		margin-left: 4px;
+	}
+
+	.mod-btn {
+		flex: 0 0 auto;
+	}
+}
+
+// Beschriftung links, Eingabe rechts
+.opt-feld {
+	display: grid;
+	grid-template-columns: 180px 1fr;
+	gap: 10px;
+	align-items: center;
+	margin-bottom: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
+
+	.mod-eingabe {
+		min-width: 0;
+	}
+}
+
+.mod .opt-kurz {
+	width: 70px;
+	text-align: right;
+}
+
+.opt-klein {
+	margin: -2px 0 8px 190px;
+	font-size: 11px;
+	line-height: 1.45;
+	color: #8b949e;
+}
+
+.opt-text {
+	margin-bottom: 8px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+}
+
+.opt-hinweis {
+	font-size: 12px;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+// Kontrollkästchen als ganze, klickbare Zeile
+.opt-optionen {
+	margin: 4px 0;
+}
+
+.opt-option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 7px 4px;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+	font-size: 12px;
+	color: #c9d1d9;
+	cursor: pointer;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	input {
+		flex: 0 0 auto;
+		width: 18px;
+		height: 18px;
+		margin: 0;
+		accent-color: var(--akzent);
+		cursor: pointer;
+	}
+}
+
+.opt-option-warn {
+	margin-bottom: 8px;
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 180, 92, 0.45);
+	border-radius: 7px;
+	color: #ffb45c;
+}
+
+.opt-fuss {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 10px;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

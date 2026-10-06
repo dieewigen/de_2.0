@@ -75,7 +75,7 @@ $options_lang['sektorbilder']='Sektorbilder';
 $options_lang['smreminder']='Schwarzmarkt-Reminder<br>(Der kleinste wert ist 15, bei 0 wird der Reminder deaktiviert)';
 $options_lang['sounddeaktivieren']='Sound deaktivieren';
 $options_lang['transparenz']='Transparenz';
-$options_lang['umodeinfo1']='Um den Account in den Urlaubsmodus zu versetzen einfach die Anzahl der Urlaubstage (min. 1, max. 21) und das Passwort eingeben und dann mit "Urlaubsmodus aktivieren" bestätigen.';
+$options_lang['umodeinfo1']='Um den Account in den Urlaubsmodus zu versetzen einfach die Anzahl der Urlaubstage (min. 3, max. 21) und das Passwort eingeben und dann mit "Urlaubsmodus aktivieren" bestätigen.';
 $options_lang['urlaubstage']='Urlaubstage';
 $options_lang['urlaubsmodusaktivieren']='Urlaubsmodus aktivieren';
 ?>
