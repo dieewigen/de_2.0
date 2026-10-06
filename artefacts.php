@@ -132,7 +132,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -207,7 +207,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -257,7 +257,7 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -335,7 +335,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
 
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?", [$tronic, $_SESSION['ums_user_id']]);
                 $restyp05 += $tronic;
-                //artefakt l�schen
+                //artefakt löschen
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
                 //message ausgeben
@@ -429,7 +429,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
 
 
             /*
-            //�berpr�fen ob dem spieler schonmal kollektoren gestohlen worden sind und ob davon noch jemand dabei ist
+            //überprüfen ob dem spieler schonmal kollektoren gestohlen worden sind und ob davon noch jemand dabei ist
             unset($atter);
             $ac=0;
             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_getcol WHERE zuser_id=?", [$_SESSION['ums_user_id']]);
@@ -479,7 +479,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                 $errmsg.='<font color="#00FF00">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</font>';
             }
 
-            //artefakt l�schen
+            //artefakt löschen
             mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
         }
         */
@@ -488,7 +488,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -529,9 +529,9 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
             $id2 = $row2['id'];
             $lvl2 = isset($row2['level']) ? (int)$row2['level'] : (isset($row2['lvl']) ? (int)$row2['lvl'] : 0);
 
-            //�berpr�fen ob die artefakte unterschiedlicher art sind
+            //überprüfen ob die artefakte unterschiedlicher art sind
             if ($id1 != $id2) {//wenn sie unterschiedlich sind, dann muss ein neues artefakt erzeugt werden und die beiden alten gel�scht werden
-                //�berpr�fen ob man genug tronic hat
+                //überprüfen ob man genug tronic hat
                 if ($restyp05 >= $tcost2) {
                     //rohstoffe abziehen
                     $restyp05 = $restyp05 - $tcost2;
@@ -589,7 +589,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
                         }
 
                     } else {
-                        $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst f�r den Vorgang '.$tcost1.' Tronic.</font><br><br>';
+                        $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst für den Vorgang '.$tcost1.' Tronic.</font><br><br>';
                     }
                 } else {
                     $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler2'].'</font><br><br>';
@@ -600,7 +600,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -670,7 +670,7 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -803,9 +803,6 @@ if (!hasTech($pt, 28)) {
 		<span class="mod-chip"><img src="gp/g/item1.png" alt="">Palenium <b>'.number_format($palenium, 0, ",", ".").'</b></span>
 	</div>';
 
-    //Aktionsfeld, füllt das Skript unten je nach Auswahl
-    echo '<div class="art-panel" id="art-panel"></div>';
-
     echo '<div class="art-raster">';
     $ac = 0;
     while ($row = mysqli_fetch_array($db_artefakte)) {
@@ -831,6 +828,10 @@ if (!hasTech($pt, 28)) {
         echo '<div class="art-kachel art-kachel-frei" rel="tooltip" title="Freier Artefaktplatz&Dies ist ein freier Platz f&uuml;r ein Artefakt.">'.$artefacts_lang['frei'].'</div>';
     }
     echo '</div>';
+
+    //Aktionsfeld, füllt das Skript unten je nach Auswahl; unter dem Raster und am unteren Rand haftend,
+    //damit die Kacheln nicht springen, wenn es mit der Auswahl höher oder niedriger wird
+    echo '<div class="art-panel" id="art-panel"></div>';
 
     //Regeln aufklappbar statt im Tooltip, damit man sie auch auf dem Handy lesen kann
     echo '<details class="art-regeln">

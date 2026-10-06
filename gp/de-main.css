@@ -1767,12 +1767,16 @@ body.theme-rasse4 {
 }
 
 .art-panel {
+  position: sticky;
+  bottom: 6px;
+  z-index: 5;
   min-height: 70px;
-  margin-bottom: 12px;
+  margin: 12px 0;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)), #0d1218;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.55);
 }
 
 .art-panel-leer {
