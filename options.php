@@ -298,7 +298,7 @@ $ehlock_hinweis = '<div class="mod-hinweis opt-hinweis">'.$options_lang['account
 rahmen_oben($options_lang['title']);
 echo '<div class="mod opt">';
 
-echo '<div class="opt-zeile"><span>Accountdaten, Logins und Einstellungen der &Uuml;bersicht</span><a href="userdetails.php" target="h" class="mod-btn mod-btn-leise ally-btn-klein">'.$options_lang['userdetails'].'</a></div>';
+echo '<div class="opt-zeile"><span>Infos f&uuml;r andere Spieler (z.&nbsp;B. Onlinezeiten, Kontakt)</span><a href="userdetails.php" target="h" class="mod-btn mod-btn-leise ally-btn-klein">'.$options_lang['userdetails'].'</a></div>';
 
 if(!isset($_COOKIE['use_mobile_version'])){
     $_COOKIE['use_mobile_version'] = 0;

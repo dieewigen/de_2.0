@@ -8450,6 +8450,129 @@ a.art-kachel-zurueck:hover::after {
 	margin-top: 10px;
 }
 
+// Spielerdetails bearbeiten (userdetails.php): Texte für alle, den Sektor und die Allianz
+.ud {
+	width: 572px;
+}
+
+.ud-text-oben {
+	margin-bottom: 8px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #c9d1d9;
+}
+
+.ud-regeln {
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.ud-feld {
+	margin-top: 10px;
+}
+
+.ud-kopf {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #ffffff;
+
+	.mod-chip {
+		font-weight: 400;
+	}
+}
+
+.ud-zaehler {
+	margin-left: auto;
+	font-size: 11px;
+	font-weight: 400;
+	color: #8b949e;
+}
+
+.mod .ud-text {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 130px;
+	resize: vertical;
+	line-height: 1.45;
+}
+
+.ud-fuss {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+// Serverinfo (sinfo.php): Text des Servers, Tickzeiten
+.si {
+	width: 572px;
+}
+
+.si-text {
+	font-size: 12px;
+	line-height: 1.55;
+	color: #c9d1d9;
+	overflow-wrap: anywhere;
+}
+
+// Theme-Links haben 14px Arial
+.mod .si-text a,
+.mod .si-text a:link,
+.mod .si-text a:visited {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+.si-kacheln {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+
+	.ov-wert b {
+		font-size: 16px;
+	}
+
+	small {
+		font-size: 11px;
+		color: #8b949e;
+	}
+}
+
+.si-abschnitt {
+	margin-top: 12px;
+
+	> .mod-typ {
+		display: block;
+		margin-bottom: 4px;
+	}
+}
+
+.si-plan {
+	display: grid;
+	grid-template-columns: 110px 1fr;
+	gap: 3px 10px;
+	font-size: 12px;
+	color: #c9d1d9;
+}
+
+.si-stunden {
+	font-weight: 600;
+	color: #ffffff;
+	white-space: nowrap;
+}
+
+.si-klein {
+	margin-top: 10px;
+	font-size: 11px;
+	color: #8b949e;
+}
+
 // Mobile Layout
 body.mobile {
 	height: 100vh;

@@ -20,74 +20,77 @@ $sector=$row["sector"];$system=$row["system"];
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-//stelle die ressourcenleiste dar
+//stelle die ressourcenleiste dar (lädt auch $deSystem mit dem Servertext)
 include "resline.php";
 
-?>
-<table width="580" border="0" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="500" align="center" class="ro">Informationen zum Server</td>
-</td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td class="rl">&nbsp;</td>
-<td><div class="cell"><?php echo $deSystem['server_information']; ?></div></td>
-<td class="rr">&nbsp;</td>
-</tr>
+//Stunden mit gleichen Minuten zu Zeilen zusammenfassen: array(array(von, bis, minuten), ...); Stunden ohne Tick fallen weg
+function si_plan($ticks)
+{
+	$zeilen = array();
+	for ($h = 0; $h <= 23; $h++) {
+		$minuten = array_map('intval', $ticks[$h] ?? array());
+		sort($minuten);
+		$letzte = count($zeilen) - 1;
+		if ($letzte >= 0 && $zeilen[$letzte][1] == $h - 1 && $zeilen[$letzte][2] === $minuten) {
+			$zeilen[$letzte][1] = $h;
+		} else {
+			$zeilen[] = array($h, $h, $minuten);
+		}
+	}
+	return array_values(array_filter($zeilen, fn($z) => count($z[2]) > 0));
+}
 
-<tr>
-<td class="rul">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur">&nbsp;</td>
-</tr>
-</table>
-<br>
-<?php 
+//nächster planmäßiger Tick ab der kommenden Minute (Echtzeit)
+function si_naechster($ticks)
+{
+	$start = (int)(floor(time() / 60) * 60) + 60;
+	for ($i = 0; $i < 24 * 60; $i++) {
+		$t = $start + $i * 60;
+		if (in_array((int)date('i', $t), array_map('intval', $ticks[(int)date('G', $t)] ?? array()))) {
+			return $t;
+		}
+	}
+	return 0;
+}
+
+//Anzahl Ticks pro Tag
+function si_anzahl($ticks)
+{
+	$n = 0;
+	for ($h = 0; $h <= 23; $h++) {
+		$n += count($ticks[$h] ?? array());
+	}
+	return $n;
+}
+
+function si_tabelle($ticks)
+{
+	$html = '<div class="si-plan">';
+	foreach (si_plan($ticks) as [$von, $bis, $minuten]) {
+		$html .= '<span class="si-stunden">'.($von == $bis ? sprintf('%02d', $von).' Uhr' : sprintf('%02d&ndash;%02d', $von, $bis).' Uhr').'</span>';
+		$html .= '<span class="si-minuten">'.(count($minuten) > 6 && count(array_unique(array_map(fn($a, $b) => $b - $a, array_slice($minuten, 0, -1), array_slice($minuten, 1)))) == 1
+			? 'alle '.($minuten[1] - $minuten[0]).' Minuten ab Minute '.$minuten[0]
+			: 'Minute '.implode(', ', $minuten)).'</span>';
+	}
+	return $html.'</div>';
+}
+
+rahmen_oben('Informationen zum Server');
+echo '<div class="mod si"><div class="si-text">'.$deSystem['server_information'].'</div></div>';
+rahmen_unten();
+
 rahmen_oben('Tickzeiten');
-echo '<div class="cell" style="width: 554px;">';
-echo 'Wirtschaftsticks (WT): ';
-echo '<table style="width: 100%; text-align: center;"><tr><td>Stunde</td><td>Minute</td></tr>';
-for($h=0;$h<=23;$h++){
-	$first_minute=true;
-	echo '<tr>';
-	echo '<td style="width: 100px;">'.$h.'</td><td>';
-	for($m=0;$m<=59;$m++){
-		if(in_array(intval($m), $GLOBALS['wts'][$h])){
-			if(!$first_minute){
-				echo ',';
-			}
-			echo $m;
-			$first_minute=false;
-		}
-	}
-	echo '</td></tr>';
-}
-echo '</table>';
-
-echo 'Kampfticks (KT): ';
-echo '<table style="width: 100%; text-align: center;"><tr><td>Stunde</td><td>Minute</td></tr>';
-for($h=0;$h<=23;$h++){
-	if(count($GLOBALS['kts'][$h])>0){
-		$first_minute=true;
-		echo '<tr>';
-		echo '<td style="width: 100px;">'.$h.'</td><td>';
-		for($m=0;$m<=59;$m++){
-			if(in_array(intval($m), $GLOBALS['kts'][$h])){
-				if(!$first_minute){
-					echo ',';
-				}
-				echo $m;
-				$first_minute=false;
-			}
-		}
-		echo '</td></tr>';
-	}
-}
-echo '</table>';	
+echo '<div class="mod si">';
+$naechster_wt = si_naechster($GLOBALS['wts']);
+$naechster_kt = si_naechster($GLOBALS['kts']);
+echo '<div class="si-kacheln">';
+echo '<div class="ov-wert"><span class="mod-typ">N&auml;chster Wirtschaftstick</span><b>'.($naechster_wt > 0 ? \DieEwigen\DE2\View\RealTime::at($naechster_wt) : '&ndash;').'</b><small>zuletzt '.\DieEwigen\DE2\View\RealTime::at(strtotime($deSystem['lasttick'])).' &middot; '.si_anzahl($GLOBALS['wts']).' WT am Tag</small></div>';
+echo '<div class="ov-wert"><span class="mod-typ">N&auml;chster Kampftick</span><b>'.($naechster_kt > 0 ? \DieEwigen\DE2\View\RealTime::at($naechster_kt) : '&ndash;').'</b><small>zuletzt '.\DieEwigen\DE2\View\RealTime::at(strtotime($deSystem['lastmtick'])).' &middot; '.si_anzahl($GLOBALS['kts']).' KT am Tag</small></div>';
 echo '</div>';
-
+echo '<div class="si-abschnitt"><span class="mod-typ">Wirtschaftsticks (WT)</span>'.si_tabelle($GLOBALS['wts']).'</div>';
+echo '<div class="si-abschnitt"><span class="mod-typ">Kampfticks (KT)</span>'.si_tabelle($GLOBALS['kts']).'</div>';
+echo '<div class="si-klein">Planm&auml;&szlig;ige Zeiten nach der Serveruhr.</div>';
+echo '</div>';
 rahmen_unten();
 ?>
 
