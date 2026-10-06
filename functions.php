@@ -865,6 +865,10 @@ function substractSpecialsystemNeeds($cost)
     }
 }
 
+/**
+ * Kosten eines Sondersystems (lib/special_system_*.inc.php), je Posten ein span.ms-posten für ein .ms-kosten,
+ * rot (ms-fehlt), wenn der Posten nach hasSpecialsystemNeeds() nicht reicht.
+ */
 function showSpecialsystemCost($cost)
 {
     $content = '';
@@ -874,9 +878,9 @@ function showSpecialsystemCost($cost)
             //Artefakt
             case 'A':
                 if ($cost[$i][1] == '?') {
-                    $content .= 'zuf&auml;lliges Artefakt';
+                    $content .= '<span class="ms-posten">zuf&auml;lliges Artefakt</span>';
                 } else {
-                    $content .= 'Folgendes Artefakt:'.$cost[$i][1];
+                    $content .= '<span class="ms-posten">Folgendes Artefakt:'.$cost[$i][1].'</span>';
                 }
 
                 break;
@@ -887,7 +891,7 @@ function showSpecialsystemCost($cost)
                 $amount = number_format(floor($cost[$i][2]), 0, "", ".");
                 $resnamen = array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
 
-                $content .= $amount.' '.$resnamen[$restyp - 1].'<br>';
+                $content .= '<span class="ms-posten">'.$amount.' '.$resnamen[$restyp - 1].'</span>';
                 break;
 
                 //Einheit
@@ -897,7 +901,8 @@ function showSpecialsystemCost($cost)
                 switch ($unit_typ) {
                     case 'A':
                         $amount = number_format(floor($cost[$i][2]), 0, "", ".");
-                        $content .= $amount.' Agenten (vorhanden: '.number_format($GLOBALS['pd']['agent'], 0, "", ".").')<br>';
+                        $fehlt = $GLOBALS['pd']['agent'] < $cost[$i][2];
+                        $content .= '<span class="ms-posten'.($fehlt ? ' ms-fehlt' : '').'">'.$amount.' Agenten <small>(vorhanden: '.number_format($GLOBALS['pd']['agent'], 0, "", ".").')</small></span>';
 
                         break;
                 }
@@ -908,8 +913,9 @@ function showSpecialsystemCost($cost)
             case 'I':
                 $item_id = $cost[$i][1];
                 $amount = number_format(floor($cost[$i][2]), 0, "", ".");
+                $fehlt = $GLOBALS['ps'][$item_id]['item_amount'] < $cost[$i][2];
 
-                $content .= $amount.' '.$GLOBALS['ps'][$item_id]['item_name'].' (Lager: '.number_format($GLOBALS['ps'][$item_id]['item_amount'], 0, "", ".").')<br>';
+                $content .= '<span class="ms-posten'.($fehlt ? ' ms-fehlt' : '').'">'.$amount.' '.$GLOBALS['ps'][$item_id]['item_name'].' <small>(Lager: '.number_format($GLOBALS['ps'][$item_id]['item_amount'], 0, "", ".").')</small></span>';
                 break;
         }
     }

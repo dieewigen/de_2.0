@@ -8324,11 +8324,199 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-// Sonder-Systeme (lib/special_system_*.inc.php) bringen ihren Inhalt selbst mit
+// Sonder-Systeme (lib/special_system_*.inc.php): Erzählung, Abschnitte mit mod-typ, Aktionen als mod-btn
 .ms-sonder-inhalt {
 	font-size: 12px;
 	line-height: 1.45;
 	color: #c9d1d9;
+
+	p {
+		margin: 0 0 6px;
+	}
+
+	b {
+		color: #ffffff;
+	}
+
+	// form setzt das Theme auf 14px Arial
+	form {
+		font-family: inherit;
+		font-size: inherit;
+	}
+
+	.mod-meldung {
+		margin: 10px 0;
+	}
+}
+
+.mod .ms-sonder-inhalt a:not(.mod-btn),
+.mod .ms-sonder-inhalt a:not(.mod-btn):link,
+.mod .ms-sonder-inhalt a:not(.mod-btn):visited {
+	font-family: inherit;
+	font-size: inherit;
+	color: var(--akzent);
+}
+
+// Erzählung des Systems
+.ms-sonder-text {
+	margin-bottom: 10px;
+	padding: 8px 12px;
+	border-left: 3px solid var(--akzent);
+	border-radius: 0 8px 8px 0;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+// Erläuterungen (Regeln, Periode)
+.ms-klein {
+	font-size: 11px;
+	color: #8b949e;
+}
+
+// Anlagen (DER EINGANG): je Anlage eine Zeile
+.ms-anlage {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	min-height: 32px;
+	padding: 3px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+	color: #ffffff;
+}
+
+// Kosten als Liste untereinander (shaKer)
+.ms-kosten-liste {
+	flex-direction: column;
+}
+
+// Fortschritt (Siegel, Thanatos): Beschriftung über einem breiten Balken
+.ms-fortschritt {
+	margin: 8px 0;
+
+	.mod-balken {
+		height: 8px;
+		border-radius: 4px;
+
+		span {
+			border-radius: 4px;
+		}
+	}
+}
+
+.ms-fortschritt-text {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 2px 10px;
+	margin-bottom: 4px;
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.ms-kacheln-3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+// Formular mit Menge (Siegel)
+.ms-formular {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin: 8px 0 0;
+
+	.mod-eingabe {
+		width: 70px;
+	}
+}
+
+// Namen als Chips (Mitwirkende des Siegels)
+.ms-namen {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+
+	.mod-chip {
+		font-size: 11px;
+		color: #e6edf3;
+	}
+}
+
+// Zeilen untereinander (Verlauf des Siegels, Hekates Gunst)
+.ms-liste {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	li {
+		padding: 3px 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+}
+
+// Aufträge (Hekate): je Auftrag eine Karte
+.ms-auftraege {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.ms-auftrag {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.03);
+
+	> .mod-typ {
+		margin-top: 4px;
+	}
+
+	.ms-posten {
+		display: block;
+		color: #ffffff;
+
+		small {
+			white-space: nowrap;
+			color: #8b949e;
+		}
+	}
+
+	.ms-fehlt,
+	.ms-posten.ms-fehlt {
+		color: #ff8a8a;
+	}
+
+	.ms-belohnung {
+		color: #ffffff;
+	}
+}
+
+.ms-auftrag-erledigt {
+	border-color: rgba(62, 207, 106, 0.35);
+}
+
+.ms-auftrag-kopf {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+.ms-auftrag-fuss {
+	margin-top: auto;
+	padding-top: 6px;
+	font-size: 11px;
+
+	.mod-btn {
+		width: 100%;
+	}
 }
 
 // Optionen (options.php): Konto/Darstellung, allgemeine Einstellungen, nächste Runde, Urlaubsmodus, Account löschen

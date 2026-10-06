@@ -10,10 +10,10 @@ include 'inc/lang/'.$GLOBALS['sv_server_lang'].'_thanatos.lang.php';
 $thanatos = new \DieEwigen\DE2\Model\Thanatos\ThanatosService($GLOBALS['dbi']);
 $thanatos_uid = (int)$_SESSION['ums_user_id'];
 
-$content .= '<div style="text-align: left; padding: 5px;">'.$thanatos_lang['geschichte'].'</div>';
+$content .= '<div class="ms-sonder-text">'.$thanatos_lang['geschichte'].'</div>';
 
 if (($GLOBALS['pd']['npc'] ?? 0) != 0) {
-	$content .= '<div style="padding: 5px;">'.$thanatos_lang['kein_zugang_npc'].'</div>';
+	$content .= '<div class="mod-hinweis ms-hinweis">'.$thanatos_lang['kein_zugang_npc'].'</div>';
 } elseif (!$thanatos->getSpecialSystemData()->isUnlocked($thanatos_uid)) {
 	//vor die Wächter treten
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 1) {
@@ -21,7 +21,8 @@ if (($GLOBALS['pd']['npc'] ?? 0) != 0) {
 		vs_flash_set(true, $thanatos_lang['kontakt_ok']);
 		vs_redirect($this->system_id);
 	}
-	$content .= '<br>'.$thanatos_lang['kontakt_frage'].'<br><br><a href="?id='.$this->system_id.'&action=1">'.$thanatos_lang['kontakt_link'].'</a><br><br>';
+	$content .= '<p>'.$thanatos_lang['kontakt_frage'].'</p>';
+	$content .= '<div class="ms-aktion"><a href="?id='.$this->system_id.'&action=1" class="mod-btn">'.$thanatos_lang['kontakt_link'].'</a></div>';
 } else {
 	//Handelswaren V darbringen, danach neu laden (PRG), damit ein Neuladen nicht doppelt aufsteigt
 	if (isset($_POST['thanatos_darbringen'])) {
@@ -39,63 +40,48 @@ if (($GLOBALS['pd']['npc'] ?? 0) != 0) {
 	$thanatos_stufe = $thanatos->getStufe($thanatos_uid);
 	$thanatos_max = \DieEwigen\DE2\Model\Thanatos\ThanatosService::getMaxStufe();
 
-	$content .= '<div style="text-align: left; padding: 5px;">';
-	$content .= '<div style="font-weight: bold; font-size: 14px; margin: 10px 0 5px 0;">'.$thanatos_lang['titel_pfad'].'</div>';
-	$content .= strtr($thanatos_lang['status'], ['{STUFE}' => $thanatos_stufe, '{MAX}' => $thanatos_max]).'<br>';
-	if ($thanatos_stufe > 0) {
-		$content .= strtr($thanatos_lang['boni'], [
-			'{IND}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_stufe),
-			'{BAU}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($thanatos_stufe),
-		]);
-	} else {
-		$content .= $thanatos_lang['boni_keine'];
-	}
+	//erreichte Stufe als Balken, darunter die Boni dieser Stufe
+	$thanatos_ratio = min(1, $thanatos_stufe / $thanatos_max);
+	$content .= '<div class="ms-abschnitt"><span class="mod-typ">'.$thanatos_lang['titel_pfad'].'</span>';
+	$content .= '<div class="ms-fortschritt"><div class="ms-fortschritt-text"><span>'.strtr($thanatos_lang['balken'], ['{STUFE}' => '<b>'.$thanatos_stufe.'</b>', '{MAX}' => $thanatos_max]).'</span></div>';
+	$content .= '<div class="mod-balken"><span style="width: '.round($thanatos_ratio * 100, 1).'%"></span></div></div>';
+	$content .= '<div class="ms-kacheln">';
+	$content .= '<div class="ov-wert"><span class="mod-typ">'.$thanatos_lang['kachel_industrie'].'</span><b>+'
+		.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_stufe).' %</b><small>'.$thanatos_lang['kachel_info'].'</small></div>';
+	$content .= '<div class="ov-wert"><span class="mod-typ">'.$thanatos_lang['kachel_bauzeit'].'</span><b>−'
+		.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($thanatos_stufe).' %</b><small>'.$thanatos_lang['kachel_info'].'</small></div>';
+	$content .= '</div>';
+	$content .= '<p class="ms-klein">'.($thanatos_stufe > 0 ? $thanatos_lang['boni_dauer'] : $thanatos_lang['boni_keine']).'</p>';
 	$content .= '</div>';
 
-	//Fortschrittsbalken wie beim Siegel von Basranur
-	$thanatos_ratio = min(1, $thanatos_stufe / $thanatos_max);
-	$thanatos_class = $thanatos_ratio > 0.66 ? 'progress-high' : ($thanatos_ratio > 0.33 ? 'progress-medium' : 'progress-normal');
-	$content .= '
-		<div id="gameProgressBar">
-			<div class="scifi-progress-container">
-				<div class="scifi-corner top-left"></div>
-				<div class="scifi-corner top-right"></div>
-				<div class="scifi-corner bottom-left"></div>
-				<div class="scifi-corner bottom-right"></div>
-				<div class="scifi-progress-bar '.$thanatos_class.'" style="width: '.round($thanatos_ratio * 100, 1).'%"></div>
-				<div class="scifi-text">'.strtr($thanatos_lang['balken'], ['{STUFE}' => $thanatos_stufe, '{MAX}' => $thanatos_max]).'</div>
-			</div>
-		</div>';
-
 	//nächste Stufe
-	$content .= '<div style="text-align: left; padding: 5px;">';
 	if ($thanatos_stufe >= $thanatos_max) {
-		$content .= '<span style="color: #00FF00;">'.$thanatos_lang['max_erreicht'].'</span>';
+		$content .= '<div class="ms-abschnitt"><p><span class="mod-chip mod-chip-gruen">'.$thanatos_lang['max_erreicht'].'</span></p></div>';
 	} else {
 		$thanatos_neu = $thanatos_stufe + 1;
 		$thanatos_kosten = \DieEwigen\DE2\Model\Thanatos\ThanatosService::getKosten($thanatos_neu);
 		$thanatos_lager = $thanatos->getStock($thanatos_uid);
 		$thanatos_ware = $GLOBALS['ps'][\DieEwigen\DE2\Model\Thanatos\ThanatosService::ITEM_ID]['item_name'] ?? 'Handelswaren V';
 
-		$content .= '<div style="font-weight: bold; font-size: 14px; margin: 10px 0 5px 0;">'.$thanatos_lang['titel_naechste'].'</div>';
-		$content .= strtr($thanatos_lang['naechste'], [
+		$content .= '<div class="ms-abschnitt"><span class="mod-typ">'.$thanatos_lang['titel_naechste'].'</span>';
+		$content .= '<p>'.strtr($thanatos_lang['naechste'], [
 			'{STUFE}' => $thanatos_neu,
 			'{KOSTEN}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::formatNumber($thanatos_kosten),
 			'{WARE}' => $thanatos_ware,
-			'{LAGER}' => '<span'.($thanatos_lager >= $thanatos_kosten ? '' : ' style="color: #FF0000;"').'>'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::formatNumber($thanatos_lager).'</span>',
+			'{LAGER}' => '<span'.($thanatos_lager >= $thanatos_kosten ? '' : ' class="ms-fehlt"').'>'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::formatNumber($thanatos_lager).'</span>',
 			'{PALENIUM}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::formatNumber(\DieEwigen\DE2\Model\Thanatos\ThanatosService::getPalenium($thanatos_neu)),
 			'{IND}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_neu),
 			'{BAU}' => \DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($thanatos_neu),
-		]);
+		]).'</p>';
 
 		if ($thanatos_lager >= $thanatos_kosten) {
 			$content .= '
-			<form method="post" action="?id='.$this->system_id.'" style="margin-top: 8px;">
+			<div class="ms-aktion"><form method="post" action="?id='.$this->system_id.'">
 				<input type="hidden" name="vs_token" value="'.htmlspecialchars(vs_csrf_token(), ENT_QUOTES, 'UTF-8').'">
-				<input type="submit" name="thanatos_darbringen" value="'.$thanatos_lang['button'].'">
-			</form>';
+				<button type="submit" name="thanatos_darbringen" value="'.$thanatos_lang['button'].'" class="mod-btn">'.$thanatos_lang['button'].'</button>
+			</form></div>';
 		}
+		$content .= '</div>';
 	}
-	$content .= '</div>';
 }
 ?>

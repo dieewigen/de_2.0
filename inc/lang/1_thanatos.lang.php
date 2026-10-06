@@ -14,8 +14,10 @@ $thanatos_lang['kein_zugang_npc']='Die Wächter schweigen.';
 
 //Stufe
 $thanatos_lang['titel_pfad']='Dein Pfad';
-$thanatos_lang['status']='Du hast Stufe <b>{STUFE}</b> von {MAX} erreicht.';
-$thanatos_lang['boni']='Bis zum Rundenende in den Vergessenen Systemen: <b>Industrie-Ertrag +{IND} %</b> und <b>Bauzeit −{BAU} %</b>.';
+$thanatos_lang['kachel_industrie']='Industrie-Ertrag';
+$thanatos_lang['kachel_bauzeit']='Bauzeit';
+$thanatos_lang['kachel_info']='in den Vergessenen Systemen';
+$thanatos_lang['boni_dauer']='Die Boni gelten bis zum Rundenende.';
 $thanatos_lang['boni_keine']='Noch wirkt kein Segen des Thanatos auf Dich.';
 $thanatos_lang['balken']='Stufe {STUFE} von {MAX}';
 

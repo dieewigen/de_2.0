@@ -9,15 +9,19 @@ $siegel_lang['geschichte']='Jahrtausendelang lag dieses System hinter einem undu
 //Freischaltung
 $siegel_lang['verbindung_frage']='Die Anlage reagiert auf die Annäherung Deiner Sonden. Soll eine Verbindung zum Siegel hergestellt werden?';
 $siegel_lang['verbindung_link']='Verbindung zum Siegel herstellen';
-$siegel_lang['verbindung_ok']='Die Verbindung zum Siegel steht. Weiter.';
-$siegel_lang['mission_hinweis']='Unter <a href="missions.php" style="font-size: inherit;">Missionen</a> steht der Agenteneinsatz (BASRANUR) zur Verfügung. Deine Agenten bergen dabei Resonanzkristalle aus den Ruinen rund um das Siegel.';
+$siegel_lang['verbindung_ok']='Die Verbindung zum Siegel steht.';
+$siegel_lang['mission_hinweis']='Unter <a href="missions.php">Missionen</a> steht der Agenteneinsatz (BASRANUR) zur Verfügung. Deine Agenten bergen dabei Resonanzkristalle aus den Ruinen rund um das Siegel.';
 $siegel_lang['kein_zugang_npc']='Das Siegel reagiert nicht auf Dich.';
 
 //Status
 $siegel_lang['titel_status']='Zustand des Siegels';
-$siegel_lang['status_aktiv']='Aktive Stufe: <b>{LEVEL}</b>, das sind <b>+{PCT} % planetarer Grundertrag</b> für alle Kommandanten. Die Periode endet in {WT} Wirtschaftsticks.';
-$siegel_lang['status_ruht']='Das Siegel ruht derzeit (Stufe 0). Die Periode endet in {WT} Wirtschaftsticks.';
-$siegel_lang['aufladung']='Aufladung dieser Periode: <b>{N} Mitwirkende</b>, das ergibt Stufe {NEXT} (+{NEXTPCT} %) für die nächste Periode.';
+$siegel_lang['kachel_stufe']='Aktive Stufe';
+$siegel_lang['kachel_stufe_aktiv']='+{PCT} % planetarer Grundertrag für alle';
+$siegel_lang['kachel_stufe_ruht']='Das Siegel ruht derzeit.';
+$siegel_lang['kachel_aufladung']='Mitwirkende';
+$siegel_lang['kachel_aufladung_info']='ergibt Stufe {NEXT} (+{NEXTPCT} %) für die nächste Periode';
+$siegel_lang['kachel_periode']='Periode endet in';
+$siegel_lang['kachel_periode_info']='Wirtschaftsticks';
 $siegel_lang['noch_bis']='Noch {MISSING} Mitwirkende bis Stufe {STEP}.';
 $siegel_lang['max_erreicht']='Die höchste Stufe ist erreicht.';
 $siegel_lang['regel']='Wer in einer Periode {SHARE} Resonanzkristalle einsetzt, zählt als Mitwirkender. Je {STEP} Mitwirkende ergeben eine Stufe, jede Stufe bringt allen Kommandanten in der nächsten Periode +{PCT} % planetaren Grundertrag.';

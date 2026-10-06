@@ -9,7 +9,7 @@ include 'inc/lang/'.$GLOBALS['sv_server_lang'].'_hekate.lang.php';
 
 $hekate_uid = (int)$_SESSION['ums_user_id'];
 
-$content .= '<div style="text-align: left; padding: 5px;">'.$hekate_lang['geschichte'].'</div>';
+$content .= '<div class="ms-sonder-text">'.$hekate_lang['geschichte'].'</div>';
 
 //fehlen die Tabellen noch (Update nicht eingespielt), bleibt das System geschlossen
 try {
@@ -20,9 +20,9 @@ try {
 }
 
 if ($hekate === null) {
-	$content .= '<div style="padding: 5px;">'.$hekate_lang['fehler_nicht_bereit'].'</div>';
+	$content .= '<div class="mod-hinweis ms-hinweis">'.$hekate_lang['fehler_nicht_bereit'].'</div>';
 } elseif (($GLOBALS['pd']['npc'] ?? 0) != 0) {
-	$content .= '<div style="padding: 5px;">'.$hekate_lang['kein_zugang_npc'].'</div>';
+	$content .= '<div class="mod-hinweis ms-hinweis">'.$hekate_lang['kein_zugang_npc'].'</div>';
 } elseif (!$hekate->getSpecialSystemData()->isUnlocked($hekate_uid)) {
 	//Kontakt aufnehmen
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 1) {
@@ -30,7 +30,8 @@ if ($hekate === null) {
 		vs_flash_set(true, $hekate_lang['kontakt_ok']);
 		vs_redirect($this->system_id);
 	}
-	$content .= '<br>'.$hekate_lang['kontakt_frage'].'<br><br><a href="?id='.$this->system_id.'&action=1">'.$hekate_lang['kontakt_link'].'</a><br><br>';
+	$content .= '<p>'.$hekate_lang['kontakt_frage'].'</p>';
+	$content .= '<div class="ms-aktion"><a href="?id='.$this->system_id.'&action=1" class="mod-btn">'.$hekate_lang['kontakt_link'].'</a></div>';
 } else {
 	//Auftrag erfüllen, danach neu laden (PRG), damit ein Neuladen nichts doppelt liefert
 	if (isset($_POST['hekate_liefern'])) {
@@ -47,13 +48,11 @@ if ($hekate === null) {
 
 	$hekate_geliefert = $hekate->getDelivered($hekate_uid);
 
-	$content .= '<div style="text-align: left; padding: 5px;">';
-	$content .= '<div style="font-weight: bold; font-size: 14px; margin: 10px 0 5px 0;">'.$hekate_lang['titel_auftraege'].'</div>';
-	$content .= strtr($hekate_lang['periode'], ['{WT}' => \DieEwigen\DE2\Model\Hekate\HekateService::formatNumber($hekate->getRemainingTicks())]);
-	$content .= '</div>';
+	$content .= '<div class="ms-abschnitt"><span class="mod-typ">'.$hekate_lang['titel_auftraege'].'</span>';
+	$content .= '<p class="ms-klein">'.strtr($hekate_lang['periode'], ['{WT}' => \DieEwigen\DE2\Model\Hekate\HekateService::formatNumber($hekate->getRemainingTicks())]).'</p>';
 
 	//die Aufträge als Karten nebeneinander
-	$content .= '<div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 5px;">';
+	$content .= '<div class="ms-auftraege">';
 	foreach ($hekate_auftraege as $hekate_nr => $hekate_auftrag) {
 		$hekate_alles_da = true;
 		$hekate_waren = '';
@@ -61,47 +60,52 @@ if ($hekate === null) {
 			$hekate_lager = (int)($GLOBALS['ps'][$hekate_item]['item_amount'] ?? 0);
 			$hekate_genug = $hekate_lager >= $hekate_menge;
 			$hekate_alles_da = $hekate_alles_da && $hekate_genug;
-			$hekate_waren .= '<div'.($hekate_genug ? '' : ' style="color: #FF0000;"').'>'
+			$hekate_waren .= '<span class="ms-posten'.($hekate_genug ? '' : ' ms-fehlt').'">'
 				.\DieEwigen\DE2\Model\Hekate\HekateService::formatNumber($hekate_menge).' '.($GLOBALS['ps'][$hekate_item]['item_name'] ?? '#'.$hekate_item)
-				.' (Lager: '.\DieEwigen\DE2\Model\Hekate\HekateService::formatNumber($hekate_lager).')</div>';
+				.' <small>(Lager: '.\DieEwigen\DE2\Model\Hekate\HekateService::formatNumber($hekate_lager).')</small></span>';
 		}
+		$hekate_erledigt = in_array($hekate_nr, $hekate_geliefert);
 
-		$content .= '<div style="flex: 1 1 170px; border: 1px solid #FFFFFF; padding: 5px; box-sizing: border-box; text-align: left;">';
-		$content .= '<div style="font-weight: bold; margin-bottom: 5px;">'.strtr($hekate_lang['auftrag'], ['{NR}' => $hekate_nr + 1]).'</div>';
-		$content .= '<div>'.$hekate_lang['verlangt'].'</div>'.$hekate_waren;
-		$content .= '<div style="margin-top: 5px;">'.$hekate_lang['belohnung'].'</div>';
-		$content .= '<div>'.\DieEwigen\DE2\Model\Hekate\HekateService::formatBelohnung($hekate_auftrag['belohnung'], $hekate_lang).'</div>';
+		$content .= '<div class="ms-auftrag'.($hekate_erledigt ? ' ms-auftrag-erledigt' : '').'">';
+		$content .= '<div class="ms-auftrag-kopf">'.strtr($hekate_lang['auftrag'], ['{NR}' => $hekate_nr + 1])
+			.($hekate_erledigt ? '<span class="mod-chip mod-chip-gruen">'.$hekate_lang['geliefert'].'</span>' : '').'</div>';
+		$content .= '<span class="mod-typ">'.$hekate_lang['verlangt'].'</span>'.$hekate_waren;
+		$content .= '<span class="mod-typ">'.$hekate_lang['belohnung'].'</span>';
+		$content .= '<div class="ms-belohnung">'.\DieEwigen\DE2\Model\Hekate\HekateService::formatBelohnung($hekate_auftrag['belohnung'], $hekate_lang).'</div>';
 
-		if (in_array($hekate_nr, $hekate_geliefert)) {
-			$content .= '<div style="color: #00FF00; margin-top: 8px;">'.$hekate_lang['geliefert'].'</div>';
-		} elseif ($hekate_alles_da) {
-			$content .= '
-			<form method="post" action="?id='.$this->system_id.'" style="margin-top: 8px;">
-				<input type="hidden" name="vs_token" value="'.htmlspecialchars(vs_csrf_token(), ENT_QUOTES, 'UTF-8').'">
-				<input type="hidden" name="period_nr" value="'.$hekate->getPeriodNr().'">
-				<input type="hidden" name="auftrag" value="'.$hekate_nr.'">
-				<input type="submit" name="hekate_liefern" value="'.$hekate_lang['button'].'">
-			</form>';
-		} else {
-			$content .= '<div style="color: #FF0000; margin-top: 8px;">'.$hekate_lang['fehlt'].'</div>';
+		if (!$hekate_erledigt) {
+			$content .= '<div class="ms-auftrag-fuss">';
+			if ($hekate_alles_da) {
+				$content .= '
+				<form method="post" action="?id='.$this->system_id.'">
+					<input type="hidden" name="vs_token" value="'.htmlspecialchars(vs_csrf_token(), ENT_QUOTES, 'UTF-8').'">
+					<input type="hidden" name="period_nr" value="'.$hekate->getPeriodNr().'">
+					<input type="hidden" name="auftrag" value="'.$hekate_nr.'">
+					<button type="submit" name="hekate_liefern" value="'.$hekate_lang['button'].'" class="mod-btn ally-btn-klein">'.$hekate_lang['button'].'</button>
+				</form>';
+			} else {
+				$content .= '<span class="ms-fehlt">'.$hekate_lang['fehlt'].'</span>';
+			}
+			$content .= '</div>';
 		}
 		$content .= '</div>';
 	}
-	$content .= '</div>';
+	$content .= '</div></div>';
 
 	//eigene Gunst
 	$hekate_info = vs_bonus_info($hekate_uid);
-	$content .= '<div style="text-align: left; padding: 5px;">';
-	$content .= '<div style="font-weight: bold; font-size: 14px; margin: 10px 0 5px 0;">'.$hekate_lang['titel_gunst'].'</div>';
+	$content .= '<div class="ms-abschnitt"><span class="mod-typ">'.$hekate_lang['titel_gunst'].'</span>';
 	if (empty($hekate_info['hekate'])) {
-		$content .= $hekate_lang['gunst_keine'];
+		$content .= '<p>'.$hekate_lang['gunst_keine'].'</p>';
 	} else {
+		$content .= '<ul class="ms-liste">';
 		foreach ($hekate_info['hekate'] as $hekate_typ => $hekate_rest) {
 			$hekate_key = $hekate_typ == \DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE ? 'gunst_industrie' : 'gunst_bauzeit';
-			$content .= '<div>'.strtr($hekate_lang[$hekate_key], ['{PCT}' => \DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($hekate_typ), '{WT}' => $hekate_rest]).'</div>';
+			$content .= '<li>'.strtr($hekate_lang[$hekate_key], ['{PCT}' => \DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($hekate_typ), '{WT}' => $hekate_rest]).'</li>';
 		}
+		$content .= '</ul>';
 	}
-	$content .= '<br>'.strtr($hekate_lang['regel'], ['{MAX}' => \DieEwigen\DE2\Model\VsBonus\VsBonusService::getMaxVorlauf()]);
+	$content .= '<p class="ms-klein">'.strtr($hekate_lang['regel'], ['{MAX}' => \DieEwigen\DE2\Model\VsBonus\VsBonusService::getMaxVorlauf()]).'</p>';
 	$content .= '</div>';
 }
 ?>

@@ -14,125 +14,62 @@ if(empty($data)){
 	//setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'], $this->system_id, $data);
 }
 
-//$content.='<br>A:'.print_r($data,true);
-
 //Description
-$content.='<div>Laut der Inschrift eines uralten Obelisken ist diese Welt nach einem ERHABENEN namens shaKer benannt.</div>';
+$content.='<div class="ms-sonder-text">Laut der Inschrift eines uralten Obelisken ist diese Welt nach einem ERHABENEN namens shaKer benannt.</div>';
 
+//Phasen 0-2: Text, Kosten (werden verbraucht), Aktion und Meldung danach; ab Phase 3 liefert die Anlage Agenten (tickler/wt_manage_map.php)
+$phasen=array(
+	0 => array(
+		'text' => 'Auf dem Planeten wurde ein riesiges versiegeltes Tor entdeckt. Mit dem passenden Werkzeug k&ouml;nnen deine Wissenschaftler das Tor &ouml;ffnen.',
+		'cost' => array(array('I', 20, 1)),
+		'aktion' => 'Tor &ouml;ffnen',
+		'erfolg' => 'Das Tor wurde ge&ouml;ffnet.',
+	),
+	1 => array(
+		'text' => 'Hinter dem Tor liegt eine verlassene technische Anlage, die jedoch deaktiviert ist, da die Energiequelle ersch&ouml;pft ist. Mit einer passenden Ersatzquelle k&ouml;nnte man versuchen die Anlage in Betrieb zu nehmen.',
+		'cost' => array(array('I', 2, 10)),
+		'aktion' => 'Anlage mit Energie versorgen',
+		'erfolg' => 'Die Anlage wird jetzt mit Energie versorgt.',
+	),
+	2 => array(
+		'text' => 'Die Anlage ist betriebsbereit, aber es ist nicht klar, welche Funktion sie hat. Die Wissenschaftler vermuten, dass man damit Agenten zu Ultra-Agenten verbessern kann und stimmen f&uuml;r einen Versuch, bei dem 1.000 Agenten der Anlage zugef&uuml;hrt werden.',
+		'cost' => array(array('U', 'A', 1000)),
+		'aktion' => 'Agenten in die Anlage schicken',
+		'erfolg' => 'Die Agenten befinden sich jetzt in der Anlage.',
+	),
+);
 
-switch($data['phase']){
+$content.=vs_flash_html();
 
-	case 0:
-		$cost=array();
-		$cost[0]=array('I', 20, 1);
-		$show_action=true;
-		//$cost[1]=array('I', 15, 12);
+if(isset($phasen[$data['phase']])){
+	$phase=$phasen[$data['phase']];
 
-		$content.='<br><br>Auf dem Planeten wurde ein riesiges versiegeltes Tor entdeckt. Mit dem passenden Werkzeug k&ouml;nnen deine Wissenschaftler das Tor &ouml;ffnen.';
-		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
+	//Test auf Aktion
+	if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
+		if(hasSpecialsystemNeeds($phase['cost'])){
+			//Kosten abziehen
+			substractSpecialsystemNeeds($phase['cost']);
 
-		//Test auf Aktion
-		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
-			if(hasSpecialsystemNeeds($cost)){
-				//Kosten abziehen
-				substractSpecialsystemNeeds($cost);
-
-				//nächste Phase freischalten
-				$data['phase']++;
-				setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'],$this->system_id, $data);
-
-				//weiter-link
-				$content.='<br><br><a href="?id='.$this->system_id.'">Das Tor wurde ge&ouml;ffnet. Weiter.</a><br><br>';
-				$show_action=false;
-
-			}else{
-				$content.='<div style="color: #FF0000;">Du hast nicht alles was ben&ouml;tigt wird.</div>';
-			}
-
+			//nächste Phase freischalten, danach neu laden (PRG), damit ein Neuladen nicht gleich die nächste Phase auslöst
+			$data['phase']++;
+			setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'],$this->system_id, $data);
+			vs_flash_set(true, $phase['erfolg']);
+			vs_redirect($this->system_id);
+		}else{
+			$content.='<div class="mod-meldung mod-meldung-fehler">Du hast nicht alles, was ben&ouml;tigt wird.</div>';
 		}
+	}
 
-		//Aktionen anbieten
-		if($show_action){
-			$content.='<br><br><a href="?id='.$this->system_id.'&action=1">Tor &ouml;ffnen</a><br><br>';
-		}
-	break;
+	$content.='<div class="ms-abschnitt"><span class="mod-typ">Schritt '.($data['phase']+1).' von '.count($phasen).'</span><p>'.$phase['text'].'</p></div>';
+	$content.='<div class="ms-abschnitt"><span class="mod-typ">Ben&ouml;tigt und verbraucht</span><div class="ms-kosten ms-kosten-liste">'.showSpecialsystemCost($phase['cost']).'</div></div>';
 
-	case 1:
-		$cost=array();
-		$cost[0]=array('I', 2, 10);
-		$show_action=true;
+	//Aktion anbieten
+	$content.='<div class="ms-aktion"><a href="?id='.$this->system_id.'&action=1" class="mod-btn">'.$phase['aktion'].'</a></div>';
 
-		$content.='<br><br>Hinter dem Tor liegt eine verlassene technische Anlage, die jedoch deaktiviert ist, da die Energiequelle ersch&ouml;pft ist. Mit einer passenden Ersatzquelle k&ouml;nnte man versuchen die Anlage in Betrieb zu nehmen.';
-		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
+}elseif($data['phase']==3){
+	$content.='<p>Die Anlage beginnt damit die Agenten zu scannen und pl&ouml;tzlich werden die Agenten von hochenergetischer Hyperstrahlung zersetzt. Kein einziger Agent &uuml;berlebt den Vorgang. Scheinbar haben sich die Wissenschaftler geirrt was die Funktionsweise angeht.</p>';
+	$content.='<div class="mod-hinweis ms-hinweis">Eine weitere Analyse ergibt jedoch, dass sich bisher inaktive Teile der Anlage aktivieren. In diesen werden Agenten produziert und alle 100 WT werden 100 Agenten geliefert.</div>';
 
-		//Test auf Aktion
-		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
-			if(hasSpecialsystemNeeds($cost)){
-				//Kosten abziehen
-				substractSpecialsystemNeeds($cost);
-				//nächste Phase freischalten
-				$data['phase']++;
-				setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'],$this->system_id, $data);
-
-				//weiter-link
-				$content.='<br><br><a href="?id='.$this->system_id.'">Die Anlage wird jetzt mit Energie versorgt. Weiter.</a><br><br>';
-				$show_action=false;
-
-			}else{
-				$content.='<div style="color: #FF0000;">Du hast nicht alles was ben&ouml;tigt wird.</div>';
-			}
-
-		}
-
-		//Aktionen anbieten
-		if($show_action){
-			$content.='<br><br><a href="?id='.$this->system_id.'&action=1">Anlage mit Energie versorgen</a><br><br>';
-		}
-	break;
-
-	case 2:
-		$cost=array();
-		$cost[0]=array('U', 'A', 1000);
-		$show_action=true;
-
-		$content.='<br><br>Die Anlage ist betriebsbereit, aber es ist nicht klar, welche Funktion sie hat. Die Wissenschaftler vermuten, dass man damit Agenten zu Ultra-Agenten verbessern kann und stimmen f&uuml;r einen Versuch, bei dem 1.000 Agenten der Anlage zugef&uuml;hrt werden.';
-		$content.='<br><br>Ben&ouml;tigt und verbraucht werden:<br>'.showSpecialsystemCost($cost);
-
-		//Test auf Aktion
-		if(isset($_REQUEST['action']) && $_REQUEST['action']==1){
-			if(hasSpecialsystemNeeds($cost)){
-				//Kosten abziehen
-				substractSpecialsystemNeeds($cost);
-
-				//nächste Phase freischalten
-				$data['phase']++;
-				setUserSpecialsystemDataByMapID($_SESSION['ums_user_id'],$this->system_id, $data);
-
-				//weiter-link
-				$content.='<br><br><a href="?id='.$this->system_id.'">Die Agenten befinden sich jetzt in der Anlage. Weiter.</a><br><br>';
-				$show_action=false;
-
-			}else{
-				$content.='<div style="color: #FF0000;">Du hast nicht alles was ben&ouml;tigt wird.</div>';
-			}
-
-		}
-
-		//Aktionen anbieten
-		if($show_action){
-			$content.='<br><br><a href="?id='.$this->system_id.'&action=1">Agenten in die Anlage schicken</a><br><br>';
-		}
-	break;
-
-	case 3:
-		$content.='<br><br>Die Anlage beginnt damit die Agenten zu scannen und pl&ouml;tzlich werden die Agenten von hochenergetischer Hyperstrahlung zersetzt. Kein einziger Agent überlebt den Vorgang. Scheinbar haben sich die Wissenschaftler geirrt was die Funktionsweise angeht.';
-		$content.='<br><br>Eine weitere Analyse ergibt jedoch, dass sich bisher inaktive Teile der Anlage aktivieren. In diesen werden Agenten produziert und alle 100 WT werden 100 Agenten geliefert.';
-
-	break;	
-
-	default:
-		$content.='FEHLER PHx01';
-	break;
+}else{
+	$content.='<div class="mod-meldung mod-meldung-fehler">FEHLER PHx01</div>';
 }
-
-?>

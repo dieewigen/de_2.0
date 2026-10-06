@@ -7608,6 +7608,169 @@ a.art-kachel-zurueck:hover::after {
   line-height: 1.45;
   color: #c9d1d9;
 }
+.ms-sonder-inhalt p {
+  margin: 0 0 6px;
+}
+.ms-sonder-inhalt b {
+  color: #ffffff;
+}
+.ms-sonder-inhalt form {
+  font-family: inherit;
+  font-size: inherit;
+}
+.ms-sonder-inhalt .mod-meldung {
+  margin: 10px 0;
+}
+
+.mod .ms-sonder-inhalt a:not(.mod-btn),
+.mod .ms-sonder-inhalt a:not(.mod-btn):link,
+.mod .ms-sonder-inhalt a:not(.mod-btn):visited {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--akzent);
+}
+
+.ms-sonder-text {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--akzent);
+  border-radius: 0 8px 8px 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ms-klein {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.ms-anlage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 32px;
+  padding: 3px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.ms-kosten-liste {
+  flex-direction: column;
+}
+
+.ms-fortschritt {
+  margin: 8px 0;
+}
+.ms-fortschritt .mod-balken {
+  height: 8px;
+  border-radius: 4px;
+}
+.ms-fortschritt .mod-balken span {
+  border-radius: 4px;
+}
+
+.ms-fortschritt-text {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 10px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.ms-kacheln-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ms-formular {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.ms-formular .mod-eingabe {
+  width: 70px;
+}
+
+.ms-namen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ms-namen .mod-chip {
+  font-size: 11px;
+  color: #e6edf3;
+}
+
+.ms-liste {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ms-liste li {
+  padding: 3px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ms-auftraege {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.ms-auftrag {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ms-auftrag > .mod-typ {
+  margin-top: 4px;
+}
+.ms-auftrag .ms-posten {
+  display: block;
+  color: #ffffff;
+}
+.ms-auftrag .ms-posten small {
+  white-space: nowrap;
+  color: #8b949e;
+}
+.ms-auftrag .ms-fehlt,
+.ms-auftrag .ms-posten.ms-fehlt {
+  color: #ff8a8a;
+}
+.ms-auftrag .ms-belohnung {
+  color: #ffffff;
+}
+
+.ms-auftrag-erledigt {
+  border-color: rgba(62, 207, 106, 0.35);
+}
+
+.ms-auftrag-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ms-auftrag-fuss {
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 11px;
+}
+.ms-auftrag-fuss .mod-btn {
+  width: 100%;
+}
 
 .opt {
   width: 572px;
