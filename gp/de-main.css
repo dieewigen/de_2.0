@@ -7101,6 +7101,9 @@ a.art-kachel-zurueck:hover::after {
   padding: 4px 6px;
   font-size: 12px;
 }
+.vs-filter select.mod-eingabe:disabled {
+  opacity: 0.45;
+}
 .vs-filter #vsf0a {
   flex: 1 1 150px;
   min-width: 0;

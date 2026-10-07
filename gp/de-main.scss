@@ -7787,6 +7787,11 @@ a.art-kachel-zurueck:hover::after {
 	select.mod-eingabe {
 		padding: 4px 6px;
 		font-size: 12px;
+
+		//Stufenauswahl ist bei Unerforschten und Spezialsystemen abgeschaltet
+		&:disabled {
+			opacity: 0.45;
+		}
 	}
 
 	#vsf0a {

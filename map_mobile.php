@@ -128,6 +128,7 @@ if(!hasTech($pt,25)){
 		}
 	}
 	echo '<option value="f_unsy">Unerforschte Systeme</option>';
+	echo '<option value="f_spez">Spezialsysteme</option>';
 	echo '</select>';
 	echo '<select name="vsf0b" id="vsf0b" onChange="vs_filter(1);" class="mod-eingabe">
 			<option value="gg">Stufe gr&ouml;&szlig;er gleich</option>

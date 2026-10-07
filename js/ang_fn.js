@@ -140,6 +140,7 @@ function vs_filter_init(){
 function vs_filter(status){
 	if(status==0){
 		$('#vsf0a, #vsf0b, #vsf0c').prop('selectedIndex',0);
+		$('#vsf0b, #vsf0c').prop('disabled',false);
 		$('.f_system').show();
 
 		setCookie("vsf0a", "");
@@ -149,8 +150,12 @@ function vs_filter(status){
 	}else{
 		$('.f_system').hide();
 
-		if($('#vsf0a').val()=='f_unsy'){
-			$('.f_unsy').show();
+		//Unerforschte und Spezialsysteme haben keine Stufe, dann bleibt die Stufenauswahl aus
+		var wahl=$('#vsf0a').val();
+		var ohne_stufe=(wahl=='f_unsy' || wahl=='f_spez');
+		$('#vsf0b, #vsf0c').prop('disabled',ohne_stufe);
+		if(ohne_stufe){
+			$('.'+wahl).show();
 		}else{
 			if($('#vsf0b').val()=='gg'){
 				for(var s=$('#vsf0c').val(); s<=10; s++){

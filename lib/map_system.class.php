@@ -639,8 +639,12 @@ class map_system{
 			$filter_class_unsy=' f_unsy';
 		}
 
-		//die Filterklassen zusammenbauen
+		//die Filterklassen zusammenbauen; Sonder-Systeme bekommen f_spez, aber nur wenn der Spieler sie schon kennt
+		//(ein unerforschtes System soll nicht verraten, dass es ein besonderes ist)
 		$filter_class=' f_system'.$filter_class_unsy;
+		if($this->special_system>0 && ($is_explored || $is_always_visible)){
+			$filter_class.=' f_spez';
+		}
 		if($show_details){
 			for($i=0;$i<count($this->fields);$i++){
 				$stufe=$bldg[$i]['bldg_level'] ?? 0;
