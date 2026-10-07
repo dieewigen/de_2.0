@@ -122,9 +122,10 @@ else
 	}
 	elseif($allyid)
 	{
+		//nur ein Angebot, das noch an diese Allianz geht: ein neueres Angebot an eine andere Allianz ersetzt es (ally_partner.php)
 		$result = mysqli_execute_query($GLOBALS['dbi'],
-            "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ?",
-            [$allyid]
+            "SELECT COUNT(*) as count FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller = ? AND ally_id_partner = ?",
+            [$allyid, $clanid]
         );
         $row = $result->fetch_assoc();
         $antragexists = $row['count'];
@@ -136,6 +137,12 @@ else
             [$allyid, $clanid]
         );
 		echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_6'].'</div>';
+
+		//die anbietende Allianz erfährt die Ablehnung, bisher verschwand das Angebot bei ihr kommentarlos
+		include_once('ally/allyfunctions.inc.php');
+		$antragsteller_tag = getAllyTag($allyid);
+		writeHistory($clantag, $allyablehnen_lang['msg_7_1'].' <i>'.$antragsteller_tag.'</i> '.$allyablehnen_lang['msg_7_2'], true);
+		writeHistory($antragsteller_tag, $allyablehnen_lang['msg_8_1'].' <i>'.$clantag.'</i> '.$allyablehnen_lang['msg_8_2'], true);
 	}
 
 }

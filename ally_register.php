@@ -34,8 +34,8 @@ if($allytag==''){
 	<div class="ally-formular">
 		<label class="ally-feld">
 			<span class="mod-typ"><?php echo $allyregister_lang['kuerzel']?></span>
-			<input name="clankuerzel" maxlength="8" class="mod-eingabe">
-			<span class="ally-feld-hinweis">h&ouml;chstens 8 Zeichen, nur Buchstaben und Ziffern</span>
+			<input name="clankuerzel" maxlength="7" class="mod-eingabe">
+			<span class="ally-feld-hinweis">h&ouml;chstens 7 Zeichen, nur Buchstaben und Ziffern</span>
 		</label>
 		<label class="ally-feld">
 			<span class="mod-typ"><?php echo $allyregister_lang['allianzname']?></span>

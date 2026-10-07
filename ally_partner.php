@@ -102,7 +102,9 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 		"SELECT id FROM de_allys WHERE allytag=?",
 		[$an]);
 	$row = mysqli_fetch_assoc($result);
-	$allyid_partner = $row['id'];
+	$allyid_partner = $row['id'] ?? 0;
+	if (!$allyid_partner || $allyid_partner == $allyid)
+		die (partner_abbruch('Diese Allianz kann kein B&uuml;ndnisangebot erhalten.'));
 
 	$result = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT count(*) as count FROM de_ally_partner WHERE ally_id_1=? OR ally_id_2=?",
@@ -122,14 +124,33 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 	if ($num>0)
 		die (partner_abbruch('Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.'));
 
+	include_once("ally/allyfunctions.inc.php");
+
+	//ein Angebot an eine andere Allianz zieht das laufende zurück; die bisher angefragte Allianz erfährt das,
+	//sonst bleibt bei ihr nur die Meldung über ein Angebot, das es nicht mehr gibt
+	$result = mysqli_execute_query($GLOBALS['dbi'],
+		"SELECT ally_id_partner FROM de_ally_buendniss_antrag WHERE ally_id_antragsteller=?",
+		[$allyid]);
+	$row = mysqli_fetch_assoc($result);
+	$an_vorher = '';
+	if ($row && $row['ally_id_partner'] != $allyid_partner) {
+		$an_vorher = (string)getAllyTag($row['ally_id_partner']);
+	}
+
 	//je Allianz nur ein laufender Antrag (eindeutiger Schlüssel ally_id_antragsteller): ein neuer ersetzt den alten;
 	//früher INSERT mit UPDATE als Ausweichweg, seit PHP 8.1 bricht der doppelte Schlüssel aber mit einer Exception ab
 	mysqli_execute_query($GLOBALS['dbi'],
 		"INSERT INTO de_ally_buendniss_antrag (ally_id_antragsteller, ally_id_partner, antrag) VALUES (?, ?, ?)
 		 ON DUPLICATE KEY UPDATE ally_id_partner=VALUES(ally_id_partner), antrag=VALUES(antrag)",
 		[$allyid, $allyid_partner, $antrag]);
-	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allypartner_lang['msg_6_1'].' '.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').' '.$allypartner_lang['msg_6_2'].' '.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').' '.$allypartner_lang['msg_6_3'].'</div><div class="ally-aktionen"><a href="ally_partner.php" class="mod-btn mod-btn-leise">Zur&uuml;ck</a></div></div>';
-	include("ally/allyfunctions.inc.php");
+
+	$meldung = $allypartner_lang['msg_6_1'].' <b>'.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').'</b> '.$allypartner_lang['msg_6_2'].' '.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').' '.$allypartner_lang['msg_6_3'];
+	if ($an_vorher != '') {
+		$meldung = $allypartner_lang['msg_11_1'].' <b>'.htmlspecialchars($an_vorher, ENT_QUOTES, 'UTF-8').'</b> '.$allypartner_lang['msg_11_2'].'<br><br>'.$meldung;
+		writeHistory($allytag, "$allypartner_lang[msg_11_1] <i>$an_vorher</i> $allypartner_lang[msg_11_2]",true);
+		writeHistory($an_vorher, "$allypartner_lang[msg_12_1] <i>$allytag</i> $allypartner_lang[msg_12_2]",true);
+	}
+	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$meldung.'</div><div class="ally-aktionen"><a href="ally_partner.php" class="mod-btn mod-btn-leise">Zur&uuml;ck</a></div></div>';
 	writeHistory($allytag, "$allypartner_lang[msg_7_1] <i>$an</i> $allypartner_lang[msg_7_2]",true);
 	writeHistory($an, "$allypartner_lang[msg_8_1] <i>$allytag</i> $allypartner_lang[msg_8_2]",true);
 
@@ -185,17 +206,19 @@ else {
 
 	if($isleader || $iscoleader){
 		$result = mysqli_execute_query($GLOBALS['dbi'],
-			"SELECT antrag, ally_id_partner FROM de_ally_buendniss_antrag, de_allys
-			 WHERE ally_id_antragsteller=id
-			 AND (leaderid=? OR coleaderid1=? OR coleaderid2=? OR coleaderid3=?)",
+			"SELECT a.antrag, a.ally_id_partner, p.allytag AS partner_tag
+			 FROM de_ally_buendniss_antrag a
+			 JOIN de_allys s ON s.id=a.ally_id_antragsteller
+			 LEFT JOIN de_allys p ON p.id=a.ally_id_partner
+			 WHERE s.leaderid=? OR s.coleaderid1=? OR s.coleaderid2=? OR s.coleaderid3=?",
 			[$_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id'], $_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_assoc($result);
 		$laufenderantrag = $row['antrag'] ?? '';
 		$selected = $row['ally_id_partner'] ?? '';
 
 		echo '<div class="ally-abschnitt"><div class="mod-typ">'.$allypartner_lang['choosepartner'].'</div>';
-		if ($laufenderantrag){
-			echo '<div class="mod-hinweis">'.$allypartner_lang['msg_10'].'</div>';
+		if ($row){
+			echo '<div class="mod-hinweis">'.$allypartner_lang['msg_10_1'].' <b>'.htmlspecialchars($row['partner_tag'] ?? '', ENT_QUOTES, 'UTF-8').'</b>. '.$allypartner_lang['msg_10_2'].'</div>';
 		}
 
 		echo	'<form name="buendniss" method="POST" class="ally-formular">'.

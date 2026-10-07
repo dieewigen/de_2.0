@@ -1799,7 +1799,7 @@ if ($doetick == 1) {
         //allianz siegartefakte
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, allytag, questpoints FROM de_allys ORDER BY questpoints DESC, id ASC LIMIT 1", []);
         $row = mysqli_fetch_array($db_daten);
-        $ranglistendaten .= "Allianz: ".$row['allytag']." Roundpoints: ".$row['questpoints']."\n".
+        $ranglistendaten .= "Allianz: ".$row['allytag']." Roundpoints: ".$row['questpoints']."\n";
         $ally_id = $row['id'];
         $ally_tag = $row['allytag'];
         $ally_roundpoints = $row['questpoints'];

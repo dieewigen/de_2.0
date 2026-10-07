@@ -532,9 +532,10 @@ if($historie){
 		echo '<div class="tl-runde-kopf">Runde '.$row['round_id'].'<span>'.number_format($row['round_wt'], 0,"",".").' Wirtschaftsticks</span></div>';
 		echo '<div class="tl-runde-daten">';
 		echo '<span class="mod-typ">Erhabene/Erhabener</span><span><b>'.$row['player_spielername'].'</b> ('.$row['player_sector'].':'.$row['player_system'].') &middot; '.$rasse.' &middot; '.number_format($row['player_score'], 0,"",".").' Punkte</span>';
-		echo '<span class="mod-typ">Sektor</span><span><b>'.$row['sector_id'].'</b>'.($row['sector_name'] != '' ? ' &middot; '.$row['sector_name'] : '').' &middot; '.number_format($row['sector_score'], 0,"",".").' Punkte</span>';
+		//Sektor und Allianz sind eigene Wertungen (bester Sektor, meiste Rundensiegartefakte), nicht die des Erhabenen
+		echo '<span class="mod-typ">Bester Sektor</span><span><b>'.$row['sector_id'].'</b>'.($row['sector_name'] != '' ? ' &middot; '.$row['sector_name'] : '').' &middot; '.number_format($row['sector_score'], 0,"",".").' Punkte</span>';
 		if(!empty($row['ally_tag'])){
-			echo '<span class="mod-typ">Allianz</span><span><b>'.$row['ally_tag'].'</b> &middot; '.number_format($row['ally_roundpoints'], 0,"",".").' Rundensiegartefakte</span>';
+			echo '<span class="mod-typ">Beste Allianz</span><span><b>'.$row['ally_tag'].'</b> &middot; '.number_format($row['ally_roundpoints'], 0,"",".").' Rundensiegartefakte</span>';
 		}
 		echo '</div></div>';
 		$runden++;

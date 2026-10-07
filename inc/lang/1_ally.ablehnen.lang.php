@@ -8,4 +8,8 @@ $allyablehnen_lang['msg_3']='Der Antrag des Benutzers wurde abgelehnt.';
 $allyablehnen_lang['msg_4']='Der Benutzer gehört leider nicht zu deiner Allianz!';
 $allyablehnen_lang['msg_5']='Dieser Antrag existiert garnicht! Wahrscheinlich wurde er wieder zurückgezogen.';
 $allyablehnen_lang['msg_6']='Bündnisantrag wurde abgelehnt.';
+$allyablehnen_lang['msg_7_1']='Das Bündnisangebot der Allianz';
+$allyablehnen_lang['msg_7_2']='wurde abgelehnt.';
+$allyablehnen_lang['msg_8_1']='Die Allianz';
+$allyablehnen_lang['msg_8_2']='hat Euer Bündnisangebot abgelehnt.';
 ?>

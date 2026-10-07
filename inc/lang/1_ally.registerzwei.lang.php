@@ -3,7 +3,7 @@ $allyregisterzwei_lang['title']='Allinz registrieren';
 
 $allyregisterzwei_lang['msg_1']='Bitte kontrolliere Deinen Allianznamen';
 $allyregisterzwei_lang['msg_2']='Bitte kontrolliere Dein Allianzkürzel';
-$allyregisterzwei_lang['msg_3']='Das Allianzkürzel ist zu lang';
+$allyregisterzwei_lang['msg_3']='Das Allianzkürzel ist zu lang (höchstens 7 Zeichen).';
 $allyregisterzwei_lang['msg_4']='Leider existiert schon eine Allianz mit Deinem Kürzel';
 $allyregisterzwei_lang['msg_5']='Leider existiert schon eine Allianz mit Deinem Namen';
 $allyregisterzwei_lang['msg_6']='Zuerst musst Du leider das Amt als Anführer deiner alten Allianz an jemand anders übergeben ["Allianzmen&uuml"]';

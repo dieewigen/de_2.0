@@ -55,7 +55,8 @@ if($clankuerzel==""){
 
 }
 
-if( strlen($clankuerzel) > 8 ){
+//7 Zeichen: so breit sind de_server_round_toplist.ally_tag und de_hfn_usr_ally.allytag
+if( strlen($clankuerzel) > 7 ){
 	$eintragung=0;
 	$errormessage.=$allyregisterzwei_lang['msg_3']."<br>";
 }
