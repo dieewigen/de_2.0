@@ -52,4 +52,16 @@ $sec_lang['sys']='System';
 $sec_lang['welle']='Welle';
 $sec_lang['wellenrechner']='Wellenrechner';
 
+//Die Struktur der Erbauer (Karte rechts oben, map.php)
+$sec_lang['struktur_titel']='Die Struktur der Erbauer';
+$sec_lang['struktur_unter']='Erzeugt das Dimensionsfeld, das die Reise zwischen den Systemen erlaubt';
+$sec_lang['struktur_lore']='<b>Die Struktur der Erbauer</b><br>Sie erzeugt das Dimensionsfeld, das die Reise zwischen den Planeten erlaubt. Niemand kann sie direkt beeinflussen, doch sie reagiert auf politische Umwälzungen: Sobald es einen Erhabenen gibt, erlöschen die Dimensionsfelder und die Hochtechnologie zerfällt.<br><br>Klick öffnet die Hilfe zur Struktur.';
+$sec_lang['struktur_hilfe']='Hilfe';
+$sec_lang['struktur_hilfe_tip']='Mehr zur Struktur im Hilfe-Forum (neues Fenster)';
+$sec_lang['struktur_signal_start']='Signal der Struktur abspielen';
+$sec_lang['struktur_signal_stop']='Signal anhalten';
+$sec_lang['struktur_artefakte']='Verwahrte Sektorartefakte';
+$sec_lang['struktur_artefakte_tip']='Diese Sektorartefakte sind noch nicht im Spiel. Die Struktur gibt sie im Lauf der Runde frei, je mehr Sektorraumbasen gebaut werden.<br>Klick auf ein Artefakt zeigt seine Beschreibung.';
+$sec_lang['struktur_artefakte_leer']='Alle Sektorartefakte sind im Spiel.';
+$sec_lang['struktur_anzahl']='Anzahl';
 ?>

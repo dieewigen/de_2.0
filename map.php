@@ -107,9 +107,10 @@ echo '<div id="serverdesc" style="top:40512px; left:40000px;">'.$sv_server_name.
 //////////////////////////////////////////////////////////////////////////////
 //rechts oben die struktur
 //////////////////////////////////////////////////////////////////////////////
-//es werden die Sektorartefakte angezeigt die in Sektor -1 sind
-$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?", [-1]);
-$artstr = '';
+//Die Struktur der Erbauer verwahrt die Sektorartefakte, die noch nicht im Spiel sind (Sektor -1).
+//Gleiche Artefakte (z. B. die zehn Gaben der Reichen) werden zusammengefasst und mit Anzahl gezeigt.
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=? ORDER BY id", [-1]);
+$verwahrt = array();
 while ($row = mysqli_fetch_array($res)) {
     //artefakttooltip bauen
     $desc = $row["artdesc"];
@@ -120,242 +121,149 @@ while ($row = mysqli_fetch_array($res)) {
     $desc = str_replace("{WERT5}", number_format($sv_artefakt[$row["id"] - 1][4], 0, "", "."), $desc);
     $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
 
-
-    $atip = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
-
-    $artstr .= '
-    <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip).'">
-        <img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" style="width: 50px; height: 50px;">
-    </div>';
+    $schluessel = $row["picid"].'|'.$row["artname"];
+    if (!isset($verwahrt[$schluessel])) {
+        $verwahrt[$schluessel] = array(
+            'id' => intval($row["id"]),
+            'name' => $row["artname"],
+            'desc' => $desc,
+            'color' => preg_match('/^[0-9a-fA-F]{6}$/', $row["color"]) ? $row["color"] : '777777',
+            'picid' => intval($row["picid"]),
+            'anzahl' => 0,
+        );
+    }
+    $verwahrt[$schluessel]['anzahl']++;
 }
 
-if(!empty($artstr)) {
-    $artstr = '<div style="position: absolute; bottom: 18px; left: 22px; display: flex; gap: 4px; z-index: 10;">'.$artstr.'</div>';
+$artstr = '';
+foreach ($verwahrt as $art) {
+    $atip = '<font color=#'.$art['color'].'>'.$art['name'].'</font>';
+    if ($art['anzahl'] > 1) {
+        $atip .= ' ('.$sec_lang['struktur_anzahl'].': '.$art['anzahl'].')';
+    }
+    $atip .= '<br>'.$art['desc'];
+
+    $artstr .= '<div class="struktur-artefakt" style="--artfarbe: #'.$art['color'].';" onclick="switch_iframe_main_container(\'help.php?a=1#art'.$art['id'].'\')" title="'.umlaut($atip).'">'
+        .'<img src="gp/g/sa'.$art['picid'].'.gif" alt="">'
+        .($art['anzahl'] > 1 ? '<span class="struktur-anzahl">'.$art['anzahl'].'</span>' : '')
+        .'</div>';
+}
+if ($artstr == '') {
+    $artstr = '<div class="struktur-leer">'.$sec_lang['struktur_artefakte_leer'].'</div>';
 }
 
-//Ausgabe structure_override_code
-$structureOverrideCode = '';
-$deSystemResult=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_system LIMIT 1");
-$deSystem=mysqli_fetch_assoc($deSystemResult);
+//Signalfolge der Struktur (Indizes der griechischen Rangnamen): aus de_system, sonst die feste Folge
+$deSystemResult = mysqli_execute_query($GLOBALS['dbi'], "SELECT structure_override_code FROM de_system LIMIT 1");
+$deSystem = mysqli_fetch_assoc($deSystemResult);
+$signalfolge = array();
+foreach (explode(',', (string)($deSystem['structure_override_code'] ?? '')) as $wert) {
+    $wert = trim($wert);
+    if ($wert !== '' && ctype_digit($wert) && intval($wert) < 24) {
+        $signalfolge[] = intval($wert);
+    }
+}
+if (count($signalfolge) == 0) {
+    $signalfolge = array(5,17,0,23,11,3,19,8,14,22,1,6,12,20,9,4,16,7,2,15,13,21,18,10,0,23,5,11,17,3,19,8,14,22,1,6,12,20,9,4,16,2);
+}
 
 echo '
 <script>
 const socRaenge = ["alpha","beta","gamma","delta","epsilon","zeta","eta","theta","iota","kappa","lambda","my","ny","xi","omikron","pi","rho","sigma","tau","ypsilon","phi","chi","psi","omega"];
-const structureOverrideCode = [5,17,0,23,11,3,19,8,14,22,1,6,12,20,9,4,16,7,2,15,13,21,18,10,0,23,5,11,17,3,19,8,14,22,1,6,12,20,9,4,16,2];
+const structureOverrideCode = '.json_encode($signalfolge).';
 
-// HTML5 Audio Player für Greek Letters
+// Signal der Struktur: spielt die Folge griechischer Buchstaben als Audio ab (sound/greek_letters)
 class GreekLetterPlayer {
   constructor() {
     this.audio = new Audio();
+    this.audio.preload = "none";
     this.currentIndex = 0;
     this.isPlaying = false;
-    this.playlist = this.buildPlaylist();
-    
-    console.log("GreekLetterPlayer initialized");
-    console.log("structureOverrideCode:", structureOverrideCode);
-    console.log("Playlist:", this.playlist);
-    
+    this.fehler = 0;
+    this.playlist = structureOverrideCode.map(index => "/sound/greek_letters/" + (socRaenge[index] || "alpha") + ".mp3");
+
     this.audio.addEventListener("ended", () => this.playNext());
-    this.audio.addEventListener("error", (e) => {
-      console.error("Audio error:", e);
-      console.error("Failed to load:", this.audio.src);
-    });
-    this.audio.addEventListener("loadstart", () => console.log("Loading:", this.audio.src));
-    this.audio.addEventListener("canplay", () => console.log("Can play:", this.audio.src));
+    this.audio.addEventListener("error", () => this.naechstesNachFehler());
   }
-  
-  buildPlaylist() {
-    const playlist = structureOverrideCode.map(index => {
-      const filename = socRaenge[index] || "alpha"; // Fallback zu alpha
-      return `/sound/greek_letters/${filename}.mp3`;
-    });
-    
-    // Fallback wenn structureOverrideCode leer ist
-    if (playlist.length === 0) {
-      console.log("No structureOverrideCode found, using test playlist");
-      return ["/sound/greek_letters/alpha.mp3", "/sound/greek_letters/beta.mp3"];
-    }
-    
-    return playlist;
-  }
-  
+
   play() {
-    console.log("Play button pressed");
-    console.log("Playlist length:", this.playlist.length);
-    
-    if (this.playlist.length === 0) {
-      console.log("No playlist available");
-      return;
-    }
-    
+    if (this.playlist.length === 0) return;
     this.isPlaying = true;
     this.currentIndex = 0;
+    this.fehler = 0;
     this.loadAndPlay();
   }
-  
+
   stop() {
-    console.log("Stop button pressed");
     this.isPlaying = false;
     this.audio.pause();
-    this.audio.currentTime = 0;
     this.currentIndex = 0;
+    this.zeigeZustand();
   }
-  
+
   playNext() {
-    console.log("Playing next track");
     if (!this.isPlaying) return;
-    
-    this.currentIndex++;
-    if (this.currentIndex >= this.playlist.length) {
-      this.currentIndex = 0; // Loop zurück zum Anfang
-    }
-    
+    this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
     this.loadAndPlay();
   }
-  
-  loadAndPlay() {
-    if (this.playlist[this.currentIndex]) {
-      console.log("Loading and playing:", this.playlist[this.currentIndex]);
-      this.audio.src = this.playlist[this.currentIndex];
-      this.audio.load();
-      
-      // User interaction ist erforderlich für autoplay
-      this.audio.play().then(() => {
-        console.log("Playback started successfully");
-      }).catch(e => {
-        console.error("Play error:", e);
-        console.error("This might be due to browser autoplay policy");
-        alert("Audio playback failed. This might be due to browser autoplay restrictions. Please interact with the page first.");
-      });
+
+  // fehlende Datei ueberspringen, nach einer vollen Runde ohne Erfolg aufhoeren
+  naechstesNachFehler() {
+    this.fehler++;
+    if (this.fehler >= this.playlist.length) {
+      this.stop();
+      return;
     }
+    this.playNext();
   }
-  
+
+  loadAndPlay() {
+    this.audio.src = this.playlist[this.currentIndex];
+    this.audio.play().then(() => {
+      this.fehler = 0;
+      this.zeigeZustand();
+    }).catch(e => {
+      // Autoplay-Sperre des Browsers: anhalten, Ladefehler regelt das error-Ereignis
+      if (e && e.name === "NotAllowedError") this.stop();
+    });
+  }
+
+  zeigeZustand() {
+    document.querySelectorAll(".struktur-signal").forEach(el => el.classList.toggle("struktur-signal-aktiv", this.isPlaying));
+  }
+
   getCurrentTrack() {
     return this.playlist[this.currentIndex] || null;
   }
 }
 
-// Globalen Player erstellen
 window.greekPlayer = new GreekLetterPlayer();
-
 </script>
 ';
 
-//die Struktur darstellen
-echo '<div style="position: absolute; top:40000px; right:40000px;">
-    <div style="
-        background: linear-gradient(45deg, #00ff41, #0099ff, #ff0080, #00ff41);
-        background-size: 400% 400%;
-        animation: sci-fi-border 3s ease-in-out infinite;
-        padding: 8px;
-        border-radius: 15px;
-        box-shadow: 
-            0 0 20px rgba(0, 255, 65, 0.5),
-            0 0 40px rgba(0, 153, 255, 0.3),
-            inset 0 0 20px rgba(255, 255, 255, 0.1);
-        position: relative;
-        overflow: hidden;
-    ">
-        <div style="
-            background: rgba(0, 20, 40, 0.9);
-            padding: 4px;
-            border-radius: 10px;
-            border: 2px solid rgba(0, 255, 65, 0.8);
-            position: relative;
-            overflow: hidden;
-        ">
-            <div style="
-                position: absolute;
-                top: -2px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    rgba(0, 255, 65, 0.3), 
-                    transparent
-                );
-                animation: scan-line 2s linear infinite;
-                pointer-events: none;
-            "></div>
-            
-            <a href="https://hilfe.die-ewigen.com/index.php?thread=de_de&post=68" target="_blank">
-                <img src="gp/g/die_struktur.jpg" style="
-                    width: 2028px; 
-                    height: 2028px; 
-                    border-radius: 8px;
-                    display: block;
-                    transition: all 0.3s ease;
-                " onmouseover="this.style.transform=\'scale(1.02)\'; this.style.filter=\'brightness(1.2) contrast(1.1)\';" 
-                   onmouseout="this.style.transform=\'scale(1)\'; this.style.filter=\'brightness(1) contrast(1)\';">
-                
-                
-
-                '.$artstr.'
-            </a>
-            
-            <!-- Sci-Fi Corner Decorations -->
-            <div style="
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                width: 30px;
-                height: 30px;
-                border-left: 3px solid #00ff41;
-                border-top: 3px solid #00ff41;
-                opacity: 0.8;
-            "></div>
-            <div style="
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                width: 30px;
-                height: 30px;
-                border-right: 3px solid #0099ff;
-                border-top: 3px solid #0099ff;
-                opacity: 0.8;
-            "></div>
-
-            <div id="greek-player-controls" style="position: absolute; top: 18px; right: 18px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 5px; color: white; font-family: Arial; font-size: 11px; z-index: 1000;">
-              <button onclick="window.greekPlayer.play()" style="margin-right: 3px; padding: 2px 6px; background: #3399FF; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 9px;">παίζω</button>
-              <button onclick="window.greekPlayer.stop()" style="padding: 2px 6px; background: #999999; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 9px;">σταμάτα</button>
-            </div>
-
-            <div style="
-                position: absolute;
-                bottom: 10px;
-                left: 10px;
-                width: 30px;
-                height: 30px;
-                border-left: 3px solid #ff0080;
-                border-bottom: 3px solid #ff0080;
-                opacity: 0.8;
-            "></div>
-            <div style="
-                position: absolute;
-                bottom: 10px;
-                right: 10px;
-                width: 30px;
-                height: 30px;
-                border-right: 3px solid #00ff41;
-                border-bottom: 3px solid #00ff41;
-                opacity: 0.8;
-            "></div>
+//die Struktur darstellen: Bild als Landmarke, Kopf- und Fusszeile liegen als Leisten auf dem Bild (Aussehen in de-map.scss)
+$strukturHilfe = 'https://hilfe.die-ewigen.com/index.php?thread=de_de&amp;post=68';
+echo '<div class="struktur" style="top:40000px; right:40000px;">
+    <a class="struktur-link" href="'.$strukturHilfe.'" target="_blank" rel="noopener" title="'.$sec_lang['struktur_lore'].'">
+        <img class="struktur-bild" src="gp/g/die_struktur.jpg" alt="'.$sec_lang['struktur_titel'].'">
+    </a>
+    <div class="struktur-kopf">
+        <div>
+            <div class="struktur-titel" title="'.$sec_lang['struktur_lore'].'">'.$sec_lang['struktur_titel'].'</div>
+            <div class="struktur-unter">'.$sec_lang['struktur_unter'].'</div>
+        </div>
+        <div class="struktur-knoepfe">
+            <button type="button" class="map-btn struktur-signal" onclick="window.greekPlayer.play()" title="'.$sec_lang['struktur_signal_start'].'">παίζω</button>
+            <button type="button" class="map-btn" onclick="window.greekPlayer.stop()" title="'.$sec_lang['struktur_signal_stop'].'">σταμάτα</button>
+            <a class="map-btn" href="'.$strukturHilfe.'" target="_blank" rel="noopener" title="'.$sec_lang['struktur_hilfe_tip'].'">'.$sec_lang['struktur_hilfe'].'</a>
         </div>
     </div>
+    <div class="struktur-fuss">
+        <div class="struktur-fuss-titel" title="'.$sec_lang['struktur_artefakte_tip'].'">'.$sec_lang['struktur_artefakte'].'</div>
+        <div class="struktur-artefakte">'.$artstr.'</div>
+    </div>
 </div>
-
-<style>
-@keyframes sci-fi-border {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-@keyframes scan-line {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-</style>';
+';
+//ende struktur
 
 $sector_width = 1300;
 $sector_height = 150;
