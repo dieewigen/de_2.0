@@ -48,7 +48,8 @@ $rangnamen=array($military_lang['dererhabene'], "Alpha","Beta","Gamma","Delta","
 
 //rangwerte-liste erstellen
 $ranginfo='Ben&ouml;tigte Erfahrungspunkte f&uuml;r verbesserte Formationen&';
-for($i=0;$i<25;$i++)
+//24 Formationen von Omega bis Alpha, wie in getfleetlevel()
+for($i=0;$i<24;$i++)
 {
   $counter=($i*($i-1)*30000)+30000;
   if($i==0)$counter=0;

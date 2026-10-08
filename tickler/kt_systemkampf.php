@@ -2152,12 +2152,15 @@ for ($c = 0; $c < $z; $c++) {
         }
         $deffer_kbsum[3][1] += $deffer_exp[$i];
 
-        //schlachterrecycling
+        //schlachterrecycling: [3][3] Multiplex, [3][4] Dyharra
         if(!isset($deffer_kbsum[3][3])) {
             $deffer_kbsum[3][3] = 0;
         }
+        if(!isset($deffer_kbsum[3][4])) {
+            $deffer_kbsum[3][4] = 0;
+        }
         $deffer_kbsum[3][3] += $deffer_rec[$i][0];
-        $deffer_kbsum[3][3] += $deffer_rec[$i][1];
+        $deffer_kbsum[3][4] += $deffer_rec[$i][1];
 
         $hv = explode("-", $d_userdata[$i][0]);
         $uid = $hv[0]; //so stellt man die user_id der flotte fest, einfach splitten
@@ -2241,6 +2244,9 @@ for ($c = 0; $c < $z; $c++) {
                 $kb_daten_spieler['kartefakt'] = $kartefakte;
                 $kb_daten_spieler['exp'] = $deffer_kbsum[3][1] + $defenseexp;
             }
+            //schlachterrecycling aller heimatflotten, gutgeschrieben wird es oben je flotte
+            $kb_daten_spieler['recycling1'] = $deffer_kbsum[3][3];
+            $kb_daten_spieler['recycling2'] = $deffer_kbsum[3][4];
 
             //allyaufgabe kriegsartefakte
             if ($sv_oscar != 1) {

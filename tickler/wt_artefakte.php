@@ -461,7 +461,7 @@ for ($k = 11;$k <= 20;$k++) {
         } else {
             $emvd = 4;
         }
-        if (hasTech($pt, 10)) {
+        if (hasTech($pt, 20)) {
             $emvi = 3;
         } else {
             $emvi = 6;

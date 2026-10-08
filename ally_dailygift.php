@@ -283,7 +283,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         change_storage_amount($_SESSION['ums_user_id'], 2, $amount, false);
 
                         changeAllyStorageAmount($ally_id, 13, 5, false);
-                        $bonusstr .= '<br>Allianz: 1 Quantenglimmer';
+                        $bonusstr .= '<br>Allianz: 5 Quantenglimmer';
                         break;
 
                     default:

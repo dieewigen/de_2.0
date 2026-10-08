@@ -60,7 +60,7 @@ if($num==1){
 	$def_allybldg[0]['maxlevel']=1;
 
 	$def_allybldg[1]['name']='Diplomatiezentrum';
-	$def_allybldg[1]['desc']='Das Diplomatiezentrum wird f&uuml;r ein Allianzb&uuml;ndnis ben&ouml;tigt.<br>Pro Projektstufe erh&auml;lt man 1% der Projektboni des B&uuml;ndnispartners. (Ausgenommen davon: Notfallrohstoffkonverter, Fundb&uuml;ro)';
+	$def_allybldg[1]['desc']='Das Diplomatiezentrum wird f&uuml;r ein Allianzb&uuml;ndnis ben&ouml;tigt.<br>Leitzentralen: Eure angreifenden Flotten erhalten pro Stufe 2% der Wirkung der Leitzentralen des B&uuml;ndnispartners, auf Stufe 50 also die volle Wirkung.<br>Kommunikationsphalax: Der B&uuml;ndnispartner erh&auml;lt pro Stufe 1% der Wirkung Eurer Kommunikationsphalax.<br>Andere Projekte wirken nicht beim B&uuml;ndnispartner.';
 	$def_allybldg[1]['artpreis']=2;
 	$def_allybldg[1]['tronicpreis']=1;
 	$def_allybldg[1]['grafikfile']='symbol11.png';

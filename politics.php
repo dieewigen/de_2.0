@@ -646,12 +646,11 @@ if (!empty($sec_btn) && $system == issectorcommander()) {
 
         if (issectorcommander() && $sector != 1) //nur wenn man sk ist kann man die steuer ändern
         {
-            if ($sv_deactivate_vsystems != 1)
-                mysqli_execute_query(
-                    $GLOBALS['dbi'],
-                    "UPDATE de_sector SET ssteuer = ? WHERE sec_id = ?",
-                    [$seksteuer, $sector]
-                );
+            mysqli_execute_query(
+                $GLOBALS['dbi'],
+                "UPDATE de_sector SET ssteuer = ? WHERE sec_id = ?",
+                [$seksteuer, $sector]
+            );
         }
         $ssteuer = $seksteuer;
         pol_meldung('Die Sektordaten sind gespeichert.');
