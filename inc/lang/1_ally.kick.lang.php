@@ -12,4 +12,5 @@ $allykick_lang['msg_5_2']='wurde vom Allianzvorstand entlassen.';
 $allykick_lang['msg_6']='Der Benutzer gehört leider nicht zu deiner Allianz.';
 $allykick_lang['msg_7_1']='Leider stehen Deiner Allianz nicht genügend finanzielle Mittel zur Verfügung, um die Ausschlussgebühr zu tragen.<br>Es werden';
 $allykick_lang['msg_7_2']='zusätzliche Tronic benötigt.';
+$allykick_lang['msg_8']='Die Entlassung wurde nicht ausgeführt, weil der Aufruf nicht aus der Mitgliederliste kam. Bitte nutze dort den Knopf „Entlassen“.';
 ?>

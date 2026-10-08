@@ -35,7 +35,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 include('ally/ally.menu.inc.php');
 
-$userid = $_REQUEST['userid'] ?? -1;
+$userid = (int)($_GET['userid'] ?? -1);
 
 //Ergebnis als Meldung unter den Reitern, darunter zurück zur Mitgliederliste
 echo '<div class="mod ally-meldung">';
@@ -48,30 +48,22 @@ $allys = mysqli_execute_query(
 
 if (mysqli_num_rows($allys) < 1) {
     echo '<div class="mod-meldung mod-meldung-fehler">'.$allyleader_lang['msg_1'].'</div>';
+} elseif (!\DieEwigen\DE2\Session\CsrfToken::check($_GET['token'] ?? '')) {
+    //Aufruf kam nicht über den Knopf in der Mitgliederliste (z. B. untergeschobener Link)
+    echo '<div class="mod-meldung mod-meldung-fehler">'.$allyleader_lang['msg_4'].'</div>';
 } else {
-    $result = mysqli_execute_query(
-        $GLOBALS['dbi'],
-        "SELECT * FROM de_allys WHERE leaderid=?",
-        [$_SESSION['ums_user_id']]
-    );
-    $row = mysqli_fetch_assoc($result);
+    $row = mysqli_fetch_assoc($allys);
 
     $clanid = $row['id'];
-    $clantag = $row['allytag'];
 
-
-
+    //neuer Leader muss aufgenommenes Mitglied dieser Allianz sein (status=1), Bewerber haben status=0
     $result = mysqli_execute_query(
         $GLOBALS['dbi'],
-        "SELECT * FROM de_user_data WHERE user_id=?",
-        [$userid]
+        "SELECT user_id FROM de_user_data WHERE user_id=? AND ally_id=? AND status=1",
+        [$userid, $clanid]
     );
-    $row = mysqli_fetch_assoc($result);
-    $clan = $row['allytag'];
 
-
-
-    if ($clantag == $clan) {
+    if (mysqli_num_rows($result) == 1 && $userid != $_SESSION['ums_user_id']) {
 
         mysqli_execute_query(
             $GLOBALS['dbi'],
@@ -81,8 +73,8 @@ if (mysqli_num_rows($allys) < 1) {
 
         mysqli_execute_query(
             $GLOBALS['dbi'],
-            "UPDATE de_allys SET leaderid=? WHERE id=?",
-            [$userid, $clanid]
+            "UPDATE de_allys SET leaderid=? WHERE id=? AND leaderid=?",
+            [$userid, $clanid, $_SESSION['ums_user_id']]
         );
 
         echo '<div class="mod-meldung mod-meldung-ok">'.$allyleader_lang['msg_2'].'</div>';

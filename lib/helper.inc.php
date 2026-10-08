@@ -107,6 +107,15 @@ while(in_array($_SESSION['helperid'], $helper_skip)){
 	$_SESSION['helperid']+=$helper_richtung;
 }
 
+//Name einer Technologie in der Rasse des Spielers, wie auf der Technologieseite
+if(!function_exists('helper_tech')){
+	function helper_tech($tech_id){
+		$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data WHERE tech_id=?", [$tech_id]);
+		$row = mysqli_fetch_assoc($res);
+		return $row ? getTechNameByRasse($row['tech_name'], $_SESSION['ums_rasse']) : '';
+	}
+}
+
 //for($i=0;$i<=100;$i++){$_SESSION['helperid']=$i;
 
 switch($_SESSION['helperid']){
@@ -255,53 +264,16 @@ switch($_SESSION['helperid']){
       $helper_progress++;
     }
   break;
+  //Schritte 9-13 folgen den Voraussetzungen im Technologiebaum: Forschungszentrum I (8) -> Forschung Kollektoren (80)
+  //-> Kollektorenfabrik (7); Materieumwandler D (15) braucht Konstruktionszentrum II (2), die Weltraumhandelsgilde (4)
+  //Planetare Börse (3) und Konstruktionszentrum IV (113). Früher kam die Kollektorenfabrik vor dem Forschungszentrum.
   case 9:
-    if($_SESSION['ums_rasse']==1)$helper_hs='Kollektorenfabrik';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Sonnenschildfabrik';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Zentrum der Wandler';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterwabe';
-    $helper_msg='Baue, um damit Kollektoren produzieren zu k&ouml;nnen, als n&auml;chstes folgendes Geb&auml;ude: '.$helper_hs.'<br><br>Die Kollektoren sind Deine wichtigste Energiequelle und wecken schnell die Gier der anderen Spieler. Wichtig ist eine ausgewogene Anzahl der Kollektoren zu Deinen Schiffen und Verteidigungsanlagen.';
+    $helper_msg='F&uuml;r Kollektoren brauchst Du zuerst eine Forschung, und forschen kannst Du erst mit dem richtigen Geb&auml;ude. Baue als n&auml;chstes: <b>'.helper_tech(8).'</b><br><br>Ein Geb&auml;ude und eine Forschung k&ouml;nnen gleichzeitig laufen, so kommst Du schneller voran.';
     $helper_picid=10;
-    
+
     if($helper_progress==9)
     {
-      //test ob das geb�ude fertig ist
-      if(hasTech($pt,7))
-      {
-        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-        $helper_progress++;
-      }
-    }
-  break;    
-  case 10:
-    if($_SESSION['ums_rasse']==1)$helper_hs='Materieumwandler M';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Raffinerie M';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Wandlerkammer M';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterlager M';
-    $helper_msg='Gut gemacht, jetzt fehlt nur noch ein Energie-Materie-Wandler. Baue als n&auml;chstes folgendes Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Gehe jetzt '.$helper_weg['ressourcen'].' und baue 17 Kollektoren.<br><br>Damit kommst Du raus aus Sektor 1 und in einen Spielersektor. Bei dem Umzug kannst Du kurz ausgeloggt werden. Logge Dich nach dem Umzug einfach wieder ein.';
-    $helper_picid=11;
-    
-    if($helper_progress==10){
-      //test ob das geb�ude fertig ist
-      if(hasTech($pt,14) AND $helper_col>0){
-        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-        $helper_progress++;
-      }
-    }
-  break;
-  case 11:
-    if($_SESSION['ums_rasse']==1)$helper_hs='Forschungszentrum I';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Alchemielabor I';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Kammer der Evolution I';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Netzwerk des Denkens I';
-    $helper_msg='Gut, jetzt bekommst Du bei jedem Wirtschaftstick mehr Multiplex.<br><br>Um bessere Einheiten und Geb&auml;ude bauen zu k&ouml;nnen, ben&ouml;tigst Du die passenden Forschungen daf&uuml;r. Um forschen zu k&ouml;nnen, ben&ouml;tigst du folgendes Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Baue jetzt dieses Geb&auml;ude.';
-    $helper_picid=1;
-    
-    if($helper_progress==11)
-    {
-      //test ob das geb�ude fertig ist
+      //test ob das Forschungszentrum I fertig ist
       if(hasTech($pt,8))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
@@ -310,47 +282,60 @@ switch($_SESSION['helperid']){
       }
     }
   break;
-  case 12:
-    if($_SESSION['ums_rasse']==1)$helper_hs='Transmitterfeld';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Dimensionsfeld';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Netzevolution';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Transwabenfeld';
-    
-    $helper_msg='Jetzt steht Deine erste Forschung an, sie l&auml;uft parallel zum Geb&auml;udebau. Gehe '.$helper_weg['technologien'].', w&auml;hle dort <b>Forschungen</b> und starte: <b>'.$helper_hs.'</b><br>Diese Forschung ist eine Grundlage f&uuml;r den Handel und den Geheimdienst.';
+  case 10:
+    $helper_msg='Jetzt kannst Du forschen. Gehe '.$helper_weg['technologien'].', w&auml;hle dort <b>Forschungen</b> und starte: <b>'.helper_tech(80).'</b><br><br>Ist die Forschung fertig, baue unter <b>Geb&auml;ude</b>: <b>'.helper_tech(7).'</b><br><br>Die Kollektoren sind Deine wichtigste Energiequelle und wecken schnell die Gier der anderen Spieler. Wichtig ist eine ausgewogene Anzahl der Kollektoren zu Deinen Schiffen und Verteidigungsanlagen.';
+    $helper_picid=11;
 
-    if($_SESSION['ums_rasse']==1)$helper_hs='Materieumwandler D,I,E';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Raffinerie D,I,E';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Wandlerkammer D,I,E';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Arbeiterlager D,I,E';
-    $helper_msg.='<br><br>Neben Multiplex ben&ouml;tigst Du noch Dyharra, Iradium und Eternium. Baue daf&uuml;r auch die passenden Geb&auml;ude: <b>'.$helper_hs.'</b><br><br>Mit dem Energieverteilungsschl&uuml;ssel auf der Seite <b>Ressourcen</b> legst Du dann fest, wie die Energie auf die Rohstoffe verteilt wird.';
-    
-    
-    $helper_picid=2;
-    
-    if($helper_progress==12)
+    if($helper_progress==10){
+      //test ob die Kollektorenfabrik fertig ist
+      if(hasTech($pt,7)){
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
+        $helper_progress++;
+      }
+    }
+  break;
+  case 11:
+    $helper_msg='Gut gemacht, jetzt fehlt nur noch ein Energie-Materie-Wandler. Baue als n&auml;chstes folgendes Geb&auml;ude: <b>'.helper_tech(14).'</b><br><br>Gehe jetzt '.$helper_weg['ressourcen'].' und baue 17 Kollektoren.<br><br>Damit kommst Du raus aus Sektor 1 und in einen Spielersektor. Bei dem Umzug kannst Du kurz ausgeloggt werden. Logge Dich nach dem Umzug einfach wieder ein.';
+    $helper_picid=1;
+
+    if($helper_progress==11)
     {
-      //test ob das geb�ude fertig ist
-      if(hasTech($pt,65) AND hasTech($pt,14))
+      //test ob der Materieumwandler M fertig ist und Kollektoren da sind
+      if(hasTech($pt,14) AND $helper_col>0)
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
         mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
         $helper_progress++;
       }
     }
-  break;    
+  break;
+  case 12:
+    $helper_msg='Gut, jetzt bekommst Du bei jedem Wirtschaftstick mehr Multiplex.<br><br>Gehe '.$helper_weg['technologien'].', w&auml;hle dort <b>Forschungen</b> und starte: <b>'.helper_tech(65).'</b><br>Diese Forschung ist eine Grundlage f&uuml;r den Handel und den Geheimdienst.';
+    $helper_msg.='<br><br>Neben Multiplex ben&ouml;tigst Du noch Dyharra. Baue daf&uuml;r unter <b>Geb&auml;ude</b> zuerst <b>'.helper_tech(2).'</b> und dann <b>'.helper_tech(15).'</b>.<br><br>Mit dem Energieverteilungsschl&uuml;ssel auf der Seite <b>Ressourcen</b> legst Du fest, wie die Energie auf die Rohstoffe verteilt wird.';
+    $helper_picid=2;
+
+    if($helper_progress==12)
+    {
+      //test ob Transmitterfeld und Materieumwandler D fertig sind
+      if(hasTech($pt,65) AND hasTech($pt,15))
+      {
+        $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
+        mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
+        $helper_progress++;
+      }
+    }
+  break;
   case 13:
-    if($_SESSION['ums_rasse']==1)$helper_hs='Planetare B&ouml;rse und Konstruktionszentrum II';
-    elseif($_SESSION['ums_rasse']==2)$helper_hs='Planetarer Markt und Werkstatt II';
-    elseif($_SESSION['ums_rasse']==3)$helper_hs='Platz des Sektortausches und Zentralbau II';
-    elseif($_SESSION['ums_rasse']==4)$helper_hs='Planetare Handelswabe und Stock II';
-    $helper_msg='Sehr gut, du verf&uuml;gst jetzt &uuml;ber eine gute Grundproduktion aller Rohstoffe.<br><br>Der n&auml;chste Schritt ist die Anbindung Deines Sonnensystems an das intergalaktische Handelssystem um den planetaren Rohstoffertrag zu erh&ouml;hen. Baue dazu zuerst folgende Geb&auml;ude als Grundlage: <b>'.$helper_hs.'</b><br><br>Damit erh&auml;ltst Du die Voraussetzung f&uuml;r gr&ouml;&szlig;ere Geb&auml;ude und die M&ouml;glichkeit Rohstoffe f&uuml;r die Sektorgeb&auml;ude Deines Sektors zu spenden. Baue Dich aber erstmal auf, bevor Du Rohstoffe spendest.';
-   
+    $helper_msg='Sehr gut, jetzt bekommst Du auch Dyharra.<br><br>Der n&auml;chste Schritt ist die Anbindung Deines Sonnensystems an das intergalaktische Handelssystem, um den planetaren Rohstoffertrag zu erh&ouml;hen. Baue dazu als Grundlage: <b>'.helper_tech(3).'</b>, <b>'.helper_tech(112).'</b> und <b>'.helper_tech(113).'</b>';
+    $helper_msg.='<br><br>Damit kannst Du auch <b>'.helper_tech(16).'</b> und <b>'.helper_tech(17).'</b> f&uuml;r Iradium und Eternium bauen. Au&szlig;erdem kannst Du mit der B&ouml;rse Rohstoffe f&uuml;r die Sektorgeb&auml;ude Deines Sektors spenden. Baue Dich aber erstmal auf, bevor Du Rohstoffe spendest.';
+
     $helper_picid=3;
-    
+
     if($helper_progress==13)
     {
-      //test ob das geb�ude fertig ist
-      if(hasTech($pt,3) AND hasTech($pt,2))
+      //test ob Planetare Börse und Konstruktionszentrum IV fertig sind (Voraussetzungen der Weltraumhandelsgilde)
+      if(hasTech($pt,3) AND hasTech($pt,113))
       {
         $sql = "UPDATE de_user_data SET helperprogress=helperprogress+1 WHERE user_id=?";
         mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
@@ -363,7 +348,7 @@ switch($_SESSION['helperid']){
     elseif($_SESSION['ums_rasse']==2)$helper_hs='Galaktische Handelszunft';
     elseif($_SESSION['ums_rasse']==3)$helper_hs='Platz des Raumtausches';
     elseif($_SESSION['ums_rasse']==4)$helper_hs='Handelswabe des Universums';
-    $helper_msg='Mit dem n&auml;chsten Geb&auml;ude bindest Du Dein Sonnensystem an das intergalaktische Handelssystem an. Dadurch steigt der planetare Rohstoffertrag stark an, was der Energie von 47 Kollektoren entspricht.<br><br>Au&szlig;erdem kannst Du damit an Auktionen teilnehmen, und es ist die Voraussetzung f&uuml;r Missionen und das Artefaktgeb&auml;ude.<br><br>Baue jetzt folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
+    $helper_msg='Mit dem n&auml;chsten Geb&auml;ude bindest Du Dein Sonnensystem an das intergalaktische Handelssystem an. Dadurch steigt der planetare Rohstoffertrag stark an.<br><br>Au&szlig;erdem kannst Du damit an Auktionen teilnehmen, und es ist die Voraussetzung f&uuml;r Missionen und das Artefaktgeb&auml;ude.<br><br>Baue jetzt folgendes Geb&auml;ude: <b>'.$helper_hs.'</b>';
    
     $helper_picid=4;
     
@@ -639,7 +624,7 @@ switch($_SESSION['helperid']){
     elseif($_SESSION['ums_rasse']==2){$helper_hs='Missionshort';$helper_hs2='Werkstatt VII';}
     elseif($_SESSION['ums_rasse']==3){$helper_hs='Missionsbau';$helper_hs2='Zentralbau VII';}
     elseif($_SESSION['ums_rasse']==4){$helper_hs='Missionsstock';$helper_hs2='Stock VII';}
-    $helper_msg='Mit Missionen kannst Du Agenten und Frachter gewinnbringend einsetzen. Daf&uuml;r ben&ouml;tigst Du folgendes Geb&auml;ude: <b>'.$helper_hs.'</b> (Voraussetzung: '.$helper_hs2.').<br><br>Gehe dann '.$helper_weg['missionen'].'. <b>Agenteneins&auml;tze</b> ben&ouml;tigen nur Agenten und bringen Artefakte, Tronic oder Titanen-Energiekerne. Beim <b>Rohstoff-Handel</b> und <b>Waren-Handel</b> schickst Du eine Flotte mit Frachtern los. Missionen laufen in Echtzeit und k&ouml;nnen nicht abgebrochen werden, eine Flotte auf Mission verteidigt Dein System nicht. Ist die Zeit abgelaufen, holst Du die Belohnung mit <b>Mission beenden</b> ab.';
+    $helper_msg='Mit Missionen kannst Du Agenten und Frachter gewinnbringend einsetzen. Daf&uuml;r ben&ouml;tigst Du folgendes Geb&auml;ude: <b>'.$helper_hs.'</b> (Voraussetzung: '.$helper_hs2.').<br><br>Gehe dann '.$helper_weg['missionen'].'. <b>Agenteneins&auml;tze</b> ben&ouml;tigen nur Agenten und bringen Artefakte, Tronic oder Titanen-Energiekerne. Beim <b>Rohstoff-Handel</b> und <b>Waren-Handel</b> schickst Du eine Flotte mit Frachtern los. Missionen laufen in Echtzeit und k&ouml;nnen nicht abgebrochen werden, eine Flotte auf Mission verteidigt Dein System nicht. Ist die Zeit abgelaufen, holst Du die Belohnung mit <b>Abholen</b> ab.';
     $helper_picid=10;
 
     if($helper_progress==31){

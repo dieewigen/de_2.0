@@ -795,7 +795,7 @@ while ($row = mysqli_fetch_assoc($db_daten)) //jeder gefundene datensatz wird ge
       $status = '<a href="bkmenu.php?ida='.$gebnr.'" class="mod-btn ally-btn-klein" data-bestaetigen="Wirklich bauen?">'.$functions['bauen'].'</a>';
     }
     echo '<div class="bk-zeile bk-geb'.($techs[$gebnr] == 1 ? ' bk-gebaut' : '').'">';
-    echo '<span class="bk-name"><a href="help.php?t='.$gebnr.'">'.$row["tech_name"].'</a></span>';
+    echo '<span class="bk-name"><a href="help.php?s='.$gebnr.'">'.$row["tech_name"].'</a></span>';
     for ($r = 1; $r <= 5; $r++) {
       echo '<span class="bk-zahl'.($kosten[$r] == 0 ? ' bk-null' : '').'">'.number_format($kosten[$r], 0, "", ".").'</span>';
     }

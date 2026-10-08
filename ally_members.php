@@ -143,19 +143,21 @@ while ($data = mysqli_fetch_assoc($result)) {
         $inaktiv = ' ally-mitglied-inaktiv';
     }
 
-    //Entlassen/Leader übergeben mit Zwei-Klick-Bestätigung statt Rückfrage
+    //Entlassen/Leader übergeben mit Zwei-Klick-Bestätigung statt Rückfrage;
+    //das Token verhindert, dass ein fremder Link die Aktion im Namen der Allianzleitung auslöst
     $aktionen = '';
+    $token = \DieEwigen\DE2\Session\CsrfToken::query();
     if ($isleader) {
         $aktionen = '
             <span class="ally-mitglied-aktionen">
-                <a href="ally_kick.php?userid='.$userid.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
-                <a href="ally_leader.php?userid='.$userid.'" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Abgeben?" title="'.htmlspecialchars($allymembers_lang['msg_2_1'].' '.$name.' '.$allymembers_lang['msg_2_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['toleader']).'</a>
+                <a href="ally_kick.php?userid='.$userid.'&amp;'.$token.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
+                <a href="ally_leader.php?userid='.$userid.'&amp;'.$token.'" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Abgeben?" title="'.htmlspecialchars($allymembers_lang['msg_2_1'].' '.$name.' '.$allymembers_lang['msg_2_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['toleader']).'</a>
             </span>';
     }
     if ($iscoleader) {
         $aktionen = '
             <span class="ally-mitglied-aktionen">
-                <a href="ally_kick.php?userid='.$userid.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
+                <a href="ally_kick.php?userid='.$userid.'&amp;'.$token.'" class="mod-btn mod-btn-gefahr ally-btn-klein" data-bestaetigen="Entlassen?" title="'.htmlspecialchars($allymembers_lang['msg_1_1'].' '.$name.' '.$allymembers_lang['msg_1_2'], ENT_QUOTES, 'UTF-8').'">'.ucfirst($allymembers_lang['entlassen']).'</a>
             </span>';
     }
 

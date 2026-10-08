@@ -36,7 +36,7 @@ include('resline.php');
 include('ally/ally.menu.inc.php');
 include('lib/basefunctions.lib.php');
 
-$userid = $_GET['userid'] ?? 0;
+$userid = (int)($_GET['userid'] ?? 0);
 
 //Ergebnis als Meldung unter den Reitern, darunter zurück zur Mitgliederliste
 echo '<div class="mod ally-meldung">';
@@ -48,6 +48,11 @@ $allys = mysqli_execute_query($GLOBALS['dbi'],
 if(mysqli_num_rows($allys) < 1)
 {
 	echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_1'].'</div>';
+}
+elseif(!\DieEwigen\DE2\Session\CsrfToken::check($_GET['token'] ?? ''))
+{
+	//Aufruf kam nicht über den Knopf in der Mitgliederliste (z. B. untergeschobener Link)
+	echo '<div class="mod-meldung mod-meldung-fehler">'.$allykick_lang['msg_8'].'</div>';
 }
 else
 {
@@ -69,9 +74,12 @@ else
 		}
 	}
 	
+	//entlassen werden nur aufgenommene Mitglieder dieser Allianz (status=1); Bewerbungen lehnt man unter Anträge ab,
+	//dort bekommt der Bewerber seine Gebühr zurück
+	$clan = '';
 	$result = mysqli_execute_query($GLOBALS['dbi'],
-		"SELECT * FROM de_user_data WHERE user_id=?",
-		[$userid]);
+		"SELECT * FROM de_user_data WHERE user_id=? AND ally_id=? AND status=1",
+		[$userid, $clanid]);
 	if($result) {
 		if($row = mysqli_fetch_assoc($result)) {
 	

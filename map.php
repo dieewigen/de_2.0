@@ -241,7 +241,7 @@ window.greekPlayer = new GreekLetterPlayer();
 ';
 
 //die Struktur darstellen: Bild als Landmarke, Kopf- und Fusszeile liegen als Leisten auf dem Bild (Aussehen in de-map.scss)
-$strukturHilfe = 'https://hilfe.die-ewigen.com/index.php?thread=de_de&amp;post=68';
+$strukturHilfe = 'https://hilfe.die-ewigen.com/index.php?thema=universum#struktur';
 echo '<div class="struktur" style="top:40000px; right:40000px;">
     <a class="struktur-link" href="'.$strukturHilfe.'" target="_blank" rel="noopener" title="'.$sec_lang['struktur_lore'].'">
         <img class="struktur-bild" src="gp/g/die_struktur.jpg" alt="'.$sec_lang['struktur_titel'].'">

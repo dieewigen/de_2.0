@@ -29,8 +29,8 @@ include "functions.php";
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include "resline.php";
 
-//Art einer Technologie anhand der bekannten Bereiche der tech_id
-function hlp_art($tech_id)
+//Art einer Technologie: Einheiten anhand ihres tech_id-Bereichs, sonst der Reiter der Technologieseite (tech_typ)
+function hlp_art($tech_id, $tech_typ)
 {
     if ($tech_id == 80) {
         return 'Kollektor';
@@ -47,51 +47,96 @@ function hlp_art($tech_id)
     if ($tech_id == 111) {
         return 'Agent';
     }
-    if ($tech_id >= 120 && $tech_id <= 129) {
-        return 'Sektorgeb&auml;ude';
-    }
-    return '';
+    $arten = array(0 => 'Geb&auml;ude', 1 => 'Forschung', 2 => 'Basisschiff', 3 => 'V-Systeme');
+    return $arten[$tech_typ] ?? '';
 }
 
+//eine Beschreibung mit Art, Text und Voraussetzungen (Liste fertiger Links/Chips) ausgeben
+function hlp_eintrag($titel, $art, $text, $voraussetzungen)
+{
+    global $help_lang;
+    rahmen_oben($titel);
+    echo '<div class="mod hlp">';
+    if ($art != '') {
+        echo '<div class="mod-typ">'.$art.'</div>';
+    }
+    echo '<div class="hlp-text">'.$text.'</div>';
+    if (count($voraussetzungen) > 0) {
+        echo '<div class="hlp-abschnitt"><div class="mod-typ">Voraussetzungen</div><div class="hlp-chips">'.implode('', $voraussetzungen).'</div></div>';
+    }
+    echo '<div class="hlp-fuss"><a href="javascript:history.back();" class="mod-btn mod-btn-leise ally-btn-klein">'.ucfirst($help_lang['zurueck']).'</a></div>';
+    echo '</div>';
+    rahmen_unten();
+}
+
+function hlp_leer()
+{
+    global $help_lang;
+    rahmen_oben($help_lang['title']);
+    echo '<div class="mod hlp"><div class="mod-leer">Zu diesem Eintrag gibt es keine Beschreibung.</div></div>';
+    rahmen_unten();
+}
+
+//Technologien: Namen und Beschreibungen stehen in de_tech_data je Rasse durch ";" getrennt, wie auf der Technologieseite
+//(früher las diese Seite die alten Tabellen de_tech_data1-4, deren Voraussetzungen nicht mehr stimmten)
 if (isset($_GET["t"])) {
     $t = intval($_GET["t"]);
     $db_daten = mysqli_execute_query($GLOBALS['dbi'],
-      "SELECT tech_name, des, tech_vor FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?",
+      "SELECT tech_name, tech_desc, tech_vor, tech_typ FROM de_tech_data WHERE tech_id=?",
       [$t]);
     $row = mysqli_fetch_assoc($db_daten);
 
     if ($row) {
-        rahmen_oben($row["tech_name"]);
-        echo '<div class="mod hlp">';
-        $art = hlp_art($t);
-        if ($art != '') {
-            echo '<div class="mod-typ">'.$art.'</div>';
+        //Voraussetzungen: Technologien (T…) als Link auf deren Beschreibung, im Hardcore-Modus auch EH-Teilsiege (B1x…)
+        $voraussetzungen = array();
+        foreach (explode(';', (string)$row['tech_vor']) as $vor) {
+            if ($vor === '') {
+                continue;
+            }
+            if ($vor[0] == 'T') {
+                $vor_id = (int)substr($vor, 1);
+                $db_vor = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data WHERE tech_id=?", [$vor_id]);
+                $row_vor = mysqli_fetch_assoc($db_vor);
+                if ($row_vor) {
+                    $voraussetzungen[] = '<a href="help.php?t='.$vor_id.'" class="mod-chip hlp-chip">'.getTechNameByRasse($row_vor['tech_name'], $_SESSION['ums_rasse']).'</a>';
+                }
+            } elseif ($vor[0] == 'B' && ($vor[1] ?? '') == '1' && $sv_hardcore == 1) {
+                $parts = explode('x', $vor);
+                $voraussetzungen[] = '<span class="mod-chip hlp-chip">'.(int)($parts[1] ?? 0).' EH-Teilsieg(e)</span>';
+            }
         }
-        echo '<div class="hlp-text">'.$row["des"].'</div>';
+        $beschreibungen = explode(';', (string)$row['tech_desc']);
+        hlp_eintrag(getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']), hlp_art($t, (int)$row['tech_typ']),
+            nl2br(trim($beschreibungen[$_SESSION['ums_rasse'] - 1] ?? '')), $voraussetzungen);
+    } else {
+        hlp_leer();
+    }
+}
 
-        //Voraussetzungen, je als Link auf deren Beschreibung
+//Sektorgebäude: stehen weiterhin in de_tech_data1 (IDs 120-129, für alle Rassen gleich), wie im SK-Bau (bkmenu.php);
+//in de_tech_data sind dieselben IDs Forschungszentren und Raumwerft, darum ein eigener Parameter
+if (isset($_GET["s"])) {
+    $s = intval($_GET["s"]);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'],
+      "SELECT tech_name, des, tech_vor FROM de_tech_data1 WHERE tech_id=? AND tech_id>119 AND tech_id<130",
+      [$s]);
+    $row = mysqli_fetch_assoc($db_daten);
+
+    if ($row) {
         $voraussetzungen = array();
         foreach (explode(';', (string)$row['tech_vor']) as $vor) {
             $vor = (int)$vor;
-            if ($vor > 0) {
-                $db_vor = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=?", [$vor]);
+            if ($vor > 119 && $vor < 130) {
+                $db_vor = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data1 WHERE tech_id=?", [$vor]);
                 $row_vor = mysqli_fetch_assoc($db_vor);
                 if ($row_vor) {
-                    $voraussetzungen[] = '<a href="help.php?t='.$vor.'" class="mod-chip hlp-chip">'.$row_vor['tech_name'].'</a>';
+                    $voraussetzungen[] = '<a href="help.php?s='.$vor.'" class="mod-chip hlp-chip">'.$row_vor['tech_name'].'</a>';
                 }
             }
         }
-        if (count($voraussetzungen) > 0) {
-            echo '<div class="hlp-abschnitt"><div class="mod-typ">Voraussetzungen</div><div class="hlp-chips">'.implode('', $voraussetzungen).'</div></div>';
-        }
-
-        echo '<div class="hlp-fuss"><a href="javascript:history.back();" class="mod-btn mod-btn-leise ally-btn-klein">'.ucfirst($help_lang['zurueck']).'</a></div>';
-        echo '</div>';
-        rahmen_unten();
+        hlp_eintrag($row['tech_name'], 'Sektorgeb&auml;ude', $row['des'], $voraussetzungen);
     } else {
-        rahmen_oben($help_lang['title']);
-        echo '<div class="mod hlp"><div class="mod-leer">Zu diesem Eintrag gibt es keine Beschreibung.</div></div>';
-        rahmen_unten();
+        hlp_leer();
     }
 }
 
