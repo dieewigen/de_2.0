@@ -367,6 +367,22 @@ if (($GLOBALS['sv_deactivate_vsystems'] ?? 0) != 1) {
     }
 }
 
+//Sektor 666, nur solange die Schläfer wach sind
+try {
+    $s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
+    if ($s666->isWach()) {
+        include_once 'inc/lang/'.$sv_server_lang.'_sektor666.lang.php';
+        $s666_text = strtr($s666_lang['ov_zeile'], ['{STUFE}' => $s666->getStufe(), '{PCT}' => $s666->getHuelleProzent()]);
+        $s666_rang = $s666->getEigenerRang((int)$sector);
+        if ($s666_rang !== null) {
+            $s666_text .= strtr($s666_lang['ov_eigener'], ['{PLATZ}' => $s666_rang['platz'], '{ANTEIL}' => \DieEwigen\DE2\Model\Sektor666\Sektor666Service::anteil($s666_rang['anteil'])]);
+        }
+        echo '<div class="ov-siegel ov-s666">'.$s666_text.'.</div>';
+    }
+} catch (\Throwable $e) {
+    error_log('Sektor 666: '.$e->getMessage());
+}
+
 //Links: Serverinfos, Hilfe, Umfragen, Community; als schlichte Knöpfe passen alle fünf in eine Zeile
 echo '
     <div class="ov-links">

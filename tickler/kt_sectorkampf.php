@@ -50,7 +50,25 @@ function create_bknachricht(){
 	}
 }
 
-$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec FROM de_sector WHERE aktion = 1 AND zeit = 1 ORDER BY zielsec", []);
+//Sektor 666: Sind die Schläfer wach, rechnet der Sektor666Service die Angriffe dorthin selbst ab
+//(eigene Regeln ohne "/4"-Formel und ohne Artefaktraub); Fehler dürfen den Tick nicht aufhalten
+$s666_wach = false;
+try {
+	include __DIR__.'/../inc/lang/'.($GLOBALS['sv_server_lang'] ?? 1).'_sektor666.lang.php';
+	$s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
+	if ($s666->isWach()) {
+		$s666_wach = true;
+		$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, e2 FROM de_sector WHERE zielsec = ? AND aktion = 1 AND zeit = 1 ORDER BY sec_id", [\DieEwigen\DE2\Model\Sektor666\Sektor666Service::SEKTOR]);
+		while ($row = mysqli_fetch_assoc($res)) {
+			$s666_ergebnis = $s666->angriff((int)$row['sec_id'], (int)$row['e2'], $s666_lang);
+			echo '<br>Sektor 666: Angriff von Sektor '.$row['sec_id'].' mit '.$row['e2'].' Schiffen: '.json_encode($s666_ergebnis).'<br>';
+		}
+	}
+} catch (\Throwable $e) {
+	echo '<br>Fehler bei Sektor 666: '.$e->getMessage().'<br>';
+}
+
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec FROM de_sector WHERE aktion = 1 AND zeit = 1".($s666_wach ? " AND zielsec <> 666" : "")." ORDER BY zielsec", []);
 
 $num = mysqli_num_rows($res);
 //echo '<br>'.$num.' Kampfsysteme<br>';

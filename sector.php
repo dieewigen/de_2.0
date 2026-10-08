@@ -208,19 +208,11 @@ $sql = "SELECT * FROM de_sector WHERE sec_id=?";
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 $sec_data = mysqli_fetch_assoc($db_daten);
 
-//Hinweis in Sektor 666
+//Sektor 666: Zustand der Schläfer (src/Model/Sektor666/Sektor666Service.php), schlafend nur der Kulissentext
 if($sf==666){
-    //hinweistext für npc-sektoren
-	echo '
-	<div class="cell" style="display: flex; width: 597px; border: 1px solid #333333; padding: 4px; margin-bottom: 20px;">
-    	<div style="background-color: #000000; width: 50px; height: 50px;">
-			<img src="'.'gp/'.'g/symbol12.png" border="0" title="Info">
-		</div>
-    
-		<div style="flex-grow: 1; padding: 10px;">
-			In Sektor 666 regten sich vor Äonen die größten Übel der Zeit. Heute schlafen sie und man kann nur hoffen, dass sie nie wieder erwachen. 
-		</div>
-    </div>';
+	include 'inc/lang/'.$sv_server_lang.'_sektor666.lang.php';
+	$s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
+	echo \DieEwigen\DE2\View\Sektor666\Karte::render($s666, $s666_lang, (int)$_SESSION['ums_user_id'], (int)$ownsector);
 }
 
 

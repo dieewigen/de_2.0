@@ -4,7 +4,11 @@ include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_bkmenu.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
+include 'inc/lang/'.$sv_server_lang.'_sektor666.lang.php';
 include 'functions.php';
+
+//Sektor 666: Sind die Schläfer wach, ist der Angriff auch ohne Sektorraumbasis möglich, Verteidigen nicht
+$s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id=?", 
@@ -178,7 +182,7 @@ function bk_zahl($wert){
 }
 
 function attdef($ownsector, $zsec, $akttyp, $aktzeit){
-	global $bkmenu_lang;
+	global $bkmenu_lang, $s666, $s666_lang;
 
 	$rz = 0;
   //teste ob die flotte bereit ist befehle zu bekommen
@@ -199,6 +203,13 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 	  $ak=$ownsector;
 	  if ($zk==$ak) $zsec=0;
 
+	  //Sektor 666 mit wachen Schläfern: nur Angriff, und der auch ohne Sektorraumbasis
+	  $s666_ziel = (intval($zsec)==\DieEwigen\DE2\Model\Sektor666\Sektor666Service::SEKTOR && $s666->isWach());
+	  if ($s666_ziel && $akttyp!=1){
+		bk_meldung($s666_lang['fehler_verteidigen']);
+		return;
+	  }
+
 	  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
 	    "SELECT techs FROM de_sector WHERE sec_id=?",
 		[$zsec]);
@@ -210,7 +221,7 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 		$rowx = mysqli_fetch_assoc($db_daten);
 		$ztechs = $rowx["techs"];
 
-		if ($ztechs[1]==1) $ok=1;else $ok=0;//wenn srb dann hinflug möglich
+		if ($ztechs[1]==1 || $s666_ziel) $ok=1;else $ok=0;//wenn srb dann hinflug möglich
 
 		$rz = 0; // Initialisierung der Variable $rz
 
@@ -232,7 +243,7 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 				[$zsec, $bk]);
 			$numbk = mysqli_num_rows($db_daten);
 
-			if ($numbk!=0){//nachricht an bk schicken
+			if ($numbk!=0 && !$s666_ziel){//nachricht an bk schicken (in 666 sitzen nur Bots)
 				$row = mysqli_fetch_assoc($db_daten);
 				$ge=$schiffe;
 				$time=date("YmdHis");
@@ -879,6 +890,9 @@ if ($techs[122]==1) //raumwerft vorhanden?
 	//flottenbefehle
 	echo '<form action="bkmenu.php" method="post" class="ally-abschnitt">';
 	echo '<div class="mod-typ">'.$bkmenu_lang['flottenbefehleerteilen'].'</div>';
+	if ($s666->isWach()) {
+		echo '<div class="mod-hinweis bk-s666">'.strtr($s666_lang['bk_hinweis'], array('{STUFE}' => $s666->getStufe(), '{PCT}' => $s666->getHuelleProzent(), '{RZ}' => $s666->getReisezeit())).'</div>';
+	}
 	echo '<div class="bk-formzeile">';
 	echo '<select name="af1" class="mod-eingabe bk-befehl">';
 	echo '<option value="0">'.$bkmenu_lang['befehlebeibehalten'].'</option><option value="1">'.$bkmenu_lang['heimkehr'].'</option><option value="2">'.$bkmenu_lang['angreifen'].'</option>';

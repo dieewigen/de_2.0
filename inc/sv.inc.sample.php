@@ -174,6 +174,18 @@ $GLOBALS['sv_pcs_id']=11;
 //$GLOBALS['sv_thanatos_industrie_pro_stufe']=5;    //Industrie-Ertrag in den VS je Stufe in Prozent, bis Rundenende
 //$GLOBALS['sv_thanatos_bauzeit_pro_stufe']=3;      //kürzere Bauzeit in den VS je Stufe in Prozent, bis Rundenende
 
+//Sektor 666 erwacht (Server-Boss für die Sektorflotten, Sektor666Service), optional, ohne Eintrag gelten diese Werte
+//$GLOBALS['sv_s666_aktiv']=true;             //false schaltet das Ereignis ab
+//$GLOBALS['sv_s666_start']=50;               //erstes Erwachen bei diesem Rundenfortschritt in Prozent (WT / sv_winscore)
+//$GLOBALS['sv_s666_pause']=8;                //Pause nach einer Niederlage in Prozent des Rundenfortschritts
+//$GLOBALS['sv_s666_hp_je_schiff']=2;         //Hülle je Sektorschiff (Wach- und Sektorflotte) der teilnehmenden Sektoren beim Erwachen
+//$GLOBALS['sv_s666_hp_je_sektor']=500;       //Mindesthülle je teilnehmendem Sektor, falls die Sektorflotten noch klein sind
+//$GLOBALS['sv_s666_stufenfaktor']=1.5;       //jede weitere Stufe hat so viel mehr Hülle
+//$GLOBALS['sv_s666_abwehr']=10;              //Abwehrfeuer: so viel Prozent der angreifenden Sektorschiffe gehen verloren
+//$GLOBALS['sv_s666_ausgleich']=50;           //so viel Prozent der Kosten verlorener Schiffe gehen beim Sieg zurück ins Sektorlager
+//$GLOBALS['sv_s666_mindestanteil']=1;        //Mindestanteil am Schaden in Prozent für Beute
+//$GLOBALS['sv_s666_beute']=array('grund' => array('tronic' => 10), 1 => array('artefakte' => 2)); //einzelne Werte der Beute, Aufbau siehe Sektor666Service::BEUTE
+
 //serversprache
 $GLOBALS['sv_server_lang']=1;
 

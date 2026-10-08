@@ -3224,6 +3224,92 @@ a.art-kachel-zurueck:hover::after {
   color: #ffffff;
 }
 
+.s666 {
+  width: 572px;
+}
+.s666 .ov-werte {
+  margin-top: 10px;
+}
+.s666 .mod-hinweis {
+  margin: 10px 0 0;
+}
+
+.s666-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #c9d1d9;
+}
+
+.s666-leise {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.s666-balken {
+  height: 6px;
+  margin-top: 6px;
+}
+.s666-balken > span {
+  background: linear-gradient(90deg, #d9534f, #ff8a5c);
+}
+
+.s666-liste {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #c9d1d9;
+}
+.s666-liste b {
+  color: #ffffff;
+}
+
+.prod-liste .einh-rang.s666-eigen {
+  box-shadow: inset 0 0 0 1px var(--akzent);
+}
+
+.mod .s666-text a,
+.mod .s666-text a:link,
+.mod .s666-text a:visited,
+.mod .bk-s666 a,
+.mod .bk-s666 a:link,
+.mod .bk-s666 a:visited,
+.mod .ov-s666 a,
+.mod .ov-s666 a:link,
+.mod .ov-s666 a:visited {
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--akzent);
+}
+
+.s666 .einh-rang-name a,
+.s666 .einh-rang-name a:link,
+.s666 .einh-rang-name a:visited {
+  font-size: 12px;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.s666-verlauf {
+  margin-top: 12px;
+}
+.s666-verlauf summary {
+  font-size: 11px;
+  color: #8b949e;
+  cursor: pointer;
+}
+.s666-verlauf summary:hover {
+  color: #c9d1d9;
+}
+.s666-verlauf ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 11px;
+  color: #9da7b1;
+}
+
 .einh-rang {
   display: grid;
   grid-template-columns: 44px 1fr 120px 60px;

@@ -2858,6 +2858,57 @@ CREATE TABLE `de_sector_voteout` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_sektor666`
+-- Sektor 666 erwacht: Zustand der Schläfer, eine Zeile mit id=1 (legt der Sektor666Service selbst an)
+--
+
+CREATE TABLE `de_sektor666` (
+  `id` tinyint(3) UNSIGNED NOT NULL,
+  `round_start` date DEFAULT NULL,
+  `stufe` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `hp_max` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `hp` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `marke` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `naechstes_erwachen_wt` bigint(20) NOT NULL DEFAULT 0,
+  `stand_wt` bigint(20) NOT NULL DEFAULT 1,
+  `history` varchar(2000) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_sektor666_mitglied`
+-- Wer beim Erwachen einer Stufe in einem teilnehmenden Sektor war (nur diese Spieler bekommen Beute)
+--
+
+CREATE TABLE `de_sektor666_mitglied` (
+  `stufe` smallint(5) UNSIGNED NOT NULL,
+  `user_id` mediumint(9) NOT NULL,
+  `sec_id` int(11) NOT NULL,
+  PRIMARY KEY (`stufe`, `user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_sektor666_schaden`
+-- Schaden, Angriffe und Schiffsverluste je Stufe und Sektor
+--
+
+CREATE TABLE `de_sektor666_schaden` (
+  `stufe` smallint(5) UNSIGNED NOT NULL,
+  `sec_id` int(11) NOT NULL,
+  `schaden` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `angriffe` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `verluste` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`stufe`, `sec_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_server_round_toplist`
 --
 
