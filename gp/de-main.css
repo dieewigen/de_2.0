@@ -3185,6 +3185,45 @@ a.art-kachel-zurueck:hover::after {
   color: #ff8a8a;
 }
 
+.einh-haltung {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.einh-haltung > .mod-typ {
+  flex-basis: 100%;
+}
+.einh-haltung .pol-optionen {
+  flex-basis: 100%;
+}
+
+.einh-haltung-fuss {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.einh-regeln {
+  margin-bottom: 8px;
+}
+.einh-regeln summary {
+  font-size: 11px;
+  color: #8b949e;
+  cursor: pointer;
+}
+.einh-regeln summary:hover {
+  color: #c9d1d9;
+}
+.einh-regeln p {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.einh-regeln b {
+  color: #ffffff;
+}
+
 .einh-rang {
   display: grid;
   grid-template-columns: 44px 1fr 120px 60px;

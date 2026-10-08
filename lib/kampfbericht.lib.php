@@ -1,4 +1,25 @@
 <?php
+require_once __DIR__.'/../vendor/autoload.php';
+
+//Haltung einer Seite unter dem Namen, nur in Berichten mit Haltungen (seit Okt. 2026) und nur bei echtem Kampf
+function kampfberichtBG_haltung($paar, $seite){
+	$eigene=intval($paar['haltung'.$seite] ?? 0);
+	$gegner=intval($paar['haltung'.($seite==1 ? 2 : 1)] ?? 0);
+	if($eigene<1 || $gegner<1){
+		return '';
+	}
+
+	$text=\DieEwigen\DE2\Model\Battleground\Haltung::name($eigene);
+	if(intval($paar['wahl'.$seite] ?? 0)==0){
+		$text.=' (Zufall)';
+	}
+	if(\DieEwigen\DE2\Model\Battleground\Haltung::vorteil($eigene, $gegner)>0){
+		$text.=' &middot; <span style="color: #5fe08a;">Vorteil</span>';
+	}
+
+	return '<div style="font-size: 11px; font-weight: normal; color: #9da7b1;">'.$text.'</div>';
+}
+
 function showkampfberichtBG($data){
 	$content='';
 
@@ -44,10 +65,11 @@ function showkampfberichtBG($data){
 
 			$content.='<div style="display: flex; background-color: '.$bg_color.'">';
 
-			$content.='<div style="width: 260px; text-align: center;'.$css1.'">'.$kb[$runde][$p]['spielername1'].'</div>';
+			//beide Namen teilen sich die Breite, damit der Bericht auch mobil passt
+			$content.='<div style="flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: center;'.$css1.'">'.$kb[$runde][$p]['spielername1'].kampfberichtBG_haltung($kb[$runde][$p], 1).'</div>';
 			if(!empty($kb[$runde][$p]['spielername2'])){
-				$content.='<div style="flex-grow: 1; text-align: center;">:</div>';
-				$content.='<div style="width: 260px; text-align: center;'.$css2.'">'.$kb[$runde][$p]['spielername2'].'</div>';
+				$content.='<div style="flex: 0 0 auto; padding: 0 6px; text-align: center;">:</div>';
+				$content.='<div style="flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: center;'.$css2.'">'.$kb[$runde][$p]['spielername2'].kampfberichtBG_haltung($kb[$runde][$p], 2).'</div>';
 			}
 
 			$content.='</div>';

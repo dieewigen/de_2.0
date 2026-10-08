@@ -3546,6 +3546,53 @@ a.art-kachel-zurueck:hover::after {
 	color: #ff8a8a;
 }
 
+// Haltung je Battleground (Auswahlflächen wie .pol-option in politics.php)
+.einh-haltung {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 8px;
+
+	> .mod-typ {
+		flex-basis: 100%;
+	}
+
+	.pol-optionen {
+		flex-basis: 100%;
+	}
+}
+
+.einh-haltung-fuss {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 10px;
+}
+
+// Erklärung der Haltungen, aufklappbar über den Battlegrounds
+.einh-regeln {
+	margin-bottom: 8px;
+
+	summary {
+		font-size: 11px;
+		color: #8b949e;
+		cursor: pointer;
+
+		&:hover {
+			color: #c9d1d9;
+		}
+	}
+
+	p {
+		margin: 6px 0 0;
+		font-size: 11px;
+		color: #9da7b1;
+	}
+
+	b {
+		color: #ffffff;
+	}
+}
+
 // Gewinnerlisten
 .einh-rang {
 	display: grid;

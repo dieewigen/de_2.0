@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__.'/../vendor/autoload.php';
+use DieEwigen\DE2\Model\Battleground\Haltung;
 
 echo '<hr>Battlegrounds<br><br>';
 
@@ -60,6 +62,7 @@ function doBattleGround($bg)
         //Schiff laden
         $player[$player_id]['user_id'] = $row['user_id'];
         $player[$player_id]['ship'] = loadSpecialShip($row['user_id']);
+        $player[$player_id]['wahl'] = $player[$player_id]['ship']->getHaltung($bg);
         $player[$player_id]['score'] = $row['bgscore'.$bg];
         $player[$player_id]['spielername'] = $row['spielername'];
 
@@ -97,20 +100,27 @@ function doBattleGround($bg)
                     echo 'add';
 
                     $allys[$ship_exist_id]['ship']->ship_level += $player[$p]['ship']->ship_level;
+                    $allys[$ship_exist_id]['stimmen'][] = array($player[$p]['wahl'], $player[$p]['ship']->ship_level);
 
                 } else {
                     echo 'neu';
-                    //neues Schiff anlegen
+                    //neues Schiff anlegen, als Kopie, damit das Aufaddieren das Schiff des Mitglieds nicht verändert
                     $allys[$ally_id]['ally_id'] =		$player[$p]['ally_id'];
                     $allys[$ally_id]['spielername'] =	$player[$p]['ally_tag'];
-                    $allys[$ally_id]['ship'] =		$player[$p]['ship'];
+                    $allys[$ally_id]['ship'] =		clone $player[$p]['ship'];
                     $allys[$ally_id]['score'] =		getAllyBGScore($allys[$ally_id]['ally_id'], $bg);
                     $allys[$ally_id]['runde'] =		-1;
+                    $allys[$ally_id]['stimmen'] =	array(array($player[$p]['wahl'], $player[$p]['ship']->ship_level));
 
                     $ally_ids[] = $allys[$ally_id]['ally_id'];
                     $ally_id++;
                 }
             }
+        }
+
+        //Haltung der Allianz: die Haltung mit den meisten Basisstern-Stufen
+        for ($a = 0;$a < count($allys);$a++) {
+            $allys[$a]['wahl'] = Haltung::mehrheit($allys[$a]['stimmen']);
         }
     }
 
@@ -164,7 +174,8 @@ function doBattleGround($bg)
 
                     //spieler kämpfen lassen
                     if ($player_id1 != -1 || $player_id2 != -1) {
-                        $winner_id = letSpecialShipFight($player_id1, $player_id2, $player);
+                        $haltung = array(0, 0);
+                        $winner_id = letSpecialShipFight($player_id1, $player_id2, $player, $haltung);
 
                         echo '<br>P1: '.$player[$player_id1]['spielername'];
                         if($player_id2 > 0){
@@ -212,7 +223,12 @@ function doBattleGround($bg)
                             'user_id2' => $player_id2 > -1 ? $player[$player_id2]['user_id'] : -1,
                             'spielername1' => $spielername1.$p1_ship_level,
                             'spielername2' => $spielername2.$p2_ship_level,
-                            'gewinn' => $gewinn_text
+                            'gewinn' => $gewinn_text,
+                            //Haltungen: wahl = gewählt (0 = Zufall), haltung = im Kampf (0 = kein Kampf)
+                            'wahl1' => $player_id1 > -1 ? $player[$player_id1]['wahl'] : 0,
+                            'wahl2' => $player_id2 > -1 ? $player[$player_id2]['wahl'] : 0,
+                            'haltung1' => $haltung[0],
+                            'haltung2' => $haltung[1]
                         );
 
                         //echo '<br>A:'.$winner_id;
@@ -264,7 +280,7 @@ function doBattleGround($bg)
                     //größten spieler finden, der noch nicht gekämpft hat
                     $player_id1 = -1;
                     $max_score = -1;
-                    for ($i = 0;$i < count($player);$i++) {
+                    for ($i = 0;$i < count($allys);$i++) {
                         if(!isset($allys[$i]['score'])){
                             $allys[$i]['score'] = 0;
                         }
@@ -301,7 +317,8 @@ function doBattleGround($bg)
 
                     //spieler kämpfen lassen
                     if ($player_id1 != -1 || $player_id2 != -1) {
-                        $winner_id = letSpecialShipFight($player_id1, $player_id2, $allys);
+                        $haltung = array(0, 0);
+                        $winner_id = letSpecialShipFight($player_id1, $player_id2, $allys, $haltung);
 
                         echo '<br>P1: '.(isset($allys[$player_id1]['spielername']) ? $allys[$player_id1]['spielername'] : 'Kein Gegner');
                         echo '<br>P2: '.(isset($allys[$player_id2]['spielername']) ? $allys[$player_id2]['spielername'] : 'Kein Gegner');
@@ -340,7 +357,11 @@ function doBattleGround($bg)
                                 'user_id2' => ($player_id2 > -1 && isset($allys[$player_id2]['ally_id'])) ? $allys[$player_id2]['ally_id'] : -1,
                                 'spielername1' => $spielername1,
                                 'spielername2' => $spielername2,
-                                'gewinn' => $gewinn_text
+                                'gewinn' => $gewinn_text,
+                                'wahl1' => $allys[$player_id1]['wahl'] ?? 0,
+                                'wahl2' => $allys[$player_id2]['wahl'] ?? 0,
+                                'haltung1' => $haltung[0],
+                                'haltung2' => $haltung[1]
                             );
                         }
 
@@ -387,10 +408,10 @@ function doBattleGround($bg)
     }//es gibt spieler
 }
 
-function letSpecialShipFight($player_id1, $player_id2, $player)
+//$haltung liefert die Haltungen beider Seiten im Kampf zurück (Haltung::ANGRIFF … MANOEVER), 0 wenn kein Kampf stattfand
+function letSpecialShipFight($player_id1, $player_id2, $player, &$haltung = null)
 {
-
-    $fighlog = '';
+    $haltung = array(0, 0);
 
     //wenn ein Spieler keinen Gegner hat, dann hat er automatisch gewonnen
     if ($player_id1 == -1) {
@@ -441,6 +462,12 @@ function letSpecialShipFight($player_id1, $player_id2, $player)
     $schaden_min[1] = $enm[1]->get_wp_min();
     $schaden_max[1] = $enm[1]->get_wp_max();
 
+    //Haltungen: Zufall wird für jeden Kampf neu ausgewürfelt, die überlegene Haltung macht mehr Schaden
+    $haltung[0] = Haltung::aufloesen((int)($player[$player_id1]['wahl'] ?? Haltung::ZUFALL));
+    $haltung[1] = Haltung::aufloesen((int)($player[$player_id2]['wahl'] ?? Haltung::ZUFALL));
+    $schadensfaktor[0] = Haltung::schadensfaktor($haltung[0], $haltung[1]);
+    $schadensfaktor[1] = Haltung::schadensfaktor($haltung[1], $haltung[0]);
+
 
     //die daten der gegner anzeigen
     $fightlog =
@@ -450,6 +477,7 @@ function letSpecialShipFight($player_id1, $player_id2, $player)
 	<tr><td>H&uuml;llenstruktur</td><td class="c2">'.number_format($enm[0]->get_hp_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_hp_max(), 0, "", ".").'</td></tr>
 	<tr><td>Schilde</td><td class="c2">'.number_format($enm[0]->get_shield_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_shield_max(), 0, "", ".").'</td></tr>
 	<tr><td>Waffen</td><td class="c2">'.number_format($enm[0]->get_wp_min(), 0, "", ".").' - '.number_format($enm[0]->get_wp_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_wp_min(), 0, "", ".").' - '.number_format($enm[1]->get_wp_max(), 0, "", ".").'</td></tr>
+	<tr><td>Haltung</td><td class="c2">'.Haltung::name($haltung[0]).' (x'.round($schadensfaktor[0], 2).')</td><td class="c2">'.Haltung::name($haltung[1]).' (x'.round($schadensfaktor[1], 2).')</td></tr>
 	<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 	';
 
@@ -487,7 +515,7 @@ function letSpecialShipFight($player_id1, $player_id2, $player)
                 if (isset($schadenssenkung[0]) && isset($schadenssenkung[1])) {
                     $schadenssenkung_enm = ($c == 0) ? $schadenssenkung[1] : $schadenssenkung[0];
                 }
-                $schaden[$c] = round($schaden[$c] * (100 - $schadenssenkung_enm) / 100);
+                $schaden[$c] = round($schaden[$c] * (100 - $schadenssenkung_enm) / 100 * $schadensfaktor[$c]);
 
                 //$schaden[$c]+=$eschaden[$c];
 
@@ -511,30 +539,21 @@ function letSpecialShipFight($player_id1, $player_id2, $player)
         //echo '<br>Schaden 1: '.$schaden[1];
 
 
-        //player 1 schlägt zu
-        if ($hp[1] - $schaden[0] <= 0) {
-            //player 2 hat verloren
-            $haswon = 1;
-            $hp[1] -= $schaden[0];
-            $ausweichflag[1] = 1;
-            $critflag[1] = 0;
-        } else {
-            //player 2 hp abziehen
-            $hp[1] -= $schaden[0];
-        }
+        //beide schlagen gleichzeitig zu, auch der Unterlegene trifft in seiner letzten Runde noch
+        $hp[1] -= $schaden[0];
+        $hp[0] -= $schaden[1];
 
-
-        //player 2 schlägt zu
-        if ($hp[0] - $schaden[1] <= 0 and $haswon == 0) {
-            //player 1 hat verloren
-            $hp[0] -= $schaden[1];
-            $haswon = 2;
-            $ausweichflag[0] = 1;
-            $critflag[0] = 0;
-        } else {
-            //player 1 hp abziehen
-            if ($haswon == 0) {
-                $hp[0] -= $schaden[1];
+        if ($hp[0] <= 0 || $hp[1] <= 0) {
+            if ($hp[0] > 0) {
+                $haswon = 1;
+            } elseif ($hp[1] > 0) {
+                $haswon = 2;
+            } elseif ($hp[0] == $hp[1]) {
+                //beide zerstört: gleich viel Rest, dann entscheidet das Los
+                $haswon = mt_rand(1, 2);
+            } else {
+                //beide zerstört: wer weniger tief gefallen ist, gewinnt
+                $haswon = ($hp[0] > $hp[1]) ? 1 : 2;
             }
         }
 
