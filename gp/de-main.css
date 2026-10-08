@@ -4472,6 +4472,13 @@ a.art-kachel-zurueck:hover::after {
   color: #8b949e;
 }
 
+.mil-umstellen {
+  grid-column: 1/-1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 0 4px;
+}
+
 .mil-fuss {
   display: flex;
   justify-content: flex-end;

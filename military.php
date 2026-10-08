@@ -1030,6 +1030,12 @@ if ($techs[13]==0 AND 1==2){
 		echo '<span class="mil-sp mil-zahl'.$aus[$f].'"><span id="m'.$f.'_fk">0</span></span>';
 	}
 
+	//Verteilung übernehmen, wie früher direkt unter Schnellwahl und Werten
+	echo '
+		<div class="mil-umstellen">
+			<input type="submit" form="milform1" name="verlegen" value="'.$military_lang['flottenumstellen'].'" class="mod-btn mod-btn-leise" title="&Uuml;bernimmt die Verteilung der Schiffe auf die Flotten.">
+		</div>';
+
 	//Befehl und Ziel; auf Mission sind keine Befehle möglich
 	echo '
 		<span class="mil-label mil-trenn mil-befehlzeile">Befehl</span>
@@ -1079,7 +1085,6 @@ if ($techs[13]==0 AND 1==2){
 	echo '
 	</div>
 	<div class="mil-fuss">
-		<input type="submit" form="milform1" name="verlegen" value="'.$military_lang['flottenumstellen'].'" class="mod-btn mod-btn-leise" title="&Uuml;bernimmt die Verteilung der Schiffe auf die Flotten.">
 		<input type="submit" form="milform2" name="befehle" value="'.$military_lang['dobefehl'].'" class="mod-btn" title="Schickt die Flotten mit Befehl und Ziel los.">
 	</div>
 	</div>';
