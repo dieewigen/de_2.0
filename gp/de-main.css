@@ -6201,7 +6201,7 @@ a.art-kachel-zurueck:hover::after {
 }
 
 .ss-eigen {
-  grid-template-columns: 74px 1fr 60px 80px 64px 60px;
+  grid-template-columns: 64px 70px 1fr 80px 64px 60px;
 }
 .ss-eigen > span:nth-child(n+4) {
   text-align: right;

@@ -845,12 +845,13 @@ for ($i = 0; $i < $fa; $i++) {
     $fp_html = ($sv_hide_fp_in_secstatus != 1) ? '<span class="ss-zahl" title="'.number_format($fp, 0, "", ".").'">'.formatMasseinheit($fp, 2).'</span>' : '<span class="ss-zahl">N/A</span>';
 
     if ($mission_aktiv) {
-        $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>'.$hsec.':'.$hsys.'</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span><span class="ss-leise">&ndash;</span>';
+        $ss_eigene .= '<div class="ss-zeile ss-eigen"><span class="ss-leise">&ndash;</span><span>'.$hsec.':'.$hsys.'</span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
         $ss_eigene .= '<span class="ss-zahl ss-uhrzeit" title="Ende der Mission">'.RealTime::until($mission_time).'</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span>'.$fp_html.'</div>';
     } else {
-        $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>'.$hsec.':'.$hsys.'</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
+        $ss_eigene .= '<div class="ss-zeile ss-eigen">';
         //beim Rückflug ist das Ziel die Heimat
-        $ss_eigene .= '<span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : $zsec1.':'.$zsys1).'</span>';
+        $ss_eigene .= '<span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : '<b>'.$zsec1.':'.$zsys1.'</b>').'</span>';
+        $ss_eigene .= '<span>'.$hsec.':'.$hsys.'</span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
         $ss_eigene .= '<span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span>'.$fp_html.'</div>';
     }
 }
@@ -893,8 +894,8 @@ for ($i = 0; $i < $fa; $i++) {
     //einheiten zählen
     $ge = $row_sector["e2"];
 
-    $ss_eigene .= '<div class="ss-zeile ss-eigen"><span><b>Sektorflotte</b></span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span>';
-    $ss_eigene .= '<span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : $ss_lang['sektor'].' '.$zsec1).'</span><span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span><span class="ss-zahl">&ndash;</span></div>';
+    $ss_eigene .= '<div class="ss-zeile ss-eigen"><span>'.($as1 == 3 ? '<span class="ss-leise">Heimat</span>' : '<b>'.$ss_lang['sektor'].' '.$zsec1.'</b>').'</span>';
+    $ss_eigene .= '<span>Sektorflotte</span><span class="ss-auftrag">'.ss_auftrag($cl, $as1, $at1).'</span><span class="ss-zahl">'.$t1.' KT</span><span class="ss-zahl">'.number_format($ge, 0, "", ".").'</span><span class="ss-zahl">&ndash;</span></div>';
 }
 
 rahmen_oben($ss_lang['sektorflotten']);
@@ -902,7 +903,7 @@ echo '<div class="mod ss">';
 if (count($outgoing_fleet_data) == 0 && $fa == 0) {
     echo '<div class="mod-leer">'.($secstatdisable == 1 ? 'Zurzeit sind keine deiner Flotten unterwegs.' : 'Zurzeit sind keine Flotten deines Sektors unterwegs.').'</div>';
 } else {
-    echo '<div class="ss-zeile ss-eigen ss-kopfzeile"><span>'.$ss_lang['herkunft'].'</span><span>'.$ss_lang['status'].'</span><span>'.$ss_lang['ziel'].'</span><span>'.$ss_lang['zeit'].'</span><span>'.$ss_lang['schiffe'].'</span><span title="Flottenpunkte. Getarnte Einheiten werden mit eingerechnet.">FP</span></div>';
+    echo '<div class="ss-zeile ss-eigen ss-kopfzeile"><span>'.$ss_lang['ziel'].'</span><span>'.$ss_lang['herkunft'].'</span><span>'.$ss_lang['status'].'</span><span>'.$ss_lang['zeit'].'</span><span>'.$ss_lang['schiffe'].'</span><span title="Flottenpunkte. Getarnte Einheiten werden mit eingerechnet.">FP</span></div>';
     echo '<div class="ss-liste-zeilen">'.$ss_eigene.'</div>';
 }
 echo '</div>';

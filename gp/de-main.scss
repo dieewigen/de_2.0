@@ -6795,9 +6795,9 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-// eigene Flotten: Herkunft, Auftrag, Ziel, Zeit, Schiffe, FP
+// eigene Flotten: Ziel, Herkunft, Auftrag, Zeit, Schiffe, FP
 .ss-eigen {
-	grid-template-columns: 74px 1fr 60px 80px 64px 60px;
+	grid-template-columns: 64px 70px 1fr 80px 64px 60px;
 
 	> span:nth-child(n+4) {
 		text-align: right;
