@@ -156,3 +156,22 @@ function showHiddenInfo(id){
     uhr = setTimeout(zurueck, 4000);
   });
 })();
+
+// Esc in der Desktop-Ansicht (dm.php): die Spielseiten laufen in iframes, darum reichen sie die Taste an dm_esc() der
+// Hauptseite weiter, die damit die Spielspalte bzw. das große Fenster schließt; in Eingabefeldern bleibt Esc dem Feld
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape' || e.defaultPrevented){
+    return;
+  }
+  var feld = document.activeElement;
+  if(feld && (feld.tagName === 'TEXTAREA' || feld.tagName === 'SELECT' || feld.isContentEditable ||
+      (feld.tagName === 'INPUT' && !/^(button|submit|reset|checkbox|radio|image)$/i.test(feld.type)))){
+    return;
+  }
+  var haupt = (window.parent !== window) ? window.parent : window;
+  try{
+    if(typeof haupt.dm_esc === 'function'){
+      haupt.dm_esc();
+    }
+  }catch(err){}
+});

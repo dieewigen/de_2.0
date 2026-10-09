@@ -1464,6 +1464,13 @@ function centerMap() {
     centerMap();
   });
 
+  // Esc schließt in der Desktop-Ansicht die Spielspalte (dm_esc in dm.php); die Karte läuft dort in einem iframe
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && window.parent !== window && typeof window.parent.dm_esc === 'function') {
+      window.parent.dm_esc();
+    }
+  });
+
   // Custom Tooltip Funktionalität
   const customTooltip = document.getElementById('custom-tooltip');
   let tooltipTimeout = null;

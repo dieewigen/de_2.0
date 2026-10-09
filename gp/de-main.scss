@@ -756,29 +756,6 @@ a.btn:visited {
 	font-size: 14px;
 }
 
-#chat_popup {
-	display: flex !important;
-	flex-direction: column !important;
-	background: transparent !important;
-	border-left: 1px solid #444 !important;
-}
-
-#chat_header {
-	border-top: 1px solid #444 !important;
-	flex-shrink: 0 !important;
-	padding-left: 8px;
-}
-#iframe_chat {
-	flex: 1 !important;
-	height: 100% !important;
-	border: none !important;
-	border-left: none !important;
-	margin: 0 !important;
-	padding: 0 0 0 2px !important;
-	display: block !important;
-	background: url(g/cellblack.png) repeat;
-}
-
 #gameProgressBar {
 	@keyframes scan {
 		0% { left: -100px; }
@@ -9648,23 +9625,27 @@ body #topbar {
 	font-family: Roboto, Arial, Helvetica, sans-serif;
 }
 
-// dm.php hat body.rasseN statt theme-rasseN, daher die Akzentfarbe hier je Rasse (für die ganze obere Leiste)
+// dm.php hat body.template.rasseN statt theme-rasseN, daher die Akzentfarbe hier je Rasse; sie gilt für die ganze
+// Desktop-Ansicht (obere Leiste, Chat-Popup, Kartenknöpfe, Schließen-Knopf der Spielspalte)
 @each $name, $cfg in $themes {
-	body.#{$name} #topbar {
+	body.template.#{$name} {
 		--akzent: #{map.get($cfg, color)};
 		--akzent-weich: #{color.change(map.get($cfg, color), $alpha: 0.22)};
 		--dm-glow: 0 0 8px #{color.change(map.get($cfg, color), $alpha: 0.6)}, 0 0 18px #{color.change(map.get($cfg, color), $alpha: 0.35)};
 	}
 }
 
-.dm-menu a.dm-reiter,
-.dm-menu a.dm-reiter:link,
-.dm-menu a.dm-reiter:visited {
+// die Desktop-Ansicht selbst zeigt nie Bildlaufleisten, alles liegt in iframes
+body.template {
+	overflow: hidden;
+}
+
+// Kachel der Desktop-Ansicht im Stil der mobilen Kommandokonsole; Menüreiter, Kartenknöpfe, Schließen-Knopf und
+// Chat-Kopf teilen sich den Look, das Symbol kommt aus data-icon
+@mixin dm-kachel {
 	position: relative;
 	display: flex;
-	flex: 1 0 auto;
 	align-items: center;
-	justify-content: center;
 	gap: 6px;
 	height: 26px;
 	padding: 0 12px;
@@ -9674,6 +9655,7 @@ body #topbar {
 	border-radius: 9px;
 	background: linear-gradient(145deg, #161f29, #0d1218 60%);
 	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 6px rgba(0, 0, 0, 0.65);
+	font-family: Roboto, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	font-weight: 500;
 	letter-spacing: 0.04em;
@@ -9681,6 +9663,7 @@ body #topbar {
 	white-space: nowrap;
 	text-decoration: none;
 	color: #d8e9ff;
+	cursor: pointer;
 	transition: border-color 0.25s, color 0.25s, transform 0.18s, box-shadow 0.25s;
 
 	// Symbol wie im Mobilmenü, einfarbige Zeichen in der Rassenfarbe
@@ -9707,7 +9690,8 @@ body #topbar {
 	}
 }
 
-.dm-menu a.dm-reiter:hover {
+// beim Überfahren Rahmen und Leuchten in der Rassenfarbe, das Symbol dreht sich leicht
+@mixin dm-kachel-hover {
 	border-color: var(--akzent);
 	box-shadow: var(--dm-glow);
 	color: #ffffff;
@@ -9715,6 +9699,31 @@ body #topbar {
 
 	&::before {
 		transform: scale(1.12) rotate(5deg);
+	}
+}
+
+.dm-menu a.dm-reiter,
+.dm-menu a.dm-reiter:link,
+.dm-menu a.dm-reiter:visited {
+	@include dm-kachel;
+	flex: 1 0 auto;
+	justify-content: center;
+}
+
+.dm-menu a.dm-reiter:hover {
+	@include dm-kachel-hover;
+}
+
+// schmale Fenster (etwa ein Laptop mit 1366 px bei 125 % Skalierung, also 1093 CSS-Pixel): Reiter nur mit Symbol,
+// die Beschriftung wandert in den Tooltip (dm_menu_schmal() in dm.php setzt title)
+// (die Symbole sind 24 bis 33 px breit, deshalb bleiben es bei 1093 px zwei Zeilen; das passt in die 67 px der Leiste)
+@media (max-width: 1279px) {
+	.dm-menu a.dm-reiter {
+		padding: 0 8px;
+	}
+
+	.dm-menu .dm-reiter-text {
+		display: none;
 	}
 }
 
@@ -9820,6 +9829,182 @@ body #topbar {
 		background: linear-gradient(145deg, rgba(255, 74, 74, 0.2), #0d1218 75%);
 		box-shadow: 0 0 10px rgba(255, 80, 80, 0.6), 0 0 22px rgba(255, 80, 80, 0.35);
 	}
+}
+
+// Knöpfe rechts oben auf der Karte (VS-Übersicht, Heimatsektor, Karte neu laden) und der Schließen-Knopf an der
+// Spielspalte: dieselben Kacheln, als <button> ohne Browser-Optik
+.dm-knopf,
+a.dm-knopf:link,
+a.dm-knopf:visited {
+	@include dm-kachel;
+	height: 30px;
+	padding: 0 12px 0 10px;
+	appearance: none;
+}
+
+.dm-knopf:hover {
+	@include dm-kachel-hover;
+}
+
+.dm-karte-knoepfe {
+	position: absolute;
+	top: 75px;
+	right: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 6px;
+}
+
+// bündig an der rechten oberen Ecke der Spielspalte (620 px breit, ab 64 px); ang_fn.js blendet ihn über display ein
+// und aus, beim Überfahren rot wie der Logout
+#iframe_main_container_closer {
+	position: absolute;
+	top: 64px;
+	left: 620px;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	justify-content: center;
+	border-radius: 0 9px 9px 0;
+
+	&::before {
+		font-size: 14px;
+	}
+
+	&:hover {
+		transform: none;
+		border-color: #ff4a4a;
+		box-shadow: 0 0 10px rgba(255, 80, 80, 0.6), 0 0 22px rgba(255, 80, 80, 0.35);
+
+		&::before {
+			color: #ff6a6a;
+		}
+	}
+}
+
+// Chat-Popup unten rechts: Kopf als Kachel, ein Klick darauf klappt den Chat zu einer Leiste zusammen (Cookie chat_zu);
+// Breite und Höhe stehen inline aus den Cookies chat_width/chat_height, die Ränder oben und links und der Griff in der
+// Ecke ändern sie (dm_chat_resize_start in dm.php)
+#chat_popup {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid rgba(160, 200, 255, 0.18);
+	border-right: 0;
+	border-bottom: 0;
+	border-radius: 8px 0 0 0;
+	background: rgba(6, 9, 14, 0.9);
+	box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.5);
+	transition: transform 0.25s;
+}
+
+#chat_header {
+	@include dm-kachel;
+	flex-shrink: 0;
+	height: 34px;
+	padding: 0 12px 0 22px;
+	border: 0;
+	border-bottom: 1px solid var(--akzent);
+	border-radius: 0;
+	box-shadow: none;
+	font-size: 13px;
+	user-select: none;
+
+	&:hover {
+		color: #ffffff;
+		text-shadow: 0 0 6px var(--akzent);
+
+		&::before {
+			transform: scale(1.12) rotate(5deg);
+		}
+	}
+}
+
+.dm-chat-titel {
+	flex: 1;
+}
+
+// Pfeil rechts zeigt, wohin der Chat beim Klick geht
+.dm-chat-pfeil::before {
+	content: '▾';
+	font-size: 14px;
+	color: #8b949e;
+}
+
+#chat_popup.dm-chat-zu .dm-chat-pfeil::before {
+	content: '▴';
+}
+
+#iframe_chat {
+	flex: 1;
+	min-height: 0;
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: url(g/cellblack.png) repeat;
+}
+
+// zugeklappt rutscht alles außer dem Kopf (34 px plus Rand) unter den Fensterrand, der Chat läuft dabei weiter
+#chat_popup.dm-chat-zu {
+	transform: translateY(calc(100% - 35px));
+}
+
+#chat_popup.dm-chat-zu .dm-chat-rand,
+#chat_popup.dm-chat-zu .dm-chat-griff {
+	display: none;
+}
+
+// unsichtbare Ränder oben und links zum Ziehen, dazu ein sichtbarer Griff in der Ecke (Linien wie an einem Fenster)
+.dm-chat-rand {
+	position: absolute;
+	z-index: 2;
+}
+
+.dm-chat-rand-n {
+	top: 0;
+	right: 0;
+	left: 0;
+	height: 6px;
+	cursor: n-resize;
+}
+
+.dm-chat-rand-w {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 6px;
+	cursor: w-resize;
+}
+
+.dm-chat-griff {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	z-index: 3;
+	width: 16px;
+	height: 16px;
+	background: repeating-linear-gradient(135deg, rgba(216, 233, 255, 0.6) 0 1px, transparent 1px 4px);
+	clip-path: polygon(0 0, 100% 0, 0 100%);
+	cursor: nw-resize;
+	opacity: 0.7;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+// Spielseiten in der Spielspalte der Desktop-Ansicht liegen auf der Karte: Zellmuster statt Hintergrundbild
+// (die Klasse setzt cssinclude.php, wenn die Seite im Rahmen "h" von dm.php läuft)
+html.dm-rahmen body,
+html.dm-rahmen body.desktop {
+	background: transparent url(g/cellblack.png) repeat;
 }
 
 // Mobile Layout
@@ -10414,43 +10599,6 @@ div.title {
 	text-align: center;
 }
 
-
-#ic-button {
-	position: absolute;
-	top: 66px;
-	left: 680px;
-	background-color: rgba(30, 30, 30, 0.99);
-	color: #FFFFFF;
-	border: 1px solid #333333;
-	padding: 4px;
-	cursor: pointer;
-	user-select: none;
-}
-
-#ic {
-	position: absolute;
-	top: 95px;
-	left: 680px;
-	background-color: rgba(30, 30, 30, 0.99);
-	color: #FFFFFF;
-	border: 1px solid #333333;
-	padding: 4px;
-	font-size: 14px;
-
-	.header {
-		text-decoration: underline;
-		margin-bottom: 6px;
-	}
-
-	.red {
-		color: red;
-	}
-
-	.green {
-		color: green;
-	}
-
-}
 
 body.rasse1 .btn,
 body.rasse1 a.btn:link,

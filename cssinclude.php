@@ -18,3 +18,9 @@ echo '<link rel="stylesheet" type="text/css" href="gp/de-main.css?'.filemtime($_
 
 echo '<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>';
 echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js').'"></script>';
+
+//in der Spielspalte der Desktop-Ansicht (dm.php, Rahmen "h") liegt die Seite auf der Karte: html.dm-rahmen gibt ihr in
+//gp/de-main.scss das Zellmuster statt des Hintergrundbilds; per Script, weil jede Seite ihr <html> selbst schreibt
+if(!empty($_SESSION['new_desktop_version']) && empty($_SESSION['de_frameset']) && $_SESSION['ums_mobi']!=1){
+	echo '<script>if(window.parent!==window && window.name==="h"){document.documentElement.classList.add("dm-rahmen");}</script>';
+}

@@ -10,9 +10,10 @@ unset($_SESSION["de_frameset"]);
 $_SESSION['new_desktop_version']=1;
 $_SESSION['ic_last_refresh']=0;
 
-//gibt es eine Chatgröße im Cookie?
-$chat_width=400;
-$chat_height=400;
+//Chat-Popup: Größe und Zustand (zugeklappt) aus den Cookies, nur Zahlen, die Werte landen im Markup
+$chat_width = max(250, isset($_COOKIE['chat_width']) ? intval($_COOKIE['chat_width']) : 400);
+$chat_height = max(250, isset($_COOKIE['chat_height']) ? intval($_COOKIE['chat_height']) : 400);
+$chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
 
 ?>
 <!doctype html>
@@ -31,23 +32,22 @@ $chat_height=400;
   </head>
   <body class="template rasse<?php echo $_SESSION['ums_rasse'];?>">
 	<div style="position: absolute; width: 100%; height: 100%; left: 0px; top:0px;"><iframe src="map.php" id="iframe_map" height="100%" width="100%" frameBorder="0"></iframe></div>
-	<?php
-	//<div style="position: absolute; width: 209px; height: calc(100% - 80px); left: 0px; top:24px;"><iframe src="menu.php" id="iframe_menu" height="100%" width="100%" frameBorder="0"></iframe></div>
-	?>
 	<div id="iframe_main_container" style="position: absolute; width: 620px; height: calc(100% - 64px); left: 0px; top:64px;"><iframe src="overview.php" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe></div>
-	<div id="iframe_main_container_closer" style="position: absolute; left: 620px; top:64px; width: 29px; height: 31px; background-color: rgba(0,0,0, 0.8); border-bottom: 1px solid rgba(22,22,22, 0.8); border-right: 1px solid #222222; cursor: pointer;" onclick="closeIframeMain()">
-		<img src="gp/g/close_icon.png" style="height: 26px; width: auto; margin-left: 4px; margin-top: 4px;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en" rel="tooltip">
-	</div>
+	<?php //Schließen-Knopf an der Spielspalte (Optik in de-main.scss), die Esc-Taste tut dasselbe (dm_esc unten) ?>
+	<button type="button" id="iframe_main_container_closer" class="dm-knopf" data-icon="✕" onclick="closeIframeMain()" title="Spielseite schlie&szlig;en (Esc)"></button>
 
 	<div id="iframe_main_container_big" style="position: absolute; display: none; width: 100%; height: calc(100% - 64px); left: 0px; top:64px; z-index: 100;"></div>
-	
-	<div id="chat_popup" style="position: fixed; bottom: 0; right: 0; width: <?php echo $chat_width; ?>px; height: <?php echo $chat_height; ?>px; z-index: 1000; overflow: hidden;">
-		<div id="chat_header" style="color: #FFFFFF; background: linear-gradient(to right, #222222, #303030); padding: 5px 10px; border-bottom: 1px solid #444444; font-weight: 500; user-select: none;">CHAT</div>
+
+	<?php //Chat-Popup: der Kopf klappt ein und aus, Ränder und Griff ändern die Größe (Script unten, Optik in de-main.scss) ?>
+	<div id="chat_popup"<?php echo $chat_zu ? ' class="dm-chat-zu"' : ''; ?> style="width: <?php echo $chat_width; ?>px; height: <?php echo $chat_height; ?>px;">
+		<div id="chat_header" data-icon="💬" onclick="dm_chat_umschalten()" title="Chat ein- oder ausklappen">
+			<span class="dm-chat-titel">Chat</span>
+			<span class="dm-chat-pfeil" aria-hidden="true"></span>
+		</div>
 		<iframe src="chat.php" id="iframe_chat" name="c" width="100%" frameBorder="0"></iframe>
-		<!-- Unsichtbare Resize-Bereiche -->
-		<div class="resize-handle resize-n" style="position: absolute; top: 0; left: 0; right: 0; height: 3px; cursor: n-resize;"></div>
-		<div class="resize-handle resize-w" style="position: absolute; top: 0; left: 0; bottom: 0; width: 3px; cursor: w-resize;"></div>
-		<div class="resize-handle resize-nw" style="position: absolute; top: 0; left: 0; width: 10px; height: 10px; cursor: nw-resize;"></div>
+		<div class="dm-chat-rand dm-chat-rand-n" data-richtung="n"></div>
+		<div class="dm-chat-rand dm-chat-rand-w" data-richtung="w"></div>
+		<div class="dm-chat-griff" data-richtung="nw" title="Gr&ouml;&szlig;e &auml;ndern"></div>
 	</div>
 	
 	<div id="topbar" style="z-index: 1000;">
@@ -145,7 +145,7 @@ $chat_height=400;
 		);
 		echo '<nav class="dm-menu">';
 		foreach ($dm_menu as [$seite, $text, $muster, $gross, $symbol]) {
-			echo '<a href="'.$seite.'" class="dm-reiter" data-icon="'.$symbol.'" data-muster="'.$muster.'" onclick="return dm_menu_klick(event, \''.$seite.'\', '.($gross ? 'true' : 'false').')">'.$text.'</a>';
+			echo '<a href="'.$seite.'" class="dm-reiter" data-icon="'.$symbol.'" data-muster="'.$muster.'" onclick="return dm_menu_klick(event, \''.$seite.'\', '.($gross ? 'true' : 'false').')"><span class="dm-reiter-text">'.$text.'</span></a>';
 		}
 		echo '</nav>
 		</div>';
@@ -153,142 +153,113 @@ $chat_height=400;
 		////////////////////////////////////////////////////////
 		//Infocenter
 		////////////////////////////////////////////////////////
-		//echo '<div id="ic-button" onclick="$(\'#ic\').toggle()">Infocenter</div>';
-		//unsichtbares Div, in das die Scripte für das Infocenter geladen werden
+		//unsichtbares Div, in das der Chat (de_ajaxrpc.php) die Scripte für das Infocenter lädt
 		echo '<div id="infocenter"></div>';
-		
+
 		////////////////////////////////////////////////////////
-		//Icons direkt auf der Karte
+		//Knöpfe rechts oben auf der Karte, Kacheln wie das Menü (Optik in de-main.scss)
 		////////////////////////////////////////////////////////
-	
-		//Reload-Button
-		echo '<img onclick="document.getElementById(\'iframe_map\').contentDocument.location.reload(true);" style="width: 40px; height: auto; position: absolute; right: 6px; top: 74px; cursor: pointer;" src="gp/g/icon9.png" class="rounded-borders" title="Karte aktualisieren" rel="tooltip">';
-
-		//VS Listenansicht
-		echo '<img onclick="switch_iframe_main_container(\'map_mobile.php\')" style="width: 40px; height: auto; position: absolute; right: 60px; top: 74px; cursor: pointer;" src="gp/g/icon13.png" class="rounded-borders" title="Vergessene System (VS) &Uuml;bersicht" rel="tooltip">';	
-
-		//go-home-Button
-		echo '<img onclick="reset_map()" style="width: 40px; height: auto; position: absolute; right: 6px; top: 124px; cursor: pointer;" src="gp/g/icon10.png" class="rounded-borders" title="zum Heimatsektor" rel="tooltip">';
-
-//nur Zahlen, die Werte landen in einem JavaScript-String
-if(isset($_COOKIE['chat_width'])){
-	$chat_width=intval(str_replace("px", "", $_COOKIE['chat_width']));
-}
-
-if(isset($_COOKIE['chat_height'])){
-	$chat_height=intval(str_replace("px", "", $_COOKIE['chat_height']));
-}
-
-
-if($chat_width<250){
-	$chat_width=250;
-}
-
-if($chat_height<250){
-	$chat_height=250;
-}
+		//der breiteste Knopf steht oben, darunter werden sie schmaler
+		echo '<nav class="dm-karte-knoepfe">';
+		echo '<button type="button" class="dm-knopf" data-icon="↻" onclick="document.getElementById(\'iframe_map\').contentWindow.location.reload()">Karte aktualisieren</button>';
+		if (empty($GLOBALS['sv_deactivate_vsystems'])) {
+			echo '<a href="map_mobile.php" class="dm-knopf" data-icon="✸" onclick="return dm_menu_klick(event, \'map_mobile.php\', false)" title="Vergessene Systeme (VS) als Liste">VS-&Uuml;bersicht</a>';
+		}
+		echo '<button type="button" class="dm-knopf" data-icon="⌂" onclick="reset_map()" title="Karte auf den Heimatsektor zentrieren">Heimatsektor</button>';
+		echo '</nav>';
 
 	?>
 <script type="text/javascript">
-window.onresize = setsize;
-
-function setsize(){ 
-    $("body").css("overflow","hidden");
+//Chat ein- und ausklappen (Cookie chat_zu); zugeklappt bleibt nur der Kopf sichtbar, der Chat läuft weiter
+function dm_chat_umschalten(){
+	var zu = !$('#chat_popup').hasClass('dm-chat-zu');
+	$('#chat_popup').toggleClass('dm-chat-zu', zu);
+	setCookie('chat_zu', zu ? '1' : '0');
 }
-	
+
+//Größe des Chats ändern über die Ränder oben und links und den Griff in der Ecke; eine Fläche über der ganzen Seite
+//fängt die Mausbewegung, weil die iframes sie sonst schlucken
+var dm_resize = null;
+
+function dm_chat_resize_start(e){
+	var popup = $('#chat_popup');
+	dm_resize = {
+		richtung: $(this).attr('data-richtung'),
+		x: e.clientX,
+		y: e.clientY,
+		breite: popup.outerWidth(),
+		hoehe: popup.outerHeight()
+	};
+	$('#iframe_chat').css('pointer-events', 'none');
+	$('body').css('user-select', 'none').append('<div id="resize-overlay" style="position: fixed; inset: 0; z-index: 9999; cursor: ' + $(this).css('cursor') + ';"></div>');
+	e.preventDefault();
+}
+
+function dm_chat_resize_move(e){
+	if(!dm_resize){
+		return;
+	}
+	var breite = dm_resize.breite;
+	var hoehe = dm_resize.hoehe;
+	if(dm_resize.richtung !== 'n'){
+		breite = Math.max(250, dm_resize.breite + dm_resize.x - e.clientX);
+	}
+	if(dm_resize.richtung !== 'w'){
+		hoehe = Math.max(200, dm_resize.hoehe + dm_resize.y - e.clientY);
+	}
+	$('#chat_popup').css({width: breite + 'px', height: hoehe + 'px'});
+}
+
+//speichern=false (Esc) stellt die alte Größe wieder her
+function dm_chat_resize_ende(speichern){
+	if(!dm_resize){
+		return;
+	}
+	var popup = $('#chat_popup');
+	if(speichern){
+		setCookie('chat_width', popup.outerWidth() + 'px');
+		setCookie('chat_height', popup.outerHeight() + 'px');
+	}else{
+		popup.css({width: dm_resize.breite + 'px', height: dm_resize.hoehe + 'px'});
+	}
+	dm_resize = null;
+	$('#resize-overlay').remove();
+	$('#iframe_chat').css('pointer-events', '');
+	$('body').css('user-select', '');
+}
+
+//Esc schließt die Spielspalte bzw. das große Fenster; läuft gerade eine Größenänderung des Chats, bricht es nur diese ab.
+//Die Spielseiten und die Karte reichen die Taste aus ihren iframes hierher weiter (de_fn.js, map.php).
+function dm_esc(){
+	if(dm_resize){
+		dm_chat_resize_ende(false);
+		return;
+	}
+	closeIframeMain();
+}
+
+//unter 1280 px zeigen die Reiter nur ihr Symbol (de-main.scss), die Beschriftung wandert in den Tooltip
+var dm_schmal = window.matchMedia('(max-width: 1279px)');
+
+function dm_menu_schmal(schmal){
+	$('.dm-reiter').each(function(){
+		if(schmal){
+			$(this).attr('title', $(this).find('.dm-reiter-text').text());
+		}else{
+			$(this).removeAttr('title');
+		}
+	});
+	if(schmal){
+		setTooltip();
+	}
+}
+
 $(document).ready(function() {
-	setsize();
-
-	// Chat-Popup Größe beim Laden setzen
-	var chatPopup = $('#chat_popup');
-	var iframe = $('#iframe_chat');
-	
-	// Größe aus PHP-Variablen setzen (falls Cookies vorhanden waren)
-	chatPopup.css({
-		width: '<?php echo $chat_width; ?>px',
-		height: '<?php echo $chat_height; ?>px'
-	});
-
-	// Robuste Resize-Funktionalität
-	var isResizing = false;
-	var resizeDirection = '';
-	var startX, startY, startWidth, startHeight;
-
-	// Resize-Handles
-	$('.resize-handle').on('mousedown', function(e) {
-		isResizing = true;
-		resizeDirection = $(this).attr('class').split(' ')[1];
-		
-		startX = e.clientX;
-		startY = e.clientY;
-		startWidth = chatPopup.width();
-		startHeight = chatPopup.height();
-		
-		// Iframe deaktivieren während Resize
-		iframe.css('pointer-events', 'none');
-		
-		// Overlay über gesamte Seite um Events zu fangen
-		if (!$('#resize-overlay').length) {
-			$('body').append('<div id="resize-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: ' + $(this).css('cursor') + ';"></div>');
-		}
-		
-		e.preventDefault();
-		e.stopPropagation();
-		$('body').css('user-select', 'none');
-	});
-
-	// Resize über Overlay
-	$(document).on('mousemove.chatresize', '#resize-overlay', function(e) {
-		if (!isResizing) return;
-		
-		var deltaX = startX - e.clientX;
-		var deltaY = startY - e.clientY;
-		
-		var newWidth = startWidth;
-		var newHeight = startHeight;
-		
-		if (resizeDirection === 'resize-w' || resizeDirection === 'resize-nw') {
-			newWidth = startWidth + deltaX;
-		}
-		if (resizeDirection === 'resize-n' || resizeDirection === 'resize-nw') {
-			newHeight = startHeight + deltaY;
-		}
-		
-		newWidth = Math.max(250, newWidth);
-		newHeight = Math.max(200, newHeight);
-		
-		chatPopup.css({
-			width: newWidth + 'px',
-			height: newHeight + 'px'
-		});
-	});
-
-	// Resize beenden
-	$(document).on('mouseup.chatresize', function() {
-		if (isResizing) {
-			isResizing = false;
-			resizeDirection = '';
-			
-			// Cleanup
-			$('#resize-overlay').remove();
-			iframe.css('pointer-events', '');
-			$('body').css('user-select', '');
-			
-			// Cookies speichern
-			setCookie('chat_width', chatPopup.width() + 'px');
-			setCookie('chat_height', chatPopup.height() + 'px');
-		}
-	});
-
-	// Sicherheits-Cleanup bei Escape
-	$(document).on('keydown.chatresize', function(e) {
-		if (e.key === 'Escape' && isResizing) {
-			isResizing = false;
-			$('#resize-overlay').remove();
-			iframe.css('pointer-events', '');
-			$('body').css('user-select', '');
-		}
-	});
+	$('.dm-chat-rand, .dm-chat-griff').on('mousedown', dm_chat_resize_start);
+	$(document).on('mousemove', '#resize-overlay', dm_chat_resize_move);
+	$(document).on('mouseup', function(){ dm_chat_resize_ende(true); });
+	dm_schmal.addEventListener('change', function(e){ dm_menu_schmal(e.matches); });
+	dm_menu_schmal(dm_schmal.matches);
 });
 
 //Menü: normaler Klick öffnet die Seite in der Spielspalte, Strg-/Umschalt-Klick wie ein Link (der Mittelklick löst kein click aus)
@@ -325,15 +296,6 @@ function dm_menu_markieren(seite){
 	});
 }
 window.setInterval(function(){ dm_menu_markieren(); }, 500);
-
-window.setInterval(function(){
-	$("#iframe_menu").contents().find("body").css("background-color", "transparent");
-	$("#iframe_menu").contents().find("body").css("background-image", "none");
-	$("#iframe_main").contents().find("body").css("background-color", "transparent");
-	$("#iframe_main").contents().find("body").css("background-image", "url(gp/g/cellblack.png)");
-	$("#iframe_chat").contents().find("body").css("background-color", "transparent");
-	$("#iframe_chat").contents().find("body").css("background-image", "none");
-}, 100);
 </script>
 </body>
 </html>
