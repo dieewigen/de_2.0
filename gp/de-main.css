@@ -5867,6 +5867,16 @@ a.art-kachel-zurueck:hover::after {
   color: #8b949e;
 }
 
+.det-titel {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  line-height: 1.6;
+  color: #f0c24b;
+}
+
 .det-abstand {
   margin-top: 10px;
 }

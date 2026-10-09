@@ -243,7 +243,10 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		return (int)$a['timestamp'] <=> (int)$b['timestamp'];
 	});
 	$sorted=$chatdata;
-	
+
+	//Titel der Schreiber aus der Accountverwaltung (über die owner_id), für das Abzeichen vor dem Namen
+	$titel=chat_titel_laden($sorted);
+
 	////////////////////////////////////////////////////////////////
 	// Liste der Spieler laden, die man selbst ignoriert
 	// gilt f�r: Global, Allgemein, Sektor
@@ -282,7 +285,8 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	////////////////////////////////////////////////////////////////	
 	for($i=0;$i<count($sorted);$i++){
 		$row=$sorted[$i];
-		
+		$row['titel']=$titel[(int)$row['owner_id']] ?? array();
+
 		//je nach Channel kommen verschiede Filter zur Auswahl
 		if($row['channeltyp']==0){//Sektor
 			if(!in_array($row['owner_id'], $ignore_self)){
@@ -366,6 +370,16 @@ function format_chat_output($row){
 		$server_tag='';
 	}
 
+	//Titel-Abzeichen: ein Symbol für alle Titel, bewusst ohne Anzahl; die Titel selbst stehen im Tooltip (title ist HTML,
+	//setTooltip aus de_fn.js zeigt ihn) und klappen beim Antippen als Liste unter der Zeile auf (chat.php liest data-titel)
+	$titel_badge='';
+	if(!empty($row['titel']) && chat_zeile_von_spieler($row)){
+		$liste=array_map('html_text', $row['titel']);
+		//das JSON als Ganzes für das Attribut escapen (die Begrenzer sind selbst Anführungszeichen)
+		$titel_json=htmlspecialchars(json_encode(array_values($row['titel']), JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_SUBSTITUTE), ENT_QUOTES, 'UTF-8');
+		$titel_badge='<span class="chat-titel" title="'.implode('<br>', $liste).'" data-titel="'.$titel_json.'">&#x265B;</span> ';
+	}
+
 	//Link zum Spieler; der Name ist HTML-escaped gespeichert
 	$link='details.php?sn='.rawurlencode(html_entity_decode($row["spielername"], ENT_QUOTES, 'UTF-8'));
 	//Spieler anderer Server werden über die Chat-ID gefunden (Ignore-Liste)
@@ -381,7 +395,7 @@ function format_chat_output($row){
 	}
 
 	//die Farbe kommt über die Klasse des Channels (gp/de-chat.scss)
-	$output='<div class="chatline chat-ch'.intval($row["channeltyp"]).'" data-day="'.$tag.'"><span class="chat-time" title="'.$datum.'">'.$zeit.'</span> '.$server_tag;
+	$output='<div class="chatline chat-ch'.intval($row["channeltyp"]).'" data-day="'.$tag.'"><span class="chat-time" title="'.$datum.'">'.$zeit.'</span> '.$server_tag.$titel_badge;
 
 	//schauen ob es ein emote ist
 	if(substr($row["message"], 0, 3)==='/me'){
@@ -400,6 +414,35 @@ function format_chat_output($row){
 	$output.='</div>';
 
 	return $output;
+}
+
+//Zeile eines echten Spielers? Meldungen des Spiels haben keinen Spielernamen oder heißen [SYSTEM] bzw. Herold, tragen aber
+//die owner_id des Spielers, der sie ausgelöst hat (insert_chat_msg nimmt die Session), und bekommen darum kein Titel-Abzeichen
+function chat_zeile_von_spieler($zeile){
+	return (int)$zeile['owner_id']>0 && $zeile['spielername']!='' && $zeile['spielername']!='[SYSTEM]' && $zeile['spielername']!='^Der Herold^';
+}
+
+//Titel der Schreiber aus der Accountverwaltung (ls_user_title/ls_title, über die owner_id): eine Abfrage für alle
+//neuen Zeilen echter Spieler, Ergebnis owner_id => Liste der Titel
+function chat_titel_laden($zeilen){
+	$ids=array();
+	foreach($zeilen as $zeile){
+		if(chat_zeile_von_spieler($zeile)){
+			$ids[(int)$zeile['owner_id']]=true;
+		}
+	}
+	$titel=array();
+	if(count($ids)>0){
+		$ids=array_keys($ids);
+		$platzhalter=implode(',', array_fill(0, count($ids), '?'));
+		$db_daten=mysqli_execute_query($GLOBALS['dbi_ls'],
+		  "SELECT ut.user_id, t.title FROM ls_user_title ut JOIN ls_title t ON t.title_id=ut.title_id WHERE ut.user_id IN (".$platzhalter.") ORDER BY t.title",
+		  $ids);
+		while($row = mysqli_fetch_assoc($db_daten)){
+			$titel[(int)$row['user_id']][]=$row['title'];
+		}
+	}
+	return $titel;
 }
 
 //Chat-Aktionen nur per POST mit dem Token aus chat.php, damit fremde Seiten/Links nichts im Namen des Spielers auslösen

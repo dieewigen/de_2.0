@@ -355,6 +355,19 @@ if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spiele
         return '<div class="det-text">' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</div>';
     };
 
+    //Titel aus der Accountverwaltung (über die owner_id), dieselben wie das Abzeichen im Chat
+    $det_titel = array();
+    if ($zowner_id > 0) {
+        $db_titel = mysqli_execute_query(
+            $GLOBALS['dbi_ls'],
+            "SELECT t.title FROM ls_user_title ut JOIN ls_title t ON t.title_id=ut.title_id WHERE ut.user_id=? ORDER BY t.title",
+            [$zowner_id]
+        );
+        while ($zeile = mysqli_fetch_assoc($db_titel)) {
+            $det_titel[] = $zeile['title'];
+        }
+    }
+
     rahmen_oben($details_lang['detailsvon'] . $rew["spielername"]);
     echo '<div class="mod det">';
     echo '<div class="det-kopf"><b>' . $rew["spielername"] . '</b><span class="mod-chip">' . $se . ':' . $sy . '</span>';
@@ -362,6 +375,13 @@ if (!isset($_REQUEST['ctyp']) && !isset($_REQUEST['cid']) && !empty($rew["spiele
         echo '<span class="mod-chip">' . $rew['allytag'] . '</span>';
     }
     echo '</div>';
+    if (count($det_titel) > 0) {
+        echo '<div class="det-abschnitt"><div class="mod-typ">Titel</div><div class="det-titel">';
+        foreach ($det_titel as $t) {
+            echo '<div>&#x265B; ' . htmlspecialchars($t, ENT_QUOTES, 'UTF-8', false) . '</div>';
+        }
+        echo '</div></div>';
+    }
     echo '<div class="det-abschnitt"><div class="mod-typ">Informationen f&uuml;r alle</div>' . $det_text($ud_all, true, '') . '</div>';
     echo '<div class="det-abschnitt"><div class="mod-typ">Sektorinformationen</div>' . $det_text($ud_sector, $sektor_sichtbar, 'Nur f&uuml;r Spieler aus demselben Sektor sichtbar.') . '</div>';
     echo '<div class="det-abschnitt"><div class="mod-typ">Allianzinformationen</div>' . $det_text($ud_ally, $ally_sichtbar, 'Nur f&uuml;r Mitglieder derselben Allianz sichtbar.') . '</div>';

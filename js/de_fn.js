@@ -97,27 +97,29 @@ function setTooltip(){
         target.bind('mouseleave', remove_tooltip);
         tooltip.bind('click touchstart', remove_tooltip);
     });
-    
-    // Zusätzlicher Fallback: Entferne alle Tooltips bei Scroll oder Resize
-    $(window).on('scroll resize', function() {
+};
+
+// Die Aufräum-Handler nur einmal binden: setTooltip() läuft nach jedem Nachladen (Infocenter, Chat) erneut und hatte
+// sie bisher bei jedem Aufruf zusätzlich registriert
+// Fallback: alle Tooltips bei Scroll oder Resize entfernen
+$(window).on('scroll resize', function() {
+    $('#tt').remove();
+    $('[data-original-title]').each(function() {
+        var $this = $(this);
+        $this.attr('title', $this.data('original-title'));
+    });
+});
+
+// Touch-Geräte: Tooltip bei Touch außerhalb entfernen
+$(document).on('touchstart', function(e) {
+    if(!$(e.target).closest('#tt').length && !$(e.target).closest('[title], [data-original-title]').length) {
         $('#tt').remove();
         $('[data-original-title]').each(function() {
             var $this = $(this);
             $this.attr('title', $this.data('original-title'));
         });
-    });
-    
-    // Touch-Geräte: Tooltip bei Touch außerhalb entfernen
-    $(document).on('touchstart', function(e) {
-        if(!$(e.target).closest('#tt').length && !$(e.target).closest('[title], [data-original-title]').length) {
-            $('#tt').remove();
-            $('[data-original-title]').each(function() {
-                var $this = $(this);
-                $this.attr('title', $this.data('original-title'));
-            });
-        }
-    });
-};
+    }
+});
 
 
 function showHiddenInfo(id){

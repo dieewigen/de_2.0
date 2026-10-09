@@ -149,6 +149,65 @@ $chat-channels: (
   text-decoration: underline;
 }
 
+// Titel-Abzeichen vor dem Namen (ein Symbol für alle Titel, ohne Anzahl); die Titel stehen im Tooltip
+// und klappen beim Antippen als Liste unter der Zeile auf (chat.php)
+// bewusst ohne Rahmen (User: zu mächtig), nur die goldene Krone mit leichtem Schein
+#chatcontent .chat-titel {
+  display: inline-block;
+  padding: 0 1px;
+  font-size: 0.85em;
+  line-height: 1;
+  color: #f0c24b;
+  text-shadow: 0 0 3px rgba(240, 194, 75, 0.45);
+  cursor: pointer;
+}
+#chatcontent .chat-titel-liste {
+  margin: 2px 0 3px 1.6em;
+  padding-left: 6px;
+  border-left: 2px solid #f0c24b;
+  font-size: 0.85em;
+  color: #f0c24b;
+}
+
+// Tooltip des Spiels (setTooltip in js/de_fn.js), gleicher Stil wie #tt in de-main.scss
+#tt {
+  position: absolute;
+  z-index: 1100;
+  padding: 15px;
+  text-align: left;
+  font-size: 13px;
+  color: #FFFFFF;
+  background: #222222;
+  pointer-events: none;
+}
+#tt:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 0;
+  height: 0;
+  margin-left: -10px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #222222;
+}
+#tt.top:after {
+  top: -19px;
+  bottom: auto;
+  border-top-color: transparent;
+  border-bottom: 10px solid #222222;
+}
+#tt.left:after {
+  left: 10px;
+  margin: 0;
+}
+#tt.right:after {
+  right: 10px;
+  left: auto;
+  margin: 0;
+}
+
 // Tagestrenner ("Heute", "Gestern", Datum)
 #chatcontent .chat-day {
   display: flex;

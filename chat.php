@@ -42,6 +42,8 @@ if (empty($_SESSION['chat_token'])) {
 <meta charset="UTF-8">
 
 <link rel="stylesheet" type="text/css" href="/gp/de-chat.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-chat.css'); ?>">
+<?php //Tooltips wie im Rest des Spiels (setTooltip aus de_fn.js), der Stil von #tt steht in de-chat.scss ?>
+<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js'); ?>"></script>
 <?php
 
 $pageType='desktop';
@@ -171,6 +173,7 @@ if($pageType==='mobile'){
 ?>
 <script type="text/javascript">
 var chatToken = <?php echo json_encode($_SESSION['chat_token']); ?>;
+var chatPageType = <?php echo json_encode($pageType); ?>;
 //so viele Zeilen bleiben im Chatfenster, ältere werden entfernt
 var chatMaxLines = 500;
 var chatcounter = 100;
@@ -238,6 +241,23 @@ $('#chatcontent').on('scroll', function(){
 	if(chat_atbottom()) $('#chatnewmsgs').prop('hidden', true);
 });
 
+//Titel-Abzeichen: Antippen klappt die Titel als Liste unter der Zeile auf und wieder zu (Tooltips greifen auf dem Handy nicht)
+$('#chatcontent').on('click', '.chat-titel', function(){
+	var zeile = $(this).closest('.chatline');
+	var liste = zeile.children('.chat-titel-liste');
+	if(liste.length){
+		liste.remove();
+		return;
+	}
+	var titel = [];
+	try{ titel = JSON.parse(this.getAttribute('data-titel')) || []; }catch(err){}
+	liste = $('<div class="chat-titel-liste">');
+	$.each(titel, function(i, t){
+		liste.append($('<div>').text(t));
+	});
+	zeile.append(liste);
+});
+
 function change_chatchannel(channeltyp){
 	$.post('de_ajaxrpc.php', {changechatchannel: channeltyp + 1, token: chatToken}, function(data){
 		show_chatmenu(data[0].newchatchannel);
@@ -264,6 +284,11 @@ if (window.Worker) {
 			}
 
 			chat_daydividers();
+
+			//Tooltips des Spiels auch für die neuen Zeilen (Titel-Abzeichen, Datum); mobil zeigt das Antippen die Liste
+			if(chatPageType === 'desktop'){
+				setTooltip();
+			}
 
 			if(atBottom){
 				chat_scrolldown();
