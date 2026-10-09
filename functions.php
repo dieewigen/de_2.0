@@ -626,14 +626,27 @@ function vs_flash_html()
 }
 
 /**
- * VS-Boni eines Spielers aus Hekates Gunst und dem Pfad des Thanatos, Prozentwerte noch ohne Obergrenze.
- * Fehlt die Tabelle de_vs_bonus noch (Update nicht eingespielt), zählt nur der Pfad des Thanatos.
+ * VS-Boni eines Spielers aus Hekates Gunst, dem Pfad des Thanatos und dem Feldzug (Mine/Werft der eigenen Allianz),
+ * Prozentwerte noch ohne Obergrenze. Fehlen die Tabellen de_vs_bonus oder de_feldzug* noch (Update nicht eingespielt),
+ * zählt der Teil nicht.
  *
- * @return array{industrie:int, bauzeit:int, hekate:array<int,int>, thanatos:int} hekate: typ => verbleibende WT
+ * @return array{industrie:int, bauzeit:int, hekate:array<int,int>, thanatos:int, feldzug:array{mine:bool, werft:bool}} hekate: typ => verbleibende WT
  */
 function vs_bonus_info($uid)
 {
-    $info = ['industrie' => 0, 'bauzeit' => 0, 'hekate' => [], 'thanatos' => 0];
+    $info = ['industrie' => 0, 'bauzeit' => 0, 'hekate' => [], 'thanatos' => 0, 'feldzug' => ['mine' => false, 'werft' => false]];
+
+    try {
+        $info['feldzug'] = (new \DieEwigen\DE2\Model\Feldzug\FeldzugService($GLOBALS['dbi']))->getVorteile((int)$uid);
+    } catch (\Throwable $e) {
+        $info['feldzug'] = ['mine' => false, 'werft' => false];
+    }
+    if ($info['feldzug']['mine']) {
+        $info['industrie'] += \DieEwigen\DE2\Model\Feldzug\FeldzugService::MINE_PROZENT;
+    }
+    if ($info['feldzug']['werft']) {
+        $info['bauzeit'] += \DieEwigen\DE2\Model\Feldzug\FeldzugService::WERFT_PROZENT;
+    }
 
     $info['thanatos'] = (new \DieEwigen\DE2\Model\Thanatos\ThanatosService($GLOBALS['dbi']))->getStufe($uid);
     $info['industrie'] += \DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($info['thanatos']);
@@ -655,7 +668,7 @@ function vs_bonus_info($uid)
 
 /**
  * Faktor für Bau- und Missionszeiten in den Vergessenen Systemen. Artefakt 12 verkürzt sie um max. 50%,
- * Hekates Gunst und der Pfad des Thanatos zusammen um weitere max. 50%.
+ * Hekates Gunst, der Pfad des Thanatos und die Werft im Feldzug zusammen um weitere max. 50%.
  */
 function vs_duration_factor($uid, $ua_werte)
 {

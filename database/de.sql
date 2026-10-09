@@ -499,6 +499,143 @@ CREATE TABLE `de_dez_zeitung` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_feldzug`
+-- Feldzug um die Vergessenen Systeme (docs/feldzug.md, FeldzugService): eine Zeile je Feldzug der Runde
+-- Beim Update eines laufenden Servers alle Tabellen de_feldzug* anlegen; ohne sv_feldzug_aktiv bleibt der Feldzug aus
+-- phase: 1 Aufruf, 2 Kampf, 3 beendet, 4 ausgefallen
+--
+
+CREATE TABLE `de_feldzug` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `round_start` date DEFAULT NULL,
+  `nr` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
+  `phase` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `start_wt` bigint(20) NOT NULL DEFAULT 0,
+  `kampf_start_wt` bigint(20) NOT NULL DEFAULT 0,
+  `zug` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `preis` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `produktion` double NOT NULL DEFAULT 0,
+  `produktion_basis` double NOT NULL DEFAULT 0,
+  `sieger_ally_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `ende_wt` bigint(20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_brennpunkt`
+-- rolle: 0 keine, 1 Festung, 2 Mine, 3 Werft; Name und Halter-Kürzel als Text (map_id und ally_id gelten nur in der Runde)
+--
+
+CREATE TABLE `de_feldzug_brennpunkt` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `feldzug_id` int(10) UNSIGNED NOT NULL,
+  `map_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `wert` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `rolle` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `halter_ally_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `halter_tag` varchar(8) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `feldzug_id` (`feldzug_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_ergebnis`
+-- je Zug, Brennpunkt und Allianz die gesetzten Legionen, die Stärke und ob sie danach hält (öffentlich)
+--
+
+CREATE TABLE `de_feldzug_ergebnis` (
+  `feldzug_id` int(10) UNSIGNED NOT NULL,
+  `zug` smallint(5) UNSIGNED NOT NULL,
+  `brennpunkt_id` int(10) UNSIGNED NOT NULL,
+  `ally_id` int(10) UNSIGNED NOT NULL,
+  `legionen` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `staerke` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `halter` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`feldzug_id`, `zug`, `brennpunkt_id`, `ally_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_historie`
+-- art: 1 Sieg eines Feldzugs, 2 Feldherren der Runde; Kürzel und Name als Text, wird beim Reset nicht geleert
+--
+
+CREATE TABLE `de_feldzug_historie` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `round_start` date DEFAULT NULL,
+  `round_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `art` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `feldzug_nr` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `allytag` varchar(8) NOT NULL DEFAULT '',
+  `allyname` varchar(50) NOT NULL DEFAULT '',
+  `kontrollpunkte` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `siege` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `wt` bigint(20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `round_id` (`round_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_mitglied`
+-- Allianzmitglieder beim Aufruf; teilnehmer=1: beim Kampfstart noch in derselben Allianz und berechtigt (für den Titel)
+--
+
+CREATE TABLE `de_feldzug_mitglied` (
+  `feldzug_id` int(10) UNSIGNED NOT NULL,
+  `user_id` mediumint(9) NOT NULL,
+  `ally_id` int(10) UNSIGNED NOT NULL,
+  `teilnehmer` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`feldzug_id`, `user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_teilnehmer`
+-- status: 1 angemeldet, 2 dabei (Eintrittspreis bezahlt); Kürzel und Name als Text
+--
+
+CREATE TABLE `de_feldzug_teilnehmer` (
+  `feldzug_id` int(10) UNSIGNED NOT NULL,
+  `ally_id` int(10) UNSIGNED NOT NULL,
+  `allytag` varchar(8) NOT NULL DEFAULT '',
+  `allyname` varchar(50) NOT NULL DEFAULT '',
+  `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `angemeldet_von` varchar(30) NOT NULL DEFAULT '',
+  `kontrollpunkte` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `gehalten_ende` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `platz` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `letzte_aenderung_name` varchar(30) NOT NULL DEFAULT '',
+  `letzte_aenderung_wt` bigint(20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`feldzug_id`, `ally_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_feldzug_verteilung`
+-- stehende Verteilung der Legionen je Allianz und Brennpunkt
+--
+
+CREATE TABLE `de_feldzug_verteilung` (
+  `feldzug_id` int(10) UNSIGNED NOT NULL,
+  `ally_id` int(10) UNSIGNED NOT NULL,
+  `brennpunkt_id` int(10) UNSIGNED NOT NULL,
+  `legionen` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`feldzug_id`, `ally_id`, `brennpunkt_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_hekate`
 -- Hekate (Spezialsystem 6 der Vergessenen Systeme): wechselnde Aufträge, eine Zeile mit id=1 (legt der HekateService selbst an)
 -- Beim Update eines laufenden Servers diese Tabelle und `de_hekate_lieferung` anlegen

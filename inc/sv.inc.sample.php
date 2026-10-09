@@ -174,6 +174,17 @@ $GLOBALS['sv_pcs_id']=11;
 //$GLOBALS['sv_thanatos_industrie_pro_stufe']=5;    //Industrie-Ertrag in den VS je Stufe in Prozent, bis Rundenende
 //$GLOBALS['sv_thanatos_bauzeit_pro_stufe']=3;      //kürzere Bauzeit in den VS je Stufe in Prozent, bis Rundenende
 
+//Feldzug um die Vergessenen Systeme (Wettstreit der Allianzen, FeldzugService, Regelwerk docs/feldzug.md)
+//nur zu einem Rundenstart einschalten: der Feldzug vergibt Rundensiegartefakte; Server 2: Zuglänge 144 und Grundpreis 600
+//$GLOBALS['sv_feldzug_aktiv']=0;                 //1 schaltet den Feldzug ein (aus, wenn sv_deactivate_vsystems=1)
+//$GLOBALS['sv_feldzug_zug_wt']=480;              //Länge eines Zuges in WT
+//$GLOBALS['sv_feldzug_start_zuege']=7;           //Rundenlaufzeit in Zügen bis zum ersten Aufruf
+//$GLOBALS['sv_feldzug_aufruf_zuege']=2;          //Länge des Aufrufs in Zügen
+//$GLOBALS['sv_feldzug_kampf_zuege']=12;          //Länge der Kampfphase in Zügen
+//$GLOBALS['sv_feldzug_legionen']=12;             //Legionen je Allianz und Zug
+//$GLOBALS['sv_feldzug_extra_brennpunkte']=3;     //Brennpunkte = Teilnehmer + dieser Wert
+//$GLOBALS['sv_feldzug_grundpreis']=2000;         //Eintrittspreis je VS-Rohstoffart beim ersten Aufruf, wächst mit der VS-Produktion
+
 //Sektor 666 erwacht (Server-Boss für die Sektorflotten, Sektor666Service), optional, ohne Eintrag gelten diese Werte
 //$GLOBALS['sv_s666_aktiv']=true;             //false schaltet das Ereignis ab
 //$GLOBALS['sv_s666_start']=50;               //erstes Erwachen bei diesem Rundenfortschritt in Prozent (WT / sv_winscore)

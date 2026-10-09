@@ -11,6 +11,7 @@ use DieEwigen\DE2\Model\Exile\ExileMail;
 use DieEwigen\DE2\Model\Siegel\SiegelService;
 use DieEwigen\DE2\Model\Hekate\HekateService;
 use DieEwigen\DE2\Model\Sektor666\Sektor666Service;
+use DieEwigen\DE2\Model\Feldzug\FeldzugService;
 
 set_time_limit(240);
 $directory = '../';
@@ -27,11 +28,12 @@ include_once $directory."inccon.php";
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
-//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang, $hekate_lang, $s666_lang und $sv_link müssen hier definiert sein
+//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang, $hekate_lang, $s666_lang, $feldzug_lang und $sv_link müssen hier definiert sein
 include $directory."inc/lang/".$sv_server_lang."_exile.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_siegel.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_hekate.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_sektor666.lang.php";
+include $directory."inc/lang/".$sv_server_lang."_feldzug.lang.php";
 include $directory."inc/".$sv_server_lang."_links.inc.php";
 include_once $directory."inc/sabotage.inc.php";
 include_once $directory."inc/allyjobs.inc.php";
@@ -375,6 +377,14 @@ if ($doetick == 1) {
         (new Sektor666Service($GLOBALS['dbi']))->processWt($s666_lang);
     } catch (\Throwable $e) {
         echo 'Fehler bei Sektor 666: '.$e->getMessage().'<br>';
+    }
+
+    //Feldzug: Aufruf, Kampfstart und Zugauswertung, Fehler dürfen den Tick nicht aufhalten
+    echo '<br>Feldzug<br>';
+    try {
+        (new FeldzugService($GLOBALS['dbi']))->processWt($feldzug_lang);
+    } catch (\Throwable $e) {
+        echo 'Fehler beim Feldzug: '.$e->getMessage().'<br>';
     }
 
     ////////////////////////////////////////////////
@@ -1838,6 +1848,13 @@ if ($doetick == 1) {
 
         //für den Erhabenen einen Titel erzeugen und für seine owner_id im Account hinterlegen
         createTitleForUser($player_owner_id, '['.$sv_server_tag.'] ERHABENE/R - Runde '.$rundenNummer);
+
+        //Feldzug: Feldherren der Runde ermitteln und betiteln, vor dem Reset (er löscht die Allianzen)
+        try {
+            (new FeldzugService($GLOBALS['dbi']))->rundenende((int)$rundenNummer, (string)($GLOBALS['sv_server_tag'] ?? ''), $feldzug_lang);
+        } catch (\Throwable $e) {
+            echo 'Fehler beim Feldzug (Rundenende): '.$e->getMessage().'<br>';
+        }
 
         //überprüfen ob es einen automatischen reset geben soll
         if ($sv_auto_reset == 1) {

@@ -112,10 +112,23 @@ if(!hasTech($pt,25)){
 	if($vs_boni['thanatos']>0){
 		$vs_boni_teile[]='Pfad des Thanatos Stufe '.$vs_boni['thanatos'].': Industrie +'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($vs_boni['thanatos']).'%, Bauzeit -'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($vs_boni['thanatos']).'%';
 	}
+	//Feldzug: Mine und Werft der eigenen Allianz
+	include_once 'inc/lang/'.$sv_server_lang.'_feldzug.lang.php';
+	if($vs_boni['feldzug']['mine']){
+		$vs_boni_teile[]=$feldzug_lang['vs_boni_mine'];
+	}
+	if($vs_boni['feldzug']['werft']){
+		$vs_boni_teile[]=$feldzug_lang['vs_boni_werft'];
+	}
 	if(!empty($vs_boni_teile)){
 		echo '<div class="ov-wert"><span class="mod-typ">Weitere Boni</span><span class="vs-boni-liste">'.implode('<br>', $vs_boni_teile).'</span></div>';
 	}
 	echo '</div>';
+
+	//Feldzug: Brennpunkte sind in der Liste markiert, alle stehen auf der Feldzugseite
+	if(\DieEwigen\DE2\Model\Feldzug\FeldzugService::istAktiv()){
+		echo '<div class="vs-zeile"><span>'.$feldzug_lang['vs_hinweis'].'</span><a href="feldzug.php" class="mod-btn mod-btn-leise ally-btn-klein">'.$feldzug_lang['vs_link'].'</a></div>';
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// Filter für die einzelnen Systeme (vs_filter in ang_fn.js, Auswahl bleibt per Cookie erhalten)

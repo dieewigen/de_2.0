@@ -31,14 +31,20 @@ $valid_rohstoff_ids=array(
 	array(12,12)
 );
 
-//Hekates Gunst und Pfad des Thanatos: zusätzlicher Industrie-Ertrag, Fehler dürfen den Tick nicht aufhalten
+//Hekates Gunst, Pfad des Thanatos und die Mine im Feldzug: zusätzlicher Industrie-Ertrag, Fehler dürfen den Tick nicht aufhalten
 $vs_bonus_aktiv=array();
 $thanatos_stufen=array();
+$feldzug_mine=array();
 try{
 	$thanatos_stufen=(new \DieEwigen\DE2\Model\Thanatos\ThanatosService($GLOBALS['dbi']))->loadAllStufen();
 	$vs_bonus_aktiv=(new \DieEwigen\DE2\Model\VsBonus\VsBonusService($GLOBALS['dbi']))->loadAllActive($rundenalter_wt);
 }catch(\Throwable $e){
 	echo '<br>Fehler beim Laden der VS-Boni: '.$e->getMessage();
+}
+try{
+	$feldzug_mine=(new \DieEwigen\DE2\Model\Feldzug\FeldzugService($GLOBALS['dbi']))->getMineMitglieder();
+}catch(\Throwable $e){
+	echo '<br>Fehler beim Laden der Feldzug-Mine: '.$e->getMessage();
 }
 
 //die einzelnen User abarbeiten, die Gebäudedaten befinden sich alle im Array $bldg_data und für jeden aktiven Spieler wird dieses durchlaufen
@@ -61,6 +67,9 @@ while($row = mysqli_fetch_array($result)){
 		$prozentwert+=\DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent(\DieEwigen\DE2\Model\VsBonus\VsBonusService::TYP_INDUSTRIE);
 	}
 	$prozentwert+=\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_stufen[$uid] ?? 0);
+	if(isset($feldzug_mine[(int)$uid])){
+		$prozentwert+=\DieEwigen\DE2\Model\Feldzug\FeldzugService::MINE_PROZENT;
+	}
 
 	$prozentwert=1+($prozentwert/100);
 

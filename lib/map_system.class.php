@@ -676,6 +676,12 @@ class map_system{
 
 		//eine Karte je System; die Filterklassen sitzen am tbody, damit der Filter (vs_filter in ang_fn.js) die ganze Karte
 		//ein- und ausblendet. vs_upgrade_row() ersetzt das tbody und hängt seine Meldung an die erste Zelle an.
+		//Feldzug: Brennpunkte mit dem Kürzel des Halters markieren (hier, damit es "alle upgraden" übersteht)
+		$brennpunkte=\DieEwigen\DE2\Model\Feldzug\FeldzugService::getMarker($GLOBALS['dbi']);
+		if(isset($brennpunkte[$system_id])){
+			$system_name.=' <span class="mod-chip mod-chip-warn vs-brennpunkt">Brennpunkt'.($brennpunkte[$system_id]!=='' ? ' &middot; '.html_text($brennpunkte[$system_id]) : '').'</span>';
+		}
+
 		$output='<tbody id="vsrow'.$system_id.'" class="vs-system'.$filter_class.'">';
 		$output.='<tr class="vs-kopf"><td class="vs-name"><img id="sysid'.$system_id.'" src="'.$bg_image.'" class="vs-symbol" alt=""> '.$system_name.'</td>';
 		$output.='<td class="vs-aktion"><a href="map_system.php?id='.$system_id.'" class="mod-btn mod-btn-leise ally-btn-klein">Zum System</a></td></tr>';

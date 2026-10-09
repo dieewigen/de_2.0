@@ -383,6 +383,50 @@ try {
     error_log('Sektor 666: '.$e->getMessage());
 }
 
+//Feldzug, solange ein Aufruf oder Kampf läuft
+try {
+    if (\DieEwigen\DE2\Model\Feldzug\FeldzugService::istAktiv()) {
+        include_once 'inc/lang/'.$sv_server_lang.'_feldzug.lang.php';
+        $fz_ov = new \DieEwigen\DE2\Model\Feldzug\FeldzugService($GLOBALS['dbi']);
+        $fz_ov_fz = $fz_ov->getAktuell();
+        $fz_ov_eigene = $fz_ov->getEigeneAllianz((int)$_SESSION['ums_user_id']);
+        $fz_ov_text = '';
+        if ($fz_ov_fz !== null && (int)$fz_ov_fz['phase'] === \DieEwigen\DE2\Model\Feldzug\FeldzugService::PHASE_AUFRUF) {
+            $fz_ov_text = strtr($feldzug_lang['ov_aufruf'], ['{NR}' => (int)$fz_ov_fz['nr'], '{WT}' => number_format($fz_ov->getWtBisSchritt($fz_ov_fz), 0, ',', '.')]);
+            if ($fz_ov_eigene !== null) {
+                foreach ($fz_ov->getTeilnehmer((int)$fz_ov_fz['id']) as $fz_ov_t) {
+                    if ((int)$fz_ov_t['ally_id'] === $fz_ov_eigene['ally_id']) {
+                        $fz_ov_text .= $feldzug_lang['ov_angemeldet'];
+                    }
+                }
+            }
+        } elseif ($fz_ov_fz !== null && (int)$fz_ov_fz['phase'] === \DieEwigen\DE2\Model\Feldzug\FeldzugService::PHASE_KAMPF) {
+            $fz_ov_text = strtr($feldzug_lang['ov_kampf'], ['{NR}' => (int)$fz_ov_fz['nr'], '{ZUG}' => (int)$fz_ov_fz['zug'] + 1,
+                '{ZUEGE}' => \DieEwigen\DE2\Model\Feldzug\FeldzugService::getKampfZuege(), '{WT}' => number_format($fz_ov->getWtBisSchritt($fz_ov_fz), 0, ',', '.')]);
+            if ($fz_ov_eigene !== null) {
+                $fz_ov_platz = 0;
+                $fz_ov_vorher = null;
+                $fz_ov_i = 0;
+                foreach ($fz_ov->getTeilnehmer((int)$fz_ov_fz['id'], \DieEwigen\DE2\Model\Feldzug\FeldzugService::TEILNEHMER_DABEI) as $fz_ov_t) {
+                    $fz_ov_i++;
+                    if ($fz_ov_vorher !== (int)$fz_ov_t['kontrollpunkte']) {
+                        $fz_ov_platz = $fz_ov_i;
+                        $fz_ov_vorher = (int)$fz_ov_t['kontrollpunkte'];
+                    }
+                    if ((int)$fz_ov_t['ally_id'] === $fz_ov_eigene['ally_id']) {
+                        $fz_ov_text .= strtr($feldzug_lang['ov_eigene'], ['{PLATZ}' => $fz_ov_platz, '{KP}' => number_format((int)$fz_ov_t['kontrollpunkte'], 0, ',', '.')]);
+                    }
+                }
+            }
+        }
+        if ($fz_ov_text !== '') {
+            echo '<div class="ov-siegel ov-feldzug">'.$fz_ov_text.'.</div>';
+        }
+    }
+} catch (\Throwable $e) {
+    error_log('Feldzug: '.$e->getMessage());
+}
+
 //Links: Serverinfos, Hilfe, Umfragen, Community; als schlichte Knöpfe passen alle fünf in eine Zeile
 echo '
     <div class="ov-links">

@@ -1,6 +1,6 @@
 # Feldzug um die Vergessenen Systeme – Regelwerk
 
-Stand: Entwurf vom 05.10.2026, überarbeitet zu Brennpunkten statt Karte. Grundlage für die Umsetzung und für die Spielerfassung `docs/feldzug.html`.
+Stand: umgesetzt am 08.10.2026 (Entwurf vom 05.10.2026, überarbeitet zu Brennpunkten statt Karte). Spielerfassung: `docs/feldzug.html`. Freigeschaltet wird der Feldzug mit `sv_feldzug_aktiv` zu einem Rundenstart, weil er Questpunkte vergibt.
 
 ## Entscheidungen
 
@@ -14,6 +14,17 @@ Stand: Entwurf vom 05.10.2026, überarbeitet zu Brennpunkten statt Karte. Grundl
 - Belohnungen: Ansehen, Vorteile durch gehaltene Brennpunkte, Questpunkte. Keine Kollektoren, keine Allianzartefakte, kein Quantenglimmer.
 - Alle Mitglieder sehen alles. Legionen verteilen nur Mitglieder mit Posten. Spenden dürfen alle Mitglieder.
 - **Allianzwappen vorerst nicht.** Halter werden mit ihrem Allianzkürzel angezeigt.
+
+Bei der Umsetzung am 08.10.2026 entschieden:
+- **Questpunkte:** Die Kontrollpunkte fließen voll in `de_allys.questpoints`. Erfolgreiche Allianzen erreichen damit auch die Stufen des täglichen Allianzbonus schneller. Das ist bewusst so.
+- **Markierung:** Brennpunkte werden in der Liste der V-Systeme und auf der Desktop-Karte nur markiert, wenn der Spieler das System dort ohnehin sieht. Alle Brennpunkte stehen auf der Feldzugseite.
+- **Sparsame Meldungen:** Die Sammelmeldung je Zug geht nur in den Serverchat im Spiel. An Discord gehen nur Aufruf, Start, Ausfall, Sieg und Feldherren. Der Allianzchat bekommt nur bei gewonnenem oder verlorenem Brennpunkt eine Meldung.
+- **Einstieg:** Reiter „Feldzug“ in der Allianz-Navigation (nur bei eingeschaltetem Feldzug), Zeile auf der Übersicht, Link in der Liste der V-Systeme. Das Menü bleibt unverändert.
+- **Laufender Feldzug zum Rundenende:** Er hat keinen Sieger, nur abgeschlossene Feldzüge zählen für die Feldherren.
+- **Mine und Werft** wirken nur während der Kampfphase.
+- **Gelöschte Allianz:** Ihre Brennpunkte werden beim nächsten Zug neutral, ihre Verteilung entfällt, ihre Punkte bleiben im Punktestand.
+- **„Seit Beginn des Aufrufs“:** Ein Beitrittsdatum gibt es nicht. Beim Aufruf werden alle Mitglieder festgehalten (`de_feldzug_mitglied`). Beim Kampfstart ist berechtigt, wer festgehalten wurde und noch in derselben Allianz ist.
+- **Produktionsmedian:** aus `de_user_storage.item_wt_change` (Items 3–12) aktiver menschlicher Spieler außerhalb von Sektor 1, deren Summe über 0 liegt.
 
 ## 1. Grundsätze
 
@@ -220,7 +231,7 @@ Weil alle Mitglieder die aktuelle Verteilung sehen, kann ein Mitglied sie an Geg
 
 | Einstellung | Server 1 | Server 2 | Bedeutung |
 |---|---|---|---|
-| `sv_feldzug_aktiv` | 1 | 1 | Feldzüge an oder aus |
+| `sv_feldzug_aktiv` | 1 | 1 | Feldzüge an oder aus (Standard ohne Eintrag: aus; zum Rundenstart einschalten) |
 | `sv_feldzug_zug_wt` | 480 | 144 | Länge eines Zuges in WT |
 | `sv_feldzug_start_zuege` | 7 | 7 | Rundenlaufzeit in Zügen bis zum ersten Aufruf |
 | `sv_feldzug_aufruf_zuege` | 2 | 2 | Länge des Aufrufs |
@@ -229,7 +240,7 @@ Weil alle Mitglieder die aktuelle Verteilung sehen, kann ein Mitglied sie an Geg
 | `sv_feldzug_extra_brennpunkte` | 3 | 3 | Brennpunkte = Teilnehmer + dieser Wert |
 | `sv_feldzug_grundpreis` | 2000 | 600 | Eintrittspreis je VS-Rohstoffart beim ersten Aufruf, danach wächst er mit der Produktion |
 
-Ohne Eintrag gelten die Werte von Server 1. Server 2 braucht also nur andere Werte für Zuglänge und Grundpreis.
+Ohne Eintrag gelten die Werte von Server 1, außer `sv_feldzug_aktiv` (aus). Server 2 braucht also den Schalter und andere Werte für Zuglänge und Grundpreis.
 
 ## 12. Technische Umsetzung
 

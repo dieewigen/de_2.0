@@ -698,6 +698,23 @@ body {
 	color: #8b949e;
 }
 
+// Brennpunkt im Feldzug: Kürzel des Halters über dem Knoten (map.php)
+.vsk-brennpunkt {
+	position: absolute;
+	top: -10px;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 1px 8px;
+	border: 1px solid #ffb45c;
+	border-radius: 999px;
+	background: rgba(40, 22, 6, 0.92);
+	font-size: 12px;
+	font-weight: 700;
+	white-space: nowrap;
+	color: #ffb45c;
+	box-shadow: 0 0 8px rgba(255, 150, 60, 0.45);
+}
+
 // Die Struktur der Erbauer (rechts oben auf der Karte): Landmarke im Konsolen-Look statt Regenbogenrahmen.
 // Die Position bleibt inline in map.php. Kopf- und Fusszeile liegen als Leisten auf dem Bild, damit die
 // Landmarke ihre Masse (2028px Bild) behaelt. Schriften sind etwa doppelt so gross wie in den Sektoren,

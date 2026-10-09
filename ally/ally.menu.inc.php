@@ -88,6 +88,10 @@ function print_ally_navi($eintraege, $klasse = ''){
 	}
 	echo '<div class="mod ally-navi'.$klasse.'">';
 	foreach ($eintraege as $datei => $text) {
+		//den Feldzug erst zeigen, wenn er auf dem Server eingeschaltet ist
+		if ($datei == 'feldzug.php' && !\DieEwigen\DE2\Model\Feldzug\FeldzugService::istAktiv()) {
+			continue;
+		}
 		$css = 'ally-reiter';
 		if ($datei == 'ally_delete.php' || $datei == 'ally_austritt.php') {
 			$css .= ' ally-reiter-gefahr';
@@ -114,6 +118,7 @@ function print_LEADER_ally_bar()
 		'ally_history.php' => $allymenu_lang['allianzhistory'],
 		'ally_fleet.php' => $allymenu_lang['allianzflotten'],
 		'ally_bldg.php' => 'Projekte',
+		'feldzug.php' => 'Feldzug',
 		'ally_delete.php' => $allymenu_lang['loeschen'],
 	));
 }
@@ -131,6 +136,7 @@ function print_COLEADER_ally_bar()
 		'ally_finance.php' => $allymenu_lang['finanzen'],
 		'ally_history.php' => $allymenu_lang['allianzhistory'],
 		'ally_bldg.php' => 'Projekte',
+		'feldzug.php' => 'Feldzug',
 		'ally_fleet.php' => $allymenu_lang['allianzflotten'],
 		'ally_austritt.php' => $allymenu_lang['austreten'],
 	));
@@ -148,6 +154,7 @@ function print_MEMBER_ally_bar()
 		'ally_history.php' => $allymenu_lang['allianzhistory'],
 		'ally_fleet.php' => $allymenu_lang['allianzflotten'],
 		'ally_bldg.php' => 'Projekte',
+		'feldzug.php' => 'Feldzug',
 		'ally_austritt.php' => $allymenu_lang['austreten'],
 	));
 }

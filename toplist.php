@@ -537,6 +537,11 @@ if($historie){
 		if(!empty($row['ally_tag'])){
 			echo '<span class="mod-typ">Beste Allianz</span><span><b>'.$row['ally_tag'].'</b> &middot; '.number_format($row['ally_roundpoints'], 0,"",".").' Rundensiegartefakte</span>';
 		}
+		//Feldherren: Allianz mit den meisten gewonnenen Feldzügen der Runde
+		$feldherren = (new \DieEwigen\DE2\Model\Feldzug\FeldzugService($GLOBALS['dbi']))->getFeldherren((int)$row['round_id']);
+		if($feldherren !== null){
+			echo '<span class="mod-typ">Feldherren</span><span><b>'.html_text($feldherren['allytag']).'</b> &middot; '.(int)$feldherren['siege'].' gewonnene Feldz&uuml;ge</span>';
+		}
 		echo '</div></div>';
 		$runden++;
 	}

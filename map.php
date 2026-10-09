@@ -1104,10 +1104,20 @@ while ($row = mysqli_fetch_array($db_daten)) {
         }
     }
 
+    //Feldzug: Brennpunkte mit dem Kürzel des Halters markieren
+    $brennpunkt = '';
+    $brennpunkte = \DieEwigen\DE2\Model\Feldzug\FeldzugService::getMarker($GLOBALS['dbi']);
+    if (isset($brennpunkte[(int)$row['id']])) {
+        $halter = $brennpunkte[(int)$row['id']] !== '' ? html_text($brennpunkte[(int)$row['id']]) : 'neutral';
+        $brennpunkt = '<div class="vsk-brennpunkt">'.$halter.'</div>';
+        $system_name .= '<br>Brennpunkt im Feldzug: '.$halter;
+    }
+
     $output .= '<div class="vsk" style="left: '.$alienpos_x.'px; top: '.$alienpos_y.'px; background-image: url('.$bg_image.');" title="'.$system_name.$tech_info.'" onclick="switch_iframe_main_container(\'map_system.php?id='.$row['id'].'\')">';
     if ($felder != '') {
         $output .= '<div class="vsk-felder">'.$felder.'</div>';
     }
+    $output .= $brennpunkt;
     $output .= '</div>';
     //if($row['user_id']<1 && $data->always_visible==0){
     if (!in_array($row['id'], $sichtbare_systeme)) {
