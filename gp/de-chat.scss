@@ -218,6 +218,11 @@ $chat-channels: (
   border-color: currentColor;
   background-color: rgba(255, 255, 255, 0.08);
 }
+// Kanal steht gerade nicht offen (keine Allianz, in den Optionen abgeschaltet); der Grund steht im title
+#chatchannelchanger .chatchannel.chat-aus {
+  opacity: 0.35;
+  cursor: default;
+}
 
 #chatinput .chat-inputrow {
   display: flex;

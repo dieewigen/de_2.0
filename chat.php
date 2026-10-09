@@ -1,13 +1,30 @@
 <?php
+use DieEwigen\DE2\Model\Chat\ChannelChoice;
+
 //fix um den chat von der botabfrage unabh�ngig zu machen, gleichzeitig darf man aber keine credits bekommmen
 $eftachatbotdefensedisable = 1;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_chat.lang.php';
 
-//schauen ob es die variablen schon gibt
+include 'functions.php';
+
+//Sektor, Allianz und zuletzt gewählter Kanal des Spielers
+$chat_wahl = new ChannelChoice($GLOBALS['dbi']);
+$chat_info = $chat_wahl->playerInfo((int)$_SESSION['ums_user_id']);
+
+//beim ersten Öffnen in dieser Sitzung den zuletzt gewählten Kanal nehmen, sofern er noch offensteht
 if (!isset($_SESSION["de_chat_inputchannel"])) {
-    $_SESSION["de_chat_inputchannel"] = 0;
+    $_SESSION["de_chat_inputchannel"] = $chat_wahl->sanitize($chat_info, $chat_info['chatchannel'], ChannelChoice::SEKTOR);
 }
+
+//Reiter über dem Eingabefeld; typ wie channeltyp in de_chat_msg, die Farben stehen in gp/de-chat.scss
+//aus: der Kanal steht dem Spieler gerade nicht offen (Reiter abgeblendet, der Server prüft beim Klick trotzdem)
+$chat_kanaele = [
+    ['typ' => 3, 'name' => 'Global', 'placeholder' => 'Nachricht an alle Server …', 'aus' => $chat_info['chatoffglobal'] == 1, 'hinweis' => 'In den Optionen abgeschaltet'],
+    ['typ' => 2, 'name' => 'Server', 'placeholder' => 'Nachricht an den Server …', 'aus' => $chat_info['chatoffallg'] == 1, 'hinweis' => 'In den Optionen abgeschaltet'],
+    ['typ' => 0, 'name' => $chat_lang['sektor'].' '.$chat_info['sector'], 'placeholder' => 'Nachricht an den Sektor …', 'aus' => false, 'hinweis' => ''],
+    ['typ' => 1, 'name' => trim($chat_lang['allianz'].' '.$chat_info['allytag']), 'placeholder' => 'Nachricht an die Allianz …', 'aus' => $chat_info['allytag'] === '', 'hinweis' => 'Du bist in keiner Allianz'],
+];
 
 //Token für Schreiben/Channelwechsel, wird in de_ajaxrpc.php geprüft
 if (empty($_SESSION['chat_token'])) {
@@ -158,13 +175,8 @@ var chatToken = <?php echo json_encode($_SESSION['chat_token']); ?>;
 var chatMaxLines = 500;
 var chatcounter = 100;
 
-//Reihenfolge im Menü; typ wie channeltyp in de_chat_msg, die Farben stehen in gp/de-chat.scss
-var chatChannels = [
-	{typ: 3, name: 'Global', placeholder: 'Nachricht an alle Server …'},
-	{typ: 2, name: 'Server', placeholder: 'Nachricht an den Server …'},
-	{typ: 0, name: <?php echo json_encode($chat_lang['sektor']); ?>, placeholder: 'Nachricht an den Sektor …'},
-	{typ: 1, name: <?php echo json_encode($chat_lang['allianz']); ?>, placeholder: 'Nachricht an die Allianz …'}
-];
+//Reiter in dieser Reihenfolge, Inhalt siehe $chat_kanaele oben
+var chatChannels = <?php echo json_encode($chat_kanaele, JSON_HEX_TAG | JSON_INVALID_UTF8_SUBSTITUTE) ?: '[]'; ?>;
 
 function show_chatmenu(channeltyp){
 	var menu = $('#chatchannelchanger').empty();
@@ -172,6 +184,9 @@ function show_chatmenu(channeltyp){
 		var item = $('<span class="chatchannel chat-ch'+ch.typ+'">').text(ch.name).on('click', function(){
 			change_chatchannel(ch.typ);
 		});
+		if(ch.aus){
+			item.addClass('chat-aus').attr('title', ch.hinweis);
+		}
 		if(ch.typ == channeltyp){
 			item.addClass('active');
 			$('#chatinputfield').attr('placeholder', ch.placeholder);

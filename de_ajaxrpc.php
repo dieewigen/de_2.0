@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Chat\ChannelChoice;
+
 $eftachatbotdefensedisable=1;
 mb_internal_encoding("UTF-8");
 
@@ -17,46 +19,19 @@ $chat_max_length=1000;
 //////////////////////////////////////////////////////////
 if(isset($_REQUEST['changechatchannel'])){
 	$newchannel=intval($_REQUEST['changechatchannel'])-1;
+	$aktuell=intval($_SESSION["de_chat_inputchannel"] ?? 0);
 
 	//ohne gültigen Token bleibt der bisherige Channel
 	if(!chat_request_valid()){
-		$newchannel=intval($_SESSION["de_chat_inputchannel"] ?? 0);
+		$newchannel=$aktuell;
 		$_SESSION['chat_hint']='Der Chat wurde aktualisiert. Bitte lade die Seite neu.';
+	}else{
+		//Allianz nur als Mitglied, Server und Global nur, wenn nicht in den Optionen abgeschaltet; sonst bleibt der bisherige Channel
+		$wahl=new ChannelChoice($GLOBALS['dbi']);
+		$newchannel=$wahl->sanitize($wahl->playerInfo((int)$_SESSION['ums_user_id']), $newchannel, $aktuell);
+		//die Wahl überdauert den nächsten Login (de_user_data.chatchannel)
+		$wahl->remember((int)$_SESSION['ums_user_id'], $newchannel);
 	}
-
-	if($newchannel<0 OR $newchannel>3)$newchannel=0;
-
-	//wenn channel 2 gew�hlt wurde, allgemein, dann testen ob man den aktiv hat
-	if($newchannel==2){
-		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-			"SELECT chatoffallg FROM de_user_data WHERE user_id=?",
-			[$_SESSION['ums_user_id']]);
-		$row = mysqli_fetch_assoc($db_daten);
-
-		if($row['chatoffallg']==1)$newchannel=$_SESSION["de_chat_inputchannel"];
-	}
-	
-	//wenn channel 3 gewählt wurde, allgemein, dann testen ob man den aktiv hat
-	if($newchannel==3){
-		$db_daten = mysqli_execute_query($GLOBALS['dbi'],
-			"SELECT chatoffglobal FROM de_user_data WHERE user_id=?",
-			[$_SESSION['ums_user_id']]);
-		$row = mysqli_fetch_assoc($db_daten);
-
-		if($row['chatoffglobal']==1)$newchannel=$_SESSION["de_chat_inputchannel"];
-	}	
-
-	//wenn channel 1 gew�hlt wurde, allianz, dann test ob man in einer ally ist
-	if($newchannel==1)
-	{
-	  $db_daten = mysqli_execute_query($GLOBALS['dbi'],
-		"SELECT allytag, status FROM de_user_data WHERE user_id=?",
-		[$_SESSION['ums_user_id']]);
-	  $row = mysqli_fetch_assoc($db_daten);
-
-	  if($row['allytag']=='' OR $row['status']==0)$newchannel=$_SESSION["de_chat_inputchannel"];
-	}
-
 
 	$_SESSION["de_chat_inputchannel"]=$newchannel;
 	$data[] = array ('newchatchannel' => $newchannel);
@@ -132,6 +107,8 @@ if(isset($_REQUEST['chatinsert'])){
 			//nicht (mehr) in einer Allianz: die Nachricht würde niemand lesen, daher zurück auf Sektor
 			if($channel==0 && $chat_message!=''){
 				$_SESSION["de_chat_inputchannel"]=0;
+				//auch dauerhaft, sonst stünde der Chat beim nächsten Login wieder auf Allianz
+				(new ChannelChoice($GLOBALS['dbi']))->remember((int)$_SESSION['ums_user_id'], 0);
 				$_SESSION['chat_hint']='Du bist in keiner Allianz, der Chat ist jetzt auf Sektor gestellt. Bitte sende die Nachricht erneut.';
 				$chat_message='';
 				$return=2;
@@ -228,6 +205,12 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	//$first=1;
 	while ($row = mysqli_fetch_assoc($db_daten)){
 		$row['server_tag']='';
+		$row['ally_tag']='';
+		//Zeilen der Partner-Allianz tragen deren Kürzel als Abzeichen (format_chat_output)
+		if($row['channeltyp']==1 && isset($allyidpartner) && $row['channel']==$allyidpartner){
+			$partnertag=$partnertag ?? getAllytagByAllyid($allyidpartner);
+			$row['ally_tag']=$partnertag;
+		}
 		$chatdata[]=$row;
 	}
 	
@@ -375,9 +358,10 @@ function format_chat_output($row){
 	//für die Tagestrenner im Chatfenster
 	$tag=date("Y-m-d", $row["timestamp"]);
 
-	//schauen ob es ein servertag gibt, wird als kleines Abzeichen angezeigt
-	if(!empty($row['server_tag'])){
-		$server_tag='<span class="chat-tag">'.$row['server_tag'].'</span> ';
+	//Abzeichen: Server-Kürzel bei Global, Allianz-Kürzel bei Zeilen der Partner-Allianz
+	$badge=!empty($row['server_tag']) ? $row['server_tag'] : html_text($row['ally_tag'] ?? '');
+	if($badge!==''){
+		$server_tag='<span class="chat-tag">'.$badge.'</span> ';
 	}else{
 		$server_tag='';
 	}
