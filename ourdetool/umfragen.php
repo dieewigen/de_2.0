@@ -11,15 +11,25 @@ $prozentegesamt = 0;
 
 $action = req_str('action');
 $id = req_int('id');
-$frage = req_str('frage');
-$wantwort = req_str('wantwort');
+$frage = trim(req_str('frage'));
+$hinweis = req_str('hinweis');
+$wantwort = trim(str_replace("|", "", req_str('wantwort')));
 $anzahlantwort = req_int('anzahlantwort');
+
+// Antwortfelder a1..a10 einsammeln: Trenner "|" entfernen, leere Felder ueberspringen
+$antwortliste = array();
+for ($n = 1; $n <= 10; $n++) {
+	$a = trim(str_replace("|", "", req_str('a' . $n)));
+	if ($a !== '') {
+		$antwortliste[] = $a;
+	}
+}
+$antworten_neu = implode('|', $antwortliste);
 
 if ($action == "ak") {
 	csrf_require();
 	$time = date("Y-m-d H:i:s");
 	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET status = 1, startdatum=? WHERE id=?", [$time, $id]);
-	echo "<h2>Vote aktiviert</h2>";
 
 	$anzahlantworten = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
 	$riw = mysqli_fetch_assoc($anzahlantworten);
@@ -30,6 +40,7 @@ if ($action == "ak") {
 		mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_vote_stimmen (user_id, vote_id, votefor) VALUES (?, ?, ?)", [0, $id, $i]);
 		$i++;
 	}
+	echo '<div class="flash flash-ok">Umfrage aktiviert, sie ist jetzt im Spiel sichtbar.</div>';
 }
 
 if ($action == "deak") {
@@ -69,9 +80,6 @@ if ($action == "deak") {
 
 	$stimmen = $abgegebenestimmen . '|' . $gesamtuser;
 
-	echo $stimmen;
-
-
 	$time = date("Y-m-d H:i:s");
 
 	mysqli_execute_query(
@@ -79,124 +87,52 @@ if ($action == "deak") {
 		"UPDATE de_vote_umfragen SET status=2, enddatum=?, ergebnisse=?, stimmen=? WHERE id=?",
 		[$time, $db_ergebnisse, $stimmen, $id]
 	);
-	echo "<h2>Vote deaktiviert</h2>";
+	echo '<div class="flash flash-ok">Umfrage beendet: ' . (int)$abgegebenestimmen . ' von ' . (int)$gesamtuser . ' Spielern haben abgestimmt.</div>';
 }
 
-$a1 = req_str('a1');
-$a2 = req_str('a2');
-$a3 = req_str('a3');
-$a4 = req_str('a4');
-$a5 = req_str('a5');
-$a6 = req_str('a6');
-$a7 = req_str('a7');
-$a8 = req_str('a8');
-$a9 = req_str('a9');
-$a10 = req_str('a10');
-
-
-if (isset($_REQUEST['subentry']) && !empty($_REQUEST['frage']) && !empty($_REQUEST['hinweis'])) {
+if (isset($_REQUEST['subentry'])) {
 	csrf_require();
-	$hinweis = $_REQUEST['hinweis'];
-	$a1 = str_replace("|", "", $a1);
-	$a2 = str_replace("|", "", $a2);
-	$a3 = str_replace("|", "", $a3);
-	$a4 = str_replace("|", "", $a4);
-	$a5 = str_replace("|", "", $a5);
-	$a6 = str_replace("|", "", $a6);
-	$a7 = str_replace("|", "", $a7);
-	$a8 = str_replace("|", "", $a8);
-	$a9 = str_replace("|", "", $a9);
-	$a10 = str_replace("|", "", $a10);
-
-	$a1 = trim($a1);
-	$a2 = trim($a2);
-	$a3 = trim($a3);
-	$a4 = trim($a4);
-	$a5 = trim($a5);
-	$a6 = trim($a6);
-	$a7 = trim($a7);
-	$a8 = trim($a8);
-	$a9 = trim($a9);
-	$a10 = trim($a10);
-
-	$antworten = '';
-	if ($a1 != "") $antworten = $a1;
-	if ($a2 != "") $antworten = "$antworten|$a2";
-	if ($a3 != "") $antworten = "$antworten|$a3";
-	if ($a4 != "") $antworten = "$antworten|$a4";
-	if ($a5 != "") $antworten = "$antworten|$a5";
-	if ($a6 != "") $antworten = "$antworten|$a6";
-	if ($a7 != "") $antworten = "$antworten|$a7";
-	if ($a8 != "") $antworten = "$antworten|$a8";
-	if ($a9 != "") $antworten = "$antworten|$a9";
-	if ($a10 != "") $antworten = "$antworten|$a10";
-
-	mysqli_execute_query(
-		$GLOBALS['dbi'],
-		"INSERT INTO de_vote_umfragen(frage, antworten, hinweis, status) VALUES (?, ?, ?, 0)",
-		[$frage, $antworten, $hinweis]
-	);
-
-	echo "<h2>Umfrage erfolgreich erstellt</h2>";
+	if ($frage === '' || trim($hinweis) === '' || count($antwortliste) < 2) {
+		echo '<div class="flash flash-danger">Umfrage nicht gespeichert: Frage, Beschreibung und mindestens zwei Antworten sind Pflicht.</div>';
+	} else {
+		mysqli_execute_query(
+			$GLOBALS['dbi'],
+			"INSERT INTO de_vote_umfragen(frage, antworten, hinweis, status) VALUES (?, ?, ?, 0)",
+			[$frage, $antworten_neu, $hinweis]
+		);
+		echo '<div class="flash flash-ok">Umfrage erfolgreich erstellt. Sie wartet unten auf die Aktivierung.</div>';
+	}
 }
 
 if (isset($_REQUEST['subedit'])) {
 	csrf_require();
-	$hinweis = $_REQUEST['hinweis'];
-	$a1 = str_replace("|", "", $a1);
-	$a2 = str_replace("|", "", $a2);
-	$a3 = str_replace("|", "", $a3);
-	$a4 = str_replace("|", "", $a4);
-	$a5 = str_replace("|", "", $a5);
-	$a6 = str_replace("|", "", $a6);
-	$a7 = str_replace("|", "", $a7);
-	$a8 = str_replace("|", "", $a8);
-	$a9 = str_replace("|", "", $a9);
-	$a10 = str_replace("|", "", $a10);
-
-	$a1 = trim($a1);
-	$a2 = trim($a2);
-	$a3 = trim($a3);
-	$a4 = trim($a4);
-	$a5 = trim($a5);
-	$a6 = trim($a6);
-	$a7 = trim($a7);
-	$a8 = trim($a8);
-	$a9 = trim($a9);
-	$a10 = trim($a10);
-
-	$antworten = '';
-	if ($a1 != "") $antworten = $a1;
-	if ($a2 != "") $antworten = "$antworten|$a2";
-	if ($a3 != "") $antworten = "$antworten|$a3";
-	if ($a4 != "") $antworten = "$antworten|$a4";
-	if ($a5 != "") $antworten = "$antworten|$a5";
-	if ($a6 != "") $antworten = "$antworten|$a6";
-	if ($a7 != "") $antworten = "$antworten|$a7";
-	if ($a8 != "") $antworten = "$antworten|$a8";
-	if ($a9 != "") $antworten = "$antworten|$a9";
-	if ($a10 != "") $antworten = "$antworten|$a10";
-
-	mysqli_execute_query(
-		$GLOBALS['dbi'],
-		"UPDATE de_vote_umfragen SET frage=?, antworten=?, hinweis=? WHERE id=?",
-		[$frage, $antworten, $hinweis, $id]
-	);
-
-	echo "<h2>Umfrage editiert</h2>";
-
+	if ($frage === '' || trim($hinweis) === '' || count($antwortliste) < 2) {
+		echo '<div class="flash flash-danger">&Auml;nderungen nicht gespeichert: Frage, Beschreibung und mindestens zwei Antworten sind Pflicht.</div>';
+	} else {
+		mysqli_execute_query(
+			$GLOBALS['dbi'],
+			"UPDATE de_vote_umfragen SET frage=?, antworten=?, hinweis=? WHERE id=? AND status=0",
+			[$frage, $antworten_neu, $hinweis, $id]
+		);
+		echo '<div class="flash flash-ok">Umfrage editiert.</div>';
+	}
 	$action = 'edit';
 }
 
 if (isset($_REQUEST['addant'])) {
 	csrf_require();
-	$db_umfrage = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=?", [$id]);
+	$db_umfrage = mysqli_execute_query($GLOBALS['dbi'], "SELECT antworten FROM de_vote_umfragen WHERE id=? AND status=0", [$id]);
 	$row = mysqli_fetch_assoc($db_umfrage);
 
-	$antworten = $row['antworten'] . '|' . $wantwort;
-
-	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET antworten=? WHERE id=?", [$antworten, $id]);
-	echo "<h2>weitere Antwort erfolgreich hinzugef&uuml;gt</h2>";
+	if ($row === null || $wantwort === '') {
+		echo '<div class="flash flash-danger">Keine Antwort hinzugef&uuml;gt.</div>';
+	} elseif (count(explode("|", $row['antworten'])) >= 10) {
+		echo '<div class="flash flash-danger">Es sind h&ouml;chstens zehn Antworten m&ouml;glich.</div>';
+	} else {
+		$antworten = $row['antworten'] . '|' . $wantwort;
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_vote_umfragen SET antworten=? WHERE id=?", [$antworten, $id]);
+		echo '<div class="flash flash-ok">Weitere Antwort erfolgreich hinzugef&uuml;gt.</div>';
+	}
 
 	$action = 'edit';
 }
@@ -204,12 +140,140 @@ if (isset($_REQUEST['addant'])) {
 if (isset($_REQUEST['delvote'])) {
 	csrf_require();
 	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_vote_umfragen WHERE id=?", [$id]);
-	echo "<h2>Umfrage erfolgreich gel&ouml;scht</h2>";
+	echo '<div class="flash flash-ok">Umfrage erfolgreich gel&ouml;scht.</div>';
 }
 
+/* ---------- Umfrage anlegen / bearbeiten (oben, damit man gleich loslegen kann) ---------- */
 
+$row = null;
+if ($action == "edit") {
+	$db_umfrage = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, hinweis, antworten, status FROM de_vote_umfragen WHERE id=?", [$id]);
+	$row = mysqli_fetch_assoc($db_umfrage);
+}
 
+if ($action == "edit" && $row) {
+	$gesperrt = ($row['status'] != 0) ? ' disabled' : '';
+	$antworten = explode("|", $row['antworten']);
+?>
+	<form action="umfragen.php" method="post" class="umf-form">
+		<?= csrf_field() ?>
+		<table>
+			<tr>
+				<th colspan="2">Umfrage #<?= (int)$row['id'] ?> <?= $row['status'] == 0 ? 'bearbeiten' : 'ansehen (nach dem Start nicht mehr editierbar)' ?></th>
+			</tr>
+			<tr>
+				<td>Frage</td>
+				<td><input type="text" name="frage" maxlength="75" required value="<?= htmlspecialchars($row['frage']) ?>"<?= $gesperrt ?>>
+					<div class="dim">H&ouml;chstens 75 Zeichen, erscheint als &Uuml;berschrift der Umfrage.</div></td>
+			</tr>
+			<tr>
+				<td>Beschreibung</td>
+				<td><textarea name="hinweis" rows="14" required<?= $gesperrt ?>><?= htmlspecialchars($row['hinweis']) ?></textarea>
+					<div class="dim">Hinweistext unter der Frage, Zeilenumbr&uuml;che bleiben erhalten.</div></td>
+			</tr>
+			<?php
+			foreach ($antworten as $i => $antwort) {
+				$zaehler = $i + 1;
+				echo '<tr><td>Antwort ' . $zaehler . '</td><td><input type="text" name="a' . $zaehler . '" value="' . htmlspecialchars($antwort) . '"' . $gesperrt . '></td></tr>';
+			}
+			?>
+			<tr>
+				<td colspan="2"><input type="submit" name="subedit" value="&Auml;nderungen speichern"<?= $gesperrt ?>></td>
+			</tr>
+		</table>
+		<input type="hidden" name="id" value="<?= (int)$id ?>">
+	</form>
+	<?php
+	if (count($antworten) < 10 && $row['status'] == 0) {
+	?>
+	<form action="umfragen.php" method="post" class="umf-form">
+		<?= csrf_field() ?>
+		<table>
+			<tr>
+				<th colspan="2">Antwort hinzuf&uuml;gen</th>
+			</tr>
+			<tr>
+				<td>Antwort <?= count($antworten) + 1 ?></td>
+				<td><input type="text" name="wantwort" required></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" name="addant" value="Antwort hinzuf&uuml;gen"></td>
+			</tr>
+		</table>
+		<input type="hidden" name="id" value="<?= (int)$id ?>">
+	</form>
+	<?php
+	}
+	?>
+	<form action="umfragen.php" method="post" data-confirm="M&ouml;chtest du diese Umfrage wirklich l&ouml;schen?">
+		<?= csrf_field() ?>
+		<input type="submit" class="btn-danger" name="delvote" value="Umfrage l&ouml;schen">
+		<input type="hidden" name="id" value="<?= (int)$id ?>">
+	</form>
+	<p><a href="umfragen.php">Neue Umfrage anlegen</a></p>
+<?php
+} elseif (isset($_REQUEST['anzant']) && $anzahlantwort >= 2) {
+	if ($anzahlantwort > 10) {
+		$anzahlantwort = 10;
+	}
+?>
+	<form action="umfragen.php" method="post" class="umf-form">
+		<?= csrf_field() ?>
+		<table>
+			<tr>
+				<th colspan="2">Umfrage erstellen</th>
+			</tr>
+			<tr>
+				<td>Frage</td>
+				<td><input type="text" name="frage" maxlength="75" required autofocus>
+					<div class="dim">H&ouml;chstens 75 Zeichen, erscheint als &Uuml;berschrift der Umfrage.</div></td>
+			</tr>
+			<tr>
+				<td>Beschreibung</td>
+				<td><textarea name="hinweis" rows="14" required></textarea>
+					<div class="dim">Hinweistext unter der Frage, Zeilenumbr&uuml;che bleiben erhalten. Das Zeichen | ist in Antworten nicht erlaubt.</div></td>
+			</tr>
+			<?php
+			for ($zaehler = 1; $zaehler <= $anzahlantwort; $zaehler++) {
+				echo '<tr><td>Antwort ' . $zaehler . '</td><td><input type="text" name="a' . $zaehler . '"' . ($zaehler <= 2 ? ' required' : '') . '></td></tr>';
+			}
+			?>
+			<tr>
+				<td colspan="2"><input type="submit" name="subentry" value="Umfrage eintragen"> <a href="umfragen.php">Abbrechen</a></td>
+			</tr>
+		</table>
+	</form>
+<?php
+} else {
+?>
+	<form action="umfragen.php" method="post" class="umf-form">
+		<table>
+			<tr>
+				<th>Neue Umfrage anlegen</th>
+			</tr>
+			<tr>
+				<td>Anzahl der Antworten:
+					<select name="anzahlantwort" size="1">
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4" selected>4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+					</select>
+					<input type="submit" name="anzant" value="Umfragemaske laden">
+					<span class="dim">Weitere Antworten lassen sich sp&auml;ter beim Bearbeiten erg&auml;nzen.</span>
+				</td>
+			</tr>
+		</table>
+	</form>
+<?php
+}
 
+/* ---------- Listen ---------- */
 ?>
 <h2>Umfragen die auf die Aktivierung warten</h2>
 <table>
@@ -224,7 +288,7 @@ if (isset($_REQUEST['delvote'])) {
 	while ($row = mysqli_fetch_assoc($db_umfrage)) {
 		echo '<tr>';
 		echo '<td class="num">' . $row['id'] . '</td><td><a href="umfragen.php?action=edit&id=' . $row['id'] . '">' . htmlspecialchars($row['frage']) . '</a></td><td>';
-		echo '<a href="' . csrf_url('umfragen.php?action=ak&id=' . $row['id']) . '" data-confirm="M&ouml;chtes du diese Umfrage wirklich aktivieren?"><span class="badge badge-warn">inaktiv</span></a></td></tr>';
+		echo '<a href="' . csrf_url('umfragen.php?action=ak&id=' . $row['id']) . '" data-confirm="M&ouml;chtest du diese Umfrage wirklich aktivieren?"><span class="badge badge-warn">inaktiv</span></a></td></tr>';
 	}
 	?>
 
@@ -242,7 +306,7 @@ if (isset($_REQUEST['delvote'])) {
 	while ($row = mysqli_fetch_assoc($db_umfrage)) {
 		echo '<tr>';
 		echo '<td class="num">' . $row['id'] . '</td><td><a href="umfragen.php?action=tendenz&id=' . $row['id'] . '">' . htmlspecialchars($row['frage']) . '</a></td><td>';
-		echo '<a href="' . csrf_url('umfragen.php?action=deak&id=' . $row['id']) . '" data-confirm="M&ouml;chtes du diese Umfrage wirklich beenden?"><span class="badge badge-ok">offen</span></a></td></tr>';
+		echo '<a href="' . csrf_url('umfragen.php?action=deak&id=' . $row['id']) . '" data-confirm="M&ouml;chtest du diese Umfrage wirklich beenden?"><span class="badge badge-ok">offen</span></a></td></tr>';
 	}
 	?>
 
@@ -266,149 +330,7 @@ if (isset($_REQUEST['delvote'])) {
 
 </table>
 
-
 <?php
-if ($action == "edit") {
-	$db_umfrage = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, frage, hinweis, antworten, status FROM de_vote_umfragen WHERE id=?", [$id]);
-	$row = mysqli_fetch_assoc($db_umfrage);
-
-?>
-	<form action="umfragen.php" method="post">
-		<?= csrf_field() ?>
-		<table>
-			<tr>
-				<th colspan="2">Umfrage <?php if ($row['status'] == 0) echo 'editieren';
-										else echo 'nicht editierbar';  ?></th>
-			</tr>
-			<tr>
-				<td>Frage:</td>
-				<td><input type="text" name="frage" size="48" value="<?= htmlspecialchars($row['frage']) ?>"<?php if ($row['status'] != 0) echo ' disabled'; ?>></td>
-			</tr>
-			<tr>
-				<td valign="top">Hinweis:</td>
-				<td><textarea name="hinweis" cols="70" rows="20"<?php if ($row['status'] != 0) echo ' disabled'; ?>><?= htmlspecialchars($row['hinweis']) ?></textarea></td>
-			</tr>
-			<?php
-			$i = 0;
-
-			$antworten = explode("|", $row['antworten']);
-
-			while ($i < count($antworten)) {
-				$zaehler = $i + 1;
-				echo '<tr><td class="num">' . $zaehler . '</td><td><input type="text" name="a' . $zaehler . '" value="' . htmlspecialchars($antworten[$i]) . '" size="48"';
-				if ($row['status'] != 0) {
-					echo ' disabled';
-				}
-				echo '></td></tr>';
-				$i++;
-			}
-			?>
-			<tr>
-				<td colspan="2" align="center"><input type="submit" <?php if ($row['status'] != 0) echo 'disabled '; ?>name="subedit" value="&Auml;nderungen speichern"></td>
-			</tr>
-		</table>
-		<input type="hidden" name="id" value="<?= $id ?>">
-	</form>
-	<?php
-	if (count($antworten) < 10 && $row['status'] == 0) {
-	?>
-	<form action="umfragen.php" method="post">
-		<?= csrf_field() ?>
-		<table>
-			<tr>
-				<th colspan="2">Antwort hinzuf&uuml;gen</th>
-			</tr>
-			<tr>
-				<td>Antwort:</td>
-				<td><input type="text" name="wantwort" size="48"></td>
-			</tr>
-			<tr>
-				<td colspan="2" align="center"><input type="submit" name="addant" value="&Auml;nderungen speichern"></td>
-			</tr>
-		</table>
-		<input type="hidden" name="id" value="<?= $id ?>">
-	</form>
-	<?php
-	}
-	?>
-	<form action="umfragen.php" method="post" data-confirm="M&ouml;chtes du diese Umfrage wirklich l&ouml;schen?">
-		<?= csrf_field() ?>
-		<table>
-			<tr>
-				<th>Umfrage l&ouml;schen?</th>
-			</tr>
-			<tr>
-				<td align="center"><input type="submit" class="btn-danger" name="delvote" value="Umfrage l&ouml;schen"></td>
-			</tr>
-		</table>
-		<input type="hidden" name="id" value="<?= $id ?>">
-	</form>
-<?php
-} elseif (isset($_REQUEST['anzant'])) {
-?>
-	<form action="umfragen.php" method="post">
-		<?= csrf_field() ?>
-		<table>
-			<tr>
-				<th colspan="2">Umfrage erstellen</th>
-			</tr>
-			<tr>
-				<td>Frage:</td>
-				<td><input type="text" name="frage" size="48"></td>
-			</tr>
-			<tr>
-				<td valign="top">Hinweis:</td>
-				<td><textarea name="hinweis" cols="30" rows="8"></textarea></td>
-			</tr>
-			<?php
-			$i = 0;
-
-
-
-			while ($i < $anzahlantwort) {
-				$zaehler = $i + 1;
-				echo '<tr><td class="num">' . $zaehler . '</td><td><input type="text" name="a' . $zaehler . '" size="48"></td></tr>';
-				$i++;
-			}
-			?>
-			<tr>
-				<td colspan="2" align="center"><input type="submit" name="subentry" value="Umfrage eintragen"></td>
-			</tr>
-		</table>
-
-	</form>
-<?php
-} else {
-?>
-	<form action="umfragen.php" method="post">
-		<table>
-			<tr>
-				<th>Anzahl der Antworten f&uuml;r eine neue Umfrage</th>
-			</tr>
-			<tr>
-				<td align="center">Antworten:&nbsp;&nbsp;
-					<select name="anzahlantwort" size="1">
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-						<option value="6">6</option>
-						<option value="7">7</option>
-						<option value="8">8</option>
-						<option value="9">9</option>
-						<option value="10">10</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td align="center"><input type="submit" name="anzant" value="Umfragemaske laden"></td>
-			</tr>
-		</table>
-	</form>
-	<?php
-}
-
-
 if ($action == "show") {
 	$db_checkobende = mysqli_execute_query($GLOBALS['dbi'], "SELECT frage, antworten, hinweis, stimmen, status, startdatum, enddatum, ergebnisse FROM de_vote_umfragen WHERE status=2 AND id=?", [$id]);
 

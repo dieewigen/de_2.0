@@ -306,3 +306,11 @@ td.act-active { background: #1b3d20; }
 span.act-none { color: var(--danger); }
 span.act-chat { color: var(--warn); }
 span.act-active { color: var(--ok); }
+
+/* ---------- Umfragen anlegen/bearbeiten (umfragen.php) ---------- */
+
+.umf-form table { width: 100%; max-width: 820px; }
+.umf-form td:first-child { white-space: nowrap; vertical-align: top; padding-top: 8px; }
+.umf-form input[type="text"] { width: min(100%, 640px); }
+.umf-form textarea { width: min(100%, 640px); min-height: 280px; resize: vertical; }
+.umf-form .dim { margin-top: 3px; font-size: 12px; }
