@@ -17,11 +17,12 @@ class Karte
      * @param array            $lang      Texte aus inc/lang/*_sektor666.lang.php
      * @param int              $uid       angemeldeter Spieler
      * @param int              $ownSector Sektor des Spielers
+     * @param string           $einschub  HTML oben in der Karte, z. B. der Funkspruch des Geisterschiffs
      */
-    public static function render(Sektor666Service $s666, array $lang, int $uid, int $ownSector): string
+    public static function render(Sektor666Service $s666, array $lang, int $uid, int $ownSector, string $einschub = ''): string
     {
         $html = rahmen_oben($lang['titel'], false);
-        $html .= '<div class="mod s666">';
+        $html .= '<div class="mod s666">'.$einschub;
 
         if ($s666->isWach()) {
             $html .= self::wach($s666, $lang, $uid, $ownSector);

@@ -1,0 +1,113 @@
+/* Geisterschiff zu Halloween (src/Model/GhostShip/GhostShipEvent.php), nur eingebunden, solange es läuft.
+   Flackern bewusst langsam und kontrastarm; mit prefers-reduced-motion steht alles still. */
+
+/* Zeile in der Sektoransicht */
+.sec-table tr.geist-zeile > td {
+  color: #9ff3d6;
+  font-size: 10pt;
+  font-style: italic;
+  text-shadow: 0 0 6px rgba(120, 255, 210, 0.55);
+  box-shadow: inset 0 0 0 100px rgba(60, 160, 130, 0.1);
+  animation: geist-flackern 7s infinite;
+}
+
+/* Sektor 666: pulsierender Rahmen, Störstreifen und der abgefangene Funkspruch */
+.mod.s666:has(> .geist-funk) {
+  position: relative;
+  animation: geist-puls 6s ease-in-out infinite;
+}
+.mod.s666:has(> .geist-funk)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px);
+}
+.geist-funk {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-left: 3px solid #9ff3d6;
+  background: rgba(0, 0, 0, 0.45);
+  font: 12px/1.5 Consolas, "Courier New", monospace;
+  color: #9ff3d6;
+}
+.geist-funk b {
+  letter-spacing: 0.12em;
+}
+.geist-funk p {
+  margin: 4px 0;
+}
+
+/* Einblendung des Funkspruchs */
+.geist-signal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 4, 3, 0.9) repeating-linear-gradient(0deg, rgba(159, 243, 214, 0.04) 0 1px, transparent 1px 3px);
+  cursor: pointer;
+  font-family: Consolas, "Courier New", monospace;
+  color: #9ff3d6;
+  text-shadow: 0 0 8px rgba(120, 255, 210, 0.6);
+  animation: geist-ein 0.6s;
+  transition: opacity 0.6s;
+}
+.geist-signal.geist-aus {
+  opacity: 0;
+}
+.geist-signal-inhalt {
+  box-sizing: border-box;
+  width: 520px;
+  max-width: 92%;
+  padding: 18px 20px;
+  border: 1px solid rgba(159, 243, 214, 0.45);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 30px rgba(120, 255, 210, 0.18);
+}
+.geist-signal-kopf {
+  font-size: 18px;
+  letter-spacing: 0.25em;
+  text-align: center;
+  animation: geist-flackern 4s infinite;
+}
+.geist-signal canvas {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+}
+.geist-signal-kennung {
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+.geist-signal-nachricht {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(159, 243, 214, 0.25);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.geist-signal-hinweis {
+  margin-top: 14px;
+  font-size: 11px;
+  text-align: center;
+  opacity: 0.55;
+}
+
+@keyframes geist-flackern {
+  0%, 100% { opacity: 0.8; }
+  40% { opacity: 0.95; }
+  47% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+}
+@keyframes geist-puls {
+  50% { box-shadow: inset 0 0 26px rgba(217, 83, 79, 0.3), 0 0 14px rgba(217, 83, 79, 0.35); }
+}
+@keyframes geist-ein {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sec-table tr.geist-zeile > td, .mod.s666:has(> .geist-funk), .geist-signal, .geist-signal-kopf { animation: none; }
+}

@@ -12,6 +12,7 @@ use DieEwigen\DE2\Model\Siegel\SiegelService;
 use DieEwigen\DE2\Model\Hekate\HekateService;
 use DieEwigen\DE2\Model\Sektor666\Sektor666Service;
 use DieEwigen\DE2\Model\Feldzug\FeldzugService;
+use DieEwigen\DE2\Model\GhostShip\GhostShipEvent;
 
 set_time_limit(240);
 $directory = '../';
@@ -385,6 +386,14 @@ if ($doetick == 1) {
         (new FeldzugService($GLOBALS['dbi']))->processWt($feldzug_lang);
     } catch (\Throwable $e) {
         echo 'Fehler beim Feldzug: '.$e->getMessage().'<br>';
+    }
+
+    //Geisterschiff zu Halloween: Route, Stationen und Ende im Serverchat; Fehler dürfen den Tick nicht aufhalten
+    echo '<br>Geisterschiff<br>';
+    try {
+        (new GhostShipEvent($GLOBALS['dbi']))->processWt();
+    } catch (\Throwable $e) {
+        echo 'Fehler beim Geisterschiff: '.$e->getMessage().'<br>';
     }
 
     ////////////////////////////////////////////////

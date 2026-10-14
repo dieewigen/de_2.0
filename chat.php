@@ -300,6 +300,14 @@ if (window.Worker) {
 		if(e.data.infocenter){
 			$('#infocenter', parent.document).html(e.data.infocenter);
 		}
+
+		//Geisterschiff zu Halloween: der Funkspruch kommt mit, das Script zeigt ihn einmal je Gerät
+		if(e.data.geist && !window.deGeist){
+			window.deGeist = e.data.geist;
+			var geist_skript = document.createElement('script');
+			geist_skript.src = 'js/geisterschiff.js';
+			document.head.appendChild(geist_skript);
+		}
 	}, false);
 
 	setInterval(get_chatdata, 1000);

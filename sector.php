@@ -208,11 +208,15 @@ $sql = "SELECT * FROM de_sector WHERE sec_id=?";
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 $sec_data = mysqli_fetch_assoc($db_daten);
 
+//Geisterschiff zu Halloween: treibt durch die Sektoren und stört Sektor 666 (src/Model/GhostShip/GhostShipEvent.php)
+$geist = new \DieEwigen\DE2\Model\GhostShip\GhostShipEvent($GLOBALS['dbi']);
+
 //Sektor 666: Zustand der Schläfer (src/Model/Sektor666/Sektor666Service.php), schlafend nur der Kulissentext
 if($sf==666){
 	include 'inc/lang/'.$sv_server_lang.'_sektor666.lang.php';
 	$s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
-	echo \DieEwigen\DE2\View\Sektor666\Karte::render($s666, $s666_lang, (int)$_SESSION['ums_user_id'], (int)$ownsector);
+	$geist_funk = \DieEwigen\DE2\View\GhostShip\GhostShipView::sector666($geist, $s666->isWach());
+	echo \DieEwigen\DE2\View\Sektor666\Karte::render($s666, $s666_lang, (int)$_SESSION['ums_user_id'], (int)$ownsector, $geist_funk);
 }
 
 
@@ -620,8 +624,10 @@ if($sec_data['npc']==1){
 		
 		$output.='</tr>';
 	}
-	
-	
+
+	//Geisterschiff, falls es gerade durch diesen Sektor treibt
+	$output.=\DieEwigen\DE2\View\GhostShip\GhostShipView::sectorRow($geist, (int)$sf);
+
 	$output.='</table>';
 	$output.=sector_legende($sv_oscar!=1);
 

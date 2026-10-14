@@ -24,3 +24,9 @@ echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCU
 if(!empty($_SESSION['new_desktop_version']) && empty($_SESSION['de_frameset']) && $_SESSION['ums_mobi']!=1){
 	echo '<script>if(window.parent!==window && window.name==="h"){document.documentElement.classList.add("dm-rahmen");}</script>';
 }
+
+//Geisterschiff zu Halloween: Stil und Script nur für angemeldete Spieler und nur am Event-Tag (src/Model/GhostShip/GhostShipEvent.php)
+if(!empty($_SESSION['ums_user_id']) && isset($GLOBALS['dbi'])){
+	require_once __DIR__.'/vendor/autoload.php';
+	echo \DieEwigen\DE2\View\GhostShip\GhostShipView::pageHead(new \DieEwigen\DE2\Model\GhostShip\GhostShipEvent($GLOBALS['dbi']));
+}

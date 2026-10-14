@@ -1,5 +1,6 @@
 <?php
 use DieEwigen\DE2\Model\Chat\ChannelChoice;
+use DieEwigen\DE2\Model\GhostShip\GhostShipEvent;
 
 $eftachatbotdefensedisable=1;
 mb_internal_encoding("UTF-8");
@@ -350,6 +351,13 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 	}
 
 	$data[] = array ('output' => $output, 'chatid' => $chatid, 'chatidallg' => $chatidallg, 'infocenter' => $infocenter);
+
+	//Geisterschiff: ab der Ankunft vor Sektor 666 kommt der Funkspruch mit, chat.php lädt dann js/geisterschiff.js
+	$geist=new GhostShipEvent($GLOBALS['dbi']);
+	if($geist->hasArrived()){
+		$data[0]['geist']=$geist->clientConfig();
+	}
+
 	echo json_encode($data);
 	//print_r($data);
 }
