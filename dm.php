@@ -22,7 +22,7 @@ $chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
     
     <title><?php echo $sv_server_tag;?> - DIE EWIGEN - <?php echo $sv_server_name;?></title>
 	<meta charset="utf-8">
-	<link rel="shortcut icon" href="favicon.ico" />
+	<?php require_once 'vendor/autoload.php'; echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']); ?>
 	<link rel="stylesheet" href="gp/de-main.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-main.css');?>">	
 	
 	<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>

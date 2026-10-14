@@ -68,7 +68,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 <tr class="cell">
  <td>&nbsp;[img]<?php print($legende_lang['eintrag_15']); ?>[/img]</td>
- <td>&nbsp;<image src=http://forum.bgam.es/DENeu/on.gif></td>
+ <td>&nbsp;<img src="gp/g/hfn/DENeu.gif" alt="Neu"></td>
  <td>&nbsp;<?php print($legende_lang['eintrag_16']); ?></td>
 </tr>
 

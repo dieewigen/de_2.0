@@ -1512,14 +1512,6 @@ if (!hasTech($pt, 9)) {
                                         echo '</tr>';
 
                                         break;
-                                    case 50:
-                                        echo '<tr>';
-                                        echo '<td class="cl">'.$time.'</td>';
-                                        echo '</tr>';
-                                        echo '<tr>';
-                                        echo '<td class="cc">'.showkampfberichtV0($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte).'</td>';
-                                        echo '</tr>';
-                                        break;
                                     case 57:
                                         echo '<tr>';
                                         echo '<td class="cl">'.$time.'</td>';

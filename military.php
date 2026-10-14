@@ -1093,19 +1093,6 @@ if ($techs[13]==0 AND 1==2){
 ?>
 <script language="javascript">
 SetMil();
-
-$(document).ready(function () {
-$("input").tooltip({
-	      track: true,
-	      delay: 0,
-	      showURL: false,
-	      showBody: "&",
-	      extraClass: "design1",
-	      fixPNG: true,
-	      opacity: 1.00,
-	      left: 0
-	  });
-	  });
 </script>
 
 </body>

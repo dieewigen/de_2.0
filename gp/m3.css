@@ -1,3 +1,9 @@
+/* Bildlaufleiste in Rassenfarbe und dunkle Bedienelemente, wie in de-main.scss */
+html {
+	color-scheme: dark;
+	scrollbar-color: #7f2527 #0b0e12;
+}
+
 body {
 	font-family: Arial, helvetica, geneva, sans-serif;
 	color: #0bbfff;

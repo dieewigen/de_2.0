@@ -82,715 +82,237 @@ function showkampfberichtBG($data){
 	return $content;
 }
 
-function showkampfberichtV0($text,$rasse, $spielername, $sector, $system, $schiffspunkte){
-	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $sv_server_lang;
-
-	$rassenklassen[0] = array ('k1', 'k2');
-	$rassenklassen[1] = array ('k3', 'k4');
-	$rassenklassen[2] = array ('k5', 'k6');
-	$rassenklassen[3] = array ('k7', 'k8');
-	$rassenklassen[4] = array ('k9', 'k10');
-
-	//kb in seine bestandteile zerlegen
-	$kbd=explode(";",$text);
-
-	//daten aus dem kb holen
-	$grundindex=284;
-	$kkollies=$kbd[$grundindex];
-	$ksec=$kbd[$grundindex+1];
-	$ksys=$kbd[$grundindex+2];
-	$krassenvorhanden[0]=$kbd[$grundindex+3];
-	$krassenvorhanden[1]=$kbd[$grundindex+4];
-	$krassenvorhanden[2]=$kbd[$grundindex+5];
-	$krassenvorhanden[3]=$kbd[$grundindex+6];
-	$krassenvorhanden[4]=$kbd[$grundindex+7];
-	$kturmrasse=$kbd[$grundindex+8];
-	$atterliste=$kbd[$grundindex+9];
-	$defferliste=$kbd[$grundindex+10];
-
-	$grundindex=279;
-	$kollieserbeutet=$kbd[$grundindex+0];
-	$exp=$kbd[$grundindex+1];
-	$kartefakte=$kbd[$grundindex+2];
-	$srec1=$kbd[$grundindex+3];
-	$srec2=$kbd[$grundindex+4];
-
-	//eigenen spielername fett darstellen
-	if($_SESSION['ums_rasse']==1)$rflag='E';
-	elseif($_SESSION['ums_rasse']==2)$rflag='I';
-	elseif($_SESSION['ums_rasse']==3)$rflag='K';
-	elseif($_SESSION['ums_rasse']==4)$rflag='Z';
-	elseif($_SESSION['ums_rasse']==5)$rflag='D';
-
-
-	$username=$_SESSION['ums_spielername'].' ['.$rflag.']('.$sector.':'.$system.')';
-	$atterliste=str_replace($username, '<b>'.$username.'</b>', $atterliste);
-	$defferliste=str_replace($username, '<b>'.$username.'</b>', $defferliste);
-
-	$exp=number_format($exp, 0,"",".");
-
-	//sprachdatei einbinden
-	unset($kbl_lang);
-	include 'inc/lang/'.$sv_server_lang.'_kampfbericht.lib.lang.php';
-
-	//meldung f�r kollies zusammenbauen
-	if ($kkollies==-1)$kolliesatz=$kbl_lang['abgewehrt'];
-	else
-	{
-	  if ($kkollies==1)$kolliesatz=$kbl_lang['deffercollosts']; else $kolliesatz=$kbl_lang['deffercollostp'];
-
-	  if ($kollieserbeutet>0)
-	  {
-		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwins']); 
-		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinp']);
-	  }
-	  elseif($kollieserbeutet<0)
-	  {
-		$kollieserbeutet=$kollieserbeutet*(-1);
-		if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinsdestroy']); 
-		else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinpdestroy']);
-	  }
-	  //$kolliesatz=$kbl_lang[deffercollost];
-	  //$kolliesatz.=$kbl_lang[attercolwin];
-	}
-
-	//zuerst den header
-	$kbstring='
-		ALT<br>
-  <table cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center">
-  <td class="k1" width="15%"><b>'.$kbl_lang['angreifer'].':</b></td>
-  <td class="k1" width="85%">'.$atterliste.'</td>
-  </tr>
-  <tr align="center">
-  <td class="k1""><b>'.$kbl_lang['verteidiger'].':</b></td>
-  <td class="k1"">'.$defferliste.'</td>
-  </tr>
-  <tr align="center">
-  <td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
-  '<br>'.$kbl_lang['admiralexp'].'<br>'.
-  $kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
-  $rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((float)$srec1, 0,"",".").' M - '.number_format((float)$srec2, 0,"",".").' D</b></td>
-  </tr>
-  </table>
-  <br>
-  <TABLE cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center">
-  <td class="k1" width="14%"><b>'.$ksec.':'.$ksys.'</font></b></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['angreifer'].'</u></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['verteidiger'].'</u></td>
-  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang['eigene'].'</u></td>
-  </tr>
-  <tr align="center" width="14%">
-  <td class="k2">'.$kbl_lang['einheit'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  </tr>';
-
-  $geseinheiten_atter_anz=0;
-  $geseinheiten_deffer_anz=0;
-  $geseinheiten_atter_anz_verloren=0;
-  $geseinheiten_deffer_anz_verloren=0;
-  $geseinheiten_atter_score=0;
-  $geseinheiten_deffer_score=0;
-  $geseinheiten_atter_score_lost=0;
-  $geseinheiten_deffer_score_lost=0;
-
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-  //schiffe
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////  
-	$grundindex1=0;
-	for ($aktrasse=0;$aktrasse<$sv_anz_rassen;$aktrasse++)
-	{
-	  if ($krassenvorhanden[$aktrasse]>0)
-	  {
-		$schiffsnamen = $rassennamen[$aktrasse];
-		$c1=0;$c2=0;
-		for ($i=0;$i<$sv_anz_schiffe;$i++)
-		{
-		  if ($schiffsnamen[$i]!='NA')
-		  {
-			if ($c1==0){$c1=1; $klasse=$rassenklassen[$aktrasse][0];}
-			else {$c1=0; $klasse=$rassenklassen[$aktrasse][1];}
-
-			$grundindex2=$grundindex1+40;
-			$grundindex3=$grundindex2+40;
-			$grundindex4=$grundindex3+40;
-			$grundindex5=$grundindex4+40;
-			$grundindex6=$grundindex5+40;
-
-			if ($rasse-1!=$aktrasse)//wenn es nicht die eigene rasse ist leer lassen
-			{
-			  // Platzhalter dynamisch auf Anzahl der Schiffe setzen (vorher nur 8, führte zu Undefined array key Warnungen bei Index >=8)
-			  $keigene1 = array_fill(0, $sv_anz_schiffe, '&nbsp;');
-			  $keigene2 = $keigene1;
-			  $keigene3 = $keigene1;
-			}
-			else //ansonsten variablen in die array packen
-			{
-			  $grundindex=255;
-			  for ($j=0;$j<$sv_anz_schiffe;$j++)
-			  $keigene1[$j] = number_format($kbd[$grundindex+$j], 0,"",".");
-
-			  for ($j=0;$j<$sv_anz_schiffe;$j++)
-			  $keigene2[$j] = number_format($kbd[$grundindex+8+$j], 0,"",".");
-
-			  for ($j=0;$j<$sv_anz_schiffe;$j++)
-			  $keigene3[$j] = number_format($kbd[$grundindex+16+$j], 0,"",".");
-			}
-
-			$kbstring.='
-  <TR align="center">
-  <TD class="'.$klasse.'">'.$schiffsnamen[$i].'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex1+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex2+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex3+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex4+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex5+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex6+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.$keigene1[$i].'</TD>
-  <TD class="'.$klasse.'">'.$keigene2[$i].'</TD>
-  <TD class="'.$klasse.'">'.$keigene3[$i].'</TD>
-  </TR>';
-			//statistik erstellen
-			$geseinheiten_atter_anz+=$kbd[$grundindex1+$i];
-			$geseinheiten_deffer_anz+=$kbd[$grundindex4+$i];
-
-			$geseinheiten_atter_anz_verloren+=($kbd[$grundindex1+$i]-$kbd[$grundindex3+$i]);
-			$geseinheiten_deffer_anz_verloren+=($kbd[$grundindex4+$i]-$kbd[$grundindex6+$i]);
-
-			$geseinheiten_atter_score+=$kbd[$grundindex1+$i]*$schiffspunkte[$aktrasse][$i];
-			$geseinheiten_deffer_score+=$kbd[$grundindex4+$i]*$schiffspunkte[$aktrasse][$i];
-
-			$geseinheiten_atter_score_lost+=($kbd[$grundindex1+$i]-$kbd[$grundindex3+$i])*$schiffspunkte[$aktrasse][$i];
-			$geseinheiten_deffer_score_lost+=($kbd[$grundindex4+$i]-$kbd[$grundindex6+$i])*$schiffspunkte[$aktrasse][$i];
-
-		  }
-		}
-	  }
-	  $grundindex1=$grundindex1+8;
-	}
-
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-  //t�rme
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-
-  $grundindex1=240;
-  if (($kbd[$grundindex1]+$kbd[$grundindex1+1]+$kbd[$grundindex1+2]+$kbd[$grundindex1+3]+$kbd[$grundindex1+4])>0)
-  {
-  $kbstring.='
-  <TR align="center">
-  <TD class="k1" colSpan=10><u>'.$kbl_lang['tuerme'].'</u></TD>
-  </TR>
-  ';
-	$aktrasse=$kturmrasse;
-
-	$schiffsnamen = $turmnamen[$aktrasse];
-	$c1=0;$c2=0;
-	for ($i=0;$i<$sv_anz_tuerme;$i++)
-	{
-	  if ($schiffsnamen[$i]!='NA')
-	  {
-		if ($c1==0){$c1=1; $klasse=$rassenklassen[$aktrasse][0];}
-		else {$c1=0; $klasse=$rassenklassen[$aktrasse][1];}
-
-		$grundindex2=$grundindex1+5;
-		$grundindex3=$grundindex2+5;
-
-		$kbstring.='
-  <TR align="center">
-  <TD class="'.$klasse.'">'.$schiffsnamen[$i].'</TD>
-  <TD class="'.$klasse.'">-</TD>
-  <TD class="'.$klasse.'">-</TD>
-  <TD class="'.$klasse.'">-</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex1+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex2+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">'.number_format($kbd[$grundindex3+$i], 0,"",".").'</TD>
-  <TD class="'.$klasse.'">-</TD>
-  <TD class="'.$klasse.'">-</TD>
-  <TD class="'.$klasse.'">-</TD>
-  </TR>';
-
-		//statistik erstellen
-		$geseinheiten_deffer_anz+=$kbd[$grundindex1+$i];
-		$geseinheiten_deffer_anz_verloren+=($kbd[$grundindex1+$i]-$kbd[$grundindex3+$i]);
-
-		$geseinheiten_deffer_score+=$kbd[$grundindex1+$i]*$schiffspunkte[$aktrasse][$i+8];
-		$geseinheiten_deffer_score_lost+=($kbd[$grundindex1+$i]-$kbd[$grundindex3+$i])*$schiffspunkte[$aktrasse][$i+8];
-	  }
-	  //$grundindex1=$grundindex1+5;
-	}
-  }
-
-  $kbstring.=
-  '</TABLE>';
-  //////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////
-  //  statistik
-  //////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////
-  $kbstring.='
-  <br><table cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang['statistik'].'</b></td></tr>
-  <tr align="center">
-  <td  class="k2"><b>'.$kbl_lang['typ'].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang['angreifer'].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang['verteidiger'].'</b></td>
-  <td  class="k2"><b>'.$kbl_lang['verhaeltnis'].'</b></td>
-  </tr>';
-
-  if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-  //das verh�ltnis berechnen
-  if ($geseinheiten_atter_anz>0)
-  $verhaeltnis=$geseinheiten_deffer_anz/$geseinheiten_atter_anz;
-  else $verhaeltnis=0;
-  $kbstring.='
-  <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang['einheitenanzahl'].'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz, 0,"",".").'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz, 0,"",".").'</td>
-  <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-  </tr>';
-
-  if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-  //das verh�ltnis berechnen
-  if ($geseinheiten_atter_anz_verloren>0)
-  $verhaeltnis=$geseinheiten_deffer_anz_verloren/$geseinheiten_atter_anz_verloren;
-  else $verhaeltnis=0;
-  //den prozentwert berechnen
-  $prozent_atter=$geseinheiten_atter_anz_verloren*100/$geseinheiten_atter_anz;
-  if($geseinheiten_deffer_anz>0)$prozent_deffer=$geseinheiten_deffer_anz_verloren*100/$geseinheiten_deffer_anz;
-  else $prozent_deffer=0;
-  $kbstring.='
-  <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang['verloreneeinheiten'].'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz_verloren, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz_verloren, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
-  <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-  </tr>';
-  if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-  //das verh�ltnis berechnen
-  if ($geseinheiten_atter_score>0)
-  $verhaeltnis=$geseinheiten_deffer_score/$geseinheiten_atter_score;
-  else $verhaeltnis=0;
-  $kbstring.='
-  <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang['einheitenpunktewert'].'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_atter_score, 0,"",".").'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score, 0,"",".").'</td>
-  <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-  </tr>';
-
-  if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-  //das verh�ltnis berechnen
-  if ($geseinheiten_atter_score_lost>0)
-  $verhaeltnis=$geseinheiten_deffer_score_lost/$geseinheiten_atter_score_lost;
-  else $verhaeltnis=0;
-  //den prozentwert berechnen
-  $prozent_atter=$geseinheiten_atter_score_lost*100/$geseinheiten_atter_score;
-  if($geseinheiten_deffer_score>0)$prozent_deffer=$geseinheiten_deffer_score_lost*100/$geseinheiten_deffer_score;
-  else $prozent_deffer=0;
-  $kbstring.='
-  <tr align="center">
-  <td  class="'.$bg.'">'.$kbl_lang['verlorenepunkte'].'</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_atter_score_lost, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
-  <td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score_lost, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
-  <td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-  </tr>';
-
-  $kbstring.='</table>&nbsp;</CENTER>';
-
-	return($kbstring);
+//Zahl mit Tausenderpunkt
+function kb_zahl($n){
+	return number_format((float)$n, 0, '', '.');
 }
 
-function showkampfberichtV1($text,$rasse, $spielername, $sector, $system, $schiffspunkte){
+//Anteil in Prozent mit einer Nachkommastelle
+function kb_prozent($teil, $ganz){
+	return number_format($ganz>0 ? $teil*100/$ganz : 0, 1, ',', '.').' %';
+}
 
+//Teilnehmer "Name [E](3:12), Name [K](4:1)" als Abzeichen in der Rassenfarbe, der eigene Name hervorgehoben
+function kb_namen($liste, $ich){
+	$html='';
+	foreach(explode(', ', $liste) as $name){
+		if($name===''){
+			continue;
+		}
+		$klasse='kb-name';
+		if(preg_match('/\[([EIKZD])\]\(\d+:\d+\)$/', $name, $m)){
+			$klasse.=' kb-r'.strpos('EIKZD', $m[1]);
+		}
+		if($name===$ich){
+			$klasse.=' kb-ich';
+		}
+		$html.='<span class="'.$klasse.'">'.$name.'</span>';
+	}
+	return $html;
+}
+
+//Zeile einer Einheitentabelle: eingesetzt, geblockt, überlebt und die Verluste mit Balken
+function kb_zeile($klasse, $name, $ein, $geb, $ver){
+	$anteil=$ein>0 ? min(100, $ver*100/$ein) : 0;
+	return '<tr class="'.$klasse.'"><td>'.$name.'</td><td>'.kb_zahl($ein).'</td><td>'.kb_zahl($geb).'</td><td>'.kb_zahl($ein-$ver).'</td>'
+		.'<td><div class="kb-verlust"><div class="mod-balken"><span style="width: '.round($anteil).'%"></span></div>'.kb_zahl($ver).' <small>'.number_format($anteil, 1, ',', '.').' %</small></div></td></tr>';
+}
+
+//Einheitentabelle einer Seite aus fertigen Zeilen
+function kb_tabelle($zeilen, $lang){
+	if($zeilen===''){
+		return '<div class="kb-keine">Keine Einheiten beteiligt.</div>';
+	}
+	return '<table class="kb-tabelle"><thead><tr><th>'.$lang['einheit'].'</th><th>'.$lang['eingesetzt'].'</th><th>'.$lang['geblockt'].'</th><th>'.$lang['ueberlebt'].'</th><th>Verluste</th></tr></thead><tbody>'.$zeilen.'</tbody></table>';
+}
+
+//Zeile der Bilanz: Angreifer links, Verteidiger rechts, dazwischen der Anteil beider Seiten, rechts das Verhältnis wie im alten Bericht (1 : x)
+function kb_bilanz($label, $a, $v, $atext, $vtext){
+	$summe=$a+$v;
+	$pa=$summe>0 ? round($a*100/$summe) : 50;
+	$verh=$a>0 ? '1 : '.number_format($v/$a, 2, ',', '.') : '-';
+	return '<tr><td>'.$label.'</td><td>'.$atext.'</td><td><div class="kb-anteil"><span class="kb-anteil-a" style="width: '.$pa.'%"></span><span class="kb-anteil-v" style="width: '.(100-$pa).'%"></span></div></td><td>'.$vtext.'</td><td class="kb-verh">'.$verh.'</td></tr>';
+}
+
+//Kampfbericht (de_user_news.typ 57): Kopf mit Ergebnis, beide Seiten, Bilanz, Einheiten je Seite und eigene Einheiten.
+//$text ist der serialisierte Bericht aus tickler/kt_systemkampf.php, $schiffspunkte[rasse][index] die Punkte je Einheit (Türme ab 10).
+//Die Rassenfarben der früheren Zellklassen k1 bis k10 leben als .kb-r0 bis .kb-r4 in gp/de-main.scss weiter.
+function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schiffspunkte){
 	global $sv_anz_rassen, $sv_anz_schiffe, $sv_anz_tuerme, $sv_server_lang, $sv_oscar;
 
-	$rassenklassen[0] = array ('k1', 'k2');
-	$rassenklassen[1] = array ('k3', 'k4');
-	$rassenklassen[2] = array ('k5', 'k6');
-	$rassenklassen[3] = array ('k7', 'k8');
-	$rassenklassen[4] = array ('k9', 'k10');
-
-	//kb in seine bestandteile zerlegen
-	$kbd=unserialize($text);
-	//print_r($kbd);
-
-	//daten aus dem kb holen
-	$kkollies=$kbd['daten']['colstolen'];
-	$ksec=$kbd['daten']['sector'];;
-	$ksys=$kbd['daten']['system'];;
-	$krassenvorhanden[0]=$kbd['daten']['rassen'][0];
-	$krassenvorhanden[1]=$kbd['daten']['rassen'][1];
-	$krassenvorhanden[2]=$kbd['daten']['rassen'][2];
-	$krassenvorhanden[3]=$kbd['daten']['rassen'][3];
-	$krassenvorhanden[4]=$kbd['daten']['rassen'][4];
-	$kturmrasse=$kbd['daten']['target_rasse'];
-	$atterliste=$kbd['daten']['atterliste'];
-	$defferliste=$kbd['daten']['defferliste'];
-
-	// Sicherer Zugriff auf Spieler-Daten, Defaults verhindern PHP-Warnungen bei fehlenden Keys
-	$daten_spieler = [];
-	if(isset($kbd['daten_spieler']) && is_array($kbd['daten_spieler'])){
-		$daten_spieler = $kbd['daten_spieler'];
+	$kbd=@unserialize($text);
+	if(!is_array($kbd) || !isset($kbd['daten'])){
+		return '<div class="kb"><div class="kb-keine">Dieser Kampfbericht ist nicht lesbar.</div></div>';
 	}
-	$kollieserbeutet = isset($daten_spieler['colstolen']) ? (int)$daten_spieler['colstolen'] : 0;
-	$exp            = isset($daten_spieler['exp']) ? (int)$daten_spieler['exp'] : 0;
-	$kartefakte     = isset($daten_spieler['kartefakt']) ? (int)$daten_spieler['kartefakt'] : 0;
-	$srec1          = isset($daten_spieler['recycling1']) ? (int)$daten_spieler['recycling1'] : 0;
-	$srec2          = isset($daten_spieler['recycling2']) ? (int)$daten_spieler['recycling2'] : 0;
-	$kg_set_01      = isset($daten_spieler['kg_set_01']) ? (int)$daten_spieler['kg_set_01'] : 0;
-	$kg_set_02      = isset($daten_spieler['kg_set_02']) ? (int)$daten_spieler['kg_set_02'] : 0;
-	$kg_set_03      = isset($daten_spieler['kg_set_03']) ? (int)$daten_spieler['kg_set_03'] : 0;
-	$kg_set_04      = isset($daten_spieler['kg_set_04']) ? (int)$daten_spieler['kg_set_04'] : 0;
+	$daten=$kbd['daten'];
+	$ds=(isset($kbd['daten_spieler']) && is_array($kbd['daten_spieler'])) ? $kbd['daten_spieler'] : array();
+	$rassen=(isset($daten['rassen']) && is_array($daten['rassen'])) ? $daten['rassen'] : array();
+	$turmrasse=(int)($daten['target_rasse'] ?? 0);
+	$eigene_rasse=max(0, min($sv_anz_rassen-1, (int)$rasse-1));
 
-	//eigenen spielername fett darstellen
-	if(!isset($_SESSION['ums_rasse']) || $_SESSION['ums_rasse']==1)$rflag='E';
-	elseif($_SESSION['ums_rasse']==2)$rflag='I';
-	elseif($_SESSION['ums_rasse']==3)$rflag='K';
-	elseif($_SESSION['ums_rasse']==4)$rflag='Z';
-	elseif($_SESSION['ums_rasse']==5)$rflag='D';
-
-
-	$username=($_SESSION['ums_spielername'] ?? '').' ['.$rflag.']('.$sector.':'.$system.')';
-	$atterliste=str_replace($username, '<b>'.$username.'</b>', $atterliste);
-	$defferliste=str_replace($username, '<b>'.$username.'</b>', $defferliste);
-
-	$exp=number_format($exp, 0,"",".");
-
-	//sprachdatei einbinden
+	//die Sprachdatei baut einige Sätze beim Einbinden aus $kkollies und $exp
+	$kkollies=(int)($daten['colstolen'] ?? 0);
+	$kollieserbeutet=(int)($ds['colstolen'] ?? 0);
+	$exp=kb_zahl($ds['exp'] ?? 0);
 	unset($kbl_lang);
 	include 'inc/lang/'.$sv_server_lang.'_kampfbericht.lib.lang.php';
 
-	//meldung f�r kollies zusammenbauen
-	if ($kkollies==-1){
-		$kolliesatz=$kbl_lang['abgewehrt'];
+	//eigene Seite: der eigene Name steht in der Angreifer- oder der Verteidigerliste
+	$flaggen=array(1=>'E', 2=>'I', 3=>'K', 4=>'Z', 5=>'D');
+	$ich=$spielername.' ['.($flaggen[$rasse] ?? 'E').']('.$sector.':'.$system.')';
+	$atterliste=(string)($daten['atterliste'] ?? '');
+	$defferliste=(string)($daten['defferliste'] ?? '');
+	//im Geheimdienst ist es der Bericht eines anderen Spielers, dann steht sein Name statt "dein"
+	$du=($spielername==($_SESSION['ums_spielername'] ?? ''));
+	$seite='';
+	if(strpos($atterliste, $ich)!==false){
+		$seite='a';
+	}elseif(strpos($defferliste, $ich)!==false){
+		$seite='v';
+	}
+
+	//Ergebnis: abgewehrt oder Kollektoren haben den Besitzer gewechselt
+	if($kkollies==-1){
+		$satz=$kbl_lang['abgewehrt'];
+		$chip='Angriff abgewehrt';
+		$ton=$seite=='a' ? 'kb-schlecht' : ($seite=='v' ? 'kb-gut' : '');
 	}else{
-		if ($kkollies==1)$kolliesatz=$kbl_lang['deffercollosts']; else $kolliesatz=$kbl_lang['deffercollostp'];
-
-		if ($kollieserbeutet>0)
-		{
-		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwins']); 
-		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinp']);
+		$satz=$kkollies==1 ? $kbl_lang['deffercollosts'] : $kbl_lang['deffercollostp'];
+		if($kollieserbeutet>0){
+			$satz.=str_replace('{WERT1}', $kollieserbeutet, $kollieserbeutet==1 ? $kbl_lang['attercolwins'] : $kbl_lang['attercolwinp']);
+		}elseif($kollieserbeutet<0){
+			$satz.=str_replace('{WERT1}', -$kollieserbeutet, $kollieserbeutet==-1 ? $kbl_lang['attercolwinsdestroy'] : $kbl_lang['attercolwinpdestroy']);
 		}
-		elseif($kollieserbeutet<0)
-		{
-		  $kollieserbeutet=$kollieserbeutet*(-1);
-		  if ($kollieserbeutet==1)$kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinsdestroy']); 
-		  else $kolliesatz.=str_replace("{WERT1}", $kollieserbeutet,$kbl_lang['attercolwinpdestroy']);
-		}
-		//$kolliesatz=$kbl_lang[deffercollost];
-		//$kolliesatz.=$kbl_lang[attercolwin];
+		$chip=kb_zahl($kkollies).' '.($kkollies==1 ? $kbl_lang['col'] : $kbl_lang['cols']).($seite=='a' ? ' erobert' : ' verloren');
+		$ton=$seite=='a' ? 'kb-gut' : ($seite=='v' ? 'kb-schlecht' : '');
 	}
 
-	//Kopfgeldhinweis
-	//auf den Atter ausgesetzt
-	$kg_set_hinweis='';
-	if($sv_oscar!=1){
-		if($kg_set_01>0 || $kg_set_02>0 || $kg_set_03>0 || $kg_set_04>0){
-			$kg_set_hinweis='<br><b>Ausgesetztes Kopfgeld: '
-				.number_format((float)$kg_set_01, 0,"","."). ' M '
-				.number_format((float)$kg_set_02, 0,"","."). ' D '
-				.number_format((float)$kg_set_03, 0,"","."). ' I '
-				.number_format((float)$kg_set_04, 0,"","."). ' E</b>';
+	//Einheiten je Seite und Rasse; Summen wie im alten Bericht: Anzahl, verloren, Punktewert, verlorene Punkte
+	$ges=array('a'=>array(0, 0, 0, 0), 'v'=>array(0, 0, 0, 0));
+	$zeilen=array('a'=>'', 'v'=>'');
+	$quellen=array('a'=>'einheiten_atter', 'v'=>'einheiten_deffer');
+	for($r=0;$r<$sv_anz_rassen;$r++){
+		if(empty($rassen[$r])){
+			continue;
 		}
-	}
-	
-	//zuerst den header
-	$kbstring='
-  <table cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center">
-  <td class="k1" width="15%"><b>'.$kbl_lang['angreifer'].':</b></td>
-  <td class="k1" width="85%">'.$atterliste.'</td>
-  </tr>
-  <tr align="center">
-  <td class="k1"><b>'.$kbl_lang['verteidiger'].':</b></td>
-  <td class="k1">'.$defferliste.'</td>
-  </tr>
-  <tr align="center">
-	<td class="k1" colspan="2" align="left"><b>'.$kolliesatz.
-	'<br>'.$kbl_lang['admiralexp'].'<br>'.
-	$kbl_lang['erhaltenekartefakt'].': '.$kartefakte.'<br>'.
-	$rassennamen[$rasse-1][4].'-'.$kbl_lang['recycling'].': '.number_format((float)$srec1, 0,"",".").' M - '.number_format((float)$srec2, 0,"",".").' D</b>
-	'.$kg_set_hinweis.'  
-	  </td>
-  </tr>
-  </table>
-  <br>
-  <TABLE cellSpacing=0 cellPadding=2 width=555 border=1>
-  <tr align="center">
-  <td class="k1" width="14%"><b>'.$ksec.':'.$ksys.'</font></b></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['angreifer'].'</u></td>
-  <td class="k1" width="28%" colSpan=3><u>'.$kbl_lang['verteidiger'].'</u></td>
-  <td class="k1" width="30%" colSpan=3><u>'.$kbl_lang['eigene'].'</u></td>
-  </tr>
-  <tr align="center" width="14%">
-  <td class="k2">'.$kbl_lang['einheit'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  <td class="k2">'.$kbl_lang['eingesetzt'].'</td>
-  <td class="k2">'.$kbl_lang['geblockt'].'</td>
-  <td class="k2">'.$kbl_lang['ueberlebt'].'</td>
-  </tr>';
-
-  $geseinheiten_atter_anz=0;
-  $geseinheiten_deffer_anz=0;
-  $geseinheiten_atter_anz_verloren=0;
-  $geseinheiten_deffer_anz_verloren=0;
-  $geseinheiten_atter_score=0;
-  $geseinheiten_deffer_score=0;
-  $geseinheiten_atter_score_lost=0;
-  $geseinheiten_deffer_score_lost=0;
-
-	////////////////////////////////////////////////
-	////////////////////////////////////////////////
-	//schiffe
-	////////////////////////////////////////////////
-	////////////////////////////////////////////////  
-	for ($aktrasse=0;$aktrasse<$sv_anz_rassen;$aktrasse++){
-		if ($krassenvorhanden[$aktrasse]>0){
-			$schiffsnamen = $rassennamen[$aktrasse];
-			$c1=0;$c2=0;
-			for ($i=0;$i<$sv_anz_schiffe;$i++){
-			  if ($schiffsnamen[$i]!='NA'){
-					if ($c1==0){$c1=1; $klasse=$rassenklassen[$aktrasse][0];}
-					else {$c1=0; $klasse=$rassenklassen[$aktrasse][1];}
-
-					//eigene Einheiten
-					if ($rasse-1!=$aktrasse){//wenn es nicht die eigene rasse ist leer lassen
-						  // Platzhalter dynamisch auf Anzahl der Schiffe setzen (vorher nur 8, führte zu Undefined array key Warnungen bei Index >=8)
-						  $keigene1 = array_fill(0, $sv_anz_schiffe, '&nbsp;');
-						  $keigene2 = $keigene1;
-						  $keigene3 = $keigene1;
-					}else{ //ansonsten variablen in die array packen
-						for ($j=0;$j<$sv_anz_schiffe;$j++){
-							$keigene1[$j] = number_format($kbd['einheiten_spieler'][0][$j], 0,"",".");
-							$keigene2[$j] = number_format($kbd['einheiten_spieler'][1][$j], 0,"",".");
-							$keigene3[$j] = number_format($kbd['einheiten_spieler'][0][$j]-$kbd['einheiten_spieler'][2][$j], 0,"",".");
-						}
-					}
-					
-					
-
-					$kbstring.='
-		  <TR align="center">
-		  <TD class="'.$klasse.'">'.$schiffsnamen[$i].'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_atter'][0][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_atter'][1][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_atter'][0][$aktrasse][$i]-$kbd['einheiten_atter'][2][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_deffer'][0][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_deffer'][1][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.number_format($kbd['einheiten_deffer'][0][$aktrasse][$i]-$kbd['einheiten_deffer'][2][$aktrasse][$i], 0,"",".").'</TD>
-		  <TD class="'.$klasse.'">'.$keigene1[$i].'</TD>
-		  <TD class="'.$klasse.'">'.$keigene2[$i].'</TD>
-		  <TD class="'.$klasse.'">'.$keigene3[$i].'</TD>
-		  </TR>';
-					//statistik erstellen
-					$geseinheiten_atter_anz+=$kbd['einheiten_atter'][0][$aktrasse][$i];
-					$geseinheiten_deffer_anz+=$kbd['einheiten_deffer'][0][$aktrasse][$i];
-
-					$geseinheiten_atter_anz_verloren+=$kbd['einheiten_atter'][2][$aktrasse][$i];
-					$geseinheiten_deffer_anz_verloren+=$kbd['einheiten_deffer'][2][$aktrasse][$i];
-
-					$geseinheiten_atter_score+=$kbd['einheiten_atter'][0][$aktrasse][$i]*$schiffspunkte[$aktrasse][$i];
-					$geseinheiten_deffer_score+=$kbd['einheiten_deffer'][0][$aktrasse][$i]*$schiffspunkte[$aktrasse][$i];
-
-					$geseinheiten_atter_score_lost+=$kbd['einheiten_atter'][2][$aktrasse][$i]*$schiffspunkte[$aktrasse][$i];
-					$geseinheiten_deffer_score_lost+=$kbd['einheiten_deffer'][2][$aktrasse][$i]*$schiffspunkte[$aktrasse][$i];
-
+		for($i=0;$i<$sv_anz_schiffe;$i++){
+			if(($rassennamen[$r][$i] ?? 'NA')=='NA'){
+				continue;
+			}
+			foreach($quellen as $s=>$key){
+				$ein=(int)($kbd[$key][0][$r][$i] ?? 0);
+				if($ein==0){
+					continue;
 				}
+				$geb=(int)($kbd[$key][1][$r][$i] ?? 0);
+				$ver=(int)($kbd[$key][2][$r][$i] ?? 0);
+				$punkte=(float)($schiffspunkte[$r][$i] ?? 0);
+				$zeilen[$s].=kb_zeile('kb-r'.$r, $rassennamen[$r][$i], $ein, $geb, $ver);
+				$ges[$s][0]+=$ein;
+				$ges[$s][1]+=$ver;
+				$ges[$s][2]+=$ein*$punkte;
+				$ges[$s][3]+=$ver*$punkte;
 			}
 		}
 	}
 
-	////////////////////////////////////////////////
-	////////////////////////////////////////////////
-	//türme
-	////////////////////////////////////////////////
-	////////////////////////////////////////////////
-	//print_r($kbd['tuerme']);
-	if(($kbd['tuerme'][0][0]+$kbd['tuerme'][0][1]+$kbd['tuerme'][0][2]+$kbd['tuerme'][0][3]+$kbd['tuerme'][0][4])>0){
-		$kbstring.='
-		<TR align="center">
-		<TD class="k1" colSpan=10><u>'.$kbl_lang['tuerme'].'</u></TD>
-		</TR>
-		';
-		  $aktrasse=$kturmrasse;
-		  $schiffsnamen = $turmnamen[$aktrasse];
-		  $c1=0;$c2=0;
-		  for ($i=0;$i<$sv_anz_tuerme;$i++)
-		  {
-			if ($schiffsnamen[$i]!='NA')
-			{
-			  if ($c1==0){$c1=1; $klasse=$rassenklassen[$aktrasse][0];}
-			  else {$c1=0; $klasse=$rassenklassen[$aktrasse][1];}
-
-			  $kbstring.='
-		<TR align="center">
-		<TD class="'.$klasse.'">'.$schiffsnamen[$i].'</TD>
-		<TD class="'.$klasse.'">-</TD>
-		<TD class="'.$klasse.'">-</TD>
-		<TD class="'.$klasse.'">-</TD>
-		<TD class="'.$klasse.'">'.number_format($kbd['tuerme'][0][$i], 0,"",".").'</TD>
-		<TD class="'.$klasse.'">'.number_format($kbd['tuerme'][1][$i], 0,"",".").'</TD>
-		<TD class="'.$klasse.'">'.number_format($kbd['tuerme'][0][$i]-$kbd['tuerme'][2][$i], 0,"",".").'</TD>
-		<TD class="'.$klasse.'">-</TD>
-		<TD class="'.$klasse.'">-</TD>
-		<TD class="'.$klasse.'">-</TD>
-		</TR>';
-
-			  //statistik erstellen
-			  $geseinheiten_deffer_anz+=$kbd['tuerme'][0][$i];
-			  $geseinheiten_deffer_anz_verloren+=$kbd['tuerme'][2][$i];
-
-			  $geseinheiten_deffer_score+=$kbd['tuerme'][0][$i]*$schiffspunkte[$aktrasse][$i+10];
-			  $geseinheiten_deffer_score_lost+=$kbd['tuerme'][2][$i]*$schiffspunkte[$aktrasse][$i+10];
-			}
-			//$grundindex1=$grundindex1+5;
-		  }
+	//Türme des Verteidigers, in der Farbe der angegriffenen Rasse
+	$tuerme=(isset($kbd['tuerme']) && is_array($kbd['tuerme'])) ? $kbd['tuerme'] : array();
+	$turmzeilen='';
+	for($i=0;$i<$sv_anz_tuerme;$i++){
+		$ein=(int)($tuerme[0][$i] ?? 0);
+		if($ein==0 || ($turmnamen[$turmrasse][$i] ?? 'NA')=='NA'){
+			continue;
+		}
+		$geb=(int)($tuerme[1][$i] ?? 0);
+		$ver=(int)($tuerme[2][$i] ?? 0);
+		$punkte=(float)($schiffspunkte[$turmrasse][$i+10] ?? 0);
+		$turmzeilen.=kb_zeile('kb-r'.$turmrasse, $turmnamen[$turmrasse][$i], $ein, $geb, $ver);
+		$ges['v'][0]+=$ein;
+		$ges['v'][1]+=$ver;
+		$ges['v'][2]+=$ein*$punkte;
+		$ges['v'][3]+=$ver*$punkte;
+	}
+	if($turmzeilen!==''){
+		$zeilen['v'].='<tr class="kb-trenner"><td colspan="5">'.$kbl_lang['tuerme'].'</td></tr>'.$turmzeilen;
 	}
 
-	$kbstring.=
-	'</TABLE>';
-	//////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////
-	//  statistik
-	//////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////
-	$kbstring.='
-	<br><table cellSpacing=0 cellPadding=2 width=555 border=1>
-	<tr align="center"><td colspan="4" class="k1"><b>'.$kbl_lang['statistik'].'</b></td></tr>
-	<tr align="center">
-	<td  class="k2"><b>'.$kbl_lang['typ'].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang['angreifer'].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang['verteidiger'].'</b></td>
-	<td  class="k2"><b>'.$kbl_lang['verhaeltnis'].'</b></td>
-	</tr>';
-
-	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-	//das verh�ltnis berechnen
-	if ($geseinheiten_atter_anz>0)
-	$verhaeltnis=$geseinheiten_deffer_anz/$geseinheiten_atter_anz;
-	else $verhaeltnis=0;
-	$kbstring.='
-	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang['einheitenanzahl'].'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz, 0,"",".").'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz, 0,"",".").'</td>
-	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-	</tr>';
-
-	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-	//das verh�ltnis berechnen
-	if ($geseinheiten_atter_anz_verloren>0)
-	$verhaeltnis=$geseinheiten_deffer_anz_verloren/$geseinheiten_atter_anz_verloren;
-	else $verhaeltnis=0;
-	//den prozentwert berechnen
-	@$prozent_atter=$geseinheiten_atter_anz_verloren*100/$geseinheiten_atter_anz;
-	if($geseinheiten_deffer_anz>0)$prozent_deffer=$geseinheiten_deffer_anz_verloren*100/$geseinheiten_deffer_anz;
-	else $prozent_deffer=0;
-	$kbstring.='
-	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang['verloreneeinheiten'].'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_anz_verloren, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_anz_verloren, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
-	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-	</tr>';
-	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-	//das verh�ltnis berechnen
-	if ($geseinheiten_atter_score>0)
-	$verhaeltnis=$geseinheiten_deffer_score/$geseinheiten_atter_score;
-	else $verhaeltnis=0;
-	$kbstring.='
-	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang['einheitenpunktewert'].'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_score, 0,"",".").'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score, 0,"",".").'</td>
-	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-	</tr>';
-
-	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-	//das verh�ltnis berechnen
-	if ($geseinheiten_atter_score_lost>0)
-	$verhaeltnis=$geseinheiten_deffer_score_lost/$geseinheiten_atter_score_lost;
-	else $verhaeltnis=0;
-	//den prozentwert berechnen
-	@$prozent_atter=$geseinheiten_atter_score_lost*100/$geseinheiten_atter_score;
-	if($geseinheiten_deffer_score>0)$prozent_deffer=$geseinheiten_deffer_score_lost*100/$geseinheiten_deffer_score;
-	else $prozent_deffer=0;
-	$kbstring.='
-	<tr align="center">
-	<td  class="'.$bg.'">'.$kbl_lang['verlorenepunkte'].'</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_atter_score_lost, 0,"",".").' ('.number_format($prozent_atter, 2,",",".").'%)</td>
-	<td  class="'.$bg.'">'.number_format($geseinheiten_deffer_score_lost, 0,"",".").' ('.number_format($prozent_deffer, 2,",",".").'%)</td>
-	<td  class="'.$bg.'">1:'.number_format($verhaeltnis, 2,",",".").'</td>
-	</tr>';
-
-	///////////////////////////////////////////////////
-	// Erklärung warum wer gewonnen hat
-	///////////////////////////////////////////////////
-	if ($c1==0){$c1=1;$bg='k2';}else{$c1=0;$bg='k1';}
-
-	$vernichtete_deffer=$kbd['daten']['deffer_hp_lost'];
-	$vernichtete_atter=$kbd['daten']['atter_hp_lost'];
-
-	$deffer_allhp=$kbd['daten']['deffer_hp'];
-	$atter_allhp=$kbd['daten']['atter_hp'];
-
-	if($vernichtete_deffer==0)$vernichtete_deffer = 0.000001;
-	if($vernichtete_atter==0)$vernichtete_atter   = 0.000001;
-	$zrd=$deffer_allhp/$vernichtete_deffer;
-	$zra=$atter_allhp/$vernichtete_atter;	
-
-	//wenn $zra>$zrd also der atter weniger einheiten verloren hat, als der deffer auf die gesamtflotte gerechnet
-	/*
-	if($zra>=$zrd){
-		//Atter hat gewonnen
-		$win_explain='Es gewinnt derjenige, der weniger Hitpoints im Verhältnis zur Gesamthitpointzahl verloren hat.';
-	}else{
-		//Deffer hat gewonnen
-		$win_explain='deffer';
-	}
-	*/
-
-	if($atter_allhp == 0){
-		$atter_allhp=1;
+	//eigene Einheiten
+	$spieler=(isset($kbd['einheiten_spieler']) && is_array($kbd['einheiten_spieler'])) ? $kbd['einheiten_spieler'] : array();
+	$eigene='';
+	$eig=array(0, 0, 0, 0);
+	for($j=0;$j<$sv_anz_schiffe;$j++){
+		$ein=(int)($spieler[0][$j] ?? 0);
+		if($ein==0){
+			continue;
+		}
+		$ver=(int)($spieler[2][$j] ?? 0);
+		$punkte=(float)($schiffspunkte[$eigene_rasse][$j] ?? 0);
+		$eigene.=kb_zeile('kb-r'.$eigene_rasse, $rassennamen[$eigene_rasse][$j] ?? '', $ein, (int)($spieler[1][$j] ?? 0), $ver);
+		$eig[0]+=$ein;
+		$eig[1]+=$ver;
+		$eig[2]+=$ein*$punkte;
+		$eig[3]+=$ver*$punkte;
 	}
 
-	if($deffer_allhp == 0){
-		$deffer_allhp=1;
+	//Hitpoints entscheiden den Sieg: weniger anteilige Verluste gewinnen
+	$hp=array('a'=>(float)($daten['atter_hp'] ?? 0), 'v'=>(float)($daten['deffer_hp'] ?? 0));
+	$hpv=array('a'=>(float)($daten['atter_hp_lost'] ?? 0), 'v'=>(float)($daten['deffer_hp_lost'] ?? 0));
+	$quote=array('a'=>($hp['a']>0 ? $hpv['a']*100/$hp['a'] : 0), 'v'=>($hp['v']>0 ? $hpv['v']*100/$hp['v'] : 0));
+	$besser='';
+	if($hp['a']>0 && $hp['v']>0 && $quote['a']!=$quote['v']){
+		$besser=$quote['a']<$quote['v'] ? 'a' : 'v';
 	}
 
-	$win_explain='Es gewinnt derjenige, der weniger Hitpoints im Verh&auml;ltnis zur Gesamthitpointzahl verloren hat. In den Hitpoints sind alle Boni eingerechnet.';	
-	$win_explain.='<br>Verluste Angreifer: '.number_format($vernichtete_atter*100/$atter_allhp, 2,",",".").'%';
-	$win_explain.='<br>Verluste Verteidiger: '.number_format($vernichtete_deffer*100/$deffer_allhp, 2,",",".").'%';
+	//Kopf: Ort und Ergebnis
+	$html='<div class="kb">';
+	$html.='<div class="kb-kopf"><div><span class="mod-typ">Kampf im System</span><b class="kb-ort">'.(int)($daten['sector'] ?? 0).':'.(int)($daten['system'] ?? 0).'</b></div><span class="kb-ergebnis '.$ton.'">'.$chip.'</span></div>';
 
-	$kbstring.='
-	<tr align="center">
-	<td  class="'.$bg.'">Gewinner</td>
-	<td  class="'.$bg.'" colspan="3">'.$win_explain.'</td>
-	</tr>';
+	//beide Seiten mit Teilnehmern
+	$html.='<div class="kb-seiten">';
+	foreach(array('a'=>array($kbl_lang['angreifer'], $atterliste), 'v'=>array($kbl_lang['verteidiger'], $defferliste)) as $s=>$p){
+		$html.='<div class="kb-seite kb-seite-'.$s.'"><div class="kb-seite-kopf"><span class="mod-typ">'.$p[0].'</span>'
+			.($besser==$s ? '<span class="mod-chip mod-chip-gruen" title="Diese Seite hat anteilig weniger Hitpoints verloren.">weniger Verluste</span>' : '')
+			.'</div><div class="kb-namen">'.kb_namen($p[1], $ich).'</div></div>';
+	}
+	$html.='</div>';
+	$html.='<p class="kb-text">'.$satz.'</p>';
 
+	//Bilanz beider Seiten
+	$html.='<table class="kb-bilanz"><thead><tr><th></th><th>'.$kbl_lang['angreifer'].'</th><th></th><th>'.$kbl_lang['verteidiger'].'</th><th>'.$kbl_lang['verhaeltnis'].'</th></tr></thead><tbody>'
+		.kb_bilanz($kbl_lang['einheitenanzahl'], $ges['a'][0], $ges['v'][0], kb_zahl($ges['a'][0]), kb_zahl($ges['v'][0]))
+		.kb_bilanz($kbl_lang['verloreneeinheiten'], $ges['a'][1], $ges['v'][1], kb_zahl($ges['a'][1]).' <small>'.kb_prozent($ges['a'][1], $ges['a'][0]).'</small>', kb_zahl($ges['v'][1]).' <small>'.kb_prozent($ges['v'][1], $ges['v'][0]).'</small>')
+		.kb_bilanz($kbl_lang['einheitenpunktewert'], $ges['a'][2], $ges['v'][2], kb_zahl($ges['a'][2]), kb_zahl($ges['v'][2]))
+		.kb_bilanz($kbl_lang['verlorenepunkte'], $ges['a'][3], $ges['v'][3], kb_zahl($ges['a'][3]).' <small>'.kb_prozent($ges['a'][3], $ges['a'][2]).'</small>', kb_zahl($ges['v'][3]).' <small>'.kb_prozent($ges['v'][3], $ges['v'][2]).'</small>')
+		.kb_bilanz('Verlorene Hitpoints', $hpv['a'], $hpv['v'], kb_zahl($hpv['a']).' <small>'.number_format($quote['a'], 1, ',', '.').' %</small>', kb_zahl($hpv['v']).' <small>'.number_format($quote['v'], 1, ',', '.').' %</small>')
+		.'</tbody></table>';
 
+	//eigenes Ergebnis
+	$chips='';
+	if($seite!='' && $eig[0]>0){
+		$chips.='<span class="mod-chip" title="Anteil deiner Einheiten an der eigenen Seite">'.($du ? 'Dein Anteil' : 'Anteil').' <b>'.kb_prozent($eig[0], $ges[$seite][0]).'</b></span>';
+		$chips.='<span class="mod-chip">Eigene Verluste <b>'.kb_zahl($eig[1]).'</b> Einheiten, <b>'.kb_zahl($eig[3]).'</b> Punkte</span>';
+	}
+	$chips.='<span class="mod-chip" title="'.$kbl_lang['admiralexp'].'">Admiral <b>+'.$exp.' EP</b></span>';
+	$chips.='<span class="mod-chip">'.$kbl_lang['erhaltenekartefakt'].' <b>'.kb_zahl($ds['kartefakt'] ?? 0).'</b></span>';
+	$chips.='<span class="mod-chip">'.($rassennamen[$eigene_rasse][4] ?? '').'-'.$kbl_lang['recycling'].' <b>'.kb_zahl($ds['recycling1'] ?? 0).' M</b> <b>'.kb_zahl($ds['recycling2'] ?? 0).' D</b></span>';
+	$kg=array((float)($ds['kg_set_01'] ?? 0), (float)($ds['kg_set_02'] ?? 0), (float)($ds['kg_set_03'] ?? 0), (float)($ds['kg_set_04'] ?? 0));
+	if($sv_oscar!=1 && array_sum($kg)>0){
+		$chips.='<span class="mod-chip mod-chip-warn">Ausgesetztes Kopfgeld <b>'.kb_zahl($kg[0]).' M</b> <b>'.kb_zahl($kg[1]).' D</b> <b>'.kb_zahl($kg[2]).' I</b> <b>'.kb_zahl($kg[3]).' E</b></span>';
+	}
+	$html.='<div class="kb-dein"><span class="mod-typ">'.($du ? 'Dein Ergebnis' : 'Ergebnis von '.$spielername).'</span><div class="kb-chips">'.$chips.'</div></div>';
 
-	$kbstring.='</table>&nbsp;</CENTER>';
+	//Einheiten je Seite, aufklappbar
+	$html.='<details class="kb-block" open><summary>'.$kbl_lang['angreifer'].'<small>'.kb_zahl($ges['a'][0]).' Einheiten, '.kb_zahl($ges['a'][1]).' verloren</small></summary>'.kb_tabelle($zeilen['a'], $kbl_lang).'</details>';
+	$html.='<details class="kb-block" open><summary>'.$kbl_lang['verteidiger'].'<small>'.kb_zahl($ges['v'][0]).' Einheiten, '.kb_zahl($ges['v'][1]).' verloren</small></summary>'.kb_tabelle($zeilen['v'], $kbl_lang).'</details>';
+	if($eigene!==''){
+		$html.='<details class="kb-block" open><summary>'.($du ? 'Deine Einheiten' : 'Einheiten von '.$spielername).'<small>'.kb_zahl($eig[0]).' Einheiten, '.kb_zahl($eig[1]).' verloren</small></summary>'.kb_tabelle($eigene, $kbl_lang).'</details>';
+	}
 
-	return($kbstring);
+	//Siegregel wie im alten Bericht
+	$html.='<details class="kb-regel"><summary>Wie wird der Sieger bestimmt?</summary><p>Es gewinnt die Seite, die weniger Hitpoints im Verhältnis zu ihren gesamten Hitpoints verloren hat. In den Hitpoints sind alle Boni eingerechnet.<br>'
+		.'Verluste '.$kbl_lang['angreifer'].': '.number_format($quote['a'], 2, ',', '.').' %<br>Verluste '.$kbl_lang['verteidiger'].': '.number_format($quote['v'], 2, ',', '.').' %</p></details>';
+	$html.='</div>';
+
+	return $html;
 }
-?>

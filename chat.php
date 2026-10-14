@@ -40,6 +40,7 @@ if (empty($_SESSION['chat_token'])) {
 <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 <title>DE Chat</title>
 <meta charset="UTF-8">
+<?php echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']); ?>
 
 <link rel="stylesheet" type="text/css" href="/gp/de-chat.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-chat.css'); ?>">
 <?php //Tooltips wie im Rest des Spiels (setTooltip aus de_fn.js), der Stil von #tt steht in de-chat.scss ?>

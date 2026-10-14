@@ -378,6 +378,20 @@ body.mobile #chatinput #chatsend {
 body.mobile a { font-size: 20px; }
 body.mobile #chatcontent a { font-size: inherit; }
 
+// Bildlaufleisten in Rassenfarbe und dunkle Bedienelemente wie in de-main.scss; die Akzentfarbe steht am html-Element,
+// weil die Leiste des Fensters dort gezeichnet wird
+:root {
+  --akzent: #3399FF;
+  --rollen-schiene: #0b0e12;
+  --rollen-griff: color-mix(in srgb, var(--akzent) 55%, #0b0e12);
+  color-scheme: dark;
+  scrollbar-color: var(--rollen-griff) var(--rollen-schiene);
+}
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: var(--rollen-schiene); }
+::-webkit-scrollbar-thumb { border: 2px solid var(--rollen-schiene); border-radius: 6px; background: var(--rollen-griff); }
+::-webkit-scrollbar-thumb:hover { background: var(--akzent); }
+
 // Theme-Generator
 @each $name, $cfg in $themes {
   $col: map.get($cfg, color);
@@ -403,6 +417,7 @@ body.mobile #chatcontent a { font-size: inherit; }
     // Akzentfarbe der Rasse
     .chat-newmsgs { background-color: $col; }
   }
+  html:has(> body.theme-#{$name}) { --akzent: #{$col}; }
 
   // Desktop-Variante: ersetzt nur den Hintergrund gemäß Originaldateien
   body.theme-#{$name}.desktop {

@@ -59,7 +59,9 @@ if ($_SESSION['ums_mobi'] == 1) {
 <title>Menu</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+'.\DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']).'
 <style>
+html{color-scheme:dark;scrollbar-color:color-mix(in srgb,'.$accent.' 55%,#0b0e12) #0b0e12}
 :root{
   --accent: '.$accent.';
   --bg-panel: #0d1218;
@@ -248,6 +250,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 <head>
 	<meta charset="UTF-8">
 	<title>Menu</title><title><?php echo $menu_lang['title']?></title>
+	<?php echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']); ?>
 <?php
 
 

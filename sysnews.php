@@ -116,14 +116,6 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 $allenachrichten .= '<td>'.$nachricht.'<br><br></td>';
                 $allenachrichten .= '</tr>';
                 break;
-            case 50:
-                $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
-                $allenachrichten .= '</tr>';
-                $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
-                $allenachrichten .= '</tr>';
-                break;
             case 57:
                 $allenachrichten .= '<tr>';
                 $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
@@ -338,10 +330,6 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
 
             echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif', $art, $time);
             echo '<div class="sn-text">'.$nachricht.'</div>';
-            break;
-        case 50:
-            echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e'.$n.'.gif', $art, $time);
-            echo '<div class="sn-bericht">'.showkampfberichtV0($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</div>';
             break;
         case 57: //Kampfbericht V1
             echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e50.gif', $art, $time);

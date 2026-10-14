@@ -5,6 +5,9 @@ echo '<!DOCTYPE html>
 <html lang="de">
 <head>
 <title>'.$sv_server_tag.' - DIE EWIGEN - '.$sv_server_name.'</title>';
+//Browser-Zubehör wie auf den Spielseiten (cssinclude.php)
+require_once 'vendor/autoload.php';
+echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']);
  echo '</head>';
 
 //////////////////////////////////////////////////////////////

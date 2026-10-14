@@ -85,9 +85,7 @@ if ($uid > 0) {
             echo '<td>' . $hrstr . '<br>' . $typ . '<br><b> ' . $time . '</b></td>';
             echo '</tr>';
             echo '<tr>';
-            if ($n == 50) {
-                echo '<td>' . showkampfberichtV0($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte) . '</td>';
-            } elseif ($n == 57) {
+            if ($n == 57) {
                 echo '<td>' . '<br>' . showkampfberichtV1($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte) . '</td>';
             } elseif ($n == 70) {
                 echo '<td>' . '<br>' . showkampfberichtBG($row["text"]) . '</td>';

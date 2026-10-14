@@ -920,3 +920,8 @@ body {
 		animation: none;
 	}
 }
+
+// dunkle Bedienelemente wie in de-main.scss, gleiches Farbschema wie dm.php (sonst bekommt das iframe einen hellen Grund)
+html {
+	color-scheme: dark;
+}
