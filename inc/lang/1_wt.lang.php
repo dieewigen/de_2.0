@@ -20,6 +20,9 @@ $wt_lang['auktiongettronic2']=' Tronic zu einen Preis von ';
 $wt_lang['auktiongettronic3']=' Eternium.';
 $wt_lang['buendnisse']='Bündnisse';
 $wt_lang['buendnis']='Bündnis';
+//Meldungen im Global-Chat (tickler/wt.php): {SERVER} = Kürzel dieses Servers, {WT} = Haltezeit für den Sieg
+$wt_lang['chat_neue_runde']='<b>Auf {SERVER} hat eine neue Runde begonnen.</b>';
+$wt_lang['chat_erhabenenkampf']='<b>Auf {SERVER} hat der Erhabenenkampf begonnen.</b> Wer {WT} WT lang die meisten Erhabenenpunkte hat, gewinnt die Runde.';
 $wt_lang['ehpunkte']='EH-Punkte';
 $wt_lang['eftaquest1']='Im Efta-System wurden sonderbare Energiesignaturen entdeckt. Die Koordinaten sind: ';
 $wt_lang['eftakeinaccount']='Du hast keinen Cyborg in EFTA kannst somit keine zusätzlichen Bonus erhalten.';

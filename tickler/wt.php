@@ -1089,6 +1089,10 @@ if ($doetick == 1) {
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET tick = tick + 1", []);
     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET wt=wt+1", []);
 
+    //erster WT einer Runde (reset.sql und wt_auto_reset.php setzen wt=1): Meldung in den Global-Chat, damit auch der andere Server davon erfährt
+    if ($rundenalter_wt == 1) {
+        insert_chat_msg(0, 3, '[SYSTEM]', '<span style="color: #ffff00;">'.strtr($wt_lang['chat_neue_runde'], ['{SERVER}' => $GLOBALS['sv_server_tag']]).'</span>');
+    }
 
     //alte nachrichten l�schen
     $tis = time() - (86400 * $sv_nachrichten_deldays);
@@ -1685,6 +1689,8 @@ if ($doetick == 1) {
                 //flag setzen, dass nur einmal pro runde die verteilung stattfindet
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_system SET roundpointsflag=1", []);
 
+                //Meldung in den Global-Chat, damit auch der andere Server vom Erhabenenkampf erfährt (Haltezeit in WT dieses Servers)
+                insert_chat_msg(0, 3, '[SYSTEM]', '<span style="color: #ffff00;">'.strtr($wt_lang['chat_erhabenenkampf'], ['{SERVER}' => $GLOBALS['sv_server_tag'], '{WT}' => (int)$GLOBALS['sv_benticks']]).'</span>');
 
                 //rundenpunkte zuerst
                 //jeder bekommt einen
