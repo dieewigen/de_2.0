@@ -117,7 +117,6 @@ $themes: (
 		rand-suffix: '_b',
 		rand-ro-suffix: '_b',
 		mobilebtn-bg: #3399FF,
-		secbutton-prefix: '1'
 	),
 	rasse2: (color: #A6A6A6,
 		btn-image: 'm/2_btn.png',
@@ -140,7 +139,6 @@ $themes: (
 		rand-suffix: '',
 		rand-ro-suffix: '',
 		mobilebtn-bg: #A6A6A6,
-		secbutton-prefix: '2'
 	),
 	rasse3: (color: #DE3939,
 		btn-image: 'm/3_btn.png',
@@ -163,7 +161,6 @@ $themes: (
 		rand-suffix: '_r',
 		rand-ro-suffix: '_ro',
 		mobilebtn-bg: #DE3939,
-		secbutton-prefix: '3'
 	),
 	rasse4: (color: #ED951E,
 		btn-image: 'm/4_btn.png',
@@ -186,7 +183,6 @@ $themes: (
 		rand-suffix: '_g',
 		rand-ro-suffix: '_g',
 		mobilebtn-bg: #ED951E,
-		secbutton-prefix: '4'
 	)
 );
 
@@ -733,131 +729,232 @@ a.btn:visited {
 	transform: rotate(45deg);
 }
 
-// Sektoransicht (sector.php)
+// Sektoransicht (sector.php): Navigation über dem Rahmen, darin die Spielertabelle mit den gewohnten Spalten,
+// die Legende und nebeneinander Informationen, Sektorraumbasis und Sektorartefakte
+.sec-navi {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 602px;
+	box-sizing: border-box;
+	margin: 0 auto 6px;
+	padding: 6px;
+	border-radius: 10px;
+
+	// spezifischer als .mod .mod-eingabe, das weiter unten im Stylesheet steht
+	&.mod .mod-eingabe {
+		width: 56px;
+		padding: 4px 6px;
+		text-align: center;
+	}
+}
+
+.sec-navi-titel {
+	margin-right: 4px;
+	font-size: 12px;
+	color: #8b949e;
+}
+
+.sec {
+	width: 572px;
+
+	// Farben der Werte, auch in der Legende; spezifischer als die Zellfarbe der Tabelle
+	.sec-gruen {
+		color: #5fe08a;
+	}
+
+	.sec-rot {
+		color: #ff8a8a;
+	}
+
+	.sec-gelb {
+		color: #f2cc60;
+	}
+
+	.sec-weiss {
+		color: #ffffff;
+	}
+
+	.sec-kopfgeld {
+		font-weight: 700;
+	}
+}
+
+.sec-meldung {
+	margin-bottom: 8px;
+}
+
+// Spielertabelle; th/td bekommen global 14px Arial und th einen hellen Hintergrund, darum hier überschrieben.
+// Feste Spaltenbreiten (am Spaltenkopf), die Namensspalte bekommt den Rest; sonst verteilt der Browser die Breite
+// wegen des Umbruchs langer Namen ungünstig und Namen brechen unnötig um.
 .sec-table {
-	.sec-th {
-		font-size: 12px;
-		font-weight: bold;
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+
+	th,
+	td {
+		box-sizing: border-box;
+		font-family: inherit;
+	}
+
+	th {
+		padding: 0 4px 5px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		background: none;
+		font-size: 10px;
+		font-weight: 600;
 		text-align: center;
 		white-space: nowrap;
-		padding: 3px 0;
-		color: #cccccc;
+		color: #8b949e;
 	}
 
-	// a:link/a:visited, sonst gewinnt die 14px-Linkgröße des Themes
-	.sec-th a,
-	.sec-th a:link,
-	.sec-th a:visited {
+	td {
+		padding: 4px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 		font-size: 12px;
+		text-align: center;
+		color: #c9d1d9;
 	}
 
-	// aktive Sortierung: Linie in Linkfarbe, kostet keine Breite
-	.sec-sort-active a {
-		border-bottom: 2px solid currentColor;
+	tbody tr:hover td {
+		background: rgba(255, 255, 255, 0.04);
 	}
 
-	tr.sec-own > td {
-		box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.1);
+	tbody tr.sec-eigen td {
+		background: var(--akzent-weich);
+	}
+
+	tfoot td {
+		padding-top: 6px;
+		border-bottom: none;
+		text-align: left;
+		font-size: 11px;
+		color: #8b949e;
+	}
+
+	img {
+		vertical-align: middle;
+	}
+
+	.sec-sys {
+		width: 40px;
+	}
+
+	.sec-rang {
+		width: 30px;
+	}
+
+	.sec-rasse {
+		width: 30px;
+	}
+
+	.sec-ally {
+		width: 56px;
+	}
+
+	.sec-zahl {
+		width: 84px;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.sec-kol {
+		width: 70px;
+	}
+
+	.sec-aktion {
+		width: 60px;
+		white-space: nowrap;
 	}
 
 	// sehr lange Namen/Allianztags umbrechen statt die Tabelle über den Rahmen hinaus zu verbreitern
 	.sec-wrap {
 		overflow-wrap: anywhere;
 	}
-}
 
-// Sektorkopf: einzeilig, ein langer Sektorname wird mit … gekürzt; width/min-width wie bei der Legende,
-// damit die Zeile den Rahmen nicht verbreitert
-.sec-head {
-	width: 0;
-	min-width: 100%;
-	text-align: left;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.sec-rz {
-	display: inline-block;
-	padding: 0 4px;
-	margin-right: 6px;
-	border: 1px solid #444444;
-	border-radius: 3px;
-	color: #000000;
-	font-weight: bold;
-}
-
-.sec-rz0 {
-	background-color: #00DD00;
-}
-
-.sec-rz2 {
-	background-color: #f05a00;
-}
-
-.sec-info {
-	width: 100%;
-	border-spacing: 0;
-	font-size: 12px;
-
-	td {
-		padding: 2px 4px;
-		color: #aaaaaa;
-	}
-
-	td + td {
-		text-align: right;
-		white-space: nowrap;
-		color: #ffffff;
-	}
-
-	tr + tr td {
-		border-top: 1px solid rgba(255, 255, 255, 0.07);
+	.user_title {
+		margin-left: 5px;
 	}
 }
 
-.sec-hint {
-	border-bottom: 1px dotted #777777;
-	cursor: help;
+// Links: hell statt der roten 14px-Themenlinks; die Aktionen in der Rassenfarbe
+.mod .sec-table a,
+.mod .sec-table a:link,
+.mod .sec-table a:visited {
+	font-family: inherit;
+	font-size: inherit;
+	text-decoration: none;
+	color: #e6edf3;
 }
 
-.sec-none {
-	color: #777777;
-	font-style: italic;
+.mod .sec-table a:hover {
+	text-decoration: underline;
+	color: #ffffff;
+}
+
+.mod .sec-table th a,
+.mod .sec-table th a:link,
+.mod .sec-table th a:visited {
+	color: #c9d1d9;
+}
+
+// aktive Sortierung: Linie in der Rassenfarbe
+.mod .sec-table th.sec-sortiert a {
+	padding-bottom: 1px;
+	border-bottom: 2px solid var(--akzent);
+	color: #ffffff;
+}
+
+.mod .sec-table .sec-aktion a,
+.mod .sec-table .sec-aktion a:link,
+.mod .sec-table .sec-aktion a:visited {
+	padding: 0 1px;
+	font-weight: 600;
+	color: var(--akzent);
+}
+
+// Titel der Accountverwaltung im Tooltip der Raute am Namen
+#tt .sec-titel {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	img {
+		width: 32px;
+		height: auto;
+	}
 }
 
 .sec-legend {
-	// so breit wie die Tabelle darüber; ohne das zieht der lange Text den Rahmen bis zur Fensterbreite auf
-	width: 0;
-	min-width: 100%;
-	box-sizing: border-box;
-	margin-top: 1px;
-	text-align: left;
-	font-size: 12px;
-	color: #cccccc;
-	background: url(g/cellblack.png) repeat;
+	margin-top: 8px;
+	font-size: 11px;
+	color: #9da7b1;
 
 	summary {
-		padding: 3px 6px;
 		cursor: pointer;
-		color: #ffffff;
+		color: #c9d1d9;
 	}
 
 	table {
 		width: 100%;
+		margin-top: 4px;
 		border-spacing: 0;
-		padding: 0 6px 4px 6px;
 	}
 
 	td {
 		padding: 2px 4px;
 		vertical-align: top;
+		font-family: inherit;
+		font-size: 11px;
+		color: #9da7b1;
 	}
 
 	td:first-child {
 		width: 1%;
 		white-space: nowrap;
-		color: #888888;
+		color: #8b949e;
 	}
 
 	img {
@@ -869,6 +966,145 @@ a.btn:visited {
 	}
 }
 
+// unten nebeneinander wie bisher: Informationen, Sektorraumbasis, Sektorartefakte
+.sec-unten {
+	display: grid;
+	grid-template-columns: 46fr 30fr 24fr;
+	gap: 6px;
+	margin-top: 10px;
+}
+
+.sec-karte {
+	padding: 6px 8px;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.04);
+
+	.mod-typ {
+		display: block;
+		margin-bottom: 4px;
+	}
+}
+
+.sec-bild {
+	display: flex;
+	flex-direction: column;
+
+	> div {
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+	}
+}
+
+.sec-info {
+	width: 100%;
+	border-spacing: 0;
+
+	td {
+		padding: 2px 0;
+		font-family: inherit;
+		font-size: 11px;
+		color: #9da7b1;
+	}
+
+	td + td {
+		padding-left: 6px;
+		text-align: right;
+		white-space: nowrap;
+		color: #ffffff;
+	}
+
+	tr + tr td {
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+}
+
+.sec-knoepfe {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	margin-top: 10px;
+}
+
+// Hinweis im NPC-Sektor, links das bisherige Info-Symbol
+.sec-npc {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 10px 0 0;
+
+	img {
+		flex: none;
+		width: 32px;
+		height: 32px;
+	}
+}
+
+// Handy: große Knöpfe zum Blättern wie bisher
+body.mobile .sec-navi {
+	gap: 10px;
+	padding: 8px;
+
+	.ms-nav,
+	a.ms-nav:link,
+	a.ms-nav:visited {
+		width: 64px;
+		height: 48px;
+		font-size: 30px;
+	}
+
+	.sec-navi-titel {
+		font-size: 20px;
+	}
+
+	.mod-eingabe {
+		width: 96px;
+		height: 48px;
+		box-sizing: border-box;
+		font-size: 24px;
+	}
+
+	.mod-btn {
+		height: 48px;
+		padding: 0 16px;
+		font-size: 20px;
+	}
+}
+
+.sec-head {
+	width: 0;
+	min-width: 100%;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.sec-rz {
+	display: inline-block;
+	padding: 0 4px;
+	margin-right: 6px;
+	border: 1px solid #444444;
+	border-radius: 3px;
+	color: #000000;
+	font-weight: bold;
+}
+.sec-rz0 {
+	background-color: #00DD00;
+}
+.sec-rz2 {
+	background-color: #f05a00;
+}
+.sec-hint {
+	border-bottom: 1px dotted #777777;
+	cursor: help;
+}
+.sec-none {
+	color: #777777;
+	font-style: italic;
+}
 // Fluxurion der Berater (lib/helper.inc.php): zurück/weiter als Buttons
 .helper-nav {
 	.helper-btn,
@@ -10584,7 +10820,6 @@ body.mobile {
 	$rand-suffix: map.get($cfg, rand-suffix);
 	$rand-ro-suffix: map.get($cfg, rand-ro-suffix);
 	$mobilebtn-bg: map.get($cfg, mobilebtn-bg);
-	$secbutton-prefix: map.get($cfg, secbutton-prefix);
 
 	// Basis-Theme (funktioniert für mobile und desktop)
 	body.theme-#{$name} {
@@ -10637,98 +10872,6 @@ body.mobile {
 			padding: 1px 4px 1px 4px;
 			text-decoration: none;
 			cursor: pointer;
-		}
-
-		// SecButton-Klassen
-		a.secbutton1 {
-			background: url(g/secbutton/#{$secbutton-prefix}_2backbtnnl.gif);
-			width: 36px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-		a.secbutton1:hover {
-			background: url(g/secbutton/#{$secbutton-prefix}_2backbtnlo.gif);
-			width: 36px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-
-		a.secbutton2 {
-			background: url(g/secbutton/#{$secbutton-prefix}_1backbtnnl.gif);
-			width: 17px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-		a.secbutton2:hover {
-			background: url(g/secbutton/#{$secbutton-prefix}_1backbtnlo.gif);
-			width: 17px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-
-		.secbutton3 {
-			background: url(g/secbutton/#{$secbutton-prefix}_seknrnl.gif);
-			width: 49px;
-			height: 20px;
-			float: left;
-		}
-		input.secbutton3 {
-			color: #000000;
-			font-size: 14px;
-			width: 47px;
-			height: 18px;
-			text-align: center;
-			border: none;
-			float: left;
-		}
-
-		a.secbutton4 {
-			background: url(g/secbutton/#{$secbutton-prefix}_okbtnnl.gif);
-			width: 42px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-		a.secbutton4:hover {
-			background: url(g/secbutton/#{$secbutton-prefix}_okbtnlo.gif);
-			width: 42px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-
-		a.secbutton5 {
-			background: url(g/secbutton/#{$secbutton-prefix}_1forbtnnl.gif);
-			width: 18px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-		a.secbutton5:hover {
-			background: url(g/secbutton/#{$secbutton-prefix}_1forbtnlo.gif);
-			width: 18px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-
-		a.secbutton6 {
-			background: url(g/secbutton/#{$secbutton-prefix}_2forbtnnl.gif);
-			width: 38px;
-			height: 20px;
-			display: block;
-			float: left;
-		}
-		a.secbutton6:hover {
-			background: url(g/secbutton/#{$secbutton-prefix}_2forbtnlo.gif);
-			width: 38px;
-			height: 20px;
-			display: block;
-			float: left;
 		}
 
 		// Formulareingaben

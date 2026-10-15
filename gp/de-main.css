@@ -544,27 +544,296 @@ a.btn:visited {
   transform: rotate(45deg);
 }
 
-.sec-table .sec-th {
+.sec-navi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 602px;
+  box-sizing: border-box;
+  margin: 0 auto 6px;
+  padding: 6px;
+  border-radius: 10px;
+}
+.sec-navi.mod .mod-eingabe {
+  width: 56px;
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.sec-navi-titel {
+  margin-right: 4px;
   font-size: 12px;
-  font-weight: bold;
+  color: #8b949e;
+}
+
+.sec {
+  width: 572px;
+}
+.sec .sec-gruen {
+  color: #5fe08a;
+}
+.sec .sec-rot {
+  color: #ff8a8a;
+}
+.sec .sec-gelb {
+  color: #f2cc60;
+}
+.sec .sec-weiss {
+  color: #ffffff;
+}
+.sec .sec-kopfgeld {
+  font-weight: 700;
+}
+
+.sec-meldung {
+  margin-bottom: 8px;
+}
+
+.sec-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.sec-table th,
+.sec-table td {
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.sec-table th {
+  padding: 0 4px 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: none;
+  font-size: 10px;
+  font-weight: 600;
   text-align: center;
   white-space: nowrap;
-  padding: 3px 0;
-  color: #cccccc;
+  color: #8b949e;
 }
-.sec-table .sec-th a,
-.sec-table .sec-th a:link,
-.sec-table .sec-th a:visited {
+.sec-table td {
+  padding: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   font-size: 12px;
+  text-align: center;
+  color: #c9d1d9;
 }
-.sec-table .sec-sort-active a {
-  border-bottom: 2px solid currentColor;
+.sec-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
 }
-.sec-table tr.sec-own > td {
-  box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.1);
+.sec-table tbody tr.sec-eigen td {
+  background: var(--akzent-weich);
+}
+.sec-table tfoot td {
+  padding-top: 6px;
+  border-bottom: none;
+  text-align: left;
+  font-size: 11px;
+  color: #8b949e;
+}
+.sec-table img {
+  vertical-align: middle;
+}
+.sec-table .sec-sys {
+  width: 40px;
+}
+.sec-table .sec-rang {
+  width: 30px;
+}
+.sec-table .sec-rasse {
+  width: 30px;
+}
+.sec-table .sec-ally {
+  width: 56px;
+}
+.sec-table .sec-zahl {
+  width: 84px;
+  text-align: right;
+  white-space: nowrap;
+}
+.sec-table .sec-kol {
+  width: 70px;
+}
+.sec-table .sec-aktion {
+  width: 60px;
+  white-space: nowrap;
 }
 .sec-table .sec-wrap {
   overflow-wrap: anywhere;
+}
+.sec-table .user_title {
+  margin-left: 5px;
+}
+
+.mod .sec-table a,
+.mod .sec-table a:link,
+.mod .sec-table a:visited {
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: none;
+  color: #e6edf3;
+}
+
+.mod .sec-table a:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+.mod .sec-table th a,
+.mod .sec-table th a:link,
+.mod .sec-table th a:visited {
+  color: #c9d1d9;
+}
+
+.mod .sec-table th.sec-sortiert a {
+  padding-bottom: 1px;
+  border-bottom: 2px solid var(--akzent);
+  color: #ffffff;
+}
+
+.mod .sec-table .sec-aktion a,
+.mod .sec-table .sec-aktion a:link,
+.mod .sec-table .sec-aktion a:visited {
+  padding: 0 1px;
+  font-weight: 600;
+  color: var(--akzent);
+}
+
+#tt .sec-titel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#tt .sec-titel img {
+  width: 32px;
+  height: auto;
+}
+
+.sec-legend {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.sec-legend summary {
+  cursor: pointer;
+  color: #c9d1d9;
+}
+.sec-legend table {
+  width: 100%;
+  margin-top: 4px;
+  border-spacing: 0;
+}
+.sec-legend td {
+  padding: 2px 4px;
+  vertical-align: top;
+  font-family: inherit;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.sec-legend td:first-child {
+  width: 1%;
+  white-space: nowrap;
+  color: #8b949e;
+}
+.sec-legend img {
+  vertical-align: middle;
+}
+.sec-legend .user_title {
+  margin: 0 3px;
+}
+
+.sec-unten {
+  display: grid;
+  grid-template-columns: 46fr 30fr 24fr;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.sec-karte {
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.sec-karte .mod-typ {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sec-bild {
+  display: flex;
+  flex-direction: column;
+}
+.sec-bild > div {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.sec-info {
+  width: 100%;
+  border-spacing: 0;
+}
+.sec-info td {
+  padding: 2px 0;
+  font-family: inherit;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.sec-info td + td {
+  padding-left: 6px;
+  text-align: right;
+  white-space: nowrap;
+  color: #ffffff;
+}
+.sec-info tr + tr td {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sec-knoepfe {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.sec-npc {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+.sec-npc img {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+body.mobile .sec-navi {
+  gap: 10px;
+  padding: 8px;
+}
+body.mobile .sec-navi .ms-nav,
+body.mobile .sec-navi a.ms-nav:link,
+body.mobile .sec-navi a.ms-nav:visited {
+  width: 64px;
+  height: 48px;
+  font-size: 30px;
+}
+body.mobile .sec-navi .sec-navi-titel {
+  font-size: 20px;
+}
+body.mobile .sec-navi .mod-eingabe {
+  width: 96px;
+  height: 48px;
+  box-sizing: border-box;
+  font-size: 24px;
+}
+body.mobile .sec-navi .mod-btn {
+  height: 48px;
+  padding: 0 16px;
+  font-size: 20px;
 }
 
 .sec-head {
@@ -594,24 +863,6 @@ a.btn:visited {
   background-color: #f05a00;
 }
 
-.sec-info {
-  width: 100%;
-  border-spacing: 0;
-  font-size: 12px;
-}
-.sec-info td {
-  padding: 2px 4px;
-  color: #aaaaaa;
-}
-.sec-info td + td {
-  text-align: right;
-  white-space: nowrap;
-  color: #ffffff;
-}
-.sec-info tr + tr td {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-
 .sec-hint {
   border-bottom: 1px dotted #777777;
   cursor: help;
@@ -620,42 +871,6 @@ a.btn:visited {
 .sec-none {
   color: #777777;
   font-style: italic;
-}
-
-.sec-legend {
-  width: 0;
-  min-width: 100%;
-  box-sizing: border-box;
-  margin-top: 1px;
-  text-align: left;
-  font-size: 12px;
-  color: #cccccc;
-  background: url(g/cellblack.png) repeat;
-}
-.sec-legend summary {
-  padding: 3px 6px;
-  cursor: pointer;
-  color: #ffffff;
-}
-.sec-legend table {
-  width: 100%;
-  border-spacing: 0;
-  padding: 0 6px 4px 6px;
-}
-.sec-legend td {
-  padding: 2px 4px;
-  vertical-align: top;
-}
-.sec-legend td:first-child {
-  width: 1%;
-  white-space: nowrap;
-  color: #888888;
-}
-.sec-legend img {
-  vertical-align: middle;
-}
-.sec-legend .user_title {
-  margin: 0 3px;
 }
 
 .helper-nav .helper-btn,
@@ -9804,91 +10019,6 @@ body.theme-rasse1 a.btn2:visited {
   text-decoration: none;
   cursor: pointer;
 }
-body.theme-rasse1 a.secbutton1 {
-  background: url(g/secbutton/1_2backbtnnl.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton1:hover {
-  background: url(g/secbutton/1_2backbtnlo.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton2 {
-  background: url(g/secbutton/1_1backbtnnl.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton2:hover {
-  background: url(g/secbutton/1_1backbtnlo.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 .secbutton3 {
-  background: url(g/secbutton/1_seknrnl.gif);
-  width: 49px;
-  height: 20px;
-  float: left;
-}
-body.theme-rasse1 input.secbutton3 {
-  color: #000000;
-  font-size: 14px;
-  width: 47px;
-  height: 18px;
-  text-align: center;
-  border: none;
-  float: left;
-}
-body.theme-rasse1 a.secbutton4 {
-  background: url(g/secbutton/1_okbtnnl.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton4:hover {
-  background: url(g/secbutton/1_okbtnlo.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton5 {
-  background: url(g/secbutton/1_1forbtnnl.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton5:hover {
-  background: url(g/secbutton/1_1forbtnlo.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton6 {
-  background: url(g/secbutton/1_2forbtnnl.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse1 a.secbutton6:hover {
-  background: url(g/secbutton/1_2forbtnlo.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
 body.theme-rasse1 input {
   font-size: 11px;
   font-family: Tahoma;
@@ -10087,91 +10217,6 @@ body.theme-rasse2 a.btn2:visited {
   padding: 1px 4px 1px 4px;
   text-decoration: none;
   cursor: pointer;
-}
-body.theme-rasse2 a.secbutton1 {
-  background: url(g/secbutton/2_2backbtnnl.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton1:hover {
-  background: url(g/secbutton/2_2backbtnlo.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton2 {
-  background: url(g/secbutton/2_1backbtnnl.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton2:hover {
-  background: url(g/secbutton/2_1backbtnlo.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 .secbutton3 {
-  background: url(g/secbutton/2_seknrnl.gif);
-  width: 49px;
-  height: 20px;
-  float: left;
-}
-body.theme-rasse2 input.secbutton3 {
-  color: #000000;
-  font-size: 14px;
-  width: 47px;
-  height: 18px;
-  text-align: center;
-  border: none;
-  float: left;
-}
-body.theme-rasse2 a.secbutton4 {
-  background: url(g/secbutton/2_okbtnnl.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton4:hover {
-  background: url(g/secbutton/2_okbtnlo.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton5 {
-  background: url(g/secbutton/2_1forbtnnl.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton5:hover {
-  background: url(g/secbutton/2_1forbtnlo.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton6 {
-  background: url(g/secbutton/2_2forbtnnl.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse2 a.secbutton6:hover {
-  background: url(g/secbutton/2_2forbtnlo.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
 }
 body.theme-rasse2 input {
   font-size: 11px;
@@ -10372,91 +10417,6 @@ body.theme-rasse3 a.btn2:visited {
   text-decoration: none;
   cursor: pointer;
 }
-body.theme-rasse3 a.secbutton1 {
-  background: url(g/secbutton/3_2backbtnnl.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton1:hover {
-  background: url(g/secbutton/3_2backbtnlo.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton2 {
-  background: url(g/secbutton/3_1backbtnnl.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton2:hover {
-  background: url(g/secbutton/3_1backbtnlo.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 .secbutton3 {
-  background: url(g/secbutton/3_seknrnl.gif);
-  width: 49px;
-  height: 20px;
-  float: left;
-}
-body.theme-rasse3 input.secbutton3 {
-  color: #000000;
-  font-size: 14px;
-  width: 47px;
-  height: 18px;
-  text-align: center;
-  border: none;
-  float: left;
-}
-body.theme-rasse3 a.secbutton4 {
-  background: url(g/secbutton/3_okbtnnl.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton4:hover {
-  background: url(g/secbutton/3_okbtnlo.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton5 {
-  background: url(g/secbutton/3_1forbtnnl.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton5:hover {
-  background: url(g/secbutton/3_1forbtnlo.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton6 {
-  background: url(g/secbutton/3_2forbtnnl.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse3 a.secbutton6:hover {
-  background: url(g/secbutton/3_2forbtnlo.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
 body.theme-rasse3 input {
   font-size: 11px;
   font-family: Tahoma;
@@ -10655,91 +10615,6 @@ body.theme-rasse4 a.btn2:visited {
   padding: 1px 4px 1px 4px;
   text-decoration: none;
   cursor: pointer;
-}
-body.theme-rasse4 a.secbutton1 {
-  background: url(g/secbutton/4_2backbtnnl.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton1:hover {
-  background: url(g/secbutton/4_2backbtnlo.gif);
-  width: 36px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton2 {
-  background: url(g/secbutton/4_1backbtnnl.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton2:hover {
-  background: url(g/secbutton/4_1backbtnlo.gif);
-  width: 17px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 .secbutton3 {
-  background: url(g/secbutton/4_seknrnl.gif);
-  width: 49px;
-  height: 20px;
-  float: left;
-}
-body.theme-rasse4 input.secbutton3 {
-  color: #000000;
-  font-size: 14px;
-  width: 47px;
-  height: 18px;
-  text-align: center;
-  border: none;
-  float: left;
-}
-body.theme-rasse4 a.secbutton4 {
-  background: url(g/secbutton/4_okbtnnl.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton4:hover {
-  background: url(g/secbutton/4_okbtnlo.gif);
-  width: 42px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton5 {
-  background: url(g/secbutton/4_1forbtnnl.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton5:hover {
-  background: url(g/secbutton/4_1forbtnlo.gif);
-  width: 18px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton6 {
-  background: url(g/secbutton/4_2forbtnnl.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
-}
-body.theme-rasse4 a.secbutton6:hover {
-  background: url(g/secbutton/4_2forbtnlo.gif);
-  width: 38px;
-  height: 20px;
-  display: block;
-  float: left;
 }
 body.theme-rasse4 input {
   font-size: 11px;

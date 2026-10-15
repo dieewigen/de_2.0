@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\DE2\View\Einheit\Tooltip;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_sector.lang.php';
 include "functions.php";
@@ -40,7 +41,7 @@ if(isset($_REQUEST["sso"])){
 	$secsort=$sso;
 }
 
-//spieler sortiert auslesen    
+//spieler sortiert auslesen
 $orderby='`system`';$sort_sso=1;
 if($secsort=='1'){$orderby='col';$sort_sso=2;}
 elseif($secsort=='2'){$orderby='score';$sort_sso=3;}
@@ -60,9 +61,10 @@ $maxcol=$row['maxcol'];
 echo '
 </head>';
 if($_SESSION['ums_mobi']==1){
-	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+	echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' mobile">';
 }else{
-	echo '<body onload="javascript:document.secform.sf.focus();document.secform.sf.select();" class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+	//der Cursor steht gleich im Sektorfeld, so lässt sich direkt eine Nummer eintippen
+	echo '<body onload="document.secform.sf.focus();document.secform.sf.select();" class="theme-rasse'.$_SESSION['ums_rasse'].' desktop">';
 }
 
 //stelle die ressourcenleiste dar
@@ -70,17 +72,16 @@ include "resline.php";
 
 echo '<div align="center">';
 
+//Tooltip "Kollektoren-Wellenrechner": was in den nächsten fünf Angriffswellen erobert (grün) oder zerstört (rot) wird
 function wellenrechner($kol, $maxcol, $npcsec){
 	global $sec_lang, $col, $sv_min_col_attgrenze, $sv_max_col_attgrenze, $sv_kollie_klaurate;
-	$str='Kollektoren-Wellenrechner';
-	$str.="<table width=200px border=0 cellpadding=0 cellspacing=1><tr align=center><td width=15%>&nbsp</td><td width=17%>".$sec_lang['kollektoren']."</td></tr>";
-	$str.="<tr align=center><td>&nbsp;</td><td>".number_format($kol, 0, ',' ,'.')."</td></tr>";
+	$zeilen=array(array($sec_lang['kollektoren'], number_format($kol, 0, ',' ,'.')));
 
 	$owncol=$col;
 	if($maxcol==0)$maxcol=1;
 	for($we=0; $we<5; $we++){
 		if($owncol>$maxcol)$maxcol=$owncol;
-	
+
 		if($npcsec==0){
 			$col_angriffsgrenze=$owncol*100/$maxcol;
 			$col_angriffsgrenze=$col_angriffsgrenze/100*$sv_max_col_attgrenze;
@@ -93,20 +94,30 @@ function wellenrechner($kol, $maxcol, $npcsec){
 		}else{
 			$col_angriffsgrenze=$sv_min_col_attgrenze;
 		}
-		
-		if ($kol<$col_angriffsgrenze*$owncol){$colclass="text2";}else{$colclass="text3";}
-		
-		$str.="<tr align=center><td nowrap>".($we+1).". ".$sec_lang['welle']."</td><td class=".$colclass.">".
-		number_format(floor($kol*$sv_kollie_klaurate), 0, ',','.')."</td></tr>";
+
+		$klasse=($kol<$col_angriffsgrenze*$owncol) ? 'ei-nein' : 'ei-ja';
+		$zeilen[]=array(($we+1).'. '.$sec_lang['welle'], "<span class='".$klasse."'>".number_format(floor($kol*$sv_kollie_klaurate), 0, ',','.')."</span>");
 		$owncol=$owncol+floor($kol*$sv_kollie_klaurate);
 		$kol=$kol-floor($kol*$sv_kollie_klaurate);
 	}
-		
 
-	//info bzgl. erobern/zerst�ren von kollektoren
-	$str.="</table><br>Gr&uuml;ner Kollektorenwert: Kollektoren liegen &uuml;ber der Kollektorenangriffsgrenze und werden erobert.<br><br>Roter Kollektorenwert: Kollektoren liegen unter der Kollektorenangriffsgrenze und werden zerst&ouml;rt.";
+	//info bzgl. erobern/zerstören von kollektoren
+	return Tooltip::status(array(array('Kollektoren-Wellenrechner', $zeilen,
+		'Gr&uuml;ner Kollektorenwert: Kollektoren liegen &uuml;ber der Kollektorenangriffsgrenze und werden erobert.<br><br>Roter Kollektorenwert: Kollektoren liegen unter der Kollektorenangriffsgrenze und werden zerst&ouml;rt.')));
+}
 
-	return ($str);
+//Tooltip der Punkte: was die Farbe bedeutet, bei ausgesetztem Kopfgeld zusätzlich die Beträge
+function sector_punkte_tooltip($kopfgeld=null){
+	$abschnitte=array(array('Punkte', array(),
+		'Gr&uuml;ner Punktewert: Ziel ist angreifbar, da oberhalb der Punkteangriffsgrenze.<br><br>Roter Punktewert: Ziel ist nicht angreifbar, da unterhalb der Punkteangriffsgrenze.'));
+	if($kopfgeld!==null){
+		$abschnitte[]=array('Kopfgeld', array(
+			array('M', number_format($kopfgeld['kg01'], 0,"",".")),
+			array('D', number_format($kopfgeld['kg02'], 0,"",".")),
+			array('I', number_format($kopfgeld['kg03'], 0,"",".")),
+			array('E', number_format($kopfgeld['kg04'], 0,"","."))));
+	}
+	return Tooltip::status($abschnitte);
 }
 
 //Reisezeit-Kennzeichen im Sektorkopf
@@ -124,12 +135,12 @@ function sector_head($inhalt, $name=''){
 }
 
 //Spaltenkopf der Spielertabelle; sortierbare Spalten sind Links, die aktive Sortierung ist unterstrichen
-function sector_th($label, $width, $sso=0, $sort_sso=0, $sf=0){
+function sector_th($label, $klasse, $sso=0, $sort_sso=0, $sf=0){
 	if($sso==0){
-		return '<td width="'.$width.'" class="cell sec-th">'.$label.'</td>';
+		return '<th class="'.$klasse.'">'.$label.'</th>';
 	}
-	$aktiv=($sso==$sort_sso) ? ' sec-sort-active' : '';
-	return '<td width="'.$width.'" class="cell sec-th'.$aktiv.'"><a href="sector.php?sso='.$sso.'&sf='.$sf.'" title="Sortieren nach: '.$label.'">'.$label.'</a></td>';
+	$aktiv=($sso==$sort_sso) ? ' sec-sortiert' : '';
+	return '<th class="'.$klasse.$aktiv.'"><a href="sector.php?sso='.$sso.'&amp;sf='.$sf.'" title="Sortieren nach: '.$label.'">'.$label.'</a></th>';
 }
 
 //Zeile im Infoblock, optional mit Erklärung als Tooltip am Namen
@@ -142,7 +153,7 @@ function sector_inforow($label, $wert, $tooltip=''){
 
 //Legende unter der Spielertabelle, zugeklappt; ob sie offen ist, merkt sich der Browser
 function sector_legende($kopfgeld){
-	$punkte='<span class="tc3">gr&uuml;n</span> angreifbar &middot; <span class="tc2">rot</span> unter der Angriffsgrenze';
+	$punkte='<span class="sec-gruen">gr&uuml;n</span> angreifbar &middot; <span class="sec-rot">rot</span> unter der Angriffsgrenze';
 	if($kopfgeld){
 		$punkte.=' &middot; <b>fett</b>: Kopfgeld ausgesetzt';
 	}
@@ -155,9 +166,9 @@ function sector_legende($kopfgeld){
 	<tr><td>System</td><td>^5^ Sektorkommandant &middot; [5] gesperrt &middot; (5) Urlaubsmodus &middot; {5} L&ouml;schmodus</td></tr>
 	<tr><td>Name</td><td>* in den letzten 30 Minuten aktiv (nur im eigenen Sektor) &middot; <span class="user_title"></span> Titel (Maus dar&uuml;ber)</td></tr>
 	<tr><td>Rasse</td><td>sichtbar im eigenen Sektor (au&szlig;er Sektor 1) und nach einem Scan</td></tr>
-	<tr><td>Allianz</td><td><span class="tc1">wei&szlig;</span> eigene &middot; <span class="tc3">gr&uuml;n</span> Partner &middot; <span class="tc2">rot</span> Kriegsgegner &middot; <span class="tc4">gelb</span> andere</td></tr>
+	<tr><td>Allianz</td><td><span class="sec-weiss">wei&szlig;</span> eigene &middot; <span class="sec-gruen">gr&uuml;n</span> Partner &middot; <span class="sec-rot">rot</span> Kriegsgegner &middot; <span class="sec-gelb">gelb</span> andere</td></tr>
 	<tr><td>Punkte</td><td>'.$punkte.'</td></tr>
-	<tr><td>Kollektoren</td><td><span class="tc3">gr&uuml;n</span> werden erobert &middot; <span class="tc2">rot</span> werden zerst&ouml;rt &middot; Maus dar&uuml;ber: Wellenrechner</td></tr>
+	<tr><td>Kollektoren</td><td><span class="sec-gruen">gr&uuml;n</span> werden erobert &middot; <span class="sec-rot">rot</span> werden zerst&ouml;rt &middot; Maus dar&uuml;ber: Wellenrechner</td></tr>
 	<tr><td>Aktion</td><td>S Sonde &middot; A Agenten &middot; F Flotte &middot; Punkt: deine Einstufung im Geheimdienst (<img src="gp/g/ps_0.gif" alt=""> neutral, <img src="gp/g/ps_1.gif" alt=""> freundlich, <img src="gp/g/ps_2.gif" alt=""> feindlich)</td></tr>
 	</table>
 	</details>
@@ -181,21 +192,16 @@ if ($sf>$sv_show_maxsector or $sf<1){
 }
 $sector=$sf;
 
-//den button fürs blättern durch die sektoren darstellen
-echo '<form action="sector.php" name="secform" method="POST">';
-
-echo '<table><tr align="center"><td>';
-
-if($_SESSION['ums_mobi']==1){
-	echo '<a style="float:left;" href="sector.php?sf='.($sf-1).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;">&lt;</div></a>';
-	echo '<input class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;" type="text" name="sf" value="'.$sf.'" size="4" maxlength="5" autocomplete="off">';
-	echo '<a class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;" href="javascript:document.secform.submit();">OK</a>';
-	echo '<a style="float:left;" href="sector.php?sf='.($sf+1).'"><div class="mobilebtn" style="float:left; margin-bottom: 5px; margin-left: 10px; width: 80px; margin-top: 5px;">&gt;</div></a>';
-}else{
-	echo '<a href="sector.php?sf='.($sf-2).'" class="secbutton1"></a><a href="sector.php?sf='.($sf-1).'" class="secbutton2">&nbsp;</a><span class="secbutton3"><input type="text" name="sf" value="'.$sf.'" size="4" maxlength="5" class="secbutton3" autocomplete="off"></span><a href="javascript:document.secform.submit();" class="secbutton4"></a><a href="sector.php?sf='.($sf+1).'" class="secbutton5"></a><a href="sector.php?sf='.($sf+2).'" class="secbutton6"></a>';	
-}
-echo '</td></tr></table>';
-echo '</form><br>';
+//Blättern zwischen den Sektoren: einer zurück, Nummer, einer vor (Knöpfe wie bei den Vergessenen Systemen), kompakt in der
+//Mitte, damit die Wege zwischen den Pfeilen kurz bleiben. Die früheren Sprünge um zwei Sektoren gab es für die
+//Alien-Sektoren an jeder zweiten Stelle, die heute nicht mehr so verteilt sind.
+echo '<form action="sector.php" name="secform" method="POST" class="mod sec-navi">
+	<span class="sec-navi-titel">Sektor</span>
+	<a href="sector.php?sf='.($sf-1).'" class="ms-nav">&lsaquo;</a>
+	<input type="text" name="sf" value="'.$sf.'" maxlength="5" inputmode="numeric" autocomplete="off" class="mod-eingabe">
+	<button type="submit" class="mod-btn mod-btn-leise ally-btn-klein">OK</button>
+	<a href="sector.php?sf='.($sf+1).'" class="ms-nav">&rsaquo;</a>
+</form>';
 
 //schauen ob nah oder fern
 $rzadd=0;
@@ -221,83 +227,72 @@ if($sf==666){
 
 
 if($sec_data['npc']==1){
-	////////////////////////////////////////////////////////////////////////	
+	////////////////////////////////////////////////////////////////////////
 	//npc anzeigen
 	////////////////////////////////////////////////////////////////////////
-	
+
 	//kein malus bei aliens
-  	$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus;
-  	$col_angriffsgrenze_final=$sv_min_col_attgrenze;
-  	$rec_bonus=0;
-  	
+	$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus;
+	$col_angriffsgrenze_final=$sv_min_col_attgrenze;
+	$rec_bonus=0;
+
 	//sektoransicht darstellen
 	$sektorinfo=sector_rz_badge($rzadd);
-	//rahmen
 	rahmen_oben(sector_head($sektorinfo.$sec_data['name']));
-    //tabellen�berschrift
-	echo '<table border="0" cellpadding="0" cellspacing="1" width="100%" class="sec-table">
-	<tr>'.
-	sector_th($sec_lang['sys'], 50, 1, $sort_sso, $sf).
-	sector_th($sec_lang['name'], 230).
-	sector_th($sec_lang['punkte'], 150, 3, $sort_sso, $sf).
-	sector_th($sec_lang['kollektoren'], 76, 2, $sort_sso, $sf).
-	sector_th($sec_lang['aktion'], 70).'
-	</tr>';
+	echo '<div class="mod sec">';
+	echo '<table class="sec-table"><thead><tr>'.
+	sector_th($sec_lang['sys'], 'sec-sys', 1, $sort_sso, $sf).
+	sector_th($sec_lang['name'], 'sec-name').
+	sector_th($sec_lang['punkte'], 'sec-zahl', 3, $sort_sso, $sf).
+	sector_th($sec_lang['kollektoren'], 'sec-zahl sec-kol', 2, $sort_sso, $sf).
+	sector_th($sec_lang['aktion'], 'sec-aktion').'
+	</tr></thead><tbody>';
 	$sql = "SELECT * FROM de_user_data WHERE sector=? ORDER BY $orderby ASC LIMIT 300";
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 	$anz = mysqli_num_rows($db_daten);
 	while($row = mysqli_fetch_assoc($db_daten)){
 		echo '<tr>';
 		//system
-		echo '<td class="cell tac" style="font-size: 10pt;">'.$row['system'].'</td>';
+		echo '<td>'.$row['system'].'</td>';
 		//spielername
-		echo '<td class="cell tac" style="font-size: 10pt;">'.$row['spielername'].'</td>';
+		echo '<td class="sec-wrap">'.$row['spielername'].'</td>';
 		//punkte
-		if ($punkte*$sec_angriffsgrenze<=$row['score']) $csstag=' text3'; else $csstag=' text2';
-		$tooltip='Gr&uuml;ner Punktewert: Ziel ist angreifbar, da oberhalb der Punkteangriffsgrenze.<br><br>Roter Punktewert: Ziel ist nicht angreifbar, da unterhalb der Punkteangriffsgrenze.';
-		echo '<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['score'], 0,"",".").'</div></td>';
-		
+		$csstag=($punkte*$sec_angriffsgrenze<=$row['score']) ? 'sec-gruen' : 'sec-rot';
+		echo '<td class="sec-zahl '.$csstag.'"><span title="'.sector_punkte_tooltip().'">'.number_format($row['score'], 0,"",".").'</span></td>';
+
 		//kollektoren
-		if ($col*$col_angriffsgrenze_final<=$row['col']) $csstag=' text3'; else $csstag=' text2';
-		$tooltip=wellenrechner($row['col'], $maxcol, 1);
-		echo '<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['col'], 0,"",".").'</div></td>';
-		
+		$csstag=($col*$col_angriffsgrenze_final<=$row['col']) ? 'sec-gruen' : 'sec-rot';
+		echo '<td class="sec-zahl '.$csstag.'"><span title="'.wellenrechner($row['col'], $maxcol, 1).'">'.number_format($row['col'], 0,"",".").'</span></td>';
+
 		//aktion
-		echo '<td class="cell tac"><a href="military.php?se='.$row['sector'].'&sy='.$row['system'].'">F</a></td>';
-	
+		echo '<td class="sec-aktion"><a href="military.php?se='.$row['sector'].'&amp;sy='.$row['system'].'">F</a></td>';
+
 		echo '</tr>';
 	}
-	
+
 	//sektorendaten
-	echo '<tr><td colspan="5" class="cell" height="24px">&nbsp;'.$sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze*100, 2,",",".").'% / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%</td></tr>';
-	
+	echo '</tbody><tfoot><tr><td colspan="5">'.$sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze*100, 2,",",".").'% / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%</td></tr></tfoot>';
 	echo '</table>';
+
+	//hinweistext für npc-sektoren
+	echo '<div class="mod-hinweis sec-npc"><img src="gp/g/symbol12.png" alt="" title="Info"><div>'.
+	$sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($_SESSION['ums_user_id']).'<br>'.$sec_lang['npsecinfo3'].
+	'<br>'.$sec_lang['npsecinfo4'].'</div></div>';
+	echo '</div>';
 	rahmen_unten();
-	
-    //hinweistext für npc-sektoren
-	echo '<div class="cell" style="position: relative; width: 590px; border: 1px solid #333333; padding: 4px;">';
-    echo '<div style="background-color: #000000; width: 50px; height: 50px; position: relative; float: left;">
-      <img src="'.'gp/'.'g/symbol12.png" border="0" title="Info">
-    </div>';    
-    
-    echo '<div style="width: 540px; height: 70px; position: relative;">'.
-    $sec_lang['npsecinfo1'].' '.$sec_lang['npsecinfo2'].get_free_artefact_places($_SESSION['ums_user_id']).'<br>'.$sec_lang['npsecinfo3'].
-    '<br>'.$sec_lang['npsecinfo4'].'
-    </div>';    
-    echo '</div><br>';
-	
+
 }else{
-	////////////////////////////////////////////////////////////////////////	
+	////////////////////////////////////////////////////////////////////////
 	//spieler anzeigen
 	////////////////////////////////////////////////////////////////////////
 	//sektorkommandant feststellen
 	$sksystem=issectorcommander();
-	
+
 	//die scandaten des spielers auslesen
 	unset($scandaten);
-    $sql = "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $index=0;
+	$sql = "SELECT zuser_id, rasse, allytag, ps FROM de_user_scan WHERE user_id=?";
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
+	$index=0;
 	while($row = mysqli_fetch_assoc($db_daten))
 	{
 		$scandaten[$index]['zuser_id']=$row['zuser_id'];
@@ -306,7 +301,7 @@ if($sec_data['npc']==1){
 		$scandaten[$index]['ps']=$row['ps'];
 		$index++;
 	}
-	
+
 	//----------- Ally Feine/Freunde
 	$allypartner = array();
 	$allyfeinde = array();
@@ -317,7 +312,7 @@ if($sec_data['npc']==1){
 	{
 	  $allyrow = mysqli_fetch_assoc($allyresult);
 	  $allyid = $allyrow["id"];
-	
+
 	  $sql = "SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=? or ally_id_2=?) and (ally_id_1=id or ally_id_2=id)";
 	  $allyresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid, $allyid]);
 	  while($row = mysqli_fetch_assoc($allyresult))
@@ -325,7 +320,7 @@ if($sec_data['npc']==1){
 	        if ($ownally != $row["allytag"])
 	                $allypartner[] = $row["allytag"];
 	  }
-	
+
 	  $sql = "SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=? or ally_id_angegriffener=?) and (ally_id_angreifer=id or ally_id_angegriffener=id)";
 	  $allyresult = mysqli_execute_query($GLOBALS['dbi'], $sql, [$allyid, $allyid]);
 	  while($row = mysqli_fetch_assoc($allyresult))
@@ -334,79 +329,79 @@ if($sec_data['npc']==1){
 	                $allyfeinde[] = $row["allytag"];
 	  }
 	}
-	
+
 	//sektormalus bei der attgrenze berechnen
 	//zuerst anzahl der pc-sektoren auslesen
 	$sql = "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>1";
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql);
 	$num = mysqli_num_rows($db_daten);
 	if($num<1)$num=1;
-	
+
 	//eigenen sektorplatz auslesen
 	$sql = "SELECT platz FROM de_sector WHERE sec_id=?";
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ownsector]);
 	$row = mysqli_fetch_assoc($db_daten);
 	$ownsectorplatz=$row["platz"];
-	  
+
 	//sektorplatzunterschied berechnen
 	$secplatz=$sec_data['platz'];
 	$secplatzunterschied=$secplatz-$ownsectorplatz;
 	if($secplatzunterschied<0)$secplatzunterschied=0;
-	  
+
 	//secmalus berechnen
 	$sec_malus=$sv_sector_attmalus/$num*$secplatzunterschied;
-	  
-	//secmalus darf nicht gr��er als maximum sein
+
+	//secmalus darf nicht größer als maximum sein
 	if($sec_malus>$sv_sector_attmalus)$sec_malus=$sv_sector_attmalus;
 	$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus+$sec_malus;
-	  
+
 	//recyclotronbonus berechnen
 	$rec_bonus=$sv_recyclotron_sector_bonus/$num*($secplatz-1);
-	//recyclotronbonus darf nicht gr��er als das maximum sein
+	//recyclotronbonus darf nicht größer als das maximum sein
 	if($rec_bonus>$sv_recyclotron_sector_bonus)$rec_bonus=$sv_recyclotron_sector_bonus;
-	  
-	//angriffsgrenze f�r die kollektoren berechnen
+
+	//angriffsgrenze für die kollektoren berechnen
 	if($maxcol==0)$maxcol=1;
 	$col_angriffsgrenze=$col*100/$maxcol;
 	$col_angriffsgrenze_final=$col_angriffsgrenze/100*$sv_max_col_attgrenze;
 	if($col_angriffsgrenze_final>$sv_max_col_attgrenze)$col_angriffsgrenze_final=$sv_max_col_attgrenze;
 	if($col_angriffsgrenze_final<$sv_min_col_attgrenze)$col_angriffsgrenze_final=$sv_min_col_attgrenze;
 
-	//anzeige ob der sektorstatus deaktiviert worden ist
-	if($secstatdisable==1 AND $ownsector==$sf) echo '<div class="info_box text2">'.$sec_lang['secstatdisable'].'</div><br>';
-	
+	//Hinweis, wenn der Sektorstatus deaktiviert ist; steht oben im Rahmen
+	$sec_meldung='';
+	if($secstatdisable==1 AND $ownsector==$sf) $sec_meldung='<div class="mod-meldung mod-meldung-warn sec-meldung">'.$sec_lang['secstatdisable'].'</div>';
+
 	$gesamtpunkte=0;$anz=0;
-	//Breiten so verteilt, dass die Köpfe in lesbarer Größe in die Gesamtbreite passen; die Namensspalte gibt dafür etwas ab
-	$output='<table border="0" cellpadding="0" cellspacing="1" width="100%" class="sec-table">
-	<tr>'.
-	sector_th($sec_lang['sys'], 44, 1, $sort_sso, $sf).
-	sector_th($sec_lang['rang'], 34).
-	sector_th($sec_lang['name'], 170).
-	sector_th($sec_lang['rasse'], 38).
-	sector_th($sec_lang['allianz'], 55).
-	sector_th($sec_lang['punkte'], 90, 3, $sort_sso, $sf).
-	sector_th($sec_lang['kollektoren'], 76, 2, $sort_sso, $sf).
-	sector_th($sec_lang['aktion'], 65).'
-	</tr>';
-	
+	//Spalten wie bisher; feste Breiten stehen im Stylesheet (Klassen am Spaltenkopf), die Namensspalte nimmt den Rest
+	$output='<table class="sec-table"><thead><tr>'.
+	sector_th($sec_lang['sys'], 'sec-sys', 1, $sort_sso, $sf).
+	sector_th($sec_lang['rang'], 'sec-rang').
+	sector_th($sec_lang['name'], 'sec-name').
+	sector_th($sec_lang['rasse'], 'sec-rasse').
+	sector_th($sec_lang['allianz'], 'sec-ally').
+	sector_th($sec_lang['punkte'], 'sec-zahl', 3, $sort_sso, $sf).
+	sector_th($sec_lang['kollektoren'], 'sec-zahl sec-kol', 2, $sort_sso, $sf).
+	sector_th($sec_lang['aktion'], 'sec-aktion').'
+	</tr></thead><tbody>';
+
 	//die spielerdaten laden
 	if($sf==1 && !isset($_REQUEST['showall'])){
-		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
-		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc, 
-		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
+		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode,
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
+		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc,
+		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector=? ORDER BY $orderby ASC";
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
 	}else{
 		//alles anzeigen
-		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode, 
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag, 
-		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc, 
-		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04 
+		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode,
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
+		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc,
+		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector=? ORDER BY $orderby ASC";
 		$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sf]);
-	}	
-	
+	}
+
 	$anz = mysqli_num_rows($db_daten);
 	$gescol=0;
 	while($row = mysqli_fetch_assoc($db_daten)){
@@ -414,83 +409,64 @@ if($sec_data['npc']==1){
 		$gescol+=$row['col'];
 
 		//eigene Zeile hervorheben
-		$output.=($row['user_id']==$_SESSION['ums_user_id']) ? '<tr class="sec-own">' : '<tr>';
-		////////////////////////////////////////////////////////////////////////
+		$output.=($row['user_id']==$_SESSION['ums_user_id']) ? '<tr class="sec-eigen">' : '<tr>';
 		////////////////////////////////////////////////////////////////////////
 		//system inkl sk/bk und accountstatus
 		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
 		$systemstr=$row['system'];
-	    if ($row["lstatus"]==2)$systemstr='['.$systemstr.']';//gesperrt
-	    if ($row["lstatus"]==3 AND $row["delmode"]>0) $systemstr='{'.$systemstr.'}';//l�schmode
-	    if ($row["lstatus"]==3 AND $row["delmode"]==0) $systemstr='('.$systemstr.')';//umode
-	    
-	    if($sksystem==$row['system']){
-	      	$systemstr='<span class="tc3">^'.$systemstr.'^</span>';
+		if ($row["lstatus"]==2)$systemstr='['.$systemstr.']';//gesperrt
+		if ($row["lstatus"]==3 AND $row["delmode"]>0) $systemstr='{'.$systemstr.'}';//löschmode
+		if ($row["lstatus"]==3 AND $row["delmode"]==0) $systemstr='('.$systemstr.')';//umode
+
+		if($sksystem==$row['system']){
+			$systemstr='<span class="sec-gruen">^'.$systemstr.'^</span>';
 		}
-		
-		/*
-	    if($row['system']==$sec_data['bk']){
-			$systemstr='<span class="tc2">&deg;'.$systemstr.'&deg;</span>';
-		}*/
-		
-		$output.='<td class="cell tac" style="font-size: 10pt;">'.$systemstr.'</td>';
-		
-		////////////////////////////////////////////////////////////////////////
+
+		$output.='<td>'.$systemstr.'</td>';
+
 		////////////////////////////////////////////////////////////////////////
 		//rang
 		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
 		$rang='';
 		if($row['npc']==0){
-			$rang="<img src='".'gp/'.'g/r/'.$row['rang']."_g.gif' title='".$rangnamen1[$row['rang']]."'>";
+			$rang="<img src='gp/g/r/".$row['rang']."_g.gif' alt='' title='".$rangnamen1[$row['rang']]."'>";
 		}
-    	
-		$output.='<td class="cell tac">'.$rang.'</td>';
-		
-		
-		////////////////////////////////////////////////////////////////////////
+
+		$output.='<td>'.$rang.'</td>';
+
 		////////////////////////////////////////////////////////////////////////
 		//spielername, Spielertitel, details, im sektor online
 		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-    	$playername=utf8_encode_fix(umlaut($row['spielername']));
-    	if(strtotime($row["last_click"])+1800 > time() AND $row["lstatus"]==1) $os=' *';else $os='';
-    	if ($ownsector==$sf AND $secstatdisable==0) $osown=$os;else $osown='';
-    	$csstag='tc1';
-		
+		$playername=utf8_encode_fix(umlaut($row['spielername']));
+		if(strtotime($row["last_click"])+1800 > time() AND $row["lstatus"]==1) $os=' *';else $os='';
+		if ($ownsector==$sf AND $secstatdisable==0) $osown=$os;else $osown='';
+
+		//Titel aus der Accountverwaltung; die Raute am Namen zeigt sie im Tooltip
 		$userTitle='';
 		$sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = ? ORDER BY ls_title.title ASC";
 		$db_datenx=mysqli_execute_query($GLOBALS['dbi_ls'], $sql, [$row['owner_id']]);
 		if(mysqli_num_rows($db_datenx) > 0){
-			
+
 			while ($rowx = mysqli_fetch_assoc($db_datenx)){
 				$titleId=0; //Standardgrafik
 				if(strpos($rowx['title'], "ERHABEN")!==false){
 					$titleId=1;
 				}
 
-				$userTitle.='
-				<div style=\'display: flex; align-items: center;\'>
-					<div><img src=\'/gp/g/title'.$titleId.'.png\' style=\'width: 32px; height: auto; margin-right: 10px;\'></div>
-					<div>'.$rowx['title'].'</div>
-				</div>';
+				$userTitle.="<div class='sec-titel'><img src='/gp/g/title".$titleId.".png' alt=''><span>".$rowx['title']."</span></div>";
 			}
-			$userTitle='<div class="user_title" title="'.$userTitle.'"></div>';
+			$userTitle='<span class="user_title" title="'.$userTitle.'"></span>';
 		}
 
-		$output.='<td class="cell tac sec-wrap" style="font-size: 10pt;"><a href="details.php?se='.$sector.'&sy='.$row['system'].'">
-		<span class="'.$csstag.'">'.$playername.$osown.$userTitle.'</span></a></td>';
-		
-		////////////////////////////////////////////////////////////////////////
+		$output.='<td class="sec-wrap"><a href="details.php?se='.$sector.'&amp;sy='.$row['system'].'">'.$playername.$osown.$userTitle.'</a></td>';
+
 		////////////////////////////////////////////////////////////////////////
 		//rasse
-		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
 		$knowrasse=0;
 		$playerstatus=0;
 		$rasse='';
-		//hat man scandaten �ber die rasse/allianz?
+		//hat man scandaten über die rasse/allianz?
 		$allytagscan='';
 		if (isset($scandaten))
 		{
@@ -504,135 +480,112 @@ if($sec_data['npc']==1){
 				}
 			}
 		}
-		
-		//im eigenen sektor sieht man alle rassen, au�er in sektor 1
+
+		//im eigenen sektor sieht man alle rassen, außer in sektor 1
 		if($sector==$ownsector AND $ownsector>1)$knowrasse=1;
-		
-		
+
+
 		if($knowrasse==1)
 		{
-			if($row['rasse']==1)$rasse='<img src="'.'gp/'.'g/r/raceE.png" title="Die Ewigen" width="16px" height="16px">';
-			if($row['rasse']==2)$rasse='<img src="'.'gp/'.'g/r/raceI.png" title="Ishtar" width="16px" height="16px">';
-			if($row['rasse']==3)$rasse='<img src="'.'gp/'.'g/r/raceK.png" title="K&#180;Tharr" width="16px" height="16px">';
-			if($row['rasse']==4)$rasse='<img src="'.'gp/'.'g/r/raceZ.png" title="Z&#180;tah-ara" width="16px" height="16px">';
-			if($row['rasse']==5)$rasse='<img src="'.'gp/'.'g/r/raceD.png" title="DX61a23" width="16px" height="16px">';
+			if($row['rasse']==1)$rasse='<img src="gp/g/r/raceE.png" title="Die Ewigen" alt="" width="16" height="16">';
+			if($row['rasse']==2)$rasse='<img src="gp/g/r/raceI.png" title="Ishtar" alt="" width="16" height="16">';
+			if($row['rasse']==3)$rasse='<img src="gp/g/r/raceK.png" title="K&#180;Tharr" alt="" width="16" height="16">';
+			if($row['rasse']==4)$rasse='<img src="gp/g/r/raceZ.png" title="Z&#180;tah-ara" alt="" width="16" height="16">';
+			if($row['rasse']==5)$rasse='<img src="gp/g/r/raceD.png" title="DX61a23" alt="" width="16" height="16">';
 		}
-		
-		$output.='<td class="cell tac">'.$rasse.'</td>';
-		
+
+		$output.='<td>'.$rasse.'</td>';
+
 		////////////////////////////////////////////////////////////////////////
+		//allianz, sichtbarkeit durch ally, allybündnis, scandaten, sektor
 		////////////////////////////////////////////////////////////////////////
-		//allianz, sichtbarkeit durch ally, allyb�ndnis, scandaten, sektor
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-	    if($row['status']==1)$allytag=$row['allytag'];else $allytag='';
-	    $showallytag='';
+		if($row['status']==1)$allytag=$row['allytag'];else $allytag='';
+		$showallytag='';
 		$csstag='';
-	
-	    //festellen welche farbe das allytag hat
-	    //allypartner
+
+		//festellen welche farbe das allytag hat
+		//allypartner
 		if (in_array($allytag, $allypartner)){
-			$csstag='tc3';
+			$csstag='sec-gruen';
 			$showallytag=$allytag;
 		}
-	    //allyfeinde
-	    elseif (in_array($allytag, $allyfeinde)){
-			$csstag='tc2';
+		//allyfeinde
+		elseif (in_array($allytag, $allyfeinde)){
+			$csstag='sec-rot';
 			$showallytag=$allytag;
 		}
-	    //ganze andere ally, nichts anzeigen, au�er es gibt scandaten, oder es ist der eigene sektor
-	    elseif (($ownally != $allytag) OR ($allytag=='') OR ($ownally=='')){
+		//ganze andere ally, nichts anzeigen, außer es gibt scandaten, oder es ist der eigene sektor
+		elseif (($ownally != $allytag) OR ($allytag=='') OR ($ownally=='')){
 			//anzeige im eigenen sektor
 			if($ownsector==$sf AND $ownsector>1)
-	        {
-	          	$csstag='tc4';
+			{
+				$csstag='sec-gelb';
 				$showallytag=$allytag;
-	        }
+			}
 			//allytag aus den scandaten
-	        elseif ($allytagscan!='')
-	        {
-	          	//es gibt scandaten der ally
-	        	$csstag='tc4';
-	          	$showallytag=$allytagscan;
-	        }
-	        else
-	        {
-	          //es gibt keine daten vom allytag
-	          $showallytag='&nbsp;';
-	        }
-	    }
-	    //eigene ally, tag anzeigen
-	    else {
-			$csstag='tc1';
+			elseif ($allytagscan!='')
+			{
+				//es gibt scandaten der ally
+				$csstag='sec-gelb';
+				$showallytag=$allytagscan;
+			}
+			else
+			{
+				//es gibt keine daten vom allytag
+				$showallytag='';
+			}
+		}
+		//eigene ally, tag anzeigen
+		else {
+			$csstag='sec-weiss';
 			$showallytag=$allytag;
 		}
-	
-	    //allytag
-	    if($showallytag=='') 
-	    {
-	    	$showallytag='&nbsp;';
-	    } 
-        
-        if($showallytag!='&nbsp;'){
+
+		if($showallytag!=''){
 			$showallytag='<a href="ally_detail.php?allytag='.urlencode($showallytag).'"><span class="'.$csstag.'">'.$showallytag.'</span></a>';
 		}
 
-        $output.='<td class="cell tac sec-wrap" style="font-size: 10pt;">'.$showallytag.'</td>';
-		
+		$output.='<td class="sec-wrap">'.$showallytag.'</td>';
+
 		////////////////////////////////////////////////////////////////////////
+		//punkte, fett bei ausgesetztem Kopfgeld
 		////////////////////////////////////////////////////////////////////////
-		//punkte
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		if ($punkte*$sec_angriffsgrenze<=$row['score']) $csstag=' text3'; else $csstag=' text2';
-		
-		$tooltip='Gr&uuml;ner Punktewert: Ziel ist angreifbar, da oberhalb der Punkteangriffsgrenze.<br><br>Roter Punktewert: Ziel ist nicht angreifbar, da unterhalb der Punkteangriffsgrenze.';
-		
-		//fett darstellen, wenn es Kopfgeld gibt
+		$csstag=($punkte*$sec_angriffsgrenze<=$row['score']) ? 'sec-gruen' : 'sec-rot';
+		$kopfgeld=null;
 		if($sv_oscar!=1){
 			if($row['kg01']>0 || $row['kg02']>0 || $row['kg03']>0 || $row['kg04']>0){
-				$csstag.=' fett';
-				$tooltip.='<br><br>Kopfgeld:';
-				$tooltip.='<br>M: '.number_format($row['kg01'], 0,"",".");
-				$tooltip.='<br>D: '.number_format($row['kg02'], 0,"",".");
-				$tooltip.='<br>I: '.number_format($row['kg03'], 0,"",".");
-				$tooltip.='<br>E: '.number_format($row['kg04'], 0,"",".");
+				$csstag.=' sec-kopfgeld';
+				$kopfgeld=$row;
 			}
 		}
-		
-		$output.='<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['score'], 0,"",".").'</div></td>';
-		
-		////////////////////////////////////////////////////////////////////////
+
+		$output.='<td class="sec-zahl '.$csstag.'"><span title="'.sector_punkte_tooltip($kopfgeld).'">'.number_format($row['score'], 0,"",".").'</span></td>';
+
 		////////////////////////////////////////////////////////////////////////
 		//kollektoren
 		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		if ($col*$col_angriffsgrenze_final<=$row['col']) $csstag=' text3'; else $csstag=' text2';
-		$tooltip=wellenrechner($row['col'], $maxcol, 0);
-		$output.='<td class="cell tac'.$csstag.'" style="text-align: right;"><div title="'.$tooltip.'">'.number_format($row['col'], 0,"",".").'</div></td>';
-			
-		////////////////////////////////////////////////////////////////////////
+		$csstag=($col*$col_angriffsgrenze_final<=$row['col']) ? 'sec-gruen' : 'sec-rot';
+		$output.='<td class="sec-zahl '.$csstag.'"><span title="'.wellenrechner($row['col'], $maxcol, 0).'">'.number_format($row['col'], 0,"",".").'</span></td>';
+
 		////////////////////////////////////////////////////////////////////////
 		//aktion
 		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		
-		$aktion='<a href="secret.php?a=s&zsec1='.$sector.'&zsys1='.$row['system'].'" title="Sonde starten">S</a> <a href="secret.php?a=a&zsec2='.$sector.'&zsys2='.$row['system'].'" title="Agenteneinsatz">A</a> <a href="military.php?se='.$sector.'&sy='.$row['system'].'" title="Flotteneinsatz">F</a> ';
-		$aktion.='<a href="secret.php?a=d&zsec1='.$sector.'&zsys1='.$row['system'].'"><img src="'.'gp/'.'g/ps_'.$playerstatus.'.gif" border="0" title="Geheimdienstinformationen"></a>';
-		
-		$output.='<td class="cell tac" style="font-size: 10pt;">'.$aktion.'</td>';
-		
+		$aktion='<a href="secret.php?a=s&amp;zsec1='.$sector.'&amp;zsys1='.$row['system'].'" title="Sonde starten">S</a> <a href="secret.php?a=a&amp;zsec2='.$sector.'&amp;zsys2='.$row['system'].'" title="Agenteneinsatz">A</a> <a href="military.php?se='.$sector.'&amp;sy='.$row['system'].'" title="Flotteneinsatz">F</a> ';
+		$aktion.='<a href="secret.php?a=d&amp;zsec1='.$sector.'&amp;zsys1='.$row['system'].'"><img src="gp/g/ps_'.$playerstatus.'.gif" alt="" title="Geheimdienstinformationen"></a>';
+
+		$output.='<td class="sec-aktion">'.$aktion.'</td>';
+
 		$output.='</tr>';
 	}
 
 	//Geisterschiff, falls es gerade durch diesen Sektor treibt
 	$output.=\DieEwigen\DE2\View\GhostShip\GhostShipView::sectorRow($geist, (int)$sf);
 
-	$output.='</table>';
+	$output.='</tbody></table>';
 	$output.=sector_legende($sv_oscar!=1);
 
 
-	//die sektor�berschrift zusammenbauen
+	//die sektorüberschrift zusammenbauen
 	$sektorinfo=sector_rz_badge($rzadd);
 	$sektorinfo.='<span title="Platz in der Sektorwertung">Platz: '.$sec_data['platz'].'</span>';
 	$sektorinfo.=' &middot; Punkte: '.number_format($gesamtpunkte, 0,",",".");
@@ -642,81 +595,72 @@ if($sec_data['npc']==1){
 	if($sf==1){
 		$sektorinfo=sector_head(sector_rz_badge($rzadd).'Sektor 1 - Startsektor');
 	}
-	
+
 	rahmen_oben($sektorinfo);
-	
-	echo $output;
-	
-	//rahmen_unten();
-	
+	echo '<div class="mod sec">'.$sec_meldung.$output;
+
 	////////////////////////////////////////////////////////////////////////
-	// alter bereich
+	// Sektorraumbasis und Sektorartefakte
 	////////////////////////////////////////////////////////////////////////
 
 	//bild von der sternenbasis anzeigen
-  $bed=$sec_data['techs'][1].$sec_data['techs'][2].$sec_data['techs'][3];
-  $std=date("H");
-  //1=sternenbasis 2=begrenzer 3=werft
+	$bed=$sec_data['techs'][1].$sec_data['techs'][2].$sec_data['techs'][3];
+	$std=date("H");
+	//1=sternenbasis 2=begrenzer 3=werft
 
-  if ($bed=='100') {if ($std>6 && $std<20 )$bn='sbtag.gif'; else $bn='sbnacht.gif';}
-  elseif ($bed=='110') {if ($std>6 && $std<20 )$bn='sbtagsfb.gif'; else $bn='sbnachtsfb.gif';}
-  elseif ($bed=='101') {if ($std>6 && $std<20 )$bn='sbtagw.gif'; else $bn='sbnachtw.gif';}
-  elseif ($bed=='111') {if ($std>6 && $std<20 )$bn='sbtagsfbw.gif'; else $bn='sbnachtsfbw.gif';}
-  //artefakte anzeigen
+	if ($bed=='100') {if ($std>6 && $std<20 )$bn='sbtag.gif'; else $bn='sbnacht.gif';}
+	elseif ($bed=='110') {if ($std>6 && $std<20 )$bn='sbtagsfb.gif'; else $bn='sbnachtsfb.gif';}
+	elseif ($bed=='101') {if ($std>6 && $std<20 )$bn='sbtagw.gif'; else $bn='sbnachtw.gif';}
+	elseif ($bed=='111') {if ($std>6 && $std<20 )$bn='sbtagsfbw.gif'; else $bn='sbnachtsfbw.gif';}
 
-  //schauen ob es artefakte gibt
-  $sql = "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?";
-  $res = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
-  $artnum = mysqli_num_rows($res);
-  //if ($artnum>0 OR $bed!='000')//artefakt vorhanden, oder raumbasis gebaut
-  //{
-    
-  $artstr='';
-  $c=0;
+	//schauen ob es artefakte gibt
+	$sql = "SELECT id, artname, artdesc, color, picid FROM de_artefakt WHERE sector=?";
+	$res = mysqli_execute_query($GLOBALS['dbi'], $sql, [$sector]);
+	$artnum = mysqli_num_rows($res);
 
-  if($artnum>0)
-  {
-    include "inc/artefakt.inc.php";
-  }
-  	
-  	
-  while($row = mysqli_fetch_assoc($res))
-  {
-      //artefakttooltip bauen
-	$desc=$row["artdesc"];
-	$desc=str_replace("{WERT1}", number_format($sv_artefakt[$row["id"]-1][0], 2,",",".") ,$desc);
-	$desc=str_replace("{WERT2}", number_format($sv_artefakt[$row["id"]-1][1], 0,"",".") ,$desc);
-	$desc=str_replace("{WERT3}", number_format($sv_artefakt[$row["id"]-1][2], 0,"",".") ,$desc);
-	$desc=str_replace("{WERT4}", number_format($sv_artefakt[$row["id"]-1][3], 0,"",".") ,$desc);
-	$desc=str_replace("{WERT5}", number_format($sv_artefakt[$row["id"]-1][4], 0,"",".") ,$desc);
-	$desc=str_replace("{WERT6}", number_format($sv_artefakt[$row["id"]-1][5], 2,",",".") ,$desc);
-      
-      
-    $atip[$c] = '<span style=\'color: #'.$row["color"].';\'>'.$row["artname"].'</span>&'.$desc;
-      
-    $artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
-    $c++;
-  }
-  if($artstr=='')$artstr='<span class="sec-none">keine</span>';
-  
-  //sektorraumbasistooltip erzeugen
-  $basestr='';
-  if($bed!='000'){
-  	$srbstr=$sec_lang['sekerweiterungen'].':';
-  	if($sec_data['techs'][2]>0)$srbstr.='<br>- '.$sec_lang['sekbldg1'];
-  	if($sec_data['techs'][3]>0)$srbstr.='<br>- '.$sec_lang['sekbldg2'];
-  	if($sec_data['techs'][4]>0)$srbstr.='<br>- '.$sec_lang['sekbldg3'];
-  	if($sec_data['techs'][5]>0)$srbstr.='<br>- '.$sec_lang['sekbldg4'];
-  	if($sec_data['techs'][6]>0)$srbstr.='<br>- '.$sec_lang['sekbldg5'];
+	$artstr='';
+	$c=0;
 
-  	$stip = $sec_lang['sektorraumbasis'].'&'.$srbstr;
-    $basestr='<a href="'.'gp/'.'g/big/'.strtoupper($bn).'" target="_blank"><img border="0" src="'.'gp/'.'g/'.$bn.'" name="sb" title="'.$stip.'"></a>';
-    //wenn es keine sektorraumbasis gibt string mit einem leerzeichen belegen
-    if($bed=='000')$basestr='&nbsp;';
-   }
-  if($basestr=='')$basestr='<span class="sec-none">nicht gebaut</span>';
+	if($artnum>0)
+	{
+		include "inc/artefakt.inc.php";
+	}
 
-	//infostring zusammenbauen
+	while($row = mysqli_fetch_assoc($res))
+	{
+		//artefakttooltip bauen
+		$desc=$row["artdesc"];
+		$desc=str_replace("{WERT1}", number_format($sv_artefakt[$row["id"]-1][0], 2,",",".") ,$desc);
+		$desc=str_replace("{WERT2}", number_format($sv_artefakt[$row["id"]-1][1], 0,"",".") ,$desc);
+		$desc=str_replace("{WERT3}", number_format($sv_artefakt[$row["id"]-1][2], 0,"",".") ,$desc);
+		$desc=str_replace("{WERT4}", number_format($sv_artefakt[$row["id"]-1][3], 0,"",".") ,$desc);
+		$desc=str_replace("{WERT5}", number_format($sv_artefakt[$row["id"]-1][4], 0,"",".") ,$desc);
+		$desc=str_replace("{WERT6}", number_format($sv_artefakt[$row["id"]-1][5], 2,",",".") ,$desc);
+
+		//die Farbe des Namens steht beim Artefakt in der Datenbank
+		$atip[$c] = '<span style=\'color: #'.$row["color"].';\'>'.$row["artname"].'</span>&'.$desc;
+
+		$artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="gp/g/sa'.$row["picid"].'.gif" alt=""></a>';
+		$c++;
+	}
+	if($artstr=='')$artstr='<span class="sec-none">keine</span>';
+
+	//sektorraumbasistooltip erzeugen
+	$basestr='';
+	if($bed!='000'){
+		$srbstr=$sec_lang['sekerweiterungen'].':';
+		if($sec_data['techs'][2]>0)$srbstr.='<br>- '.$sec_lang['sekbldg1'];
+		if($sec_data['techs'][3]>0)$srbstr.='<br>- '.$sec_lang['sekbldg2'];
+		if($sec_data['techs'][4]>0)$srbstr.='<br>- '.$sec_lang['sekbldg3'];
+		if($sec_data['techs'][5]>0)$srbstr.='<br>- '.$sec_lang['sekbldg4'];
+		if($sec_data['techs'][6]>0)$srbstr.='<br>- '.$sec_lang['sekbldg5'];
+
+		$stip = $sec_lang['sektorraumbasis'].'&'.$srbstr;
+		$basestr='<a href="gp/g/big/'.strtoupper($bn).'" target="_blank"><img src="gp/g/'.$bn.'" alt="" name="sb" title="'.$stip.'"></a>';
+	}
+	if($basestr=='')$basestr='<span class="sec-none">nicht gebaut</span>';
+
+	//Informationen, Sektorraumbasis und Sektorartefakte nebeneinander
 	if($sector>1 AND $anz>0){
 		$infostr='<table class="sec-info">'.
 		sector_inforow('Angriffsgrenze Punkte', number_format($sec_angriffsgrenze*100, 2,",",".").'%',
@@ -734,51 +678,27 @@ if($sec_data['npc']==1){
 			'Sektorartefakt-Haltezeit&Wirtschaftsticks, in denen der Sektor Sektorartefakte gehalten hat (je Artefakt und Tick +1).').
 		'</table>';
 
-		//daten ausgeben
-		echo '<table width="580" border="0" cellpadding="0" cellspacing="1" class="sec-table">';
-		$bg='cell';
-		echo '<tr align="center">';
-		echo '<td class="'.$bg.' sec-th" width="46%">'.$sec_lang['informationen'].'</td>';
-		echo '<td class="'.$bg.' sec-th" width="30%">'.$sec_lang['sektorraumbasis'].'</td>';
-		echo '<td class="'.$bg.' sec-th" width="24%">'.$sec_lang['sektorartefakte'].'</td>';
-		echo '</tr>';
-
-		echo '<tr align="center">';
-		echo '<td align="left" valign="top" class="'.$bg.'">'.$infostr.'</td>';
-		echo '<td align="center" valign="middle" class="'.$bg.'">'.$basestr.'</td>';
-		echo '<td align="center" valign="middle" class="'.$bg.'">'.$artstr.'</td>';
-		echo '</tr>';
+		echo '<div class="sec-unten">
+			<div class="sec-karte"><span class="mod-typ">'.$sec_lang['informationen'].'</span>'.$infostr.'</div>
+			<div class="sec-karte sec-bild"><span class="mod-typ">'.$sec_lang['sektorraumbasis'].'</span><div>'.$basestr.'</div></div>
+			<div class="sec-karte sec-bild"><span class="mod-typ">'.$sec_lang['sektorartefakte'].'</span><div>'.$artstr.'</div></div>
+		</div>';
 
 		if ($ownsector==$sf){
-			echo '<tr align="center">';
-			if($_SESSION['ums_mobi']==0){
-				echo '<td colspan="3"><a href="politics.php" target="h" class="btn">Sektorpolitik</a></td>';
-			}else{
-				echo '<td colspan="3"><a href="politics.php" class="btn">Sektorpolitik</a></td>';
-			}
-			
-			echo '</tr>';
+			echo '<div class="sec-knoepfe"><a href="politics.php"'.($_SESSION['ums_mobi']==0 ? ' target="h"' : '').' class="mod-btn">Sektorpolitik</a></div>';
 		}
-
-		echo '</table>';
 	}
-	
-	rahmen_unten();
-  
-  //Link um in Sektor 1 alle Spieler anzuzeigen
-  if($sf==1){
-		//f�r die mobile Seite einen refresh-Button
-		if($_SESSION['ums_mobi']==1){
-			echo '<a href="sector.php?sf=1&showall=1"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Alle Spieler anzeigen</div></a>';
-		}else{
-			echo '<a href="sector.php?sf=1&showall=1" class="btn">alles anzeigen</a><br><br>';
-		}
-  }
 
+	//im Startsektor stehen zunächst nur aktive Spieler, auf Wunsch alle
+	if($sf==1){
+		echo '<div class="sec-knoepfe"><a href="sector.php?sf=1&amp;showall=1" class="mod-btn mod-btn-leise">Alle Spieler anzeigen</a></div>';
+	}
+
+	echo '</div>';
+	rahmen_unten();
 }
 ?>
 </div>
-</form>
 
 </body>
 </html>

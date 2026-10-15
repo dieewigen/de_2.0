@@ -27,11 +27,11 @@ class GhostShipView
             return '';
         }
         $t = $event->texte();
-        $leer = '<td class="cell tac"></td>';
-        $wert = '<td class="cell tac" style="text-align: right;">▮▮▮</td>';
-        return '<tr class="geist-zeile"><td class="cell tac">∅</td>'.$leer
-            .'<td class="cell tac sec-wrap"><span title="'.htmlspecialchars($t['zeile_tooltip']).'">'.$t['name'].'</span></td>'
-            .'<td class="cell tac">?</td>'.$leer.$wert.$wert.$leer.'</tr>';
+        $leer = '<td></td>';
+        $wert = '<td class="sec-zahl">▮▮▮</td>';
+        return '<tr class="geist-zeile"><td>∅</td>'.$leer
+            .'<td class="sec-wrap"><span title="'.htmlspecialchars($t['zeile_tooltip']).'">'.$t['name'].'</span></td>'
+            .'<td>?</td>'.$leer.$wert.$wert.$leer.'</tr>';
     }
 
     //abgefangener Funkspruch oben in der Karte von Sektor 666 (src/View/Sektor666/Karte.php)
