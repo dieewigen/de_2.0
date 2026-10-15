@@ -7542,6 +7542,10 @@ a.art-kachel-zurueck:hover::after {
   cursor: pointer;
 }
 
+.vs-bauen {
+  margin-left: 6px;
+}
+
 .ms {
   width: 572px;
 }

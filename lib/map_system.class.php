@@ -598,6 +598,60 @@ class map_system{
 	}
 
 	/**
+	 * Freie Rohstofffelder, auf denen die passende Industrie gebaut werden darf: Feldtyp und System-Typ passen, die
+	 * Technologie ist erforscht, kein Blocker, kein Gebäude. Felder ohne Rohstoff bleiben außen vor, dort ist die Fabrik
+	 * eine Wahl für die Systemseite. $bldg: Gebäude des Spielers in diesem System, Index = field_id. Ergebnis: field_id => bldg_id
+	 */
+	public function buildableFields($bldg){
+		$felder=array();
+		for($fieldid=1;$fieldid<count($this->fields);$fieldid++){
+			if(isset($this->fields[$fieldid][1]) || isset($bldg[$fieldid]) || $this->fields[$fieldid][0]==0){
+				continue;
+			}
+			foreach($GLOBALS['map_buildings'] as $g => $def){
+				if($g>2 && isset($def['need_field_typ']) && in_array($this->system_typ, $def['bldg_in_type']) && in_array($this->fields[$fieldid][0], $def['need_field_typ'])
+				&& (!isset($def['need_tech']) || hasTech($GLOBALS['pt'], $def['need_tech']))){
+					$felder[$fieldid]=$g;
+					break;
+				}
+			}
+		}
+		return $felder;
+	}
+
+	/**
+	 * Baut auf allen freien Rohstofffeldern die passende Industrie (Stufe 1), soweit die Rohstoffe reichen; Gegenstück
+	 * zu upgradeAllBuildings() für die Übersicht. Erwartet $this->playerBldg sowie $GLOBALS['pt'], $GLOBALS['ps'],
+	 * $GLOBALS['pd'] und $GLOBALS['duration_factor']. Gibt die Anzahl der begonnenen Bauten zurück.
+	 */
+	public function buildMissingBuildings(){
+		$bldg=array();
+		foreach($this->playerBldg as $b){
+			$bldg[$b['field_id']]=$b;
+		}
+		$started=0;
+		foreach($this->buildableFields($bldg) as $fieldid => $g){
+			//formatBaukosten liest die Rohstoffe frisch, so zählt jeder Bau für den nächsten
+			$baukosten=$this->formatBaukosten($GLOBALS['map_buildings'][$g]['bldg_cost'][0]);
+			if(!$baukosten['has_all']){
+				continue;
+			}
+			setBldgByFieldID($_SESSION['ums_user_id'], $this->system_id, $fieldid, $g, 1, time()+round($GLOBALS['map_buildings'][$g]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']));
+			$this->doBaukosten($GLOBALS['map_buildings'][$g]['bldg_cost'][0]);
+			$started++;
+		}
+		return $started;
+	}
+
+	/**
+	 * Kann in der Übersicht "fehlende Gebäude bauen" angeboten werden? Gleiche Bedingungen wie "alle upgraden"
+	 * und mindestens ein freies Rohstofffeld mit erforschter Technologie.
+	 */
+	public function canBuildMissingFromOverview($bldg, $is_explored, $is_always_visible){
+		return $this->canUpgradeAllFromOverview($bldg, $is_explored, $is_always_visible) && count($this->buildableFields($bldg))>0;
+	}
+
+	/**
 	 * Kann in der Übersicht für dieses System "alle upgraden" angeboten werden?
 	 * Nur normale, erforschte Planeten mit fertigem Außenposten; besondere Systeme haben ihre eigene Logik.
 	 * $bldg: Gebäude des Spielers in diesem System, Index = field_id
@@ -724,6 +778,11 @@ class map_system{
 			//alle upgraden, gleiches Symbol wie die Upgrade-Pfeile auf der Systemseite
 			if($this->canUpgradeAllFromOverview($bldg, $is_explored, $is_always_visible)){
 				$output.='<img class="vs-upgrade-all" src="gp/g/icon12.png" onclick="vs_upgrade_row('.$system_id.', this);" title="Alle upgraden&Startet f&uuml;r alle Geb&auml;ude in diesem System ein Upgrade, soweit Rohstoffe und Au&szlig;enposten es erlauben." alt="Alle upgraden">';
+			}
+
+			//fehlende Industrien bauen: nur wenn ein freies Rohstofffeld mit erforschter Technologie da ist
+			if($this->canBuildMissingFromOverview($bldg, $is_explored, $is_always_visible)){
+				$output.='<img class="vs-upgrade-all vs-bauen" src="gp/g/icon19.png" onclick="vs_upgrade_row('.$system_id.', this, \'buildall\');" title="Fehlende Geb&auml;ude bauen&Errichtet auf allen freien Rohstofffeldern dieses Systems die passende Industrie (Stufe 1), soweit Technologie und Rohstoffe es erlauben. Fabriken w&auml;hlst Du auf der Systemseite." alt="Fehlende Geb&auml;ude bauen">';
 			}
 			$output.='</div></td></tr>';
 		}

@@ -348,14 +348,15 @@ function vs_load(url, method, body, from_history){
 	});
 }
 
-//VS-Uebersicht: alle Gebaeude eines Systems upgraden und die Zeile aktualisieren
-function vs_upgrade_row(id, btn){
+//VS-Uebersicht: alle Gebaeude eines Systems upgraden (action upgradeall) oder fehlende Industrien bauen (buildall)
+//und die Zeile aktualisieren
+function vs_upgrade_row(id, btn, action){
 	if($(btn).data('busy')){
 		return;
 	}
 	$(btn).data('busy', 1).css('opacity', '0.5');
 
-	$.post('map_system_ajax.php', {action: 'upgradeall', id: id}, null, 'json').done(function(data){
+	$.post('map_system_ajax.php', {action: action || 'upgradeall', id: id}, null, 'json').done(function(data){
 		if(data.html){
 			$('#vsrow'+id).replaceWith(data.html);
 		}else{

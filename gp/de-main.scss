@@ -8232,6 +8232,11 @@ a.art-kachel-zurueck:hover::after {
 	cursor: pointer;
 }
 
+// zweites Symbol daneben: fehlende Industrien bauen
+.vs-bauen {
+	margin-left: 6px;
+}
+
 // Vergessene Systeme, Systemansicht (map_system.php mit showSystem/showFields aus lib/map_system.class.php):
 // Navigation, Felder (Kacheln wie in der Übersicht: vs-feld), darunter das gewählte Feld; Sonder-Systeme behalten ihren Inhalt
 .ms {

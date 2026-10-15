@@ -3,6 +3,7 @@ use DieEwigen\DE2\Model\Sperre;
 //////////////////////////////////////////////////////////////////////////////
 // AJAX-Aktionen der VS-Übersicht (map_mobile.php), Antwort als JSON
 // action=upgradeall&id=X: alle Gebäude eines normalen Systems upgraden
+// action=buildall&id=X: auf allen freien Rohstofffeldern die passende Industrie bauen
 //////////////////////////////////////////////////////////////////////////////
 include "inc/header.inc.php";
 include "functions.php";
@@ -20,7 +21,8 @@ function vs_ajax_response($ok, $msg, $extra = array()){
 $uid=$_SESSION['ums_user_id'];
 $id=intval($_POST['id'] ?? 0);
 
-if(($_POST['action'] ?? '')!=='upgradeall' || $id<1){
+$action=$_POST['action'] ?? '';
+if(!in_array($action, array('upgradeall', 'buildall'), true) || $id<1){
 	vs_ajax_response(false, 'Ung&uuml;ltige Anfrage.');
 }
 
@@ -71,7 +73,7 @@ if(!$data->canUpgradeAllFromOverview($bldg, $is_explored, $is_always_visible)){
 	vs_ajax_response(false, 'In diesem System ist das nicht m&ouml;glich.');
 }
 
-$started=$data->upgradeAllBuildings();
+$started=($action==='buildall') ? $data->buildMissingBuildings() : $data->upgradeAllBuildings();
 
 //neuen Stand für die Zeile laden
 $bldg=array();
@@ -83,7 +85,9 @@ $pd=loadPlayerData($uid);
 
 Sperre::loesen($GLOBALS['dbi'], $uid);
 
-if($started==0){
+if($action==='buildall'){
+	$msg=($started==0) ? 'Kein Bau m&ouml;glich' : ($started==1 ? '1 Geb&auml;ude im Bau' : $started.' Geb&auml;ude im Bau');
+}elseif($started==0){
 	$msg='Kein Upgrade m&ouml;glich';
 }elseif($started==1){
 	$msg='1 Upgrade gestartet';
