@@ -45,16 +45,16 @@ if ($uid > 0)
 <h4>Angreifer - Verteidiger</h4>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<th width="70" class="ro">Ziel</th>
-<th width="80" class="ro">System</th>
-<th width="200" class="ro">Status</th>
-<th width="50" class="ro">Zeit</th>
-<th width="100" class="ro">Schiffe</th>
-<td width="13" class="ror">&nbsp;</td>
+<td width="13" height="37">&nbsp;</td>
+<th width="70">Ziel</th>
+<th width="80">System</th>
+<th width="200">Status</th>
+<th width="50">Zeit</th>
+<th width="100">Schiffe</th>
+<td width="13">&nbsp;</td>
 </tr>
 <tr>
-<td width="13" class="rl">&nbsp;</td>
+<td width="13">&nbsp;</td>
 <td colspan="5">
 <table border="0" cellpadding="0" cellspacing="1" width="100%">
 <colgroup>
@@ -137,32 +137,32 @@ while ($fleetRow = mysqli_fetch_assoc($flotten))
 ?>
 </table>
 </td>
-<td width="13" class="rr">&nbsp;</td>
+<td width="13">&nbsp;</td>
 </tr>
 <tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
+<td height="20" width="13">&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td width="13">&nbsp;</td>
 </tr>
 </table>
 
 <h4>Sektorflotten</h4>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<th width="70" class="ro">Ziel</th>
-<th width="80" class="ro">System</th>
-<th width="200" class="ro">Status</th>
-<th width="50" class="ro">Zeit</th>
-<th width="100" class="ro">Schiffe</th>
-<td width="13" class="ror">&nbsp;</td>
+<td width="13" height="37">&nbsp;</td>
+<th width="70">Ziel</th>
+<th width="80">System</th>
+<th width="200">Status</th>
+<th width="50">Zeit</th>
+<th width="100">Schiffe</th>
+<td width="13">&nbsp;</td>
 </tr>
 <tr>
-<td width="13" class="rl">&nbsp;</td>
+<td width="13">&nbsp;</td>
 <td colspan="5">
 <table border="0" cellpadding="0" cellspacing="1" width="100%">
 <colgroup>
@@ -242,16 +242,16 @@ while ($fleetRow = mysqli_fetch_assoc($flotten))
 ?>
 </table>
 </td>
-<td width="13" class="rr">&nbsp;</td>
+<td width="13">&nbsp;</td>
 </tr>
 <tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
+<td height="20" width="13">&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td width="13">&nbsp;</td>
 </tr>
 </table>
 <br>

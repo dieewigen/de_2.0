@@ -75,16 +75,8 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 </head>
 '.$bodyTag.'
 <div align="center">
-<table border="0" cellpadding="0" cellspacing="0" style="background-color: #000000;">
-<tr height="37">
-<td width="13" height="37" class="rol">&nbsp;</td>
-<td width="560" class="ro" align="center">Die Ewigen - Nachrichten Export</td>
-<td width="13" class="ror">&nbsp;</td>
-</tr>
-<tr>
-<td width="13" class="rl">&nbsp;</td>
-<td colspan="1">
-<table width="560" border="0" cellpadding="0" cellspacing="1" width="100%">
+'.rahmen_oben('Die Ewigen - Nachrichten Export', false).'
+<table width="560" border="0" cellpadding="0" cellspacing="1">
 ';
 
 
@@ -150,15 +142,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
 
     $allenachrichten .= '
 </table>
-</td>
-<td width="13" class="rr">&nbsp;</td>
-</tr>
-<tr height="20">
-<td height="20" class="rul" width="13">&nbsp;</td>
-<td class="ru">&nbsp;</td>
-<td class="rur" width="13">&nbsp;</td>
-</tr>
-</table></div>
+'.rahmen_unten(false).'</div>
 </body></html>';
 
     // HTML-Datei zum Download bereitstellen

@@ -297,8 +297,7 @@ h1 {
 // Seitenrahmen aus rahmen_oben()/rahmen_unten() (functions.php), Nachbau der früheren Tabelle mit acht Bildzellen:
 // Titelleiste 37 px, Ränder 13 px, Fußleiste so hoch wie damals die Zellen mit &nbsp; (14 px Arial, Zeilenhöhe 1,3).
 // display: table, damit sich die Breite wie bei der Tabelle nach dem Inhalt richtet. Die Grafiken je Rasse stehen im
-// Theme (Abschnitt "Seitenrahmen"); die alten Klassen .rol/.ro/.ror usw. braucht nur noch der handgebaute Rahmen in
-// sysnews.php und im Admintool.
+// Theme (Abschnitt "Seitenrahmen").
 .rahmen {
 	display: table;
 }
@@ -11067,61 +11066,8 @@ body.mobile {
 			z-index: 11;
 		}
 
-		// Theme-spezifische Rand-Klassen
-		.ro {
-			background: url(g/rand_oben#{$rand-ro-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.rol {
-			background: url(g/rand_oben_l#{$rand-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.ror {
-			background: url(g/rand_oben_r#{$rand-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.rml {
-			background: url(g/rand_mitte_l#{$rand-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.rmr {
-			background: url(g/rand_mitte_r#{$rand-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.ru {
-			background: url(g/rand_unten#{$rand-ro-suffix}.png) repeat;
-			color: #ffffff;
-			font-weight: bold;
-		}
-
-		.rul {
-			background: url(g/rand_unten_l#{$rand-suffix}.png) repeat;
-		}
-
-		.rur {
-			background: url(g/rand_unten_r#{$rand-suffix}.png) repeat;
-		}
-
-		.rl {
-			background: url(g/rand_l#{$rand-suffix}.png) repeat;
-		}
-
-		.rr {
-			background: url(g/rand_r#{$rand-suffix}.png) repeat;
-		}
-
-		// Seitenrahmen (rahmen_oben/rahmen_unten): dieselben Grafiken wie .rol/.ro/.ror usw.; die Mitte der Titel- und
-		// Fußleiste nur zwischen den Ecken (content-box), weil die Grafiken teilweise durchsichtig sind
+		// Seitenrahmen (rahmen_oben/rahmen_unten): Randgrafiken je Rasse; die Mitte der Titel- und Fußleiste nur
+		// zwischen den Ecken (content-box), weil die Grafiken teilweise durchsichtig sind
 		.rahmen-kopf {
 			background:
 				url(g/rand_oben_l#{$rand-suffix}.png) left top repeat-y,
