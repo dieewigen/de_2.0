@@ -825,7 +825,12 @@ class map_system{
 
 
 		$content.='<div class="ms-titel">'.$GLOBALS['map_buildings'][$bldg_id]['name'].'</div>';
-		$content.='<div class="ms-zeile bk-leise">Hier kann ein '.$GLOBALS['map_buildings'][$bldg_id]['name'].' errichtet werden, danach lassen sich die Felder nutzen.</div>';
+		if($this->system_typ==4){
+			//Battleground: hier gibt es keine nutzbaren Felder, der Weltraumhafen meldet nur den Basisstern an
+			$content.='<div class="ms-zeile bk-leise">Mit dem Weltraumhafen nimmt Dein Basisstern an den K&auml;mpfen dieses Battlegrounds teil.</div>';
+		}else{
+			$content.='<div class="ms-zeile bk-leise">Hier kann ein '.$GLOBALS['map_buildings'][$bldg_id]['name'].' errichtet werden, danach lassen sich die Felder nutzen.</div>';
+		}
 
 		//zuerst checken ob man die Technologie erforscht hat
 		if(hasTech($GLOBALS['pt'],$tech_id)){
@@ -907,31 +912,33 @@ class map_system{
 
 				$content.='<div class="mod-meldung mod-meldung-warn ms-warnung">ACHTUNG: Missionen k&ouml;nnen nicht abgebrochen werden.</div>';
 
-				//Die Felder anzeigen
-				$content.='<div class="ms-abschnitt"><span class="mod-typ">Felder des Systems</span><div class="vs-feldliste">';
-				for($i=0;$i<count($this->fields);$i++){
+				//Die Felder anzeigen; Battlegrounds tragen zwar Felder vom ursprünglichen Planeten, nutzbar sind sie dort aber nie
+				if($this->system_typ!=4){
+					$content.='<div class="ms-abschnitt"><span class="mod-typ">Felder des Systems</span><div class="vs-feldliste">';
+					for($i=0;$i<count($this->fields);$i++){
 
-					///////////////////////////////////////////
-					//Feld-Ressource anzeigen
-					///////////////////////////////////////////
-					if($i>0){
-						$blockiert=isset($this->fields[$i][1]) ? ' vs-feld-blockiert' : '';
+						///////////////////////////////////////////
+						//Feld-Ressource anzeigen
+						///////////////////////////////////////////
+						if($i>0){
+							$blockiert=isset($this->fields[$i][1]) ? ' vs-feld-blockiert' : '';
 
-						if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
-							//Grafik bestimmen
-							$filename_nr=$this->fields[$i][0];
-							if($filename_nr<10){
-								$filename_nr='0'.$filename_nr;
+							if($GLOBALS['map_field_typ'][$this->fields[$i][0]]['name']!='-'){
+								//Grafik bestimmen
+								$filename_nr=$this->fields[$i][0];
+								if($filename_nr<10){
+									$filename_nr='0'.$filename_nr;
+								}
+								$content.='<div class="vs-feld'.$blockiert.'" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'"><img src="gp/g/ele'.$filename_nr.'.gif" alt=""></div>';
+							}else{
+								$content.='<div class="vs-feld vs-feld-leer'.$blockiert.'" title="keine Rohstoffe">&ndash;</div>';
 							}
-							$content.='<div class="vs-feld'.$blockiert.'" title="'.$GLOBALS['map_field_typ'][$this->fields[$i][0]]['name'].'"><img src="gp/g/ele'.$filename_nr.'.gif" alt=""></div>';
-						}else{
-							$content.='<div class="vs-feld vs-feld-leer'.$blockiert.'" title="keine Rohstoffe">&ndash;</div>';
 						}
+
 					}
 
+					$content.='</div></div>';
 				}
-
-				$content.='</div></div>';
 
 			}else{
 				//die Mission läuft schon, daher die Uhrzeit angeben, zu der sie endet
