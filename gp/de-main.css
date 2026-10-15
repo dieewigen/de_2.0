@@ -8690,6 +8690,11 @@ a.art-kachel-zurueck:hover::after {
   justify-content: space-between;
   gap: 12px;
 }
+#tt .ei-zeile b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  text-align: right;
+}
 
 #tt .ei-klasse {
   color: #d265ff;
@@ -8748,6 +8753,34 @@ a.art-kachel-zurueck:hover::after {
 
 #tt .ei-besonderheit {
   color: #5fe08a;
+}
+
+#tt .ei-abschnitt {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+#tt .ei-abschnitt:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+#tt .ei-titel {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+#tt .ei-hinweis {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #8b949e;
 }
 
 .hfl {

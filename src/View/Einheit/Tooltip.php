@@ -37,4 +37,22 @@ class Tooltip
 
         return $h."</div>";
     }
+
+    //Statusinformationen (production.php): Abschnitte [Titel, Zeilen [Bezeichnung, Wert], Hinweis]
+    public static function status(array $abschnitte): string
+    {
+        $h = "<div class='ei'>";
+        foreach ($abschnitte as $a) {
+            $h .= "<div class='ei-abschnitt'><span class='ei-titel'>".$a[0]."</span>";
+            foreach ($a[1] as $z) {
+                $h .= "<div class='ei-zeile'><span>".$z[0]."</span><b>".$z[1]."</b></div>";
+            }
+            if (!empty($a[2])) {
+                $h .= "<div class='ei-hinweis'>".$a[2]."</div>";
+            }
+            $h .= "</div>";
+        }
+
+        return $h."</div>";
+    }
 }

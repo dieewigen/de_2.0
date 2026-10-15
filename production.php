@@ -84,20 +84,30 @@ $ps_name=$row['tech_name'];
 //spezialisierung schildst�rke
 if($spec3==1)$defense_bonus_ps+=10;
 
-$infostring = $defense_lang['kostenreduz'].$ua_name[1].$defense_lang['artefakte'].number_format($artbonus_def, 2,",",".").'% (max. 5,00%)<br>'.
-$ua_name[7].'-'.$defense_lang['artefakt'].'-'.$defense_lang['angriffskraftbonus'].': '.number_format($artbonus2, 2,",",".").'%<br>'.
-$ua_name[8].'-'.$defense_lang['artefakt'].'-'.$defense_lang['laehmkraftbonus'].': '.number_format($artbonus3, 2,",",".").'%<br>'.
-$defense_lang['erfahrungspunkte'].': '.number_format($defenseexp, 0,",",".").' ('.$rangnamen[getfleetlevel($defenseexp)].')<br>- '.
-$ps_name.'-'.$defense_lang['bonus'].': '.$defense_bonus_ps.'%<br>- '.
-$defense_lang['bauzeitreduzierung'].': '.$defense_bonus_buildtime.'%<br>'.
-$defense_lang['bauzeitreduzierung1'].'<br>- '.		
-$defense_lang['erfahrungspunkte'].'-'.$defense_lang['angriffskraftbonus'].'/'.$defense_lang['laehmkraftbonus'].': '.
-number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").'%<br><span class=\'ei-ja\'>'.$defense_lang['spezialfaehigkeiten'].':</span><br>';
-
-//angriffskraft
-if($defense_bonus_feuerkraft[0]>0)$infostring.='- '.$defense_lang['angriffskraftbonus'].': '.$defense_bonus_feuerkraft[0].'% '.$defense_lang['wahrscheinlichkeit'].': '.$defense_bonus_feuerkraft[1].'%';
-
-$defstatus = $defense_lang['statusinformationen'].'&'.$infostring;
+//Statusinformationen als Karte (src/View/Einheit/Tooltip.php): Artefakte, Erfahrung, Boni, Spezialfähigkeiten
+$status_faehigkeiten=array();
+if($defense_bonus_feuerkraft[0]>0){
+	$status_faehigkeiten[]=array($defense_lang['angriffskraftbonus'], $defense_bonus_feuerkraft[0].' %');
+	$status_faehigkeiten[]=array($defense_lang['wahrscheinlichkeit'], $defense_bonus_feuerkraft[1].' %');
+}else{
+	$status_faehigkeiten[]=array('keine', '');
+}
+$defstatus = $defense_lang['statusinformationen'].'&'.\DieEwigen\DE2\View\Einheit\Tooltip::status(array(
+	array('Artefakte', array(
+		array($defense_lang['kostenreduz'].$ua_name[1], number_format($artbonus_def, 2,",",".").' % (max. 5 %)'),
+		array($ua_name[7].': '.$defense_lang['angriffskraftbonus'], number_format($artbonus2, 2,",",".").' %'),
+		array($ua_name[8].': '.$defense_lang['laehmkraftbonus'], number_format($artbonus3, 2,",",".").' %'),
+	)),
+	array($defense_lang['erfahrungspunkte'], array(
+		array($rangnamen[getfleetlevel($defenseexp)], number_format($defenseexp, 0,",",".")),
+		array($defense_lang['angriffskraftbonus'].' / '.$defense_lang['laehmkraftbonus'], number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").' %'),
+	)),
+	array('Boni', array(
+		array($ps_name.'-'.$defense_lang['bonus'], $defense_bonus_ps.' %'),
+		array($defense_lang['bauzeitreduzierung'], $defense_bonus_buildtime.' %'),
+	), $defense_lang['bauzeitreduzierung1']),
+	array($defense_lang['spezialfaehigkeiten'], $status_faehigkeiten),
+));
 
 ////////////////////////////////////////////////////////////////////////////////
 //feststellen ob die raumwerft sabotiert ist
