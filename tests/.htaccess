@@ -1,0 +1,8 @@
+# Prüfwerkzeug nur für die Kommandozeile, nie über den Webserver (testlauf.php prüft das zusätzlich selbst)
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>

@@ -14,55 +14,57 @@
 - **PHP:** 7.4+ (kompatibel mit PHP 8.x)
 - **Datenbank:** MySQL 5.7+ oder MariaDB 10.2+
 - **Empfohlen:** XAMPP für lokale Entwicklung
+- **Hosting:** Shared PHP-Hosting ohne Dauerprozesse und eigene Ports; Echtzeit (z. B. Chat) läuft über Polling, WebSockets sind nicht möglich
 
 ## Projektstruktur
 
 ```
 de2/
-├── ally/                    # Allianz-spezifische Dateien und Funktionen
-├── api/                     # API-Endpunkte (REST/JSON)
+├── api/                     # JSON-API mit eigenem Composer-Ordner (api/vendor)
 ├── cache/                   # Cache-Verzeichnis für generierte Daten
-├── controllers/             # (Leer) - Für zukünftige MVC-Struktur
-├── database/                # SQL-Schemas und Migrations
+├── database/                # SQL-Schemas
 │   ├── de.sql              # Hauptdatenbank-Schema
 │   ├── br.sql              # Battle Report Schema
 │   └── reset.sql           # Reset-Skript
-├── docs/                    # Dokumentation
+├── docs/                    # Dokumentation (Feldzug)
 ├── gp/                      # Grafiken, Styles (CSS/SCSS)
 │   ├── de-main.scss        # Haupt-Stylesheet
 │   ├── de-chat.scss        # Chat-Stylesheet
 │   ├── de-map.scss         # Karten-Stylesheet
 │   └── g/                  # Grafik-Assets
-├── inc/                     # Include-Dateien (Konfiguration, Includes)
-│   ├── env.inc.php         # Umgebungsvariablen (DB-Zugänge)
-│   ├── sv.inc.php          # Server-Variablen (Spielkonfiguration)
+├── inc/                     # Konfiguration und ältere Include-Dateien
+│   ├── env.inc.php         # Umgebungsvariablen (DB-Zugänge, Mail), nicht im Git
+│   ├── sv.inc.php          # Server-Variablen (Spielkonfiguration), nicht im Git
 │   ├── session.inc.php     # Session-Management
 │   ├── header.inc.php      # Standard-Header
 │   ├── lang/               # Sprachdateien (Deutsch/Englisch)
-│   ├── artefakt.inc.php    # Artefakt-Funktionen
-│   ├── sabotage.inc.php    # Sabotage-Mechaniken
+│   ├── artefakt.inc.php    # Artefakt-Werte
+│   ├── sabotage.inc.php    # Sabotage-Werte
 │   └── allyjobs.inc.php    # Allianz-Aufgaben
 ├── js/                      # JavaScript-Dateien
 │   ├── de_fn.js            # Hauptfunktionen
+│   ├── ang_fn.js           # Funktionen der Spielseiten (u. a. Vergessene Systeme)
 │   ├── de_chat.js          # Chat-Funktionen
 │   └── jquery-3.7.1.min.js # jQuery-Bibliothek
 ├── ki/                      # KI/NPC-Systeme
-├── lib/                     # Bibliotheken und Hilfsfunktionen
+├── lib/                     # Vergessene Systeme (map_system, Sonder-Systeme) und Basisstern
+│                            # (special_ship); bleibt bis zum Rundenstart, siehe „Bekannte Issues“
 ├── npcx/                    # Erweiterte NPC-Logik
+├── ourdetool/               # Admintool
 ├── src/                     # PSR-4 Autoload-Klassen (DieEwigen\DE2)
-│   ├── Model/              # Business-Logik-Modelle
-│   │   ├── Tick/           # Tick-Verarbeitungslogik
-│   │   └── Alliance/       # Allianz-Funktionen
-│   ├── Controller/         # (In Entwicklung)
-│   ├── View/               # (In Entwicklung)
-│   └── Database/           # Datenbankzugriff-Klassen
+│   ├── Model/              # Spiellogik je Bereich (Alliance, Feldzug, Tick …), dazu
+│   │                       # Sperre (Spielersperre) und Nachricht (an einen Spieler)
+│   ├── View/               # Darstellung (Kampfbericht, Berater, Alliance/Navi …)
+│   └── Session/            # CsrfToken
+├── tests/                   # Prüfwerkzeug für Umbauten (nur Kommandozeile)
 ├── tickler/                 # Tick-Skripte (Cron-Jobs)
-│   ├── wt.php              # Wirtschafts-Tick (Ressourcen, Punkte)
-│   ├── mt.php              # Militär-Tick (Flottenbewegungen)
-│   └── kt.php              # Kampf-Tick (Schlachten)
-├── vendor/                  # Composer-Dependencies
-├── views/                   # View-Templates
+│   ├── runtick.php         # startet ki_tick.php, kt.php und wt.php nacheinander
+│   ├── ki_tick.php         # NPC-Tick
+│   ├── kt.php              # Kampf-Tick (Flottenbewegungen, Schlachten)
+│   └── wt.php              # Wirtschafts-Tick (Ressourcen, Punkte)
+├── vendor/                  # Composer-Dependencies, nicht im Git
 ├── composer.json            # PHP-Abhängigkeiten
+├── functions.php            # Gemeinsame Funktionen, lädt vendor/autoload.php
 └── index.php               # Haupteinstiegspunkt
 ```
 
@@ -80,7 +82,7 @@ de2/
   - Rang und Platzierung
 
 ### 2. Sektoren und Systeme
-- **Tabelle:** `de_sector`, `de_sector_data`
+- **Tabelle:** `de_sector`
 - Das Universum ist in Sektoren unterteilt (0-8+)
 - Jeder Sektor hat mehrere Systeme
 - Sektor 1 ist der Startsektor
@@ -99,25 +101,25 @@ Ressourcen werden durch Kollektoren generiert, die Energie in Materie umwandeln.
 - **Tabelle:** `de_tech_data`
 - Technologien schalten Gebäude, Schiffe und Fähigkeiten frei
 - Forschung kostet Ressourcen und Zeit
-- Tech-IDs:
-  - 1-79: Forschungen und Gebäude
+- Spalte `tech_typ` (Reiter der Technologieseite): 0 Gebäude, 1 Forschungen und Einheiten, 2 Basisschiffe, 3 V-Systeme
+- Tech-IDs (Namen je Rasse, Beispiele für Rasse 1):
+  - 1-24, 26-30, 112-132, 139-141, 157, 158, 160: Gebäude (z. B. 1 Konstruktionszentrum I, 129 Raumwerft I)
+  - 40-75: Forschungen
   - 80: Kollektoren
   - 81-90: Schiffe
-  - 100-109: Verteidigungsanlagen
+  - 100-104: Verteidigungsanlagen
   - 110: Sonden
   - 111: Agenten
+  - 133-138: Basisschiff-Erweiterungen (z. B. 133 BS-Artefaktplatz I)
+  - 25, 142-156, 159: Vergessene Systeme (z. B. 25 Hyperraumpfad-Stabilisator, 159 Basisstern)
 
 ### 5. Flottensystem
 - **Tabelle:** `de_user_fleet`
 - Jeder Spieler hat 4 Flotten (fleet_id: user_id-0 bis user_id-3)
 - Flottenkommandeure sammeln Erfahrung (Angriff/Verteidigung)
-- Schiffstypen:
-  - Fregatte (e81)
-  - Jabo (e82)
-  - Zerstörer (e83)
-  - Kreuzer (e84)
-  - Schlachtschiff (e85)
-  - Titan (e90)
+- Schiffsklassen (Spalten e81-e90, Namen je Rasse, z. B. Rasse 1: Hornisse, Guillotine, Schakal …):
+  - Jäger (e81), Jagdboot (e82), Zerstörer (e83), Kreuzer (e84), Schlachtschiff (e85)
+  - Bomber (e86), Transmitterschiff (e87), Trägerschiff (e88), Frachter (e89), Titan (e90)
 
 ### 6. Allianzen (Allys)
 - **Tabelle:** `de_allys`, `de_ally_*`
@@ -145,7 +147,7 @@ Ressourcen werden durch Kollektoren generiert, die Energie in Materie umwandeln.
   - Grab des Ra (Anti-Agentenabwehr)
 
 ### 8. Tick-System
-Das Spiel läuft mit drei verschiedenen Tick-Typen:
+Das Spiel läuft mit zwei Tick-Typen; die Skripte prüfen selbst anhand von `$wts`/`$kts` in `sv.inc.php`, ob Tickzeit ist. Dazu kommt der NPC-Tick (`tickler/ki_tick.php`) im Takt des WT.
 
 #### Wirtschaftstick (WT)
 - **Datei:** `tickler/wt.php`
@@ -159,14 +161,9 @@ Das Spiel läuft mit drei verschiedenen Tick-Typen:
   - Inaktive Spieler löschen
   - Erhabenen-Prüfung
 
-#### Militärtick (MT)
-- **Datei:** `tickler/mt.php`
-- Bewegt Flotten
-- Aktualisiert Flottenzeiten
-- Verarbeitet Ankünfte
-
 #### Kampftick (KT)
 - **Datei:** `tickler/kt.php`
+- Bewegt Flotten (Flugzeiten, Ankünfte, Rückkehr)
 - Berechnet Kämpfe
 - Generiert Kampfberichte
 - Verarbeitet Sabotageaktionen
@@ -213,7 +210,6 @@ Das ultimative Spielziel:
 
 ### Spielwelt
 - `de_sector`: Sektoren (Eigenschaften, Ressourcen, Gebäude)
-- `de_sector_data`: Spieler in Sektoren
 - `de_basedata_map_knoten`: Karten-Knoten
 - `de_basedata_map_kanten`: Karten-Verbindungen
 - `de_basedata_map_sector`: Sektor-Typen
@@ -239,11 +235,15 @@ Das ultimative Spielziel:
 
 ### Umgebungsvariablen (inc/env.inc.php)
 ```php
-$GLOBALS['env_host'] = 'localhost';          // DB-Host
-$GLOBALS['env_user'] = 'root';               // DB-User
-$GLOBALS['env_pw'] = 'password';             // DB-Passwort
-$GLOBALS['env_db'] = 'de_database';          // DB-Name
+// Spiel-Datenbank
+$GLOBALS['env_db_dieewigen_host'] = 'localhost';
+$GLOBALS['env_db_dieewigen_user'] = 'root';
+$GLOBALS['env_db_dieewigen_password'] = '';
+$GLOBALS['env_db_dieewigen_database'] = 'de_game';
+// ebenso env_db_loginsystem_* (Accountverwaltung: globaler Chat, Titel) und env_db_logging_* (Aktionsprotokoll)
+$GLOBALS['env_mail_server'] = 'smtp.example.com';   // SMTP für mail_smtp(), dazu env_mail_user/-password/-noreply
 $GLOBALS['env_admin_email'] = 'admin@example.com';
+// vollständige Liste: inc/env.inc.sample.php
 ```
 
 ### Server-Variablen (inc/sv.inc.php)
@@ -301,18 +301,15 @@ php ki/generiereaccounts.php
 Wichtig: `$sv_maxsystem` in `sv.inc.php` muss groß genug sein!
 
 ### 7. Cron-Jobs einrichten
-Für Produktionsserver (Linux):
+Für Produktionsserver (Linux), minütlich; die Skripte prüfen selbst, ob Tickzeit ist. Sie binden ihre Dateien relativ ein und müssen deshalb im Ordner `tickler/` starten:
 ```bash
-# Minütlich alle Tick-Skripte aufrufen
-* * * * * /usr/bin/php /pfad/zu/de2/tickler/wt.php
-* * * * * /usr/bin/php /pfad/zu/de2/tickler/mt.php
-* * * * * /usr/bin/php /pfad/zu/de2/tickler/kt.php
+* * * * * cd /pfad/zu/de2/tickler && /usr/bin/php runtick.php
 ```
+`runtick.php` startet `ki_tick.php`, `kt.php` und `wt.php` nacheinander; die drei lassen sich auch einzeln eintragen.
 
 Für Windows (Task Scheduler):
-- Erstelle Tasks für wt.php, mt.php, kt.php
-- Trigger: Minütlich
-- Aktion: `php.exe C:\pfad\zu\tickler\wt.php`
+- Task für `runtick.php`, Trigger: minütlich
+- Aktion: `php.exe runtick.php`, Starten in: `C:\pfad\zu\de2\tickler`
 
 ## Entwicklung
 
@@ -354,34 +351,27 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_user_data WHERE user_id=?", 
     [$user_id]
 );
-
-// Legacy (noch vorhanden, aber zu vermeiden)
-$result = mysqli_query($GLOBALS['dbi'], 
-    "SELECT * FROM de_user_data WHERE user_id='$user_id'"
-);
 ```
+
+- `mysqli_query` steht nur noch bei Befehlen ohne Parameter (LOCK/UNLOCK TABLES, SHOW), in `api/` und in den generischen Wrappern des Admintools.
+- Spalten- und Tabellennamen (z. B. `"restyp0".$restyp`) bleiben verkettet, nur Werte werden Platzhalter; IN-Listen bekommen einen Platzhalter je Element.
+- Prepared Statements liefern Zahlenspalten als int/float, nicht als String.
+- Aktionen, die Rohstoffe oder Einheiten ändern, laufen in der Spielersperre: `Sperre::setzen($GLOBALS['dbi'], $uid)` … `Sperre::loesen($GLOBALS['dbi'], $uid)` (`DieEwigen\DE2\Model\Sperre`).
 
 ### SCSS-Kompilierung
-CSS wird aus SCSS generiert:
-```bash
-# Installation von SASS (einmalig)
-npm install -g sass
+CSS wird aus SCSS generiert (Dart Sass, `npm install -g sass`). Die eingecheckten CSS-Dateien werden aber nicht einfach neu erzeugt:
+- `gp/de-main.css` weicht in der Farbschreibweise von einem frischen Sass-Lauf ab. Änderungen deshalb als Differenz einspielen: den Stand vor und nach der SCSS-Änderung kompilieren und nur den Unterschied übertragen.
+- `gp/de-chat.css` entsteht komprimiert aus `gp/de-chat.scss` (`--style=compressed`).
+- `gp/de-map.css` stammt aus einem anderen Compiler (eine Zeile); neue Regeln nur anhängen.
 
-# Kompilierung
-sass gp/de-main.scss gp/de-main.css
-sass gp/de-chat.scss gp/de-chat.css
-sass gp/de-map.scss gp/de-map.css
+```bash
+sass --style=expanded --no-source-map gp/de-main.scss /tmp/vorher.css    # vor der Änderung
+sass --style=expanded --no-source-map gp/de-main.scss /tmp/nachher.css   # nach der Änderung
+diff -u /tmp/vorher.css /tmp/nachher.css | patch gp/de-main.css
 ```
 
-### JavaScript-Minifizierung
-```bash
-# Installation von UglifyJS (einmalig)
-npm install -g uglify-js
-
-# Minifizierung
-uglifyjs js/de_fn.js -o js/de_fn.min.js
-uglifyjs js/de_chat.js -o js/de_chat.min.js
-```
+### JavaScript
+Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js` …) und hängen `filemtime` als Versionsparameter an. Die `*.min.js` im Ordner lädt keine Seite.
 
 ## Wichtige Funktionen und Helper
 
@@ -389,18 +379,26 @@ uglifyjs js/de_chat.js -o js/de_chat.min.js
 - `loadPlayerTechs($uid)`: Lädt Technologien eines Spielers
 - `hasTech($techs, $tech_id)`: Prüft, ob Spieler Tech hat
 - `change_storage_amount($uid, $item_id, $amount)`: Ändert Item-Menge
-- `insert_chat_msg($channel, $type, $username, $message)`: Chat-Nachricht
+- `insert_chat_msg($channel, $type, $username, $message)`: Chat-Nachricht; Typ 3 (globaler Chat) landet in der Login-Datenbank, alle anderen in der Spiel-Datenbank
 - `get_player_allyid($uid)`: Gibt Allianz-ID zurück
 - `createTitleForUser($owner_id, $title)`: Erstellt Spieler-Titel
 - `mail_smtp($to, $subject, $body)`: Versendet E-Mails
+- `getArtefactAmountByUserId($uid, $art_id)`: Artefakt-Anzahl
+- `rahmen_oben($titel)` / `rahmen_unten()`: Seitenrahmen (etwa 580 px Innenbreite); mit `false` als letztem Parameter geben sie HTML zurück statt es auszugeben
+
+### In src/ (Auswahl)
+- `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
+- `Model\Nachricht::anSpieler($db, $uid, $text, $typ)`: Nachricht an einen Spieler (`de_user_news`)
+- `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
+- `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds
+- `Session\CsrfToken`: siehe Sicherheit
 
 ### In inc/allyjobs.inc.php
 - Allianz-Aufgaben-Definitionen
 - `$allyjobs` Array mit Quest-Typen
 
 ### In inc/artefakt.inc.php
-- `getArtefactAmountByUserId($uid, $art_id)`: Artefakt-Anzahl
-- Artefakt-Effekt-Berechnungen
+- `$sv_artefakt`: permanente Boni und Zufallswerte je Artefakt
 
 ## API-Endpunkte
 
@@ -444,7 +442,9 @@ Das Projekt verfügt über eine REST-API unter `api/`:
 - HTML-Eingaben mit `strip_tags()` filtern
 
 ### CSRF-Schutz
-- (In Entwicklung) Token-basiertes System
+- `DieEwigen\DE2\Session\CsrfToken`: ein Token je Sitzung; `CsrfToken::get()` für ein verstecktes Formularfeld `token`, `CsrfToken::query()` für Links, `CsrfToken::check($_POST['token'] ?? '')` beim Auswerten
+- bisher nur in feldzug.php, specialship.php und einigen Allianzseiten (ally_kick, ally_leader, ally_members); die übrigen Formulare sind noch ungeschützt
+- das Admintool hat ein eigenes Verfahren (Secret in `ourdetool/.ht_csrf_secret`, nicht im Git)
 
 ## Testing
 
@@ -461,6 +461,19 @@ $sv_debug = 1;  // Aktiviert Debug-Ausgaben
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ```
+
+### Prüfwerkzeug für Umbauten
+`tests/testlauf.php` führt Spielseiten und Aktionen (Bauen, Recycling, Flotten, Forschung, Vergessene Systeme …) wie ein eingeloggter Spieler gegen Kopien der lokalen Spiel- und Login-Datenbank aus und vergleicht Ausgabe und Datenbankstand:
+```bash
+php tests/testlauf.php aufnehmen vorher      # vor der Änderung (bei schon geändertem Code: git stash … git stash pop)
+php tests/testlauf.php aufnehmen nachher     # nach der Änderung
+php tests/testlauf.php vergleich vorher nachher
+php tests/testlauf.php seite 1 recycling.php POST recyclingbutton=1 e81=5 t81=82   # eine Seite einzeln
+```
+- Jeder Fall beginnt mit frischen Kopien (`de_test`, `de_test_login`); die echten Datenbanken bleiben unberührt, Mails gehen ins Leere.
+- Testspieler, Seiten und Aktionen stehen oben in der Datei (`TL_SPIELER`, `TL_SEITEN`, `TL_AKTIONEN`); bei einer anderen Entwicklungsdatenbank die Spieler-IDs anpassen.
+- Nur Kommandozeile und lokal: Webaufrufe liefern nichts, `tests/.htaccess` sperrt den Ordner.
+- Die Ticks sind nicht abgedeckt. `wt.php` nie komplett zum Testen starten, der WT verschickt Mails.
 
 ## Performance-Optimierung
 
@@ -483,17 +496,16 @@ ini_set('display_errors', 1);
 
 ### Legacy-Code
 - Viele Dateien sind noch prozedural
-- Schrittweise Umstellung auf OOP/PSR-4
-- `controllers/` und `views/` Ordner noch leer
+- Schrittweise Umstellung auf OOP/PSR-4: gemeinsame Bausteine als Klasse unter `src/`, keine neuen `inc/*.inc.php`
+- `lib/map_system.class.php` (mit den Sonder-Systemen) und `lib/special_ship.class.php` bleiben vorerst in `lib/`: Ihre Objekte liegen serialisiert in `de_map_objects.data` und `de_user_special_ship.data`, ein neuer Klassenname macht diese Daten unlesbar. Der Umzug nach `src/` geht deshalb nur zum Rundenstart, wenn beide Tabellen neu aufgebaut werden.
 
 ### Sicherheit
 - Passwort-Hashing modernisieren (zu `password_hash()`)
-- CSRF-Tokens implementieren
+- CSRF-Tokens auf alle Formulare ausweiten
 - Input-Validierung vereinheitlichen
 
 ### Features in Entwicklung
 - REST-API vervollständigen
-- WebSocket für Echtzeit-Chat
 - Mobile App (PWA)
 - Grafische Verbesserungen
 
@@ -545,6 +557,6 @@ Siehe Git-Tags für Release-Versionen:
 
 ---
 
-**Letzte Aktualisierung:** 28. Oktober 2025
+**Letzte Aktualisierung:** 15. Oktober 2026
 
 Für weitere Fragen siehe README.md oder kontaktiere das Entwicklerteam.
