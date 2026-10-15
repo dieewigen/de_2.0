@@ -81,7 +81,7 @@ if ($_SESSION['ums_rasse'] == 1) {
     $rasse = 'Z&#180;tah-ara';
 }
 
-$sel_news = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_news_overview where typ=1 order by id desc Limit 0,5");
+$sel_news = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_news_overview where typ=1 order by id desc Limit 0,5", []);
 $det_news = '';
 while ($rew = mysqli_fetch_array($sel_news)) {
     $t = $rew['time'];
@@ -514,7 +514,7 @@ while ($row = mysqli_fetch_array($db_daten)) {
 //lade einheitentypen
 $flag1 = 0;
 $ik = 0;
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT  tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id", []);
 while ($row = mysqli_fetch_array($db_daten)) {
     $schiffe[$ik][0] = getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']);
     $schiffe[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
@@ -541,7 +541,7 @@ $ec[104] = $row['e104'];
 //lade einheitentypen
 $flag1 = 0;
 $ik = 0;
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id", []);
 while ($row = mysqli_fetch_array($db_daten)) {
     $defense[$ik][0] = getTechNameByRasse($row["tech_name"], $_SESSION['ums_rasse']);
     $defense[$ik][1] = number_format($ec[$row["tech_id"]], 0, "", ".");
@@ -609,7 +609,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_table_field = 'ac2';
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards2;
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS anzahl FROM de_user_getcol WHERE user_id = '".$_SESSION['ums_user_id']."' AND colanz>0");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS anzahl FROM de_user_getcol WHERE user_id = ? AND colanz>0", [$_SESSION['ums_user_id']]);
             $rowx = mysqli_fetch_array($db_datenx);
             $zielwert = $rowx['anzahl'];
             $do_calc = 1;
@@ -639,7 +639,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards5;
 
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT SUM(counter) AS zielwert FROM de_user_mission WHERE user_id=".$_SESSION['ums_user_id'].";");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(counter) AS zielwert FROM de_user_mission WHERE user_id=?;", [$_SESSION['ums_user_id']]);
             $row = mysqli_fetch_array($db_daten);
             $zielwert = $row['zielwert'];
 
@@ -661,7 +661,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards8;
 
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_artefact WHERE user_id = '".$_SESSION['ums_user_id']."'");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_artefact WHERE user_id = ?", [$_SESSION['ums_user_id']]);
             $rowx = mysqli_fetch_array($db_datenx);
             $zielwert = $rowx['anzahl'];
 
@@ -710,7 +710,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards10;
 
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT ((spend01+spend02*2+spend03*3+spend04*4)/10+spend05*1000) AS wert FROM de_user_data WHERE user_id = '".$_SESSION['ums_user_id']."'");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT ((spend01+spend02*2+spend03*3+spend04*4)/10+spend05*1000) AS wert FROM de_user_data WHERE user_id = ?", [$_SESSION['ums_user_id']]);
             $rowx = mysqli_fetch_array($db_datenx);
             $zielwert = $rowx['wert'];
 
@@ -785,7 +785,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards18;
 
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 5 AND user_id='".$_SESSION['ums_user_id']."';");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 5 AND user_id=?;", [$_SESSION['ums_user_id']]);
             $rowx = mysqli_fetch_array($db_datenx);
             $zielwert = $rowx['anzahl'];
 
@@ -798,7 +798,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards19;
 
-            $db_datenx = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 10 AND user_id='".$_SESSION['ums_user_id']."';");
+            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 10 AND user_id=?;", [$_SESSION['ums_user_id']]);
             $rowx = mysqli_fetch_array($db_datenx);
             $zielwert = $rowx['anzahl'];
 

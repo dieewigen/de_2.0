@@ -50,11 +50,11 @@ if(!hasTech($pt,25)){
 	///////////////////////////////////////////////////////////////////////////
 	// automatisches erkunden, nur anzeigen, wenn man noch nicht alles erkundet hat
 	///////////////////////////////////////////////////////////////////////////
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT COUNT(*) AS anzahl FROM de_map_objects");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_map_objects", []);
 	$row = mysqli_fetch_array($db_daten);
 	$anzahl_systeme=$row['anzahl'];
 
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT COUNT(*) AS anzahl FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."';");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_map WHERE user_id=?;", [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_array($db_daten);
 	$anzahl_systeme_entdeckt=$row['anzahl'];
 
@@ -62,9 +62,9 @@ if(!hasTech($pt,25)){
 
 		//status ändern
 		if(isset($_REQUEST['set_auto_explore'])){
-			$sql="UPDATE de_user_data SET vs_auto_explore=".intval($_REQUEST['set_auto_explore'])." WHERE user_id='".$_SESSION['ums_user_id']."';";
+			$sql="UPDATE de_user_data SET vs_auto_explore=? WHERE user_id=?;";
 			//echo $sql;
-			$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [intval($_REQUEST['set_auto_explore']), $_SESSION['ums_user_id']]);
 			$pd['vs_auto_explore']=intval($_REQUEST['set_auto_explore']);
 		}
 
@@ -167,14 +167,14 @@ if(!hasTech($pt,25)){
 
 	//Kanten laden
 	$kanten=array();
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_kanten");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_kanten", []);
 	while($row = mysqli_fetch_array($db_daten)){
 		$kanten[]=array($row['knoten_id1'],$row['knoten_id2']);
 	}
 
 	//die erforschten Systeme laden
-	$sql="SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>0 AND known_since<'".time()."';";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT map_id FROM de_user_map WHERE user_id=? AND known_since>0 AND known_since<?;";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], time()]);
 	while($row = mysqli_fetch_array($db_daten)){
 		//sie sind sichtbar und erforscht
 		$sichtbare_systeme[]=$row['map_id'];
@@ -183,7 +183,7 @@ if(!hasTech($pt,25)){
 
 	//die sichtbaren Systeme um Systeme ergänzen, die immer sichtbar sind
 	$sql="SELECT id FROM de_map_objects WHERE always_visible=1 OR system_typ=4;";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 	while($row = mysqli_fetch_array($db_daten)){
 		if(!in_array($row['id'],$sichtbare_systeme)){
 			$sichtbare_systeme[]=$row['id'];
@@ -216,8 +216,8 @@ if(!hasTech($pt,25)){
 	// allge Gebäude der Karte laden und in ein Array packen
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	$bldg=array();
-	$sql="SELECT * FROM de_user_map_bldg WHERE user_id='".$_SESSION['ums_user_id']."';";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT * FROM de_user_map_bldg WHERE user_id=?;";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 	while($row = mysqli_fetch_array($db_daten)){
 		$bldg[$row['map_id']][$row['field_id']]['bldg_id']=$row['bldg_id'];
 		$bldg[$row['map_id']][$row['field_id']]['bldg_level']=$row['bldg_level'];
@@ -225,7 +225,7 @@ if(!hasTech($pt,25)){
 	}
 
 	//Systeme laden
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects", []);
 	while($row = mysqli_fetch_array($db_daten)){
 		if(!in_array($row['id'], $sichtbare_systeme)){
 			continue;

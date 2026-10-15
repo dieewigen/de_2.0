@@ -1023,15 +1023,15 @@ class map_system{
 		if($has_all){
 			//Rohstoff-Kosten abziehen
 			$sql="UPDATE de_user_data SET 
-				restyp01=restyp01-'".$ben_restyp01."',
-				restyp02=restyp02-'".$ben_restyp02."',
-				restyp03=restyp03-'".$ben_restyp03."',
-				restyp04=restyp04-'".$ben_restyp04."',
-				restyp05=restyp05-'".$ben_restyp05."'
-				WHERE user_id='".$_SESSION['ums_user_id']."';";
+				restyp01=restyp01-?,
+				restyp02=restyp02-?,
+				restyp03=restyp03-?,
+				restyp04=restyp04-?,
+				restyp05=restyp05-?
+				WHERE user_id=?;";
 
 			//echo $sql;
-			mysqli_query($GLOBALS['dbi'], $sql);
+			mysqli_execute_query($GLOBALS['dbi'], $sql, [$ben_restyp01, $ben_restyp02, $ben_restyp03, $ben_restyp04, $ben_restyp05, $_SESSION['ums_user_id']]);
 			
 			//Item-Kosten abziehen
 			foreach ($need_storage_res as $key => $value){
@@ -1124,8 +1124,8 @@ class map_system{
 				//falls das eigene Gebäude vom Level her zu niedrig ist, ist evtl. das Gebäude von jemandem in der Allianz groß genug
 				if($amount>0 && $inlevel>$bldg_level){
 					if($GLOBALS['allyid']>0 && $GLOBALS['ally_fundbuero_level']>=$inlevel){
-						$sql="SELECT de_user_data.user_id FROM de_user_data LEFT JOIN de_user_map_loot ON (de_user_data.user_id=de_user_map_loot.user_id) WHERE de_user_data.allytag='".$GLOBALS['pd']['allytag']."' and de_user_data.status=1 AND de_user_map_loot.map_id=".$this->system_id." AND de_user_map_loot.field_id=".$i;
-						$db_data=mysqli_query($GLOBALS['dbi'], $sql);
+						$sql="SELECT de_user_data.user_id FROM de_user_data LEFT JOIN de_user_map_loot ON (de_user_data.user_id=de_user_map_loot.user_id) WHERE de_user_data.allytag=? and de_user_data.status=1 AND de_user_map_loot.map_id=? AND de_user_map_loot.field_id=?";
+						$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, [$GLOBALS['pd']['allytag'], $this->system_id, $i]);
 						$num = mysqli_num_rows($db_data);
 						if($num>0){
 							$ally_know_it=true;
@@ -1182,14 +1182,14 @@ class map_system{
 								break;
 
 								case 2: //Tronic
-									$sql="UPDATE de_user_data SET restyp05=restyp05+'".$amount."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-									mysqli_query($GLOBALS['dbi'], $sql);
+									$sql="UPDATE de_user_data SET restyp05=restyp05+? WHERE user_id=?;";
+									mysqli_execute_query($GLOBALS['dbi'], $sql, [$amount, $_SESSION['ums_user_id']]);
 									$geborgen=true;
 								break;
 
 								case 3://Spielerartefakt
 									if(get_free_artefact_places($_SESSION['ums_user_id'])>0){
-										mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES ('".$_SESSION['ums_user_id']."', '".($subtyp+1)."', '1')");
+										mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, '1')", [$_SESSION['ums_user_id'], ($subtyp+1)]);
 										$geborgen=true;
 									}else{
 										$content.='<span class="ms-fehlt">Im Artefaktgeb&auml;ude ist kein freier Platz.</span> ';

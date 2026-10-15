@@ -54,19 +54,19 @@ $res = mysqli_query($GLOBALS['dbi'], "SHOW TABLES LIKE 'de_user_exile_mail'");
 $has_log = $res && mysqli_num_rows($res) > 0;
 
 //Konten im Exil
-$exile = mysqli_fetch_assoc(mysqli_query($GLOBALS['dbi'], "SELECT SUM(e.returned_at IS NULL) AS im_exil, SUM(e.returned_at IS NOT NULL) AS zurueck,
+$exile = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(e.returned_at IS NULL) AS im_exil, SUM(e.returned_at IS NOT NULL) AS zurueck,
     SUM(e.returned_at IS NULL AND (l.lageberichte = 0 OR l.reg_mail = '')) AS ohne_berichte
-    FROM de_user_exile e LEFT JOIN de_login l ON (l.user_id = e.user_id)"));
+    FROM de_user_exile e LEFT JOIN de_login l ON (l.user_id = e.user_id)", []));
 
 if (!$has_log) {
     echo '<div class="flash flash-danger">Die Tabelle <code>de_user_exile_mail</code> fehlt noch. Bitte den Abschnitt dazu aus <code>database/de.sql</code> einspielen, erst dann werden Mails protokolliert.</div>';
 } else {
-    $tot = mysqli_fetch_assoc(mysqli_query($GLOBALS['dbi'], "SELECT SUM(ok = 1) AS sent, SUM(ok = 0) AS failed,
+    $tot = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(ok = 1) AS sent, SUM(ok = 0) AS failed,
         COUNT(DISTINCT IF(ok = 1, user_id, NULL)) AS empf,
         COUNT(DISTINCT IF(ok = 1 AND login_at IS NOT NULL, user_id, NULL)) AS empf_login,
         COUNT(DISTINCT IF(ok = 1 AND login_at <= sent_at + INTERVAL 7 DAY, user_id, NULL)) AS empf_login7,
         MIN(sent_at) AS seit
-        FROM de_user_exile_mail"));
+        FROM de_user_exile_mail", []));
 
     echo '<div class="cards">';
     echo '<div class="card"><h2>Verschickt</h2><div class="stat-value">' . em_num($tot['sent']) . '</div>'
@@ -83,11 +83,11 @@ if (!$has_log) {
 
     //Auswertung nach Mailart
     $by_type = [];
-    $res = mysqli_query($GLOBALS['dbi'], "SELECT type, SUM(ok = 1) AS sent, SUM(ok = 0) AS failed,
+    $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT type, SUM(ok = 1) AS sent, SUM(ok = 0) AS failed,
         SUM(ok = 1 AND login_at IS NOT NULL) AS login,
         SUM(ok = 1 AND login_at <= sent_at + INTERVAL 7 DAY) AS login7,
         SUM(IF(ok = 1 AND login_at IS NOT NULL, TIMESTAMPDIFF(MINUTE, sent_at, login_at), 0)) AS minuten
-        FROM de_user_exile_mail GROUP BY type");
+        FROM de_user_exile_mail GROUP BY type", []);
     while ($row = mysqli_fetch_assoc($res)) {
         $by_type[$row['type']] = $row;
     }
@@ -176,9 +176,9 @@ if (!$has_log) {
 
 //Exil-Akten
 $mails_sql = $has_log ? "(SELECT COUNT(*) FROM de_user_exile_mail m WHERE m.user_id = e.user_id AND m.ok = 1 AND m.sent_at >= e.since)" : "NULL";
-$res = mysqli_query($GLOBALS['dbi'], "SELECT e.*, d.spielername, d.col, l.lageberichte, l.reg_mail, DATEDIFF(NOW(), e.since) AS tage, $mails_sql AS mails
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT e.*, d.spielername, d.col, l.lageberichte, l.reg_mail, DATEDIFF(NOW(), e.since) AS tage, $mails_sql AS mails
     FROM de_user_exile e LEFT JOIN de_login l ON (l.user_id = e.user_id) LEFT JOIN de_user_data d ON (d.user_id = e.user_id)
-    ORDER BY (e.returned_at IS NULL) DESC, e.since DESC");
+    ORDER BY (e.returned_at IS NULL) DESC, e.since DESC", []);
 
 echo '<h2>Exil-Akten</h2>';
 echo '<table>';

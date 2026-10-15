@@ -12,20 +12,20 @@ class Sperre
         $id = intval($id);
         $ergebnis = false;
         mysqli_query($db, "LOCK TABLES de_user_locks WRITE");
-        $result = mysqli_query($db, "SELECT * FROM de_user_locks WHERE id='$id'");
+        $result = mysqli_execute_query($db, "SELECT * FROM de_user_locks WHERE id=?", [$id]);
         if ($result) {
             $anzahl = mysqli_num_rows($result);
             if ($anzahl == 1) {
                 $locks = mysqli_fetch_array($result);
                 if ($locks["locked"] != "1") {
-                    if (mysqli_query($db, "UPDATE de_user_locks SET locked='1' WHERE id='$id'")) {
+                    if (mysqli_execute_query($db, "UPDATE de_user_locks SET locked='1' WHERE id=?", [$id])) {
                         $ergebnis = true;
                     }
                 }
             } elseif ($anzahl > 1) {
                 print("Transactionmanager: An internal error occured [#0001]: dublicate lock definition. Transaction has been cancelled.<br><br>Please open a support ticket.");
             } elseif ($anzahl == 0) {
-                if (mysqli_query($db, "INSERT into de_user_locks (id, locked) VALUES ($id, '1')")) {
+                if (mysqli_execute_query($db, "INSERT into de_user_locks (id, locked) VALUES (?, '1')", [$id])) {
                     $ergebnis = true;
                 }
             }
@@ -40,17 +40,17 @@ class Sperre
         $id = intval($id);
         $ergebnis = false;
         mysqli_query($db, "LOCK TABLES de_user_locks WRITE");
-        $result = mysqli_query($db, "SELECT * FROM de_user_locks WHERE id='$id'");
+        $result = mysqli_execute_query($db, "SELECT * FROM de_user_locks WHERE id=?", [$id]);
         if ($result) {
             $anzahl = mysqli_num_rows($result);
             if ($anzahl == 1) {
-                if (mysqli_query($db, "UPDATE de_user_locks SET locked='0' WHERE id='$id'")) {
+                if (mysqli_execute_query($db, "UPDATE de_user_locks SET locked='0' WHERE id=?", [$id])) {
                     $ergebnis = true;
                 }
             } elseif ($anzahl > 1) {
                 print("Transactionmanager: An internal error occured [#01]: dublicate lock definition<br><br>Please open a support ticket.");
             } elseif ($anzahl == 0) {
-                if (mysqli_query($db, "INSERT into de_user_locks (id, locked) VALUES ($id, '0')")) {
+                if (mysqli_execute_query($db, "INSERT into de_user_locks (id, locked) VALUES (?, '0')", [$id])) {
                     $ergebnis = true;
                 }
             }

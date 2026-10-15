@@ -12,7 +12,7 @@
 
 //f�r dynamische Aufgaben den maximalen Tick auslesen
 //maximalen tick auslesen
-$result_allyjobs  = mysqli_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data");
+$result_allyjobs  = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(tick) AS tick FROM de_user_data", []);
 $row_allyjobs     = mysqli_fetch_array($result_allyjobs);
 $maxtick_allyjobs = $row_allyjobs["tick"];
 

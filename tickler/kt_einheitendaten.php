@@ -182,7 +182,7 @@ $smatrix[] = array ( 7, 18 );
 //vorbelegung der einheitendaten
 //$unit[rasse 0-3][schiffname aus db][hp][aw]
 $schiffsname=array();
-$res = mysqli_query($GLOBALS['dbi'],"SELECT tech_name FROM de_tech_data where tech_id>80 and tech_id<110 order by tech_id");
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data where tech_id>80 and tech_id<110 order by tech_id", []);
 while($row = mysqli_fetch_array($res)){//für die Rassen die Schiffsnamen auslesen
     $schiffsname[]   = $row["tech_name"];
 }

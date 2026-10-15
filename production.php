@@ -33,7 +33,7 @@ $spec1=$row['spec1'];$spec3=$row['spec3'];
 $design=0;
 
 //maximalen tick auslesen
-$result  = mysqli_query($GLOBALS['dbi'],"SELECT wt AS tick FROM de_system LIMIT 1");
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $maxtick = $row['tick'];
 
@@ -47,7 +47,7 @@ if($spec3==2){
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=1 AND user_id='".$_SESSION['ums_user_id']."';");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=1 AND user_id=?;", [$_SESSION['ums_user_id']]);
 $artbonus_fleet=0;
 while($row = mysqli_fetch_array($db_daten)){
   $artbonus_fleet=$artbonus_fleet+$ua_werte[$row['id']-1][$row['level']-1][0];
@@ -138,7 +138,7 @@ if($spec3==2) echo 'var traegerbonus=1.2;'; else  echo 'var traegerbonus=1;';
 //////////////////////////////////////////////////////////////////////////
 //tooltip-daten generieren
 //////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id", []);
 $c1=0;$i=81;unset($tooltips);
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	$i=$row['tech_id'];
@@ -310,7 +310,7 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 					}
 					
 					$buildscore=$z*$tech_score;
-					mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score) VALUES (".$_SESSION['ums_user_id'].", $i, $z, $tech_ticks, $buildscore)");
+					mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score) VALUES (?, ?, ?, ?, ?)", [$_SESSION['ums_user_id'], $i, $z, $tech_ticks, $buildscore]);
 				}
 			}
 		}
@@ -320,9 +320,9 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 		$gr03=$gr03-$restyp03;
 		$gr04=$gr04-$restyp04;
 		$gr05=$gr05-$restyp05;
-		mysqli_query($GLOBALS['dbi'],"update de_user_data set restyp01 = restyp01 - $gr01,
-		 restyp02 = restyp02 - $gr02, restyp03 = restyp03 - $gr03,
-		 restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE user_id = '".$_SESSION['ums_user_id']."';");
+		mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set restyp01 = restyp01 - ?,
+		 restyp02 = restyp02 - ?, restyp03 = restyp03 - ?,
+		 restyp04 = restyp04 - ?, restyp05 = restyp05 - ? WHERE user_id = ?;", [$gr01, $gr02, $gr03, $gr04, $gr05, $_SESSION['ums_user_id']]);
 
 		//transaktionsende
 		$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
@@ -379,7 +379,7 @@ echo '<div>';
 /////////////////////////////////////////////////////////////////////////////
 $ec=array();
 $fid0=$_SESSION['ums_user_id'].'-0';$fid1=$_SESSION['ums_user_id'].'-1';$fid2=$_SESSION['ums_user_id'].'-2';$fid3=$_SESSION['ums_user_id'].'-3';
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
 while($row = mysqli_fetch_array($db_daten)){
 	for ($i=81;$i<=90;$i++){
 		if(!isset($ec[$i])){
@@ -399,7 +399,7 @@ for($i=100;$i<=104;$i++){
 $prod_resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
 $einheiten=array('flotte' => '', 'verteidigung' => '');
 $z=0;
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT  * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT  * FROM de_tech_data WHERE tech_id>80 AND tech_id<110 ORDER BY tech_id", []);
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	$tech_id=$row['tech_id'];
 	if($tech_id<100){
@@ -502,13 +502,13 @@ echo '
 //zeige aktive bauaufträge an
 $technames=array();
 $sql="SELECT * FROM de_tech_data WHERE tech_id>=81 AND tech_id<=104 ORDER BY tech_id ASC";
-$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 while($row = mysqli_fetch_array($db_daten)){
 	$technames[$row['tech_id']]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']);
 }
 
-$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
-	WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
+$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
+	WHERE user_id=? AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC", [$_SESSION['ums_user_id']]);
 if(mysqli_num_rows($result)>0){
 	echo '<div class="geh-produktion"><div class="mod-typ">'.$production_lang['aktiveauftraege'].'</div>';
 	while($row = mysqli_fetch_array($result)){
@@ -528,7 +528,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 	$factory_max_capacity=array();
 	for($g=0;$g<count($GLOBALS['map_buildings']);$g++){
 		if(isset($GLOBALS['map_buildings'][$g]['factory_id'])){
-			$result  = mysqli_query($GLOBALS['dbi'],"SELECT SUM(bldg_level) AS anzahl FROM de_user_map_bldg WHERE user_id='".$_SESSION['ums_user_id']."' AND bldg_id='".$g."';");
+			$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(bldg_level) AS anzahl FROM de_user_map_bldg WHERE user_id=? AND bldg_id=?;", [$_SESSION['ums_user_id'], $g]);
 			$row     = mysqli_fetch_array($result);
 			$anzahl = $row["anzahl"];
 
@@ -639,9 +639,9 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 							$item_build_id=10000+$item_id;
 								
-							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, factory_id, factory_used_capacity) VALUES (".$_SESSION['ums_user_id'].", $item_build_id, $z, $tech_ticks, $factory_id, $factory_used_capacity)";
+							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, factory_id, factory_used_capacity) VALUES (?, ?, ?, ?, ?, ?)";
 							//echo $sql;
-							mysqli_query($GLOBALS['dbi'],$sql);
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $item_build_id, $z, $tech_ticks, $factory_id, $factory_used_capacity]);
 
 							//Lageranzahl neu laden, damit die Anzeige aktuell ist
 							$ps=loadPlayerStorage($_SESSION['ums_user_id']);

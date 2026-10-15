@@ -127,7 +127,7 @@ mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector set platz=0 where platz>
 
 //Rangliste: Platz, Name, Kollektoren und Punkte aller Spieler im Sektor, Platzveränderung seit dem Vortag
 $zeilen = array();
-$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT sec_id, name, platz, platz_last_day FROM de_sector WHERE platz>0 order by platz  LIMIT 100");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id, name, platz, platz_last_day FROM de_sector WHERE platz>0 order by platz  LIMIT 100", []);
 while($row = mysqli_fetch_array($db_daten)){
   $get_score=mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(score) AS score, SUM(col) AS col FROM de_user_data WHERE sector=?", [$row['sec_id']]);
   $row_score=mysqli_fetch_array($get_score);
@@ -149,13 +149,13 @@ $toplistCache->write('top2', array('zeilen' => $zeilen));
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 $zeilen = array();
-$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT allytag, sum(score) as score, sum(col) as col, count(allytag) as am FROM de_user_data where allytag<>'' AND status=1 group by allytag order by score DESC LIMIT 100");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, sum(score) as score, sum(col) as col, count(allytag) as am FROM de_user_data where allytag<>'' AND status=1 group by allytag order by score DESC LIMIT 100", []);
 $platz=1;
 while($row = mysqli_fetch_array($db_daten)){
 	//allianzdaten nachladen
   $wt_a_tag = $row["allytag"];
-  $sql="SELECT * FROM de_allys WHERE allytag='$wt_a_tag'";
-  $wt_a_result=mysqli_fetch_array(mysqli_query($GLOBALS['dbi'],$sql));
+  $sql="SELECT * FROM de_allys WHERE allytag=?";
+  $wt_a_result=mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], $sql, [$wt_a_tag]));
 	$wt_a_id=$wt_a_result["id"];
 	$siegartefakte=$wt_a_result["questpoints"];
 	$col_erobert = $wt_a_result["colstolen"];

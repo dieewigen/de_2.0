@@ -41,7 +41,7 @@ if(hasTech($GLOBALS['pt'],145)){
 	}
 }else{
 	//die Botschaft (Technologie 145) mit dem Namen für die Rasse des Spielers
-	$row_tech=mysqli_fetch_array(mysqli_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data WHERE tech_id=145"));
+	$row_tech=mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_name FROM de_tech_data WHERE tech_id=145", []));
 	$content.='<p>Diese Welt ist bewohnt und mit dem entsprechenden Wissen ist eine Kontaktaufnahme m&ouml;glich.</p>';
 	$content.='<div class="mod-hinweis ms-hinweis">Voraussetzung: <a href="help.php?t=145">'.getTechNameByRasse($row_tech['tech_name'], $_SESSION['ums_rasse']).'</a></div>';
 }

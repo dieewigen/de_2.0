@@ -135,7 +135,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+2 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>2 Allianzartefakte';
 
                         if ($isPlayer) {
@@ -203,7 +203,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>3 Allianzartefakte';
 
                         if ($isPlayer) {
@@ -237,7 +237,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+3 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>3 Allianzartefakte';
 
                         if ($isPlayer) {
@@ -271,7 +271,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                         }
 
                         //Allianzartefakt
-                        mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+4 WHERE id='$ally_id'");
+                        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET artefacts=artefacts+4 WHERE id=?", [$ally_id]);
                         $bonusstr .= '<br>4 Allianzartefakte';
 
                         if ($isPlayer) {

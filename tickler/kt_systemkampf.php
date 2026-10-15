@@ -1832,7 +1832,7 @@ for ($c = 0; $c < $z; $c++) {
     $global_kb_array['einheiten_deffer'] = $kb_einheiten_deffer;
     $global_kb_array['tuerme'] = $kb_tuerme;
 
-    mysqli_query($GLOBALS['dbi_ls'], "INSERT INTO ls_de_kb SET time=NOW(), server='$sv_server_tag', atter='$global_atter', deffer='$global_deffer', kb='".serialize($global_kb_array)."', kbversion=1");
+    mysqli_execute_query($GLOBALS['dbi_ls'], "INSERT INTO ls_de_kb SET time=NOW(), server=?, atter=?, deffer=?, kb=?, kbversion=1", [$sv_server_tag, $global_atter, $global_deffer, serialize($global_kb_array)]);
     //}
 
     //globalen KB speichern - ENDE

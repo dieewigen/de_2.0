@@ -16,7 +16,7 @@ $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;
 $spec1=$row['spec1'];$defenseexp=$row["defenseexp"];$mysc2=$row["sc2"];
 
 //maximalen tick auslesen
-$result  = mysqli_query($GLOBALS['dbi'],"SELECT wt AS tick FROM de_system LIMIT 1");
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 
@@ -40,7 +40,7 @@ $defabzug=0.20;
 unset($technames);
 unset($techcost);
 $techselect='<option value="0">Bitte w&auml;hlen</option>';
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<105 ORDER BY tech_id");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<105 ORDER BY tech_id", []);
 while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft
 	if($row['tech_id']<100){
 		$unit_index=$row['tech_id']-81;
@@ -113,12 +113,12 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 		//zerst alle vorhandenen einheiten auslesen
 		unset($einheiten);
 		$fleetid=$_SESSION['ums_user_id'].'-0';
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fleetid'");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
 		$row = mysqli_fetch_array($db_daten);
 		for($i=81;$i<=90;$i++){
 			$einheiten[$i]=$row['e'.$i];
 		}
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."'");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 		$row = mysqli_fetch_array($db_daten);
 		for($i=100;$i<=104;$i++){
 			$einheiten[$i]=$row['e'.$i];
@@ -144,8 +144,8 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 						$score=$target_amount*$techscore[$rec_target];
 						if($target_amount>0){
 							//die schiffe abziehen
-							$sql="UPDATE de_user_fleet SET e".$i."=e".$i."-".$rec_amount." WHERE user_id='$fleetid'";
-							mysqli_query($GLOBALS['dbi'],$sql);
+							$sql="UPDATE de_user_fleet SET e".$i."=e".$i."-? WHERE user_id=?";
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$rec_amount, $fleetid]);
 
 							//bauauftrag hinterlegen
 							//bauzeit berechnen
@@ -161,8 +161,8 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 							if($tech_ticks<1){
 								$tech_ticks=1;
 							}
-							mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES 
-							(".$_SESSION['ums_user_id'].", $rec_target, $target_amount, $tech_ticks, $score, 1)");
+							mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES 
+							(?, ?, ?, ?, ?, 1)", [$_SESSION['ums_user_id'], $rec_target, $target_amount, $tech_ticks, $score]);
 						}
 					}
 				}
@@ -191,8 +191,8 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 						$score=$target_amount*$techscore[$rec_target];
 						if($target_amount>0){
 							//die türme abziehen
-							$sql="UPDATE de_user_data SET e".$i."=e".$i."-".$rec_amount." WHERE user_id='".$_SESSION['ums_user_id']."'";
-							mysqli_query($GLOBALS['dbi'],$sql);
+							$sql="UPDATE de_user_data SET e".$i."=e".$i."-? WHERE user_id=?";
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$rec_amount, $_SESSION['ums_user_id']]);
 
 							//bauauftrag hinterlegen
 							//bauzeit berechnen
@@ -208,9 +208,9 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 							if($tech_ticks<1){
 								$tech_ticks=1;
 							}
-							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES (".$_SESSION['ums_user_id'].", $rec_target, $target_amount, $tech_ticks, $score, 1)";
+							$sql="INSERT INTO de_user_build (user_id, tech_id, anzahl, verbzeit, score, recycling) VALUES (?, ?, ?, ?, ?, 1)";
 							//echo $sql;
-							mysqli_query($GLOBALS['dbi'],$sql);
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $rec_target, $target_amount, $tech_ticks, $score]);
 						}
 					}
 				}
@@ -265,12 +265,12 @@ if(!hasTech($pt,129)){
 	//Bestände: Heimatflotte und Verteidigungsanlagen
 	$bestand=array();
 	$fleetid=$_SESSION['ums_user_id'].'-0';
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fleetid'");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=?", [$fleetid]);
 	$row = mysqli_fetch_array($db_daten);
 	for($i=81;$i<=90;$i++){
 		$bestand[$i]=(int)$row['e'.$i];
 	}
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id='".$_SESSION['ums_user_id']."'");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT e100, e101, e102, e103, e104 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
 	$row = mysqli_fetch_array($db_daten);
 	for($i=100;$i<=104;$i++){
 		$bestand[$i]=(int)$row['e'.$i];
@@ -308,8 +308,8 @@ if(!hasTech($pt,129)){
 		<div class="rec-los"><input type="Submit" name="recyclingbutton" value="Recycling starten" class="mod-btn"></div>';
 
 	//zeige aktive bauaufträge an
-	$result=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
-		WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC");
+	$result=mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, SUM(anzahl) AS anzahl, verbzeit, SUM(score) AS score FROM `de_user_build`
+		WHERE user_id=? AND tech_id>80 AND tech_id<110 GROUP BY tech_id, verbzeit ORDER BY verbzeit, tech_id ASC", [$_SESSION['ums_user_id']]);
 	if(mysqli_num_rows($result)>0){
 		echo '<div class="geh-produktion"><div class="mod-typ">Aktive Bauauftr&auml;ge</div>';
 		while($row = mysqli_fetch_array($result)){

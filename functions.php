@@ -4,15 +4,15 @@ require_once 'vendor/autoload.php';
 function createTitleForUser($ownerId, $title){
 
     //Titel in der DB hinterlegen
-    $sql = "INSERT INTO ls_title SET title='$title';";
+    $sql = "INSERT INTO ls_title SET title=?;";
     echo $sql;
-    mysqli_query($GLOBALS['dbi_ls'], $sql);
+    mysqli_execute_query($GLOBALS['dbi_ls'], $sql, [$title]);
     $titleId=mysqli_insert_id($GLOBALS['dbi_ls']);
 
     //den Titel dem Spieler im Hauptaccount zuweisen
-    $sql = "INSERT INTO ls_user_title SET user_id='$ownerId', title_id='$titleId';";
+    $sql = "INSERT INTO ls_user_title SET user_id=?, title_id=?;";
     echo $sql;
-    mysqli_query($GLOBALS['dbi_ls'], $sql);
+    mysqli_execute_query($GLOBALS['dbi_ls'], $sql, [$ownerId, $titleId]);
 
 }
 
@@ -20,7 +20,7 @@ function write2agentlog($uid, $reason, $change_amount)
 {
     /*
     //zuerst auslesen wieviel man hat
-    $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT agent, agent_lost FROM de_user_data WHERE user_id='$uid'");
+    $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT agent, agent_lost FROM de_user_data WHERE user_id=?", [$uid]);
     $row = mysqli_fetch_array($db_daten);
     $agent=$row["agent"];
     $agent_lost=$row["agent_lost"];
@@ -101,7 +101,7 @@ function getInfocenter()
 
 function getStolenColByUID($user_id)
 {
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id='$user_id' AND colanz>0;");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(colanz) AS colanz FROM de_user_getcol WHERE user_id=? AND colanz>0;", [$user_id]);
     $row = mysqli_fetch_array($db_daten);
 
     return $row['colanz'];
@@ -110,8 +110,8 @@ function getStolenColByUID($user_id)
 function getItemBuildAmount($user_id, $item_id)
 {
     $tech_id = $item_id + 10000;
-    $sql = "SELECT SUM(anzahl) AS anzahl FROM de_user_build WHERE user_id='$user_id' AND tech_id='$tech_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT SUM(anzahl) AS anzahl FROM de_user_build WHERE user_id=? AND tech_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $tech_id]);
     $row = mysqli_fetch_array($db_daten);
 
     return $row['anzahl'];
@@ -119,8 +119,8 @@ function getItemBuildAmount($user_id, $item_id)
 
 function getUsedFactoryCapacity($user_id, $factory_id)
 {
-    $sql = "SELECT SUM(factory_used_capacity) AS anzahl FROM de_user_build WHERE user_id='$user_id' AND factory_id='$factory_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT SUM(factory_used_capacity) AS anzahl FROM de_user_build WHERE user_id=? AND factory_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $factory_id]);
     $row = mysqli_fetch_array($db_daten);
 
     return $row['anzahl'];
@@ -130,7 +130,7 @@ function getAveragePlayerAmountInSectorOnServer()
 {
     global $sv_maxsector;
     $sql = "SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE sector>2 AND npc=0;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, []);
     $row = mysqli_fetch_array($db_daten);
 
     //echo $row['anzahl'].'/'.($sv_maxsector-2);
@@ -143,8 +143,8 @@ function getAveragePlayerAmountInSectorOnServer()
 
 function getAnzahlGeworbeneSpielerByOwnerid($owner_id)
 {
-    $sql = "SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE sector>1 AND werberid='$owner_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT COUNT(user_id) AS anzahl FROM de_user_data WHERE sector>1 AND werberid=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$owner_id]);
     $row = mysqli_fetch_array($db_daten);
 
     return intval($row['anzahl']);
@@ -198,7 +198,7 @@ function createAuction($uid)
     //Kostenliste erstellen und aus dieser dann per Zufall eine auswählen
     //////////////////////////////////////////////////////////////////////////////////
     //die Maximalwerte aus der DB holen
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT MAX(restyp01) AS restyp01, MAX(restyp02) AS restyp02, MAX(restyp03) AS restyp03, MAX(restyp04) AS restyp04, MAX(credits) AS credits FROM de_user_data WHERE sector>1 AND npc=0");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(restyp01) AS restyp01, MAX(restyp02) AS restyp02, MAX(restyp03) AS restyp03, MAX(restyp04) AS restyp04, MAX(credits) AS credits FROM de_user_data WHERE sector>1 AND npc=0", []);
     $restyp_x = mysqli_fetch_array($db_daten);
 
     //Standardrohstoffe
@@ -213,7 +213,7 @@ function createAuction($uid)
     //neue Rohstoffe 3-12
     if ($sv_deactivate_vsystems != 1 && $maxtick > 3000) {
         for ($r = 3;$r <= 12;$r++) {
-            $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT MAX(item_amount) AS amount FROM de_user_storage WHERE item_id='".$r."'");
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(item_amount) AS amount FROM de_user_storage WHERE item_id=?", [$r]);
             $res = mysqli_fetch_array($db_daten);
 
             $amount = $res['amount'] / 5;
@@ -245,15 +245,15 @@ function createAuction($uid)
 
     //in die DB einfügen
     $sql = "INSERT INTO de_auction SET 
-	creator='".$uid."',
-	start_wt='".$maxtick."',
-	cost='".serialize($cost)."',
-	reward='".serialize($reward)."'
+	creator=?,
+	start_wt=?,
+	cost=?,
+	reward=?
 	";
 
     //error_log($sql, 0);
 
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, $maxtick, serialize($cost), serialize($reward)]);
 }
 
 function formatTime($seconds)
@@ -296,8 +296,8 @@ function formatTime($seconds)
 function loadSpecialShip($user_id)
 {
     //Schiffsdaten aus der DB holen
-    $sql = "SELECT * FROM `de_user_special_ship` WHERE user_id='".$user_id."' LIMIT 1;";
-    $db_data = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT * FROM `de_user_special_ship` WHERE user_id=? LIMIT 1;";
+    $db_data = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id]);
     $num = mysqli_num_rows($db_data);
     if ($num == 1) {
         $row = mysqli_fetch_array($db_data);
@@ -306,8 +306,8 @@ function loadSpecialShip($user_id)
     } else {
         $data = new special_ship($user_id);
 
-        $sql = "INSERT INTO `de_user_special_ship` SET user_id='".$user_id."', data='".serialize($data)."';";
-        $db_data = mysqli_query($GLOBALS['dbi'], $sql);
+        $sql = "INSERT INTO `de_user_special_ship` SET user_id=?, data=?;";
+        $db_data = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, serialize($data)]);
     }
 
     return $data;
@@ -318,9 +318,9 @@ function saveSpecialShip($user_id, $ship)
     //Schiffsdaten aus der DB holen
     $ship_data = serialize($ship);
 
-    $sql = "UPDATE `de_user_special_ship` SET data='$ship_data' WHERE user_id='".$user_id."' LIMIT 1;";
+    $sql = "UPDATE `de_user_special_ship` SET data=? WHERE user_id=? LIMIT 1;";
     //echo $sql;
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$ship_data, $user_id]);
 }
 
 
@@ -375,8 +375,8 @@ function hasMissionNeeds($cost)
                 $restyp=$cost[$i][1];
                 $amount=floor($cost[$i][2]*$percent);
 
-                $sql="UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."-'".$amount."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-                mysqli_query($GLOBALS['dbi'],$sql);
+                $sql="UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."-? WHERE user_id=?;";
+                mysqli_execute_query($GLOBALS['dbi'], $sql, [$amount, $_SESSION['ums_user_id']]);
             break;
             */
             //Items
@@ -464,8 +464,8 @@ function substractMissionCost($cost, $percent)
                 $restyp = $cost[$i][1];
                 $amount = floor($cost[$i][2] * $percent);
 
-                $sql = "UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."-'".$amount."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-                mysqli_query($GLOBALS['dbi'], $sql);
+                $sql = "UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."-? WHERE user_id=?;";
+                mysqli_execute_query($GLOBALS['dbi'], $sql, [$amount, $_SESSION['ums_user_id']]);
                 break;
                 //Items
             case 'I':
@@ -505,8 +505,8 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 
     //erste
     $link_first = '<span class="ms-nav ms-nav-aus">&laquo;</span>';
-    $sql = "SELECT MIN(map_id) AS map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' LIMIT 1;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT MIN(map_id) AS map_id FROM de_user_map WHERE user_id=? LIMIT 1;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     $id_first = $row['map_id'];
     if ($id_first > 0) {
@@ -515,8 +515,8 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 
     //letzte
     $link_last = '<span class="ms-nav ms-nav-aus">&raquo;</span>';
-    $sql = "SELECT MAX(map_id) AS map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' LIMIT 1;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT MAX(map_id) AS map_id FROM de_user_map WHERE user_id=? LIMIT 1;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
     $row = mysqli_fetch_array($db_daten);
     $id_last = $row['map_id'];
     if ($id_last > 0) {
@@ -525,8 +525,8 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 
     //niedriger
     $link_lower = '<span class="ms-nav ms-nav-aus">&lsaquo;</span>';
-    $sql = "SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND map_id < '".$system_id."' ORDER BY map_id DESC LIMIT 1;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id < ? ORDER BY map_id DESC LIMIT 1;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]);
     $row = mysqli_fetch_array($db_daten);
     $id_lower = $row['map_id'] ?? -1;
     if ($id_lower > 0) {
@@ -535,8 +535,8 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 
     //höher
     $link_higher = '<span class="ms-nav ms-nav-aus">&rsaquo;</span>';
-    $sql = "SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND map_id > '".$system_id."' ORDER BY map_id ASC LIMIT 1;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id > ? ORDER BY map_id ASC LIMIT 1;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]);
     $row = mysqli_fetch_array($db_daten);
     $id_higher = $row['map_id'] ?? -1;
     if ($id_higher > 0) {
@@ -688,11 +688,11 @@ function vs_duration_factor($uid, $ua_werte)
 function changeCredits($uid, $amount, $reason)
 {
     //zuerst auslesen wieviel man hat
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT credits FROM de_user_data WHERE user_id='$uid'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT credits FROM de_user_data WHERE user_id=?", [$uid]);
     $row = mysqli_fetch_array($db_daten);
     $hascredits = $row["credits"];
     //wert in der db ändern
-    $db_daten = mysqli_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+'$amount' WHERE user_id='$uid'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $uid]);
 
     //creditanzahl ändern
     $hascredits = $hascredits + $amount;
@@ -709,15 +709,15 @@ function changeCredits($uid, $amount, $reason)
 
 function setUserLoot($uid, $map_id, $field_id)
 {
-    mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_map_loot(user_id, map_id, field_id) VALUES ('$uid', '$map_id', '$field_id')");
+    mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_map_loot(user_id, map_id, field_id) VALUES (?, ?, ?)", [$uid, $map_id, $field_id]);
 }
 
 function getUserLootByMapID($uid, $map_id)
 {
-    $sql = "SELECT * FROM de_user_map_loot WHERE user_id='$uid' AND map_id='$map_id';";
+    $sql = "SELECT * FROM de_user_map_loot WHERE user_id=? AND map_id=?;";
     //echo $sql;
     $data = array();
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, $map_id]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[] = $row['field_id'];
     }
@@ -727,8 +727,8 @@ function getUserLootByMapID($uid, $map_id)
 
 function getMapIDBySpecialsystemID($id)
 {
-    $sql = "SELECT id FROM de_map_objects WHERE system_typ=5 AND system_subtyp='$id'";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT id FROM de_map_objects WHERE system_typ=5 AND system_subtyp=?";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
     $row = mysqli_fetch_array($db_daten);
 
     return intval($row['id']);
@@ -736,8 +736,8 @@ function getMapIDBySpecialsystemID($id)
 
 function getUserSpecialsystemDataByMapID($uid, $map_id)
 {
-    $sql = "SELECT specialsystem_data FROM de_user_map WHERE user_id='$uid' AND map_id='$map_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT specialsystem_data FROM de_user_map WHERE user_id=? AND map_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, $map_id]);
     $row = mysqli_fetch_array($db_daten);
     if (!empty($row['specialsystem_data'])) {
         $data = unserialize($row['specialsystem_data']);
@@ -751,8 +751,8 @@ function getUserSpecialsystemDataByMapID($uid, $map_id)
 function setUserSpecialsystemDataByMapID($uid, $map_id, $data)
 {
     $data = serialize($data);
-    $sql = "UPDATE de_user_map SET specialsystem_data='$data' WHERE user_id='$uid' AND map_id='$map_id';";
-    mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "UPDATE de_user_map SET specialsystem_data=? WHERE user_id=? AND map_id=?;";
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$data, $uid, $map_id]);
 
     return $data;
 }
@@ -810,10 +810,10 @@ function substractSpecialsystemNeeds($cost)
                     case 'A':
                         $amount = $cost[$i][2];
 
-                        $sql = "UPDATE de_user_data SET agent=agent-$amount WHERE user_id='".$_SESSION['ums_user_id']."';";
+                        $sql = "UPDATE de_user_data SET agent=agent-? WHERE user_id=?;";
                         write2agentlog($_SESSION['ums_user_id'], 'shaker', $amount);
                         //echo $sql;
-                        mysqli_query($GLOBALS['dbi'], $sql);
+                        mysqli_execute_query($GLOBALS['dbi'], $sql, [$amount, $_SESSION['ums_user_id']]);
 
                         break;
                 }
@@ -892,9 +892,9 @@ function showSpecialsystemCost($cost)
 
 function startFleetMission($fleet_id, $time, $mission_data)
 {
-    $sql = "UPDATE de_user_fleet SET aktion=4, mission_time='$time', mission_data='".serialize($mission_data)."' WHERE user_id='$fleet_id';";
+    $sql = "UPDATE de_user_fleet SET aktion=4, mission_time=?, mission_data=? WHERE user_id=?;";
     //echo $sql;
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$time, serialize($mission_data), $fleet_id]);
 }
 
 function getFleetData($user_id)
@@ -902,8 +902,8 @@ function getFleetData($user_id)
     checkMissionEnd();
 
     //Flotten auslesen
-    $sql = "SELECT * FROM de_user_fleet WHERE user_id LIKE '".$user_id."-%' ORDER BY user_id ASC;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT * FROM de_user_fleet WHERE user_id LIKE ? ORDER BY user_id ASC;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id."-%"]);
 
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[] = $row;
@@ -919,9 +919,9 @@ function getFleetFK($user_id)
     $rasse = getRasseByUID($user_id);
 
     //Flotten auslesen
-    $sql = "SELECT * FROM de_user_fleet WHERE user_id LIKE '".$user_id."-%' ORDER BY user_id ASC;";
+    $sql = "SELECT * FROM de_user_fleet WHERE user_id LIKE ? ORDER BY user_id ASC;";
     //echo $sql;
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id."-%"]);
 
     while ($row = mysqli_fetch_array($db_daten)) {
         $fk = 0;
@@ -944,8 +944,8 @@ function getFleetFK($user_id)
 
 function getRasseByUID($user_id)
 {
-    $sql = "SELECT rasse FROM de_user_data WHERE user_id ='$user_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT rasse FROM de_user_data WHERE user_id =?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id]);
 
     $row = mysqli_fetch_array($db_daten);
 
@@ -954,9 +954,9 @@ function getRasseByUID($user_id)
 
 function checkMissionEnd()
 {
-    $sql = "UPDATE de_user_fleet SET aktion=0, mission_data='' WHERE aktion=4 AND mission_time<'".time()."';";
+    $sql = "UPDATE de_user_fleet SET aktion=0, mission_data='' WHERE aktion=4 AND mission_time<?;";
     //echo $sql;
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [time()]);
 }
 
 function setBldgByFieldID($user_id, $map_id, $field_id, $bldg_id, $bldg_level, $bldg_time)
@@ -971,30 +971,30 @@ function setBldgByFieldID($user_id, $map_id, $field_id, $bldg_id, $bldg_level, $
 		bldg_level,
 		bldg_time
 	)VALUES(
-		'".$user_id."',
-		'".$map_id."',
-		'".$field_id."',
-		'".$bldg_id."',
-		'".$bldg_level."',
-		'".$bldg_time."'
+		?,
+		?,
+		?,
+		?,
+		?,
+		?
 	) ON DUPLICATE KEY UPDATE 
-		bldg_id='".$bldg_id."',
-		bldg_level='".$bldg_level."',
-		bldg_time='".$bldg_time."'
+		bldg_id=?,
+		bldg_level=?,
+		bldg_time=?
 	";
 
     //echo $sql;
 
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $map_id, $field_id, $bldg_id, $bldg_level, $bldg_time, $bldg_id, $bldg_level, $bldg_time]);
 }
 
 function removeBldgByFieldID($user_id, $map_id, $field_id)
 {
-    $sql = "DELETE FROM de_user_map_bldg WHERE user_id='".$user_id."' AND map_id='".$map_id."' AND field_id='".$field_id."';";
+    $sql = "DELETE FROM de_user_map_bldg WHERE user_id=? AND map_id=? AND field_id=?;";
 
     //echo $sql;
 
-    mysqli_query($GLOBALS['dbi'], $sql);
+    mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $map_id, $field_id]);
 }
 
 function getBldgByFieldID($pb, $field_id)
@@ -1026,8 +1026,8 @@ function getBldgByFieldID($pb, $field_id)
 function loadPlayerBuildings($uid, $map_id)
 {
     $data = array();
-    $sql = "SELECT * FROM de_user_map_bldg WHERE user_id='$uid' AND map_id='$map_id';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT * FROM de_user_map_bldg WHERE user_id=? AND map_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, $map_id]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[] = $row;
     }
@@ -1042,7 +1042,7 @@ function loadPlayerStorage($uid)
     //$sql="SELECT * FROM de_user_storage LEFT JOIN de_item_data ON(de_user_storage.item_id=de_item_data.item_id) WHERE de_user_storage.user_id='".$uid."';";
     //Namen auslesen
     $sql = "SELECT * FROM de_item_data ORDER BY item_id;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, []);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[$row['item_id']]['item_name'] = $row['item_name'];
         $data[$row['item_id']]['item_amount'] = 0;
@@ -1050,8 +1050,8 @@ function loadPlayerStorage($uid)
     }
 
     //Anzahl auslesen
-    $sql = "SELECT * FROM de_user_storage WHERE user_id='".$uid."';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT * FROM de_user_storage WHERE user_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[$row['item_id']]['item_amount'] = $row['item_amount'];
     }
@@ -1066,7 +1066,7 @@ function loadAllyStorage($ally_id)
     //$sql="SELECT * FROM de_user_storage LEFT JOIN de_item_data ON(de_user_storage.item_id=de_item_data.item_id) WHERE de_user_storage.user_id='".$uid."';";
     //Namen auslesen
     $sql = "SELECT * FROM de_item_data ORDER BY item_id;";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, []);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[$row['item_id']]['item_name'] = $row['item_name'];
         $data[$row['item_id']]['item_amount'] = 0;
@@ -1074,8 +1074,8 @@ function loadAllyStorage($ally_id)
     }
 
     //Anzahl auslesen
-    $sql = "SELECT * FROM de_ally_storage WHERE ally_id='".$ally_id."';";
-    $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT * FROM de_ally_storage WHERE ally_id=?;";
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
     while ($row = mysqli_fetch_array($db_daten)) {
         $data[$row['item_id']]['item_amount'] = $row['item_amount'];
     }
@@ -1086,7 +1086,7 @@ function loadAllyStorage($ally_id)
 function get_storage_amount($uid, $item_id)
 {
     //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM `de_user_storage` WHERE user_id='$uid' AND item_id='$item_id'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_user_storage` WHERE user_id=? AND item_id=?", [$uid, $item_id]);
     $num = mysqli_num_rows($db_daten);
     if ($num == 1) { //es gibt einen datensatz
         //datensatz auslesen
@@ -1103,23 +1103,23 @@ function get_storage_amount($uid, $item_id)
 function change_storage_amount($uid, $item_id, $item_amount, $is_wt = false)
 {
     //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM `de_user_storage` WHERE user_id='$uid' AND item_id='$item_id'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_user_storage` WHERE user_id=? AND item_id=?", [$uid, $item_id]);
     $num = mysqli_num_rows($db_daten);
     if ($num == 0) { //es gibt noch keinen datensatz
 
         //neuen datensatz anelgen
         if (!$is_wt) {
-            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_storage (user_id, item_id, item_amount) VALUES ('$uid', '$item_id', '$item_amount')");
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_storage (user_id, item_id, item_amount) VALUES (?, ?, ?)", [$uid, $item_id, $item_amount]);
         } else {
-            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_storage (user_id, item_id, item_amount, item_wt_change) VALUES ('$uid', '$item_id', '$item_amount', $item_amount)");
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_storage (user_id, item_id, item_amount, item_wt_change) VALUES (?, ?, ?, ?)", [$uid, $item_id, $item_amount, $item_amount]);
         }
 
     } else { //es gibt bereits einen datensatz
         //db updaten
         if (!$is_wt) {
-            mysqli_query($GLOBALS['dbi'], "UPDATE de_user_storage SET item_amount=item_amount+'$item_amount' WHERE user_id='$uid' AND item_id='$item_id'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_storage SET item_amount=item_amount+? WHERE user_id=? AND item_id=?", [$item_amount, $uid, $item_id]);
         } else {
-            mysqli_query($GLOBALS['dbi'], "UPDATE de_user_storage SET item_amount=item_amount+'$item_amount', item_wt_change='$item_amount' WHERE user_id='$uid' AND item_id='$item_id'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_storage SET item_amount=item_amount+?, item_wt_change=? WHERE user_id=? AND item_id=?", [$item_amount, $item_amount, $uid, $item_id]);
         }
     }
 }
@@ -1127,23 +1127,23 @@ function change_storage_amount($uid, $item_id, $item_amount, $is_wt = false)
 function changeAllyStorageAmount($ally_id, $item_id, $item_amount, $is_wt = false)
 {
     //überprüfen ob es bereits einen datensatz mit der rohstoff-id gibt
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM `de_ally_storage` WHERE ally_id='$ally_id' AND item_id='$item_id'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_ally_storage` WHERE ally_id=? AND item_id=?", [$ally_id, $item_id]);
     $num = mysqli_num_rows($db_daten);
     if ($num == 0) { //es gibt noch keinen datensatz
 
         //neuen datensatz anelgen
         if (!$is_wt) {
-            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_ally_storage (ally_id, item_id, item_amount) VALUES ('$ally_id', '$item_id', '$item_amount')");
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_ally_storage (ally_id, item_id, item_amount) VALUES (?, ?, ?)", [$ally_id, $item_id, $item_amount]);
         } else {
-            mysqli_query($GLOBALS['dbi'], "INSERT INTO de_ally_storage (ally_id, item_id, item_amount, item_wt_change) VALUES ('$ally_id', '$item_id', '$item_amount', $item_amount)");
+            mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_ally_storage (ally_id, item_id, item_amount, item_wt_change) VALUES (?, ?, ?, ?)", [$ally_id, $item_id, $item_amount, $item_amount]);
         }
 
     } else { //es gibt bereits einen datensatz
         //db updaten
         if (!$is_wt) {
-            mysqli_query($GLOBALS['dbi'], "UPDATE de_ally_storage SET item_amount=item_amount+'$item_amount' WHERE ally_id='$ally_id' AND item_id='$item_id'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_ally_storage SET item_amount=item_amount+? WHERE ally_id=? AND item_id=?", [$item_amount, $ally_id, $item_id]);
         } else {
-            mysqli_query($GLOBALS['dbi'], "UPDATE de_ally_storage SET item_amount=item_amount+'$item_amount', item_wt_change='$item_amount' WHERE ally_id='$ally_id' AND item_id='$item_id'");
+            mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_ally_storage SET item_amount=item_amount+?, item_wt_change=? WHERE ally_id=? AND item_id=?", [$item_amount, $item_amount, $ally_id, $item_id]);
         }
     }
 }
@@ -1152,15 +1152,15 @@ function loadPlayerTechs($uid)
 {
     $data = array();
     if ($uid > 0) {
-        $sql = "SELECT * FROM de_user_techs WHERE user_id='$uid';";
-        $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+        $sql = "SELECT * FROM de_user_techs WHERE user_id=?;";
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid]);
         while ($row = mysqli_fetch_array($db_daten)) {
             $data[$row['tech_id']]['time_finished'] = $row['time_finished'];
         }
 
         //die Daten um den NPC-Status erweitern
-        $sql = "SELECT npc FROM de_user_data WHERE user_id='$uid';";
-        $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+        $sql = "SELECT npc FROM de_user_data WHERE user_id=?;";
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid]);
         $row = mysqli_fetch_array($db_daten);
         $data['npc'] = $row['npc'];
     }
@@ -1186,8 +1186,8 @@ function loadPlayerData($uid)
 {
     $data = array();
     if ($uid > 0) {
-        $sql = "SELECT *, de_user_data.status AS ally_status FROM de_user_data LEFT JOIN de_login ON (de_login.user_id=de_user_data.user_id) WHERE de_login.user_id='$uid';";
-        $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+        $sql = "SELECT *, de_user_data.status AS ally_status FROM de_user_data LEFT JOIN de_login ON (de_login.user_id=de_user_data.user_id) WHERE de_login.user_id=?;";
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid]);
         $num = mysqli_num_rows($db_daten);
         if ($num == 1) {
             $data = mysqli_fetch_array($db_daten);
@@ -1203,8 +1203,8 @@ function isMetaOrAlly($ally_id1, $ally_id2): bool
         if ($ally_id1 == $ally_id2) {
             return true;
         }
-        $sql = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = '$ally_id1' AND ally_id_2 = '$ally_id2' OR ally_id_1 = '$ally_id2' AND ally_id_2 = '$ally_id1' LIMIT 1;";
-        $query = mysqli_query($GLOBALS['dbi'], $sql);
+        $sql = "SELECT ally_id_1, ally_id_2 FROM de_ally_partner WHERE ally_id_1 = ? AND ally_id_2 = ? OR ally_id_1 = ? AND ally_id_2 = ? LIMIT 1;";
+        $query = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id1, $ally_id2, $ally_id2, $ally_id1]);
         $num = mysqli_num_rows($query);
         if ($num > 0) {
             return true;
@@ -1527,7 +1527,7 @@ function get_free_artefact_places($user_id)
 
 function getArtefactAmountByUserId($user_id, $artefact_id)
 {
-    $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS amount FROM de_user_artefact WHERE user_id='$user_id' AND id='$artefact_id'");
+    $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS amount FROM de_user_artefact WHERE user_id=? AND id=?", [$user_id, $artefact_id]);
     $row = mysqli_fetch_array($db_daten);
     return($row['amount']);
 }
@@ -1588,8 +1588,8 @@ function getAllyIDByAllytag($allytag)
 
 function getAllyBGScore($ally_id, $bg)
 {
-    $sql = "SELECT bgscore".$bg." AS value FROM de_allys WHERE id='$ally_id'";
-    $db_data = mysqli_query($GLOBALS['dbi'], $sql);
+    $sql = "SELECT bgscore".$bg." AS value FROM de_allys WHERE id=?";
+    $db_data = mysqli_execute_query($GLOBALS['dbi'], $sql, [$ally_id]);
     $row = mysqli_fetch_array($db_data);
 
 

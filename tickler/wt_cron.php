@@ -14,9 +14,9 @@
 if (intval(date("i")) == 0) {
     $time = time() - 3600 * 24 * 2;
     mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_chat_msg WHERE timestamp<?", [$time]);
-    mysqli_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_msg WHERE timestamp<'$time'");
+    mysqli_execute_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_msg WHERE timestamp<?", [$time]);
     // Und auch die alten Ignores aufräumen
-    mysqli_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_ignore WHERE ignore_until<'".time()."'");
+    mysqli_execute_query($GLOBALS['dbi_ls'], "DELETE FROM de_chat_ignore WHERE ignore_until<?", [time()]);
 }
 
 //aktuelle stunde ermitteln
@@ -162,7 +162,7 @@ if ($nachtcron != $time) {
 
             //Anzahl der Spieler im globalen Chat anzeigen
             if ($sv_server_tag == 'SDE') {
-                $db_daten_uc = mysqli_query($GLOBALS['dbi_ls'], "SELECT anzahl FROM ls_user_count ORDER BY datum DESC LIMIT 1;");
+                $db_daten_uc = mysqli_execute_query($GLOBALS['dbi_ls'], "SELECT anzahl FROM ls_user_count ORDER BY datum DESC LIMIT 1;", []);
                 $row_uc = mysqli_fetch_array($db_daten_uc);
                 $anzahl_uc = $row_uc["anzahl"];
 

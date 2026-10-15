@@ -454,23 +454,23 @@ if ($doetick == 1) {
             if ($vs_auto_explore == 1) {
                 $ea = 0;
 
-                $sql = "SELECT * FROM de_user_map WHERE user_id='".$uid."' AND known_since>'".time()."' LIMIT 1";
-                $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+                $sql = "SELECT * FROM de_user_map WHERE user_id=? AND known_since>? LIMIT 1";
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, time()]);
                 $num = mysqli_num_rows($db_daten);
                 if ($num > 0) {
                     //vom WT werden alle known_since des Users auf 1000 gesetzt, damit ist das System erforscht
-                    mysqli_query($GLOBALS['dbi'], "UPDATE de_user_map SET known_since=1000 WHERE user_id='".$uid."';");
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_map SET known_since=1000 WHERE user_id=?;", [$uid]);
                 }
             } else {
-                $sql = "SELECT * FROM de_user_map WHERE user_id='".$uid."' AND known_since>'".time()."' LIMIT 1";
-                $db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+                $sql = "SELECT * FROM de_user_map WHERE user_id=? AND known_since>? LIMIT 1";
+                $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$uid, time()]);
                 $num = mysqli_num_rows($db_daten);
                 if ($num == 0) {
                     $ea = $col * ($sv_kollieertrag - $malus - $sabotagemalus);
                 } else {
                     $ea = 0;
                     //vom WT werden alle known_since des Users auf 1000 gesetzt, damit ist das System erforscht
-                    mysqli_query($GLOBALS['dbi'], "UPDATE de_user_map SET known_since=1000 WHERE user_id='".$uid."';");
+                    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_map SET known_since=1000 WHERE user_id=?;", [$uid]);
                 }
             }
 
@@ -1617,8 +1617,8 @@ if ($doetick == 1) {
                     //account zurücksetzen, in sektor 1 (0:0) verschieben, eh_siege um 1 erhöhen
                     ///////////////////////////////////////////////////////////////////////////
                     //die Titanen-Energiekerne beim Teilreset zurückerstatten
-                    $titanen_sql = "SELECT SUM(e90) AS anzahl FROM de_user_fleet WHERE user_id LIKE '".$user_id."-%';";
-                    $db_titanen = mysqli_query($GLOBALS['dbi'], $titanen_sql);
+                    $titanen_sql = "SELECT SUM(e90) AS anzahl FROM de_user_fleet WHERE user_id LIKE ?;";
+                    $db_titanen = mysqli_execute_query($GLOBALS['dbi'], $titanen_sql, [$user_id."-%"]);
                     $row_titanen = mysqli_fetch_array($db_titanen);
                     change_storage_amount($user_id, 2, $row_titanen['anzahl'], false);
 

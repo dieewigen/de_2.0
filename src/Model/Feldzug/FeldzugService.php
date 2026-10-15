@@ -214,11 +214,11 @@ class FeldzugService
         if (empty($alt)) {
             return;
         }
-        $liste = implode(',', $alt);
+        $platzhalter = implode(',', array_fill(0, count($alt), '?'));
         foreach (['de_feldzug_brennpunkt', 'de_feldzug_teilnehmer', 'de_feldzug_mitglied', 'de_feldzug_verteilung', 'de_feldzug_ergebnis'] as $tabelle) {
-            mysqli_query($this->db, "DELETE FROM ".$tabelle." WHERE feldzug_id IN (".$liste.")");
+            mysqli_execute_query($this->db, "DELETE FROM ".$tabelle." WHERE feldzug_id IN (".$platzhalter.")", $alt);
         }
-        mysqli_query($this->db, "DELETE FROM de_feldzug WHERE id IN (".$liste.")");
+        mysqli_execute_query($this->db, "DELETE FROM de_feldzug WHERE id IN (".$platzhalter.")", $alt);
         $this->neuLaden();
     }
 
@@ -322,7 +322,7 @@ class FeldzugService
      */
     private function waehleSysteme(int $anzahl): array
     {
-        $res = mysqli_query($this->db, "SELECT id, data FROM de_map_objects WHERE system_typ = 1 AND always_visible = 0 ORDER BY RAND() LIMIT ".(int)($anzahl * 3));
+        $res = mysqli_execute_query($this->db, "SELECT id, data FROM de_map_objects WHERE system_typ = 1 AND always_visible = 0 ORDER BY RAND() LIMIT ?", [(int)($anzahl * 3)]);
         $liste = [];
         while (($row = mysqli_fetch_assoc($res)) && count($liste) < $anzahl) {
             $name = '#'.$row['id'];

@@ -27,7 +27,7 @@ class TickGiveSecBuildingsToNPC2
                   AND npc IN (0, 2)
                 GROUP BY sector
             ";
-            $result = mysqli_query($this->db, $sectorQuery);
+            $result = mysqli_execute_query($this->db, $sectorQuery, []);
             
             if (!$result) {
                 return [

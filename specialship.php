@@ -3,9 +3,9 @@ use DieEwigen\DE2\Model\Battleground\Battleground;
 use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
 include "lib/map_system.class.php";
-$sv_bg = Battleground::DEFS;
 include 'lib/special_ship.class.php';
 include "functions.php";
+$sv_bg = Battleground::DEFS;
 
 use DieEwigen\DE2\Model\Battleground\Haltung;
 use DieEwigen\DE2\Session\CsrfToken;
@@ -24,7 +24,7 @@ $spec4=$row['spec4'];
 $gr01=$restyp01;$gr02=$restyp02;$gr03=$restyp03;$gr04=$restyp04;$gr05=$restyp05;
 
 //maximalen tick auslesen
-$result  = mysqli_query($GLOBALS['dbi'], "SELECT kt FROM de_system LIMIT 1");
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT kt FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $max_kt = $row["kt"];
 
@@ -163,7 +163,7 @@ if(!hasTech($pt,159)){
 	//Battlegrounds aus der DB holen und darstellen
 	$ss_wahl_moeglich=false;
 	$sql="SELECT * FROM `de_map_objects` WHERE system_typ=4 ORDER BY system_subtyp ASC;";
-	$db_data=mysqli_query($GLOBALS['dbi'],$sql);
+	$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 	while($row = mysqli_fetch_array($db_data)){
 		$system_data=unserialize($row['data']);
 		$system_subtyp=$row['system_subtyp'];
@@ -247,7 +247,7 @@ for($i=0;$i<3;$i++){
 
 		//Spielerdaten laden
 		$sql="SELECT * FROM `de_user_data` WHERE bgscore".$i." > 1 ORDER BY bgscore".$i." DESC;";
-		$db_data=mysqli_query($GLOBALS['dbi'],$sql);
+		$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 		$platz=1;
 		while($row = mysqli_fetch_array($db_data)){
 			//Schiffsdaten laden
@@ -263,7 +263,7 @@ for($i=0;$i<3;$i++){
 
 		//Allianzdaten laden
 		$sql="SELECT * FROM de_allys WHERE bgscore".$i." > 0 ORDER BY bgscore".$i." DESC;";
-		$db_data=mysqli_query($GLOBALS['dbi'],$sql);
+		$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 		$platz=1;
 		while($row = mysqli_fetch_array($db_data)){
 			$zeilen.='<div class="einh-rang einh-rang-ally einh-platz'.min($platz, 4).'"><span class="prod-zahl">'.$platz.'</span><span class="einh-rang-name">'.$row['allytag'].'</span><span class="prod-zahl"><b>'.$row['bgscore'.$i].'</b></span></div>';

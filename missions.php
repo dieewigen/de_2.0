@@ -107,7 +107,7 @@ function mission_text($liste){
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT id, level FROM de_user_artefact WHERE id=11 AND user_id='".$_SESSION['ums_user_id']."';");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=11 AND user_id=?;", [$_SESSION['ums_user_id']]);
 $artbonus_duration=0;
 while($row = mysqli_fetch_array($db_daten)){
 	$artbonus_duration=$artbonus_duration+$ua_werte[$row["id"]-1][$row["level"]-1][0];
@@ -122,7 +122,7 @@ if($artbonus_duration>50){
 ///////////////////////////////////////////////////////////////////////
 /*
 unset($agent_list);
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT agent FROM de_user_data WHERE sector>1 AND npc=0");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT agent FROM de_user_data WHERE sector>1 AND npc=0", []);
 //alle daten in ein array packen
 while($row = mysqli_fetch_array($db_daten)){
 	$agent_list[]=$row['agent'];
@@ -141,7 +141,7 @@ if($spec4==2){
 //echo 'A: '.$duration_factor.'/'.$artbonus_duration;
 
 //maximalen tick auslesen
-$result  = mysqli_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1");
+$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt AS tick FROM de_system LIMIT 1", []);
 $row     = mysqli_fetch_array($result);
 $maxtick = $row["tick"];
 
@@ -158,7 +158,7 @@ if($mission_sabotage){
 ///////////////////////////////////////////////////////////////////////
 // Durchschnittswert der Agenten auf dem Server berechnen
 ///////////////////////////////////////////////////////////////////////
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT AVG(agent) AS agent_avg FROM de_user_data WHERE sector>1 AND npc=0 LIMIT 1");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT AVG(agent) AS agent_avg FROM de_user_data WHERE sector>1 AND npc=0 LIMIT 1", []);
 $row = mysqli_fetch_array($db_daten);
 $agent_avg=$row['agent_avg'];
 
@@ -424,7 +424,7 @@ if(!hasTech($pt,29)){
 	//die Missionsdatensätze auslesen
 	///////////////////////////////////////////////////////////
 	$um=array();
-	$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=".intval($_SESSION['ums_user_id']).";");
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_mission WHERE user_id=?;", [intval($_SESSION['ums_user_id'])]);
 	//alle daten in ein array packen
 	while($row = mysqli_fetch_array($db_daten)){
 		$um[$row['mission_id']]=$row;
@@ -584,9 +584,9 @@ if(!hasTech($pt,29)){
 
 
 								//Agenten abziehen
-								$sql="UPDATE de_user_data SET agent=agent-".$md[$m]['need_agents']." WHERE user_id=".$_SESSION['ums_user_id'].";";
+								$sql="UPDATE de_user_data SET agent=agent-? WHERE user_id=?;";
 								write2agentlog($_SESSION['ums_user_id'], 'mission-need', $md[$m]['need_agents']);
-								mysqli_query($GLOBALS['dbi'],$sql);
+								mysqli_execute_query($GLOBALS['dbi'], $sql, [$md[$m]['need_agents'], $_SESSION['ums_user_id']]);
 
 								//Kosten abziehen
 								if(isset($md[$m]['cost']) && count($md[$m]['cost'])>0){
@@ -608,18 +608,18 @@ if(!hasTech($pt,29)){
 									end_time,
 									get_reward
 								)VALUES(
-									'".$_SESSION['ums_user_id']."',
-									'".$m."',
-									'".serialize($md[$m]['reward'])."',
-									'".$reward_percentage."',
-									'".$md[$m]['need_agents']."',
-									'".$end_time."',
+									?,
+									?,
+									?,
+									?,
+									?,
+									?,
 									'0'
 								) ON DUPLICATE KEY UPDATE 
-									reward='".serialize($md[$m]['reward'])."',
-									reward_percentage='".$reward_percentage."',
-									end_time='".$end_time."',
-									need_agents='".$md[$m]['need_agents']."',
+									reward=?,
+									reward_percentage=?,
+									end_time=?,
+									need_agents=?,
 									get_reward='0'
 								";
 
@@ -627,7 +627,7 @@ if(!hasTech($pt,29)){
 								$um[$m]['need_agents']=$md[$m]['need_agents'];
 							
 								//echo $sql;
-								mysqli_query($GLOBALS['dbi'],$sql);
+								mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $m, serialize($md[$m]['reward']), $reward_percentage, $md[$m]['need_agents'], $end_time, serialize($md[$m]['reward']), $reward_percentage, $end_time, $md[$m]['need_agents']]);
 
 								$um[$m]['end_time']=$end_time;
 								$um[$m]['get_reward']=0;
@@ -636,8 +636,8 @@ if(!hasTech($pt,29)){
 								if($md[$m]['typ']==1 || $md[$m]['typ']==2){
 									//Handelspunkte
 									$tradescore=$md[$m]['time']*$GLOBALS['tech_build_time_faktor']*$reward_percentage/100;
-									$sql="UPDATE de_user_data SET tradesystemscore=tradesystemscore+'".$tradescore."', tradesystemtrades=tradesystemtrades+1 WHERE user_id='".$_SESSION['ums_user_id']."'";
-									mysqli_query($GLOBALS['dbi'], $sql);
+									$sql="UPDATE de_user_data SET tradesystemscore=tradesystemscore+?, tradesystemtrades=tradesystemtrades+1 WHERE user_id=?";
+									mysqli_execute_query($GLOBALS['dbi'], $sql, [$tradescore, $_SESSION['ums_user_id']]);
 
 									//Flotte
 									unset($mission_data);
@@ -649,12 +649,12 @@ if(!hasTech($pt,29)){
 								if($allyid>0){
 
 									//wenn die Missionsaufgabe aktiv ist, den Wert um eins erhöhen
-									mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id='$allyid' AND questtyp=4");
+									mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questreach = questreach + 1 WHERE id=? AND questtyp=4", [$allyid]);
 
 									//Allianzmission aktualisieren
 									if(isset($md[$m]['ally_mission_counter_id'])){
 										$mcid=intval($md[$m]['ally_mission_counter_id']);
-										mysqli_query($GLOBALS['dbi'], "UPDATE de_allys SET mission_counter_$mcid = mission_counter_$mcid + 1 WHERE id='$allyid'");
+										mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET mission_counter_$mcid = mission_counter_$mcid + 1 WHERE id=?", [$allyid]);
 									}
 								}
 
@@ -702,9 +702,9 @@ if(!hasTech($pt,29)){
 
 							if($mission_claimed){
 								//Agenten wieder gutschreiben
-								$sql="UPDATE de_user_data SET agent=agent+".$um[$m]['need_agents']." WHERE user_id=".$_SESSION['ums_user_id'].";";
+								$sql="UPDATE de_user_data SET agent=agent+? WHERE user_id=?;";
 								write2agentlog($_SESSION['ums_user_id'], 'mission-getback', $md[$m]['need_agents']);
-								mysqli_query($GLOBALS['dbi'],$sql);
+								mysqli_execute_query($GLOBALS['dbi'], $sql, [$um[$m]['need_agents'], $_SESSION['ums_user_id']]);
 
 								//bekommt man nur einen prozentuellen Wert?
 								$reward_percentage=$um[$m]['reward_percentage'];
@@ -722,8 +722,8 @@ if(!hasTech($pt,29)){
 										case 'A':
 											//Zufallsartefakt hinterlegen
 											$artid=mt_rand(1, count($ua_name));
-											$sql="INSERT INTO de_user_artefact (user_id, id, level) VALUES ('".$_SESSION['ums_user_id']."', '$artid', '1')";
-											mysqli_query($GLOBALS['dbi'],$sql);
+											$sql="INSERT INTO de_user_artefact (user_id, id, level) VALUES (?, ?, '1')";
+											mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $artid]);
 
 											//Erfolgs-Nachricht
 											$success_msg.='<br>Erhaltenes Artefakt: '.$ua_name[$artid-1];
@@ -744,12 +744,12 @@ if(!hasTech($pt,29)){
 											//steuern
 											$tax_amount=round($tax_amount/100*$sektorsteuersatz);
 											//Steuer an die Sektorkasse abführen
-											$sql="UPDATE de_sector SET restyp0".$restyp."=restyp0".$restyp."+'".$tax_amount."' WHERE sec_id='$sector'";
-											mysqli_query($GLOBALS['dbi'],$sql);
+											$sql="UPDATE de_sector SET restyp0".$restyp."=restyp0".$restyp."+? WHERE sec_id=?";
+											mysqli_execute_query($GLOBALS['dbi'], $sql, [$tax_amount, $sector]);
 
 											//Rohstoffe und Spende hinterlegen
-											$sql="UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."+'".($amount-$tax_amount)."', spend0".$restyp."=spend0".$restyp."+'".$tax_amount."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-											mysqli_query($GLOBALS['dbi'],$sql);
+											$sql="UPDATE de_user_data SET restyp0".$restyp."=restyp0".$restyp."+?, spend0".$restyp."=spend0".$restyp."+? WHERE user_id=?;";
+											mysqli_execute_query($GLOBALS['dbi'], $sql, [($amount-$tax_amount), $tax_amount, $_SESSION['ums_user_id']]);
 											
 											$resnamen=array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
 											//Erfolgs-Nachricht

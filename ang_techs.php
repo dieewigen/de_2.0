@@ -55,7 +55,7 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	///////////////////////////////////////////////////////////////////
 	//alle Technologien aus der DB auslesen und in ein Array packen
 	///////////////////////////////////////////////////////////////////
-	$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_sort_id < 1000 ORDER BY tech_level ASC, tech_sort_id ASC");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_sort_id < 1000 ORDER BY tech_level ASC, tech_sort_id ASC", []);
 	$tech_daten=array();
 	while($row = mysqli_fetch_array($db_daten)){
 		$tech_daten[$row['tech_id']]=$row;
@@ -68,8 +68,8 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	$active_tech_types_row=array();
 	$anzahl_tech_types=4;
 	for($i=0;$i<$anzahl_tech_types;$i++){
-		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
-			WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_typ='$i' AND time_finished>='".time()."';");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
+			WHERE user_id=? AND tech_typ=? AND time_finished>=?;", [$_SESSION['ums_user_id'], $i, time()]);
 		$num=mysqli_num_rows($db_daten);
 		$active_tech_types[$i] = $num;
 		if($num>0){
@@ -156,15 +156,15 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 
 			//Kosten gutschreiben
 			$sql="UPDATE de_user_data SET
-				restyp01=restyp01+'".$ben_restyp01."',
-				restyp02=restyp02+'".$ben_restyp02."',
-				restyp03=restyp03+'".$ben_restyp03."',
-				restyp04=restyp04+'".$ben_restyp04."',
-				restyp05=restyp05+'".$ben_restyp05."'
-				WHERE user_id='".$_SESSION['ums_user_id']."';";
+				restyp01=restyp01+?,
+				restyp02=restyp02+?,
+				restyp03=restyp03+?,
+				restyp04=restyp04+?,
+				restyp05=restyp05+?
+				WHERE user_id=?;";
 
 			//echo $sql;
-			mysqli_query($GLOBALS['dbi'], $sql);
+			mysqli_execute_query($GLOBALS['dbi'], $sql, [$ben_restyp01, $ben_restyp02, $ben_restyp03, $ben_restyp04, $ben_restyp05, $_SESSION['ums_user_id']]);
 
 			//Item-Kosten gutschreiben
 			foreach ($need_storage_res as $key => $value){
@@ -175,9 +175,9 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 			//Technologie in der DB hinterlegen
 			//
 			$time_finished=time()+floor($tech_daten[$tech_id]['tech_build_time']*$GLOBALS['tech_build_time_faktor']);
-			$sql="DELETE FROM de_user_techs WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_id='".$tech_id."';";
+			$sql="DELETE FROM de_user_techs WHERE user_id=? AND tech_id=?;";
 			//echo $sql;
-			mysqli_query($GLOBALS['dbi'], $sql);
+			mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $tech_id]);
 			$msg='<div class="mod-meldung mod-meldung-ok">Der Auftrag wurde abgebrochen, die Kosten wurden erstattet.</div>';
 
 			//Daten erneut auslesen
@@ -196,7 +196,7 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	///////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['start_tech']) && $_REQUEST['start_tech']>0){
 		//ist die Runde bereits gestartet?
-		$result  = mysqli_query($GLOBALS['dbi'], "SELECT wt FROM de_system LIMIT 1");
+		$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT wt FROM de_system LIMIT 1", []);
 		$row     = mysqli_fetch_array($result);
 		$max_wt = $row["wt"];
 
@@ -311,15 +311,15 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 						if($has_all){
 							//Rohstoff-Kosten abziehen
 							$sql="UPDATE de_user_data SET
-								restyp01=restyp01-'".$ben_restyp01."',
-								restyp02=restyp02-'".$ben_restyp02."',
-								restyp03=restyp03-'".$ben_restyp03."',
-								restyp04=restyp04-'".$ben_restyp04."',
-								restyp05=restyp05-'".$ben_restyp05."'
-								WHERE user_id='".$_SESSION['ums_user_id']."';";
+								restyp01=restyp01-?,
+								restyp02=restyp02-?,
+								restyp03=restyp03-?,
+								restyp04=restyp04-?,
+								restyp05=restyp05-?
+								WHERE user_id=?;";
 
 							//echo $sql;
-							mysqli_query($GLOBALS['dbi'], $sql);
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$ben_restyp01, $ben_restyp02, $ben_restyp03, $ben_restyp04, $ben_restyp05, $_SESSION['ums_user_id']]);
 
 							//Item-Kosten abziehen
 							foreach ($need_storage_res as $key => $value){
@@ -330,9 +330,9 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 							//Technologie in der DB hinterlegen
 							//
 							$time_finished=time()+floor($tech_daten[$tech_id]['tech_build_time']*$GLOBALS['tech_build_time_faktor']);
-							$sql="INSERT INTO de_user_techs SET user_id='".$_SESSION['ums_user_id']."', tech_id='".$tech_id."', time_finished='".$time_finished."'";
+							$sql="INSERT INTO de_user_techs SET user_id=?, tech_id=?, time_finished=?";
 							//echo $sql;
-							mysqli_query($GLOBALS['dbi'], $sql);
+							mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $tech_id, $time_finished]);
 
 							$tech_names=explode(";",$tech_daten[$tech_id]['tech_name']);
 							$msg='<div class="mod-meldung mod-meldung-ok">'.$tech_names[$_SESSION['ums_rasse']-1].' l&auml;uft jetzt '.RealTime::until($time_finished).'.</div>';
@@ -381,8 +381,8 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	$active_tech_types=array();
 	$active_tech_types_row=array();
 	for($i=0;$i<$anzahl_tech_types;$i++){
-		$db_daten=mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
-			WHERE user_id='".$_SESSION['ums_user_id']."' AND tech_typ='$i' AND time_finished>='".time()."';");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_techs LEFT JOIN de_tech_data ON (de_user_techs.tech_id=de_tech_data.tech_id)
+			WHERE user_id=? AND tech_typ=? AND time_finished>=?;", [$_SESSION['ums_user_id'], $i, time()]);
 		$num=mysqli_num_rows($db_daten);
 		$active_tech_types[$i] = $num;
 		if($num>0){

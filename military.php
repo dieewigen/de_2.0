@@ -187,7 +187,7 @@ if (isset($_POST['verlegen'])){
 		}
 		//flottendaten laden
 		$fid0=$_SESSION['ums_user_id'].'-0';$fid1=$_SESSION['ums_user_id'].'-1';$fid2=$_SESSION['ums_user_id'].'-2';$fid3=$_SESSION['ums_user_id'].'-3';
-		$einheiten_result=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+		$einheiten_result=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
 		$einheiten_daten=array();
 		while($row = mysqli_fetch_array($einheiten_result)){ //jeder gefundene datensatz wird geprueft
 			$einheiten_daten[]=$row;
@@ -230,14 +230,14 @@ if (isset($_POST['verlegen'])){
 					$fw2=$sa[$i-81][1]-$fleet[2];
 					$fw3=$sa[$i-81][2]-$fleet[3];
 					//schiffsart updaten, wenn die flotte auch daheim ist
-					$sql ="UPDATE de_user_fleet SET e$i = e$i + '$fw0' WHERE user_id = '".$_SESSION['ums_user_id']."-0';";
-					mysqli_query($GLOBALS['dbi'],$sql);
-					$sql="UPDATE de_user_fleet SET e$i = e$i + '$fw1' WHERE user_id = '".$_SESSION['ums_user_id']."-1';";
-					if($fleet_a[1]==0)mysqli_query($GLOBALS['dbi'],$sql);
-					$sql="UPDATE de_user_fleet SET e$i = e$i + '$fw2' WHERE user_id = '".$_SESSION['ums_user_id']."-2';";
-					if($fleet_a[2]==0)mysqli_query($GLOBALS['dbi'],$sql);
-					$sql="UPDATE de_user_fleet SET e$i = e$i + '$fw3' WHERE user_id = '".$_SESSION['ums_user_id']."-3';";
-					if($fleet_a[3]==0)mysqli_query($GLOBALS['dbi'],$sql);
+					$sql ="UPDATE de_user_fleet SET e$i = e$i + ? WHERE user_id = ?;";
+					mysqli_execute_query($GLOBALS['dbi'], $sql, [$fw0, $_SESSION['ums_user_id']."-0"]);
+					$sql="UPDATE de_user_fleet SET e$i = e$i + ? WHERE user_id = ?;";
+					if($fleet_a[1]==0)mysqli_execute_query($GLOBALS['dbi'], $sql, [$fw1, $_SESSION['ums_user_id']."-1"]);
+					$sql="UPDATE de_user_fleet SET e$i = e$i + ? WHERE user_id = ?;";
+					if($fleet_a[2]==0)mysqli_execute_query($GLOBALS['dbi'], $sql, [$fw2, $_SESSION['ums_user_id']."-2"]);
+					$sql="UPDATE de_user_fleet SET e$i = e$i + ? WHERE user_id = ?;";
+					if($fleet_a[3]==0)mysqli_execute_query($GLOBALS['dbi'], $sql, [$fw3, $_SESSION['ums_user_id']."-3"]);
 				}
 			}
 			else $error=1;
@@ -305,13 +305,13 @@ echo 'var shipscore = new Array();';
 //alle werte auslesen, die man für die seite benötigt
 //lade die anzahl der einheiten
 $fid0=$_SESSION['ums_user_id'].'-0';$fid1=$_SESSION['ums_user_id'].'-1';$fid2=$_SESSION['ums_user_id'].'-2';$fid3=$_SESSION['ums_user_id'].'-3';
-$einheiten_result=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+$einheiten_result=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
 $einheiten_daten=array();
 while($row = mysqli_fetch_array($einheiten_result)){ //jeder gefundene datensatz wird geprueft
 	$einheiten_daten[]=$row;
 }
 //lade einheitentypen
-$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id");
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id", []);
 $i=81;
 $ez1=Array(0,0,0,0,0,0,0,0,0,0,0,0);
 $ez2=Array(0,0,0,0,0,0,0,0,0,0,0,0);
@@ -458,7 +458,7 @@ function rangok($zscore, $rang_nr, $sector, $system, $zcol, $kriegsgegner, $coun
 	}
 
 	//sektordaten auslesen
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT platz, npc FROM de_sector WHERE sec_id='$sector'");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT platz, npc FROM de_sector WHERE sec_id=?", [$sector]);
 	$row = mysqli_fetch_array($db_daten);
 	$secplatz=$row['platz'];
 	$npcsec=$row['npc'];
@@ -467,12 +467,12 @@ function rangok($zscore, $rang_nr, $sector, $system, $zcol, $kriegsgegner, $coun
 	if ($npcsec==0){//normaler spielersektor
 		//sektormalus bei der attgrenze berechnen
 		//zuerst anzahl der pc-sektoren auslesen
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT sec_id FROM de_sector WHERE npc=0 AND platz>0");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT sec_id FROM de_sector WHERE npc=0 AND platz>0", []);
 		$num = mysqli_num_rows($db_daten);
 		if($num<1)$num=1;
 
 		//eigenen sektorplatz auslesen
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT platz FROM de_sector WHERE sec_id='$ownsector'");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT platz FROM de_sector WHERE sec_id=?", [$ownsector]);
 		$row = mysqli_fetch_array($db_daten);
 		$ownsectorplatz=$row['platz'];
 
@@ -488,7 +488,7 @@ function rangok($zscore, $rang_nr, $sector, $system, $zcol, $kriegsgegner, $coun
 		$sec_angriffsgrenze=$sv_attgrenze-$sv_attgrenze_whg_bonus+$sec_malus;
 
 		//angriffsgrenze für die kollektoren berechnen
-		$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0");
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(col) AS maxcol FROM de_user_data WHERE npc=0", []);
 		$row = mysqli_fetch_array($db_daten);
 		$maxcol=$row['maxcol'];
 		if($maxcol==0)$maxcol=1;
@@ -516,8 +516,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 	global $ownally, $schiffsdaten, $errmsg, $col, $military_lang, $sv_npcatt_col_grenze, $ownsector, $showfleettarget;
 
 	//teste ob die flotte bereit ist befehle zu bekommen
-	$sql="SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id = '$fleet_id'";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT aktion, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 FROM de_user_fleet WHERE user_id = ?";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$fleet_id]);
 	$row = mysqli_fetch_array($db_daten);
 	$akt=$row['aktion'];
 	$schiffe=0;$ge=0;$deftarn=0;
@@ -539,7 +539,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 		  $zk=$zsec.':'.$zsys;
 		  $ak=$sector.':'.$system;
 		  if ($zk==$ak) $zsec=0;
-		  $db_daten=mysqli_query($GLOBALS['dbi'],"SELECT user_id, score, col, techs, status, allytag, rang, npc FROM de_user_data WHERE sector='$zsec' and system='$zsys'");
+		  $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, score, col, techs, status, allytag, rang, npc FROM de_user_data WHERE sector=? and system=?", [$zsec, $zsys]);
 		  $num = mysqli_num_rows($db_daten);
 
 		  if($num==1){//die koordinaten stimmen
@@ -573,7 +573,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 			if ($akttyp==2) $ok=1;//bei der verteidigung spielt der rang keine rolle
 
 			//status für urlaub bestimmen
-			$db_datenx=mysqli_query($GLOBALS['dbi'],"SELECT status FROM de_login WHERE user_id='$uid'");
+			$db_datenx=mysqli_execute_query($GLOBALS['dbi'], "SELECT status FROM de_login WHERE user_id=?", [$uid]);
 			$rowx = mysqli_fetch_array($db_datenx);
 			if ($rowx['status']==3) $ok=0;
 			if ($rowx['status']==2) $ok=0;
@@ -583,8 +583,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 				$fleet_id_1=$_SESSION['ums_user_id'].'-1';
 				$fleet_id_2=$_SESSION['ums_user_id'].'-2';
 				$fleet_id_3=$_SESSION['ums_user_id'].'-3';
-				$sql="SELECT aktion FROM de_user_fleet WHERE aktion=2 AND zielsec='$zsec' AND zielsys='$zsys' AND (user_id = '$fleet_id_1' OR user_id = '$fleet_id_2' OR user_id = '$fleet_id_3');";
-				$db_datenf=mysqli_query($GLOBALS['dbi'],$sql);
+				$sql="SELECT aktion FROM de_user_fleet WHERE aktion=2 AND zielsec=? AND zielsys=? AND (user_id = ? OR user_id = ? OR user_id = ?);";
+				$db_datenf=mysqli_execute_query($GLOBALS['dbi'], $sql, [$zsec, $zsys, $fleet_id_1, $fleet_id_2, $fleet_id_3]);
 				$num = mysqli_num_rows($db_datenf);
 				if($num>0){
 					$ok=0;
@@ -595,8 +595,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 				$fleet_id_1=$_SESSION['ums_user_id'].'-1';
 				$fleet_id_2=$_SESSION['ums_user_id'].'-2';
 				$fleet_id_3=$_SESSION['ums_user_id'].'-3';
-				$sql="SELECT aktion FROM de_user_fleet WHERE aktion=1 AND zielsec='$zsec' AND zielsys='$zsys' AND (user_id = '$fleet_id_1' OR user_id = '$fleet_id_2' OR user_id = '$fleet_id_3');";
-				$db_datenf=mysqli_query($GLOBALS['dbi'],$sql);
+				$sql="SELECT aktion FROM de_user_fleet WHERE aktion=1 AND zielsec=? AND zielsys=? AND (user_id = ? OR user_id = ? OR user_id = ?);";
+				$db_datenf=mysqli_execute_query($GLOBALS['dbi'], $sql, [$zsec, $zsys, $fleet_id_1, $fleet_id_2, $fleet_id_3]);
 				$num = mysqli_num_rows($db_datenf);
 				if($num>0){
 					$ok=0;
@@ -608,21 +608,21 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 				//----------- Ally Feinde/Freunde
 				$allypartner = array();
 				$allyfeinde = array();
-				$query = "select id from de_allys where allytag='$ownally'";
-				$allyresult = mysqli_query($GLOBALS['dbi'],$query);
+				$query = "select id from de_allys where allytag=?";
+				$allyresult = mysqli_execute_query($GLOBALS['dbi'], $query, [$ownally]);
 				$at=mysqli_num_rows($allyresult);
 				if ($at!=0){
 					$row = mysqli_fetch_array($allyresult);
 					$allyid = $row['id'];
 
 
-					$allyresult = mysqli_query($GLOBALS['dbi'],"SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=$allyid or ally_id_2=$allyid) and (ally_id_1=id or ally_id_2=id)");
+					$allyresult = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_partner, de_allys where (ally_id_1=? or ally_id_2=?) and (ally_id_1=id or ally_id_2=id)", [$allyid, $allyid]);
 					while($row = mysqli_fetch_array($allyresult)){
 							if ($ownally != $row['allytag'])
 								  $allypartner[] = $row['allytag'];
 					}
 
-					$allyresult = mysqli_query($GLOBALS['dbi'],"SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=$allyid or ally_id_angegriffener=$allyid) and (ally_id_angreifer=id or ally_id_angegriffener=id)");
+					$allyresult = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag FROM de_ally_war, de_allys where (ally_id_angreifer=? or ally_id_angegriffener=?) and (ally_id_angreifer=id or ally_id_angegriffener=id)", [$allyid, $allyid]);
 					while($row = mysqli_fetch_array($allyresult)){
 						if ($ownally != $row['allytag']){
 							$allyfeinde[] = $row['allytag'];
@@ -658,7 +658,7 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 
 				if ($akttyp==1 && $rz>0){
 					//sektor
-					$db_datensec=mysqli_query($GLOBALS['dbi'],"SELECT techs FROM de_sector WHERE sec_id = '$zsec'");
+					$db_datensec=mysqli_execute_query($GLOBALS['dbi'], "SELECT techs FROM de_sector WHERE sec_id = ?", [$zsec]);
 					$rowsec = mysqli_fetch_array($db_datensec);
 					$sectechs = $rowsec['techs'];
 					if ($sectechs[2]==1) $rz++;
@@ -689,8 +689,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 					if ($akttyp==1){$freind=$military_lang['feindliche'];$newsid=51;}
 					else {$freind=$military_lang['verbuendete'];$newsid=53; $ge=$ge+$deftarn;}
 					if ($ge==1) $sb=$military_lang['schiff'];else $sb=$military_lang['schiffen'];
-					mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, $newsid,'$time','$military_lang[sendmsg1] $freind $military_lang[sendmsg2] ".number_format($ge, 0,"",".")." $sb $military_lang[sendmsg3]: ($ak), $military_lang[reisezeit]: $rz')");
-					mysqli_query($GLOBALS['dbi'],"update de_user_data set newnews = 1 where user_id = $uid");
+					mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, ?,?,?)", [$uid, $newsid, $time, "$military_lang[sendmsg1] $freind $military_lang[sendmsg2] ".number_format($ge, 0,"",".")." $sb $military_lang[sendmsg3]: ($ak), $military_lang[reisezeit]: $rz"]);
+					mysqli_execute_query($GLOBALS['dbi'], "update de_user_data set newnews = 1 where user_id = ?", [$uid]);
 				}
 
 				if ($rz>0){//zielkoordinaten und flotte ok? flotte starten
@@ -705,8 +705,8 @@ function attdef($fleet_id, $sector, $system, $pt, $zsec, $zsys, $db, $akttyp, $a
 					//flotte losschicken
 					if ($aktzeit<1 OR $aktzeit>3)$aktzeit=0;
 					if ($akttyp==1)$aktzeit=0;
-					$sql="UPDATE de_user_fleet SET aktion = '$akttyp', zeit = '$rz', gesrzeit = '$rz', zielsys = '$zsys', zielsec='$zsec', entdeckt='$entdeckt', entdecktsec='$entdecktsec', showfleettarget='$showft', aktzeit = '$aktzeit', fleetsize = '$ge' WHERE user_id = '$fleet_id'";
-					mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="UPDATE de_user_fleet SET aktion = ?, zeit = ?, gesrzeit = ?, zielsys = ?, zielsec=?, entdeckt=?, entdecktsec=?, showfleettarget=?, aktzeit = ?, fleetsize = ? WHERE user_id = ?";
+					mysqli_execute_query($GLOBALS['dbi'], $sql, [$akttyp, $rz, $rz, $zsys, $zsec, $entdeckt, $entdecktsec, $showft, $aktzeit, $ge, $fleet_id]);
 
 					//Bestätigung mit Ziel und Reisezeit
 					$errmsg.=mil_meldung(($akttyp==1 ? $military_lang['status2'].' auf ' : $military_lang['status3'].' von ').$zsec.':'.$zsys.' befohlen, '.$military_lang['reisezeit'].' '.$rz.' KT.', 'ok', $fleet_id);
@@ -735,8 +735,8 @@ function recall($fleet_id, $sector, $system, $db){
 	global $military_lang, $spec5, $errmsg;
 
 	//erstmal die daten der flotte holen und sichern
-	$sql="select aktion, zeit, entdeckt, zielsec, zielsys, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 from de_user_fleet where user_id = '$fleet_id'";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="select aktion, zeit, entdeckt, zielsec, zielsys, e81, e82, e83, e84, e85, e86, e87, e88, e89, e90 from de_user_fleet where user_id = ?";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$fleet_id]);
 	$row = mysqli_fetch_array($db_daten);
 	$entdeckt=$row['entdeckt'];
 	$akttyp=$row['aktion'];
@@ -749,26 +749,26 @@ function recall($fleet_id, $sector, $system, $db){
 	if ($akttyp==1 OR $akttyp==2){//also wenn sie hinfliegt
         //nur Flotten, die noch hinfliegen (aktion 1/2): sonst würde ein zweiter, gleichzeitiger Rückruf die Flugzeit nochmals umdrehen
         if($spec5!=2){
-            $sql="UPDATE de_user_fleet set aktion = 3, zeit = gesrzeit - zeit, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id' AND aktion IN (1,2)";
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = gesrzeit - zeit, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = ? AND aktion IN (1,2)";
         }else{
             // Saubere Lösung: Erst prüfen, dann berechnen
-            $sql="UPDATE de_user_fleet set aktion = 3, zeit = CASE WHEN gesrzeit > zeit THEN gesrzeit - zeit - 1 ELSE 0 END, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = '$fleet_id' AND aktion IN (1,2)";
+            $sql="UPDATE de_user_fleet set aktion = 3, zeit = CASE WHEN gesrzeit > zeit THEN gesrzeit - zeit - 1 ELSE 0 END, entdeckt = 0, zielsec = hsec, zielsys = hsys, aktzeit=0 WHERE user_id = ? AND aktion IN (1,2)";
         }
 
-		mysqli_query($GLOBALS['dbi'],$sql);
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$fleet_id]);
 		if (mysqli_affected_rows($GLOBALS['dbi']) != 1) {
 			return;
 		}
 		$errmsg.=mil_meldung($military_lang['befehl2'].' befohlen.', 'ok', $fleet_id);
 
 		//schon weit weg? wenn nicht, dann status wieder auf defence
-		$sql="SELECT zeit FROM de_user_fleet WHERE user_id = '$fleet_id'";
-		$db_daten1=mysqli_query($GLOBALS['dbi'],$sql);
+		$sql="SELECT zeit FROM de_user_fleet WHERE user_id = ?";
+		$db_daten1=mysqli_execute_query($GLOBALS['dbi'], $sql, [$fleet_id]);
 		$rowx = mysqli_fetch_array($db_daten1);
 		$zeit=$rowx['zeit'];
 		if ($zeit<=0 OR $zeit >250){//setzte gleich wieder status verteidigen, da noch nicht soweit geflogen
-			$sql="UPDATE de_user_fleet SET aktion = 0, zielsec = 0, zielsys = 0, zeit = 0 WHERE user_id = '$fleet_id'";
-			mysqli_query($GLOBALS['dbi'],$sql);
+			$sql="UPDATE de_user_fleet SET aktion = 0, zielsec = 0, zielsys = 0, zeit = 0 WHERE user_id = ?";
+			mysqli_execute_query($GLOBALS['dbi'], $sql, [$fleet_id]);
 		}
 
 		if ($entdeckt==1){ //rückzugsnachricht schreiben
@@ -785,7 +785,7 @@ function recall($fleet_id, $sector, $system, $db){
 				$ge=$ge+$erg;
 			}
 
-			$db_datenz=mysqli_query($GLOBALS['dbi'],"SELECT user_id FROM de_user_data WHERE sector='$zsec' and system='$zsys'");
+			$db_datenz=mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_data WHERE sector=? and system=?", [$zsec, $zsys]);
 			if(mysqli_num_rows($db_datenz)>0){
 				$rowz = mysqli_fetch_array($db_datenz);
 				$uid=$rowz['user_id'];
@@ -799,8 +799,8 @@ function recall($fleet_id, $sector, $system, $db){
 						 $sb.': '.number_format($ge, 0,"",".").'<br>'.
 						 $military_lang['ursprung'].': '.$ak;
 
-				mysqli_query($GLOBALS['dbi'],"INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($uid, $newsid,'$time','$newsmsg')");
-				mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET newnews = 1 WHERE user_id = $uid");
+				mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, ?,?,?)", [$uid, $newsid, $time, $newsmsg]);
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1 WHERE user_id = ?", [$uid]);
 			}
 		}
 	}//ende der if ($akttyp==1 OR $akttyp==2)
@@ -808,7 +808,7 @@ function recall($fleet_id, $sector, $system, $db){
 
 if ($techs[13]==0 AND 1==2){
 	$techcheck="SELECT tech_name FROM de_tech_data".$_SESSION['ums_rasse']." WHERE tech_id=13";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
+	$db_tech=mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
 	$row_techcheck = mysqli_fetch_array($db_tech);
 
 	echo '<br>';
@@ -826,7 +826,7 @@ if ($techs[13]==0 AND 1==2){
   unset($flottentooltip);
   for($flotte=0;$flotte<=3;$flotte++){
   $fleetid=$_SESSION['ums_user_id'].'-'.$flotte;
-  $result=mysqli_query($GLOBALS['dbi'],"SELECT komatt, komdef, aktion, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3  FROM de_user_fleet WHERE user_id='$fleetid'");
+  $result=mysqli_execute_query($GLOBALS['dbi'], "SELECT komatt, komdef, aktion, artid1, artlvl1, artid2, artlvl2, artid3, artlvl3  FROM de_user_fleet WHERE user_id=?", [$fleetid]);
   $row = mysqli_fetch_array($result);
 
   $flottentooltip[$flotte] ='&<b>Angriffsformation '.$rangnamen[getfleetlevel($row['komatt'])].' ('.number_format($row['komatt'], 0,"",".").')</b><br>
@@ -839,7 +839,7 @@ if ($techs[13]==0 AND 1==2){
 
   //lade die anzahl der einheiten
   $fid0=$_SESSION['ums_user_id'].'-0';$fid1=$_SESSION['ums_user_id'].'-1';$fid2=$_SESSION['ums_user_id'].'-2';$fid3=$_SESSION['ums_user_id'].'-3';
-  $einheiten_result=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_fleet WHERE user_id='$fid0' OR user_id='$fid1' OR user_id='$fid2' OR user_id='$fid3'ORDER BY user_id ASC");
+  $einheiten_result=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_fleet WHERE user_id=? OR user_id=? OR user_id=? OR user_id=? ORDER BY user_id ASC", [$fid0, $fid1, $fid2, $fid3]);
   $einheiten_daten=array();
   while($row = mysqli_fetch_array($einheiten_result)){ //jeder gefundene datensatz wird geprueft
 	  $einheiten_daten[]=$row;
@@ -932,7 +932,7 @@ if ($techs[13]==0 AND 1==2){
 	}
 
 	//eine Zeile je Schiffstyp
-	$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT tech_id, tech_name, tech_vor FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id");
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name, tech_vor FROM de_tech_data WHERE tech_id>80 AND tech_id<100 ORDER BY tech_id", []);
 	$i=81;
 	$c1=1;
 	while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird geprueft

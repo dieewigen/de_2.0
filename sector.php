@@ -460,8 +460,8 @@ if($sec_data['npc']==1){
     	$csstag='tc1';
 		
 		$userTitle='';
-		$sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = '".$row['owner_id']."' ORDER BY ls_title.title ASC";
-		$db_datenx=mysqli_query($GLOBALS['dbi_ls'], $sql);
+		$sql="SELECT * FROM ls_user_title LEFT JOIN ls_title ON (ls_user_title.title_id=ls_title.title_id) WHERE ls_user_title.user_id = ? ORDER BY ls_title.title ASC";
+		$db_datenx=mysqli_execute_query($GLOBALS['dbi_ls'], $sql, [$row['owner_id']]);
 		if(mysqli_num_rows($db_datenx) > 0){
 			
 			while ($rowx = mysqli_fetch_assoc($db_datenx)){

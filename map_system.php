@@ -91,8 +91,8 @@ if(!$vs_locked){
 	}
 
 	//Daten über das System aden
-	$sql="SELECT * FROM de_map_objects WHERE id='$id' LIMIT 1";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT * FROM de_map_objects WHERE id=? LIMIT 1";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$id]);
 	$num = mysqli_num_rows($db_daten);
 	if($num==1){
 		$system_daten = mysqli_fetch_array($db_daten);
@@ -108,8 +108,8 @@ if(!$vs_locked){
 	}
 
 	//die vorhandenen Daten laden, die man davon hat
-	$sql="SELECT * FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND map_id='$id' LIMIT 1";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$sql="SELECT * FROM de_user_map WHERE user_id=? AND map_id=? LIMIT 1";
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id]);
 	$user_map_data = mysqli_fetch_array($db_daten);
 	if(isset($user_map_data['known_since']) && $user_map_data['known_since'] > 0 && $user_map_data['known_since']<time()){//man hat schon Infos
 		echo $data->showSystem($ps);
@@ -127,16 +127,16 @@ if(!$vs_locked){
 		//ist ein erforschtes System per Kante erreichbar?
 		//alle erforschten  auslesen
 		$erforschte_systeme=array();
-		$sql="SELECT map_id FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>0 AND known_since<'".time()."';";
-		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+		$sql="SELECT map_id FROM de_user_map WHERE user_id=? AND known_since>0 AND known_since<?;";
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], time()]);
 		while($row = mysqli_fetch_array($db_daten)){
 			//sie sind sichtbar und erforscht
 			$erforschte_systeme[]=$row['map_id'];
 		}
 
 		//alle Kanten für dieses System hier auslesen und schauen ob es zu einem erforschten System passt
-		$sql="SELECT * FROM de_map_kanten WHERE knoten_id1='$id' OR knoten_id2='$id';";
-		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+		$sql="SELECT * FROM de_map_kanten WHERE knoten_id1=? OR knoten_id2=?;";
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$id, $id]);
 		while($row = mysqli_fetch_array($db_daten)){
 
 			if(in_array($row['knoten_id1'],$erforschte_systeme) ||  in_array($row['knoten_id2'],$erforschte_systeme)){
@@ -159,8 +159,8 @@ if(!$vs_locked){
 			rahmen_oben('Unerforschtes System <span class="ms-nummer">#'.$id.'</span>');
 			echo '<div class="mod ms">'.generate_vsystem_kopfzeile($id, 'Unerforschtes System');
 			//checken ob bereits ein system erforscht wird
-			$sql="SELECT * FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>'".time()."' LIMIT 1";
-			$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+			$sql="SELECT * FROM de_user_map WHERE user_id=? AND known_since>? LIMIT 1";
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], time()]);
 			$num = mysqli_num_rows($db_daten);
 
 			//wird eine Erkundung gestartet?
@@ -186,11 +186,11 @@ if(!$vs_locked){
 					//checken ob man genug Sonden hat
 					if($pd['sonde']>=$kosten_sonden){
 						//Datensatz hinzufügen
-						$sql="INSERT INTO de_user_map SET user_id='".$_SESSION['ums_user_id']."', map_id='".$id."', known_since='".(intval(time()+$kosten_zeit))."', specialsystem_data='';";
-						mysqli_query($GLOBALS['dbi'],$sql);
+						$sql="INSERT INTO de_user_map SET user_id=?, map_id=?, known_since=?, specialsystem_data='';";
+						mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $id, (intval(time()+$kosten_zeit))]);
 						//Sonden abziehen
-						$sql="UPDATE de_user_data SET sonde=sonde-'".$kosten_sonden."' WHERE user_id='".$_SESSION['ums_user_id']."';";
-						mysqli_query($GLOBALS['dbi'],$sql);
+						$sql="UPDATE de_user_data SET sonde=sonde-? WHERE user_id=?;";
+						mysqli_execute_query($GLOBALS['dbi'], $sql, [$kosten_sonden, $_SESSION['ums_user_id']]);
 						$explore_starting=true;
 					}else{
 						echo '<div class="mod-meldung mod-meldung-fehler">Es sind nicht genug Sonden vorhanden.</div>';

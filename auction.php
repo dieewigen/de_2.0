@@ -42,7 +42,7 @@ $maxtick = $row["tick"];
 ////////////////////////////////////////////////////////////////////////////////
 //userartefakte auslesen
 ////////////////////////////////////////////////////////////////////////////////
-$db_daten = mysqli_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=22 AND user_id='".$_SESSION['ums_user_id']."';");
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id, level FROM de_user_artefact WHERE id=22 AND user_id=?;", [$_SESSION['ums_user_id']]);
 $artbonus_auktion = 0;
 while ($row = mysqli_fetch_array($db_daten)) {
     $artbonus_auktion = $artbonus_auktion + $ua_werte[$row["id"] - 1][$row["level"] - 1][0];
@@ -104,7 +104,7 @@ if (!hasTech($pt, 4)) {
         //die einzelnen Auktionen ausgeben
         $resnamen = array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
 
-        $db_daten = mysqli_query($GLOBALS['dbi'], "SELECT * FROM de_auction WHERE bidder=0 ORDER BY start_wt ASC");
+        $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_auction WHERE bidder=0 ORDER BY start_wt ASC", []);
         while ($row = mysqli_fetch_array($db_daten)) {
             //möchte man bieten?
             $bid = intval($_REQUEST['bid'] ?? -1);
@@ -233,8 +233,8 @@ if (!hasTech($pt, 4)) {
                             //DB updaten
                             changeCredits($_SESSION['ums_user_id'], $amount * -1, 'Auktion: '.$bid);
 
-                            $sql = "UPDATE de_user_data SET tradesystemscore=tradesystemscore+'".$tradescore."', tradesystemtrades=tradesystemtrades+1 WHERE user_id='".$_SESSION['ums_user_id']."'";
-                            mysqli_query($GLOBALS['dbi'], $sql);
+                            $sql = "UPDATE de_user_data SET tradesystemscore=tradesystemscore+?, tradesystemtrades=tradesystemtrades+1 WHERE user_id=?";
+                            mysqli_execute_query($GLOBALS['dbi'], $sql, [$tradescore, $_SESSION['ums_user_id']]);
 
                             $bid_has_all = true;
                         }
@@ -298,9 +298,9 @@ if (!hasTech($pt, 4)) {
                     if ($bid == $row['id']) {
                         if ($bid_has_all) {
                             //DB updaten
-                            $sql = "UPDATE de_user_data SET restyp0".$reward[1]."=restyp0".$reward[1]."+'".$amount."' WHERE user_id='".$_SESSION['ums_user_id']."'";
+                            $sql = "UPDATE de_user_data SET restyp0".$reward[1]."=restyp0".$reward[1]."+? WHERE user_id=?";
                             //echo $sql;
-                            mysqli_query($GLOBALS['dbi'], $sql);
+                            mysqli_execute_query($GLOBALS['dbi'], $sql, [$amount, $_SESSION['ums_user_id']]);
                         }
                     }
 

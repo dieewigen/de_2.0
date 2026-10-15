@@ -6,7 +6,7 @@ echo '<br>[MAP] - Gebäude Rohstoffertrag';
 
 //alle Gebäude laden
 $bldg_data=array();
-$res = mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_map_bldg WHERE bldg_time < ".time().";");
+$res = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_map_bldg WHERE bldg_time < ?;", [time()]);
 //echo '<br>A: '."SELECT * FROM de_user_map_bldg WHERE bldg_time < ".time().";";
 while($row = mysqli_fetch_array($res)){
 	
@@ -49,7 +49,7 @@ try{
 
 //die einzelnen User abarbeiten, die Gebäudedaten befinden sich alle im Array $bldg_data und für jeden aktiven Spieler wird dieses durchlaufen
 $aktive_user=array();
-$result = mysqli_query($GLOBALS['dbi'],"SELECT de_user_data.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0");
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0", []);
 while($row = mysqli_fetch_array($result)){
 	$uid=$row['user_id'];
 	$aktive_user[]=$uid;
@@ -119,7 +119,7 @@ while($row = mysqli_fetch_array($result)){
 	}
 
 	//Gebäudepunkte in der DB hinterlegen
-	mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET pve_bldg_score='$bldg_score' WHERE user_id='$uid'");
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET pve_bldg_score=? WHERE user_id=?", [$bldg_score, $uid]);
 	//echo '<br>bldg_score: '.$bldg_score;
 
 }
@@ -130,21 +130,21 @@ while($row = mysqli_fetch_array($result)){
 //wird alle 100 WT ausgeführt
 if($rundenalter_wt % 100 == 0){
 	//system-id auslesen
-	$result = mysqli_query($GLOBALS['dbi'],"SELECT * FROM `de_map_objects` WHERE system_typ=5 and system_subtyp=2");
+	$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM `de_map_objects` WHERE system_typ=5 and system_subtyp=2", []);
 	$row = mysqli_fetch_array($result);
 	$system_id=$row['id'];
 
 	if($system_id>0){
 		//alle Spielerdaten laden, die dort bereits etwas haben
-		$result = mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_user_map WHERE map_id='$system_id' AND specialsystem_data<>'';");
+		$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_map WHERE map_id=? AND specialsystem_data<>'';", [$system_id]);
 		while($row = mysqli_fetch_array($result)){
 			$user_id=$row['user_id'];
 			if(in_array($user_id, $aktive_user)){
 				$data=unserialize($row['specialsystem_data']);
 				if($data['phase']==3){
-					$sql="UPDATE de_user_data SET agent=agent+100 WHERE user_id='$user_id';";
+					$sql="UPDATE de_user_data SET agent=agent+100 WHERE user_id=?;";
 					echo $sql;
-					mysqli_query($GLOBALS['dbi'],$sql);
+					mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id]);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ if($rundenalter_wt % 100 == 0){
 /////////////////////////////////////////////////////
 // PVE-Gesamtpunkte berechnen
 /////////////////////////////////////////////////////
-mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET pve_score=tradesystemscore / 100 + pve_bldg_score WHERE npc=0");
+mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET pve_score=tradesystemscore / 100 + pve_bldg_score WHERE npc=0", []);
 
 /////////////////////////////////////////////////////
 // VS automatisches Erkunden
@@ -163,18 +163,18 @@ mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET pve_score=tradesystemscore
 $time=date("YmdHis");
 //$kosten_zeit=15*60*$GLOBALS['tech_build_time_faktor']-5;
 $kosten_zeit=15*60*$GLOBALS['tech_build_time_faktor']*2;
-$result = mysqli_query($GLOBALS['dbi'],"SELECT de_user_data.user_id, de_user_data.sonde FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.vs_auto_explore=1");
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.sonde FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.vs_auto_explore=1", []);
 while($row = mysqli_fetch_array($result)){
 	$user_id=$row['user_id'];
 
 	//testen ob evtl. schon etwas erkundet wird
-	$db_daten = mysqli_query($GLOBALS['dbi'],"SELECT COUNT(*) AS anzahl FROM de_user_map WHERE user_id='$user_id' AND known_since > ".(time()));
+	$db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_map WHERE user_id=? AND known_since > ?", [$user_id, (time())]);
 	$rowx = mysqli_fetch_array($db_daten);
 
 	if($rowx['anzahl']>0){
 		//aussetzen, da bereits etwas läuft
 		//echo 'erkunden läuft';
-		mysqli_query($GLOBALS['dbi'],"UPDATE de_user_map SET known_since=1000 WHERE user_id='".$user_id."';");
+		mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_map SET known_since=1000 WHERE user_id=?;", [$user_id]);
 	}else{
 		//echo 'erkunden läuft nicht';
 		//hat man genug Sonden, wenn nicht wird die automatische Erkundung abgebrochen
@@ -188,14 +188,14 @@ while($row = mysqli_fetch_array($result)){
 			
 			//Kanten laden
 			$kanten=array();
-			$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_kanten");
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_kanten", []);
 			while($row = mysqli_fetch_array($db_daten)){
 				$kanten[]=array($row['knoten_id1'],$row['knoten_id2']);
 			}
 			
 			//die erforschten Systeme laden
-			$sql="SELECT map_id FROM de_user_map WHERE user_id='".$user_id."' AND known_since>0 AND known_since<'".(time())."';";
-			$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+			$sql="SELECT map_id FROM de_user_map WHERE user_id=? AND known_since>0 AND known_since<?;";
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, (time())]);
 			while($row = mysqli_fetch_array($db_daten)){
 				//sie sind sichtbar und erforscht
 				$sichtbare_systeme[]=$row['map_id'];
@@ -231,7 +231,7 @@ while($row = mysqli_fetch_array($result)){
 
 			//Systeme laden
 			$esysteme=array();
-			$db_daten=mysqli_query($GLOBALS['dbi'],"SELECT * FROM de_map_objects");
+			$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects", []);
 			while($row = mysqli_fetch_array($db_daten)){
 				if(!in_array($row['id'], $erforschte_systeme) && in_array($row['id'], $sichtbare_systeme)){
 					$esysteme[]=$row['id'];
@@ -246,29 +246,29 @@ while($row = mysqli_fetch_array($result)){
 				$map_id=$esysteme[mt_rand(0, count($esysteme)-1)];
 
 				//erkundetes System hinterlegen
-				$sql="INSERT INTO de_user_map SET user_id='".$user_id."', map_id='".$map_id."', known_since='".(time()+$kosten_zeit)."';";
-				mysqli_query($GLOBALS['dbi'],$sql);
+				$sql="INSERT INTO de_user_map SET user_id=?, map_id=?, known_since=?;";
+				mysqli_execute_query($GLOBALS['dbi'], $sql, [$user_id, $map_id, (time()+$kosten_zeit)]);
 
 				//sonden abziehen
-				mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET sonde=sonde-10 WHERE user_id=$user_id");
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET sonde=sonde-10 WHERE user_id=?", [$user_id]);
 			}else{
 				//es gibt keine Systeme mehr zu erforschen
 
 				//automatische Erkundung deaktivieren
-				mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET vs_auto_explore=0 WHERE user_id=$user_id");
+				mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET vs_auto_explore=0 WHERE user_id=?", [$user_id]);
 
 				//Meldung in die News packen
 				$newstext='Die automatische Erkundung der Vergessenen Systeme wurde beendet, da alle Systeme erkundet worden sind.';
-				mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($user_id, 60,'$time','$newstext')");
+				mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 60,?,?)", [$user_id, $time, $newstext]);
 			}
 
 		}else{
 			//automatische Erkundung deaktivieren
-			mysqli_query($GLOBALS['dbi'],"UPDATE de_user_data SET vs_auto_explore=0 WHERE user_id=$user_id");
+			mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET vs_auto_explore=0 WHERE user_id=?", [$user_id]);
 			
 			//Meldung in die News packen
 			$newstext='Die automatische Erkundung der Vergessenen Systeme wurde beendet, da nicht genug Sonden vorhanden sind.';
-			mysqli_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES ($user_id, 60,'$time','$newstext')");
+			mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_news (user_id, typ, time, text) VALUES (?, 60,?,?)", [$user_id, $time, $newstext]);
 		}
 	}
 }

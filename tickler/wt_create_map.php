@@ -1,6 +1,6 @@
 <?php
 $sql="SELECT * FROM de_system LIMIT 1";
-$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 $row = mysqli_fetch_array($db_daten);
 
 //Debug
@@ -9,16 +9,16 @@ $row = mysqli_fetch_array($db_daten);
 if($row['create_map_objects']==1){
 	//FLAG zurücksetzen
 	$sql="UPDATE de_system SET create_map_objects=0;";
-	mysqli_query($GLOBALS['dbi'],$sql);
+	mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 	
 	//alte Daten löschen
-	mysqli_query($GLOBALS['dbi'], "DELETE FROM `de_map_objects`;");
-	mysqli_query($GLOBALS['dbi'], "ALTER TABLE `de_map_objects` AUTO_INCREMENT = 1;");
-	mysqli_query($GLOBALS['dbi'], "DELETE FROM `de_map_kanten`;");
-	mysqli_query($GLOBALS['dbi'], "DELETE FROM `de_user_map`;");
-	mysqli_query($GLOBALS['dbi'], "DELETE FROM `de_user_map_bldg`;");
-	mysqli_query($GLOBALS['dbi'], "DELETE FROM `de_user_map_loot`;");
-	mysqli_query($GLOBALS['dbi'], "UPDATE `de_user_storage` SET item_wt_change=0;");
+	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_map_objects`;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "ALTER TABLE `de_map_objects` AUTO_INCREMENT = 1;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_map_kanten`;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_map`;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_map_bldg`;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_map_loot`;", []);
+	mysqli_execute_query($GLOBALS['dbi'], "UPDATE `de_user_storage` SET item_wt_change=0;", []);
 
 	$GLOBALS['anzahl_felder']=0;
 
@@ -88,7 +88,7 @@ if($row['create_map_objects']==1){
 	//die vorgebaute Sektorliste laden
 	//Knoten
 	$sql="SELECT * FROM de_basedata_map_knoten LEFT JOIN de_basedata_map_sector ON (de_basedata_map_knoten.sec_id=de_basedata_map_sector.sec_id) ORDER BY de_basedata_map_knoten.sec_id ASC";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 	$c=0;
 	$old_sec_id=-1;
 	while($row = mysqli_fetch_array($db_daten)){
@@ -106,7 +106,7 @@ if($row['create_map_objects']==1){
 
 	//Kanten
 	$sql="SELECT * FROM de_basedata_map_kanten LEFT JOIN de_basedata_map_sector ON (de_basedata_map_kanten.sec_id=de_basedata_map_sector.sec_id) ORDER BY de_basedata_map_kanten.sec_id ASC";
-	$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+	$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 	$c=0;
 	$old_sec_id=-1;
 	while($row = mysqli_fetch_array($db_daten)){
@@ -231,8 +231,8 @@ if($row['create_map_objects']==1){
 					
 					//System in die DB schreiben
 					$data=serialize($new_system);
-					$sql="INSERT INTO de_map_objects SET data='$data', system_typ='$system_typ', system_subtyp='$system_subtyp', always_visible='$always_visible', pos_x='$pos_x', pos_y='$pos_y', cluster_x='$x', cluster_y='$y'";
-					mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="INSERT INTO de_map_objects SET data=?, system_typ=?, system_subtyp=?, always_visible=?, pos_x=?, pos_y=?, cluster_x=?, cluster_y=?";
+					mysqli_execute_query($GLOBALS['dbi'], $sql, [$data, $system_typ, $system_subtyp, $always_visible, $pos_x, $pos_y, $x, $y]);
 					
 					$interne_knoten_id=$basedata_knoten[$sec_id][$i]['interne_knoten_id'];
 					$sector['interne_knoten_ids'][$interne_knoten_id]=mysqli_insert_id($dbi);
@@ -257,8 +257,8 @@ if($row['create_map_objects']==1){
 					$knoten_id1=$sector['interne_knoten_ids'][$knoten_id1];
 					$knoten_id2=$sector['interne_knoten_ids'][$knoten_id2];
 
-					$sql="INSERT INTO de_map_kanten SET knoten_id1='$knoten_id1', knoten_id2='$knoten_id2'";
-					mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="INSERT INTO de_map_kanten SET knoten_id1=?, knoten_id2=?";
+					mysqli_execute_query($GLOBALS['dbi'], $sql, [$knoten_id1, $knoten_id2]);
 				}
 
 
@@ -305,34 +305,34 @@ if($row['create_map_objects']==1){
 					/////////////////////////////////////////////////////////
 
 					//das system, dass am weitesten rechts im aktuellen sektor steht
-					$sql="SELECT MAX(pos_x) AS search_value FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$y' LIMIT 1";
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="SELECT MAX(pos_x) AS search_value FROM de_map_objects WHERE cluster_x=? AND cluster_y=? LIMIT 1";
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $y]);
 					$row = mysqli_fetch_array($db_daten);
 					$search_value=$row['search_value'];
-					$sql="SELECT id FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$y' AND pos_x='$search_value' LIMIT 1";
+					$sql="SELECT id FROM de_map_objects WHERE cluster_x=? AND cluster_y=? AND pos_x=? LIMIT 1";
 					//echo $sql;
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $y, $search_value]);
 					$row = mysqli_fetch_array($db_daten);
 					$knoten_id1=$row['id'];
 					//echo '<br>ID: '.$row['id'];
 
 					//nach rechts verbinden, dazu deren system laden, das am weitesten links steht
 					$xn=$x+1;
-					$sql="SELECT MIN(pos_x) AS search_value FROM de_map_objects WHERE cluster_x='$xn' AND cluster_y='$y' LIMIT 1";
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="SELECT MIN(pos_x) AS search_value FROM de_map_objects WHERE cluster_x=? AND cluster_y=? LIMIT 1";
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$xn, $y]);
 					$row = mysqli_fetch_array($db_daten);
 					$search_value=$row['search_value'];
-					$sql="SELECT id FROM de_map_objects WHERE cluster_x='$xn' AND cluster_y='$y' AND pos_x='$search_value' LIMIT 1";
+					$sql="SELECT id FROM de_map_objects WHERE cluster_x=? AND cluster_y=? AND pos_x=? LIMIT 1";
 					//echo $sql;
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$xn, $y, $search_value]);
 					$row = mysqli_fetch_array($db_daten);
 					$knoten_id2=$row['id'] ?? -1;
 
 					//wir haben beide knoten, können also eine kante einfügen
 					if($knoten_id1>0 && $knoten_id2>0){
-						$sql="INSERT INTO de_map_kanten SET knoten_id1='$knoten_id1', knoten_id2='$knoten_id2'";
+						$sql="INSERT INTO de_map_kanten SET knoten_id1=?, knoten_id2=?";
 						echo $sql;
-						mysqli_query($GLOBALS['dbi'],$sql);
+						mysqli_execute_query($GLOBALS['dbi'], $sql, [$knoten_id1, $knoten_id2]);
 					}
 
 					/////////////////////////////////////////////////////////
@@ -340,36 +340,36 @@ if($row['create_map_objects']==1){
 					/////////////////////////////////////////////////////////
 
 					//das system, dass am weitesten unten im aktuellen sektor steht
-					$sql="SELECT MAX(pos_y) AS search_value FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$y' LIMIT 1";
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="SELECT MAX(pos_y) AS search_value FROM de_map_objects WHERE cluster_x=? AND cluster_y=? LIMIT 1";
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $y]);
 					$row = mysqli_fetch_array($db_daten);
 					$search_value=$row['search_value'];
-					$sql="SELECT id FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$y' AND pos_y='$search_value' LIMIT 1";
+					$sql="SELECT id FROM de_map_objects WHERE cluster_x=? AND cluster_y=? AND pos_y=? LIMIT 1";
 					//echo $sql;
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $y, $search_value]);
 					$row = mysqli_fetch_array($db_daten);
 					$knoten_id1=$row['id'];
 					//echo '<br>ID: '.$row['id'];
 
 					//nach unten verbinden, dazu deren system laden, das am weitesten oben steht
 					$yn=$y+1;
-					$sql="SELECT MIN(pos_y) AS search_value FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$yn' LIMIT 1";
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$sql="SELECT MIN(pos_y) AS search_value FROM de_map_objects WHERE cluster_x=? AND cluster_y=? LIMIT 1";
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $yn]);
 					$row = mysqli_fetch_array($db_daten);
 					$search_value=$row['search_value'];
 					//echo 'A:'.$search_value;
-					$sql="SELECT id FROM de_map_objects WHERE cluster_x='$x' AND cluster_y='$yn' AND pos_y='$search_value' LIMIT 1";
+					$sql="SELECT id FROM de_map_objects WHERE cluster_x=? AND cluster_y=? AND pos_y=? LIMIT 1";
 					//echo $sql;
-					$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+					$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$x, $yn, $search_value]);
 					$row = mysqli_fetch_array($db_daten);
 					$knoten_id2=$row['id'] ?? -1;
 
 					//wir haben ggf. beide knoten, können also eine kante einfügen
 					if($knoten_id1>0 && $knoten_id2>0){
-						$sql="INSERT INTO de_map_kanten SET knoten_id1='$knoten_id1', knoten_id2='$knoten_id2'";
+						$sql="INSERT INTO de_map_kanten SET knoten_id1=?, knoten_id2=?";
 						echo '<br>IK:'.$sql;
 						echo '<br>('.$x.'/'.$y.')';
-						mysqli_query($GLOBALS['dbi'],$sql);
+						mysqli_execute_query($GLOBALS['dbi'], $sql, [$knoten_id1, $knoten_id2]);
 					}
 				}
 
@@ -419,7 +419,7 @@ if($row['create_map_objects']==1){
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND cluster_x='$cluster_x' AND cluster_y='$cluster_y' ORDER BY RAND() LIMIT 1;";
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 ORDER BY RAND() LIMIT 1;";
 		$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND (cluster_x < -1 OR cluster_x > 1) AND (cluster_y < -1 OR cluster_y > 1) ORDER BY RAND() LIMIT 1;";
-		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 		$row = mysqli_fetch_array($db_daten);
 		$system_id=$row['id'];
 
@@ -435,8 +435,8 @@ if($row['create_map_objects']==1){
 		$system_data=serialize($new_system);
 
 		
-		$sql="UPDATE de_map_objects SET data='$system_data', system_typ=4, system_subtyp='$system_subtyp' WHERE id='$system_id';";
-		mysqli_query($GLOBALS['dbi'],$sql);
+		$sql="UPDATE de_map_objects SET data=?, system_typ=4, system_subtyp=? WHERE id=?;";
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$system_data, $system_subtyp, $system_id]);
 	}
 
 
@@ -498,7 +498,7 @@ if($row['create_map_objects']==1){
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND system_typ<>5 AND cluster_x='$cluster_x' AND cluster_y='$cluster_y' ORDER BY RAND() LIMIT 1;";
 		//$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND system_typ<>5 ORDER BY RAND() LIMIT 1;";
 		$sql="SELECT * FROM de_map_objects WHERE system_typ<>4 AND system_typ<>5 AND (cluster_x < -1 OR cluster_x > 1) AND (cluster_y < -1 OR cluster_y > 1) ORDER BY RAND() LIMIT 1;";
-		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, []);
 		$row = mysqli_fetch_array($db_daten);
 		$system_id=$row['id'];
 
@@ -516,9 +516,9 @@ if($row['create_map_objects']==1){
 		$system_data=serialize($new_system);
 
 		
-		$sql="UPDATE de_map_objects SET data='$system_data', system_typ=5, system_subtyp='$system_subtyp' WHERE id='$system_id';";
+		$sql="UPDATE de_map_objects SET data=?, system_typ=5, system_subtyp=? WHERE id=?;";
 		echo $sql;
-		mysqli_query($GLOBALS['dbi'],$sql);
+		mysqli_execute_query($GLOBALS['dbi'], $sql, [$system_data, $system_subtyp, $system_id]);
 	}	
 
 	//Info an den Chat über Neugenerierung
@@ -605,8 +605,8 @@ if($row['create_map_objects']==1){
 		
 		//System in die DB schreiben
 		$data=serialize($new_system);
-		$sql="INSERT INTO de_map_objects SET data='$data'";
-		$db_daten=mysqli_query($GLOBALS['dbi'],$sql);
+		$sql="INSERT INTO de_map_objects SET data=?";
+		$db_daten=mysqli_execute_query($GLOBALS['dbi'], $sql, [$data]);
 		
 		$id++;
 	}

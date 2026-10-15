@@ -423,7 +423,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                 createAuction($_SESSION['ums_user_id']);
 
                 //artefakt entfernen
-                mysqli_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid='$lid'");
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
                 */
             }
 

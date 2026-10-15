@@ -409,8 +409,8 @@ $paleniumenergie = floor($ea / 10000 * $palenium);
 
 //bei einer Hyperraumtunneletablierung geben die Kollies keine Energie
 // (Artefakte wie die Gabe der Reichen aber schon, weil zu diesem Zeitpunkt der Hyperraumtunnel schon fertig ist)
-$sql = "SELECT * FROM de_user_map WHERE user_id='".$_SESSION['ums_user_id']."' AND known_since>'".time()."' LIMIT 1";
-$db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+$sql = "SELECT * FROM de_user_map WHERE user_id=? AND known_since>? LIMIT 1";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], time()]);
 $num = mysqli_num_rows($db_daten);
 if ($num > 0) {
     $ea = 0;
@@ -885,7 +885,7 @@ if ($ally_has_notfallkonverter && hasTech($pt, 4)) {
     echo '</form>';
 } else {
     $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=4";
-    $db_tech = mysqli_query($GLOBALS['dbi'], $techcheck);
+    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
     $row_techcheck = mysqli_fetch_array($db_tech);
 
     echo '<div class="mod-leer">Du ben&ouml;tigst eine Allianz mit Notfallmateriekonverter und folgendes Geb&auml;ude: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</div>';
@@ -948,8 +948,8 @@ foreach (array('Multiplex' => array($restyp01, ''), 'Dyharra' => array($restyp02
 
 //weitere items aus der DB auslesen
 $sql = "SELECT * FROM de_user_storage LEFT JOIN de_item_data ON(de_user_storage.item_id=de_item_data.item_id)
-	WHERE de_user_storage.user_id='".$_SESSION['ums_user_id']."' ORDER BY item_sort_order ASC, item_name ASC";
-$db_daten = mysqli_query($GLOBALS['dbi'], $sql);
+	WHERE de_user_storage.user_id=? ORDER BY item_sort_order ASC, item_name ASC";
+$db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
 
 while ($row = mysqli_fetch_array($db_daten)) {
     //check auf Änderung im Tick
