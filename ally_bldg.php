@@ -1,10 +1,10 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\Model\Alliance\Allianz;
 use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include_once('functions.php');
-include('lib/transaction.lib.php');
 
 //include 'inc/lang/'.$sv_server_lang.'_community.lang.php';
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
@@ -152,7 +152,7 @@ if($num==1){
     //////////////////////////////////////////////////////
     //////////////////////////////////////////////////////    
     if(isset($_REQUEST['build'])){
-  	  	if (setLock($_SESSION['ums_user_id'])){
+  	  	if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 			//Allystorage laden
 			$as=loadAllyStorage($ownallyid);
 			$GLOBALS['as']=$as;
@@ -268,7 +268,7 @@ if($num==1){
 				echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Nur der Allianzleiter kann Allianzprojekte in Auftrag geben.</div></div>';
 			}    
 			//transaktionsende
-			$erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+			$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
 			if ($erg){
 			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			}

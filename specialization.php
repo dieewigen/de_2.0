@@ -1,6 +1,5 @@
 <?php
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/achievement.inc.php';
 include "functions.php";

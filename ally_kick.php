@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\DE2\Model\Nachricht;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\Model\Alliance\Allianz;
 use DieEwigen\DE2\View\Alliance\Navi;
@@ -41,7 +42,6 @@ echo Navi::fuer($mitgliedschaft);
 if (!$mitgliedschaft->darfLeaderseite()) {
     die(Navi::zugriffVerweigert());
 }
-include('lib/basefunctions.lib.php');
 
 $userid = (int)($_GET['userid'] ?? 0);
 
@@ -111,7 +111,7 @@ else
 					"UPDATE de_user_data SET ally_id=0, allytag='', status=0, ally_tronic=0 WHERE user_id=?",
 					[$userid]);
 				
-				notifyUser($userid, $allykick_lang['msg_3_1'].' <b>'.$clantag.'</b> '.$allykick_lang['msg_3_2'], 6);
+				Nachricht::anSpieler($GLOBALS['dbi'], $userid, $allykick_lang['msg_3_1'].' <b>'.$clantag.'</b> '.$allykick_lang['msg_3_2'], 6);
 				echo '<div class="mod-meldung mod-meldung-ok">'.$allykick_lang['msg_4_1'].' '.$kick_fee.' '.$allykick_lang['msg_4_2'].'</div>';
 				
 				//Wenn ein Coleader gekickt wird, wird diese Änderung zusätzlich im Allianzdatensatz vermerkt

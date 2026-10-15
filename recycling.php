@@ -1,6 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
+use DieEwigen\DE2\Model\Verteidigung\Boni;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include 'inc/sabotage.inc.php';
 include "tickler/kt_einheitendaten.php";
@@ -22,7 +23,9 @@ $maxtick = $row["tick"];
 //feststellen ob die raumwerft sabotiert ist
 if($maxtick<$mysc2+$sv_sabotage[8][0] AND $mysc2>$sv_sabotage[8][0])$sabotage=1;else $sabotage=0;
 
-//test auf spezialisierung bauzeit t�rme
+//Bauzeitreduzierung der Türme wie in production.php: Erfahrungsstufe der Verteidigung plus Spezialisierung
+$defense_boni=Boni::fuerStufe(24-getfleetlevel($defenseexp));
+$defense_bonus_buildtime=$defense_boni['bauzeit'];
 if($spec1==1)$defense_bonus_buildtime+=50;
 
 
@@ -105,7 +108,7 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 ///////////////////////////////////////////////////////////////////////
 if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 	//transaktionsbeginn
-	if (setLock($_SESSION['ums_user_id'])){
+	if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 		unset($rec_gesamt);
 		//zerst alle vorhandenen einheiten auslesen
 		unset($einheiten);
@@ -215,7 +218,7 @@ if(isset($_REQUEST['recyclingbutton']) AND hasTech($pt,129) AND $sabotage==0){
 		}			
 
 		//transaktionsende
-		$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+		$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
 		if ($erg)
 		{
 			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
@@ -249,10 +252,10 @@ if($sabotage==1){
 	die('</body></html>');
 }
 
-//benötigtes Gebäude: Recyclotron
+//benötigtes Gebäude: Raumwerft I (129); das Recyclotron (Tech 6) ist die Schrottverwertung nach Kämpfen im Kampftick
 if(!hasTech($pt,129)){
 	echo '<br>';
-	//das Recyclotron hat kein eigenes Bild, bisher stand hier das der Technologie 13
+	//Raumwerft I hat kein eigenes Technologiebild, gezeigt wird das von Raumwerft II (13)
 	echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(129, '', 13);
 }else{
 	///////////////////////////////////////////////////////////////////////

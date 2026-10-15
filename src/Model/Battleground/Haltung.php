@@ -11,7 +11,7 @@ namespace DieEwigen\DE2\Model\Battleground;
  *
  * Gewählt wird je Battleground in specialship.php. Gespeichert wird die Haltung im Basisstern
  * (lib/special_ship.class.php), ausgewertet in tickler/kt_manage_bg.php, angezeigt im Kampfbericht
- * (lib/kampfbericht.lib.php).
+ * (View\Kampfbericht).
  */
 class Haltung
 {

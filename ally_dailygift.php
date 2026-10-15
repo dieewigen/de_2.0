@@ -1,10 +1,10 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 $GLOBALS['deactivate_old_design'] = true;
 
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.dailygift.lang.php');
 include('inc/userartefact.inc.php');
-include('lib/transaction.lib.php');
 include_once('functions.php');
 
 $pt = loadPlayerTechs($_SESSION['ums_user_id']);
@@ -58,7 +58,7 @@ if ($ally_id > 0 && $allystatus == 1) {
     /////////////////////////////////////////////////////////////
     if (isset($_REQUEST['getdailybonus']) && $_REQUEST['getdailybonus'] == 1) {
         //transaktionsbeginn
-        if (setLock($_SESSION["ums_user_id"])) {
+        if (Sperre::setzen($GLOBALS['dbi'], $_SESSION["ums_user_id"])) {
             //auslesen ob er das geschenk schon bekommen hat
             $result = mysqli_execute_query($GLOBALS['dbi'], "SELECT dailyallygift, npc FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
             $row = mysqli_fetch_array($result);
@@ -300,7 +300,7 @@ if ($ally_id > 0 && $allystatus == 1) {
             }
 
             //lock wieder entfernen
-            $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+            $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
             if ($erg) {
                 //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
             } else {

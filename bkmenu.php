@@ -1,6 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_bkmenu.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
@@ -426,7 +426,7 @@ $prodanz=$_POST['prodanz'] ?? 0;
 if ($prod)//ja, es wurde ein button gedrueckt
 {
   //transaktionsbeginn
-  if (setLock($_SESSION['ums_user_id']))
+  if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id']))
   {
     $prodanz=(int)$prodanz;
     if($techs[122]==1 AND $prodanz>=1)
@@ -495,7 +495,7 @@ if ($prod)//ja, es wurde ein button gedrueckt
     }
 
     //transaktionsende
-    $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+    $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
     if (!$erg)
     {
         bk_meldung("Datensatz Nr. ".$_SESSION['ums_user_id']." konnte nicht entsperrt werden!");

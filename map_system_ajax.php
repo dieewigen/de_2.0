@@ -1,10 +1,10 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 //////////////////////////////////////////////////////////////////////////////
 // AJAX-Aktionen der VS-Übersicht (map_mobile.php), Antwort als JSON
 // action=upgradeall&id=X: alle Gebäude eines normalen Systems upgraden
 //////////////////////////////////////////////////////////////////////////////
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include 'lib/map_system_defs.inc.php';
 include 'lib/map_system.class.php';
@@ -35,7 +35,7 @@ if(!hasTech($pt,25)){
 }
 
 //transaktionsbeginn
-if(!setLock($uid)){
+if(!Sperre::setzen($GLOBALS['dbi'], $uid)){
 	vs_ajax_response(false, 'Es wird noch eine Aktion ausgef&uuml;hrt, bitte kurz warten.');
 }
 
@@ -47,7 +47,7 @@ $GLOBALS['duration_factor']=vs_duration_factor($uid, $ua_werte);
 $db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects WHERE id=? LIMIT 1", [$id]);
 $system_daten=mysqli_fetch_assoc($db_daten);
 if(!$system_daten){
-	releaseLock($uid);
+	Sperre::loesen($GLOBALS['dbi'], $uid);
 	vs_ajax_response(false, 'Das System existiert nicht.');
 }
 
@@ -67,7 +67,7 @@ foreach($data->playerBldg as $b){
 }
 
 if(!$data->canUpgradeAllFromOverview($bldg, $is_explored, $is_always_visible)){
-	releaseLock($uid);
+	Sperre::loesen($GLOBALS['dbi'], $uid);
 	vs_ajax_response(false, 'In diesem System ist das nicht m&ouml;glich.');
 }
 
@@ -81,7 +81,7 @@ foreach(loadPlayerBuildings($uid, $id) as $b){
 
 $pd=loadPlayerData($uid);
 
-releaseLock($uid);
+Sperre::loesen($GLOBALS['dbi'], $uid);
 
 if($started==0){
 	$msg='Kein Upgrade m&ouml;glich';

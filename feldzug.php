@@ -1,8 +1,8 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\View\Alliance\Navi;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include 'inc/lang/'.$sv_server_lang.'_feldzug.lang.php';
 
@@ -32,9 +32,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         [$fz_ok, $fz_key] = $fzs->verteilen($uid, $fz_legionen);
     } elseif (isset($_POST['spenden'])) {
-        if (setLock($uid)) {
+        if (Sperre::setzen($GLOBALS['dbi'], $uid)) {
             [$fz_ok, $fz_key] = $fzs->spenden($uid, (array)($_POST['menge'] ?? array()));
-            releaseLock($uid);
+            Sperre::loesen($GLOBALS['dbi'], $uid);
         } else {
             $fz_key = 'fehler_sperre';
         }

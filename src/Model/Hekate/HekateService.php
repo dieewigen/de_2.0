@@ -14,7 +14,7 @@ use DieEwigen\DE2\Model\VsBonus\VsBonusService;
  * Die Perioden laufen in Wirtschaftsticks. Beim Rundenwechsel setzt sich der Zustand selbst zurück (wie beim
  * SiegelService) und leert dabei auch de_vs_bonus.
  *
- * Kein setLock(): map_system.php hält die Spielersperre für die ganze Seite.
+ * Kein Sperre::setzen(): map_system.php hält die Spielersperre für die ganze Seite.
  */
 class HekateService
 {

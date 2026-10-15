@@ -1,6 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include 'inc/userartefact.inc.php';
 
@@ -89,7 +89,7 @@ if (!hasTech($pt, 4)) {
     $content .= '<br>'.\DieEwigen\DE2\View\FehlendeTechnologie::karte(4);
 } else {
 
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
 
         //Bestände erst innerhalb der Sperre laden, sonst prüft eine zweite Anfrage gegen veraltete Werte
         $pd = loadPlayerData($_SESSION['ums_user_id']);
@@ -433,7 +433,7 @@ if (!hasTech($pt, 4)) {
         $content .= rahmen_unten(false);
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {

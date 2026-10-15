@@ -16,8 +16,7 @@ include_once $directory."inc/userartefact.inc.php";
 include_once $directory."functions.php";
 include_once $directory."inc/lang/".$sv_server_lang."_kt.lang.php";
 include_once $directory."lib/special_ship.class.php";
-include_once $directory.'lib/bg_defs.inc.php';
-include_once $directory.'lib/bg_defs.inc.php';
+$sv_bg = \DieEwigen\DE2\Model\Battleground\Battleground::DEFS;
 ?>
 
 <html>

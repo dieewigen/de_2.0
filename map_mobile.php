@@ -2,7 +2,6 @@
 $GLOBALS['deactivate_old_design']=true;
 
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 
 include 'lib/map_system_defs.inc.php';

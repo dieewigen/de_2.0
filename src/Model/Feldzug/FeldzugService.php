@@ -600,7 +600,7 @@ class FeldzugService
 
     /**
      * VS-Rohstoffe aus dem eigenen Lager in die Kriegskasse der Allianz spenden. Die Seite hält dabei die
-     * Spielersperre (setLock); jede Abbuchung ist zusätzlich gegen zu wenig Bestand abgesichert.
+     * Spielersperre (Sperre::setzen); jede Abbuchung ist zusätzlich gegen zu wenig Bestand abgesichert.
      *
      * @param array $mengen [item_id => Menge]
      */

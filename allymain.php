@@ -5,7 +5,6 @@ use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php');
 include 'inc/lang/'.$sv_server_lang.'_ally.settings.lang.php';
-include('lib/basefunctions.lib.php');
 include('inc/allyjobs.inc.php');
 include_once('functions.php');
 

@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\DE2\Model\Nachricht;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\Model\Alliance\Allianz;
 use DieEwigen\DE2\View\Alliance\Navi;
@@ -35,7 +36,6 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 include('resline.php');
 $mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
 echo Navi::fuer($mitgliedschaft);
-include('lib/basefunctions.lib.php');
 
 if($a == 1)
 {
@@ -95,10 +95,10 @@ if($a == 1)
                     [$clantag]
                 );
             }
-			notifyUser($leaderid, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
-			notifyUser($coleaderid1, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
-			notifyUser($coleaderid2, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
-			notifyUser($coleaderid3, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			Nachricht::anSpieler($GLOBALS['dbi'], $leaderid, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid1, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid2, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
+			Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid3, $allyaustritt_lang['msg_2_1'].' <b>'.$username.'</b> '.$allyaustritt_lang['msg_2_2'], 6);
 			
 			echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allyaustritt_lang['msg_3_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_3_2'].'</div></div>';
 			

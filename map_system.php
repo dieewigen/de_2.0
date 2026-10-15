@@ -1,11 +1,11 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 //Ausgabe puffern, damit nach Aktionen per vs_redirect() umgeleitet werden kann
 ob_start();
 
 $GLOBALS['deactivate_old_design']=true;
 
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include 'lib/map_system.class.php';
 include "tickler/kt_einheitendaten.php";
@@ -70,7 +70,7 @@ echo '</div>';
 echo '<div id="vs-main">';
 
 //transaktionsbeginn, verhindert doppelte Aktionen durch schnelles Klicken oder mehrere Tabs
-$vs_locked=setLock($_SESSION['ums_user_id']);
+$vs_locked=Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
 if($vs_locked){
 	//innerhalb der Sperre aktuelle Werte verwenden
 	$ps=loadPlayerStorage($_SESSION['ums_user_id']);
@@ -218,7 +218,7 @@ if(!$vs_locked){
 echo '</div>';//vs-main
 
 if($vs_locked){
-	releaseLock($_SESSION['ums_user_id']);
+	Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
 }
 
 echo '<script>vs_system_init(); vs_ajax_init();</script>';

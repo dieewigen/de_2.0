@@ -632,7 +632,10 @@ for ($c = 0; $c < $z; $c++) {
     echo '<br>TAWARTBONUS: '.$tawartbonus.'<br>';
     //weitere boni berechnen
     $defense_level = 24 - getfleetlevel($defenseexp);
-    include '../lib/defenseboni.lib.php';
+    $defense_boni = \DieEwigen\DE2\Model\Verteidigung\Boni::fuerStufe($defense_level);
+    $defense_bonus_feuerkraft = $defense_boni['feuerkraft'];
+    $defense_bonus_ps = $defense_boni['ps'];
+    $defense_bonus_buildtime = $defense_boni['bauzeit'];
     if ($defense_bonus_feuerkraft[0] > 0) {
         if (mt_rand(1, 100) <= $defense_bonus_feuerkraft[0]) {
             $tawartbonus += $defense_bonus_feuerkraft[1] / 100;

@@ -1,8 +1,8 @@
 <?php
+use DieEwigen\DE2\Model\Nachricht;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
-include('lib/basefunctions.lib.php');
 include('inc/lang/'.$sv_server_lang.'_ally.join.lang.php');
 include_once('functions.php');
 
@@ -191,7 +191,7 @@ if($ok || $warnung || $npc==2){
 					if ($alt_antrag && $alt_antrag['ally_id'] != $clanid) {
 						foreach (array('leaderid', 'coleaderid1', 'coleaderid2', 'coleaderid3') as $posten) {
 							if ($alt_antrag[$posten] > 0) {
-								notifyUser($alt_antrag[$posten], 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
+								Nachricht::anSpieler($GLOBALS['dbi'], $alt_antrag[$posten], 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$_SESSION['ums_spielername'], "6");
 							}
 						}
 					}
@@ -204,10 +204,10 @@ if($ok || $warnung || $npc==2){
 						 ON DUPLICATE KEY UPDATE ally_id=VALUES(ally_id), antrag=VALUES(antrag)",
 						[$_SESSION['ums_user_id'], $clanid, $antrag]);
 
-					notifyUser($leaderid, $allyjoin_lang['msg_8'], "6");
-					notifyUser($coleaderid1, $allyjoin_lang['msg_8'], "6");
-					notifyUser($coleaderid2, $allyjoin_lang['msg_8'], "6");
-					notifyUser($coleaderid3, $allyjoin_lang['msg_8'], "6");
+					Nachricht::anSpieler($GLOBALS['dbi'], $leaderid, $allyjoin_lang['msg_8'], "6");
+					Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid1, $allyjoin_lang['msg_8'], "6");
+					Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid2, $allyjoin_lang['msg_8'], "6");
+					Nachricht::anSpieler($GLOBALS['dbi'], $coleaderid3, $allyjoin_lang['msg_8'], "6");
 
 					$transaction_result = mysqli_execute_query($GLOBALS['dbi'],
 						"SELECT * FROM de_transactions WHERE user_id=? AND type='C.A.R.S.' AND identifier='reg_fee' AND name='Tronic'",

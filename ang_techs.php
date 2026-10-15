@@ -1,9 +1,9 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 
 use DieEwigen\DE2\View\RealTime;
 
 include 'inc/header.inc.php';
-include 'lib/transaction.lib.php';
 include 'functions.php';
 
 ?>
@@ -28,7 +28,7 @@ if(!isset($sv_deactivate_vsystems)){
 }
 
 //transaktionsbeginn
-if(setLock($_SESSION['ums_user_id'])){
+if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	$pd=loadPlayerData($_SESSION['ums_user_id']);
 	$pt=loadPlayerTechs($_SESSION['ums_user_id']);
 
@@ -575,7 +575,7 @@ if(setLock($_SESSION['ums_user_id'])){
 	$content.='<script type="text/javascript">$(function(){ tc_init(); });</script>';
 
 
-	$erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
+	$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
 	if ($erg){
 		  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 	}else{

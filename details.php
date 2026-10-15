@@ -3,7 +3,6 @@
 use DieEwigen\DE2\View\Hyperfunk\ComposeForm;
 
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include 'inc/lang/' . $sv_server_lang . '_details.lang.php';
 include 'functions.php';
 

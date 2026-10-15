@@ -3,7 +3,6 @@
 use DieEwigen\DE2\View\RealTime;
 
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "functions.php";
 include "inc/sabotage.inc.php";
 include 'inc/userartefact.inc.php';

@@ -12,7 +12,7 @@ use DieEwigen\DE2\Model\SpecialSystem\Storage;
  * (vs_duration_factor()) in den VS. Die Stufe steht in de_user_map.specialsystem_data und verschwindet mit
  * der Karte beim Rundenreset.
  *
- * Kein setLock(): map_system.php hält die Spielersperre für die ganze Seite.
+ * Kein Sperre::setzen(): map_system.php hält die Spielersperre für die ganze Seite.
  */
 class ThanatosService
 {

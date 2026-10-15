@@ -1,6 +1,8 @@
 <?php
 
 namespace DieEwigen\DE2\Model\Npc;
+
+use DieEwigen\DE2\Model\Sperre;
 include('tickler/kt_einheitendaten.php');
 
 class FleetControl
@@ -33,7 +35,7 @@ class FleetControl
     public function moveAllShipsToHomeFleet(int $npcId): void
     {
         global $sv_anz_schiffe;
-        if(setLock($npcId)) {
+        if(Sperre::setzen($this->dbi, $npcId)) {
             $fleetIds = [$npcId.'-'.'0', $npcId.'-'.'1', $npcId.'-'.'2', $npcId.'-'.'3'];
             $units=array();
             $unitsResult = mysqli_execute_query($this->dbi, "SELECT * FROM de_user_fleet WHERE user_id in (?,?,?,?)", $fleetIds);
@@ -48,7 +50,7 @@ class FleetControl
                 mysqli_execute_query($this->dbi,"UPDATE de_user_fleet SET e$i = ? WHERE user_id = ?", [$fleet[0]+$fleet[1]+$fleet[2]+$fleet[3], $npcId.'-'.'0']);
                 mysqli_execute_query($this->dbi,"UPDATE de_user_fleet SET e$i = ? WHERE user_id in (?,?,?)", [0,$npcId.'-'.'1', $npcId.'-'.'2', $npcId.'-'.'3']);
             }
-            if(!releaseLock($npcId)) {
+            if(!Sperre::loesen($this->dbi, $npcId)) {
                 error_log("FleetControl::moveAllShipsToHomeFleet - could not release lock for npcId ".$npcId);
             }
         } else {

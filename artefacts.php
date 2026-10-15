@@ -1,6 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_userartefact.inc.lang.php';
 include "inc/userartefact.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_artefacts.lang.php';
@@ -52,7 +52,7 @@ if ($allyid > 0) {
 if (isset($_GET["a"]) && $_GET["a"] == 1) {
     //artefakt einf�gen
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //flotten id festlegen
         $flotte = 0;
         if ($_GET["fid"] == 1) {
@@ -132,7 +132,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -145,7 +145,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
 } elseif (isset($_GET["a"]) && $_GET["a"] == 2) {
     //Artefakt aus einem Basisschiff entfernen
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //flotten id festlegen
         $flotte = 0;
         if ($_GET["fid"] == 1) {
@@ -207,7 +207,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -231,7 +231,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 //artefakt zerst�ren
 if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         $lid = intval($_REQUEST['lid']);
         //schauen ob man das artefakte hat
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_artefact WHERE user_id=? AND lid=?", [$_SESSION['ums_user_id'], $lid]);
@@ -257,7 +257,7 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -272,7 +272,7 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
 //artefakt benutzen
 if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         $lid = intval($_REQUEST['lid']);
         //schauen ob man das artefakte hat
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_artefact WHERE user_id=? AND lid=?", [$_SESSION['ums_user_id'], $lid]);
@@ -488,7 +488,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -504,7 +504,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
 //artefaktupgrade
 if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //rohstoffe auslesen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_array($db_daten);
@@ -600,7 +600,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -617,7 +617,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
 $fehlermsg='';
 if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxlevel) {
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //Rohstoffe innerhalb der Sperre neu laden, sonst bezahlt eine parallele Anfrage mit veralteten Beständen
         $row_res = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]));
         $gr01 = $restyp01 = $row_res['restyp01'];
@@ -670,7 +670,7 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {

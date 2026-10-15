@@ -570,7 +570,7 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
 
 /**
  * Leitet nach einer Aktion in den Vergessenen Systemen per 303 auf die Systemansicht um (Post/Redirect/Get).
- * Setzt voraus, dass die Seite mit ob_start() gepuffert wird und ggf. ein setLock() aktiv ist.
+ * Setzt voraus, dass die Seite mit ob_start() gepuffert wird und ggf. eine Spielersperre (Sperre::setzen) aktiv ist.
  */
 function vs_redirect($system_id, $field_id = null)
 {
@@ -579,9 +579,7 @@ function vs_redirect($system_id, $field_id = null)
         $url .= '&fieldid='.intval($field_id);
     }
 
-    if (function_exists('releaseLock')) {
-        releaseLock($_SESSION['ums_user_id']);
-    }
+    \DieEwigen\DE2\Model\Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
 
     while (ob_get_level() > 0) {
         ob_end_clean();

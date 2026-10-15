@@ -1,12 +1,12 @@
 <?php
+use DieEwigen\DE2\View\Kampfbericht;
+use DieEwigen\DE2\Model\Sperre;
 use DieEwigen\DE2\View\Geheimdienst\Bericht;
 
 
 use DieEwigen\DE2\View\RealTime;
 
 include "inc/header.inc.php";
-include 'lib/transaction.lib.php';
-include "lib/kampfbericht.lib.php";
 
 $kkollies = 0;
 $exp = 0;
@@ -265,7 +265,7 @@ $copy_zsec2 = intval($zsec2);
 if (hasTech($pt, 9)) {
     if (isset($_POST["b110"]) || isset($_POST["b111"])) {//ja, es wurde ein button gedrueckt
         //transaktionsbeginn
-        if (setLock($_SESSION['ums_user_id'])) {
+        if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
             //Rohstoffe innerhalb der Sperre neu laden, sonst bezahlt ein paralleler Bauauftrag mit veralteten Beständen
             $row_res = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]));
             $gr01 = $restyp01 = $row_res['restyp01'];
@@ -323,7 +323,7 @@ if (hasTech($pt, 9)) {
 	
 
             //transaktionsende
-            $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+            $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
             if ($erg) {
                 //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
             } else {
@@ -1334,10 +1334,10 @@ if (!hasTech($pt, 9)) {
                                         $gb_text = $na[$werte[1]];
                                         break;
                                     case 57:
-                                        $gb_text = showkampfberichtV1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte);
+                                        $gb_text = Kampfbericht::v1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte);
                                         break;
                                     case 70:
-                                        $gb_text = showkampfberichtBG($row["text"]);
+                                        $gb_text = Kampfbericht::bg($row["text"]);
                                         break;
                                     default:
                                         if ($n == 51 && strpos($row["text"], "($sector:$system)") === false) {

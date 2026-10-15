@@ -1,8 +1,8 @@
 <?php
+use DieEwigen\DE2\View\Kampfbericht;
 include "../inccon.php";
 include "../inc/sv.inc.php";
 include_once "../functions.php";
-include "../lib/kampfbericht.lib.php";
 include_once "../tickler/kt_einheitendaten.php";
 include "det_userdata.inc.php";
 
@@ -86,9 +86,9 @@ if ($uid > 0) {
             echo '</tr>';
             echo '<tr>';
             if ($n == 57) {
-                echo '<td>' . '<br>' . showkampfberichtV1($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte) . '</td>';
+                echo '<td>' . '<br>' . Kampfbericht::v1($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte) . '</td>';
             } elseif ($n == 70) {
-                echo '<td>' . '<br>' . showkampfberichtBG($row["text"]) . '</td>';
+                echo '<td>' . '<br>' . Kampfbericht::bg($row["text"]) . '</td>';
             }
             echo '</tr>';
         }

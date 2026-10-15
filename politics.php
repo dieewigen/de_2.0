@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 
 use DieEwigen\DE2\Model\Npc\FleetControl;
 use DieEwigen\DE2\Model\Npc\NPCBuildControl;
@@ -8,7 +9,6 @@ use DieEwigen\DE2\Model\Npc\Types\FleetPresetConfig;
 include "inc/header.inc.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/' . $sv_server_lang . '_politics.lang.php';
-include "lib/transaction.lib.php";
 include_once "functions.php";
 
 $db_daten = mysqli_execute_query(
@@ -711,7 +711,7 @@ function pol_dx_botschaft()
                         return;
                     }
                     $fleetControl->moveAllShipsToHomeFleet($npcId);
-                    if (setLock($npcId)) {
+                    if (Sperre::setzen($GLOBALS['dbi'], $npcId)) {
                         try {
                             $recycler = new FleetRecycler();
                             $presetConfig = $npcControl->getShipBuildPresets($npc['user_id']);
@@ -729,7 +729,7 @@ function pol_dx_botschaft()
                             echo '<div class="mod-meldung mod-meldung-fehler">' . $politics_lang['npc_rec_error'] . '</div>';
                             return;
                         } finally {
-                            $erg = releaseLock($npcId);
+                            $erg = Sperre::loesen($GLOBALS['dbi'], $npcId);
                             if (!$erg) {
                                 echo '<div class="mod-meldung mod-meldung-fehler">Datensatz Nr. ' . $npcId . ' konnte nicht entsperrt werden!</div>';
                             }

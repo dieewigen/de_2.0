@@ -1,6 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Verteidigung\Boni;
+use DieEwigen\DE2\Model\Sperre;
 include('inc/header.inc.php');
-include('lib/transaction.lib.php');
 include('inc/userartefact.inc.php');
 include('inc/schiffsdaten.inc.php');
 include('inc/lang/'.$sv_server_lang.'_production.lang.php');
@@ -71,7 +72,10 @@ if($artbonus_def>5)$artbonus_def=5;
 ////////////////////////////////////////////////////////////////////////////////
 $rangnamen=array("Der Erhabene", "Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","My","Ny","Xi","Omikron","Pi","Rho","Sigma","Tau","Ypsilon","Phi","Chi","Psi","Omega");
 $defense_level=24-getfleetlevel($defenseexp);
-include 'lib/defenseboni.lib.php';
+$defense_boni=Boni::fuerStufe($defense_level);
+$defense_bonus_feuerkraft=$defense_boni['feuerkraft'];
+$defense_bonus_ps=$defense_boni['ps'];
+$defense_bonus_buildtime=$defense_boni['bauzeit'];
 
 //test auf spezialisierung bauzeit
 if($spec1==1)$defense_bonus_buildtime+=50;
@@ -195,7 +199,7 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 	//transaktionsbeginn
-	if (setLock($_SESSION['ums_user_id'])){
+	if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 		//$need_storage_res=array();
 		//nochmal die vorandenen Rohstoffe laden
 		$row=loadPlayerData($_SESSION['ums_user_id']);
@@ -321,7 +325,7 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 		 restyp04 = restyp04 - $gr04, restyp05 = restyp05 - $gr05 WHERE user_id = '".$_SESSION['ums_user_id']."';");
 
 		//transaktionsende
-		$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+		$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
 		if ($erg){
 			  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{
@@ -536,7 +540,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 	//möchte man ein Item bauen?
 	if(isset($_REQUEST['build_item']) && $sabotage==0){
-		if (setLock($_SESSION['ums_user_id'])){
+		if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 			for($i=0;$i<200;$i++){
 				if(isset($_POST['item_id_'.$i]) && $_POST['item_id_'.$i]>0){
 					//item_id auswerten
@@ -650,7 +654,7 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 
 
 			//transaktionsende
-			$erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+			$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
 			if ($erg){
 				//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			}else{

@@ -1,4 +1,5 @@
 <?php
+use DieEwigen\DE2\Model\Nachricht;
 use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
 use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
@@ -37,7 +38,6 @@ $iscoleader = ($count['count'] >= 1);
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-include('lib/basefunctions.lib.php');
 
 $message='';
 
@@ -96,9 +96,9 @@ if (isset($memberid) && $memberid > 0)
 			{
 				$m_data = mysqli_fetch_array($result);
 				$gemahnt_name = $m_data["spielername"];
-				notifyUser($memberid, $allyfinance_lang['msg_7'], 6);
+				Nachricht::anSpieler($GLOBALS['dbi'], $memberid, $allyfinance_lang['msg_7'], 6);
 				$message = "$allyfinance_lang[msg_8_1] $gemahnt_name $allyfinance_lang[msg_8_2]";
-				notifyUser($_SESSION['ums_user_id'], "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
+				Nachricht::anSpieler($GLOBALS['dbi'], $_SESSION['ums_user_id'], "$allyfinance_lang[msg_9_1] $gemahnt_name $allyfinance_lang[msg_9_2]",6);
 				$result = mysqli_execute_query($GLOBALS['dbi'], 
 				    "SELECT newtrans, newnews FROM de_user_data WHERE user_id=?",
 				    [$_SESSION['ums_user_id']]);

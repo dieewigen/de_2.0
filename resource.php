@@ -1,6 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_resource.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_siegel.lang.php';
@@ -206,7 +206,7 @@ $fehlermsg = '';
 //Tausch durchführen
 if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) && hasTech($pt, 4) && $ally_has_notfallkonverter) {
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //zielrohstoff auslesen
         $res_target = intval($_REQUEST['rh_v1']);
         if ($res_target < 1 || $res_target > 4) {
@@ -295,7 +295,7 @@ if (intval($_REQUEST['rh_amount'] ?? 0) > 0 && intval($_REQUEST['rh_cost'] > 0) 
         }
 
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L�sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -488,7 +488,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
     $ttr = intval($_POST["ttr"]);
 
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //Rohstoffe innerhalb der Sperre neu laden, sonst spendet eine zweite Anfrage mit veralteten Beständen
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05 FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row_res = mysqli_fetch_assoc($db_daten);
@@ -554,7 +554,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
             }
         }
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
@@ -575,7 +575,7 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 if (isset($_POST["b_col"])) {
     $b_col = intval($_POST["b_col"]);
     //transaktionsbeginn
-    if (setLock($_SESSION['ums_user_id'])) {
+    if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
         //nochmal vorher die rohstoffe und die Kollektoren auslesen (die Anzahl bestimmt den Preis)
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, col FROM de_user_data WHERE user_id=?", [$_SESSION['ums_user_id']]);
         $row = mysqli_fetch_assoc($db_daten);
@@ -657,7 +657,7 @@ if (isset($_POST["b_col"])) {
             }
         }
         //transaktionsende
-        $erg = releaseLock($_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
+        $erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //L&ouml;sen des Locks und Ergebnisabfrage
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {

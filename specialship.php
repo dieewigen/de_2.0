@@ -1,8 +1,9 @@
 <?php
+use DieEwigen\DE2\Model\Battleground\Battleground;
+use DieEwigen\DE2\Model\Sperre;
 include "inc/header.inc.php";
-include "lib/transaction.lib.php";
 include "lib/map_system.class.php";
-include "lib/bg_defs.inc.php";
+$sv_bg = Battleground::DEFS;
 include 'lib/special_ship.class.php';
 include "functions.php";
 
@@ -33,7 +34,7 @@ if(hasTech($pt,159) && ($_SERVER['REQUEST_METHOD'] ?? '')==='POST'){
 	if(!CsrfToken::check($_POST['token'] ?? '')){
 		$ss_ziel.='?fehler=token';
 	}elseif(isset($_POST['upgrade_ship'])){
-		if(setLock($_SESSION['ums_user_id'])){
+		if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 			$ship=loadSpecialShip($_SESSION['ums_user_id']);
 			$ps=loadPlayerStorage($_SESSION['ums_user_id']);
 			$ship_upgrade_cost=($ship->ship_level+1)*100;
@@ -47,7 +48,7 @@ if(hasTech($pt,159) && ($_SERVER['REQUEST_METHOD'] ?? '')==='POST'){
 			}else{
 				$ss_ziel.='?fehler=palenium';
 			}
-			releaseLock($_SESSION['ums_user_id']);
+			Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
 		}else{
 			$ss_ziel.='?fehler=sperre';
 		}

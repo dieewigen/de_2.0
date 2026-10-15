@@ -1,6 +1,6 @@
 <?php
+use DieEwigen\DE2\View\Kampfbericht;
 include "inc/header.inc.php";
-include "lib/kampfbericht.lib.php";
 include 'inc/lang/'.$sv_server_lang.'_sysnews.lang.php';
 include "functions.php";
 include "tickler/kt_einheitendaten.php";
@@ -121,7 +121,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr>';
-                $allenachrichten .= '<td>'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
+                $allenachrichten .= '<td>'.Kampfbericht::v1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</td>';
                 $allenachrichten .= '</tr>';
                 break;
             case 70: //Battleground
@@ -129,7 +129,7 @@ if (isset($_REQUEST["mailnews"]) && $_REQUEST["mailnews"]) {
                 $allenachrichten .= '<td>'.$hrstr.'<br><img src="'.$serverPath.'g/'.$_SESSION['ums_rasse'].'_e50.gif" border="0" align="left" hspace="20"><br><b> '.$time.'</b></td>';
                 $allenachrichten .= '</tr>';
                 $allenachrichten .= '<tr style="text-align: left;">';
-                $allenachrichten .= '<td>'.showkampfberichtBG($row["text"]).'</td>';
+                $allenachrichten .= '<td>'.Kampfbericht::bg($row["text"]).'</td>';
                 $allenachrichten .= '</tr>';
                 break;
             default:
@@ -333,11 +333,11 @@ while ($row = mysqli_fetch_assoc($db_daten)) { //jeder gefundene datensatz wird 
             break;
         case 57: //Kampfbericht V1
             echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e50.gif', $art, $time);
-            echo '<div class="sn-bericht">'.showkampfberichtV1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</div>';
+            echo '<div class="sn-bericht">'.Kampfbericht::v1($row["text"], $_SESSION['ums_rasse'], $_SESSION['ums_spielername'], $sector, $system, $schiffspunkte).'</div>';
             break;
         case 70: //Battleground
             echo sn_kopf('gp/g/'.$_SESSION['ums_rasse'].'_e50.gif', $art, $time);
-            echo '<div class="sn-bericht">'.showkampfberichtBG($row["text"]).'</div>';
+            echo '<div class="sn-bericht">'.Kampfbericht::bg($row["text"]).'</div>';
             break;
         default:
             //sektorkampfsymbol setzen, wenn nötigt

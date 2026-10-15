@@ -1,9 +1,9 @@
 <?php
+use DieEwigen\DE2\Model\Sperre;
 
 use DieEwigen\DE2\View\RealTime;
 
 include('inc/header.inc.php');
-include('lib/transaction.lib.php');
 include('inc/schiffsdaten.inc.php');
 include('functions.php');
 include('tickler/kt_einheitendaten.php');
@@ -174,7 +174,7 @@ if ($techs[4]==0)$sv_attgrenze_whg_bonus=0;
 
 if (isset($_POST['verlegen'])){
 	//transaktionsbeginn
-	if (setLock($_SESSION['ums_user_id'])){
+	if (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 		//zuerst alle übergebenen felder in nen array packen
 		$c=0;
 		for ($i=81; $i<=80+$sv_anz_schiffe; $i++){
@@ -256,7 +256,7 @@ if (isset($_POST['verlegen'])){
 		if($showerror[0]==0 AND $showerror[1]==0)
 		$errmsg.=mil_meldung($military_lang['fleetumgestellt'], 'ok');
 
-		$erg = releaseLock($_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
+		$erg = Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']); //Lösen des Locks und Ergebnisabfrage
 		if ($erg){
 			//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{

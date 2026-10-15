@@ -212,7 +212,7 @@ class SiegelService
 
     /**
      * Resonanzkristalle einsetzen. Die Menge wird auf den Anteil und den Lagerbestand gekappt.
-     * Der Aufrufer hält die Spielersperre (map_system.php sperrt die ganze Seite), daher hier kein setLock().
+     * Der Aufrufer hält die Spielersperre (map_system.php sperrt die ganze Seite), daher hier kein Sperre::setzen().
      *
      * @return array{ok:bool, msg:string}
      */

@@ -363,14 +363,20 @@ if(!$flag_ang_big_iframe){
 // helper
 /////////////////////////////////////////////////////////////
 if($show_helper==1 && !isset($apiDisableHelper)){
-	include 'lib/helper.inc.php';
+	echo \DieEwigen\DE2\View\Berater::html($GLOBALS['dbi'], (int)$_SESSION['ums_user_id'], (int)$helper_progress, (int)$helper_col, $pt ?? null);
 }
 
 /////////////////////////////////////////////////////////////
 // Mission-Reminder
 /////////////////////////////////////////////////////////////
 if($show_trade_reminder==1 && !$flag_ang_big_iframe && ($_SESSION['de_frameset'] || $_SESSION['ums_mobi']==1)){
-	include "lib/trade_reminder.inc.php";
+	//abgeschlossene Missionen, deren Lohn noch nicht abgeholt ist
+	$trade_offen = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_mission WHERE end_time<? AND get_reward=0 AND user_id=?", [time(), $_SESSION['ums_user_id']]));
+	if($trade_offen['anzahl']>0){
+		echo '<div class="info_box text3" style="margin-top: 6px;">
+	Es gibt abgeschlossene <a href="missions.php">Missionen</a>.<br>
+	<span style="font-size: 10px;">Unter Optionen -> "Missionshilfe aktivieren" kann die Information eingeblendet/ausgeblendet werden.</span></div><br>';
+	}
 }
 
 //Seite schließen/Seitenname ANG

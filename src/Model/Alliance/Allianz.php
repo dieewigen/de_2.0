@@ -1,9 +1,10 @@
 <?php
 namespace DieEwigen\DE2\Model\Alliance;
 
+use DieEwigen\DE2\Model\Nachricht;
+
 //Allianzdaten und -aktionen der Allianzseiten: Historie, ID und Tag, Bewerbungen. Ersetzt ally/allyfunctions.inc.php und
-//den Bewerbungsteil von ally/ally.menu.inc.php. Die Benachrichtigung beim Zurückziehen braucht notifyUser() aus
-//lib/basefunctions.lib.php (allymain.php bindet es ein).
+//den Bewerbungsteil von ally/ally.menu.inc.php.
 class Allianz
 {
     //Eintrag in die Allianzhistorie, optional auch in den Allianzchat; nur einfache Formatierung (safe_basic_html)
@@ -64,10 +65,10 @@ class Allianz
         $ally = mysqli_fetch_assoc(mysqli_execute_query($db, "SELECT leaderid, coleaderid1, coleaderid2, coleaderid3 FROM de_allys WHERE id=?", [$antrag['ally_id']]));
         if ($ally) {
             $text = 'Eine Bewerbung wurde zur&uuml;ckgezogen. Spielername: '.$spielername;
-            \notifyUser($ally['leaderid'], $text, "6");
+            Nachricht::anSpieler($db, $ally['leaderid'], $text, "6");
             foreach (array('coleaderid1', 'coleaderid2', 'coleaderid3') as $feld) {
                 if ($ally[$feld] > 0) {
-                    \notifyUser($ally[$feld], $text, "6");
+                    Nachricht::anSpieler($db, $ally[$feld], $text, "6");
                 }
             }
         }
