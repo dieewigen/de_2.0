@@ -43,13 +43,7 @@ include "resline.php";
 
 //hat man die benötigte Technologie?
 if(!hasTech($pt,25)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=25";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
-	rahmen_oben('Fehlende Technologie');
-	echo '<div class="mod vs"><div class="mod-hinweis vs-fehlt">F&uuml;r die Vergessenen Systeme ben&ouml;tigst Du folgende Technologie: <a href="help.php?t=25">'.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</a></div></div>';
-	rahmen_unten();
+	echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(25, 'F&uuml;r die Vergessenen Systeme ben&ouml;tigst du');
 }else{
 	rahmen_oben('Vergessene Systeme');
 	echo '<div class="mod vs">';

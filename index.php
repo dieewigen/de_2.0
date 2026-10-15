@@ -214,7 +214,7 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             //die prüfung läuft vor dem hochzählen weiter unten (früher in menu.php danach, dort war es 1),
             //neue konten stehen hier also auf 0; nach dem ersten login steht der wert auf 2
             if ($row['logins'] == 0) {
-                insert_chat_msg(0, 2, $_SESSION['ums_spielername'], ' <font color="#FFFF00">Ich habe mich '.$sv_server_tag.' angeschlossen.</font>');
+                insert_chat_msg(0, 2, $_SESSION['ums_spielername'], ' <span style="color: #FFFF00;">Ich habe mich '.$sv_server_tag.' angeschlossen.</span>');
                 mysqli_execute_query(
                     $GLOBALS['dbi'],
                     "UPDATE de_login SET logins=logins+1 WHERE user_id=?",
@@ -336,7 +336,7 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
             if ($row_supporter['supporter'] == "") {
                 $row_supporter['supporter'] = "Support@Die-Ewigen.com";
             }
-            //$fehlermsg=$fehlermsg.$index_lang[accountistgesperrt].' <a href="mailto:'.$row_supporter[supporter].'"><font color="#FF0000">'.$row_supporter[supporter].'</font></a>';
+            //$fehlermsg=$fehlermsg.$index_lang[accountistgesperrt].' <a href="mailto:'.$row_supporter[supporter].'"><span style="color: #FF0000;">'.$row_supporter[supporter].'</span></a>';
             $fehlermsg = $fehlermsg.'Der Account ist gesperrt. Wende Dich bitte per Ticketsystem (Accountverwaltung -> Support) an den Support.';
         } elseif ($ums_status == 4) {
             $fehlermsg = $index_lang['accumzug'];

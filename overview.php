@@ -863,9 +863,9 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             if ($ac_akt > $a) {
                 $font = '#5fe08a';
             }
-            $actip[$ac] .= '<br><font color='.$font.'>'.($a + 1).': '.number_format($rewards[$a][0], 0, "", ".").' ('.number_format($rewards[$a][1], 0, "", ".").')</font>';
+            $actip[$ac] .= '<br><span style=\'color: '.$font.';\'>'.($a + 1).': '.number_format($rewards[$a][0], 0, "", ".").' ('.number_format($rewards[$a][1], 0, "", ".").')</span>';
         }
-        $actip[$ac] .= '<br>Farblegende:<br><font color=#5fe08a>Gr&uuml;n: erledigt</font>, <font color=#ffb45c>Gelb: freigeschaltet, aber noch nicht erledigt</font>, <font color=#ff6b6b>Rot: wird automatisch zu einem sp&auml;teren Rundenzeitpunkt freigeschalten</font>';
+        $actip[$ac] .= '<br>Farblegende:<br><span style=\'color: #5fe08a;\'>Gr&uuml;n: erledigt</span>, <span style=\'color: #ffb45c;\'>Gelb: freigeschaltet, aber noch nicht erledigt</span>, <span style=\'color: #ff6b6b;\'>Rot: wird automatisch zu einem sp&auml;teren Rundenzeitpunkt freigeschalten</span>';
 
     }
 

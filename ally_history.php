@@ -62,7 +62,6 @@ echo '</div>';
 rahmen_unten();
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>
 
 </body>
 </html>

@@ -290,7 +290,6 @@ if($an and ($isleader || $iscoleader)){
 
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>
 
 </body>
 </html>

@@ -128,7 +128,7 @@ if (strlen($message) > 0)
 }
 
 // Abfrage auf $iscoleader hinzugef&uuml;gt von Ascendant (01.09.2002)
-if (!$ismember and !$isleader and !$iscoleader) die(include("ally/ally.footer.inc.php"));
+if (!$ismember and !$isleader and !$iscoleader) die();
 
 if($isleader || $iscoleader)
 {
@@ -249,7 +249,6 @@ if ($isleader || $iscoleader)
 echo '</div>';
 rahmen_unten();
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>
 
 </body>
 </html>

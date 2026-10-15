@@ -91,4 +91,3 @@ if (mysqli_num_rows($allys) < 1) {
 echo '<div class="ally-aktionen"><a href="ally_members.php" class="mod-btn mod-btn-leise">Zur Mitgliederliste</a></div></div>';
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>

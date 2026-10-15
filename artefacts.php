@@ -737,20 +737,8 @@ if (!hasTech($pt, 28)) {
         echo $meldung;
     }
 
-    $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=28";
-    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck);
-    $row_techcheck = mysqli_fetch_array($db_tech);
-
-
     echo '<br>';
-    rahmen_oben('Fehlende Technologie');
-    echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-    echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=28" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_28.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technologie: <b>'.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</b><br><br>'.link_technologien('Zu den Technologien').'</td>
-	</tr>';
-    echo '</table>';
-    rahmen_unten();
+    echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(28);
 } else {
     //schauen ob schon ein gebäudeupgrade läuft
     $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$_SESSION['ums_user_id']]);

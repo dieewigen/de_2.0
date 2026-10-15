@@ -86,5 +86,4 @@ if($allytag==''){
 		echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Du kannst keine Allianz gr&uuml;nden, da Du Dich bereits in einer Allianz befindest bzw. beworben hast.</div></div>';
 
 	}
-	include('ally/ally.footer.inc.php');
 ?>

@@ -352,20 +352,8 @@ if (isset($sv_deactivate_secret) && $sv_deactivate_secret == 1) {
 
 
 if (!hasTech($pt, 9)) {
-    $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=9";
-    $db_tech = mysqli_execute_query($GLOBALS['dbi'], $techcheck, []);
-    $row_techcheck = mysqli_fetch_array($db_tech);
-
-    //echo $secret_lang[eswirdeine].$row_techcheck[tech_name].$secret_lang[benoetigt];
     echo '<br>';
-    rahmen_oben('Fehlende Technologie');
-    echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-    echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=9" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_9.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'], $_SESSION['ums_rasse']).'</td>
-	</tr>';
-    echo '</table>';
-    rahmen_unten();
+    echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(9);
 } else {
     //zielkoordinaten trimmen
     $zsec1 = intval(trim($zsec1));

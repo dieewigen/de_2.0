@@ -46,7 +46,7 @@ function insertmessage($message, $color, $lang_systemnachricht)
 function hf_schliessen($html)
 {
     $offen = array();
-    preg_match_all('#<(/?)(b|i|u|center|font|a)\b[^>]*>#i', $html, $m, PREG_SET_ORDER);
+    preg_match_all('#<(/?)(b|i|u|center|span|a)\b[^>]*>#i', $html, $m, PREG_SET_ORDER);
     foreach ($m as $tag) {
         $name = strtolower($tag[2]);
         if ($tag[1] == '') {
@@ -435,17 +435,21 @@ if ($action == "eingang"  || $action == "" || $action == "ausgang" || $action ==
         $row['text'] = preg_replace("/\[center\]/i", "<center>", $row['text']);
         $row['text'] = preg_replace("/\[\/center\]/i", "</center>", $row['text']);
 
-        $row['text'] = str_replace("[CGRUEN]", "<font color=\"#28FF50\">", $row['text']);
-        $row['text'] = str_replace("[CROT]", "<font color=\"#F10505\">", $row['text']);
-        $row['text'] = str_replace("[CW]", "<font color=\"#FFFFFF\">", $row['text']);
-        $row['text'] = str_replace("[CGELB]", "<font color=\"#FDFB59\">", $row['text']);
-        $row['text'] = str_replace("[CDE]", "<font color=\"#3399FF\">", $row['text']);
+        $row['text'] = str_replace("[CGRUEN]", "<span style=\"color: #28FF50;\">", $row['text']);
+        $row['text'] = str_replace("[CROT]", "<span style=\"color: #F10505;\">", $row['text']);
+        $row['text'] = str_replace("[CW]", "<span style=\"color: #FFFFFF;\">", $row['text']);
+        $row['text'] = str_replace("[CGELB]", "<span style=\"color: #FDFB59;\">", $row['text']);
+        $row['text'] = str_replace("[CDE]", "<span style=\"color: #3399FF;\">", $row['text']);
 
         $row['text'] = preg_replace("/\[email\]([^[]*)\[\/email\]/", "<a href=\"mailto:\\1\">\\1</a>", $row['text']);
         //nur http(s)-Links, sonst wäre z. B. javascript: möglich
         $row['text'] = preg_replace("/\[url\](https?:\/\/[^[]*)\[\/url\]/i", '<a href="\\1" target="_blank" rel="noopener">\\1</a>', $row['text']);
-        $row['text'] = preg_replace("/\[color=#([^[]+)\]([^[]*)\[\/color\]/", "<font color=\"#\\1\" >\\2</font>", $row['text']);
-        $row['text'] = preg_replace("/\[size=([^[]+)\]([^[]*)\[\/size\]/", "<font size=\"\\1\" >\\2</font>", $row['text']);
+        //nur Hexfarben und die Größen 1 bis 7 (wie bei <font size>), damit nichts anderes in das style-Attribut gelangt
+        $row['text'] = preg_replace("/\[color=#([0-9a-fA-F]{3,6})\]([^[]*)\[\/color\]/", "<span style=\"color: #\\1;\">\\2</span>", $row['text']);
+        $row['text'] = preg_replace_callback("/\[size=([1-7])\]([^[]*)\[\/size\]/", function ($m) {
+            $px = array(1 => 10, 2 => 13, 3 => 16, 4 => 18, 5 => 24, 6 => 32, 7 => 48);
+            return '<span style="font-size: '.$px[(int)$m[1]].'px;">'.$m[2].'</span>';
+        }, $row['text']);
 
 
         $row['text'] = nl2br($row['text']);

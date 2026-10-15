@@ -123,4 +123,3 @@ if($a == 1)
 
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>

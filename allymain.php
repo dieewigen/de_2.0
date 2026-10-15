@@ -111,7 +111,7 @@ if (!$ismember and !$isleader and !$iscoleader){
 		</div>';
 		rahmen_unten();
 	}
-	die(include("ally/ally.footer.inc.php"));
+	die();
 }
 
 $meldung='';
@@ -408,7 +408,6 @@ if ($isleader || $iscoleader)
 }
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>
 
 </body>
 </html>

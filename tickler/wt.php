@@ -1559,7 +1559,7 @@ if ($doetick == 1) {
 
 
                 //Meldung im allgemeinen Chat
-                insert_chat_msg(0, 2, '', '<font color="#802ec1">'.$meldung.'</font>');
+                insert_chat_msg(0, 2, '', '<span style="color: #802ec1;">'.$meldung.'</span>');
             }
         }
 
@@ -1664,7 +1664,7 @@ if ($doetick == 1) {
                     $meldung = ''.$spielername.' hat einen ERHABENEN-Teilsieg errungen.';
 
                     //Meldung im allgemeinen Chat
-                    insert_chat_msg(0, 2, '', '<font color="#802ec1">'.$meldung.'</font>');
+                    insert_chat_msg(0, 2, '', '<span style="color: #802ec1;">'.$meldung.'</span>');
                 }
             }
         }

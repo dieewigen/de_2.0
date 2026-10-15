@@ -89,7 +89,7 @@ while($row = mysqli_fetch_array($db_daten)){
 
 	mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_allys SET questtyp=?, questreach=?, questgoal=?, questtime=? WHERE id=?", [$nexttyp, $questreach, $questgoal, $questtime, $allyid]);
 	//nachricht an den allianzchat
-	insert_chat_msg($allyid, 1, '', '<font color="#802ec1">Eine neue '.$allytag.'-Allianzaufgabe steht zur Verf&uuml;gung.</font>');
+	insert_chat_msg($allyid, 1, '', '<span style="color: #802ec1;">Eine neue '.$allytag.'-Allianzaufgabe steht zur Verf&uuml;gung.</span>');
 }
 
 
@@ -156,7 +156,7 @@ if($maxtick % $trigger_intervall == 0){
 		}
 
 		//Nachricht an den Server-Chat
-		$text='<font color="#9f2ebd">ARES-Missionsergebnis (Gesamtsumme: '.number_format(floor($maxres[0]), 0,"",".").' M, '.number_format(floor($maxres[1]), 0,"",".").' D, '.number_format(floor($maxres[2]), 0,"",".").' I, '.number_format(floor($maxres[3]), 0,"",".").' E):'.$ergebnis_text.'</font>';
+		$text='<span style="color: #9f2ebd;">ARES-Missionsergebnis (Gesamtsumme: '.number_format(floor($maxres[0]), 0,"",".").' M, '.number_format(floor($maxres[1]), 0,"",".").' D, '.number_format(floor($maxres[2]), 0,"",".").' I, '.number_format(floor($maxres[3]), 0,"",".").' E):'.$ergebnis_text.'</span>';
 		$channel=0;$channeltyp=2;$spielername='[SYSTEM]'; $chat_message=$text;
 		insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);
 
@@ -194,7 +194,7 @@ if($maxtick % $trigger_intervall == 0){
 		changeAllyStorageAmount($allyid, 13, 1, false);
 
 		//Nachricht an den Server-Chat
-		$text='<font color="#9f2ebd">HEPHAISTOS-Missionsgewinner (1 Allianzartefakt, 1 Quantenglimmer): '.$allytag.'</font>';
+		$text='<span style="color: #9f2ebd;">HEPHAISTOS-Missionsgewinner (1 Allianzartefakt, 1 Quantenglimmer): '.$allytag.'</span>';
 		$channel=0;$channeltyp=2;$spielername='[SYSTEM]'; $chat_message=$text;
 		insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);
 

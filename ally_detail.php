@@ -137,7 +137,6 @@ if($num==1)
 }
 else echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">Diese Allianz konnte nicht gefunden werden.</div></div>';
 ?>
-<?php include("ally/ally.footer.inc.php") ?>
 
 </body>
 </html>

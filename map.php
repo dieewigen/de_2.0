@@ -137,7 +137,7 @@ while ($row = mysqli_fetch_array($res)) {
 
 $artstr = '';
 foreach ($verwahrt as $art) {
-    $atip = '<font color=#'.$art['color'].'>'.$art['name'].'</font>';
+    $atip = '<span style=\'color: #'.$art['color'].';\'>'.$art['name'].'</span>';
     if ($art['anzahl'] > 1) {
         $atip .= ' ('.$sec_lang['struktur_anzahl'].': '.$art['anzahl'].')';
     }
@@ -836,7 +836,7 @@ foreach ($sectorList as $sf) {
                 $desc = str_replace("{WERT6}", number_format($sv_artefakt[$row["id"] - 1][5], 2, ",", "."), $desc);
 
 
-                $atip = '<font color=#'.$row["color"].'>'.$row["artname"].'</font><br>'.$desc;
+                $atip = '<span style=\'color: #'.$row["color"].';\'>'.$row["artname"].'</span><br>'.$desc;
 
                 $artstr .= '
                 <div onclick="switch_iframe_main_container(\'help.php?a=1\')" title="'.umlaut($atip).'">

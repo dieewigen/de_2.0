@@ -692,7 +692,7 @@ if($sec_data['npc']==1){
 	$desc=str_replace("{WERT6}", number_format($sv_artefakt[$row["id"]-1][5], 2,",",".") ,$desc);
       
       
-    $atip[$c] = '<font color=#'.$row["color"].'>'.$row["artname"].'</font>&'.$desc;
+    $atip[$c] = '<span style=\'color: #'.$row["color"].';\'>'.$row["artname"].'</span>&'.$desc;
       
     $artstr.='<a href="help.php?a=1" target="_blank" title="'.$atip[$c].'"><img src="'.'gp/'.'g/sa'.$row["picid"].'.gif" border="0"></a>&nbsp;';
     $c++;

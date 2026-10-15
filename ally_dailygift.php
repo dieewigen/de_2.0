@@ -295,7 +295,7 @@ if ($ally_id > 0 && $allystatus == 1) {
                 //info an den spieler, dass er den bonus erhalten hat
                 $msg = '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok"><b>'.$allydailygift_lang['bonuserhalten'].'</b>'.$bonusstr.'</div></div>';
                 //info für den allychat
-                $allydailygift_lang['bonuserhaltenchat'] = '<font color="#802ec1">'.str_replace("{WERT1}", $_SESSION['ums_spielername'], $allydailygift_lang['bonuserhaltenchat']).'</font>';
+                $allydailygift_lang['bonuserhaltenchat'] = '<span style="color: #802ec1;">'.str_replace("{WERT1}", $_SESSION['ums_spielername'], $allydailygift_lang['bonuserhaltenchat']).'</span>';
                 insert_chat_msg($ally_id, 1, '', $allydailygift_lang['bonuserhaltenchat']);
             }
 

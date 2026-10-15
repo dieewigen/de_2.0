@@ -418,21 +418,7 @@ $content='';
 
 //hat man die benötigte Technologie?
 if(!hasTech($pt,29)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=29";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
-
-	$content.='<br>';
-	$content.=rahmen_oben('Fehlende Technologie',false);
-	$content.='
-	<table width="572" border="0" cellpadding="0" cellspacing="0">
-		<tr align="left" class="cell">
-			<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=29" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_29.jpg" border="0"></a></td>
-			<td valign="top">Du ben&ouml;tigst folgende Technologie: <b>'.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</b><br><br>'.link_technologien('Zu den Technologien').'</td>
-		</tr>
-	</table>';
-	$content.=rahmen_unten(false);
+	$content.='<br>'.\DieEwigen\DE2\View\FehlendeTechnologie::karte(29);
 }else{
 
 	///////////////////////////////////////////////////////////

@@ -82,13 +82,7 @@ if($vs_locked){
 if(!$vs_locked){
 	echo '<div class="mod pol-meldungen"><div class="mod-meldung mod-meldung-warn">Es wird noch eine Aktion ausgef&uuml;hrt. Bitte <a href="map_system.php?id='.intval($_REQUEST['id'] ?? 1).'">kurz warten und neu laden</a>.</div></div>';
 }elseif(!hasTech($pt,25)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=25";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
-	rahmen_oben('Fehlende Technologie');
-	echo '<div class="mod ms"><div class="mod-hinweis vs-fehlt">F&uuml;r die Vergessenen Systeme ben&ouml;tigst Du folgende Technologie: <a href="help.php?t=25">'.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</a></div></div>';
-	rahmen_unten();
+	echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(25, 'F&uuml;r die Vergessenen Systeme ben&ouml;tigst du');
 }else{
 	//welche ID will man sich ansehen?
 	$id=intval($_REQUEST['id'] ?? 1);

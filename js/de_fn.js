@@ -213,3 +213,23 @@ document.addEventListener('click', function(e){
     ersatz();
   }
 });
+
+// "WhatsApp" (Kampfbericht): data-teilen nennt dasselbe Textfeld; der offizielle Teilen-Link öffnet am Handy die App,
+// am PC WhatsApp Web, bei blockiertem Popup im ganzen Fenster (wie deirc() in secstatus.php)
+document.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('[data-teilen]') : null;
+  if(!b){
+    return;
+  }
+  var quelle = document.getElementById(b.getAttribute('data-teilen'));
+  if(!quelle){
+    return;
+  }
+  var url = 'https://wa.me/?text=' + encodeURIComponent(quelle.value);
+  var wa = window.open(url, '_blank');
+  if(wa){
+    wa.opener = null;
+  }else{
+    window.top.location.href = url;
+  }
+});

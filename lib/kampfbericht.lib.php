@@ -333,10 +333,11 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 		.'  '.$kbl_lang['verlorenepunkte'].': '.kb_zahl($ges['a'][3]).' ('.kb_prozent($ges['a'][3], $ges['a'][2]).') / '.kb_zahl($ges['v'][3]).' ('.kb_prozent($ges['v'][3], $ges['v'][2]).")\n"
 		.'  Verlorene Hitpoints: '.number_format($quote['a'], 1, ',', '.').' % / '.number_format($quote['v'], 1, ',', '.')." %\n";
 
-	//Siegregel wie im alten Bericht, daneben der Knopf zum Kopieren (data-kopieren, js/de_fn.js)
+	//Siegregel wie im alten Bericht, daneben die Knöpfe zum Kopieren und Teilen (data-kopieren/data-teilen, js/de_fn.js)
 	$html.='<div class="kb-fuss"><details class="kb-regel"><summary>Wie wird der Sieger bestimmt?</summary><p>Es gewinnt die Seite, die weniger Hitpoints im Verhältnis zu ihren gesamten Hitpoints verloren hat. In den Hitpoints sind alle Boni eingerechnet.<br>'
 		.'Verluste '.$kbl_lang['angreifer'].': '.number_format($quote['a'], 2, ',', '.').' %<br>Verluste '.$kbl_lang['verteidiger'].': '.number_format($quote['v'], 2, ',', '.').' %</p></details>'
-		.'<button type="button" class="mod-btn mod-btn-leise kb-kopieren" data-kopieren="kb-quelle-'.$kb_nr.'">Als Text kopieren</button>'
+		.'<div class="kb-knoepfe"><button type="button" class="mod-btn mod-btn-leise kb-knopf" data-kopieren="kb-quelle-'.$kb_nr.'">Als Text kopieren</button>'
+		.'<button type="button" class="mod-btn mod-btn-leise kb-knopf" data-teilen="kb-quelle-'.$kb_nr.'">WhatsApp</button></div>'
 		.'<textarea class="kb-quelle" id="kb-quelle-'.$kb_nr.'" hidden readonly>'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'</textarea></div>';
 	$html.='</div>';
 

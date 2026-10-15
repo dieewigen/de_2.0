@@ -141,4 +141,3 @@ if($eintragung==1){
 }
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>

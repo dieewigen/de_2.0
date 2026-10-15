@@ -71,7 +71,7 @@ if (($restyp05 + $sum) < $t_tojoin){
 }
 
 if ($quit_script && $npc != 2){
-	die(include('ally/ally.footer.inc.php'));
+	die();
 }
 
 $ok=$_POST['ok'] ?? false;

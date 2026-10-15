@@ -251,19 +251,9 @@ if($sabotage==1){
 
 //benötigtes Gebäude: Recyclotron
 if(!hasTech($pt,129)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=129";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
 	echo '<br>';
-	rahmen_oben('Fehlende Technologie');
-	echo '<table width="572" border="0" cellpadding="0" cellspacing="0">';
-	echo '<tr align="left" class="cell">
-	<td width="100"><a href="'.$sv_link[0].'?r='.$_SESSION['ums_rasse'].'&t=13" target="_blank"><img src="'.'gp/'.'g/t/'.$_SESSION['ums_rasse'].'_13.jpg" border="0"></a></td>
-	<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
-	</tr>';
-	echo '</table>';
-	rahmen_unten();
+	//das Recyclotron hat kein eigenes Bild, bisher stand hier das der Technologie 13
+	echo \DieEwigen\DE2\View\FehlendeTechnologie::karte(129, '', 13);
 }else{
 	///////////////////////////////////////////////////////////////////////
 	//  Oberfläche darstellen: kompakte Tabelle, eine Zeile je Einheit

@@ -151,4 +151,3 @@ echo $zurueck.'</div>';
 
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>

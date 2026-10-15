@@ -1237,7 +1237,6 @@ function showeinheit_ang($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05,
     $tooltip = '<img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
-    //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
     echo '<td class="'.$bg.'" height="25"><div align="left">&nbsp;'.$tooltip.'<b>&nbsp;&nbsp;</b>'.$techname.$item_kosten.'</div></td>';
     echo '<td class="'.$bg.'">'.number_format($rt01, 0, "", ".")."</td>";
     echo '<td class="'.$bg.'">'.number_format($rt02, 0, "", ".")."</td>";
@@ -1711,9 +1710,9 @@ function validDigit($digit)
  * Link zur Technologieseite. In der Desktopversion (dm.php) öffnet sie sich wie über das Menü im großen Fenster,
  * sonst (mobil, klassische Frames) als normaler Link.
  */
-function link_technologien($text)
+function link_technologien($text, $klasse = '')
 {
-    return '<a href="ang_techs.php" onclick="if(window.parent!==window &amp;&amp; typeof window.parent.switch_iframe_main_container_big===\'function\'){window.parent.switch_iframe_main_container_big(\'ang_techs.php\');return false;}">'.$text.'</a>';
+    return '<a href="ang_techs.php"'.($klasse !== '' ? ' class="'.$klasse.'"' : '').' onclick="if(window.parent!==window &amp;&amp; typeof window.parent.switch_iframe_main_container_big===\'function\'){window.parent.switch_iframe_main_container_big(\'ang_techs.php\');return false;}">'.$text.'</a>';
 }
 
 /**
@@ -1755,15 +1754,18 @@ function discord_invite_code($code)
 
 /**
  * Spielertext mit einfacher Formatierung (b, i, u, strong, p, br, ul, li, font color) für die Ausgabe säubern:
- * andere Tags werden entfernt, die erlaubten verlieren alle Attribute außer einer einfachen Farbe bei font.
+ * andere Tags werden entfernt, die erlaubten verlieren alle Attribute; gespeicherte font-Farben kommen als span heraus.
  */
 function safe_basic_html($string)
 {
     $string = strip_tags((string)$string, '<br><i><b><strong><u><ul><li><p><font>');
     return preg_replace_callback('/<(\/?)(br|i|b|strong|u|ul|li|p|font)\b[^>]*>/i', function ($m) {
         $tag = strtolower($m[2]);
-        if ($m[1] === '' && $tag === 'font' && preg_match('/color\s*=\s*["\']?(#[0-9a-f]{3,6}|[a-z]{3,20})\b/i', $m[0], $c)) {
-            return '<font color="'.$c[1].'">';
+        if ($tag === 'font') {
+            if ($m[1] !== '') {
+                return '</span>';
+            }
+            return preg_match('/color\s*=\s*["\']?(#[0-9a-f]{3,6}|[a-z]{3,20})\b/i', $m[0], $c) ? '<span style="color: '.$c[1].';">' : '<span>';
         }
         return '<'.$m[1].$tag.'>';
     }, $string);
@@ -1867,7 +1869,6 @@ function showeinheit($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $te
     $tooltip = '<img src="'.'gp/'.'g/'.$_SESSION['ums_rasse'].'_hilfe.gif" border="0" title="'.$tooltips[$tooltipid].'">';
 
     echo '<tr valign="middle" align="center" height="25">';
-    //echo '<td width="115" height="25" bgcolor="'.$bg.'"><div align="left"><b><font color="white">&nbsp;</font></b><a href="help.php?SID='.$SID.'&t='.$tech_id.'"><FONT COLOR="#FFFFFF" style="font-size:8pt">'.$techname."</div></td>";
     echo '<td class="'.$bg.'" height="25"><div align="left">&nbsp;'.$tooltip.'<b>&nbsp;&nbsp;</b><a href="help.php?t='.$tech_id.'" class="link">'.$techname."</a></div></td>";
     echo '<td class="'.$bg.'">'.number_format($rt01, 0, "", ".")."</td>";
     echo '<td class="'.$bg.'">'.number_format($rt02, 0, "", ".")."</td>";

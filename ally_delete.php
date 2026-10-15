@@ -129,4 +129,3 @@ else
 
 
 ?>
-<?php include('ally/ally.footer.inc.php'); ?>

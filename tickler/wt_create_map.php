@@ -522,7 +522,7 @@ if($row['create_map_objects']==1){
 	}	
 
 	//Info an den Chat über Neugenerierung
-	$text='<font color="#9f2ebd">Die vergessenen Systeme wurden geresettet. Neue Systeme: '.$anzahl_systeme.' (Felder: '.$GLOBALS['anzahl_felder'].')</font>';
+	$text='<span style="color: #9f2ebd;">Die vergessenen Systeme wurden geresettet. Neue Systeme: '.$anzahl_systeme.' (Felder: '.$GLOBALS['anzahl_felder'].')</span>';
 	$channel=0;$channeltyp=2;$spielername='[SYSTEM]'; $chat_message=$text;
 	insert_chat_msg($channel, $channeltyp, $spielername, $chat_message);
 

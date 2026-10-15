@@ -9497,7 +9497,14 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-.kb .mod-btn.kb-kopieren {
+// die beiden Knöpfe rechts neben der Siegregel
+.kb-knoepfe {
+	display: flex;
+	flex: 0 0 auto;
+	gap: 6px;
+}
+
+.kb .mod-btn.kb-knopf {
 	flex: 0 0 auto;
 	padding: 4px 10px;
 	font-size: 11px;
@@ -9616,6 +9623,45 @@ a.art-kachel-zurueck:hover::after {
 	font-size: 11px;
 	line-height: 1.35;
 	color: #8b949e;
+}
+
+// Hinweis „Fehlende Technologie“ (src/View/FehlendeTechnologie.php): Bild der Technologie links, Einleitung, Name und Knöpfe rechts
+.fehlt {
+	width: 572px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.fehlt-bild img {
+	display: block;
+	width: 100px;
+	height: 75px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 8px;
+}
+
+.fehlt-text {
+	flex: 1 1 auto;
+	min-width: 0;
+
+	.mod-typ {
+		display: block;
+	}
+}
+
+.fehlt-name {
+	display: block;
+	margin: 2px 0 8px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+.fehlt-knoepfe {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
 }
 
 // Formatierungen im Hyperfunk (hfnlegende.php): eigene Seite im neuen Tab, je Marke ein Beispiel

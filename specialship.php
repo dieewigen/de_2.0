@@ -95,20 +95,7 @@ $content='';
 
 //hat man die benötigte Technologie?
 if(!hasTech($pt,159)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=159";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
-
-	$content.='<br>';
-	$content.=rahmen_oben('Fehlende Technologie',false);
-	$content.='
-	<table width="572" border="0" cellpadding="0" cellspacing="0">
-		<tr align="left" class="cell">
-			<td valign="top">Du ben&ouml;tigst folgende Technogie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
-		</tr>
-	</table>';
-	$content.=rahmen_unten(false); 
+	$content.='<br>'.\DieEwigen\DE2\View\FehlendeTechnologie::karte(159);
 }else{
 
 	$ship=loadSpecialShip($_SESSION['ums_user_id']);
@@ -149,20 +136,7 @@ if(!hasTech($pt,159)){
 
 //hat man die benötigte Technologie?
 if(!hasTech($pt,159)){
-	$techcheck="SELECT tech_name FROM de_tech_data WHERE tech_id=159";
-	$db_tech=mysqli_query($GLOBALS['dbi'],$techcheck);
-	$row_techcheck = mysqli_fetch_array($db_tech);
-
-
-	$content.='<br>';
-	$content.=rahmen_oben('Fehlende Technologie',false);
-	$content.='
-	<table width="572" border="0" cellpadding="0" cellspacing="0">
-		<tr align="left" class="cell">
-			<td valign="top">Du ben&ouml;tigst folgende Technologie: '.getTechNameByRasse($row_techcheck['tech_name'],$_SESSION['ums_rasse']).'</td>
-		</tr>
-	</table>';
-	$content.=rahmen_unten(false); 
+	$content.='<br>'.\DieEwigen\DE2\View\FehlendeTechnologie::karte(159);
 }else{
 
 	$content.=rahmen_oben('BATTLEGROUNDS',false);
