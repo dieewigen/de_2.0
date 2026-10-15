@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 //	--------------------------------- ally_annehmen.php ---------------------------------
 //	Funktion der Seite:		Annehmen eines Beitrittgesuchs oder eines Bündnisses
 //  -------------------------------------------------------------------------------------
@@ -31,7 +34,8 @@ $allyid = $_REQUEST['allyid'] ?? 0;
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 include('lib/basefunctions.lib.php');
 
 //Ergebnis als Meldung unter den Reitern, darunter zurück zu den Anträgen
@@ -123,8 +127,7 @@ else
 				notifyUser($userid, "Die Allianz <b>$clantag</b> hat Deinem Antrag zugestimmt und Dich aufgenommen. Die Registrierungsgeb&uuml;hr von $sum Tronic wurde dem Allianzdepot gutgeschrieben. Bitte beachte, dass Registrierungsgeb&uuml;hren nicht steuerlich absetzbar sind. <br>Herzlich Willkommen!", 6);
 
 				echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_2_1'].' '.$sum.' '.$allyablehnen_lang['msg_2_2'].'.</div>';
-				include('ally/allyfunctions.inc.php');
-				writeHistory($clantag, $allyablehnen_lang['msg_3'].' <i>'.$u_name.'</i>',true);
+				Allianz::historie($GLOBALS['dbi'], $clantag, $allyablehnen_lang['msg_3'].' <i>'.$u_name.'</i>',true);
 			}
 			else
 			{
@@ -206,12 +209,11 @@ else
             [$allyid, $clanid, $clanid, $allyid]
         );
 		echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_8'].'</div>';
-		include("ally/allyfunctions.inc.php");
-		$delallyid1_tag = getAllyTag($clanid);
-		$delallyid2_tag = getAllyTag($allyid);
+		$delallyid1_tag = Allianz::tagFuerId($GLOBALS['dbi'], $clanid);
+		$delallyid2_tag = Allianz::tagFuerId($GLOBALS['dbi'], $allyid);
 
-		writeHistory($delallyid1_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid2_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
-		writeHistory($delallyid2_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid1_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
+		Allianz::historie($GLOBALS['dbi'], $delallyid1_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid2_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
+		Allianz::historie($GLOBALS['dbi'], $delallyid2_tag, $allyablehnen_lang['msg_9_1'].' <i>'.$delallyid1_tag.'</i> '.$allyablehnen_lang['msg_9_2'], true);
 
 	}
 }

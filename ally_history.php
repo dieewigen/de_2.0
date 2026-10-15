@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 //        --------------------------------- ally_members.php ---------------------------------
 //        Funktion der Seite:                Anzeigen der Allianzmitglieder
 //        Letzte &Auml;nderung:                05.09.2002
@@ -34,14 +37,14 @@ $spielername=$row['spielername'];$allytag=$row['allytag'];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 
-include('ally/allyfunctions.inc.php');
 
 rahmen_oben('Allianzhistorie');
 echo '<div class="ally mod">';
 
-$ally_id = getAllyId($allytag);
+$ally_id = Allianz::idFuerTag($GLOBALS['dbi'], $allytag);
 $history_result = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT * FROM de_ally_history WHERE allyid = ? ORDER BY timestamp DESC",
     [$ally_id]);

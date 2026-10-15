@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 //        --------------------------------- ally_antrag.php ---------------------------------
 //        Funktion der Seite:                B&uuml;ndnisantr&auml;ge stellen
 //        Letzte &Auml;nderung:                05.09.2002
@@ -32,7 +34,8 @@ $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$syst
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 
 //////////////////////////////////////////////////////////////////////////////
 // Bewerbungen von Spielern

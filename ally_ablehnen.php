@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 //	--------------------------------- ally_ablehnen.php ---------------------------------
 //	Funktion der Seite:		Ablehnen eines Beitrittgesuchs
 //	Letzte Änderung:		05.09.2002
@@ -38,7 +41,8 @@ $allyid = $_REQUEST['allyid'] ?? 0;
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 include('lib/basefunctions.lib.php');
 
 //Ergebnis als Meldung unter den Reitern, darunter zurück zu den Anträgen
@@ -139,10 +143,9 @@ else
 		echo '<div class="mod-meldung mod-meldung-ok">'.$allyablehnen_lang['msg_6'].'</div>';
 
 		//die anbietende Allianz erfährt die Ablehnung, bisher verschwand das Angebot bei ihr kommentarlos
-		include_once('ally/allyfunctions.inc.php');
-		$antragsteller_tag = getAllyTag($allyid);
-		writeHistory($clantag, $allyablehnen_lang['msg_7_1'].' <i>'.$antragsteller_tag.'</i> '.$allyablehnen_lang['msg_7_2'], true);
-		writeHistory($antragsteller_tag, $allyablehnen_lang['msg_8_1'].' <i>'.$clantag.'</i> '.$allyablehnen_lang['msg_8_2'], true);
+		$antragsteller_tag = Allianz::tagFuerId($GLOBALS['dbi'], $allyid);
+		Allianz::historie($GLOBALS['dbi'], $clantag, $allyablehnen_lang['msg_7_1'].' <i>'.$antragsteller_tag.'</i> '.$allyablehnen_lang['msg_7_2'], true);
+		Allianz::historie($GLOBALS['dbi'], $antragsteller_tag, $allyablehnen_lang['msg_8_1'].' <i>'.$clantag.'</i> '.$allyablehnen_lang['msg_8_2'], true);
 	}
 
 }

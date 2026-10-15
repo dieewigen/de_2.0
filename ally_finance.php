@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.finance.lang.php');
 include_once('functions.php');
@@ -119,7 +121,11 @@ if (isset($memberid) && $memberid > 0)
 }
 
 include "resline.php";
-include ("ally/ally.menu.inc.php");
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+$isleader = $mitgliedschaft->istLeader();
+$iscoleader = $mitgliedschaft->istCoLeader();
+$ismember = $mitgliedschaft->istMitglied();
 if (strlen($message) > 0)
 {
 	//Erfolg (Überweisung, Mahnung zugestellt) grün, sonst rot

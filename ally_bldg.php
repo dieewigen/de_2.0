@@ -1,8 +1,10 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include_once('functions.php');
 include('lib/transaction.lib.php');
-include('ally/allyfunctions.inc.php');
 
 //include 'inc/lang/'.$sv_server_lang.'_community.lang.php';
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
@@ -27,7 +29,8 @@ if ($row['status']==1) $ownally = $row['allytag'];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 //stelle die ressourcenleiste dar
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 
 //allydaten laden
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
@@ -223,7 +226,7 @@ if($num==1){
 									insert_chat_msg($allyid, 1, '', $allytag.'-'.$entry);
 							
 									//meldung in der allianzhistorie hinterlegen
-									writeHistory($allytag, $entry);
+									Allianz::historie($GLOBALS['dbi'], $allytag, $entry);
 							
 									//meldung für den bauer
 									echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$entry.'</div></div>';

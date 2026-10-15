@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 $bestehende_kriege[] = '';
 $an = '';
 $selected = '';
@@ -27,7 +30,10 @@ $allytag=$row['allytag'];
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+$isleader = $mitgliedschaft->istLeader();
+$iscoleader = $mitgliedschaft->istCoLeader();
 
 //Meldungen unter den Reitern; Abbrüche (die) schließen den Kasten selbst
 function krieg_meldung($text, $art)
@@ -106,9 +112,8 @@ if(isset($peaceto) && ($isleader || $iscoleader))
 			 OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
 			[$allyid, $peaceto_id, $peaceto_id, $allyid]);
 		echo krieg_meldung("$allywar_lang[msg_3] $peaceto_html!", 'ok');
-		include("ally/allyfunctions.inc.php");
-		writeHistory($allytag, "$allywar_lang[msg_4_1] <i>$peaceto</i> $allywar_lang[msg_4_2]",true);
-		writeHistory($peaceto, "$allywar_lang[msg_4_1] <i>$allytag</i> $allywar_lang[msg_4_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $allytag, "$allywar_lang[msg_4_1] <i>$peaceto</i> $allywar_lang[msg_4_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $peaceto, "$allywar_lang[msg_4_1] <i>$allytag</i> $allywar_lang[msg_4_2]",true);
 
 	}
 	elseif ($friedensangebot == 0)
@@ -119,9 +124,8 @@ if(isset($peaceto) && ($isleader || $iscoleader))
 			 OR (ally_id_angreifer=? AND ally_id_angegriffener=?)",
 			[$allyid, $allyid, $peaceto_id, $peaceto_id, $allyid]);
 		echo krieg_meldung($allywar_lang['msg_5_1'].' '.$peaceto_html.' '.$allywar_lang['msg_5_2'].' '.$peaceto_html.' '.$allywar_lang['msg_5_3'], 'ok');
-		include('ally/allyfunctions.inc.php');
-		writeHistory($allytag, "$allywar_lang[msg_6_1] <i>$peaceto</i> $allywar_lang[msg_6_2]",true);
-		writeHistory($peaceto, "$allywar_lang[msg_7_1] <i>$allytag</i> $allywar_lang[msg_7_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $allytag, "$allywar_lang[msg_6_1] <i>$peaceto</i> $allywar_lang[msg_6_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $peaceto, "$allywar_lang[msg_7_1] <i>$allytag</i> $allywar_lang[msg_7_2]",true);
 
 	}
 	elseif ($friedensangebot == $allyid)
@@ -206,9 +210,8 @@ if($an and ($isleader || $iscoleader)){
 		[$allyid, $angegriffener]);
 
 	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allywar_lang['msg_14'].' !</div><div class="ally-aktionen"><a href="ally_war.php" class="mod-btn mod-btn-leise">Zur&uuml;ck</a></div></div>';
-	include('ally/allyfunctions.inc.php');
-	writeHistory($allytag, "$allywar_lang[msg_15_1] <i>$an</i> $allywar_lang[msg_15_2]",true);
-	writeHistory($an, "$allywar_lang[msg_16_1] <i>$allytag</i> $allywar_lang[msg_16_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $allytag, "$allywar_lang[msg_15_1] <i>$an</i> $allywar_lang[msg_15_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $an, "$allywar_lang[msg_16_1] <i>$allytag</i> $allywar_lang[msg_16_2]",true);
 
 }else {
 	rahmen_oben('Krieg');

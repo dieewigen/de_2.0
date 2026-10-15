@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_ally.partner.lang.php';
 include 'functions.php';
@@ -26,7 +29,10 @@ $maxbuendnis=1;
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include "resline.php";
-include ("ally/ally.menu.inc.php");
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+$isleader = $mitgliedschaft->istLeader();
+$iscoleader = $mitgliedschaft->istCoLeader();
 
 //Meldungen unter den Reitern; Abbrüche (die) schließen den Kasten selbst
 function partner_abbruch($text)
@@ -67,12 +73,11 @@ if($delallyid1 && $delallyid2 && ($isleader || $iscoleader)){
 		"DELETE FROM de_ally_partner WHERE ally_id_1=? AND ally_id_2=?",
 		[$delallyid1, $delallyid2]);
 	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allypartner_lang['msg_2'].'</div></div>';
-	include("ally/allyfunctions.inc.php");
-	$delallyid1_tag = getAllyTag($delallyid1);
-	$delallyid2_tag = getAllyTag($delallyid2);
+	$delallyid1_tag = Allianz::tagFuerId($GLOBALS['dbi'], $delallyid1);
+	$delallyid2_tag = Allianz::tagFuerId($GLOBALS['dbi'], $delallyid2);
 
-	writeHistory($delallyid1_tag, "$allypartner_lang[msg_3_1] <i>$delallyid2_tag</i> $allypartner_lang[msg_3_2]",true);
-	writeHistory($delallyid2_tag, "$allypartner_lang[msg_3_1] <i>$delallyid1_tag</i> $allypartner_lang[msg_3_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $delallyid1_tag, "$allypartner_lang[msg_3_1] <i>$delallyid2_tag</i> $allypartner_lang[msg_3_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $delallyid2_tag, "$allypartner_lang[msg_3_1] <i>$delallyid1_tag</i> $allypartner_lang[msg_3_2]",true);
 
 }
 
@@ -124,7 +129,6 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 	if ($num>0)
 		die (partner_abbruch('Mit dieser Allianz herrscht Krieg und ein B&uuml;ndnis ist nicht m&ouml;glich.'));
 
-	include_once("ally/allyfunctions.inc.php");
 
 	//ein Angebot an eine andere Allianz zieht das laufende zurück; die bisher angefragte Allianz erfährt das,
 	//sonst bleibt bei ihr nur die Meldung über ein Angebot, das es nicht mehr gibt
@@ -134,7 +138,7 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 	$row = mysqli_fetch_assoc($result);
 	$an_vorher = '';
 	if ($row && $row['ally_id_partner'] != $allyid_partner) {
-		$an_vorher = (string)getAllyTag($row['ally_id_partner']);
+		$an_vorher = (string)Allianz::tagFuerId($GLOBALS['dbi'], $row['ally_id_partner']);
 	}
 
 	//je Allianz nur ein laufender Antrag (eindeutiger Schlüssel ally_id_antragsteller): ein neuer ersetzt den alten;
@@ -147,12 +151,12 @@ if($antrag && $an && ($isleader || $iscoleader)) {
 	$meldung = $allypartner_lang['msg_6_1'].' <b>'.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').'</b> '.$allypartner_lang['msg_6_2'].' '.htmlspecialchars($an, ENT_QUOTES, 'UTF-8').' '.$allypartner_lang['msg_6_3'];
 	if ($an_vorher != '') {
 		$meldung = $allypartner_lang['msg_11_1'].' <b>'.htmlspecialchars($an_vorher, ENT_QUOTES, 'UTF-8').'</b> '.$allypartner_lang['msg_11_2'].'<br><br>'.$meldung;
-		writeHistory($allytag, "$allypartner_lang[msg_11_1] <i>$an_vorher</i> $allypartner_lang[msg_11_2]",true);
-		writeHistory($an_vorher, "$allypartner_lang[msg_12_1] <i>$allytag</i> $allypartner_lang[msg_12_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $allytag, "$allypartner_lang[msg_11_1] <i>$an_vorher</i> $allypartner_lang[msg_11_2]",true);
+		Allianz::historie($GLOBALS['dbi'], $an_vorher, "$allypartner_lang[msg_12_1] <i>$allytag</i> $allypartner_lang[msg_12_2]",true);
 	}
 	echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$meldung.'</div><div class="ally-aktionen"><a href="ally_partner.php" class="mod-btn mod-btn-leise">Zur&uuml;ck</a></div></div>';
-	writeHistory($allytag, "$allypartner_lang[msg_7_1] <i>$an</i> $allypartner_lang[msg_7_2]",true);
-	writeHistory($an, "$allypartner_lang[msg_8_1] <i>$allytag</i> $allypartner_lang[msg_8_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $allytag, "$allypartner_lang[msg_7_1] <i>$an</i> $allypartner_lang[msg_7_2]",true);
+	Allianz::historie($GLOBALS['dbi'], $an, "$allypartner_lang[msg_8_1] <i>$allytag</i> $allypartner_lang[msg_8_2]",true);
 
 }
 else {

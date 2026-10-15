@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.delete.lang.php');
 include_once('functions.php');
@@ -23,7 +25,12 @@ $allytag=$row['allytag'];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+if (!$mitgliedschaft->darfLeaderseite()) {
+    die(Navi::zugriffVerweigert());
+}
+$isleader = $mitgliedschaft->istLeader();
 
 $a=$_REQUEST['a'] ?? -1;
 

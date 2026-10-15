@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 //        --------------------------------- ally_members.php ---------------------------------
 //        Funktion der Seite:                Anzeigen der Allianzmitglieder
 //        Letzte &Auml;nderung:                05.09.2002
@@ -41,7 +43,10 @@ $system = $row["system"];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+$isleader = $mitgliedschaft->istLeader();
+$iscoleader = $mitgliedschaft->istCoLeader();
 
 $allyId = -1;
 if ($pd['allytag'] != "" && $pd['ally_status'] == 1) {

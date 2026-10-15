@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.kick.lang.php');
 require_once('functions.php');
@@ -33,7 +36,11 @@ if($row = mysqli_fetch_assoc($db_daten)) {
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+if (!$mitgliedschaft->darfLeaderseite()) {
+    die(Navi::zugriffVerweigert());
+}
 include('lib/basefunctions.lib.php');
 
 $userid = (int)($_GET['userid'] ?? 0);
@@ -136,8 +143,7 @@ else
 				$u_row = mysqli_fetch_assoc($u_data);
 				$u_name = $u_row["spielername"];
 
-				include('ally/allyfunctions.inc.php');
-				writeHistory($clantag, $allykick_lang['msg_5_1'].' <i>'.$u_name.'</i> '.$allykick_lang['msg_5_2'], true);
+				Allianz::historie($GLOBALS['dbi'], $clantag, $allykick_lang['msg_5_1'].' <i>'.$u_name.'</i> '.$allykick_lang['msg_5_2'], true);
 			}
 			else
 			{

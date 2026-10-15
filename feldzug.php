@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 include "inc/header.inc.php";
 include "lib/transaction.lib.php";
 include "functions.php";
@@ -73,7 +75,8 @@ function fz_zahl($wert)
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi'] == 1) ? 'mobile' : 'desktop').'">';
 include "resline.php";
 if ($fz_eigene !== null) {
-    include 'ally/ally.menu.inc.php';
+    $mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+    echo Navi::fuer($mitgliedschaft);
 }
 
 rahmen_oben($feldzug_lang['titel']);

@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 //        --------------------------------- ally_detail.php ---------------------------------
 //        Funktion der Seite:                Öffentliche Informationen zu einer Allianz
 //                                           (aus der Rangliste und der Sektoransicht)
@@ -34,7 +36,8 @@ function formatString($string)
 }
 
 include "resline.php";
-include ("ally/ally.menu.inc.php");
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 
 $allytag=$_REQUEST['allytag'] ?? '';
 $allyid=$_REQUEST['allyid'] ?? '';

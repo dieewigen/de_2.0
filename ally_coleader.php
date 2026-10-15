@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 //	--------------------------------- ally_coleader.php ---------------------------------
 //	Funktion der Seite:		Festlegen und Anzeigen von Co-Leadern der Allianz
 //	Letzte Änderung:		05.09.2002
@@ -129,7 +131,12 @@ function getSelect($leaderid, $select_name, $co, $ally){
 //Einbinden der Ressourcenanzeige
 include('resline.php');
 //Einbinden des Allianzmenüs
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
+if (!$mitgliedschaft->darfLeaderseite()) {
+    die(Navi::zugriffVerweigert());
+}
+$isleader = $mitgliedschaft->istLeader();
 
 //Meldungen ohne die angehängten Zeilenumbrüche aus den Sprachdateien
 function posten_meldung($text, $art)

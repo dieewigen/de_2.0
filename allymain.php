@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.allymain.lang.php');
 include 'inc/lang/'.$sv_server_lang.'_ally.settings.lang.php';
@@ -91,11 +94,23 @@ function formatString($string){
 }
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+//Bewerbung zurückziehen (Knopf im Kasten „Offene Bewerbung“), danach Rolle und Reiterleiste
+$ally_meldung = '';
+if (!empty($_REQUEST['stornobewerbung'])) {
+    $tronic = Allianz::bewerbungZurueckziehen($GLOBALS['dbi'], (int)$_SESSION['ums_user_id'], $_SESSION['ums_spielername']);
+    if ($tronic !== null) {
+        $ally_meldung = '<div class="mod-meldung mod-meldung-ok">Die Bewerbung wurde zur&uuml;ckgezogen. Tronicgutschrift: <b>'.$tronic.'</b></div>';
+    }
+}
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft, $ally_meldung);
+$isleader = $mitgliedschaft->istLeader();
+$iscoleader = $mitgliedschaft->istCoLeader();
+$ismember = $mitgliedschaft->istMitglied();
 
 //ohne Allianz: erklären, wie man zu einer kommt (eine offene Bewerbung zeigt schon das Menü)
 if (!$ismember and !$isleader and !$iscoleader){
-	if(empty($GLOBALS['ally_bewerbung_offen'])){
+	if ($mitgliedschaft->bewerbung() === null) {
 		rahmen_oben($allyallymain_lang['title']);
 		echo '
 		<div class="ally mod">

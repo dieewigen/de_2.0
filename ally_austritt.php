@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 //	Funktion der Seite:		Austreten aus einer Allianz
 include('inc/header.inc.php');
 include('inc/lang/'.$sv_server_lang.'_ally.austritt.lang.php'); 
@@ -30,7 +33,8 @@ $a = $_REQUEST['a'] ?? 0;
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 include('lib/basefunctions.lib.php');
 
 if($a == 1)
@@ -98,8 +102,7 @@ if($a == 1)
 			
 			echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-ok">'.$allyaustritt_lang['msg_3_1'].' '.$leave_fee.' '.$allyaustritt_lang['msg_3_2'].'</div></div>';
 			
-			include('ally/allyfunctions.inc.php');
-			writeHistory($clantag, $allyaustritt_lang['msg_4_1'].' <i>'.$username.'</i> '.$allyaustritt_lang['msg_4_2'],true);
+			Allianz::historie($GLOBALS['dbi'], $clantag, $allyaustritt_lang['msg_4_1'].' <i>'.$username.'</i> '.$allyaustritt_lang['msg_4_2'],true);
 
 		}else{
 			echo '<div class="mod ally-meldung"><div class="mod-meldung mod-meldung-fehler">'.str_replace('{VALUE}', $leave_fee, $allyaustritt_lang['msg_5']).'</div></div>';

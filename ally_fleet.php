@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\View\Alliance\Navi;
 //        --------------------------------- ally_fleet.php ---------------------------------
 //        Funktion der Seite:                Flottenstatus der Allianzmitglieder
 //  --------------------------------------------------------------------------------
@@ -30,10 +32,11 @@ $allytag=$row['allytag'];
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
 include('resline.php');
-include('ally/ally.menu.inc.php');
+$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+echo Navi::fuer($mitgliedschaft);
 
 $full_access = false;
-if (has_position("leaderid", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid1", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid2", $allytag, $_SESSION['ums_user_id']) || has_position("coleaderid3", $allytag, $_SESSION['ums_user_id']) || has_position("fleetcommander1", $allytag, $_SESSION['ums_user_id']) || has_position("fleetcommander2", $allytag, $_SESSION['ums_user_id'])){
+if (Mitgliedschaft::hatPosition($GLOBALS['dbi'], "leaderid", $allytag, $_SESSION['ums_user_id']) || Mitgliedschaft::hatPosition($GLOBALS['dbi'], "coleaderid1", $allytag, $_SESSION['ums_user_id']) || Mitgliedschaft::hatPosition($GLOBALS['dbi'], "coleaderid2", $allytag, $_SESSION['ums_user_id']) || Mitgliedschaft::hatPosition($GLOBALS['dbi'], "coleaderid3", $allytag, $_SESSION['ums_user_id']) || Mitgliedschaft::hatPosition($GLOBALS['dbi'], "fleetcommander1", $allytag, $_SESSION['ums_user_id']) || Mitgliedschaft::hatPosition($GLOBALS['dbi'], "fleetcommander2", $allytag, $_SESSION['ums_user_id'])){
 	$full_access = true;
 }
 

@@ -1,4 +1,7 @@
 <?php
+use DieEwigen\DE2\Model\Alliance\Mitgliedschaft;
+use DieEwigen\DE2\Model\Alliance\Allianz;
+use DieEwigen\DE2\View\Alliance\Navi;
 require_once __DIR__ . '/vendor/autoload.php';
 use DieEwigen\DE2\Model\Alliance\AllyMemberLimitCalc;
 
@@ -115,8 +118,7 @@ if($eintragung==1){
 		"UPDATE de_user_data SET ally_id=?, allytag=?, status=1 WHERE user_id=?",
 		[$ally_id, $clankuerzel, $_SESSION['ums_user_id']]);
 	
-	include('ally/allyfunctions.inc.php');
-	writeHistory($clankuerzel, $allyregisterzwei_lang['msg_8_1']." <i>".$clanname."</i> ".$allyregisterzwei_lang['msg_8_2']." <i>".$spielername."</i> ".$allyregisterzwei_lang['msg_8_3']);
+	Allianz::historie($GLOBALS['dbi'], $clankuerzel, $allyregisterzwei_lang['msg_8_1']." <i>".$clanname."</i> ".$allyregisterzwei_lang['msg_8_2']." <i>".$spielername."</i> ".$allyregisterzwei_lang['msg_8_3']);
 
 	// ally memberlimit anpassen
     $allyService = new AllyMemberLimitCalc($GLOBALS['dbi']);
@@ -128,7 +130,8 @@ if($eintragung==1){
         $meldung .= '<div class="mod-meldung mod-meldung-fehler ally-abstand">Fehler beim Aktualisieren des Allianz-Memberlimits: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
     }
 
-	include('ally/ally.menu.inc.php');
+	$mitgliedschaft = Mitgliedschaft::fuer($GLOBALS['dbi'], (int)$_SESSION['ums_user_id']);
+	echo Navi::fuer($mitgliedschaft);
 
 	echo '<div class="mod ally-meldung">'.$meldung.'<div class="ally-aktionen"><a href="allymain.php" class="mod-btn">Zur Allianz</a></div></div>';
 
