@@ -9218,7 +9218,7 @@ a.art-kachel-zurueck:hover::after {
 
 // Bilanz und Einheitentabellen; td/th bekommen global 14px Arial und th einen hellen Hintergrund
 .kb-bilanz,
-.kb-tabelle {
+.kb-einheiten {
 	width: 100%;
 	border-collapse: collapse;
 	font-variant-numeric: tabular-nums;
@@ -9301,25 +9301,56 @@ a.art-kachel-zurueck:hover::after {
 	gap: 4px;
 }
 
-.kb-block {
-	margin-top: 8px;
+// Einheiten: Angreifer, Verteidiger und eigene Einheiten nebeneinander wie im alten Bericht, Zeilen in der Rassenfarbe;
+// die Gruppen sind durch feine Linien getrennt, die Zahlen stehen rechtsbündig in 11 px wie früher
+.kb-einheiten {
+	margin-top: 10px;
 
-	> summary {
-		padding: 4px 0;
-		font-weight: 500;
-		color: #ffffff;
-		cursor: pointer;
-
-		small {
-			margin-left: 6px;
-			font-size: 11px;
-			font-weight: 400;
-			color: #8b949e;
-		}
+	th,
+	td {
+		padding: 2px 3px;
+		font-size: 11px;
 	}
-}
 
-.kb-tabelle {
+	.kb-gruppen th {
+		padding-top: 4px;
+		font-size: 10px;
+		font-weight: 700;
+		text-align: center;
+		color: #c9d1d9;
+	}
+
+	.kb-ga {
+		color: #ff8a5c;
+	}
+
+	.kb-gv {
+		color: #5fb0ff;
+	}
+
+	.kb-ge {
+		color: #e6edf3;
+	}
+
+	// neun Zahlenspalten neben der Namensspalte: die Köpfe bestimmen die Mindestbreite, darum 9 px
+	.kb-unter th {
+		font-size: 9px;
+		font-weight: 400;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	// Gruppen trennen: Kopfzeile mit colspan, darunter die erste Spalte jeder Gruppe
+	.kb-gruppen th + th,
+	th:nth-child(2),
+	td:nth-child(2),
+	.kb-unter th:nth-child(5),
+	td:nth-child(5),
+	.kb-unter th:nth-child(8),
+	td:nth-child(8) {
+		border-left: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
 	tr[class*="kb-r"] td {
 		background: rgba(var(--kb-farbe), 0.22);
 		color: var(--kb-text);
@@ -9327,6 +9358,11 @@ a.art-kachel-zurueck:hover::after {
 
 	tr[class*="kb-r"]:nth-child(even) td {
 		background: rgba(var(--kb-farbe), 0.34);
+	}
+
+	.kb-leer {
+		text-align: center;
+		color: rgba(255, 255, 255, 0.25);
 	}
 
 	.kb-trenner td {
@@ -9339,19 +9375,17 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-.kb-verlust {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 6px;
+// Statistik am Ende: Bilanz und eigener Anteil
+.kb-statistik {
+	margin-top: 12px;
 
-	.mod-balken {
-		width: 44px;
-		background: rgba(0, 0, 0, 0.35);
+	> .mod-typ {
+		display: block;
+		margin-bottom: 4px;
+	}
 
-		span {
-			background: #ff6b6b;
-		}
+	.kb-bilanz {
+		margin-bottom: 6px;
 	}
 }
 
