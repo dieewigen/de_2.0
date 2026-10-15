@@ -1,4 +1,6 @@
 <?php
+use DieEwigen\DE2\View\Geheimdienst\Bericht;
+
 
 use DieEwigen\DE2\View\RealTime;
 
@@ -287,7 +289,7 @@ if (hasTech($pt, 9)) {
                         $fehlermsg = '';
                     } else {
                         $h = 0;
-                        $fehlermsg = '<font color="FF0000">'.$secret_lang['fehlervorbedingung'];
+                        $fehlermsg = $secret_lang['fehlervorbedingung'];
                     }
 
                     $z = 0;
@@ -329,7 +331,7 @@ if (hasTech($pt, 9)) {
             }
         }// if setlock-ende
         else {
-            echo '<br><font color="#FF0000">'.$secret_lang['transerror2'].'</font><br><br>';
+            $geh_meldung = Bericht::meldung($secret_lang['transerror2']);
         }
 
     }
@@ -340,9 +342,11 @@ include "resline.php";
 
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
+echo $geh_meldung ?? '';
+
 //geheimdienst deaktiviert?
 if (isset($sv_deactivate_secret) && $sv_deactivate_secret == 1) {
-    echo '<br><div class="info_box text2">Auf diesem Server ist der Geheimdienst deaktiviert.</div>';
+    echo Bericht::meldung('Auf diesem Server ist der Geheimdienst deaktiviert.', 'info');
     die('</body></html>');
 }
 
@@ -444,15 +448,9 @@ if (!hasTech($pt, 9)) {
             $row = mysqli_fetch_array($db_daten);
             //playerstatus
             $ps = $row["ps"];
-            //rahmen oben
-            echo '<table border="0" cellpadding="0" cellspacing="0">
-			  <tr>
-			  <td width="13" height="37" class="rol">&nbsp;</td>
-			  <td align="center" class="ro">Geheimdienstinformationen ['.$spielername.' ('.$zsec1.':'.$zsys1.')]</td>
-			  <td width="13" class="ror">&nbsp;</td>
-			  </tr>
-			  <tr>
-			  <td class="rl">&nbsp;</td><td>';
+            //Rahmen und Karte (gb-info), die Daten links und rechts in zwei Spalten
+            rahmen_oben('Geheimdienstinformationen ['.$spielername.' ('.$zsec1.':'.$zsys1.')]');
+            echo '<div class="mod gb-info">';
             //die daten aufbereiten
             //rasse
             $rasse = '?';
@@ -599,85 +597,48 @@ if (!hasTech($pt, 9)) {
 
             //pa-check
 
-            //die daten ausgeben
-            echo '<table width=570 border="0" cellpadding="0" cellspacing="0">';
-            //spalte 1
-            echo '<tr><td width="50%" valign="top">';
-            echo '<table border="0" cellpadding="0">';
-            //rasse
-            echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['rasse'].':</b> '.$rasse.'</td></tr>';
-            //schiffs�bersicht
-            echo '<tr class="cell"><td width="25%"><b>'.$secret_lang['schiffsuebersicht'].'</b></td><td align="center" width="25%">'.$ftime.'</td>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][0].'</td><td align="center">'.$e81.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][1].'</td><td align="center">'.$e82.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][2].'</td><td align="center">'.$e83.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][3].'</td><td align="center">'.$e84.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][4].'</td><td align="center">'.$e85.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][5].'</td><td align="center">'.$e86.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][6].'</td><td align="center">'.$e87.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][7].'</td><td align="center">'.$e88.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][8].'</td><td align="center">'.$e89.'</td></tr>';
-            echo '<tr class="cell"><td>'.$rassennamen[$zrasse - 1][9].'</td><td align="center">'.$e90.'</td></tr>';
-            //turm�bersicht
-            echo '<tr class="cell"><td><b>'.$secret_lang['turmuebersicht'].'</b></td><td align="center">'.$dtime.'</td></tr>';
-            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][0].'</td><td align="center">'.$e100.'</td></tr>';
-            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][1].'</td><td align="center">'.$e101.'</td></tr>';
-            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][2].'</td><td align="center">'.$e102.'</td></tr>';
-            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][3].'</td><td align="center">'.$e103.'</td></tr>';
-            echo '<tr class="cell"><td>'.$turmnamen[$zrasse - 1][4].'</td><td align="center">'.$e104.'</td></tr>';
-            echo '</table>';
-            //spalte 2
-            echo '</td><td width="50%" valign="top">';
-            echo '<table border="0" cellpadding="0">';
-            //allianz
-            echo '<tr class="cell1"><td colspan="2"><b>'.$secret_lang['allytag'].':</b> '.$allianz.'</td></tr>';
-            //sondenbericht
-            echo '<tr class="cell1"><td width="25%"><b>Sondenbericht</b></td><td align="center" width="25%">'.$stime.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['punkte'].'</td><td align="center">'.$score.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['schiffseinheiten'].'</td><td align="center">'.$fleet.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['verteidigungsanlagen'].'</td><td align="center">'.$defense.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['einheitenimbau'].'</td><td align="center">'.$build.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['kollektoren'].'</td><td align="center">'.$col.'</td></tr>';
-            //echo '<tr class="cell1"><td>'.$secret_lang[gebaeude].'</td><td align="center">'.$buildings.'</td></tr>';
-            echo '<tr class="cell1"><td><b>'.$secret_lang['rohstoffe'].'</b></td><td>&nbsp;</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['multiplex'].'</td><td align="center">'.$restyp01.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['dyharra'].'</td><td align="center">'.$restyp02.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['iradium'].'</td><td align="center">'.$restyp03.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['eternium'].'</td><td align="center">'.$restyp04.'</td></tr>';
-            echo '<tr class="cell1"><td>'.$secret_lang['tronic'].'</td><td align="center">'.$restyp05.'</td></tr>';
-            echo '</table>';
-            echo '</td></tr>';
+            //die daten ausgeben: links Schiffe und Türme, rechts Allianz, Sondenbericht und Rohstoffe
+            $gb_schiffe = array();
+            for ($i = 0; $i < 10; $i++) {
+                $gb_schiffe[] = array($rassennamen[$zrasse - 1][$i], ${'e'.(81 + $i)});
+            }
+            $gb_tuerme = array();
+            for ($i = 0; $i < 5; $i++) {
+                $gb_tuerme[] = array($turmnamen[$zrasse - 1][$i], ${'e'.(100 + $i)});
+            }
+            echo '<div class="gb-spalten"><div>'
+                .Bericht::werte(array(array($secret_lang['rasse'], $rasse)))
+                .Bericht::abschnitt($secret_lang['schiffsuebersicht'], $ftime).Bericht::werte($gb_schiffe)
+                .Bericht::abschnitt($secret_lang['turmuebersicht'], $dtime).Bericht::werte($gb_tuerme)
+                .'</div><div>'
+                .Bericht::werte(array(array($secret_lang['allytag'], $allianz)))
+                .Bericht::abschnitt('Sondenbericht', $stime)
+                .Bericht::werte(array(
+                    array($secret_lang['punkte'], $score),
+                    array($secret_lang['schiffseinheiten'], $fleet),
+                    array($secret_lang['verteidigungsanlagen'], $defense),
+                    array($secret_lang['einheitenimbau'], $build),
+                    array($secret_lang['kollektoren'], $col),
+                ))
+                .Bericht::abschnitt($secret_lang['rohstoffe'])
+                .Bericht::werte(array(
+                    array($secret_lang['multiplex'], $restyp01),
+                    array($secret_lang['dyharra'], $restyp02),
+                    array($secret_lang['iradium'], $restyp03),
+                    array($secret_lang['eternium'], $restyp04),
+                    array($secret_lang['tronic'], $restyp05),
+                ))
+                .'</div></div>';
 
-            //playerstatus anzeigen und �nderbar machen
-            $ps_checked = '<option selected>'.$secret_lang["ps$ps"].'</option>';
-
-            $hidden = '<input type="hidden" name="zsec1" value="'.$zsec1.'"><input type="hidden" name="zsys1" value="'.$zsys1.'">';
-
-            $button = '<input type="submit" name="pschange" value="'.$secret_lang['pschange'].'">';
-
-            echo '<tr class="cell" align="center"><td colspan="2">'.$hidden.'Spielerstatus: <select name="ps">'.$ps_checked.'<option>'.$secret_lang['ps0'].'</option>
-        <option>'.$secret_lang['ps1'].'</option><option>'.$secret_lang['ps2'].'</option></select> '.$button.'</td></tr>';
-
-            //weiter-zu-links
-            echo '<tr class="cell" align="center"><td colspan="2">';
+            //Spielerstatus ändern (das Formular ist oben geöffnet)
+            echo '<div class="gb-status"><input type="hidden" name="zsec1" value="'.$zsec1.'"><input type="hidden" name="zsys1" value="'.$zsys1.'">'
+                .'<span class="mod-typ">Spielerstatus</span><select name="ps" class="mod-eingabe"><option selected>'.$secret_lang["ps$ps"].'</option>'
+                .'<option>'.$secret_lang['ps0'].'</option><option>'.$secret_lang['ps1'].'</option><option>'.$secret_lang['ps2'].'</option></select>'
+                .'<input type="submit" name="pschange" value="'.$secret_lang['pschange'].'" class="mod-btn mod-btn-leise"></div>';
             echo '</form>';
-            echo '<form name="f'.$zsec1.'" action="sector.php?sf='.$zsec1.'" method="POST">';
-            echo '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'">'.$secret_lang['zummilitaer'].'</a> - ';
-            echo '<a href="javascript:document.f'.$zsec1.'.submit()">'.$secret_lang['zursektoransicht'].'</a> - ';
-            echo '<a href="secstatus.php">'.$secret_lang['zumsektorstatus'].'</a>';
-            echo '</form></td></tr>';
-
-            echo '</table>';
-
-            //rahmen unten
-            echo '</td><td width="13" class="rr">&nbsp;</td>
-			  </tr>
-			  <tr>
-			  <td width="13" class="rul">&nbsp;</td>
-			  <td class="ru">&nbsp;</td>
-			  <td width="13" class="rur">&nbsp;</td>
-			  </tr>
-			  </table><br>';
+            echo '<div class="gb-fuss">'.Bericht::links((int)$zsec1, (int)$zsys1, $secret_lang).'</div>';
+            echo '</div>';
+            rahmen_unten();
         }
     }
 
@@ -834,76 +795,26 @@ if (!hasTech($pt, 9)) {
                         }
                     }
 
-                    echo '<br><table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                    echo '<tr>';
-                    echo '<td colspan="2" class="tc" width="100%"><b>'.$secret_lang['sondenberichtueber'].$zname.' ('.$zsec1.':'.$zsys1.')</b></td>';
-                    echo '</tr>';
+                    $gb_zeilen = array();
                     if ($GLOBALS['sv_ang'] != 1) {
-                        echo '<tr>';
-                        echo '<td class="cc" width="40%">'.$secret_lang['onlineinnerhalb'].'</td>';
-                        echo '<td class="cc" width="60%">'.$isonline.'</td>';
-                        echo '</tr>';
+                        $gb_zeilen[] = array($secret_lang['onlineinnerhalb'], $isonline);
                     }
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['punkte'].'</td>';
-                    echo '<td class="cc">'.number_format($zpunkte, 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['schiffseinheiten'].'</td>';
-                    echo '<td class="cc">'.number_format($zeinheiten, 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['verteidigungsanlagen'].'</td>';
-                    echo '<td class="cc">'.number_format($vertanz, 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['einheitenimbau'].'</td>';
-                    echo '<td class="cc">'.number_format($eimbau, 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['kollektoren'].'</td>';
-                    echo '<td class="cc">'.number_format($zcol, 0, "", ".").'</td>';
-                    echo '</tr>';
-                    //echo '<tr>';
-                    //echo '<td class="cc">'.$secret_lang[gebaeude].'</td>';
-                    //echo '<td class="cc">'.$anzgeb.'</td>';
-                    //echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['rasse'].'</td>';
-                    echo '<td class="cc">'.$rasse.'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td colspan="2" class="tc" width="100%">'.$secret_lang['rohstoffe'].'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['multiplex'].'</td>';
-                    echo '<td class="cc">'.number_format($zres[0], 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['dyharra'].'</td>';
-                    echo '<td class="cc">'.number_format($zres[1], 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['iradium'].'</td>';
-                    echo '<td class="cc">'.number_format($zres[2], 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['eternium'].'</td>';
-                    echo '<td class="cc">'.number_format($zres[3], 0, "", ".").'</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo '<td class="cc">'.$secret_lang['tronic'].'</td>';
-                    echo '<td class="cc">'.number_format($zres[4], 0, "", ".").'</td>';
-                    echo '</tr>';
-
-                    echo '<tr class="cell" align="center"><td colspan="2">';
-                    echo '<form name="f'.$zsec1.'" action="sector.php?sf='.$zsec1.'" method="POST">';
-                    echo '<a href="military.php?se='.$zsec1.'&sy='.$zsys1.'">'.$secret_lang['zummilitaer'].'</a> - ';
-                    echo '<a href="javascript:document.f'.$zsec1.'.submit()">'.$secret_lang['zursektoransicht'].'</a> - ';
-                    echo '<a href="secstatus.php">'.$secret_lang['zumsektorstatus'].'</a>';
-                    echo '</form></td></tr>';
-
-                    echo '</table><br><br>';
+                    $gb_zeilen[] = array($secret_lang['punkte'], number_format($zpunkte, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['schiffseinheiten'], number_format($zeinheiten, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['verteidigungsanlagen'], number_format($vertanz, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['einheitenimbau'], number_format($eimbau, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['kollektoren'], number_format($zcol, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['rasse'], $rasse);
+                    $gb_rohstoffe = array(
+                        array($secret_lang['multiplex'], number_format($zres[0], 0, "", ".")),
+                        array($secret_lang['dyharra'], number_format($zres[1], 0, "", ".")),
+                        array($secret_lang['iradium'], number_format($zres[2], 0, "", ".")),
+                        array($secret_lang['eternium'], number_format($zres[3], 0, "", ".")),
+                        array($secret_lang['tronic'], number_format($zres[4], 0, "", ".")),
+                    );
+                    echo Bericht::karte($secret_lang['sondenberichtueber'], $zname.' ('.$zsec1.':'.$zsys1.')',
+                        Bericht::werte($gb_zeilen).Bericht::abschnitt($secret_lang['rohstoffe']).Bericht::werte($gb_rohstoffe),
+                        Bericht::links((int)$zsec1, (int)$zsys1, $secret_lang));
 
                     if (hasTech($zpt, 12)) {
                         $w = 45;
@@ -930,14 +841,14 @@ if (!hasTech($pt, 9)) {
                     $zsec2 = $zsec1;
                     $zsys2 = $zsys1;
                 } else {
-                    echo '<div class="info_box text2">Die Technologie der DX61a23 ist zu weit fortgeschritten um dort Informationen sammeln zu k&ouml;nnen.</div><br>';
+                    echo Bericht::meldung('Die Technologie der DX61a23 ist zu weit fortgeschritten um dort Informationen sammeln zu k&ouml;nnen.');
                 }
             } else {
-                echo '<div class="info_box text2">'.$secret_lang['falschezielkoords'].'</div><br>';
+                echo Bericht::meldung($secret_lang['falschezielkoords']);
             }
 
         } else {
-            echo '<<div class="info_box text2">'.$secret_lang['falschewerte'].'</div><br>';
+            echo Bericht::meldung($secret_lang['falschewerte']);
         }
     }
 
@@ -1024,7 +935,7 @@ if (!hasTech($pt, 9)) {
                 if ($ok == 1) {
                     if ($row['npc'] == 1) {
                         $ok = 4;
-                        echo '<div class="info_box text2">Deine Agenten kehren unbeschadet vom Einsatz zur&uuml;ck, k&ouml;nnen sich aber an nichts mehr von dem Einsatz erinnern.</div><br>';
+                        echo Bericht::meldung('Deine Agenten kehren unbeschadet vom Einsatz zur&uuml;ck, k&ouml;nnen sich aber an nichts mehr von dem Einsatz erinnern.', 'info');
                     }
                 }
             } else {
@@ -1035,15 +946,10 @@ if (!hasTech($pt, 9)) {
 
             //überprüfen auf sabotagemöglichkeit
             if ($ok == 2) {
-                echo '<div class="info_box text2">'.$secret_lang['einsatzfehlerhaft'].'</div><br>';
+                echo Bericht::meldung($secret_lang['einsatzfehlerhaft']);
             }
             if ($ok == 3) {
-                echo '<div class="info_box text2">'.$secret_lang['keinetransverbindung'].'<br>';
-
-                echo '<form name="f'.$zsec2.'" action="sector.php?sf='.$zsec2.'" method="POST">';
-                echo '<a href="military.php?se='.$zsec2.'&sy='.$zsys2.'">'.$secret_lang['zummilitaer'].'</a> - ';
-                echo '<a href="javascript:document.f'.$zsec2.'.submit()">'.$secret_lang['zursektoransicht'].'</a>';
-                echo '</form></div><br>';
+                echo Bericht::meldung($secret_lang['keinetransverbindung']);
 
                 $showmenu = 1;
             }
@@ -1270,62 +1176,29 @@ if (!hasTech($pt, 9)) {
                                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET ftime=UNIX_TIMESTAMP(), e81=?, e82=?, e83=?, e84=?, e85=?, e86=?, e87=?, e88=?, e89=?, e90=? WHERE user_id=? AND zuser_id=?", [$e81, $e82, $e83, $e84, $e85, $e86, $e87, $e88, $e89, $e90, $save_uid, $uid]);
                             }
 
-                            //ueberschrift ausgeben
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="560">';
-                            echo '<tr>';
-                            echo '<td class="tc" colspan=5 width="100%"><b>'.$secret_lang['flottenaufstellungvon'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
-                            echo '<tr>';
-                            echo '<td class="tc" width="160">'.$secret_lang['schiffstypen'].'</td>';
-                            echo '<td class="tc" width="100">'.$secret_lang['heimatflotte'].'</td>';
-                            echo '<td class="tc" width="100">'.$secret_lang['flotte'].' I</td>';
-                            echo '<td class="tc" width="100">'.$secret_lang['flotte'].' II</td>';
-                            echo '<td class="tc" width="100">'.$secret_lang['flotte'].' III</td>';
-                            echo '</tr>';
-
-                            //lade einheitentypen
-                            $fleetpoints = array();
+                            //Flottenaufstellung je Flotte mit Punktewert
+                            $gb_kopf = array($secret_lang['schiffstypen'], $secret_lang['heimatflotte'], $secret_lang['flotte'].' I', $secret_lang['flotte'].' II', $secret_lang['flotte'].' III');
+                            $gb_zeilen = array();
+                            $fleetpoints = array(0, 0, 0, 0);
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>80 AND tech_id<100", []);
-                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
-                                echo '<tr>';
-                                echo '<td class="cc">'.getTechNameByRasse($row["tech_name"], $zrasse)."</td>";
-                                echo '<td class="cc">'.number_format($schiffe[0][$row["tech_id"] - 81], 0, "", ".")."</td>";
-                                echo '<td class="cc">'.number_format($schiffe[1][$row["tech_id"] - 81], 0, "", ".")."</td>";
-                                echo '<td class="cc">'.number_format($schiffe[2][$row["tech_id"] - 81], 0, "", ".")."</td>";
-                                echo '<td class="cc">'.number_format($schiffe[3][$row["tech_id"] - 81], 0, "", ".")."</td>";
-
-                                if (!isset($fleetpoints[0])) $fleetpoints[0] = 0;
-                                if (!isset($fleetpoints[1])) $fleetpoints[1] = 0;
-                                if (!isset($fleetpoints[2])) $fleetpoints[2] = 0;
-                                if (!isset($fleetpoints[3])) $fleetpoints[3] = 0;
-
-                                $fleetpoints[0] += $schiffe[0][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
-                                $fleetpoints[1] += $schiffe[1][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
-                                $fleetpoints[2] += $schiffe[2][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
-                                $fleetpoints[3] += $schiffe[3][$row["tech_id"] - 81] * $unit[$zrasse - 1][$row["tech_id"] - 81][4];
-
-                                echo '</tr>';
+                            while ($row = mysqli_fetch_array($db_daten)) {
+                                $gb_s = $row["tech_id"] - 81;
+                                $gb_zeile = array(getTechNameByRasse($row["tech_name"], $zrasse));
+                                for ($gb_f = 0; $gb_f < 4; $gb_f++) {
+                                    $gb_zeile[] = number_format($schiffe[$gb_f][$gb_s] ?? 0, 0, "", ".");
+                                    $fleetpoints[$gb_f] += ($schiffe[$gb_f][$gb_s] ?? 0) * $unit[$zrasse - 1][$gb_s][4];
+                                }
+                                $gb_zeilen[] = $gb_zeile;
                             }
-
-                            //Flottenpunktewert
-
-                            echo '<tr class="cc">
-                            <td><i>'.$secret_lang['flottenpunktewert'].'</i></td>
-                            <td>'.number_format($fleetpoints[0], 0, "", ".").'</td>
-                            <td>'.number_format($fleetpoints[1], 0, "", ".").'</td>
-                            <td>'.number_format($fleetpoints[2], 0, "", ".").'</td>
-                            <td>'.number_format($fleetpoints[3], 0, "", ".").'</td>
-                            </tr>';
-
-                            echo '</table>';
+                            $gb_fuss = array($secret_lang['flottenpunktewert']);
+                            for ($gb_f = 0; $gb_f < 4; $gb_f++) {
+                                $gb_fuss[] = number_format($fleetpoints[$gb_f], 0, "", ".");
+                            }
+                            echo Bericht::karte($secret_lang['flottenaufstellungvon'], $zname.' ('.$zsec2.':'.$zsys2.')', Bericht::tabelle($gb_kopf, $gb_zeilen, $gb_fuss));
                             break;
                         case 1: //flottenauftrag
 
                             checkMissionEnd();
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="tc" width="100%"><b>'.$secret_lang['auftraegederflotte'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
                             $zsys2save = $zsys2;
 
 
@@ -1418,16 +1291,7 @@ if (!hasTech($pt, 9)) {
                                 $a3 = $secret_lang['verteidige'].$zsec3x.':'.$zsys3.$secret_lang['zeit'].$at3;
                             }
 
-                            echo '<tr>';
-                            echo '<td class="cc" width="100%">'.$a1.'</td>';
-                            echo '</tr>';
-                            echo '<tr>';
-                            echo '<td class="cc" width="100%">'.$a2.'</td>';
-                            echo '</tr>';
-                            echo '<tr>';
-                            echo '<td class="cc" width="100%">'.$a3.'</td>';
-                            echo '</tr>';
-                            echo '</table>';
+                            echo Bericht::karte($secret_lang['auftraegederflotte'], $zname.' ('.$zsec2.':'.$zsys2save.')', Bericht::liste(array($a1, $a2, $a3)));
                             $zsys2 = $zsys2save;
 
                             break;
@@ -1453,142 +1317,71 @@ if (!hasTech($pt, 9)) {
                                     [$row['e100'], $row['e101'], $row['e102'], $row['e103'], $row['e104'], $save_uid, $uid]);
                             }
 
-                            //ueberschrift ausgeben
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="tc" width="100%"><b>'.$secret_lang['uebersichtvanlagen'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
-                            echo '</table>';
-
-                            //lade einheitentypen
+                            //Verteidigungsanlagen mit Punktewert
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data WHERE tech_id>99 AND tech_id<110 ORDER BY tech_id", []);
-
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
+                            $gb_zeilen = array();
                             $gespunkte = 0;
-                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird geprueft
+                            while ($row = mysqli_fetch_array($db_daten)) {
                                 $ec = ${'ec'.$row['tech_id']};
-
                                 $gespunkte += $ec * $unit[$rasse - 1][$row["tech_id"] - 90][4];
-
-                                echo '<tr>';
-                                echo '<td class="cc" width="70%" align="left">'.getTechNameByRasse($row["tech_name"], $zrasse)."</td>";
-                                echo '<td class="cc" width="30%" align="right">'.number_format($ec, 0, "", ".")."</td>";
-                                echo '</tr>';
-
-                                //}
+                                $gb_zeilen[] = array(getTechNameByRasse($row["tech_name"], $zrasse), number_format($ec, 0, "", "."));
                             }
-
-                            //punktewert
-                            echo '<tr class="cc"><td><i>'.$secret_lang['punktewert'].'</i></td><td>'.number_format($gespunkte, 0, "", ".").'</td></tr>';
-
-                            echo "</table>";
+                            echo Bericht::karte($secret_lang['uebersichtvanlagen'], $zname.' ('.$zsec2.':'.$zsys2.')',
+                                Bericht::tabelle(array(), $gb_zeilen, array($secret_lang['punktewert'], number_format($gespunkte, 0, "", "."))));
                             break;
                         case 3: //nachrichten
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="600">';
-                            echo '<tr>';
-                            echo '<td class="tc" width="100%"><b>'.$secret_lang['nachrichtenvon'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
-
+                            //Nachrichten des Ziels; Angriffe rot, Verteidigungen grün, Kampfberichte wie in den eigenen Nachrichten
+                            $gb_eintraege = '';
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT time, typ, text FROM de_user_news WHERE user_id=? AND typ <> 60 ORDER BY time DESC", [$uid]);
-                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird ausgegeben
+                            while ($row = mysqli_fetch_array($db_daten)) {
                                 $t = $row["time"];
                                 $n = $row["typ"];
                                 $time = $t[6].$t[7].'.'.$t[4].$t[5].'.'.$t[0].$t[1].$t[2].$t[3].' - '.$t[8].$t[9].':'.$t[10].$t[11].':'.$t[12].$t[13];
+                                $gb_text = '';
                                 switch ($n) {
                                     case 8:
                                         $werte = explode(";", $row["text"]);
-                                        $tronic = $werte[0];
                                         unset($na);
                                         include "inc/lang/".$sv_server_lang."_wt_tronicmsg.lang.php";
-                                        $nanr = mt_rand(0, count($na) - 1);
-
-                                        $nachricht = $na[$werte[1]];
-
-                                        echo '<tr>';
-                                        echo '<td class="cl">'.$time.'</td>';
-                                        echo '</tr>';
-                                        echo '<tr>';
-                                        echo '<td class="cl">'.$nachricht.'</td>';
-                                        echo '</tr>';
-
+                                        $gb_text = $na[$werte[1]];
                                         break;
                                     case 57:
-                                        echo '<tr>';
-                                        echo '<td class="cl">'.$time.'</td>';
-                                        echo '</tr>';
-                                        echo '<tr>';
-                                        echo '<td class="cc">'.showkampfberichtV1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte).'</td>';
-                                        echo '</tr>';
+                                        $gb_text = showkampfberichtV1($row["text"], $rasse, $zname, $zsec2, $zsys2, $schiffspunkte);
                                         break;
                                     case 70:
-                                        echo '<tr>';
-                                        echo '<td class="cl">'.$time.'</td>';
-                                        echo '</tr>';
-                                        echo '<tr>';
-                                        echo '<td class="cc">'.showkampfberichtBG($row["text"]).'</td>';
-                                        echo '</tr>';
+                                        $gb_text = showkampfberichtBG($row["text"]);
                                         break;
                                     default:
-                                        $dontshow = 0;
-                                        if ($n == 51 and strpos($row["text"], "($sector:$system)") === false) {
-                                            $dontshow = 1;
+                                        if ($n == 51 && strpos($row["text"], "($sector:$system)") === false) {
+                                            break;
                                         }
-
-                                        if ($dontshow == 0) {
-                                            //atter/deffer farbig darstellen
-                                            $hstr1 = '';
-                                            $hstr2 = '';
-                                            if ($n == 51) {
-                                                $hstr1 = '<font color="#FF0000">';
-                                                $hstr2 = '</font>';
-                                            }
-                                            if ($n == 52) {
-                                                $hstr1 = '<font color="#FF0000">';
-                                                $hstr2 = '</font>';
-                                            }
-                                            if ($n == 53) {
-                                                $hstr1 = '<font color="#00FF00">';
-                                                $hstr2 = '</font>';
-                                            }
-                                            if ($n == 54) {
-                                                $hstr1 = '<font color="#00FF00">';
-                                                $hstr2 = '</font>';
-                                            }
-                                            echo '<tr>';
-                                            echo '<td class="cl">'.$time.'</td>';
-                                            echo '</tr>';
-                                            echo '<tr>';
-                                            echo '<td class="cl">'.$hstr1.$row["text"].$hstr2.'</td>';
-                                            echo '</tr>';
+                                        if ($n == 51 || $n == 52) {
+                                            $gb_text = '<span class="gb-angriff">'.$row["text"].'</span>';
+                                        } elseif ($n == 53 || $n == 54) {
+                                            $gb_text = '<span class="gb-verteidigung">'.$row["text"].'</span>';
+                                        } else {
+                                            $gb_text = $row["text"];
                                         }
                                         break;
                                 }
-                            }
-                            echo '</table>';
-                            break;
-                        case 4: //entwicklungen
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="tc" width="100%"><b>'.$secret_lang['entwicklungvon'].$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
-                            echo '</table>';
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data ORDER BY tech_level", []);
-                            while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird gepr�ft
-                                if (hasTech($zpt, $row["tech_id"])) {
-                                    echo '<tr>';
-                                    echo '<td class="cl" width="100%">'.getTechNameByRasse($row['tech_name'], $zrasse).'</td>';
-                                    echo '</tr>';
+                                if ($gb_text !== '') {
+                                    $gb_eintraege .= '<div class="gb-nachricht"><span class="gb-zeit">'.$time.'</span><div>'.$gb_text.'</div></div>';
                                 }
                             }
-                            echo '</table>';
+                            echo Bericht::karte($secret_lang['nachrichtenvon'], $zname.' ('.$zsec2.':'.$zsys2.')', $gb_eintraege !== '' ? $gb_eintraege : '<div class="gb-leer">Keine Nachrichten.</div>');
+                            break;
+                        case 4: //entwicklungen
+                            //erforschte Technologien
+                            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT tech_id, tech_name FROM de_tech_data ORDER BY tech_level", []);
+                            $gb_techs = array();
+                            while ($row = mysqli_fetch_array($db_daten)) {
+                                if (hasTech($zpt, $row["tech_id"])) {
+                                    $gb_techs[] = getTechNameByRasse($row['tech_name'], $zrasse);
+                                }
+                            }
+                            echo Bericht::karte($secret_lang['entwicklungvon'], $zname.' ('.$zsec2.':'.$zsys2.')', Bericht::liste($gb_techs, true));
                             break;
                         case 5: //allytag
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="tc" width="100%">'.$secret_lang['allytagvon'].$zname.' ('.$zsec2.':'.$zsys2.')</td>';
-                            echo '</tr>';
-                            echo '</table>';
                             $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT allytag, status FROM de_user_data WHERE user_id=?", [$uid]);
                             $row = mysqli_fetch_array($db_daten);
 
@@ -1610,11 +1403,7 @@ if (!hasTech($pt, 9)) {
                                 $allytag = $secret_lang['keineally'];
                             }
 
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="cc" width="100%">'.$allytag.'</td>';
-                            echo '</tr>';
-                            echo '</table>';
+                            echo Bericht::karte($secret_lang['allytagvon'], $zname.' ('.$zsec2.':'.$zsys2.')', Bericht::werte(array(array($secret_lang['allytag'], $allytag))));
 
                             break;
                         case 6: //systemstatus
@@ -1624,19 +1413,8 @@ if (!hasTech($pt, 9)) {
                             $eta1 = $eta1["fleetsize"];
                             $eta2 = mysqli_fetch_array($eta2);
                             $eta2 = $eta2["fleetsize"];
-                            echo '<table border="0" cellpadding="0" cellspacing="1" width="400px">';
-                            echo '<tr>';
-                            echo '<td class="tc" colspan="2"><b>Systemstatus von '.$zname.' ('.$zsec2.':'.$zsys2.')</b></td>';
-                            echo '</tr>';
-                            echo '<tr>';
-                            echo '<td class="cl" width="40%">Incoming ETA 1:</td>';
-                            echo '<td class="cc" width="60%">'.number_format($eta1, 0, "", ".").'</td>';
-                            echo '</tr>';
-                            echo '<tr>';
-                            echo '<td class="cl">Incoming ETA 2:</td>';
-                            echo '<td class="cc">'.number_format($eta2, 0, "", ".").'</td>';
-                            echo '</tr>';
-                            echo '</table>';
+                            echo Bericht::karte('Systemstatus von', $zname.' ('.$zsec2.':'.$zsys2.')',
+                                Bericht::werte(array(array('Incoming ETA 1', number_format($eta1, 0, "", ".")), array('Incoming ETA 2', number_format($eta2, 0, "", ".")))));
                             break;
                         case 11: //enttarnung
                             /*
@@ -1686,7 +1464,7 @@ if (!hasTech($pt, 9)) {
                                 //�berpr�fen ob man �berhaupt schon wieder einen einsatz dieser art starten kann
                                 if ($maxroundtick > $sc1 + $sv_sabotage[$etyp][1]) {
                                     $emsg = '';
-                                    $emsg .= '<table width=600p><tr><td class="ccg">';
+                                    $emsg .= '<div class="mod-meldung mod-meldung-ok">';
 
                                     //erfolgsnachricht ausgeben
                                     $emsg .= $secret_lang['erfolgsnachricht_sabotage'];
@@ -1705,7 +1483,7 @@ if (!hasTech($pt, 9)) {
 
                                     $emsg .= '<br>'.$secret_lang['agentenverluste'].': '.number_format($aze, 0, ",", ".");
 
-                                    $emsg .= '</td></tr></table>';
+                                    $emsg .= '</div>';
                                     echo $emsg;
 
                                     //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
@@ -1715,15 +1493,15 @@ if (!hasTech($pt, 9)) {
                                     //sabotage counter setzen und dass er nen neue info hat
                                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc1 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                 } else {
-                                    $emsg .= '<table width=600><tr><td class="ccr">';
+                                    $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                     $emsg .= $secret_lang['sabotage_gehtnochnicht'];
-                                    $emsg .= '</td></tr></table>';
+                                    $emsg .= '</div>';
                                     echo $emsg;
                                 }
                             } else {
-                                $emsg .= '<table width=600><tr><td class="ccr">';
+                                $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                 $emsg .= $secret_lang['sabotage_nichterlaubt'];
-                                $emsg .= '</td></tr></table>';
+                                $emsg .= '</div>';
                                 echo $emsg;
                             }
                             break;
@@ -1738,7 +1516,7 @@ if (!hasTech($pt, 9)) {
                                     //if (hasTech($zpt,13)){
                                     if (hasTech($zpt, 129)) {
                                         $emsg = '';
-                                        $emsg .= '<table width=600><tr><td class="ccg">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-ok">';
 
                                         //erfolgsnachricht ausgeben
                                         $emsg .= $secret_lang['erfolgsnachricht_sabotage'];
@@ -1756,7 +1534,7 @@ if (!hasTech($pt, 9)) {
 
                                         $emsg .= '<br>'.$secret_lang['agentenverluste'].': '.number_format($aze, 0, ",", ".");
 
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
@@ -1766,21 +1544,21 @@ if (!hasTech($pt, 9)) {
                                         //sabotage counter setzen und dass er nen neue info hat
                                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc2 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
-                                        $emsg .= '<table width=600><tr><td class="ccr">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
                                     }
                                 } else {
-                                    $emsg .= '<table width=600><tr><td class="ccr">';
+                                    $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                     $emsg .= $secret_lang['sabotage_gehtnochnicht'];
-                                    $emsg .= '</td></tr></table>';
+                                    $emsg .= '</div>';
                                     echo $emsg;
                                 }
                             } else {
-                                $emsg .= '<table width=600><tr><td class="ccr">';
+                                $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                 $emsg .= $secret_lang['sabotage_nichterlaubt'];
-                                $emsg .= '</td></tr></table>';
+                                $emsg .= '</div>';
                                 echo $emsg;
                             }
                             break;
@@ -1794,7 +1572,7 @@ if (!hasTech($pt, 9)) {
                                     //�berpr�fen ob er eine raumwerft hat
                                     if (hasTech($zpt, 22)) {
                                         $emsg = '';
-                                        $emsg .= '<table width=600><tr><td class="ccg">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-ok">';
 
                                         //erfolgsnachricht ausgeben
                                         $emsg .= $secret_lang['erfolgsnachricht_sabotage'];
@@ -1812,7 +1590,7 @@ if (!hasTech($pt, 9)) {
 
                                         $emsg .= '<br>'.$secret_lang['agentenverluste'].': '.number_format($aze, 0, ",", ".");
 
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
@@ -1822,21 +1600,21 @@ if (!hasTech($pt, 9)) {
                                         //sabotage counter setzen und dass er nen neue info hat
                                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc3 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
-                                        $emsg .= '<table width=600><tr><td class="ccr">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
                                     }
                                 } else {
-                                    $emsg .= '<table width=600><tr><td class="ccr">';
+                                    $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                     $emsg .= $secret_lang['sabotage_gehtnochnicht'];
-                                    $emsg .= '</td></tr></table>';
+                                    $emsg .= '</div>';
                                     echo $emsg;
                                 }
                             } else {
-                                $emsg .= '<table width=600><tr><td class="ccr">';
+                                $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                 $emsg .= $secret_lang['sabotage_nichterlaubt'];
-                                $emsg .= '</td></tr></table>';
+                                $emsg .= '</div>';
                                 echo $emsg;
                             }
                             break;
@@ -1850,7 +1628,7 @@ if (!hasTech($pt, 9)) {
                                     //�berpr�fen ob er eine raumwerft hat
                                     if (hasTech($zpt, 4)) {
                                         $emsg = '';
-                                        $emsg .= '<table width=600><tr><td class="ccg">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-ok">';
 
                                         //erfolgsnachricht ausgeben
                                         $emsg .= $secret_lang['erfolgsnachricht_sabotage'];
@@ -1868,7 +1646,7 @@ if (!hasTech($pt, 9)) {
 
                                         $emsg .= '<br>'.$secret_lang['agentenverluste'].': '.number_format($aze, 0, ",", ".");
 
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
 
                                         //info an den account schicken, dass bei ihm ein agenteneinsatz gelungen ist
@@ -1878,21 +1656,21 @@ if (!hasTech($pt, 9)) {
                                         //sabotage counter setzen und dass er nen neue info hat
                                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET newnews = 1, sc4 = ? WHERE user_id = ?", [$maxroundtick, $uid]);
                                     } else { //er hat nicht die passende technologie
-                                        $emsg .= '<table width="600px"><tr><td class="ccr">';
+                                        $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                         $emsg .= $secret_lang['sabotage_keinziel'];
-                                        $emsg .= '</td></tr></table>';
+                                        $emsg .= '</div>';
                                         echo $emsg;
                                     }
                                 } else {
-                                    $emsg .= '<table width="600px"><tr><td class="ccr">';
+                                    $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                     $emsg .= $secret_lang['sabotage_gehtnochnicht'];
-                                    $emsg .= '</td></tr></table>';
+                                    $emsg .= '</div>';
                                     echo $emsg;
                                 }
                             } else {
-                                $emsg .= '<table width="600px"><tr><td class="ccr">';
+                                $emsg .= '<div class="mod-meldung mod-meldung-fehler">';
                                 $emsg .= $secret_lang['sabotage_nichterlaubt'];
-                                $emsg .= '</td></tr></table>';
+                                $emsg .= '</div>';
                                 echo $emsg;
                             }
                             break;
@@ -1916,7 +1694,7 @@ if (!hasTech($pt, 9)) {
                     if ($aze == 0) {
                         $aze = 1;
                     }
-                    echo '<table width="600"><tr align="center"><td><div class="cell">'.$secret_lang['einsatzgescheitert'].$aze.$secret_lang['einsatzgescheitert2'].'</div></td></tr></table><br>';
+                    echo Bericht::meldung($secret_lang['einsatzgescheitert'].$aze.$secret_lang['einsatzgescheitert2']);
                     if ($aze == 1) {
                         $msg = $secret_lang['einsatzentdeckt'].$_SESSION['ums_spielername'].' ('.$sector.':'.$system.$secret_lang['einsatzentdeckt2'].$aze.$secret_lang['einsatzentdeckt3'];
                     } else {
@@ -1943,10 +1721,7 @@ if (!hasTech($pt, 9)) {
                 }
 
                 if ($showmenu == 1) {
-                    echo '<form name="f'.$zsec2.'" action="sector.php?sf='.$zsec2.'" method="POST">';
-                    echo '<div class="cell" style="width: 400px"><a href="military.php?se='.$zsec2.'&sy='.$zsys2.'">'.$secret_lang['zummilitaer'].'</a> - ';
-                    echo '<a href="javascript:document.f'.$zsec2.'.submit()">'.$secret_lang['zursektoransicht'].'</a></div>';
-                    echo '</form><br>';
+                    echo '<div class="mod gb-allein">'.Bericht::links((int)$zsec2, (int)$zsys2, $secret_lang, false).'</div>';
                 }
 
                 //Scanhistorie anlegen

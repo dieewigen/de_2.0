@@ -326,52 +326,32 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//js-tooltip-daten generieren
-	//klasse
-	$zstr='<font color=#D265FF>'.$military_lang['klasse'].': '.$military_lang['klassennamen'][$i-81].'</font>';
-	//punkte
-	$zstr.='<br><font color=#FFFA65>'.$military_lang['punkte'].': '.number_format($unit[$_SESSION['ums_rasse']-1][$i-81][4], 0,"",".").'</font>';
-
-	//reiszeit
-	$zstr.='<br><br>'.$military_lang['reisezeit'].': '.$schiffsdaten[$_SESSION['ums_rasse']-1][$i-81][0].' KT';
-	//transportkapazität
-	if ($schiffsdaten[$_SESSION['ums_rasse']-1][$i-81][1]>0)$zstr.='<br>'.$military_lang['kapazitaet'].': '.$schiffsdaten[$_SESSION['ums_rasse']-1][$i-81][1];
-	//ben. transportkapazität
-	if ($schiffsdaten[$_SESSION['ums_rasse']-1][$i-81][2]>0)$zstr.='<br>'.$military_lang['kapazitaet2'].': '.$schiffsdaten[$_SESSION['ums_rasse']-1][$i-81][2];
-
-	//frachtkapazität
-	if (isset($unit[$_SESSION['ums_rasse']-1][$i-81]['fk']) && $unit[$_SESSION['ums_rasse']-1][$i-81]['fk'] > 0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$_SESSION['ums_rasse']-1][$i-81]['fk'];
-
-	//waffenarten
-	//konventionell
-	if($unit[$_SESSION['ums_rasse']-1][$i-81][2]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
-		else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
-	$zstr.='<br><br><font color=#9D4B15>'.$military_lang['waffengattung1'].':</font> '.$wv;
-
-	//klassenziel
-	if($unit[$_SESSION['ums_rasse']-1][$i-81][2]>0){
-		$zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][0]].'</font>';
-		$zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$kampfmatrix[$i-81][2]].'</font>';
+	//Tooltip: Klasse, Punkte, Reisezeit und Kapazitäten, Waffengattungen mit Zielen, Besonderheit (src/View/Einheit/Tooltip.php)
+	$ui=$i-81;
+	$ur=$unit[$_SESSION['ums_rasse']-1][$ui];
+	$sd=$schiffsdaten[$_SESSION['ums_rasse']-1][$ui];
+	$ttd=array(
+		'klasse'=>array($military_lang['klasse'], $military_lang['klassennamen'][$ui]),
+		'punkte'=>array($military_lang['punkte'], number_format($ur[4], 0,"",".")),
+		'werte'=>array(array($military_lang['reisezeit'], $sd[0].' KT')),
+		'waffen'=>array(),
+		'besonderheit'=>'',
+	);
+	if($sd[1]>0)$ttd['werte'][]=array($military_lang['kapazitaet'], $sd[1]);
+	if($sd[2]>0)$ttd['werte'][]=array($military_lang['kapazitaet2'], $sd[2]);
+	if(isset($ur['fk']) && $ur['fk']>0)$ttd['werte'][]=array('Frachtkapazit&auml;t', $ur['fk']);
+	foreach(array(array(2, 'waffengattung1', $kampfmatrix), array(3, 'waffengattung2', $blockmatrix)) as $w){
+		$hat=$ur[$w[0]]>0;
+		$ziele=array();
+		if($hat){
+			$ziele[]=array($military_lang['klasseziel1'], $military_lang['klassennamen'][$w[2][$ui][0]]);
+			$ziele[]=array($military_lang['klasseziel2'], $military_lang['klassennamen'][$w[2][$ui][2]]);
+		}
+		$ttd['waffen'][]=array($military_lang[$w[1]], $hat, $hat ? $military_lang['waffenvorhandenja'] : $military_lang['waffenvorhandennein'], $ziele);
 	}
-
-	//emp
-	if($unit[$_SESSION['ums_rasse']-1][$i-81][3]>0)$wv='<font color=#2DFF11>'.$military_lang['waffenvorhandenja'].'</font>';
-		else $wv='<font color=#ED0909>'.$military_lang['waffenvorhandennein'].'</font>';
-	$zstr.='<br><br><font color=#15629D>'.$military_lang['waffengattung2'].':</font> '.$wv;
-
-	//klassenziel
-	if($unit[$_SESSION['ums_rasse']-1][$i-81][3]>0){
-		$zstr.='<br><font color=#ED9409>-'.$military_lang['klasseziel1'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][0]].'</font>';
-		$zstr.='<br><font color=#F0BA66>-'.$military_lang['klasseziel2'].': '.$military_lang['klassennamen'][$blockmatrix[$i-81][2]].'</font>';
-	}
-
-	//besonderheiten
-	if($i-81==1)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitjagdboot'].'</font>';
-	if($i-81==3)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitkreuzer'].'</font>';
-	if($i-81==4)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheitschlachtschiff'].'</font>';
-	if($i-81==6)$zstr.='<br><br><font color=#2DFF11>'.$military_lang['besonderheittransmitterschiff'].'</font>';
-
-
-	$mtip[$c1] = getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.$zstr;
+	$besonderheiten=array(1=>'besonderheitjagdboot', 3=>'besonderheitkreuzer', 4=>'besonderheitschlachtschiff', 6=>'besonderheittransmitterschiff');
+	if(isset($besonderheiten[$ui]))$ttd['besonderheit']=$military_lang[$besonderheiten[$ui]];
+	$mtip[$c1] = getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.\DieEwigen\DE2\View\Einheit\Tooltip::html($ttd);
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//anzahl der einheiten auslesen

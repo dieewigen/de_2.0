@@ -30,4 +30,9 @@ $legende_lang['eintrag_26']='Nachrichtenfeld leeren';
 $legende_lang['eintrag_27']='<b>Hinweis: </b>Die Farbcodes für das [color] Attribut sind im HEX-Code (#XXXXXX) anzugeben.<br>
  Einen Code kann man über entsprechende <a href="http://www.google.de/search?hl=de&q=Farbpalette">Farbpaletten</a> ermitteln.';
 
+$legende_lang['eintrag_28']='Formatierungen im Hyperfunk';
+$legende_lang['eintrag_29']='blaue Schrift';
+$legende_lang['eintrag_30']='Eingabe';
+$legende_lang['eintrag_31']='ab hier';
+
 ?>

@@ -140,7 +140,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
+        $errmsg .= '<span class="ccr">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</span>';
     }
 } elseif (isset($_GET["a"]) && $_GET["a"] == 2) {
     //Artefakt aus einem Basisschiff entfernen
@@ -215,7 +215,7 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</font><br><br>';
+        $errmsg .= '<span class="ccr">Es ist zur Zeit bereits eine Transaktion aktiv. Bitte warte, bis die Transaktion abgeschlossen ist.</span>';
     }
 }
 
@@ -253,7 +253,7 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
             $errmsg .= $artefacts_lang['fehler8'];
             //}
         } else {
-            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+            $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler6'].'</span>';
         }
 
         //transaktionsende
@@ -265,7 +265,7 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        $errmsg .= '<span class="ccr">'.$artefacts_lang['error3'].'</span>';
     }
 }//ende submit1
 
@@ -355,7 +355,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                     //message ausgeben
                     $errmsg .= $artefacts_lang['fehler7'];
                 } else {
-                    $errmsg .= '<font color="FF0000">W&auml;hrend der Geb&auml;udeausbau l&auml;uft, kann dieses Artefakt nicht verwendet werden.</font>';
+                    $errmsg .= '<span class="ccr">W&auml;hrend der Geb&auml;udeausbau l&auml;uft, kann dieses Artefakt nicht verwendet werden.</span>';
                 }
             }
             //waringa 1-3 kriegsartefakte
@@ -409,7 +409,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                 //credit gutschreiben
                 //mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET credits=credits+? WHERE user_id=?", [$amount, $_SESSION['ums_user_id']]);
                 changeCredits($_SESSION['ums_user_id'], $amount, 'Creditruessel');
-                $errmsg .= '<font color="#00FF00">Du hast dem gro&szlig;en Ishtarus '.$amount.' Credits wegger&uuml;sselt.</font>';
+                $errmsg .= '<span class="ccg">Du hast dem gro&szlig;en Ishtarus '.$amount.' Credits wegger&uuml;sselt.</span>';
 
                 //artefakt entfernen
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
@@ -418,7 +418,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                 // neue Auktion erstellen
                 ////////////////////////////////////////////////////////////
                 /*
-                $errmsg.='<font color="#00FF00">Die Auktion wurde gestartet.</font>';
+                $errmsg .= '<span class="ccg">Die Auktion wurde gestartet.</span>';
 
                 createAuction($_SESSION['ums_user_id']);
 
@@ -469,14 +469,14 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
                 //dem spieler das kriegsartefakt gutschreiben
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
-                $errmsg.='<font color="#00FF00">Du hast '.$zspielername.' einen Kollektor wegger&uuml;sselt.</font>';
+                $errmsg .= '<span class="ccg">Du hast '.$zspielername.' einen Kollektor wegger&uuml;sselt.</span>';
             }
             else //es trifft einen dx
             {
                 //dem spieler das kriegsartefakt gutschreiben
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET kartefakt=kartefakt+1 WHERE user_id=?", [$_SESSION['ums_user_id']]);
 
-                $errmsg.='<font color="#00FF00">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</font>';
+                $errmsg .= '<span class="ccg">Du hast einem DX61a23 einen Kollektor wegger&uuml;sselt.</span>';
             }
 
             //artefakt löschen
@@ -484,7 +484,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
         }
         */
         } else {
-            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler6'].'</font><br><br>';
+            $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler6'].'</span>';
         }
 
         //transaktionsende
@@ -496,7 +496,7 @@ if (isset($_REQUEST['useartefact']) && $_REQUEST['useartefact'] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        $errmsg .= '<span class="ccr">'.$artefacts_lang['error3'].'</span>';
     }
 }//ende submit1
 
@@ -560,9 +560,9 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
 
 
                     //info dass alles geklappt hat
-                    $errmsg .= '<font color="#00FF00">Die Artefakte wurden zu einem neuen Artefakt verschmolzen: '.$ua_name[$artid - 1].'</font><br><br>';
+                    $errmsg .= '<span class="ccg">Die Artefakte wurden zu einem neuen Artefakt verschmolzen: '.$ua_name[$artid - 1].'</span>';
                 } else {
-                    $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst f&uuml;r den Vorgang '.$tcost2.' Tronic.</font><br><br>';
+                    $errmsg .= '<span class="ccr">Du ben&ouml;tigst f&uuml;r den Vorgang '.$tcost2.' Tronic.</span>';
                 }
             } else {
                 //schauen ob die artefakte schon auf dem maxlevel sind
@@ -572,7 +572,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
                         $restyp05 = $restyp05 - $tcost1;
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost1, $_SESSION['ums_user_id']]);
 
-                        $errmsg .= '<font color="#00FF00">'.$artefacts_lang['fehler'].'</font>';
+                        $errmsg .= '<span class="ccg">'.$artefacts_lang['fehler'].'</span>';
 
                         //ein artefakt upgraden lid1
                         mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_artefact SET level=level+1 WHERE user_id=? AND lid=?", [$_SESSION['ums_user_id'], $lid1]);
@@ -589,14 +589,14 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
                         }
 
                     } else {
-                        $errmsg .= '<font color="#FF0000">Du ben&ouml;tigst für den Vorgang '.$tcost1.' Tronic.</font><br><br>';
+                        $errmsg .= '<span class="ccr">Du ben&ouml;tigst für den Vorgang '.$tcost1.' Tronic.</span>';
                     }
                 } else {
-                    $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler2'].'</font><br><br>';
+                    $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler2'].'</span>';
                 }
             }
         } else {
-            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler3'].'</font>';
+            $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler3'].'</span>';
         }
 
         //transaktionsende
@@ -608,7 +608,7 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        $errmsg .= '<span class="ccr">'.$artefacts_lang['error3'].'</span>';
     }
 }//ende submit1
 
@@ -636,7 +636,7 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
         $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id, verbzeit FROM de_user_build WHERE tech_id=1000 AND user_id=?", [$_SESSION['ums_user_id']]);
         $gebinbau = mysqli_num_rows($db_daten);
         if ($gebinbau != 0) {
-            $fehlermsg = '<font color="FF0000">'.$artefacts_lang['fehler4'];
+            $fehlermsg = $artefacts_lang['fehler4'];
         }
 
         //genug ressourcen vorhanden?
@@ -664,9 +664,9 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
                 [$_SESSION['ums_user_id'], $tech_ticks]
             );
             //meldung an den account �ber den ausbau
-            $errmsg .= '<font color="#00FF00">Der Geb&auml;udeausbau wurde gestartet.</font>';
+            $errmsg .= '<span class="ccg">Der Geb&auml;udeausbau wurde gestartet.</span>';
         } else {
-            $errmsg .= '<font color="#FF0000">'.$artefacts_lang['fehler5'].'</font>';
+            $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler5'].'</span>';
         }
 
         //transaktionsende
@@ -678,7 +678,7 @@ if (isset($_REQUEST["bupgrade"]) and hasTech($pt, 28) and $artbldglevel < $maxle
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">'.$artefacts_lang['error3'].'</font><br><br>';
+        $errmsg .= '<span class="ccr">'.$artefacts_lang['error3'].'</span>';
     }
 }
 
@@ -689,10 +689,10 @@ include "resline.php";
 $artefacts = array();
 $flotten = array();
 
-//Ergebnis der letzten Aktion; die alten Texte bringen eigene Farben mit, hier zählt nur, ob es ein Fehler war
+//Ergebnis der letzten Aktion; ccr kennzeichnet Fehler, ccg Erfolg
 $meldung = '';
 if ($errmsg != '') {
-    $meldung_fehler = preg_match('/FF0000|ccr/i', $errmsg);
+    $meldung_fehler = preg_match('/ccr/', $errmsg);
     $meldung = '<div class="mod-meldung '.($meldung_fehler ? 'mod-meldung-fehler' : 'mod-meldung-ok').'">'.trim(strip_tags($errmsg)).'</div>';
 }
 
@@ -734,7 +734,7 @@ function artefact_tooltip($id, $level)
 
 if (!hasTech($pt, 28)) {
     if ($errmsg != '') {
-        echo '<div class="info_box">'.$errmsg.'</div><br>';
+        echo $meldung;
     }
 
     $techcheck = "SELECT tech_name FROM de_tech_data WHERE tech_id=28";

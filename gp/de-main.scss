@@ -2644,100 +2644,219 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-// Berichte nach Sonden- und Agenteneinsätzen: alter Tabellenaufbau, moderne Flächen;
-// !important, weil die Zellklassen im Theme mit höherer Spezifität gesetzt sind
+// Geheimdienst (secret.php, src/View/Geheimdienst/Bericht.php): Scanverlauf im Rahmen (.gb-info), Sonden- und Agentenberichte
+// als Karten (.mod.gb) im Stil des Kampfberichts; die Hülle .geh-berichte ist so breit wie die Rahmen
 .geh-berichte {
-	// so breit wie die Rahmen; schmale Berichtstabellen (400 px) stehen mittig darunter
 	width: 602px;
 
-	> table,
-	> form > table {
-		margin-left: auto;
-		margin-right: auto;
+	.mod-meldung,
+	.mod-hinweis {
+		margin-bottom: 8px;
 	}
+}
 
-	.info_box {
-		box-sizing: border-box;
-		width: 602px;
-		border: 0;
-		border-radius: 8px;
-		background: rgba(6, 9, 14, 0.92);
-		font-family: Roboto, Arial, Helvetica, sans-serif;
-		font-size: 13px;
-		line-height: 1.4;
-		color: #c9d1d9;
+.gb {
+	margin-bottom: 8px;
+	border-radius: 8px;
+	font-size: 12px;
+}
+
+.gb-info {
+	font-size: 12px;
+}
+
+.gb-kopf {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 8px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+	.mod-typ {
+		flex: 0 0 auto;
 	}
+}
 
-	.cell,
-	.cell1 {
-		font-family: Roboto, Arial, Helvetica, sans-serif;
-		font-size: 12px;
-		color: #c9d1d9;
+.gb-ziel {
+	font-size: 14px;
+	font-weight: 700;
+	color: #ffffff;
+	overflow-wrap: anywhere;
+}
+
+.gb-spalten {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0 16px;
+}
+
+.gb-abschnitt {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 10px 0 4px;
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #8b949e;
+
+	small {
+		font-size: 10px;
+		letter-spacing: 0;
+		text-transform: none;
+		color: #6e7681;
 	}
+}
 
-	.cell,
-	tr.cell > td {
-		background: rgba(6, 9, 14, 0.92) !important;
-	}
+.gb-werte {
+	display: flex;
+	flex-direction: column;
+}
 
-	.cell1,
-	tr.cell1 > td {
-		background: rgba(30, 37, 48, 0.95) !important;
-	}
+.gb-wert {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 3px 0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	font-variant-numeric: tabular-nums;
 
-	td {
-		padding: 2px 6px;
+	span {
+		color: #9da7b1;
 	}
 
 	b {
+		white-space: nowrap;
 		color: #ffffff;
 	}
+}
 
-	// Zellen der Agentenberichte; "table td.x" schlägt die Theme-Regel body.theme-rasseN .x
-	table td.c,
-	table td.cl,
-	table td.cc,
-	table td.cr,
-	table td.tl,
-	table td.tc,
-	table td.tr,
-	table td.ccg,
-	table td.ccr,
-	table td.ccy {
-		padding: 4px 8px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-		background: rgba(6, 9, 14, 0.92);
-		font-family: Roboto, Arial, Helvetica, sans-serif;
+// Tabellen; td/th bekommen global 14px Arial und th einen hellen Hintergrund
+.gb-tabelle {
+	width: 100%;
+	border-collapse: collapse;
+	font-variant-numeric: tabular-nums;
+
+	th,
+	td {
+		padding: 3px 5px;
+		background: none;
+		font-family: inherit;
 		font-size: 12px;
-	}
-
-	table td.c,
-	table td.cl,
-	table td.cc,
-	table td.cr {
+		text-align: right;
+		white-space: nowrap;
 		color: #c9d1d9;
 	}
 
-	// Kopfzellen
-	table td.tl,
-	table td.tc,
-	table td.tr {
-		background: rgba(30, 37, 48, 0.95);
+	th {
+		font-size: 10px;
 		font-weight: 500;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #8b949e;
+	}
+
+	th:first-child,
+	td:first-child {
+		text-align: left;
+		white-space: normal;
+	}
+
+	tbody tr + tr td {
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	tfoot td {
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		font-weight: 700;
 		color: #ffffff;
 	}
+}
 
-	table td.ccg {
-		color: #5fe08a;
-	}
+.gb-liste {
+	margin: 0;
+	padding: 0;
+	list-style: none;
 
-	table td.ccr {
-		color: #ff6b6b;
+	li {
+		padding: 3px 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
+}
 
-	table td.ccy {
-		color: #ffb45c;
+.gb-liste-spalten {
+	columns: 2;
+	column-gap: 16px;
+
+	li {
+		break-inside: avoid;
 	}
+}
+
+// Nachrichten des Ziels, Angriffe rot, Verteidigungen grün
+.gb-nachricht {
+	padding: 6px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.07);
+	line-height: 1.45;
+	overflow-wrap: anywhere;
+
+	&:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+}
+
+.gb-zeit {
+	display: block;
+	font-size: 11px;
+	color: #8b949e;
+}
+
+.gb-angriff {
+	color: #ff8a8a;
+}
+
+.gb-verteidigung {
+	color: #5fe08a;
+}
+
+.gb-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.gb-fuss {
+	margin-top: 10px;
+	padding-top: 8px;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+// Links ohne Karte (nach einem Agenteneinsatz)
+.gb-allein {
+	margin-bottom: 8px;
+}
+
+.gb-status {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 10px;
+	padding-top: 8px;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+	.mod-typ {
+		flex: 1 1 auto;
+	}
+}
+
+.gb-leer {
+	padding: 6px 0;
+	font-size: 11px;
+	color: #8b949e;
 }
 
 // Produktion (production.php), nutzt die geh-Bausteine für Kosten, Summe und Aufträge
@@ -9256,6 +9375,226 @@ a.art-kachel-zurueck:hover::after {
 		margin-top: 4px;
 		line-height: 1.5;
 	}
+}
+
+// Battleground-Berichte (showkampfberichtBG in lib/kampfbericht.lib.php): je Runde die Paarungen, Sieger grün,
+// Verlierer rot, die eigene Paarung hervorgehoben
+.bg-runde {
+	margin-top: 8px;
+
+	> .mod-typ {
+		display: block;
+		margin-bottom: 4px;
+	}
+}
+
+.bg-gewinn {
+	margin-bottom: 6px;
+	font-size: 11px;
+	color: #9da7b1;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+.bg-paar {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 8px;
+	border-radius: 6px;
+
+	& + & {
+		margin-top: 2px;
+	}
+}
+
+.bg-eigen {
+	background: rgba(255, 255, 255, 0.06);
+	box-shadow: inset 0 0 0 1px var(--akzent-weich);
+}
+
+.bg-spieler {
+	min-width: 0;
+	text-align: center;
+	overflow-wrap: anywhere;
+
+	small {
+		display: block;
+		font-size: 10px;
+		font-weight: 400;
+		color: #8b949e;
+	}
+}
+
+.bg-sieger {
+	font-weight: 700;
+	color: #5fe08a;
+}
+
+.bg-verlierer {
+	color: #ff8a8a;
+}
+
+.bg-vs {
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #6e7681;
+}
+
+.bg-vorteil {
+	color: #5fe08a;
+}
+
+// Kampfbericht: Siegregel und der Knopf "Als Text kopieren" nebeneinander, das Textfeld bleibt versteckt
+.kb-fuss {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 10px;
+	margin-top: 8px;
+
+	.kb-regel {
+		flex: 1 1 auto;
+		margin-top: 0;
+	}
+}
+
+.kb .mod-btn.kb-kopieren {
+	flex: 0 0 auto;
+	padding: 4px 10px;
+	font-size: 11px;
+}
+
+// Einheiten-Tooltips in Produktion und Flotten (src/View/Einheit/Tooltip.php); #tt zeigt das HTML aus title="…"
+#tt .ei {
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 1.4;
+
+	b {
+		color: #ffffff;
+	}
+}
+
+#tt .ei-zeile {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+#tt .ei-klasse {
+	color: #d265ff;
+}
+
+#tt .ei-punkte {
+	color: #fffa65;
+}
+
+#tt .ei-werte,
+#tt .ei-waffe,
+#tt .ei-besonderheit {
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#tt .ei-werte {
+	color: #9da7b1;
+
+	span {
+		display: block;
+	}
+}
+
+#tt .ei-waffe-name {
+	margin-right: 6px;
+	font-weight: 500;
+}
+
+#tt .ei-waffe-0 .ei-waffe-name {
+	color: #e0a060;
+}
+
+#tt .ei-waffe-1 .ei-waffe-name {
+	color: #5fb0ff;
+}
+
+#tt .ei-ja {
+	color: #5fe08a;
+}
+
+#tt .ei-nein {
+	color: #ff8a8a;
+}
+
+#tt .ei-ziele {
+	margin-top: 2px;
+	color: #ed9409;
+
+	span {
+		display: block;
+	}
+
+	b {
+		color: #f0ba66;
+	}
+}
+
+#tt .ei-besonderheit {
+	color: #5fe08a;
+}
+
+// Formatierungen im Hyperfunk (hfnlegende.php): eigene Seite im neuen Tab, je Marke ein Beispiel
+.hfl {
+	width: 607px;
+	margin: 12px auto;
+}
+
+.hfl-karte {
+	width: 580px;
+}
+
+.hfl-tabelle {
+	width: 100%;
+	border-collapse: collapse;
+
+	th,
+	td {
+		padding: 5px 6px;
+		background: none;
+		font-family: inherit;
+		font-size: 12px;
+		text-align: left;
+		vertical-align: top;
+		color: #c9d1d9;
+	}
+
+	th {
+		font-size: 10px;
+		font-weight: 500;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #8b949e;
+	}
+
+	tbody tr + tr td {
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+}
+
+.hfl-code {
+	font-family: Consolas, "Courier New", monospace;
+	font-size: 11px;
+	white-space: nowrap;
+	color: #ffb45c;
+}
+
+.hfl-karte .mod-hinweis {
+	margin: 10px 0 0;
 }
 
 // Technologien (ang_techs.php, js/ang_techs.js): Bauplätze, Filter ohne Neuladen,

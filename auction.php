@@ -449,11 +449,11 @@ if (!hasTech($pt, 4)) {
         if ($erg) {
             //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
         } else {
-            print("ERROR 17<br><br><br>");
+            $content = ($content ?? '').'<div class="mod-meldung mod-meldung-fehler">ERROR 17</div>';
         }
     }// if setlock-ende
     else {
-        echo '<br><font color="#FF0000">ERROR 18</font><br><br>';
+        $content = ($content ?? '').'<div class="mod-meldung mod-meldung-fehler">ERROR 18</div>';
     }
 
 

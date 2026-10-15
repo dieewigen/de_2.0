@@ -92,7 +92,7 @@ $ps_name.'-'.$defense_lang['bonus'].': '.$defense_bonus_ps.'%<br>- '.
 $defense_lang['bauzeitreduzierung'].': '.$defense_bonus_buildtime.'%<br>'.
 $defense_lang['bauzeitreduzierung1'].'<br>- '.		
 $defense_lang['erfahrungspunkte'].'-'.$defense_lang['angriffskraftbonus'].'/'.$defense_lang['laehmkraftbonus'].': '.
-number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").'%<br><font color=#00FF00>'.$defense_lang['spezialfaehigkeiten'].':</font><br>';
+number_format((24-getfleetlevel($defenseexp))*0.4, 2,",",".").'%<br><span class=\'ei-ja\'>'.$defense_lang['spezialfaehigkeiten'].':</span><br>';
 
 //angriffskraft
 if($defense_bonus_feuerkraft[0]>0)$infostring.='- '.$defense_lang['angriffskraftbonus'].': '.$defense_bonus_feuerkraft[0].'% '.$defense_lang['wahrscheinlichkeit'].': '.$defense_bonus_feuerkraft[1].'%';
@@ -135,57 +135,34 @@ while($row = mysqli_fetch_array($db_daten)){ //jeder gefundene datensatz wird ge
 		$unit_index=$row['tech_id']-90;
 	}
 	
-	//klasse
-	$zstr='<font color=#D265FF>'.$production_lang['klasse'].': '.$production_lang['klassennamen'][$unit_index].'</font>';
-	//punkte
-	$zstr.='<br><font color=#FFFA65>'.$production_lang['punkte'].': '.number_format($unit[$_SESSION['ums_rasse']-1][$unit_index][4], 0,"",".").'</font>';
-
-	
+	//Tooltip: Klasse, Punkte, Reisezeit und Kapazitäten, Waffengattungen mit Zielen, Besonderheit (src/View/Einheit/Tooltip.php)
+	$ur=$unit[$_SESSION['ums_rasse']-1][$unit_index];
+	$ttd=array(
+		'klasse'=>array($production_lang['klasse'], $production_lang['klassennamen'][$unit_index]),
+		'punkte'=>array($production_lang['punkte'], number_format($ur[4], 0,"",".")),
+		'werte'=>array(),
+		'waffen'=>array(),
+		'besonderheit'=>'',
+	);
 	if($i<100){
-		//reisezeit
-		$zstr.='<br><br>'.$production_lang['reisezeit'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][0];
-		//transportkapazität
-		if ($sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][1]>0)$zstr.='<br>'.$production_lang['kapazitaet1'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][1];
-		//ben. transportkapazität
-		if ($sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][2]>0)$zstr.='<br>'.$production_lang['kapazitaet2'].': '.$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index][2];
-		//frachtkapazität
-		if (isset($unit[$_SESSION['ums_rasse']-1][$unit_index]['fk']) && $unit[$_SESSION['ums_rasse']-1][$unit_index]['fk']>0)$zstr.='<br>Frachtkapazit&auml;t: '.$unit[$_SESSION['ums_rasse']-1][$unit_index]['fk'];
+		$sd=$sv_schiffsdaten[$_SESSION['ums_rasse']-1][$unit_index];
+		$ttd['werte'][]=array($production_lang['reisezeit'], $sd[0]);
+		if($sd[1]>0)$ttd['werte'][]=array($production_lang['kapazitaet1'], $sd[1]);
+		if($sd[2]>0)$ttd['werte'][]=array($production_lang['kapazitaet2'], $sd[2]);
+		if(isset($ur['fk']) && $ur['fk']>0)$ttd['werte'][]=array('Frachtkapazit&auml;t', $ur['fk']);
 	}
-
-	//waffenarten
-	//konventionell
-	if($unit[$_SESSION['ums_rasse']-1][$unit_index][2]>0)$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
-	 else $wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
-	$zstr.='<br><br><font color=#9D4B15>'.$production_lang['waffengattung1'].':</font> '.$wv;
-
-	//klassenziel
-	if($unit[$_SESSION['ums_rasse']-1][$unit_index][2]>0){
-	  $zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][0]].'</font>';
-	  $zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$kampfmatrix[$unit_index][2]].'</font>';
+	foreach(array(array(2, 'waffengattung1', $kampfmatrix), array(3, 'waffengattung2', $blockmatrix)) as $w){
+		$hat=$ur[$w[0]]>0;
+		$ziele=array();
+		if($hat){
+			$ziele[]=array($production_lang['klasseziel1'], $production_lang['klassennamen'][$w[2][$unit_index][0]]);
+			$ziele[]=array($production_lang['klasseziel2'], $production_lang['klassennamen'][$w[2][$unit_index][2]]);
+		}
+		$ttd['waffen'][]=array($production_lang[$w[1]], $hat, $hat ? $production_lang['waffenvorhandenja'] : $production_lang['waffenvorhandennein'], $ziele);
 	}
-
-	//emp
-	if($unit[$_SESSION['ums_rasse']-1][$unit_index][3]>0){
-		$wv='<font color=#2DFF11>'.$production_lang['waffenvorhandenja'].'</font>';
-	}else{
-		$wv='<font color=#ED0909>'.$production_lang['waffenvorhandennein'].'</font>';
-	}
-	$zstr.='<br><br><font color=#15629D>'.$production_lang['waffengattung2'].':</font> '.$wv;
-
-	//klassenziel
-	if($unit[$_SESSION['ums_rasse']-1][$unit_index][3]>0){
-		$zstr.='<br><font color=#ED9409>-'.$production_lang['klasseziel1'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][0]].'</font>';
-		$zstr.='<br><font color=#F0BA66>-'.$production_lang['klasseziel2'].': '.$production_lang['klassennamen'][$blockmatrix[$unit_index][2]].'</font>';
-	}
-
-	//besonderheiten
-	if($unit_index==1)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitjagdboot'].'</font>';
-	if($unit_index==3)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitkreuzer'].'</font>';
-	if($unit_index==4)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheitschlachtschiff'].'</font>';
-	if($unit_index==6)$zstr.='<br><br><font color=#2DFF11>'.$production_lang['besonderheittransmitterschiff'].'</font>';
-
-
-	$tooltips[$c1]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.$zstr;
+	$besonderheiten=array(1=>'besonderheitjagdboot', 3=>'besonderheitkreuzer', 4=>'besonderheitschlachtschiff', 6=>'besonderheittransmitterschiff');
+	if(isset($besonderheiten[$unit_index]))$ttd['besonderheit']=$production_lang[$besonderheiten[$unit_index]];
+	$tooltips[$c1]=getTechNameByRasse($row['tech_name'],$_SESSION['ums_rasse']).'&'.\DieEwigen\DE2\View\Einheit\Tooltip::html($ttd);
 	$c1++;
 
     //$i++;
@@ -250,7 +227,7 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 					$fehlermsg='';
 				}else{
 					$h=0;
-					$fehlermsg='<font color="FF0000">'.$production_lang['vorbedingung'];
+					$fehlermsg=$production_lang['vorbedingung'];
 				}
 				
 				//festellen wieviele schiffe man bauen kann
@@ -338,10 +315,10 @@ if(isset($_POST['submit']) && $sabotage==0){//ja, es wurde ein button gedrueckt
 		if ($erg){
 			  //print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 		}else{
-			print($production_lang['releaselock'].$_SESSION['ums_user_id'].$production_lang['releaselock2']."<br><br><br>");
+			$prod_meldung='<div class="mod-meldung mod-meldung-fehler">'.$production_lang['releaselock'].$_SESSION['ums_user_id'].$production_lang['releaselock2'].'</div>';
 		}
 	}// if setlock-ende
-	else echo '<br><font color="#FF0000">'.$production_lang['releaselock3'].'</font><br><br>';
+	else $prod_meldung='<div class="mod-meldung mod-meldung-fehler">'.$production_lang['releaselock3'].'</div>';
 
 }//submit ende
 
@@ -351,6 +328,9 @@ include "resline.php";
 echo '<script language="javascript">var hasres = new Array('.$restyp01.','.$restyp02.','.$restyp03.','.$restyp04.','.$restyp05.');</script>';
 
 echo einheiten_navi('production');
+
+//Ergebnis der Transaktion, falls sie scheiterte
+echo $prod_meldung ?? '';
 
 //feststellen ob eine sabotage vorliegt und dann abbrechen
 if($sabotage==1){
@@ -664,10 +644,10 @@ if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
 			if ($erg){
 				//print("Datensatz Nr. 10 erfolgreich entsperrt<br><br><br>");
 			}else{
-				print("ERROR 17<br><br><br>");
+				echo '<div class="mod-meldung mod-meldung-fehler">ERROR 17</div>';
 			}
 		}// if setlock-ende
-		else echo '<br><font color="#FF0000">ERROR 18</font><br><br>';
+		else echo '<div class="mod-meldung mod-meldung-fehler">ERROR 18</div>';
 
 	}
 

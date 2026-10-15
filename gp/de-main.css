@@ -2385,79 +2385,197 @@ a.art-kachel-zurueck:hover::after {
 .geh-berichte {
   width: 602px;
 }
-.geh-berichte > table,
-.geh-berichte > form > table {
-  margin-left: auto;
-  margin-right: auto;
+.geh-berichte .mod-meldung,
+.geh-berichte .mod-hinweis {
+  margin-bottom: 8px;
 }
-.geh-berichte .info_box {
-  box-sizing: border-box;
-  width: 602px;
-  border: 0;
+
+.gb {
+  margin-bottom: 8px;
   border-radius: 8px;
-  background: rgba(6, 9, 14, 0.92);
-  font-family: Roboto, Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 1.4;
-  color: #c9d1d9;
-}
-.geh-berichte .cell,
-.geh-berichte .cell1 {
-  font-family: Roboto, Arial, Helvetica, sans-serif;
   font-size: 12px;
-  color: #c9d1d9;
 }
-.geh-berichte .cell,
-.geh-berichte tr.cell > td {
-  background: rgba(6, 9, 14, 0.92) !important;
+
+.gb-info {
+  font-size: 12px;
 }
-.geh-berichte .cell1,
-.geh-berichte tr.cell1 > td {
-  background: rgba(30, 37, 48, 0.95) !important;
+
+.gb-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.geh-berichte td {
-  padding: 2px 6px;
+.gb-kopf .mod-typ {
+  flex: 0 0 auto;
 }
-.geh-berichte b {
+
+.gb-ziel {
+  font-size: 14px;
+  font-weight: 700;
   color: #ffffff;
+  overflow-wrap: anywhere;
 }
-.geh-berichte table td.c,
-.geh-berichte table td.cl,
-.geh-berichte table td.cc,
-.geh-berichte table td.cr,
-.geh-berichte table td.tl,
-.geh-berichte table td.tc,
-.geh-berichte table td.tr,
-.geh-berichte table td.ccg,
-.geh-berichte table td.ccr,
-.geh-berichte table td.ccy {
-  padding: 4px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(6, 9, 14, 0.92);
-  font-family: Roboto, Arial, Helvetica, sans-serif;
-  font-size: 12px;
+
+.gb-spalten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
 }
-.geh-berichte table td.c,
-.geh-berichte table td.cl,
-.geh-berichte table td.cc,
-.geh-berichte table td.cr {
-  color: #c9d1d9;
-}
-.geh-berichte table td.tl,
-.geh-berichte table td.tc,
-.geh-berichte table td.tr {
-  background: rgba(30, 37, 48, 0.95);
+
+.gb-abschnitt {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 10px 0 4px;
+  font-size: 10px;
   font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+.gb-abschnitt small {
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6e7681;
+}
+
+.gb-werte {
+  display: flex;
+  flex-direction: column;
+}
+
+.gb-wert {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-variant-numeric: tabular-nums;
+}
+.gb-wert span {
+  color: #9da7b1;
+}
+.gb-wert b {
+  white-space: nowrap;
   color: #ffffff;
 }
-.geh-berichte table td.ccg {
+
+.gb-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.gb-tabelle th,
+.gb-tabelle td {
+  padding: 3px 5px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+  color: #c9d1d9;
+}
+.gb-tabelle th {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+.gb-tabelle th:first-child,
+.gb-tabelle td:first-child {
+  text-align: left;
+  white-space: normal;
+}
+.gb-tabelle tbody tr + tr td {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.gb-tabelle tfoot td {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.gb-liste {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gb-liste li {
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gb-liste-spalten {
+  columns: 2;
+  column-gap: 16px;
+}
+.gb-liste-spalten li {
+  break-inside: avoid;
+}
+
+.gb-nachricht {
+  padding: 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.gb-nachricht:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.gb-zeit {
+  display: block;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.gb-angriff {
+  color: #ff8a8a;
+}
+
+.gb-verteidigung {
   color: #5fe08a;
 }
-.geh-berichte table td.ccr {
-  color: #ff6b6b;
+
+.gb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-.geh-berichte table td.ccy {
-  color: #ffb45c;
+
+.gb-fuss {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gb-allein {
+  margin-bottom: 8px;
+}
+
+.gb-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.gb-status .mod-typ {
+  flex: 1 1 auto;
+}
+
+.gb-leer {
+  padding: 6px 0;
+  font-size: 11px;
+  color: #8b949e;
 }
 
 .prod {
@@ -8472,6 +8590,209 @@ a.art-kachel-zurueck:hover::after {
 .kb-regel p {
   margin-top: 4px;
   line-height: 1.5;
+}
+
+.bg-runde {
+  margin-top: 8px;
+}
+.bg-runde > .mod-typ {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bg-gewinn {
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #9da7b1;
+}
+.bg-gewinn b {
+  color: #ffffff;
+}
+
+.bg-paar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+.bg-paar + .bg-paar {
+  margin-top: 2px;
+}
+
+.bg-eigen {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--akzent-weich);
+}
+
+.bg-spieler {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.bg-spieler small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.bg-sieger {
+  font-weight: 700;
+  color: #5fe08a;
+}
+
+.bg-verlierer {
+  color: #ff8a8a;
+}
+
+.bg-vs {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6e7681;
+}
+
+.bg-vorteil {
+  color: #5fe08a;
+}
+
+.kb-fuss {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+.kb-fuss .kb-regel {
+  flex: 1 1 auto;
+  margin-top: 0;
+}
+
+.kb .mod-btn.kb-kopieren {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+#tt .ei {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+#tt .ei b {
+  color: #ffffff;
+}
+
+#tt .ei-zeile {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#tt .ei-klasse {
+  color: #d265ff;
+}
+
+#tt .ei-punkte {
+  color: #fffa65;
+}
+
+#tt .ei-werte,
+#tt .ei-waffe,
+#tt .ei-besonderheit {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#tt .ei-werte {
+  color: #9da7b1;
+}
+#tt .ei-werte span {
+  display: block;
+}
+
+#tt .ei-waffe-name {
+  margin-right: 6px;
+  font-weight: 500;
+}
+
+#tt .ei-waffe-0 .ei-waffe-name {
+  color: #e0a060;
+}
+
+#tt .ei-waffe-1 .ei-waffe-name {
+  color: #5fb0ff;
+}
+
+#tt .ei-ja {
+  color: #5fe08a;
+}
+
+#tt .ei-nein {
+  color: #ff8a8a;
+}
+
+#tt .ei-ziele {
+  margin-top: 2px;
+  color: #ed9409;
+}
+#tt .ei-ziele span {
+  display: block;
+}
+#tt .ei-ziele b {
+  color: #f0ba66;
+}
+
+#tt .ei-besonderheit {
+  color: #5fe08a;
+}
+
+.hfl {
+  width: 607px;
+  margin: 12px auto;
+}
+
+.hfl-karte {
+  width: 580px;
+}
+
+.hfl-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+}
+.hfl-tabelle th,
+.hfl-tabelle td {
+  padding: 5px 6px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  vertical-align: top;
+  color: #c9d1d9;
+}
+.hfl-tabelle th {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+.hfl-tabelle tbody tr + tr td {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hfl-code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #ffb45c;
+}
+
+.hfl-karte .mod-hinweis {
+  margin: 10px 0 0;
 }
 
 .tc-body {

@@ -14,72 +14,57 @@ function kampfberichtBG_haltung($paar, $seite){
 		$text.=' (Zufall)';
 	}
 	if(\DieEwigen\DE2\Model\Battleground\Haltung::vorteil($eigene, $gegner)>0){
-		$text.=' &middot; <span style="color: #5fe08a;">Vorteil</span>';
+		$text.=' &middot; <span class="bg-vorteil">Vorteil</span>';
 	}
 
-	return '<div style="font-size: 11px; font-weight: normal; color: #9da7b1;">'.$text.'</div>';
+	return '<small>'.$text.'</small>';
 }
 
+//Battleground-Bericht (de_user_news.typ 70): je Runde die Paarungen, Sieger grün, Verlierer rot, die eigene Paarung
+//hervorgehoben; Stil im Block "kb"/"bg-" in gp/de-main.scss
 function showkampfberichtBG($data){
-	$content='';
+	$kb=@unserialize(base64_decode($data));
+	if(!is_array($kb)){
+		return '<div class="kb"><div class="kb-keine">Dieser Bericht ist nicht lesbar.</div></div>';
+	}
+	$ich=$_SESSION['ums_spielername'] ?? '';
+	$runden=count($kb);
 
-	$kb=unserialize(base64_decode($data));
-
-	$content.='<div>BATTLEGROUND-ERGEBNIS</div>';
-	
-
-	for($runde=0;$runde<count($kb);$runde++){
-		$content.='<div>Die <span style="color: #00FF00;">Gewinner</span> erhalten: '.$kb[$runde][0]['gewinn'].'</div><br>';
-
-		//die einzelnen Paare durchgehen
-		for($p=0;$p<count($kb[$runde]);$p++){
-			
-
-			if($kb[$runde][$p]['winner_user_id']==$kb[$runde][$p]['user_id1']){
-				$css1='color: #00FF00;';
-				$css2='color: #FF0000;';
-			}else{
-				$css1='color: #FF0000;';
-				$css2='color: #00FF00;';
-			}
-
-			//echo 'A: '.$kb[$runde][$p]['spielername1'].'/'.$_SESSION['ums_spielername'];
-			
-
-			//eigenen Namen in fett
-			//Zeile in der man selbst ist hervorheben
-			$bg_color='none';
-			$parts=explode("&nbsp;",$kb[$runde][$p]['spielername1']);
-			if($parts[0]==($_SESSION['ums_spielername'] ?? '') && !empty($parts[0])){
-				$css1.='font-weight: bold;';
-				$bg_color='#222222';
-			}
-			
-			$parts=explode("&nbsp;",$kb[$runde][$p]['spielername2']);
-			if($parts[0]==($_SESSION['ums_spielername'] ?? '') && !empty($parts[0])){
-				$css2.='font-weight: bold;';
-				$bg_color='#222222';
-			}
-
-			
-
-			$content.='<div style="display: flex; background-color: '.$bg_color.'">';
-
-			//beide Namen teilen sich die Breite, damit der Bericht auch mobil passt
-			$content.='<div style="flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: center;'.$css1.'">'.$kb[$runde][$p]['spielername1'].kampfberichtBG_haltung($kb[$runde][$p], 1).'</div>';
-			if(!empty($kb[$runde][$p]['spielername2'])){
-				$content.='<div style="flex: 0 0 auto; padding: 0 6px; text-align: center;">:</div>';
-				$content.='<div style="flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: center;'.$css2.'">'.$kb[$runde][$p]['spielername2'].kampfberichtBG_haltung($kb[$runde][$p], 2).'</div>';
-			}
-
-			$content.='</div>';
+	$html='<div class="kb kb-bg"><div class="kb-kopf"><div><span class="mod-typ">Battleground</span><b class="kb-ort">Ergebnis</b></div>'
+		.($runden>1 ? '<span class="mod-chip">'.$runden.' Runden</span>' : '').'</div>';
+	foreach($kb as $r=>$paare){
+		if(!is_array($paare) || count($paare)==0){
+			continue;
 		}
-
+		$html.='<div class="bg-runde">'.($runden>1 ? '<span class="mod-typ">Runde '.($r+1).'</span>' : '')
+			.'<div class="bg-gewinn">Die Gewinner erhalten <b>'.($paare[0]['gewinn'] ?? '').'</b></div>';
+		foreach($paare as $p){
+			//wie bisher: gewinnt Seite 1, verliert Seite 2, sonst umgekehrt; ohne Gegner ist es ein Freilos
+			$sieger1=(($p['winner_user_id'] ?? null)==($p['user_id1'] ?? null));
+			$eigen=false;
+			$seiten=array();
+			foreach(array(1, 2) as $s){
+				$name=(string)($p['spielername'.$s] ?? '');
+				if($name===''){
+					continue;
+				}
+				$teile=explode('&nbsp;', $name);
+				if($ich!=='' && $teile[0]===$ich){
+					$eigen=true;
+				}
+				$gewonnen=($s==1) ? $sieger1 : !$sieger1;
+				$seiten[]='<span class="bg-spieler '.($gewonnen ? 'bg-sieger' : 'bg-verlierer').'">'.$name.kampfberichtBG_haltung($p, $s).'</span>';
+			}
+			if(count($seiten)==0){
+				continue;
+			}
+			$html.='<div class="bg-paar'.($eigen ? ' bg-eigen' : '').'">'.$seiten[0]
+				.(count($seiten)>1 ? '<span class="bg-vs">gegen</span>'.$seiten[1] : '<span class="bg-vs">Freilos</span><span></span>').'</div>';
+		}
+		$html.='</div>';
 	}
 
-	//$content.=print_r($kb, true);
-
-	return $content;
+	return $html.'</div>';
 }
 
 //Zahl mit Tausenderpunkt
@@ -109,6 +94,11 @@ function kb_namen($liste, $ich){
 		$html.='<span class="'.$klasse.'">'.$name.'</span>';
 	}
 	return $html;
+}
+
+//Zeile der Textfassung zum Kopieren
+function kb_textzeile($name, $ein, $ver){
+	return '  '.html_entity_decode($name, ENT_QUOTES, 'UTF-8').': '.kb_zahl($ein).' eingesetzt, '.kb_zahl($ver).' verloren'."\n";
 }
 
 //Zeile einer Einheitentabelle: eingesetzt, geblockt, überlebt und die Verluste mit Balken
@@ -190,6 +180,7 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 	//Einheiten je Seite und Rasse; Summen wie im alten Bericht: Anzahl, verloren, Punktewert, verlorene Punkte
 	$ges=array('a'=>array(0, 0, 0, 0), 'v'=>array(0, 0, 0, 0));
 	$zeilen=array('a'=>'', 'v'=>'');
+	$texte=array('a'=>'', 'v'=>'');
 	$quellen=array('a'=>'einheiten_atter', 'v'=>'einheiten_deffer');
 	for($r=0;$r<$sv_anz_rassen;$r++){
 		if(empty($rassen[$r])){
@@ -208,6 +199,7 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 				$ver=(int)($kbd[$key][2][$r][$i] ?? 0);
 				$punkte=(float)($schiffspunkte[$r][$i] ?? 0);
 				$zeilen[$s].=kb_zeile('kb-r'.$r, $rassennamen[$r][$i], $ein, $geb, $ver);
+				$texte[$s].=kb_textzeile($rassennamen[$r][$i], $ein, $ver);
 				$ges[$s][0]+=$ein;
 				$ges[$s][1]+=$ver;
 				$ges[$s][2]+=$ein*$punkte;
@@ -219,6 +211,7 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 	//Türme des Verteidigers, in der Farbe der angegriffenen Rasse
 	$tuerme=(isset($kbd['tuerme']) && is_array($kbd['tuerme'])) ? $kbd['tuerme'] : array();
 	$turmzeilen='';
+	$turmtext='';
 	for($i=0;$i<$sv_anz_tuerme;$i++){
 		$ein=(int)($tuerme[0][$i] ?? 0);
 		if($ein==0 || ($turmnamen[$turmrasse][$i] ?? 'NA')=='NA'){
@@ -228,6 +221,7 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 		$ver=(int)($tuerme[2][$i] ?? 0);
 		$punkte=(float)($schiffspunkte[$turmrasse][$i+10] ?? 0);
 		$turmzeilen.=kb_zeile('kb-r'.$turmrasse, $turmnamen[$turmrasse][$i], $ein, $geb, $ver);
+		$turmtext.=kb_textzeile($turmnamen[$turmrasse][$i], $ein, $ver);
 		$ges['v'][0]+=$ein;
 		$ges['v'][1]+=$ver;
 		$ges['v'][2]+=$ein*$punkte;
@@ -235,11 +229,13 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 	}
 	if($turmzeilen!==''){
 		$zeilen['v'].='<tr class="kb-trenner"><td colspan="5">'.$kbl_lang['tuerme'].'</td></tr>'.$turmzeilen;
+		$texte['v'].='  '.$kbl_lang['tuerme'].":\n".$turmtext;
 	}
 
 	//eigene Einheiten
 	$spieler=(isset($kbd['einheiten_spieler']) && is_array($kbd['einheiten_spieler'])) ? $kbd['einheiten_spieler'] : array();
 	$eigene='';
+	$eigentext='';
 	$eig=array(0, 0, 0, 0);
 	for($j=0;$j<$sv_anz_schiffe;$j++){
 		$ein=(int)($spieler[0][$j] ?? 0);
@@ -249,6 +245,7 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 		$ver=(int)($spieler[2][$j] ?? 0);
 		$punkte=(float)($schiffspunkte[$eigene_rasse][$j] ?? 0);
 		$eigene.=kb_zeile('kb-r'.$eigene_rasse, $rassennamen[$eigene_rasse][$j] ?? '', $ein, (int)($spieler[1][$j] ?? 0), $ver);
+		$eigentext.=kb_textzeile($rassennamen[$eigene_rasse][$j] ?? '', $ein, $ver);
 		$eig[0]+=$ein;
 		$eig[1]+=$ver;
 		$eig[2]+=$ein*$punkte;
@@ -309,9 +306,27 @@ function showkampfberichtV1($text, $rasse, $spielername, $sector, $system, $schi
 		$html.='<details class="kb-block" open><summary>'.($du ? 'Deine Einheiten' : 'Einheiten von '.$spielername).'<small>'.kb_zahl($eig[0]).' Einheiten, '.kb_zahl($eig[1]).' verloren</small></summary>'.kb_tabelle($eigene, $kbl_lang).'</details>';
 	}
 
-	//Siegregel wie im alten Bericht
-	$html.='<details class="kb-regel"><summary>Wie wird der Sieger bestimmt?</summary><p>Es gewinnt die Seite, die weniger Hitpoints im Verhältnis zu ihren gesamten Hitpoints verloren hat. In den Hitpoints sind alle Boni eingerechnet.<br>'
-		.'Verluste '.$kbl_lang['angreifer'].': '.number_format($quote['a'], 2, ',', '.').' %<br>Verluste '.$kbl_lang['verteidiger'].': '.number_format($quote['v'], 2, ',', '.').' %</p></details>';
+	//Textfassung zum Kopieren (Chat, Discord): Kopf, Bilanz, Einheiten je Seite
+	static $kb_nr=0;
+	$kb_nr++;
+	$klar=function($s){
+		return trim(html_entity_decode(strip_tags((string)$s), ENT_QUOTES, 'UTF-8'));
+	};
+	$text='Kampfbericht '.(int)($daten['sector'] ?? 0).':'.(int)($daten['system'] ?? 0)."\n"
+		.$kbl_lang['angreifer'].': '.$klar($atterliste)."\n".$kbl_lang['verteidiger'].': '.$klar($defferliste)."\n".$klar($satz)."\n\n"
+		.$kbl_lang['einheitenanzahl'].': '.kb_zahl($ges['a'][0]).' / '.kb_zahl($ges['v'][0])."\n"
+		.$kbl_lang['verloreneeinheiten'].': '.kb_zahl($ges['a'][1]).' ('.kb_prozent($ges['a'][1], $ges['a'][0]).') / '.kb_zahl($ges['v'][1]).' ('.kb_prozent($ges['v'][1], $ges['v'][0]).")\n"
+		.$kbl_lang['einheitenpunktewert'].': '.kb_zahl($ges['a'][2]).' / '.kb_zahl($ges['v'][2])."\n"
+		.$kbl_lang['verlorenepunkte'].': '.kb_zahl($ges['a'][3]).' ('.kb_prozent($ges['a'][3], $ges['a'][2]).') / '.kb_zahl($ges['v'][3]).' ('.kb_prozent($ges['v'][3], $ges['v'][2]).")\n"
+		.'Verlorene Hitpoints: '.number_format($quote['a'], 1, ',', '.').' % / '.number_format($quote['v'], 1, ',', '.')." %\n\n"
+		.$kbl_lang['angreifer'].":\n".$texte['a'].$kbl_lang['verteidiger'].":\n".$texte['v']
+		.($eigentext!=='' ? "\n".($du ? 'Deine Einheiten' : 'Einheiten von '.$spielername).":\n".$eigentext : '');
+
+	//Siegregel wie im alten Bericht, daneben der Knopf zum Kopieren (data-kopieren, js/de_fn.js)
+	$html.='<div class="kb-fuss"><details class="kb-regel"><summary>Wie wird der Sieger bestimmt?</summary><p>Es gewinnt die Seite, die weniger Hitpoints im Verhältnis zu ihren gesamten Hitpoints verloren hat. In den Hitpoints sind alle Boni eingerechnet.<br>'
+		.'Verluste '.$kbl_lang['angreifer'].': '.number_format($quote['a'], 2, ',', '.').' %<br>Verluste '.$kbl_lang['verteidiger'].': '.number_format($quote['v'], 2, ',', '.').' %</p></details>'
+		.'<button type="button" class="mod-btn mod-btn-leise kb-kopieren" data-kopieren="kb-quelle-'.$kb_nr.'">Als Text kopieren</button>'
+		.'<textarea class="kb-quelle" id="kb-quelle-'.$kb_nr.'" hidden readonly>'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'</textarea></div>';
 	$html.='</div>';
 
 	return $html;

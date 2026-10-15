@@ -177,3 +177,39 @@ document.addEventListener('keydown', function(e){
     }
   }catch(err){}
 });
+
+// "Als Text kopieren" (Kampfbericht): data-kopieren nennt die ID eines versteckten Textfelds, dessen Inhalt in die
+// Zwischenablage geht; ohne Clipboard-API wird das Feld kurz eingeblendet und markiert kopiert
+document.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('[data-kopieren]') : null;
+  if(!b){
+    return;
+  }
+  var quelle = document.getElementById(b.getAttribute('data-kopieren'));
+  if(!quelle){
+    return;
+  }
+  var fertig = function(){
+    var alt = b.textContent;
+    b.textContent = 'Kopiert';
+    b.classList.add('mod-btn-bereit');
+    setTimeout(function(){
+      b.textContent = alt;
+      b.classList.remove('mod-btn-bereit');
+    }, 2000);
+  };
+  var ersatz = function(){
+    quelle.hidden = false;
+    quelle.select();
+    try{
+      document.execCommand('copy');
+    }catch(err){}
+    quelle.hidden = true;
+    fertig();
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(quelle.value).then(fertig, ersatz);
+  }else{
+    ersatz();
+  }
+});

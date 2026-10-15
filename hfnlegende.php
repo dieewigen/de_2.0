@@ -1,129 +1,42 @@
-<?php 
+<?php
+//Formatierungen im Hyperfunk: je Marke ein Beispiel, wie hyperfunk.php es darstellt; öffnet aus dem Verfassen-Formular
+//(src/View/Hyperfunk/ComposeForm.php) in einem neuen Tab
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_hfnlegende.lang.php';
+include "functions.php";
+
+$b = $legende_lang['eintrag_5'];
+$abhier = ' ('.$legende_lang['eintrag_31'].')';
+$zeilen = array(
+    array('[b]'.$b.'[/b]', '<b>'.$b.'</b>', $legende_lang['eintrag_6']),
+    array('[i]'.$b.'[/i]', '<i>'.$b.'</i>', $legende_lang['eintrag_8']),
+    array('[u]'.$b.'[/u]', '<u>'.$b.'</u>', $legende_lang['eintrag_7']),
+    array('[center]'.$b.'[/center]', '<div style="text-align: center;">'.$b.'</div>', $legende_lang['eintrag_9']),
+    array('[CROT]'.$b, '<span style="color: #F10505;">'.$b.'</span>', $legende_lang['eintrag_17'].$abhier),
+    array('[CGELB]'.$b, '<span style="color: #FDFB59;">'.$b.'</span>', $legende_lang['eintrag_18'].$abhier),
+    array('[CGRUEN]'.$b, '<span style="color: #28FF50;">'.$b.'</span>', $legende_lang['eintrag_19'].$abhier),
+    array('[CW]'.$b, '<span style="color: #FFFFFF;">'.$b.'</span>', $legende_lang['eintrag_20'].$abhier),
+    array('[CDE]'.$b, '<span style="color: #3399FF;">'.$b.'</span>', $legende_lang['eintrag_29'].$abhier),
+    array('[color=#33FFFF]'.$b.'[/color]', '<span style="color: #33FFFF;">'.$b.'</span>', $legende_lang['eintrag_21']),
+    array('[size=4]'.$b.'[/size]', '<span style="font-size: 18px;">'.$b.'</span>', $legende_lang['eintrag_22']),
+    array('[url]https://www.die-ewigen.com[/url]', '<a href="https://www.die-ewigen.com" target="_blank" rel="noopener">https://www.die-ewigen.com</a>', $legende_lang['eintrag_12']),
+    array('[email]'.$legende_lang['eintrag_13'].'[/email]', '<a href="mailto:'.$legende_lang['eintrag_13'].'">'.$legende_lang['eintrag_13'].'</a>', $legende_lang['eintrag_14']),
+);
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-<title><?php print($legende_lang['eintrag_1']); ?></title>
-<?php include "cssinclude.php";?>
-<style type="text/css">
-<!--
-.tab {border-style:none;}
--->
-</style>
-<script>window.resizeTo(580,540);</script>
+<title><?php echo $legende_lang['eintrag_28']; ?></title>
+<?php include "cssinclude.php"; ?>
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
-?>
-<center>
-<table bordercolor="#3399FF" width="570" class="tab">
-<tr class="cell">
- <td width=240 align=center><font color=#FFFFFF><b><?php print($legende_lang['eintrag_2']); ?></b></font></td>
- <td width=160 align=center><font color=#FFFFFF><b><?php print($legende_lang['eintrag_3']); ?></b></font></td>
- <td width=155 align=center><font color=#FFFFFF><b><?php print($legende_lang['eintrag_4']); ?></b></font></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[b]<?php print($legende_lang['eintrag_5']); ?>[/b]</td>
- <td><b>&nbsp;<?php print($legende_lang['eintrag_5']); ?></b></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_6']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[u]<?php print($legende_lang['eintrag_5']); ?>[/u]</td>
- <td><u>&nbsp;<?php print($legende_lang['eintrag_5']); ?></u></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_7']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[i]<?php print($legende_lang['eintrag_5']); ?>[/i]</td>
- <td><i>&nbsp;<?php print($legende_lang['eintrag_5']); ?></i></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_8']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[center]<?php print($legende_lang['eintrag_5']); ?>[/center]</td>
- <td><center>&nbsp;<?php print($legende_lang['eintrag_5']); ?></center></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_9']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[pre]Die&nbsp;&nbsp;&nbsp;Ewigen[/pre]</td>
- <td>&nbsp;Die&nbsp;&nbsp;&nbsp;&nbsp;Ewigen</td>
- <td>&nbsp;<?php print($legende_lang['eintrag_10_3']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[link]www.Die-Ewigen.com[/link]</td>
- <td>&nbsp;<a href=http://www.die-ewigen.com>www.Die-Ewigen.com</a></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_12']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[email]support@die-ewigen.com[/email] </td>
- <td>&nbsp;<a href=mailto:support@die-ewigen.com>support@die-ewigen.com</a></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_14']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[img]<?php print($legende_lang['eintrag_15']); ?>[/img]</td>
- <td>&nbsp;<img src="gp/g/hfn/DENeu.gif" alt="Neu"></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_16']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[CROT]<?php print($legende_lang['eintrag_5']); ?></td>
- <td>&nbsp;<font color="#FF0000"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_17']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[CGELB]<?php print($legende_lang['eintrag_5']); ?></td>
- <td>&nbsp;<font color="#FFFF00"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_18']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[CGRUEN]<?php print($legende_lang['eintrag_5']); ?></td>
- <td>&nbsp;<font color="#00FF00"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_19']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[CW]<?php print($legende_lang['eintrag_5']); ?></td>
- <td>&nbsp;<font color="#FFFFFF"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_20']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;[color=#XXXXXX]<?php print($legende_lang['eintrag_5']); ?>[/color]</td>
- <td>&nbsp;<font color="#33FFFF"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_21']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;[size=X]<?php print($legende_lang['eintrag_5']); ?>[/size]</td>
- <td>&nbsp;<font size="4"><?php print($legende_lang['eintrag_5']); ?></font></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_22']); ?></td>
-</tr>
-
-<tr class="cell1">
- <td>&nbsp;?</td>
- <td>&nbsp;<?php print($legende_lang['eintrag_23']); ?></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_24']); ?></td>
-</tr>
-
-<tr class="cell">
- <td>&nbsp;<?php print($legende_lang['eintrag_25']); ?></td>
- <td>&nbsp;<?php print($legende_lang['eintrag_26']); ?></td>
- <td>&nbsp;</td>
-</tr>
-
-<tr class="cell1">
- <td colspan="3"><?php print($legende_lang['eintrag_27']); ?></td>
-</tr>
-</table>
-</center>
-</body>
-</html>
+echo '<div class="hfl">';
+rahmen_oben($legende_lang['eintrag_28']);
+echo '<div class="mod hfl-karte"><table class="hfl-tabelle"><thead><tr><th>'.$legende_lang['eintrag_30'].'</th><th>'.$legende_lang['eintrag_3'].'</th><th>'.$legende_lang['eintrag_4'].'</th></tr></thead><tbody>';
+foreach ($zeilen as $z) {
+    echo '<tr><td><code class="hfl-code">'.htmlspecialchars($z[0], ENT_QUOTES, 'UTF-8').'</code></td><td>'.$z[1].'</td><td>'.$z[2].'</td></tr>';
+}
+echo '</tbody></table><div class="mod-hinweis">'.$legende_lang['eintrag_27'].'</div></div>';
+rahmen_unten();
+echo '</div></body></html>';
