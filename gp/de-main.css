@@ -873,6 +873,49 @@ body.mobile .sec-navi .mod-btn {
   font-style: italic;
 }
 
+a.mod.mobil-menue,
+a.mod.mobil-menue:link,
+a.mod.mobil-menue:visited {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 598px;
+  box-sizing: border-box;
+  margin: 6px auto;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--akzent);
+  border-radius: 10px;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  text-decoration: none;
+  color: #e6edf3;
+}
+
+a.mod.mobil-menue:hover {
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mobil-menue-symbol {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  background: linear-gradient(var(--akzent), var(--akzent)) top/100% 4px no-repeat, linear-gradient(var(--akzent), var(--akzent)) center/100% 4px no-repeat, linear-gradient(var(--akzent), var(--akzent)) bottom/100% 4px no-repeat;
+}
+
+.mobil-menue-titel {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.mobil-menue-hinweis {
+  margin-left: auto;
+  font-size: 17px;
+  line-height: 1.35;
+  text-align: right;
+  color: #8b949e;
+}
+
 .helper-nav .helper-btn,
 .helper-nav a.helper-btn:link,
 .helper-nav a.helper-btn:visited {
@@ -10159,13 +10202,6 @@ body.theme-rasse1.mobile a.btn:hover {
   color: #FFFFFF;
   text-decoration: none;
 }
-body.theme-rasse1.mobile .mobilebtn {
-  border: 1px solid #333333;
-  background-color: #3399FF;
-  color: #FFFFFF !important;
-  font-size: 30px !important;
-  padding: 3px;
-}
 
 body.theme-rasse1.desktop {
   background-image: url(g/bgr1_1.jpg);
@@ -10357,13 +10393,6 @@ body.theme-rasse2.mobile a.btn:hover {
   height: 18px;
   color: #89d0d9;
   text-decoration: none;
-}
-body.theme-rasse2.mobile .mobilebtn {
-  border: 1px solid #333333;
-  background-color: #A6A6A6;
-  color: #FFFFFF !important;
-  font-size: 30px !important;
-  padding: 3px;
 }
 
 body.theme-rasse2.desktop {
@@ -10557,13 +10586,6 @@ body.theme-rasse3.mobile a.btn:hover {
   color: #FFFFFF;
   text-decoration: none;
 }
-body.theme-rasse3.mobile .mobilebtn {
-  border: 1px solid #333333;
-  background-color: #DE3939;
-  color: #FFFFFF !important;
-  font-size: 30px !important;
-  padding: 3px;
-}
 
 body.theme-rasse3.desktop {
   background-image: url(g/bgr3_1.jpg);
@@ -10755,13 +10777,6 @@ body.theme-rasse4.mobile a.btn:hover {
   height: 17px;
   color: #ed951e;
   text-decoration: none;
-}
-body.theme-rasse4.mobile .mobilebtn {
-  border: 1px solid #333333;
-  background-color: #ED951E;
-  color: #FFFFFF !important;
-  font-size: 30px !important;
-  padding: 3px;
 }
 
 body.theme-rasse4.desktop {

@@ -116,7 +116,6 @@ $themes: (
 		resnews-height: 24px,
 		rand-suffix: '_b',
 		rand-ro-suffix: '_b',
-		mobilebtn-bg: #3399FF,
 	),
 	rasse2: (color: #A6A6A6,
 		btn-image: 'm/2_btn.png',
@@ -138,7 +137,6 @@ $themes: (
 		resnews-height: 24px,
 		rand-suffix: '',
 		rand-ro-suffix: '',
-		mobilebtn-bg: #A6A6A6,
 	),
 	rasse3: (color: #DE3939,
 		btn-image: 'm/3_btn.png',
@@ -160,7 +158,6 @@ $themes: (
 		resnews-height: 23px,
 		rand-suffix: '_r',
 		rand-ro-suffix: '_ro',
-		mobilebtn-bg: #DE3939,
 	),
 	rasse4: (color: #ED951E,
 		btn-image: 'm/4_btn.png',
@@ -182,7 +179,6 @@ $themes: (
 		resnews-height: 23px,
 		rand-suffix: '_g',
 		rand-ro-suffix: '_g',
-		mobilebtn-bg: #ED951E,
 	)
 );
 
@@ -1105,7 +1101,56 @@ body.mobile .sec-navi {
 	color: #777777;
 	font-style: italic;
 }
-// Fluxurion der Berater (lib/helper.inc.php): zurück/weiter als Buttons
+// Menüleiste der Mobilversion über der Rohstoffleiste (resline.php): die ganze Leiste führt zum Menü, rechts der
+// Hinweis auf die Wischgesten. a.mod… mit :link/:visited, sonst gewinnen Linkfarbe und -größe des Themes.
+a.mod.mobil-menue,
+a.mod.mobil-menue:link,
+a.mod.mobil-menue:visited {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	width: 598px;
+	box-sizing: border-box;
+	margin: 6px auto;
+	padding: 12px 16px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-left: 4px solid var(--akzent);
+	border-radius: 10px;
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	color: #e6edf3;
+}
+
+a.mod.mobil-menue:hover {
+	text-decoration: none;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+// drei Striche als Menüsymbol, ohne Schriftzeichen (sieht auf jedem Gerät gleich aus)
+.mobil-menue-symbol {
+	flex: none;
+	width: 30px;
+	height: 22px;
+	background:
+		linear-gradient(var(--akzent), var(--akzent)) top / 100% 4px no-repeat,
+		linear-gradient(var(--akzent), var(--akzent)) center / 100% 4px no-repeat,
+		linear-gradient(var(--akzent), var(--akzent)) bottom / 100% 4px no-repeat;
+}
+
+.mobil-menue-titel {
+	font-size: 28px;
+	font-weight: 600;
+}
+
+.mobil-menue-hinweis {
+	margin-left: auto;
+	font-size: 17px;
+	line-height: 1.35;
+	text-align: right;
+	color: #8b949e;
+}
+
+// Fluxurion der Berater (View\Berater): zurück/weiter als Buttons
 .helper-nav {
 	.helper-btn,
 	a.helper-btn:link,
@@ -10819,7 +10864,6 @@ body.mobile {
 	$resnews-height: map.get($cfg, resnews-height);
 	$rand-suffix: map.get($cfg, rand-suffix);
 	$rand-ro-suffix: map.get($cfg, rand-ro-suffix);
-	$mobilebtn-bg: map.get($cfg, mobilebtn-bg);
 
 	// Basis-Theme (funktioniert für mobile und desktop)
 	body.theme-#{$name} {
@@ -11053,15 +11097,6 @@ body.mobile {
 			height: $btn-h;
 			color: $btn-col;
 			text-decoration: none;
-		}
-
-		// Mobile Button Klasse
-		.mobilebtn {
-			border: 1px solid #333333;
-			background-color: #{$mobilebtn-bg};
-			color: #FFFFFF !important;
-			font-size: 30px !important;
-			padding: 3px;
 		}
 	}
 

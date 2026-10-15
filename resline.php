@@ -110,12 +110,13 @@ $show_trade_reminder=$rowresline['trade_reminder'];
 /////////////////////////////////////////////////////////////
 $deactivate_touch_menu=0;
 if($_SESSION['ums_mobi']==1){
-	if(isset($_COOKIE['deactivate_swipe']) && $_COOKIE['deactivate_swipe']==1){
-		echo '<a href="menu.php"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Men&uuml;</div></a>';
-	}else{
-		echo '<a href="menu.php"><div class="mobilebtn" style="margin-bottom: 5px; width: 600px; margin-top: 5px;">Men&uuml;: links -> rechts wischen, oder ber&uuml;hren. Chat: rechts -> links wischen</div></a>';
+	//Menüleiste: Antippen öffnet das Menü; sind die Wischgesten an, steht rechts, wohin sie führen
+	echo '<a href="menu.php" class="mod mobil-menue"><span class="mobil-menue-symbol"></span><span class="mobil-menue-titel">Men&uuml;</span>';
+	if(!isset($_COOKIE['deactivate_swipe']) || $_COOKIE['deactivate_swipe']!=1){
+		echo '<span class="mobil-menue-hinweis">Wischen nach rechts: Men&uuml;<br>Wischen nach links: Chat</span>';
 	}
-	
+	echo '</a>';
+
 
 	if(isset($_COOKIE['deactivate_swipe']) && $_COOKIE['deactivate_swipe']==1){
 		$deactivate_touch_menu=1;
