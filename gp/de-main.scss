@@ -294,6 +294,49 @@ h1 {
 	font-size: 15px;
 }
 
+// Seitenrahmen aus rahmen_oben()/rahmen_unten() (functions.php), Nachbau der früheren Tabelle mit acht Bildzellen:
+// Titelleiste 37 px, Ränder 13 px, Fußleiste so hoch wie damals die Zellen mit &nbsp; (14 px Arial, Zeilenhöhe 1,3).
+// display: table, damit sich die Breite wie bei der Tabelle nach dem Inhalt richtet. Die Grafiken je Rasse stehen im
+// Theme (Abschnitt "Seitenrahmen"); die alten Klassen .rol/.ro/.ror usw. braucht nur noch der handgebaute Rahmen in
+// sysnews.php und im Admintool.
+.rahmen {
+	display: table;
+}
+
+.rahmen-kopf {
+	display: flex;
+	align-items: center;
+	min-height: 37px;
+	padding: 0 13px;
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	color: #ffffff;
+
+	> .cellu {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+}
+
+// Schrift wie früher in der Tabellenzelle (td: 14 px Arial), die Farbe kommt wie damals vom Theme;
+// flow-root hält Außenabstände und Floats des Inhalts im Rahmen, wie es die Zelle tat
+.rahmen-inhalt {
+	display: flow-root;
+	min-height: 18.2px;
+	padding: 0 13px;
+	font-family: arial, geneva, helvetica, sans-serif;
+	font-size: 14px;
+}
+
+.rahmen::after {
+	content: "";
+	display: block;
+	height: 18.2px;
+	padding: 0 13px;
+}
+
 .link:link,
 .link:visited,
 .link:hover {
@@ -11075,6 +11118,28 @@ body.mobile {
 
 		.rr {
 			background: url(g/rand_r#{$rand-suffix}.png) repeat;
+		}
+
+		// Seitenrahmen (rahmen_oben/rahmen_unten): dieselben Grafiken wie .rol/.ro/.ror usw.; die Mitte der Titel- und
+		// Fußleiste nur zwischen den Ecken (content-box), weil die Grafiken teilweise durchsichtig sind
+		.rahmen-kopf {
+			background:
+				url(g/rand_oben_l#{$rand-suffix}.png) left top repeat-y,
+				url(g/rand_oben_r#{$rand-suffix}.png) right top repeat-y,
+				url(g/rand_oben#{$rand-ro-suffix}.png) left top repeat content-box;
+		}
+
+		.rahmen-inhalt {
+			background:
+				url(g/rand_l#{$rand-suffix}.png) left top repeat-y,
+				url(g/rand_r#{$rand-suffix}.png) right top repeat-y;
+		}
+
+		.rahmen::after {
+			background:
+				url(g/rand_unten_l#{$rand-suffix}.png) left top repeat-y,
+				url(g/rand_unten_r#{$rand-suffix}.png) right top repeat-y,
+				url(g/rand_unten#{$rand-ro-suffix}.png) left top repeat content-box;
 		}
 	}
 

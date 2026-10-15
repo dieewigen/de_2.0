@@ -1917,16 +1917,16 @@ function showeinheit2($techname, $tech_id, $rt01, $rt02, $rt03, $rt04, $rt05, $t
     echo '</tr>';
 }
 
+/**
+ * Seitenrahmen: Titelleiste und Inhalt zwischen den Randgrafiken des Rassen-Themes; rahmen_unten() schließt ihn.
+ * Seit 2026-10-15 divs mit CSS-Hintergründen statt einer Tabelle mit acht Bildzellen, optisch unverändert (Block
+ * "Seitenrahmen" in gp/de-main.scss), damit sich das Aussehen später allein im Stylesheet ändern lässt. Anders als die
+ * frühere Tabellenzelle schließt rahmen_unten() keine offen gebliebenen Elemente: Was im Rahmen geöffnet wird, muss
+ * dort auch geschlossen werden.
+ */
 function rahmen_oben($text, $echo = true)
 {
-    $content = '<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-				<td width="13" height="37" class="rol">&nbsp;</td>
-				<td align="center" class="ro"><div class="cellu">'.$text.'</div></td>
-				<td width="13" class="ror">&nbsp;</td>
-				</tr>
-				<tr>
-				<td class="rl">&nbsp;</td><td>';
+    $content = '<div class="rahmen"><div class="rahmen-kopf"><div class="cellu">'.$text.'</div></div><div class="rahmen-inhalt">';
 
     if ($echo) {
         echo $content;
@@ -1937,14 +1937,7 @@ function rahmen_oben($text, $echo = true)
 
 function rahmen_unten($echo = true)
 {
-    $content = '</td><td width="13" class="rr">&nbsp;</td>
-				</tr>
-				<tr>
-				<td width="13" class="rul">&nbsp;</td>
-				<td class="ru">&nbsp;</td>
-				<td width="13" class="rur">&nbsp;</td>
-				</tr>
-				</table><br>';
+    $content = '</div></div><br>';
 
     if ($echo) {
         echo $content;

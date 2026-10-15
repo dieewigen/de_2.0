@@ -178,6 +178,41 @@ h1 {
   font-size: 15px;
 }
 
+.rahmen {
+  display: table;
+}
+
+.rahmen-kopf {
+  display: flex;
+  align-items: center;
+  min-height: 37px;
+  padding: 0 13px;
+  font-family: arial, geneva, helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+}
+.rahmen-kopf > .cellu {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rahmen-inhalt {
+  display: flow-root;
+  min-height: 18.2px;
+  padding: 0 13px;
+  font-family: arial, geneva, helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.rahmen::after {
+  content: "";
+  display: block;
+  height: 18.2px;
+  padding: 0 13px;
+}
+
 .link:link,
 .link:visited,
 .link:hover {
@@ -10185,6 +10220,15 @@ body.theme-rasse1 .rl {
 body.theme-rasse1 .rr {
   background: url(g/rand_r_b.png) repeat;
 }
+body.theme-rasse1 .rahmen-kopf {
+  background: url(g/rand_oben_l_b.png) left top repeat-y, url(g/rand_oben_r_b.png) right top repeat-y, url(g/rand_oben_b.png) left top repeat content-box;
+}
+body.theme-rasse1 .rahmen-inhalt {
+  background: url(g/rand_l_b.png) left top repeat-y, url(g/rand_r_b.png) right top repeat-y;
+}
+body.theme-rasse1 .rahmen::after {
+  background: url(g/rand_unten_l_b.png) left top repeat-y, url(g/rand_unten_r_b.png) right top repeat-y, url(g/rand_unten_b.png) left top repeat content-box;
+}
 
 body.theme-rasse1.mobile {
   background-color: #000;
@@ -10376,6 +10420,15 @@ body.theme-rasse2 .rl {
 }
 body.theme-rasse2 .rr {
   background: url(g/rand_r.png) repeat;
+}
+body.theme-rasse2 .rahmen-kopf {
+  background: url(g/rand_oben_l.png) left top repeat-y, url(g/rand_oben_r.png) right top repeat-y, url(g/rand_oben.png) left top repeat content-box;
+}
+body.theme-rasse2 .rahmen-inhalt {
+  background: url(g/rand_l.png) left top repeat-y, url(g/rand_r.png) right top repeat-y;
+}
+body.theme-rasse2 .rahmen::after {
+  background: url(g/rand_unten_l.png) left top repeat-y, url(g/rand_unten_r.png) right top repeat-y, url(g/rand_unten.png) left top repeat content-box;
 }
 
 body.theme-rasse2.mobile {
@@ -10569,6 +10622,15 @@ body.theme-rasse3 .rl {
 body.theme-rasse3 .rr {
   background: url(g/rand_r_r.png) repeat;
 }
+body.theme-rasse3 .rahmen-kopf {
+  background: url(g/rand_oben_l_r.png) left top repeat-y, url(g/rand_oben_r_r.png) right top repeat-y, url(g/rand_oben_ro.png) left top repeat content-box;
+}
+body.theme-rasse3 .rahmen-inhalt {
+  background: url(g/rand_l_r.png) left top repeat-y, url(g/rand_r_r.png) right top repeat-y;
+}
+body.theme-rasse3 .rahmen::after {
+  background: url(g/rand_unten_l_r.png) left top repeat-y, url(g/rand_unten_r_r.png) right top repeat-y, url(g/rand_unten_ro.png) left top repeat content-box;
+}
 
 body.theme-rasse3.mobile {
   background-color: #000;
@@ -10760,6 +10822,15 @@ body.theme-rasse4 .rl {
 }
 body.theme-rasse4 .rr {
   background: url(g/rand_r_g.png) repeat;
+}
+body.theme-rasse4 .rahmen-kopf {
+  background: url(g/rand_oben_l_g.png) left top repeat-y, url(g/rand_oben_r_g.png) right top repeat-y, url(g/rand_oben_g.png) left top repeat content-box;
+}
+body.theme-rasse4 .rahmen-inhalt {
+  background: url(g/rand_l_g.png) left top repeat-y, url(g/rand_r_g.png) right top repeat-y;
+}
+body.theme-rasse4 .rahmen::after {
+  background: url(g/rand_unten_l_g.png) left top repeat-y, url(g/rand_unten_r_g.png) right top repeat-y, url(g/rand_unten_g.png) left top repeat content-box;
 }
 
 body.theme-rasse4.mobile {
