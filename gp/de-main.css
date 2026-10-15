@@ -7678,6 +7678,7 @@ a.art-kachel-zurueck:hover::after {
 .ms-alle {
   display: flex;
   justify-content: flex-end;
+  gap: 6px;
   margin: 8px 0 0;
 }
 

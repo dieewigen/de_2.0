@@ -210,6 +210,12 @@ class map_system{
 			vs_redirect($this->system_id, $_REQUEST['fieldid'] ?? null);
 		}
 
+		//auf allen freien Rohstofffeldern die passende Industrie bauen
+		if(isset($_POST['buildallbuildings']) && $_POST['buildallbuildings']==1){
+			$this->buildMissingBuildings();
+			vs_redirect($this->system_id, $_REQUEST['fieldid'] ?? null);
+		}
+
 		//gewähltes Feld nur zum Hervorheben, geprüft wird es unten in der rechten Spalte
 		$feld_gewaehlt=isset($_REQUEST['fieldid']) ? intval($_REQUEST['fieldid']) : -1;
 
@@ -304,12 +310,27 @@ class map_system{
 
 		$content.='</div>';
 
+		//Schnellfunktionen: fehlende Industrien bauen (nur wenn ein freies Rohstofffeld mit erforschter Technologie da ist) und alle upgraden
+		$felder_bldg=array();
+		foreach($this->playerBldg as $b){
+			$felder_bldg[$b['field_id']]=$b;
+		}
+		$content.='<div class="ms-alle">';
+		if(count($this->buildableFields($felder_bldg))>0){
+			$content.='
+			<form method="post">
+				<input name="id" value="'.$this->system_id.'" type="hidden">
+				<input name="buildallbuildings" value="1" type="hidden">
+				<button type="submit" class="mod-btn mod-btn-leise" title="Fehlende Geb&auml;ude bauen&Errichtet auf allen freien Rohstofffeldern die passende Industrie (Stufe 1), soweit Technologie und Rohstoffe es erlauben. Fabriken w&auml;hlst Du &uuml;ber das Feld.">Fehlende Geb&auml;ude bauen</button>
+			</form>';
+		}
 		$content.='
-		<form method="post" class="ms-alle">
-			<input name="id" value="'.$this->system_id.'" type="hidden">
-			<input name="upgradeallbuildings" value="1" type="hidden">
-			<button type="submit" id="upgrade_all" class="mod-btn" title="Alle Geb&auml;ude upgraden&Hotkey: Leertaste">Alle Geb&auml;ude upgraden</button>
-		</form>';
+			<form method="post">
+				<input name="id" value="'.$this->system_id.'" type="hidden">
+				<input name="upgradeallbuildings" value="1" type="hidden">
+				<button type="submit" id="upgrade_all" class="mod-btn" title="Alle Geb&auml;ude upgraden&Hotkey: Leertaste">Alle Geb&auml;ude upgraden</button>
+			</form>
+		</div>';
 
 		///////////////////////////////////////////
 		//rechte Spalte
