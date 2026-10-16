@@ -5,6 +5,7 @@ use DieEwigen\DE2\View\Geheimdienst\Bericht;
 
 
 use DieEwigen\DE2\View\RealTime;
+use DieEwigen\DE2\Model\Tick\Plan;
 
 include "inc/header.inc.php";
 
@@ -770,6 +771,9 @@ if (!hasTech($pt, 9)) {
                     //////////////////////////////////////////////
                     //alle user_id der savelist durchgehen
                     //////////////////////////////////////////////
+                    //Sondenhistorie: letzter eigener Bericht über das Ziel (für die Differenz), bevor der neue dazukommt
+                    $letzte_sonde = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_user_scan_history WHERE user_id=? AND zuser_id=? ORDER BY stime DESC, id DESC LIMIT 1", [$_SESSION['ums_user_id'], $uid]));
+
                     for ($i = 0;$i < count($savelist);$i++) {
                         $save_uid = $savelist[$i];
                         //schauen, ob es schon einen eintrag in der scanliste von dem spieler gibt
@@ -781,27 +785,63 @@ if (!hasTech($pt, 9)) {
                         } else { //daten aktualisieren
                             mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_scan SET stime=UNIX_TIMESTAMP(), score=?, fleet=?, defense=?, build=?, col=?, buildings=?, rasse=?, restyp01=?, restyp02=?, restyp03=?, restyp04=?, restyp05=? WHERE user_id=? AND zuser_id=?", [$zpunkte, $zeinheiten, $vertanz, $eimbau, $zcol, $anzgeb, $zrasse, $zres[0], $zres[1], $zres[2], $zres[3], $zres[4], $save_uid, $uid]);
                         }
+
+                        //Sondenhistorie: jeden Bericht anhängen, je Ziel bleiben die letzten 10
+                        mysqli_execute_query($GLOBALS['dbi'], "INSERT INTO de_user_scan_history (user_id, zuser_id, stime, score, fleet, defense, build, col, buildings, restyp01, restyp02, restyp03, restyp04, restyp05) VALUES (?, ?, UNIX_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$save_uid, $uid, $zpunkte, $zeinheiten, $vertanz, $eimbau, $zcol, $anzgeb, $zres[0], $zres[1], $zres[2], $zres[3], $zres[4]]);
+                        $alte_sonden = mysqli_execute_query($GLOBALS['dbi'], "SELECT id FROM de_user_scan_history WHERE user_id=? AND zuser_id=? ORDER BY stime DESC, id DESC LIMIT 10, 1000", [$save_uid, $uid]);
+                        while ($alte_sonde = mysqli_fetch_assoc($alte_sonden)) {
+                            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_scan_history WHERE id=?", [$alte_sonde['id']]);
+                        }
                     }
+
+                    //Differenz zum letzten Bericht als dritte Spalte (Sondenhistorie)
+                    $sd = function ($feld, $neu) use ($letzte_sonde) {
+                        if (!$letzte_sonde) {
+                            return null;
+                        }
+                        $d = $neu - $letzte_sonde[$feld];
+                        return '<i class="'.($d > 0 ? 'gb-plus' : ($d < 0 ? 'gb-minus' : 'gb-gleich')).'">'.($d > 0 ? '+' : '').number_format($d, 0, "", ".").'</i>';
+                    };
 
                     $gb_zeilen = array();
                     if ($GLOBALS['sv_ang'] != 1) {
                         $gb_zeilen[] = array($secret_lang['onlineinnerhalb'], $isonline);
                     }
-                    $gb_zeilen[] = array($secret_lang['punkte'], number_format($zpunkte, 0, "", "."));
-                    $gb_zeilen[] = array($secret_lang['schiffseinheiten'], number_format($zeinheiten, 0, "", "."));
-                    $gb_zeilen[] = array($secret_lang['verteidigungsanlagen'], number_format($vertanz, 0, "", "."));
-                    $gb_zeilen[] = array($secret_lang['einheitenimbau'], number_format($eimbau, 0, "", "."));
-                    $gb_zeilen[] = array($secret_lang['kollektoren'], number_format($zcol, 0, "", "."));
+                    $gb_zeilen[] = array($secret_lang['punkte'], number_format($zpunkte, 0, "", "."), $sd('score', $zpunkte));
+                    $gb_zeilen[] = array($secret_lang['schiffseinheiten'], number_format($zeinheiten, 0, "", "."), $sd('fleet', $zeinheiten));
+                    $gb_zeilen[] = array($secret_lang['verteidigungsanlagen'], number_format($vertanz, 0, "", "."), $sd('defense', $vertanz));
+                    $gb_zeilen[] = array($secret_lang['einheitenimbau'], number_format($eimbau, 0, "", "."), $sd('build', $eimbau));
+                    $gb_zeilen[] = array($secret_lang['kollektoren'], number_format($zcol, 0, "", "."), $sd('col', $zcol));
                     $gb_zeilen[] = array($secret_lang['rasse'], $rasse);
                     $gb_rohstoffe = array(
-                        array($secret_lang['multiplex'], number_format($zres[0], 0, "", ".")),
-                        array($secret_lang['dyharra'], number_format($zres[1], 0, "", ".")),
-                        array($secret_lang['iradium'], number_format($zres[2], 0, "", ".")),
-                        array($secret_lang['eternium'], number_format($zres[3], 0, "", ".")),
-                        array($secret_lang['tronic'], number_format($zres[4], 0, "", ".")),
+                        array($secret_lang['multiplex'], number_format($zres[0], 0, "", "."), $sd('restyp01', $zres[0])),
+                        array($secret_lang['dyharra'], number_format($zres[1], 0, "", "."), $sd('restyp02', $zres[1])),
+                        array($secret_lang['iradium'], number_format($zres[2], 0, "", "."), $sd('restyp03', $zres[2])),
+                        array($secret_lang['eternium'], number_format($zres[3], 0, "", "."), $sd('restyp04', $zres[3])),
+                        array($secret_lang['tronic'], number_format($zres[4], 0, "", "."), $sd('restyp05', $zres[4])),
                     );
+
+                    //Vergleich mit dem letzten Bericht: Rohstoffzuwachs je WT (M + 2D + 3I + 4E, so zählen sie auch bei den
+                    //Punkten) und was er in 1.000 WT an Punkten brächte, wenn die Rohstoffe liegen bleiben
+                    if ($letzte_sonde) {
+                        $sonden_wt = Plan::anzahlZwischen($GLOBALS['wts'], (int)$letzte_sonde['stime'], time());
+                        $zuwachs = 0;
+                        for ($r = 0; $r < 4; $r++) {
+                            $zuwachs += ($zres[$r] - $letzte_sonde['restyp0'.($r + 1)]) * ($r + 1);
+                        }
+                        $gb_vergleich = array(array('Wirtschaftsticks seither', number_format($sonden_wt, 0, "", ".")));
+                        if ($sonden_wt > 0 && $zuwachs > 0) {
+                            $gb_vergleich[] = array('Rohstoffzuwachs je WT <small>(M + 2D + 3I + 4E)</small>', number_format($zuwachs / $sonden_wt, 0, "", "."));
+                            $gb_vergleich[] = array('Punkte daraus in 1.000 WT', '+'.number_format($zuwachs / $sonden_wt * 10, 0, "", "."));
+                        } else {
+                            $gb_vergleich[] = array('Rohstoffzuwachs je WT', $sonden_wt > 0 ? 'kein Zuwachs' : '&ndash;');
+                        }
+                        $gb_vergleich = Bericht::abschnitt('Seit dem letzten Bericht', RealTime::at((int)$letzte_sonde['stime'])).Bericht::werte($gb_vergleich);
+                    } else {
+                        $gb_vergleich = Bericht::meldung('Erster Sondenbericht &uuml;ber dieses Ziel. Ab dem n&auml;chsten steht die Differenz zum vorigen daneben.', 'info');
+                    }
                     echo Bericht::karte($secret_lang['sondenberichtueber'], $zname.' ('.$zsec1.':'.$zsys1.')',
-                        Bericht::werte($gb_zeilen).Bericht::abschnitt($secret_lang['rohstoffe']).Bericht::werte($gb_rohstoffe),
+                        Bericht::werte($gb_zeilen).Bericht::abschnitt($secret_lang['rohstoffe']).Bericht::werte($gb_rohstoffe).$gb_vergleich,
                         Bericht::links((int)$zsec1, (int)$zsys1, $secret_lang));
 
                     if (hasTech($zpt, 12)) {
@@ -1688,6 +1728,10 @@ if (!hasTech($pt, 9)) {
                     } else {
                         $msg = $secret_lang['einsatzentdeckt'].$_SESSION['ums_spielername'].' ('.$sector.':'.$system.$secret_lang['einsatzentdeckt2'].$aze.$secret_lang['einsatzentdeckt4'];
                     }
+                    //Spanne der eingesetzten Agenten aus der Verlustquote dieser Einsatzart (die enttarnten sind $aze Prozent davon)
+                    $msg .= ' '.sprintf($secret_lang['einsatzentdeckt_spanne'],
+                        number_format(ceil($aze * 100 / $angreifer_verlust_fail_max[$etyp]), 0, "", "."),
+                        number_format(floor(($aze + 1) * 100 / $angreifer_verlust_fail_min[$etyp]), 0, "", "."));
                     //msg um die eigenen verlust erweitern
                     /*
                     $msg.=$secret_lang[einsatzentdeckt5];

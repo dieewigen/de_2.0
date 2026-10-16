@@ -466,6 +466,13 @@ foreach(array('m','d','i','e','t') as $r => $feld){
 $summe.='<span class="geh-kosten">'.$production_lang['kapazitaet'].' <b id="k">0</b></span>';
 $summe.='<span class="geh-kosten">'.$production_lang['punkte'].' <b id="p">0</b></span>';
 
+//passender Kollektorschlüssel zu den Baukosten (Anteile M : 2D : 3I : 4E), füllt js/produktion*.js; Link zum Umstellen
+$schluessel='';
+foreach(array('m','d','i','e') as $r => $feld){
+	$schluessel.='<span class="geh-kosten" title="'.$prod_resnamen[$r].'"><img src="gp/g/icon'.($r+1).'.png" alt=""><b id="s'.$feld.'">0 %</b></span>';
+}
+$schluessel.='<a href="resource.php" class="mod-btn mod-btn-leise ally-btn-klein">Kollektoren einstellen</a>';
+
 echo '<form action="production.php" method="POST" name="produktion">';
 rahmen_oben($production_lang['produktion']);
 //Kopfzeile: Rohstoff-Icons über den Kostenspalten
@@ -495,7 +502,8 @@ echo '
 	</div>
 	<div class="prod-liste">'.$einheiten['verteidigung'].'</div>
 	<div class="geh-summe">
-		<div class="geh-summe-text"><span class="mod-typ">Baukosten</span><div class="geh-summe-werte">'.$summe.'</div></div>
+		<div class="geh-summe-text"><span class="mod-typ">Baukosten</span><div class="geh-summe-werte">'.$summe.'</div>
+			<span class="mod-typ geh-schluessel" title="Passender Kollektorschl&uuml;ssel&Mit dieser Verteilung der Kollektoren entstehen die Rohstoffe im Verh&auml;ltnis der Baukosten (Multiplex z&auml;hlt einfach, Dyharra doppelt, Iradium dreifach, Eternium vierfach).">Passender Kollektorschl&uuml;ssel</span><div class="geh-summe-werte">'.$schluessel.'</div></div>
 		<input type="Submit" name="submit" value="'.$production_lang['bauen'].'" class="mod-btn">
 	</div>';
 

@@ -224,6 +224,9 @@ class map_system{
 		//linke Spalte: die Felder, je mit Upgrade-Pfeil
 		$content.='<div class="ms-links"><div class="ms-felder">';
 
+		//Felder mit bekanntem, noch nicht geborgenem Fundstück bekommen eine kleine Marke an der Kachel
+		$fund_felder=$this->bekannteFunde();
+
 		///////////////////////////////////////////
 		//Felder durchgehen und anzeigen
 		///////////////////////////////////////////
@@ -291,8 +294,9 @@ class map_system{
 				$klasse='vs-feld vs-feld-box';
 			}
 
+			$fund=in_array($i, $fund_felder);
 			$content.='<div class="ms-feld'.($feld_gewaehlt==$i ? ' ms-feld-aktiv' : '').'">';
-			$content.='<a href="map_system.php?id='.$this->system_id.'&amp;fieldid='.$i.'" class="'.$klasse.'" title="'.$titel.$titel_stufe.'">'.$inhalt.$stufeninfo.'</a>';
+			$content.='<a href="map_system.php?id='.$this->system_id.'&amp;fieldid='.$i.'" class="'.$klasse.'" title="'.$titel.$titel_stufe.($fund ? '<br>Fundst&uuml;ck bekannt' : '').'">'.$inhalt.$stufeninfo.($fund ? '<span class="vs-fund">F</span>' : '').'</a>';
 
 			//Upgrade-Pfeil
 			if($bldg_level>0){
@@ -691,32 +695,15 @@ class map_system{
 	}
 
 	/**
-	 * Zeilen eines Systems für die VS-Übersicht (map_mobile.php), eingepackt in ein eigenes tbody,
-	 * damit die Zeile nach "alle upgraden" per AJAX ersetzt werden kann.
+	 * Filterklassen eines Systems für die VS-Übersicht (vs_filter in js/ang_fn.js): f_system, f_unsy (unerforscht),
+	 * f_spez (Sonder-System, aber nur wenn der Spieler es schon kennt: ein unerforschtes System soll nicht verraten,
+	 * dass es ein besonderes ist) und je Feld Filtertag_Stufe. Dieselben Klassen legt map_mobile.php in der Session ab,
+	 * damit die Pfeile der Systemseite im Filter nur durch die passenden Systeme führen (src/Model/VSystem/Filter.php).
 	 * $bldg: Gebäude des Spielers in diesem System, Index = field_id
 	 */
-	public function showOverviewRows($bldg, $is_explored, $is_always_visible){
-		$system_id=$this->system_id;
+	public function getFilterKlassen($bldg, $is_explored, $is_always_visible){
 		$show_details=$this->special_system<1 && $is_explored && !$is_always_visible;
-
-		if($is_explored || $is_always_visible){
-			$system_name='#'.$system_id.' - '.$this->getSystemName();
-
-			if($is_always_visible){
-				$bg_image='gp/g/s/sym3.png';
-			}else{
-				$bg_image='gp/g/s/p1.png';
-			}
-			$filter_class_unsy='';
-		}else{
-			$bg_image='gp/g/derassenlogo0.png';
-			$system_name='Unerforschtes System (#'.$system_id.')';
-			$filter_class_unsy=' f_unsy';
-		}
-
-		//die Filterklassen zusammenbauen; Sonder-Systeme bekommen f_spez, aber nur wenn der Spieler sie schon kennt
-		//(ein unerforschtes System soll nicht verraten, dass es ein besonderes ist)
-		$filter_class=' f_system'.$filter_class_unsy;
+		$filter_class=' f_system'.(($is_explored || $is_always_visible) ? '' : ' f_unsy');
 		if($this->special_system>0 && ($is_explored || $is_always_visible)){
 			$filter_class.=' f_spez';
 		}
@@ -748,6 +735,32 @@ class map_system{
 				}
 			}
 		}
+		return $filter_class;
+	}
+
+	/**
+	 * Zeilen eines Systems für die VS-Übersicht (map_mobile.php), eingepackt in ein eigenes tbody,
+	 * damit die Zeile nach "alle upgraden" per AJAX ersetzt werden kann.
+	 * $bldg: Gebäude des Spielers in diesem System, Index = field_id
+	 */
+	public function showOverviewRows($bldg, $is_explored, $is_always_visible){
+		$system_id=$this->system_id;
+		$show_details=$this->special_system<1 && $is_explored && !$is_always_visible;
+
+		if($is_explored || $is_always_visible){
+			$system_name='#'.$system_id.' - '.$this->getSystemName();
+
+			if($is_always_visible){
+				$bg_image='gp/g/s/sym3.png';
+			}else{
+				$bg_image='gp/g/s/p1.png';
+			}
+		}else{
+			$bg_image='gp/g/derassenlogo0.png';
+			$system_name='Unerforschtes System (#'.$system_id.')';
+		}
+
+		$filter_class=$this->getFilterKlassen($bldg, $is_explored, $is_always_visible);
 
 		//eine Karte je System; die Filterklassen sitzen am tbody, damit der Filter (vs_filter in ang_fn.js) die ganze Karte
 		//ein- und ausblendet. vs_upgrade_row() ersetzt das tbody und hängt seine Meldung an die erste Zelle an.
@@ -862,11 +875,13 @@ class map_system{
 			//gibt es bereits einen Außenposten/Botschaft
 			if($hasOutpost){
 				if(in_array($this->system_typ,array(1))){//bewohnbare Welt
+					//gibt es etwas zu looten? Zuerst berechnen, damit ein Bergen (collectid) verbucht ist, bevor die Felder
+					//ihre Fundstück-Marken setzen; ausgegeben werden erst die Felder, dann die Fundstücke
+					$funde=$this->showLoot();
+
 					//ggf. Felder anzeigen
 					$content.=$this->showFields();
-
-					//gibt es etwas zu looten?
-					$content.=$this->showLoot();
+					$content.=$funde;
 				}
 
 				if(in_array($this->system_typ,array(4))){//Battleground
@@ -1157,6 +1172,45 @@ class map_system{
 		return array('kosten' => $kosten, 'has_all' => $has_all);
 	}
 
+	/**
+	 * Feldnummern mit bekanntem, noch nicht geborgenem Fundstück: sichtbar ab der Gebäudestufe des Fundstücks oder über
+	 * das Fundbüro der Allianz (gleiche Regel wie showLoot()); für die Marke an den Feldkacheln in showFields().
+	 */
+	private function bekannteFunde(){
+		$looted=getUserLootByMapID($_SESSION['ums_user_id'], $this->system_id);
+		$felder=array();
+		for($i=0;$i<count($this->fields);$i++){
+			if(!isset($this->fields[$i][2][0]) || in_array($i, $looted)){
+				continue;
+			}
+			$amount=$this->fields[$i][2][2];
+			$inlevel=$this->fields[$i][2][3];
+			$bldg_level=0;
+			foreach($this->playerBldg as $b){
+				if($b['field_id']==$i){
+					$bldg_level=$b['bldg_level'];
+				}
+			}
+			if($inlevel<=$bldg_level || ($amount>0 && $this->allyKenntFund($i, $inlevel))){
+				$felder[]=$i;
+			}
+		}
+		return $felder;
+	}
+
+	/**
+	 * Kennt die Allianz das Fundstück auf Feld $i? Mit einem Fundbüro mindestens der Fundstufe, sobald ein
+	 * Allianzmitglied es geborgen hat.
+	 */
+	private function allyKenntFund($i, $inlevel){
+		if(($GLOBALS['allyid'] ?? 0)<=0 || ($GLOBALS['ally_fundbuero_level'] ?? 0)<$inlevel){
+			return false;
+		}
+		$sql="SELECT de_user_data.user_id FROM de_user_data LEFT JOIN de_user_map_loot ON (de_user_data.user_id=de_user_map_loot.user_id) WHERE de_user_data.allytag=? and de_user_data.status=1 AND de_user_map_loot.map_id=? AND de_user_map_loot.field_id=?";
+		$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, [$GLOBALS['pd']['allytag'], $this->system_id, $i]);
+		return mysqli_num_rows($db_data)>0;
+	}
+
 	public function showLoot(){
 		include 'inc/userartefact.inc.php';
 
@@ -1200,18 +1254,8 @@ class map_system{
 				}
 
 				//wenn die Allianz ein Fundbüro hat, dann hat man es evtl. schon gefunden
-				$ally_know_it=false;
 				//falls das eigene Gebäude vom Level her zu niedrig ist, ist evtl. das Gebäude von jemandem in der Allianz groß genug
-				if($amount>0 && $inlevel>$bldg_level){
-					if($GLOBALS['allyid']>0 && $GLOBALS['ally_fundbuero_level']>=$inlevel){
-						$sql="SELECT de_user_data.user_id FROM de_user_data LEFT JOIN de_user_map_loot ON (de_user_data.user_id=de_user_map_loot.user_id) WHERE de_user_data.allytag=? and de_user_data.status=1 AND de_user_map_loot.map_id=? AND de_user_map_loot.field_id=?";
-						$db_data=mysqli_execute_query($GLOBALS['dbi'], $sql, [$GLOBALS['pd']['allytag'], $this->system_id, $i]);
-						$num = mysqli_num_rows($db_data);
-						if($num>0){
-							$ally_know_it=true;
-						}
-					}
-				}
+				$ally_know_it=($amount>0 && $inlevel>$bldg_level && $this->allyKenntFund($i, $inlevel));
 
 				if($inlevel<=$bldg_level || $ally_know_it){
 					$content.='<div class="ms-fund"><span class="bk-leise">Feld '.$i.'</span><span>';

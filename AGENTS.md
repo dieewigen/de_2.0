@@ -25,8 +25,9 @@ de2/
 ├── database/                # SQL-Schemas
 │   ├── de.sql              # Hauptdatenbank-Schema
 │   ├── br.sql              # Battle Report Schema
-│   └── reset.sql           # Reset-Skript
-├── docs/                    # Dokumentation (Feldzug)
+│   ├── reset.sql           # Reset-Skript
+│   └── updates/            # datierte Schemaänderungen für laufende Server (JJJJ-MM-TT_thema.sql)
+├── docs/                    # Texte: Regeln (feldzug.md), Bestandsaufnahmen und Übergaben (extension-uebernahme.md)
 ├── gp/                      # Grafiken, Styles (CSS/SCSS)
 │   ├── de-main.scss        # Haupt-Stylesheet
 │   ├── de-chat.scss        # Chat-Stylesheet
@@ -53,7 +54,8 @@ de2/
 ├── ourdetool/               # Admintool
 ├── src/                     # PSR-4 Autoload-Klassen (DieEwigen\DE2)
 │   ├── Model/              # Spiellogik je Bereich (Alliance, Feldzug, Tick …), dazu
-│   │                       # Sperre (Spielersperre) und Nachricht (an einen Spieler)
+│   │                       # Sperre (Spielersperre) und Nachricht (an einen Spieler);
+│   │                       # Tick/Plan (nächster Tick, WT zwischen zwei Zeiten), VSystem/Filter (VS-Filter)
 │   ├── View/               # Darstellung (Kampfbericht, Berater, Alliance/Navi …)
 │   └── Session/            # CsrfToken
 ├── tests/                   # Prüfwerkzeug für Umbauten (nur Kommandozeile)
@@ -197,6 +199,8 @@ Das ultimative Spielziel:
 - `de_user_fleet`: Flotten (4 pro Spieler)
 - `de_user_news`: Nachrichten/Ereignisse
 - `de_user_hyper`: Hyperfunk-Nachrichten
+- `de_user_scan`: letzter Sondenbericht je Spieler und Ziel (mit Infophalanx an die Allianz verteilt)
+- `de_user_scan_history`: Sondenhistorie, die letzten 10 Berichte je Spieler und Ziel (Differenz im Sondenbericht)
 
 ### Allianzen
 - `de_allys`: Allianz-Hauptdaten
@@ -373,6 +377,11 @@ diff -u /tmp/vorher.css /tmp/nachher.css | patch gp/de-main.css
 ### JavaScript
 Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js` …) und hängen `filemtime` als Versionsparameter an. Die `*.min.js` im Ordner lädt keine Seite.
 
+### Ablage von Texten und Schemaänderungen
+- Texte zu Umbauten (Bestandsaufnahme, Übergabe, Regeln) nach `docs/` als Markdown, eine Datei je Thema.
+- Schemaänderungen für laufende Server nach `database/updates/JJJJ-MM-TT_thema.sql` und zusätzlich in `database/de.sql`; die Datei wird auf jedem Server zusammen mit dem Code eingespielt.
+- Keine weiteren Ablageorte anlegen, auch nicht im Wurzelverzeichnis.
+
 ## Wichtige Funktionen und Helper
 
 ### In functions.php
@@ -391,6 +400,8 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `Model\Nachricht::anSpieler($db, $uid, $text, $typ)`: Nachricht an einen Spieler (`de_user_news`)
 - `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
 - `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds
+- `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
+- `Model\VSystem\Filter::ausCookies($_COOKIE)` / `passendeIds(...)`: VS-Filter der Übersicht für die Pfeile der Systemseite
 - `Session\CsrfToken`: siehe Sicherheit
 
 ### In inc/allyjobs.inc.php

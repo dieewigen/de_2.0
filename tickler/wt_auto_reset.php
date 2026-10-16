@@ -99,6 +99,7 @@ mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_mission`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_news`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_quest`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_scan`;", []);
+mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_scan_history`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_setbounty`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_special_ship`;", []);
 //mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_user_stat`;", []);

@@ -228,6 +228,15 @@ if (isset($_GET["a"]) && $_GET["a"] == 1) {
 </head>
 <?php
 echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
+//Artefakt schützen oder freigeben (Artefaktschutz): geschützte Artefakte werden nicht zerstört und nicht in ein neues verschmolzen
+if (isset($_REQUEST['artschutz']) && isset($_REQUEST['lid'])) {
+    $schutz = intval($_REQUEST['artschutz']) == 1 ? 1 : 0;
+    mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_artefact SET schutz=? WHERE user_id=? AND lid=?", [$schutz, $_SESSION['ums_user_id'], intval($_REQUEST['lid'])]);
+    if (mysqli_affected_rows($GLOBALS['dbi']) > 0) {
+        $errmsg .= '<span class="ccg">'.($schutz == 1 ? 'Das Artefakt ist jetzt gesch&uuml;tzt.' : 'Der Schutz des Artefakts ist aufgehoben.').'</span>';
+    }
+}
+
 //artefakt zerst�ren
 if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
     //transaktionsbeginn
@@ -241,17 +250,20 @@ if (isset($_REQUEST['destroyartefact']) && $_REQUEST['destroyartefact'] == 1) {
             //id auslesen
             $row = mysqli_fetch_array($db_daten);
 
-            //ist jetzt immer zerstörbar
-            //if($ua_useable[$row["id"]-1]!=1){
-            //artefakt löschen
-            mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
+            if (($row['schutz'] ?? 0) == 1) {
+                //Artefaktschutz
+                $errmsg .= '<span class="ccr">Das Artefakt ist gesch&uuml;tzt und wird nicht zerst&ouml;rt.</span>';
+            } else {
+                //ist jetzt immer zerstörbar
+                //artefakt löschen
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_artefact WHERE lid=?", [$lid]);
 
-            //palenium gutschreiben
-            change_storage_amount($_SESSION['ums_user_id'], 1, 100 * $row['level']);
+                //palenium gutschreiben
+                change_storage_amount($_SESSION['ums_user_id'], 1, 100 * $row['level']);
 
-            //message ausgeben
-            $errmsg .= $artefacts_lang['fehler8'];
-            //}
+                //message ausgeben
+                $errmsg .= $artefacts_lang['fehler8'];
+            }
         } else {
             $errmsg .= '<span class="ccr">'.$artefacts_lang['fehler6'].'</span>';
         }
@@ -531,8 +543,12 @@ if (isset($_REQUEST['mergeartefacts']) && $_REQUEST['mergeartefacts'] == 1) {
 
             //überprüfen ob die artefakte unterschiedlicher art sind
             if ($id1 != $id2) {//wenn sie unterschiedlich sind, dann muss ein neues artefakt erzeugt werden und die beiden alten gel�scht werden
+                if (($row1['schutz'] ?? 0) == 1 || ($row2['schutz'] ?? 0) == 1) {
+                    //Artefaktschutz: nur die Verschmelzung in ein neues Artefakt ist gesperrt
+                    $errmsg .= '<span class="ccr">Eines der Artefakte ist gesch&uuml;tzt und wird nicht in ein neues verschmolzen.</span>';
+                }
                 //überprüfen ob man genug tronic hat
-                if ($restyp05 >= $tcost2) {
+                elseif ($restyp05 >= $tcost2) {
                     //rohstoffe abziehen
                     $restyp05 = $restyp05 - $tcost2;
                     mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET restyp05=restyp05-? WHERE user_id=?", [$tcost2, $_SESSION['ums_user_id']]);
@@ -795,12 +811,14 @@ if (!hasTech($pt, 28)) {
     $ac = 0;
     while ($row = mysqli_fetch_array($db_artefakte)) {
         $id = $row['id'];
-        echo artefact_kachel($id, $row['level'], $ua_maxlvl[$id - 1], ' data-i="'.$ac.'" data-nr="" rel="tooltip" title="'.artefact_tooltip($id, $row['level']).'"');
+        $schutz = (int)($row['schutz'] ?? 0);
+        echo artefact_kachel($id, $row['level'], $ua_maxlvl[$id - 1], ' data-i="'.$ac.'" data-nr="" rel="tooltip" title="'.artefact_tooltip($id, $row['level']).($schutz == 1 ? '<br><br>Gesch&uuml;tzt: wird nicht zerst&ouml;rt und nicht in ein neues Artefakt verschmolzen.' : '').'"', $schutz == 1 ? ' art-schutz' : '');
 
         //daten für das Skript
         $artefacts[$ac] = array(
             'lid' => (int)$row['lid'],
             'id' => (int)$id,
+            'schutz' => $schutz,
             'level' => (int)$row['level'],
             'maxlevel' => (int)$ua_maxlvl[$id - 1],
             'useable' => (int)($ua_useable[$id - 1] ?? 0),
@@ -829,6 +847,7 @@ if (!hasTech($pt, 28)) {
 			<li>'.$artefacts_lang['upinfo1'].' Kosten: '.$tcost1.' Tronic.</li>
 			<li>'.$artefacts_lang['upinfo2'].' Kosten: '.$tcost2.' Tronic.</li>
 			<li>Das Artefakt kann auch zerst&ouml;rt und in Palenium (100 pro Artefaktstufe) umgewandelt werden.</li>
+			<li>Gesch&uuml;tzte Artefakte (Schloss) werden weder zerst&ouml;rt noch in ein neues Artefakt verschmolzen; die Verschmelzung gleicher Art zur n&auml;chsten Stufe bleibt m&ouml;glich. Den Schutz setzt und l&ouml;st Du nach dem Antippen des Artefakts.</li>
 			<li>'.$artefacts_lang['upinfo5'].'</li>
 		</ul>
 	</details>';
@@ -1001,7 +1020,14 @@ echo 'var artInfo = '.json_encode(array('tronic' => (int)$restyp05, 'kosten1' =>
       }else{
         wirkung = '<div class="art-wahl-desc">Dieses Artefakt wirkt, solange es im Artefaktgebäude liegt.</div>';
       }
-      knoepfe += knopf('artefacts.php?destroyartefact=1&lid=' + x.lid, 'Zerstören · +' + (100 * x.level) + ' Palenium', 'Wirklich zerstören?', true);
+      //Artefaktschutz: geschützt gibt es kein Zerstören, dafür den Knopf zum Freigeben
+      if(x.schutz == 1){
+        knoepfe += knopf('artefacts.php?artschutz=0&lid=' + x.lid, 'Schutz aufheben');
+        knoepfe += grund('Geschützt: kein Zerstören, keine Verschmelzung in ein neues Artefakt');
+      }else{
+        knoepfe += knopf('artefacts.php?artschutz=1&lid=' + x.lid, 'Schützen');
+        knoepfe += knopf('artefacts.php?destroyartefact=1&lid=' + x.lid, 'Zerstören · +' + (100 * x.level) + ' Palenium', 'Wirklich zerstören?', true);
+      }
 
       html = '<div class="art-wahl">' + kachel(x, x.level)
         + '<div class="art-wahl-text"><div class="mod-typ">Artefakt · Stufe ' + x.level + ' von ' + x.maxlevel + '</div>'
@@ -1014,7 +1040,11 @@ echo 'var artInfo = '.json_encode(array('tronic' => (int)$restyp05, 'kosten1' =>
         text = 'Diese beiden Artefakte können in ein zufälliges Artefakt der Stufe 1 verschmolzen werden. Das Zielartefakt wird anderer Art als die Quellartefakte sein.';
         ziel = '<div class="art-kachel art-kachel-frei">?</div>';
         kosten = artInfo.kosten2;
-        knoepfe = knopf('artefacts.php?mergeartefacts=1&lid1=' + x.lid + '&lid2=' + y.lid, 'Neues Artefakt erzeugen · ' + kosten + ' Tronic', 'Wirklich verschmelzen?');
+        if(x.schutz == 1 || y.schutz == 1){
+          knoepfe = grund('Ein gewähltes Artefakt ist geschützt');
+        }else{
+          knoepfe = knopf('artefacts.php?mergeartefacts=1&lid1=' + x.lid + '&lid2=' + y.lid, 'Neues Artefakt erzeugen · ' + kosten + ' Tronic', 'Wirklich verschmelzen?');
+        }
       }else if(x.level != y.level){
         text = '<span class="art-wahl-fehler">Artefakte der gleichen Art, aber mit unterschiedlicher Stufe können nicht verschmolzen werden.</span>';
       }else if(x.level >= x.maxlevel){

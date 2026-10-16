@@ -18,6 +18,8 @@ $row = mysqli_fetch_array($result);
 $restyp01=$row[0];$restyp02=$row[1];$restyp03=$row[2];$restyp04=$row[3];$restyp05=$row[4];$punkte=$row["score"];
 $newtrans=$row["newtrans"];$newnews=$row["newnews"];$sector=$row["sector"];$system=$row["system"];
 $allytag=$row["allytag"];$status=$row["status"];
+//$allytag wird unten mit dem Aufrufparameter überschrieben, der eigene Tag bleibt hier erhalten
+$eigener_allytag=$row["allytag"];
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -54,6 +56,7 @@ if($num==1)
 	//alle Texte stammen von Spielern und werden für die Ausgabe escaped bzw. gesäubert
 	$clanname 		= html_text($row["allyname"]);
 	$clankuerzel 	= html_text($row["allytag"]);
+	$clantag_roh	= $row["allytag"];
 	$leaderid		= $row["leaderid"];
 	$homepageurl 	= safe_http_url($row["homepage"]);
 	$memberlimit 	= $row["memberlimit"];
@@ -104,6 +107,28 @@ if($num==1)
 			(!empty(trim($openirc)) ? '<a href="https://discord.gg/'.$openirc.'" target="_blank" class="mod-btn mod-btn-leise">Discord</a>' : '').
 			($homepageurl != '' ? '<a href="'.$homepageurl.'" target="_blank" class="mod-btn mod-btn-leise" title="'.$homepageurl.'">'.$allydetail_lang['homepage'].'</a>' : '').
 			((empty(trim($openirc)) && $homepageurl == '') ? '<small>keine Angaben</small>' : '').'</span></div>
+	</div>';
+
+	//Bekannte Mitglieder: Spieler, deren Allianztag in den eigenen Sondendaten steht (Geheimdiensteinsatz "Allianztag",
+	//mit Infophalanx auch die Einsätze der Allianz); die eigene Allianz hat ihre vollständige Liste auf ally_members.php
+	if($status==1 && $eigener_allytag==$clantag_roh){
+		$bekannte='<a href="ally_members.php" class="mod-btn mod-btn-leise ally-btn-klein">Zur Mitgliederliste</a>';
+	}else{
+		$zeilen='';
+		$result=mysqli_execute_query($GLOBALS['dbi'],
+		    "SELECT d.spielername, d.sector, d.`system` FROM de_user_scan s JOIN de_user_data d ON (d.user_id=s.zuser_id)
+		     WHERE s.user_id=? AND s.allytag=? AND d.status=1 ORDER BY d.sector, d.`system`",
+		    [$_SESSION['ums_user_id'], $clantag_roh]);
+		while($mitglied=mysqli_fetch_assoc($result)){
+			$zeilen.='<div class="ally-bekannt"><a href="details.php?se='.(int)$mitglied['sector'].'&amp;sy='.(int)$mitglied['system'].'" class="ally-mitglied-name">'.html_text($mitglied['spielername']).'</a><span class="ally-zahl">'.(int)$mitglied['sector'].':'.(int)$mitglied['system'].'</span></div>';
+		}
+		$bekannte=($zeilen!='') ? '<div class="ally-zeilen">'.$zeilen.'</div>'
+			: '<div class="ally-hinweis">Noch keine bekannt. Allianztags erf&auml;hrt man &uuml;ber den Geheimdienst (Einsatz &bdquo;Allianztag&ldquo;), mit Infophalanx auch aus den Eins&auml;tzen der eigenen Allianz.</div>';
+	}
+	echo '
+	<div class="ally-abschnitt">
+		<div class="mod-typ">Bekannte Mitglieder</div>
+		'.$bekannte.'
 	</div>';
 
 	echo '

@@ -244,6 +244,7 @@ if($sec_data['npc']==1){
 	sector_th($sec_lang['sys'], 'sec-sys', 1, $sort_sso, $sf).
 	sector_th($sec_lang['name'], 'sec-name').
 	sector_th($sec_lang['punkte'], 'sec-zahl', 3, $sort_sso, $sf).
+	sector_th('FP', 'sec-zahl sec-fp').
 	sector_th($sec_lang['kollektoren'], 'sec-zahl sec-kol', 2, $sort_sso, $sf).
 	sector_th($sec_lang['aktion'], 'sec-aktion').'
 	</tr></thead><tbody>';
@@ -260,6 +261,9 @@ if($sec_data['npc']==1){
 		$csstag=($punkte*$sec_angriffsgrenze<=$row['score']) ? 'sec-gruen' : 'sec-rot';
 		echo '<td class="sec-zahl '.$csstag.'"><span title="'.sector_punkte_tooltip().'">'.number_format($row['score'], 0,"",".").'</span></td>';
 
+		//Flottenpunkte
+		echo '<td class="sec-zahl sec-fp"><span title="Flottenpunkte&Punktewert aller Schiffe und Verteidigungsanlagen.<br>'.number_format($row['fleetscore'] ?? 0, 0,"",".").'">'.formatMasseinheit($row['fleetscore'] ?? 0).'</span></td>';
+
 		//kollektoren
 		$csstag=($col*$col_angriffsgrenze_final<=$row['col']) ? 'sec-gruen' : 'sec-rot';
 		echo '<td class="sec-zahl '.$csstag.'"><span title="'.wellenrechner($row['col'], $maxcol, 1).'">'.number_format($row['col'], 0,"",".").'</span></td>';
@@ -271,7 +275,7 @@ if($sec_data['npc']==1){
 	}
 
 	//sektorendaten
-	echo '</tbody><tfoot><tr><td colspan="5">'.$sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze*100, 2,",",".").'% / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%</td></tr></tfoot>';
+	echo '</tbody><tfoot><tr><td colspan="6">'.$sec_lang['angriffsgrenze'].': '.number_format($sec_angriffsgrenze*100, 2,",",".").'% / '.number_format($col_angriffsgrenze_final*100, 2,",",".").'%</td></tr></tfoot>';
 	echo '</table>';
 
 	//hinweistext für npc-sektoren
@@ -380,6 +384,7 @@ if($sec_data['npc']==1){
 	sector_th($sec_lang['rasse'], 'sec-rasse').
 	sector_th($sec_lang['allianz'], 'sec-ally').
 	sector_th($sec_lang['punkte'], 'sec-zahl', 3, $sort_sso, $sf).
+	sector_th('FP', 'sec-zahl sec-fp').
 	sector_th($sec_lang['kollektoren'], 'sec-zahl sec-kol', 2, $sort_sso, $sf).
 	sector_th($sec_lang['aktion'], 'sec-aktion').'
 	</tr></thead><tbody>';
@@ -387,7 +392,7 @@ if($sec_data['npc']==1){
 	//die spielerdaten laden
 	if($sf==1 && !isset($_REQUEST['showall'])){
 		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode,
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.fleetscore, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc,
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_login.status=1 AND de_user_data.sector=? ORDER BY $orderby ASC";
@@ -395,7 +400,7 @@ if($sec_data['npc']==1){
 	}else{
 		//alles anzeigen
 		$sql = "SELECT de_user_data.spielername, de_login.owner_id, de_login.status AS lstatus, de_login.delmode,
-		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
+		de_login.last_login, de_login.last_click, de_login.user_id, de_user_data.score, de_user_data.fleetscore, de_user_data.col, de_user_data.`system`, de_user_data.rasse, de_user_data.allytag,
 		de_user_data.status, de_user_data.votefor, de_user_data.rang, de_user_data.npc,
 		de_user_data.kg01, de_user_data.kg02,  de_user_data.kg03,  de_user_data.kg04
 		FROM de_login left join de_user_data on(de_login.user_id = de_user_data.user_id)WHERE de_user_data.sector=? ORDER BY $orderby ASC";
@@ -560,6 +565,11 @@ if($sec_data['npc']==1){
 		}
 
 		$output.='<td class="sec-zahl '.$csstag.'"><span title="'.sector_punkte_tooltip($kopfgeld).'">'.number_format($row['score'], 0,"",".").'</span></td>';
+
+		////////////////////////////////////////////////////////////////////////
+		//Flottenpunkte: Punktewert aller Schiffe und Verteidigungsanlagen (fleetscore aus dem WT)
+		////////////////////////////////////////////////////////////////////////
+		$output.='<td class="sec-zahl sec-fp"><span title="Flottenpunkte&Punktewert aller Schiffe und Verteidigungsanlagen.<br>'.number_format($row['fleetscore'] ?? 0, 0,"",".").'">'.formatMasseinheit($row['fleetscore'] ?? 0).'</span></td>';
 
 		////////////////////////////////////////////////////////////////////////
 		//kollektoren

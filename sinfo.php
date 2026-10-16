@@ -40,19 +40,6 @@ function si_plan($ticks)
 	return array_values(array_filter($zeilen, fn($z) => count($z[2]) > 0));
 }
 
-//nächster planmäßiger Tick ab der kommenden Minute (Echtzeit)
-function si_naechster($ticks)
-{
-	$start = (int)(floor(time() / 60) * 60) + 60;
-	for ($i = 0; $i < 24 * 60; $i++) {
-		$t = $start + $i * 60;
-		if (in_array((int)date('i', $t), array_map('intval', $ticks[(int)date('G', $t)] ?? array()))) {
-			return $t;
-		}
-	}
-	return 0;
-}
-
 //Anzahl Ticks pro Tag
 function si_anzahl($ticks)
 {
@@ -81,8 +68,9 @@ rahmen_unten();
 
 rahmen_oben('Tickzeiten');
 echo '<div class="mod si">';
-$naechster_wt = si_naechster($GLOBALS['wts']);
-$naechster_kt = si_naechster($GLOBALS['kts']);
+//nächster planmäßiger Tick ab der kommenden Minute (Echtzeit), gleiche Rechnung wie der Countdown in dm.php
+$naechster_wt = \DieEwigen\DE2\Model\Tick\Plan::naechster($GLOBALS['wts']);
+$naechster_kt = \DieEwigen\DE2\Model\Tick\Plan::naechster($GLOBALS['kts']);
 echo '<div class="si-kacheln">';
 echo '<div class="ov-wert"><span class="mod-typ">N&auml;chster Wirtschaftstick</span><b>'.($naechster_wt > 0 ? \DieEwigen\DE2\View\RealTime::at($naechster_wt) : '&ndash;').'</b><small>zuletzt '.\DieEwigen\DE2\View\RealTime::at(strtotime($deSystem['lasttick'])).' &middot; '.si_anzahl($GLOBALS['wts']).' WT am Tag</small></div>';
 echo '<div class="ov-wert"><span class="mod-typ">N&auml;chster Kampftick</span><b>'.($naechster_kt > 0 ? \DieEwigen\DE2\View\RealTime::at($naechster_kt) : '&ndash;').'</b><small>zuletzt '.\DieEwigen\DE2\View\RealTime::at(strtotime($deSystem['lastmtick'])).' &middot; '.si_anzahl($GLOBALS['kts']).' KT am Tag</small></div>';

@@ -4220,7 +4220,8 @@ CREATE TABLE `de_user_artefact` (
   `lid` int(10) UNSIGNED NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `id` mediumint(8) UNSIGNED NOT NULL DEFAULT 0,
-  `level` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+  `level` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `schutz` tinyint(1) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4874,6 +4875,31 @@ CREATE TABLE `de_user_scan` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_user_scan_history`
+-- (Sondenhistorie: die letzten 10 Sondenberichte je Spieler und Ziel, secret.php)
+--
+
+CREATE TABLE `de_user_scan_history` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `zuser_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `stime` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `score` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `fleet` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `defense` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `build` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `col` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `buildings` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `restyp01` double(20,2) NOT NULL DEFAULT 0.00,
+  `restyp02` double(20,2) NOT NULL DEFAULT 0.00,
+  `restyp03` double(20,2) NOT NULL DEFAULT 0.00,
+  `restyp04` double(20,2) NOT NULL DEFAULT 0.00,
+  `restyp05` int(10) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_user_setbounty`
 --
 
@@ -5519,6 +5545,13 @@ ALTER TABLE `de_user_scan`
   ADD KEY `zuser_id` (`zuser_id`);
 
 --
+-- Indizes für die Tabelle `de_user_scan_history`
+--
+ALTER TABLE `de_user_scan_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `ziel` (`user_id`,`zuser_id`);
+
+--
 -- Indizes für die Tabelle `de_user_setbounty`
 --
 ALTER TABLE `de_user_setbounty`
@@ -5770,6 +5803,12 @@ ALTER TABLE `de_user_log`
 -- AUTO_INCREMENT für Tabelle `de_user_mission`
 --
 ALTER TABLE `de_user_mission`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT für Tabelle `de_user_scan_history`
+--
+ALTER TABLE `de_user_scan_history`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --

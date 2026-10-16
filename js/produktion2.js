@@ -431,6 +431,13 @@ document.getElementById("e").innerHTML=f1+number_format(e)+f2;
 if(t>hasres[4]){f1='<font color="#FF0000">';f2='</font>';}else{f1='';f2='';}
 document.getElementById("t").innerHTML=f1+number_format(t)+f2;
 
+//passender Kollektorschluessel: Anteile der Baukosten, Dyharra zaehlt doppelt, Iradium dreifach, Eternium vierfach (production.php)
+var sg=m+d*2+i*3+e*4;
+document.getElementById("sm").innerHTML=(sg>0?Math.round(m/sg*100):0)+" %";
+document.getElementById("sd").innerHTML=(sg>0?Math.round(d*2/sg*100):0)+" %";
+document.getElementById("si").innerHTML=(sg>0?Math.round(i*3/sg*100):0)+" %";
+document.getElementById("se").innerHTML=(sg>0?Math.round(e*4/sg*100):0)+" %";
+
 if(document.produktion.b81)
 {
 document.getElementById("k").innerHTML=number_format(k*traegerbonus);

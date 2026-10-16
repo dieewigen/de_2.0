@@ -59,6 +59,7 @@ $secret_lang['einsatzentdeckt5']=' Bei dem Einsatz gingen ';
 $secret_lang['einsatzentdeckt6']=' eigene Einheit für den Geheimdienst verloren und arbeitet jetzt als Zöllner.';
 $secret_lang['einsatzentdeckt7']=' eigene Einheiten für den Geheimdienst verloren und arbeiten jetzt als Zöllner.';
 $secret_lang['einsatzentdeckt8']='keine eigenen Einheiten verloren.';
+$secret_lang['einsatzentdeckt_spanne']='Vermutlich waren zwischen %s und %s Agenten im Einsatz.';
 $secret_lang['einsatzfehlerhaft']='Die Einsatzbefehle sind fehlerhaft.';
 $secret_lang['einsatzgescheitert']='Der Einsatz ist gescheitert. ';
 $secret_lang['einsatzgescheitert2']=' der Agenten wurden enttarnt und arbeiten jetzt als Zöllner.';

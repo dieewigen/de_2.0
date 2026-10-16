@@ -18,12 +18,13 @@ class Bericht
         return '<div class="gb-abschnitt"><span>'.$titel.'</span>'.($zeit !== '' ? '<small>'.$zeit.'</small>' : '').'</div>';
     }
 
-    //Wertepaare: Bezeichnung links, Wert rechts
+    //Wertepaare: Bezeichnung links, Wert rechts; ein drittes Element steht als Differenz daneben (Sondenhistorie)
     public static function werte(array $paare): string
     {
         $html = '<div class="gb-werte">';
         foreach ($paare as $p) {
-            $html .= '<div class="gb-wert"><span>'.$p[0].'</span><b>'.$p[1].'</b></div>';
+            $html .= '<div class="gb-wert"><span>'.$p[0].'</span><b>'.$p[1].'</b>'
+                .(isset($p[2]) ? '<small class="gb-diff">'.$p[2].'</small>' : '').'</div>';
         }
 
         return $html.'</div>';

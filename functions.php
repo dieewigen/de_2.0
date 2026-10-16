@@ -489,59 +489,58 @@ function generate_vsystem_kopfzeile($system_id, $sytem_name)
     //////////////////////////////////////////////////////////////
     //Wechselmöglichkeit erzeugen, zur niedrigeren/höheren ID
     //////////////////////////////////////////////////////////////
-    $link_lower = '';
-    $link_higher = '';
+    //im Filter der Übersicht (Cookies vsf0a/b/c, vs_filter in js/ang_fn.js) führen die Pfeile nur durch die passenden
+    //Systeme; ihre Filterklassen hat map_mobile.php beim letzten Aufruf in der Session abgelegt (src/Model/VSystem/Filter.php)
+    $filter = \DieEwigen\DE2\Model\VSystem\Filter::ausCookies($_COOKIE);
+    $gefiltert = null;
+    if ($filter !== null && !empty($_SESSION['vs_filterklassen'])) {
+        $gefiltert = \DieEwigen\DE2\Model\VSystem\Filter::passendeIds($_SESSION['vs_filterklassen'], $filter);
+    }
+    $im_filter = ($gefiltert !== null) ? ' (im Filter)' : '';
 
     //ggf. Tooltip für Hotkey anzeigen
     $tooltip_lower = '';
     $tooltip_higher = '';
     $tooltip_map = '';
     if ($_SESSION['ums_mobi'] != 1) {
-        $tooltip_lower = ' title="Voriges System&Hotkeys: a, &larr;"';
-        $tooltip_higher = ' title="N&auml;chstes System&Hotkeys: d, &rarr;"';
+        $tooltip_lower = ' title="Voriges System'.$im_filter.'&Hotkeys: a, &larr;"';
+        $tooltip_higher = ' title="N&auml;chstes System'.$im_filter.'&Hotkeys: d, &rarr;"';
         $tooltip_map = ' title="&Uuml;bersicht&Hotkeys: w, &uarr;"';
-
     }
 
-    //erste
-    $link_first = '<span class="ms-nav ms-nav-aus">&laquo;</span>';
-    $sql = "SELECT MIN(map_id) AS map_id FROM de_user_map WHERE user_id=? LIMIT 1;";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $row = mysqli_fetch_array($db_daten);
-    $id_first = $row['map_id'];
-    if ($id_first > 0) {
-        $link_first = '<a href="?id='.$id_first.'" class="ms-nav" title="Erstes System">&laquo;</a>';
+    if ($gefiltert !== null) {
+        //erstes, letztes, voriges und nächstes System im Filter
+        $id_first = $gefiltert[0] ?? -1;
+        $id_last = count($gefiltert) > 0 ? $gefiltert[count($gefiltert) - 1] : -1;
+        $id_lower = -1;
+        $id_higher = -1;
+        foreach ($gefiltert as $gid) {
+            if ($gid < $system_id) {
+                $id_lower = $gid;
+            } elseif ($gid > $system_id && $id_higher < 0) {
+                $id_higher = $gid;
+            }
+        }
+    } else {
+        //erste und letzte bekannte System-ID, dann die nächstniedrigere und nächsthöhere
+        $sql = "SELECT MIN(map_id) AS map_id, MAX(map_id) AS map_id_max FROM de_user_map WHERE user_id=?;";
+        $row = mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]));
+        $id_first = $row['map_id'] ?? -1;
+        $id_last = $row['map_id_max'] ?? -1;
+
+        $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id < ? ORDER BY map_id DESC LIMIT 1;";
+        $row = mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]));
+        $id_lower = $row['map_id'] ?? -1;
+
+        $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id > ? ORDER BY map_id ASC LIMIT 1;";
+        $row = mysqli_fetch_array(mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]));
+        $id_higher = $row['map_id'] ?? -1;
     }
 
-    //letzte
-    $link_last = '<span class="ms-nav ms-nav-aus">&raquo;</span>';
-    $sql = "SELECT MAX(map_id) AS map_id FROM de_user_map WHERE user_id=? LIMIT 1;";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id']]);
-    $row = mysqli_fetch_array($db_daten);
-    $id_last = $row['map_id'];
-    if ($id_last > 0) {
-        $link_last = '<a href="?id='.$id_last.'" class="ms-nav" title="Letztes System">&raquo;</a>';
-    }
-
-    //niedriger
-    $link_lower = '<span class="ms-nav ms-nav-aus">&lsaquo;</span>';
-    $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id < ? ORDER BY map_id DESC LIMIT 1;";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]);
-    $row = mysqli_fetch_array($db_daten);
-    $id_lower = $row['map_id'] ?? -1;
-    if ($id_lower > 0) {
-        $link_lower = '<a id="link_lower" href="?id='.$id_lower.'" class="ms-nav"'.$tooltip_lower.'>&lsaquo;</a>';
-    }
-
-    //höher
-    $link_higher = '<span class="ms-nav ms-nav-aus">&rsaquo;</span>';
-    $sql = "SELECT map_id FROM de_user_map WHERE user_id=? AND map_id > ? ORDER BY map_id ASC LIMIT 1;";
-    $db_daten = mysqli_execute_query($GLOBALS['dbi'], $sql, [$_SESSION['ums_user_id'], $system_id]);
-    $row = mysqli_fetch_array($db_daten);
-    $id_higher = $row['map_id'] ?? -1;
-    if ($id_higher > 0) {
-        $link_higher = '<a id="link_higher" href="?id='.$id_higher.'" class="ms-nav"'.$tooltip_higher.'>&rsaquo;</a>';
-    }
+    $link_first = ($id_first > 0) ? '<a href="?id='.$id_first.'" class="ms-nav" title="Erstes System'.$im_filter.'">&laquo;</a>' : '<span class="ms-nav ms-nav-aus">&laquo;</span>';
+    $link_last = ($id_last > 0) ? '<a href="?id='.$id_last.'" class="ms-nav" title="Letztes System'.$im_filter.'">&raquo;</a>' : '<span class="ms-nav ms-nav-aus">&raquo;</span>';
+    $link_lower = ($id_lower > 0) ? '<a id="link_lower" href="?id='.$id_lower.'" class="ms-nav"'.$tooltip_lower.'>&lsaquo;</a>' : '<span class="ms-nav ms-nav-aus">&lsaquo;</span>';
+    $link_higher = ($id_higher > 0) ? '<a id="link_higher" href="?id='.$id_higher.'" class="ms-nav"'.$tooltip_higher.'>&rsaquo;</a>' : '<span class="ms-nav ms-nav-aus">&rsaquo;</span>';
 
     //////////////////////////////////////////////////////////////
     // Kopfzeile

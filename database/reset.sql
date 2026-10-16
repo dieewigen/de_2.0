@@ -97,6 +97,7 @@ DELETE FROM `de_user_mission`;
 DELETE FROM `de_user_news`;
 DELETE FROM `de_user_quest`;
 DELETE FROM `de_user_scan`;
+DELETE FROM `de_user_scan_history`;
 DELETE FROM `de_user_setbounty`;
 DELETE FROM `de_user_special_ship`;
 DELETE FROM `de_user_storage`;

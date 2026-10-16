@@ -119,11 +119,13 @@ $chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
 		echo '<img onclick="switch_iframe_main_container(\'missions.php\')" id="tb_infocenter_missions" src="gp/g/icon14.png" class="rounded-borders" style="display: none; cursor: pointer; position: absolute; left: 406px; top: 36px; width: 24px; height: auto;" rel="tooltip">'; 
 
 
-		//Serverzeit, letzter WT und KT (füllt resline.php), Klick zu den Serverinfos
+		//Serverzeit, letzter WT und KT (füllt resline.php), Klick zu den Serverinfos; der Punkt rechts oben schaltet auf den
+		//Countdown bis zum nächsten WT und KT um (dm_zeit_umschalten unten)
 		echo '<div onclick="switch_iframe_main_container(\'sinfo.php\')" class="dm-zeiten" title="Serverinfos" rel="tooltip">
 				<span class="mod-typ">Zeit</span><b id="tb_time1"></b>
 				<span class="mod-typ">WT</span><b id="tb_time2"></b>
 				<span class="mod-typ">KT</span><b id="tb_time3"></b>
+				<span class="dm-zeiten-modus" onclick="dm_zeit_umschalten(event)" title="Countdown bis zum n&auml;chsten Tick ein- oder ausschalten"></span>
 			</div>';
 		
 		//Menüpunkte als Reiter: ein normaler Klick öffnet die Seite in der Spielspalte (Technologien im großen Fenster),
@@ -296,6 +298,89 @@ function dm_menu_markieren(seite){
 	});
 }
 window.setInterval(function(){ dm_menu_markieren(); }, 500);
+
+//Countdown bis zum nächsten WT und KT statt der letzten Tickzeiten: Schalter rechts oben in .dm-zeiten, Stellung in
+//localStorage (de_zeitmodus). Uhr und Ticks laufen nach der Serverzeit: resline.php schreibt sie bei jedem Seitenaufruf
+//in data-jetzt, der Tickplan ist $wts/$kts aus sv.inc.php (je Stunde die Minuten), tz der Versatz der Serveruhr zu UTC
+<?php
+$dm_tickplan = array('wt' => array(), 'kt' => array(), 'tz' => (int)date('Z'));
+for ($h = 0; $h <= 23; $h++) {
+	$dm_tickplan['wt'][] = array_map('intval', $GLOBALS['wts'][$h] ?? array());
+	$dm_tickplan['kt'][] = array_map('intval', $GLOBALS['kts'][$h] ?? array());
+}
+echo 'var dm_tickplan = '.json_encode($dm_tickplan).';';
+?>
+
+var dm_zeit_sync = '', dm_zeit_versatz = 0;
+
+function dm_zweistellig(n){
+	return (n < 10 ? '0' : '') + n;
+}
+
+//nächster planmäßiger Tick nach der Serverzeit t (Sekunden), 0 ohne Tick im Plan; wie Model\Tick\Plan::naechster()
+function dm_naechster_tick(plan, t){
+	var start = Math.floor(t / 60) * 60 + 60;
+	for(var i = 0; i < 24 * 60; i++){
+		var d = new Date((start + i * 60 + dm_tickplan.tz) * 1000);
+		if(plan[d.getUTCHours()] && plan[d.getUTCHours()].indexOf(d.getUTCMinutes()) >= 0){
+			return start + i * 60;
+		}
+	}
+	return 0;
+}
+
+function dm_zeit_rest(id, rest){
+	var el = document.getElementById(id);
+	el.textContent = rest > 0 ? Math.floor(rest / 60) + ':' + dm_zweistellig(rest % 60) : '–';
+	//letzte Minute vor dem Tick blinkt
+	el.classList.toggle('dm-zeit-bald', rest > 0 && rest <= 60);
+}
+
+function dm_zeit_tick(){
+	var feld = document.querySelector('.dm-zeiten');
+	var jetzt = feld.getAttribute('data-jetzt');
+	if(!feld.classList.contains('dm-zeiten-countdown') || !jetzt){
+		return;
+	}
+	if(jetzt !== dm_zeit_sync){
+		//resline.php hat die Serverzeit neu geschrieben: Versatz zur Browseruhr neu bestimmen
+		dm_zeit_sync = jetzt;
+		dm_zeit_versatz = parseInt(jetzt, 10) - Math.floor(Date.now() / 1000);
+	}
+	var t = Math.floor(Date.now() / 1000) + dm_zeit_versatz;
+	var d = new Date((t + dm_tickplan.tz) * 1000);
+	document.getElementById('tb_time1').textContent = dm_zweistellig(d.getUTCHours()) + ':' + dm_zweistellig(d.getUTCMinutes());
+	dm_zeit_rest('tb_time2', dm_naechster_tick(dm_tickplan.wt, t) - t);
+	dm_zeit_rest('tb_time3', dm_naechster_tick(dm_tickplan.kt, t) - t);
+}
+
+function dm_zeit_umschalten(e){
+	e.stopPropagation();
+	var feld = document.querySelector('.dm-zeiten');
+	var an = !feld.classList.contains('dm-zeiten-countdown');
+	feld.classList.toggle('dm-zeiten-countdown', an);
+	try{
+		localStorage.setItem('de_zeitmodus', an ? '1' : '0');
+	}catch(err){}
+	if(an){
+		dm_zeit_tick();
+		return;
+	}
+	//zurück zu den Tickzeiten, die resline.php zuletzt geliefert hat
+	var uhr = (feld.getAttribute('data-uhr') || '').split(' ');
+	['tb_time1', 'tb_time2', 'tb_time3'].forEach(function(id, i){
+		var el = document.getElementById(id);
+		el.textContent = uhr[i] || '';
+		el.classList.remove('dm-zeit-bald');
+	});
+}
+
+try{
+	if(localStorage.getItem('de_zeitmodus') === '1'){
+		document.querySelector('.dm-zeiten').classList.add('dm-zeiten-countdown');
+	}
+}catch(err){}
+window.setInterval(dm_zeit_tick, 1000);
 </script>
 </body>
 </html>

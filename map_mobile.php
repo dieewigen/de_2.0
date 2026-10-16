@@ -225,6 +225,7 @@ if(!hasTech($pt,25)){
 	}
 
 	//Systeme laden
+	$vs_filterklassen=array();
 	$db_daten=mysqli_execute_query($GLOBALS['dbi'], "SELECT * FROM de_map_objects", []);
 	while($row = mysqli_fetch_array($db_daten)){
 		if(!in_array($row['id'], $sichtbare_systeme)){
@@ -235,8 +236,14 @@ if(!hasTech($pt,25)){
 		$data=unserialize($row['data']);
 		$data->system_id=$row['id'];
 
-		echo $data->showOverviewRows($bldg[$row['id']] ?? array(), in_array($row['id'], $erforschte_systeme), in_array($row['id'], $immer_sichtbare_systeme));
+		$system_bldg=$bldg[$row['id']] ?? array();
+		$system_erforscht=in_array($row['id'], $erforschte_systeme);
+		$system_immer=in_array($row['id'], $immer_sichtbare_systeme);
+		echo $data->showOverviewRows($system_bldg, $system_erforscht, $system_immer);
+		//Filterklassen für die Pfeile der Systemseite im Filter (generate_vsystem_kopfzeile in functions.php)
+		$vs_filterklassen[(int)$row['id']]=$data->getFilterKlassen($system_bldg, $system_erforscht, $system_immer);
 	}
+	$_SESSION['vs_filterklassen']=$vs_filterklassen;
 
 	echo '</table>';
 	echo '</div>';

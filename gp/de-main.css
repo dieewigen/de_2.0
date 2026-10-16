@@ -688,6 +688,9 @@ a.btn:visited {
 .sec-table .sec-kol {
   width: 70px;
 }
+.sec-table .sec-fp {
+  width: 52px;
+}
 .sec-table .sec-aktion {
   width: 60px;
   white-space: nowrap;
@@ -1288,6 +1291,21 @@ html:has(> body.template.rasse4) {
   margin-bottom: 8px;
 }
 
+.auk-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.auk-filter select {
+  max-width: 220px;
+}
+
+.auk-karte.auk-aus {
+  display: none;
+}
+
 .auk-kopf-zahl {
   font-size: 13px;
   color: #8b949e;
@@ -1689,6 +1707,15 @@ a.art-kachel:hover {
   line-height: 18px;
   text-align: center;
   color: #000000;
+}
+
+.art-raster .art-schutz::before {
+  content: "🔒";
+  position: absolute;
+  top: -6px;
+  left: -3px;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .art-kachel-frei,
@@ -2754,8 +2781,27 @@ a.art-kachel-zurueck:hover::after {
   color: #9da7b1;
 }
 .gb-wert b {
+  margin-left: auto;
   white-space: nowrap;
   color: #ffffff;
+}
+.gb-wert .gb-diff {
+  flex: 0 0 64px;
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+.gb-wert .gb-diff i {
+  font-style: normal;
+}
+.gb-wert .gb-plus {
+  color: #5fe08a;
+}
+.gb-wert .gb-minus {
+  color: #ff6b6b;
+}
+.gb-wert .gb-gleich {
+  color: #6e7681;
 }
 
 .gb-tabelle {
@@ -4263,6 +4309,18 @@ a.art-kachel-zurueck:hover::after {
 
 .ally-mitglied-leader {
   grid-template-columns: 1fr 50px 84px 56px 20px 160px;
+}
+
+.ally-bekannt {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #c9d1d9;
 }
 
 .ally-mitglied-coleader {
@@ -7806,6 +7864,22 @@ a.art-kachel-zurueck:hover::after {
   box-shadow: 0 0 0 2px #ff6b6b;
 }
 
+.vs-fund {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  min-width: 14px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 7px;
+  background: #1c2128;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  color: #ffd56b;
+}
+
 .vs-stufe {
   position: absolute;
   right: -4px;
@@ -9577,7 +9651,38 @@ body #topbar::after {
   color: #ffffff;
   text-shadow: 0 0 6px var(--akzent);
 }
+#topbar .dm-zeiten .dm-zeiten-modus {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  width: 30px;
+  height: 5px;
+  border: 1px solid rgba(160, 200, 255, 0.5);
+  border-radius: 4px;
+  background: rgba(160, 200, 255, 0.18);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+#topbar .dm-zeiten .dm-zeiten-modus:hover {
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  box-shadow: var(--dm-glow);
+}
+#topbar .dm-zeiten.dm-zeiten-countdown .dm-zeiten-modus {
+  border-color: var(--akzent);
+  background: var(--akzent);
+  box-shadow: var(--dm-glow);
+}
+#topbar .dm-zeiten b.dm-zeit-bald {
+  color: #ff767e;
+  animation: dm-zeit-blinken 1s linear infinite;
+}
 
+@keyframes dm-zeit-blinken {
+  50% {
+    opacity: 0.3;
+  }
+}
 .dm-menu {
   position: absolute;
   top: 0;

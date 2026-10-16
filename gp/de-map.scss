@@ -925,3 +925,16 @@ body {
 html {
 	color-scheme: dark;
 }
+
+// Flottenpunkte in der Spielerkachel (map.php), zweite Zeile unter Punkten und Kollektoren
+.player-stats {
+	flex-wrap: wrap;
+}
+
+.player-fp {
+	flex-basis: 100%;
+	margin-top: 2px;
+	font-size: 10px;
+	text-align: center;
+	color: #8b949e;
+}

@@ -902,6 +902,11 @@ a.btn:visited {
 		width: 70px;
 	}
 
+	// Flottenpunkte, kompakt (formatMasseinheit)
+	.sec-fp {
+		width: 52px;
+	}
+
 	.sec-aktion {
 		width: 60px;
 		white-space: nowrap;
@@ -1526,6 +1531,24 @@ a.mod.mobil-menue:hover {
 	margin-bottom: 8px;
 }
 
+// Filter nach Ware und Währung (auction.php); ausgeblendete Karten bekommen auk-aus
+.auk-filter {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+
+	select {
+		max-width: 220px;
+	}
+}
+
+// spezifischer als .auk-karte (display: grid weiter unten), sonst bliebe die Karte sichtbar
+.auk-karte.auk-aus {
+	display: none;
+}
+
 .auk-kopf-zahl {
 	font-size: 13px;
 	color: #8b949e;
@@ -1952,6 +1975,16 @@ a.art-kachel {
 		text-align: center;
 		color: #000000;
 	}
+}
+
+// geschützt (Artefaktschutz): kleines Schloss oben links, das Artefakt wird weder zerstört noch in ein neues verschmolzen
+.art-raster .art-schutz::before {
+	content: '\1F512';
+	position: absolute;
+	top: -6px;
+	left: -3px;
+	font-size: 11px;
+	line-height: 1;
 }
 
 .art-kachel-frei,
@@ -3052,8 +3085,33 @@ a.art-kachel-zurueck:hover::after {
 	}
 
 	b {
+		margin-left: auto;
 		white-space: nowrap;
 		color: #ffffff;
+	}
+
+	// Differenz zum letzten Sondenbericht (Sondenhistorie, secret.php)
+	.gb-diff {
+		flex: 0 0 64px;
+		font-size: 11px;
+		text-align: right;
+		white-space: nowrap;
+
+		i {
+			font-style: normal;
+		}
+	}
+
+	.gb-plus {
+		color: #5fe08a;
+	}
+
+	.gb-minus {
+		color: #ff6b6b;
+	}
+
+	.gb-gleich {
+		color: #6e7681;
 	}
 }
 
@@ -4672,6 +4730,19 @@ a.art-kachel-zurueck:hover::after {
 
 .ally-mitglied-leader {
 	grid-template-columns: 1fr 50px 84px 56px 20px 160px;
+}
+
+// Bekannte Mitglieder einer fremden Allianz (ally_detail.php): Name und Koordinaten
+.ally-bekannt {
+	display: grid;
+	grid-template-columns: 1fr 56px;
+	align-items: center;
+	column-gap: 8px;
+	min-height: 24px;
+	padding: 2px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	color: #c9d1d9;
 }
 
 .ally-mitglied-coleader {
@@ -8526,6 +8597,23 @@ a.art-kachel-zurueck:hover::after {
 	box-shadow: 0 0 0 2px #ff6b6b;
 }
 
+// Marke oben links: bekanntes, noch nicht geborgenes Fundstück auf dem Feld (map_system.class.php)
+.vs-fund {
+	position: absolute;
+	top: -4px;
+	left: -4px;
+	min-width: 14px;
+	box-sizing: border-box;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+	border-radius: 7px;
+	background: #1c2128;
+	font-size: 9px;
+	font-weight: 700;
+	line-height: 12px;
+	text-align: center;
+	color: #ffd56b;
+}
+
 .vs-stufe {
 	position: absolute;
 	right: -4px;
@@ -10471,6 +10559,45 @@ body #topbar {
 	&:hover b {
 		color: #ffffff;
 		text-shadow: 0 0 6px var(--akzent);
+	}
+
+	// Schalter: schmaler Balken oben in der Mitte, im freien Streifen über der Zeitzeile (die drei Zeilen sind mittig
+	// gesetzt), schaltet den Countdown bis zum nächsten Tick ein (dm_zeit_umschalten in dm.php); an in der Rassenfarbe
+	.dm-zeiten-modus {
+		position: absolute;
+		top: 1px;
+		left: 50%;
+		width: 30px;
+		height: 5px;
+		border: 1px solid rgba(160, 200, 255, 0.5);
+		border-radius: 4px;
+		background: rgba(160, 200, 255, 0.18);
+		transform: translateX(-50%);
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--akzent);
+			background: var(--akzent-weich);
+			box-shadow: var(--dm-glow);
+		}
+	}
+
+	&.dm-zeiten-countdown .dm-zeiten-modus {
+		border-color: var(--akzent);
+		background: var(--akzent);
+		box-shadow: var(--dm-glow);
+	}
+
+	// letzte Minute vor dem Tick
+	b.dm-zeit-bald {
+		color: #ff767e;
+		animation: dm-zeit-blinken 1s linear infinite;
+	}
+}
+
+@keyframes dm-zeit-blinken {
+	50% {
+		opacity: 0.3;
 	}
 }
 

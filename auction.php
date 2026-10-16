@@ -100,6 +100,9 @@ if (!hasTech($pt, 4)) {
         $karten = '';
         $anz_auktionen = 0;
         $anz_offen = 0;
+        //vorkommende Waren und Währungen für den Filter im Kopf
+        $filter_waren = array();
+        $filter_waehrungen = array();
 
         //die einzelnen Auktionen ausgeben
         $resnamen = array('Multiplex','Dyharra','Iradium','Eternium','Tronic');
@@ -397,9 +400,11 @@ if (!hasTech($pt, 4)) {
                 }
             }
 
-            //links die Ware, rechts Preis, Preisverfall und Knopf
+            //links die Ware, rechts Preis, Preisverfall und Knopf; data-ware und data-waehrung für den Filter (Script unten)
+            $filter_waren[$artikel_name] = true;
+            $filter_waehrungen[$preis_name] = true;
             $karten .= '
-			<div class="auk-karte'.($is_artefact ? ' auk-artefakt' : '').($gekauft ? ' auk-gekauft' : '').'">
+			<div class="auk-karte'.($is_artefact ? ' auk-artefakt' : '').($gekauft ? ' auk-gekauft' : '').'" data-ware="'.html_text($artikel_name).'" data-waehrung="'.html_text($preis_name).'">
 				<div class="auk-ware">'.$artikel.'
 					<div class="auk-ware-text">
 						<div class="mod-typ">'.$artikel_typ.'</div>
@@ -424,8 +429,56 @@ if (!hasTech($pt, 4)) {
 			<div class="auk-plaetze'.($free_artefact_places < 1 ? ' auk-plaetze-voll' : '').'">Freie Artefaktpl&auml;tze <b>'.max(0, $free_artefact_places).'</b></div>
 		</div>';
         $content .= '<div class="mod-hinweis">Nach dem Start der Auktion sinkt 1.000 Wirtschaftsticks lang der Preis. Auktionen, die man selbst gestartet hat, haben einen Nachlass von '.$nachlass.'%.</div>';
+        if ($anz_auktionen > 1) {
+            //Filter nach Ware und Währung; die Auswahl merkt sich der Browser (localStorage)
+            ksort($filter_waren);
+            ksort($filter_waehrungen);
+            $content .= '<div class="auk-filter"><span class="mod-typ">Filter</span><select id="auk-ware" class="mod-eingabe"><option value="">Alle Waren</option>';
+            foreach (array_keys($filter_waren) as $name) {
+                $content .= '<option value="'.html_text($name).'">'.html_text($name).'</option>';
+            }
+            $content .= '</select><select id="auk-waehrung" class="mod-eingabe"><option value="">Alle W&auml;hrungen</option>';
+            foreach (array_keys($filter_waehrungen) as $name) {
+                $content .= '<option value="'.html_text($name).'">'.html_text($name).'</option>';
+            }
+            $content .= '</select></div>';
+        }
         if ($anz_auktionen > 0) {
             $content .= '<div class="auk-liste">'.$karten.'</div>';
+            $content .= '<div class="mod-leer" id="auk-filter-leer" hidden>Keine Auktion passt zum Filter.</div>';
+            $content .= '<script>
+//Auktionsfilter nach Ware und Waehrung (data-ware, data-waehrung an den Karten), Auswahl bleibt im Browser erhalten
+(function(){
+	var felder = {ware: document.getElementById("auk-ware"), waehrung: document.getElementById("auk-waehrung")};
+	if(!felder.ware || !felder.waehrung){
+		return;
+	}
+	function anwenden(){
+		var sichtbar = 0;
+		document.querySelectorAll(".auk-karte").forEach(function(karte){
+			var aus = (felder.ware.value !== "" && karte.getAttribute("data-ware") !== felder.ware.value)
+				|| (felder.waehrung.value !== "" && karte.getAttribute("data-waehrung") !== felder.waehrung.value);
+			karte.classList.toggle("auk-aus", aus);
+			if(!aus){
+				sichtbar++;
+			}
+		});
+		document.getElementById("auk-filter-leer").hidden = sichtbar > 0;
+	}
+	["ware", "waehrung"].forEach(function(name){
+		try{
+			felder[name].value = localStorage.getItem("de_auk_" + name) || "";
+		}catch(err){}
+		felder[name].addEventListener("change", function(){
+			try{
+				localStorage.setItem("de_auk_" + name, felder[name].value);
+			}catch(err){}
+			anwenden();
+		});
+	});
+	anwenden();
+})();
+</script>';
         } else {
             $content .= '<div class="mod-leer">Zurzeit gibt es keine offenen Auktionen.<br>Jeder abgeholte <a href="ally_dailygift.php">Allianzbonus</a> startet eine neue Auktion.</div>';
         }

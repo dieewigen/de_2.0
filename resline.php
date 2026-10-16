@@ -327,10 +327,14 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	}
 	
 	
-	//serverzeiten
+	//serverzeiten; im Countdown-Modus (dm_zeit_tick in dm.php) füllt die Hauptseite die Felder selbst: data-jetzt stellt
+	//ihre Uhr auf die Serverzeit, data-uhr hebt die Tickzeiten für das Zurückschalten auf
+	echo '$(".dm-zeiten", parent.document).attr("data-jetzt", "'.time().'").attr("data-uhr", "'.date("H:i").' '.$lastWT.' '.$lastKT.'");';
+	echo 'if(!$(".dm-zeiten", parent.document).hasClass("dm-zeiten-countdown")){';
 	echo '$("#tb_time1", parent.document).html("'.date("H:i").'");';
 	echo '$("#tb_time2", parent.document).html("'.$lastWT.'");';
 	echo '$("#tb_time3", parent.document).html("'.$lastKT.'");';
+	echo '}';
 	
 	echo '</script>';
 }

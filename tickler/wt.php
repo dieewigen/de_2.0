@@ -1292,6 +1292,7 @@ if ($doetick == 1) {
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_comserver WHERE user_id=?", [$uid]);
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_news WHERE user_id=?", [$uid]);
                 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_scan WHERE user_id=?", [$uid]);
+                mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_user_scan_history WHERE user_id=?", [$uid]);
 
                 //falls er SK war werden die votes entfernt
                 mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_user_data SET votefor=0 WHERE sector=? AND votefor=?", [$sector, $system]);

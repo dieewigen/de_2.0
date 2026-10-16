@@ -68,6 +68,7 @@ const TL_TABELLEN = [
     'de_user_mission' => 'user_id=?', 'de_user_storage' => 'user_id=?', 'de_user_map' => 'user_id=?', 'de_user_map_bldg' => 'user_id=?',
     'de_user_artefact' => 'user_id=?', 'de_user_news' => 'user_id=?', 'de_user_getcol' => 'user_id=?', 'de_user_special_ship' => 'user_id=?',
     'de_user_locks' => 'id=?', 'de_auction' => '', 'de_allys' => '', 'de_sector' => 'platz>0', 'de_chat_msg' => '',
+    'de_user_scan_history' => 'user_id=?',
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
