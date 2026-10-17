@@ -28,6 +28,10 @@ $kt_lang['recyclotronertrag']='Recyclotronertrag';
 $kt_lang['sektor']='Sektor';
 $kt_lang['sektorkampfbericht']='Sektorkampfbericht';
 $kt_lang['sektorschiffe']='Sektorschiffe';
+//Sektorprojekte und Kampfmittel im Sektorkampfbericht
+$kt_lang['sp_gitter']='Verteidigungsgitter Stufe {STUFE}: Verluste der Verteidiger des Sektors -{PCT} %';
+$kt_lang['sp_schild']='Schildgenerator scharf: Verluste der Verteidiger des Sektors halbiert';
+$kt_lang['sp_enter']='Enterkommando von Sektor {SEKTOR}: Artefaktchance erhöht';
 $kt_lang['ueberlebt']='überlebt';
 $kt_lang['verteidiger']='Verteidiger';
 $kt_lang['wirkungsgrad']='Wirkungsgrad';

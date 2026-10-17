@@ -46,12 +46,15 @@ try{
 }catch(\Throwable $e){
 	echo '<br>Fehler beim Laden der Feldzug-Mine: '.$e->getMessage();
 }
+//Sektorprojekte: die Sektorraffinerie des eigenen Sektors (sec_id => Zustand)
+$sektorprojekte=(new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']))->loadAll();
 
 //die einzelnen User abarbeiten, die Gebäudedaten befinden sich alle im Array $bldg_data und für jeden aktiven Spieler wird dieses durchlaufen
 $aktive_user=array();
-$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0", []);
+$result = mysqli_execute_query($GLOBALS['dbi'], "SELECT de_user_data.user_id, de_user_data.sector FROM de_login LEFT JOIN de_user_data ON(de_login.user_id = de_user_data.user_id) WHERE de_login.status=1 AND de_user_data.npc=0", []);
 while($row = mysqli_fetch_array($result)){
 	$uid=$row['user_id'];
+	$sektor=(int)$row['sector'];
 	$aktive_user[]=$uid;
 	$res=array();
 
@@ -69,6 +72,10 @@ while($row = mysqli_fetch_array($result)){
 	$prozentwert+=\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($thanatos_stufen[$uid] ?? 0);
 	if(isset($feldzug_mine[(int)$uid])){
 		$prozentwert+=\DieEwigen\DE2\Model\Feldzug\FeldzugService::MINE_PROZENT;
+	}
+	//Sektorraffinerie des eigenen Sektors
+	if(isset($sektorprojekte[$sektor])){
+		$prozentwert+=\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::boni($sektorprojekte[$sektor])['industrie'];
 	}
 
 	$prozentwert=1+($prozentwert/100);

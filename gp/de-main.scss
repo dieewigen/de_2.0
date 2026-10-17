@@ -7044,6 +7044,42 @@ a.art-kachel-zurueck:hover::after {
 	grid-template-columns: 80px 80px 1fr 56px 70px;
 }
 
+// Sektorprojekte und Kampfmittel (bkmenu.php): Name, nächste Stufe, Kosten, WT, Status bzw. Name, Kosten, Bestand, Aktion
+.sp-projekt {
+	grid-template-columns: 1fr 1fr 1.2fr 28px 96px;
+}
+
+.sp-km {
+	grid-template-columns: 1fr 1.1fr 56px 120px;
+}
+
+// Einzahlungen ins Sektor-VS-Lager (politics.php): Spieler und Posten
+.sp-einzahlung {
+	grid-template-columns: minmax(90px, 1fr) 2.5fr;
+}
+
+.sp-aktionen {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 4px;
+}
+
+.sp-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+// Sektorprojekte unter der Sektorraumbasis (sector.php)
+.sec-projekte {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 4px;
+	margin-top: 6px;
+}
+
 // Eingabe, Auswahl und Knopf in einer Zeile
 .bk-formzeile {
 	display: flex;

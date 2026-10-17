@@ -1,14 +1,19 @@
 <?php
 use DieEwigen\DE2\Model\Sperre;
+use DieEwigen\DE2\Session\CsrfToken;
+use DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService;
 include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_bkmenu.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_functions.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_politics.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_sektor666.lang.php';
+include 'inc/lang/'.$sv_server_lang.'_sektorprojekt.lang.php';
 include 'functions.php';
 
 //Sektor 666: Sind die Schläfer wach, ist der Angriff auch ohne Sektorraumbasis möglich, Verteidigen nicht
 $s666 = new \DieEwigen\DE2\Model\Sektor666\Sektor666Service($GLOBALS['dbi']);
+//Sektorprojekte und Kampfmittel aus dem Sektor-VS-Lager (docs/sektorprojekte.md)
+$sp = new SektorprojektService($GLOBALS['dbi']);
 
 $db_daten = mysqli_execute_query($GLOBALS['dbi'],
     "SELECT restyp01, restyp02, restyp03, restyp04, restyp05, score, sector, system, newtrans, newnews FROM de_user_data WHERE user_id=?", 
@@ -72,6 +77,9 @@ $db_daten = mysqli_execute_query($GLOBALS['dbi'],
 $baukostenreduzierung = mysqli_num_rows($db_daten) * 2;
 if($baukostenreduzierung>20)$baukostenreduzierung=20;
 $baukostenreduzierung=$baukostenreduzierung/100;
+//Werftausbau der Sektorprojekte macht Sektorraumschiffe zusätzlich günstiger
+$sp_status=$sp->getStatus((int)$sector);
+$baukostenreduzierung=min(0.9, $baukostenreduzierung+SektorprojektService::boni($sp_status)['schiffe']/100);
 
 
 //ggf. neuen Verteilungsschlüsssel setzen
@@ -181,8 +189,8 @@ function bk_zahl($wert){
 	return number_format($wert, 0, ",", ".");
 }
 
-function attdef($ownsector, $zsec, $akttyp, $aktzeit){
-	global $bkmenu_lang, $s666, $s666_lang;
+function attdef($ownsector, $zsec, $akttyp, $aktzeit, $nachbrenner=false, $enter=false){
+	global $bkmenu_lang, $s666, $s666_lang, $sp, $sektorprojekt_lang;
 
 	$rz = 0;
   //teste ob die flotte bereit ist befehle zu bekommen
@@ -233,6 +241,15 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
         $rz++;
       }
 
+			//Kampfmittel: der Nachbrenner verkürzt den Hinflug, das Enterkommando wirkt nur beim Angriff und nicht gegen die Schläfer;
+			//beides ist mit dem Start verbraucht
+			$sp_mittel=$sp->flugMittel($ownsector, $nachbrenner, $enter && $akttyp==1 && !$s666_ziel);
+			if ($sp_mittel['nachbrenner']) $rz=max(1, $rz-SektorprojektService::NACHBRENNER_KT);
+			$sp_liste=array();
+			if ($sp_mittel['nachbrenner']) $sp_liste[]=$sektorprojekt_lang['km'][SektorprojektService::NACHBRENNER];
+			if ($sp_mittel['enter']) $sp_liste[]=$sektorprojekt_lang['km'][SektorprojektService::ENTER];
+			$sp_text=count($sp_liste)>0 ? strtr($sektorprojekt_lang['km_flug_meldung'], array('{LISTE}' => implode(', ', $sp_liste))) : '';
+
 			//nachricht an den account schicken
 			//bk rausfinden
 	  	$bk=getSKSystemBySecID($zsec);
@@ -264,7 +281,7 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 			mysqli_execute_query($GLOBALS['dbi'],
 				"UPDATE de_sector SET aktion = ?, zeit = ?, gesrzeit = ?, zielsec = ?, aktzeit = ? WHERE sec_id = ?",
 				[$akttyp, $rz, $rz, $zsec, $aktzeit, $ownsector]);
-			bk_meldung('Die Sektorflotte fliegt '.($akttyp==1 ? 'zum Angriff auf' : 'zur Verteidigung von').' Sektor '.$zsec.', Reisezeit '.$rz.' KT.', 'ok');
+			bk_meldung('Die Sektorflotte fliegt '.($akttyp==1 ? 'zum Angriff auf' : 'zur Verteidigung von').' Sektor '.$zsec.', Reisezeit '.$rz.' KT.'.$sp_text, 'ok');
 		}else bk_meldung($bkmenu_lang['fehlerkeinesrb']);
 	  }
 	}
@@ -272,7 +289,7 @@ function attdef($ownsector, $zsec, $akttyp, $aktzeit){
 }
 
 function recall($ownsector){
-	global $bkmenu_lang;
+	global $bkmenu_lang, $sp;
 	//erstmal die daten der flotte holen und sichern
 	$db_daten = mysqli_execute_query($GLOBALS['dbi'],
 		"SELECT aktion, zeit, zielsec, e2 FROM de_sector WHERE sec_id = ?",
@@ -285,6 +302,8 @@ function recall($ownsector){
 	//flotte zurückrufen
 	//erstmal schauen, ob man sie überhaupt zurückrufen kann
 	if ($akttyp==1 OR $akttyp==2){//also wenn sie hinfliegt
+		//ein scharfes Enterkommando verfällt mit dem Rückruf
+		$sp->enterZuruecksetzen((int)$ownsector);
 		mysqli_execute_query($GLOBALS['dbi'],
 			"UPDATE de_sector SET aktion = 3, zeit = gesrzeit-zeit, zielsec = ?, aktzeit = 0 WHERE sec_id = ?",
 			[$ownsector, $ownsector]);
@@ -357,10 +376,10 @@ if(!empty($befehle)){
       recall($sector);
       break;
     case 2: //angreifen
-      attdef($sector, $zsecf1, 1, 0);
+      attdef($sector, $zsecf1, 1, 0, !empty($_POST['sp_nachbrenner']), !empty($_POST['sp_enter']));
       break;
     default: //verteidigen
-      attdef($sector, $zsecf1, 2, $af1-2);
+      attdef($sector, $zsecf1, 2, $af1-2, !empty($_POST['sp_nachbrenner']), false);
       break;
   }//switch af1 ende
 }
@@ -597,6 +616,49 @@ if ($t>=120 && $buildgnr==0){//ja, es wurde ein button gedrueckt
 	bk_meldung('Es wird bereits ein Sektorgeb&auml;ude gebaut.');
 }
 
+////////////////////////////////////////////////////////////////
+// Sektorprojekte und Kampfmittel aus dem Sektor-VS-Lager (docs/sektorprojekte.md)
+////////////////////////////////////////////////////////////////
+$sp_ticks=$sp->aktuelleTicks();
+if (isset($_POST['sp_projekt']) || isset($_POST['sp_km_bauen']) || isset($_POST['sp_km_einsetzen'])) {
+	if (!CsrfToken::check($_POST['token'] ?? '')) {
+		bk_meldung('Die Sitzung ist abgelaufen, bitte noch einmal absenden.');
+	} elseif (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
+		$sp_fehler='';
+		if (isset($_POST['sp_projekt'])) {
+			//Projekt beauftragen, braucht die Sektorraumbasis
+			$sp_id=intval($_POST['sp_projekt']);
+			if ($techs[120]!=1) {
+				$sp_fehler='basis';
+			} else {
+				$sp_fehler=$sp->projektStarten((int)$sector, $sp_id, (int)$maxtick, $sektorprojekt_lang);
+				if ($sp_fehler==='') {
+					$sp_stufe=$sp->getStatus((int)$sector)[SektorprojektService::PROJEKTE[$sp_id]]+1;
+					bk_meldung(strtr($sektorprojekt_lang['projekt_start'], array('{NAME}' => $sektorprojekt_lang['projekt'][$sp_id], '{STUFE}' => $sp_stufe, '{WT}' => SektorprojektService::STUFEN[$sp_stufe]['wt'])), 'ok');
+				}
+			}
+		} elseif (isset($_POST['sp_km_bauen'])) {
+			//Kampfmittel fertigen, wie Sektorraumschiffe nur mit Sektorraumwerft
+			$sp_id=intval($_POST['sp_km_bauen']);
+			if ($techs[122]!=1) {
+				$sp_fehler='werft';
+			} else {
+				$sp_fehler=$sp->kampfmittelFertigen((int)$sector, $sp_id);
+				if ($sp_fehler==='') bk_meldung(strtr($sektorprojekt_lang['km_auftrag'], array('{NAME}' => $sektorprojekt_lang['km'][$sp_id] ?? '')), 'ok');
+			}
+		} else {
+			//Schildgenerator oder Störsender scharf schalten
+			$sp_id=intval($_POST['sp_km_einsetzen']);
+			$sp_fehler=$sp->kampfmittelEinsetzen((int)$sector, $sp_id, $sp_ticks['wt'], $sp_ticks['kt']);
+			if ($sp_fehler==='') bk_meldung(strtr($sektorprojekt_lang['km_scharf'], array('{NAME}' => $sektorprojekt_lang['km'][$sp_id] ?? '')), 'ok');
+		}
+		if ($sp_fehler!=='') bk_meldung($sektorprojekt_lang['fehler'][$sp_fehler] ?? $sektorprojekt_lang['fehler']['unbekannt']);
+		Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
+	} else {
+		bk_meldung($bkmenu_lang['transactionactive']);
+	}
+}
+
 //sektorphalanx, nur mit Scannerphalanx (vorher fehlte die Prüfung, ohne Gebäude ließ sich per Formular scannen)
 $sc1=$_POST['sc1'] ?? false;
 $sc2=$_POST['sc2'] ?? false;
@@ -613,12 +675,24 @@ if (($sc1 || $sc2) && $scansec && $techs[124]==1){
   {
     $row = mysqli_fetch_assoc($db_daten);
 
+    //Störsender im gescannten Sektor: kein Bericht, das Tronic ist trotzdem verbraucht
+    if ($sp->istGestoert($scansec, (int)$maxtick)) {
+      $sp_scankosten=($sc1 ? 5 : 0)+($sc2 ? 10 : 0);
+      if ($srestyp05>=$sp_scankosten) {
+        mysqli_execute_query($GLOBALS['dbi'], "UPDATE de_sector SET restyp05 = restyp05 - ? WHERE sec_id = ?", [$sp_scankosten, $sector]);
+        $srestyp05=$srestyp05-$sp_scankosten;
+        bk_meldung(strtr($sektorprojekt_lang['scan_gestoert'], array('{SEKTOR}' => $scansec)), 'warn');
+      } else bk_meldung($bkmenu_lang['fehlerzuwenigtronic']);
+      $sc1=false;
+      $sc2=false;
+    }
+
     if($sc1) //scanlevel 1
     if($srestyp05>=5)
     {
       //schiffe im bau
       $db_daten = mysqli_execute_query($GLOBALS['dbi'],
-        "SELECT SUM(anzahl) as anzahl FROM de_sector_build WHERE sector_id=?",
+        "SELECT SUM(anzahl) as anzahl FROM de_sector_build WHERE sector_id=? AND tech_id=1",
         [$scansec]);
       $row1 = mysqli_fetch_assoc($db_daten);
 
@@ -634,6 +708,11 @@ if (($sc1 || $sc2) && $scansec && $techs[124]==1){
         $bkmenu_lang['schiffe'] => $zgesschiffe,
         $bkmenu_lang['schiffeimbau'] => $row1["anzahl"] ?? 0,
       );
+      //Kampfmittel des gescannten Sektors
+      $sp_ziel=$sp->getStatus($scansec);
+      foreach (SektorprojektService::KAMPFMITTEL as $sp_id => $sp_spalte) {
+        $werte[$sektorprojekt_lang['km'][$sp_id]] = $sp_ziel['km_'.$sp_spalte];
+      }
       $scanbericht .= rahmen_oben($bkmenu_lang['scannerbericht1'].' '.$scansec, false);
       $scanbericht .= '<div class="mod bk"><div class="bk-scan">';
       foreach ($werte as $name => $wert) {
@@ -725,6 +804,20 @@ rahmen_oben($bkmenu_lang['sektorlagerbestand']);
 echo '<div class="mod bk"><div class="bk-lager">';
 foreach (array('Multiplex' => $srestyp01, 'Dyharra' => $srestyp02, 'Iradium' => $srestyp03, 'Eternium' => $srestyp04, 'Tronic' => $srestyp05) as $name => $wert) {
 	echo '<div class="ov-wert"><span class="mod-typ">'.$name.'</span><b>'.bk_zahl($wert).'</b></div>';
+}
+echo '</div>';
+//Sektor-VS-Lager: VS-Rohstoffe und Handelswaren für Sektorprojekte und Kampfmittel
+$sp_lager=$sp->getLager((int)$sector);
+$sp_namen=$sp->itemNamen();
+echo '<div class="ally-abschnitt"><div class="mod-typ">'.$sektorprojekt_lang['lager'].'</div>';
+if (empty($sp_lager)) {
+	echo '<div class="bk-leise">'.$sektorprojekt_lang['lager_leer'].'</div>';
+} else {
+	echo '<div class="bk-lager">';
+	foreach ($sp_lager as $sp_item => $sp_menge) {
+		echo '<div class="ov-wert"><span class="mod-typ">'.($sp_namen[$sp_item] ?? '#'.$sp_item).'</span><b>'.bk_zahl($sp_menge).'</b></div>';
+	}
+	echo '</div>';
 }
 echo '</div></div>';
 rahmen_unten();
@@ -819,6 +912,47 @@ echo '</div>';
 echo '</div>';
 rahmen_unten();
 
+//Sektorprojekte aus dem Sektor-VS-Lager: je Projekt Stufe, nächste Stufe mit Kosten und Bauzeit
+$sp_projekte=$sp->projektUebersicht((int)$sector);
+rahmen_oben($sektorprojekt_lang['projekte']);
+echo '<div class="mod bk">';
+if ($techs[120]!=1) {
+	echo '<div class="mod-hinweis bk-hinweis">'.$sektorprojekt_lang['projekt_basis'].'</div>';
+}
+echo '<div class="bk-zeile sp-projekt bk-kopfzeile"><span>Projekt</span><span>N&auml;chste Stufe</span><span>Kosten</span><span>'.$bkmenu_lang['wochen'].'</span><span></span></div>';
+echo '<div class="bk-liste">';
+$sp_erklaert='';
+foreach ($sp_projekte as $sp_id => $sp_p) {
+	$sp_stufe_text=$sp_p['naechste'] ? $sp_p['naechste'] : $sp_p['stufe'];
+	$sp_wirkung=strtr($sektorprojekt_lang['projekt_kurz'][$sp_id], array('{PCT}' => SektorprojektService::PROZENT[$sp_id][$sp_stufe_text]));
+	if ($sp_p['im_bau']) {
+		$sp_statusfeld='<span class="mod-chip bk-imbau">'.$functions['imbau'].' ('.$sp_p['rest_wt'].' WT)</span>';
+	} elseif (!$sp_p['naechste']) {
+		$sp_statusfeld='<span class="mod-chip mod-chip-gruen">'.$functions['gebaut'].'</span>';
+	} elseif ($sp_p['laeuft_anderes']) {
+		$sp_statusfeld='<span class="bk-leise">ausgelastet</span>';
+	} elseif ($techs[120]!=1) {
+		$sp_statusfeld='<span class="bk-leise">Basis fehlt</span>';
+	} elseif (!$sp_p['bezahlbar']) {
+		$sp_statusfeld='<span class="bk-leise">Rohstoffe fehlen</span>';
+	} else {
+		$sp_statusfeld='<form method="post" action="bkmenu.php"><input type="hidden" name="token" value="'.CsrfToken::get().'"><button type="submit" name="sp_projekt" value="'.$sp_id.'" class="mod-btn ally-btn-klein" data-bestaetigen="Wirklich bauen?">'.$functions['bauen'].'</button></form>';
+	}
+	echo '<div class="bk-zeile sp-projekt">';
+	echo '<span class="bk-name" title="'.$sektorprojekt_lang['projekt'][$sp_id].'&'.strtr($sektorprojekt_lang['projekt_wirkung'][$sp_id], array('{PCT}' => implode(' / ', array_slice(SektorprojektService::PROZENT[$sp_id], 1)))).'">'.$sektorprojekt_lang['projekt'][$sp_id].' <span class="mod-chip">'.$sp_p['stufe'].'/'.SektorprojektService::MAX_STUFE.'</span></span>';
+	echo '<span>'.($sp_p['naechste'] ? 'Stufe '.$sp_p['naechste'].': ' : '').$sp_wirkung.'</span>';
+	echo '<span>'.($sp_p['naechste'] ? $sp->postenText($sp_p['kosten']) : '&ndash;').'</span>';
+	echo '<span class="bk-zahl">'.($sp_p['naechste'] ? $sp_p['wt'] : '').'</span>';
+	echo '<span class="bk-status">'.$sp_statusfeld.'</span>';
+	echo '</div>';
+	$sp_erklaert.='<div class="bk-zeile sp-einzahlung"><span class="bk-name">'.$sektorprojekt_lang['projekt'][$sp_id].'</span><span>'.strtr($sektorprojekt_lang['projekt_wirkung'][$sp_id], array('{PCT}' => implode(' / ', array_slice(SektorprojektService::PROZENT[$sp_id], 1)))).'</span></div>';
+}
+echo '</div>';
+echo '<div class="bk-hinweis">'.$sektorprojekt_lang['projekt_hinweis'].'</div>';
+echo '<details class="res-details"><summary>'.$sektorprojekt_lang['projekt_erklaert'].'</summary><div class="bk-liste">'.$sp_erklaert.'</div></details>';
+echo '</div>';
+rahmen_unten();
+
 if ($techs[122]==1) //raumwerft vorhanden?
 {
 	//Sektorraumschiffe bauen
@@ -855,6 +989,38 @@ if ($techs[122]==1) //raumwerft vorhanden?
 		echo '</div></div>';
 	}
 	echo '</form>';
+	rahmen_unten();
+
+	//Kampfmittel aus Handelswaren des Sektor-VS-Lagers: Bestand, Fertigen, Schild und Störsender scharf schalten
+	$sp_km=$sp->kampfmittelUebersicht((int)$sector, $sp_ticks['wt'], $sp_ticks['kt']);
+	rahmen_oben($sektorprojekt_lang['kampfmittel']);
+	echo '<div class="mod bk">';
+	echo '<div class="bk-zeile sp-km bk-kopfzeile"><span>'.$sektorprojekt_lang['kampfmittel'].'</span><span>Kosten</span><span>'.$sektorprojekt_lang['km_bestand'].'</span><span></span></div>';
+	echo '<div class="bk-liste">';
+	$sp_erklaert='';
+	foreach ($sp_km as $sp_id => $sp_k) {
+		$sp_bestandfeld='<b>'.$sp_k['bestand'].'</b>/'.SektorprojektService::KM_MAX.($sp_k['im_bau']>0 ? '<br><small class="bk-leise">+'.$sp_k['im_bau'].' '.$sektorprojekt_lang['km_im_bau'].'</small>' : '');
+		$sp_aktionen='<form method="post" action="bkmenu.php" class="sp-aktionen"><input type="hidden" name="token" value="'.CsrfToken::get().'">';
+		if ($sp_k['aktiv_rest']>0) {
+			$sp_aktionen.='<span class="mod-chip mod-chip-gruen">'.strtr($sektorprojekt_lang[$sp_id==SektorprojektService::SCHILD ? 'km_schild_aktiv' : 'km_stoer_aktiv'], array('{REST}' => $sp_k['aktiv_rest'])).'</span>';
+		} elseif ($sp_k['einsetzbar']) {
+			$sp_aktionen.='<button type="submit" name="sp_km_einsetzen" value="'.$sp_id.'" class="mod-btn ally-btn-klein" data-bestaetigen="Wirklich?">'.$sektorprojekt_lang['km_einsetzen'].'</button>';
+		}
+		if ($sp_k['bezahlbar']) {
+			$sp_aktionen.='<button type="submit" name="sp_km_bauen" value="'.$sp_id.'" class="mod-btn mod-btn-leise ally-btn-klein">'.$sektorprojekt_lang['km_fertigen'].'</button>';
+		} elseif ($sp_k['bestand']+$sp_k['im_bau']>=SektorprojektService::KM_MAX) {
+			$sp_aktionen.='<span class="bk-leise">voll</span>';
+		} else {
+			$sp_aktionen.='<span class="bk-leise">Handelswaren fehlen</span>';
+		}
+		$sp_aktionen.='</form>';
+		echo '<div class="bk-zeile sp-km"><span class="bk-name" title="'.$sektorprojekt_lang['km'][$sp_id].'&'.$sektorprojekt_lang['km_wirkung'][$sp_id].'">'.$sektorprojekt_lang['km'][$sp_id].'</span><span>'.$sp->postenText($sp_k['kosten']).'</span><span class="bk-zahl">'.$sp_bestandfeld.'</span><span class="bk-status">'.$sp_aktionen.'</span></div>';
+		$sp_erklaert.='<div class="bk-zeile sp-einzahlung"><span class="bk-name">'.$sektorprojekt_lang['km'][$sp_id].'</span><span>'.$sektorprojekt_lang['km_wirkung'][$sp_id].'</span></div>';
+	}
+	echo '</div>';
+	echo '<div class="bk-hinweis">'.$sektorprojekt_lang['km_hinweis'].'</div>';
+	echo '<details class="res-details"><summary>'.$sektorprojekt_lang['km_erklaert'].'</summary><div class="bk-liste">'.$sp_erklaert.'</div></details>';
+	echo '</div>';
 	rahmen_unten();
 
 	//Sektorflotte: Aufstellung, Verlegen, Befehle
@@ -901,6 +1067,11 @@ if ($techs[122]==1) //raumwerft vorhanden?
 	echo '<input type="text" name="zsecf1" value="" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="'.$bkmenu_lang['zielsektor'].'" class="mod-eingabe bk-anzahl">';
 	echo '<button type="submit" name="befehle" value="'.$bkmenu_lang['befehleerteilen'].'" class="mod-btn">'.$bkmenu_lang['befehleerteilen'].'</button>';
 	echo '</div>';
+	//Kampfmittel für diesen Flug, nur wenn welche auf Lager sind
+	$sp_flug='';
+	if (($sp_km[SektorprojektService::NACHBRENNER]['bestand'] ?? 0)>0) $sp_flug.='<label class="pol-option"><input type="checkbox" name="sp_nachbrenner" value="1"><span>'.$sektorprojekt_lang['km_flug_nachbrenner'].'</span></label>';
+	if (($sp_km[SektorprojektService::ENTER]['bestand'] ?? 0)>0) $sp_flug.='<label class="pol-option"><input type="checkbox" name="sp_enter" value="1"><span>'.$sektorprojekt_lang['km_flug_enter'].'</span></label>';
+	if ($sp_flug!='') echo '<div class="bk-formzeile">'.$sp_flug.'</div>';
 	echo '<div class="bk-hinweis">Es fliegt nur die Sektorflotte, die Wachflotte bleibt zu Hause. Das Ziel braucht eine Sektorraumbasis. Reisezeit 12 KT, beim Angriff auf einen Sektor mit Sprungfeldbegrenzer 13 KT.</div>';
 	echo '</form>';
 	echo '</div>';
@@ -917,7 +1088,7 @@ if ($techs[124]==1) //scannerphalanx vorhanden?
 	echo '<button type="submit" name="sc1" value=" 1 " class="mod-btn mod-btn-leise">Level 1 &middot; 5 Tronic</button>';
 	echo '<button type="submit" name="sc2" value=" 2 " class="mod-btn mod-btn-leise">Level 2 &middot; 10 Tronic</button>';
 	echo '</div>';
-	echo '<div class="bk-hinweis">Level 1 zeigt Lager, Kollektoren und Schiffe des Sektors, Level 2 seine Flottenbewegungen. Bezahlt wird mit Tronic aus dem Sektorlager.</div>';
+	echo '<div class="bk-hinweis">Level 1 zeigt Lager, Kollektoren, Schiffe und Kampfmittel des Sektors, Level 2 seine Flottenbewegungen. Bezahlt wird mit Tronic aus dem Sektorlager, auch wenn ein St&ouml;rsender den Scan verhindert.</div>';
 	echo '</form>';
 	rahmen_unten();
 }//scannerphalanx ende

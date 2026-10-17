@@ -47,6 +47,7 @@ $sec_lang['sektorartefakte']='Sektorartefakte';
 $sec_lang['sektorartefakthaltezeit']='Sektorartefakthaltezeit (WT)';
 $sec_lang['sektordaten']='Sektordaten';
 $sec_lang['sektorraumbasis']='Sektorraumbasis';
+$sec_lang['sektorprojekte']='Sektorprojekte';
 $sec_lang['spielergeworben']='Dieser Spieler wurde von Dir geworben. Mehr Informationen dazu findest Du links im Menü unter Schwarzmarkt -> Religion.';
 $sec_lang['sys']='System';
 $sec_lang['welle']='Welle';

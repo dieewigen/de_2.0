@@ -64,6 +64,9 @@ mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sectorforum_threads`;", [
 mysqli_execute_query($GLOBALS['dbi'], "ALTER TABLE `de_sectorforum_threads` AUTO_INCREMENT = 1;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sector_build`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sector_stat`;", []);
+mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sector_vs`;", []);
+mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sector_vs_lager`;", []);
+mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_sector_vs_einzahlung`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_tauction`;", []);
 mysqli_execute_query($GLOBALS['dbi'], "ALTER TABLE `de_tauction` AUTO_INCREMENT = 1;", []);
 mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM `de_trade_artefact`;", []);

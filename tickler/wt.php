@@ -29,12 +29,13 @@ include_once $directory."inccon.php";
 include_once $directory."inc/artefakt.inc.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt.lang.php";
 include_once $directory."inc/lang/".$sv_server_lang."_wt_zufallmsg.lang.php";
-//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang, $hekate_lang, $s666_lang, $feldzug_lang und $sv_link müssen hier definiert sein
+//bewusst include: runtick.php startet die Ticks in eigenen Closures, $exile_lang, $siegel_lang, $hekate_lang, $s666_lang, $feldzug_lang, $sektorprojekt_lang und $sv_link müssen hier definiert sein
 include $directory."inc/lang/".$sv_server_lang."_exile.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_siegel.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_hekate.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_sektor666.lang.php";
 include $directory."inc/lang/".$sv_server_lang."_feldzug.lang.php";
+include $directory."inc/lang/".$sv_server_lang."_sektorprojekt.lang.php";
 include $directory."inc/".$sv_server_lang."_links.inc.php";
 include_once $directory."inc/sabotage.inc.php";
 include_once $directory."inc/allyjobs.inc.php";
@@ -190,18 +191,26 @@ if ($doetick == 1) {
     echo '<br>Gebäude fertig ';
     echo date("d/m/Y - H:i:s");
 
-    //Sektor-Einheiten bauen
-    $tech_id = 1;
-    $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector_id, anzahl FROM de_sector_build WHERE verbzeit<=1", []);
+    //Sektor-Einheiten und Kampfmittel bauen: tech_id 1 ist das Sektorraumschiff (in die Wachflotte), 2 bis 5 sind die
+    //Kampfmittel der Sektorprojekte (Bestand in de_sector_vs, siehe SektorprojektService)
+    $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT sector_id, tech_id, anzahl FROM de_sector_build WHERE verbzeit<=1", []);
     $num = mysqli_num_rows($res);
 
     echo "<br>$num Sektor-Einheiten-Datensätze gefunden<br>";
     while ($row = mysqli_fetch_array($res)) {
         $uid      = $row["sector_id"];
+        $tech_id  = (int)$row["tech_id"];
         $anzahl   = $row["anzahl"];
-        $sql = "update de_sector set e1 = e1 + ? where sec_id = ?";
-        mysqli_execute_query($GLOBALS['dbi'], $sql, [$anzahl, $uid]);
-        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_build where sector_id = ? AND tech_id=? AND verbzeit=1", [$uid, $tech_id]);
+        if ($tech_id == 1) {
+            mysqli_execute_query($GLOBALS['dbi'], "update de_sector set e1 = e1 + ? where sec_id = ?", [$anzahl, $uid]);
+        } else {
+            try {
+                (new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']))->kampfmittelFertig((int)$uid, $tech_id, (int)$anzahl);
+            } catch (\Throwable $e) {
+                echo '<br>Fehler bei den Kampfmitteln: '.$e->getMessage();
+            }
+        }
+        mysqli_execute_query($GLOBALS['dbi'], "DELETE FROM de_sector_build where sector_id = ? AND tech_id=? AND verbzeit<=1", [$uid, $tech_id]);
     }
     //datens�tze mit geringerer zeit aktualisieren
     mysqli_execute_query($GLOBALS['dbi'], "update de_sector_build set verbzeit = verbzeit-1", []);
@@ -386,6 +395,14 @@ if ($doetick == 1) {
         (new FeldzugService($GLOBALS['dbi']))->processWt($feldzug_lang);
     } catch (\Throwable $e) {
         echo 'Fehler beim Feldzug: '.$e->getMessage().'<br>';
+    }
+
+    //Sektorprojekte: Bauzeit der Projekte, fertige Stufen im Sektorchat; Fehler dürfen den Tick nicht aufhalten
+    echo '<br>Sektorprojekte<br>';
+    try {
+        (new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']))->processWt($sektorprojekt_lang);
+    } catch (\Throwable $e) {
+        echo 'Fehler bei den Sektorprojekten: '.$e->getMessage().'<br>';
     }
 
     //Geisterschiff zu Halloween: Route, Stationen und Ende im Serverchat; Fehler dürfen den Tick nicht aufhalten

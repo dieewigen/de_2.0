@@ -105,6 +105,16 @@ if(!hasTech($pt,25)){
 	if($vs_boni['thanatos']>0){
 		$vs_boni_teile[]='Pfad des Thanatos Stufe '.$vs_boni['thanatos'].': Industrie +'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getIndustrieProzent($vs_boni['thanatos']).'%, Bauzeit -'.\DieEwigen\DE2\Model\Thanatos\ThanatosService::getBauzeitProzent($vs_boni['thanatos']).'%';
 	}
+	//Sektorprojekte des eigenen Sektors: Sektorraffinerie und Hyperraumrelais
+	if(!empty($vs_boni['sektor']) && ($vs_boni['sektor']['industrie']>0 || $vs_boni['sektor']['bauzeit']>0)){
+		include_once 'inc/lang/'.$sv_server_lang.'_sektorprojekt.lang.php';
+		if($vs_boni['sektor']['industrie']>0){
+			$vs_boni_teile[]=$sektorprojekt_lang['projekt'][\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::RAFFINERIE].' Stufe '.$vs_boni['sektor']['raffinerie'].': Industrie +'.$vs_boni['sektor']['industrie'].'%';
+		}
+		if($vs_boni['sektor']['bauzeit']>0){
+			$vs_boni_teile[]=$sektorprojekt_lang['projekt'][\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::RELAIS].' Stufe '.$vs_boni['sektor']['relais'].': Bauzeit -'.$vs_boni['sektor']['bauzeit'].'%';
+		}
+	}
 	//Feldzug: Mine und Werft der eigenen Allianz
 	include_once 'inc/lang/'.$sv_server_lang.'_feldzug.lang.php';
 	if($vs_boni['feldzug']['mine']){

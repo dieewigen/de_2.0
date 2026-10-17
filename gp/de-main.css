@@ -6445,6 +6445,39 @@ a.art-kachel-zurueck:hover::after {
   grid-template-columns: 80px 80px 1fr 56px 70px;
 }
 
+.sp-projekt {
+  grid-template-columns: 1fr 1fr 1.2fr 28px 96px;
+}
+
+.sp-km {
+  grid-template-columns: 1fr 1.1fr 56px 120px;
+}
+
+.sp-einzahlung {
+  grid-template-columns: minmax(90px, 1fr) 2.5fr;
+}
+
+.sp-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.sp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sec-projekte {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
 .bk-formzeile {
   display: flex;
   flex-wrap: wrap;

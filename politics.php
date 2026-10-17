@@ -1159,6 +1159,34 @@ if ($s == 1 or !isset($s)) {
     echo '</div>';
     rahmen_unten();
 
+    //Sektor-VS-Lager: Bestand und Einzahlungen für Sektorprojekte und Kampfmittel (docs/sektorprojekte.md)
+    include_once 'inc/lang/' . $sv_server_lang . '_sektorprojekt.lang.php';
+    $sp = new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']);
+    $sp_lager = $sp->getLager((int)$sector);
+    $sp_namen = $sp->itemNamen();
+    rahmen_oben($sektorprojekt_lang['lager']);
+    echo '<div class="mod pol">';
+    if (empty($sp_lager)) {
+        echo '<div class="mod-leer">' . $sektorprojekt_lang['lager_leer'] . '</div>';
+    } else {
+        echo '<div class="pol-kacheln">';
+        foreach ($sp_lager as $sp_item => $sp_menge) {
+            echo '<div class="ov-wert"><span class="mod-typ">' . ($sp_namen[$sp_item] ?? '#' . $sp_item) . '</span><b>' . pol_zahl($sp_menge) . '</b></div>';
+        }
+        echo '</div>';
+    }
+    $sp_einzahlungen = $sp->getEinzahlungen((int)$sector);
+    if (!empty($sp_einzahlungen)) {
+        echo '<div class="ally-abschnitt"><div class="mod-typ">' . $sektorprojekt_lang['einzahlungen'] . '</div><div class="bk-liste">';
+        foreach ($sp_einzahlungen as $sp_e) {
+            echo '<div class="bk-zeile sp-einzahlung"><span class="bk-name">' . $sp_e['name'] . '</span><span>' . $sp->postenText($sp_e['items']) . '</span></div>';
+        }
+        echo '</div></div>';
+    }
+    echo '<div class="pol-hinweis">' . $sektorprojekt_lang['lager_hinweis'] . '</div>';
+    echo '</div>';
+    rahmen_unten();
+
     //Spielerinformationen
     rahmen_oben($politics_lang["spielerinformationen"]);
     echo '<div class="mod pol">';

@@ -660,12 +660,21 @@ function vs_bonus_info($uid)
         $info[$key] += \DieEwigen\DE2\Model\VsBonus\VsBonusService::getProzent($typ);
     }
 
+    //Sektorprojekte des eigenen Sektors: Sektorraffinerie (Industrie) und Hyperraumrelais (Bauzeit)
+    try {
+        $info['sektor'] = (new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']))->getBoniFuerSpieler((int)$uid);
+    } catch (\Throwable $e) {
+        $info['sektor'] = \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::boni(\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::leer(0));
+    }
+    $info['industrie'] += $info['sektor']['industrie'];
+    $info['bauzeit'] += $info['sektor']['bauzeit'];
+
     return $info;
 }
 
 /**
  * Faktor für Bau- und Missionszeiten in den Vergessenen Systemen. Artefakt 12 verkürzt sie um max. 50%,
- * Hekates Gunst, der Pfad des Thanatos und die Werft im Feldzug zusammen um weitere max. 50%.
+ * Hekates Gunst, der Pfad des Thanatos, die Werft im Feldzug und das Hyperraumrelais des Sektors zusammen um weitere max. 50%.
  */
 function vs_duration_factor($uid, $ua_werte)
 {

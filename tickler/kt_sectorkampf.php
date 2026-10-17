@@ -68,6 +68,9 @@ try {
 	echo '<br>Fehler bei Sektor 666: '.$e->getMessage().'<br>';
 }
 
+//Sektorprojekte und Kampfmittel: Verteidigungsgitter und Schildgenerator des verteidigten Sektors, Enterkommando der Angreifer
+$sp = new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']);
+
 $res = mysqli_execute_query($GLOBALS['dbi'], "SELECT zielsec FROM de_sector WHERE aktion = 1 AND zeit = 1".($s666_wach ? " AND zielsec <> 666" : "")." ORDER BY zielsec", []);
 
 $num = mysqli_num_rows($res);
@@ -162,8 +165,17 @@ for ($c=0; $c<$num; $c++){
 	}
 	//echo '<br> '.$sumatter.' Angreifer gegen '.$sumdeffer.' Verteidiger. <br>';
 
+	//Enterkommando: Schiffe der Angreifer, die eines scharf haben, zählen für die Artefaktchance anderthalbfach (es ist damit verbraucht)
+	$sp_enter=$sp->enterAngreifer($asecid);
+	$sumatter_chance=0;
+	for ($i=0; $i<$anzatter; $i++){
+		$sumatter_chance+=$atter[$i][0]*(in_array($asecid[$i], $sp_enter) ? \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::ENTER_FAKTOR : 1);
+	}
+	//Verteidigungsgitter und scharfer Schildgenerator des verteidigten Sektors
+	$sp_vert=$sp->verteidigung((int)$zsec, (int)$max_kt);
+
 	if ($sumdeffer>0){
-		$klauw=$sumatter / $sumdeffer * 100;
+		$klauw=$sumatter_chance / $sumdeffer * 100;
 	}else{
 		$klauw=100;
 	}
@@ -199,6 +211,11 @@ for ($c=0; $c<$num; $c++){
 	}
 	}
 
+	//Gitter, Schild und Enterkommando im Bericht nennen
+	if ($sp_vert['gitter']>0) $stolestr.=strtr($kt_lang['sp_gitter'], array('{STUFE}' => $sp_vert['gitter'], '{PCT}' => $sp_vert['prozent'])).'<br>';
+	if ($sp_vert['schild']) $stolestr.=$kt_lang['sp_schild'].'<br>';
+	if (count($sp_enter)>0) $stolestr.=strtr($kt_lang['sp_enter'], array('{SEKTOR}' => implode(', ', $sp_enter))).'<br>';
+
 	$destroyedatter=$sumdeffer / 4;
 	$destroyedatter=(int)$destroyedatter;
 	if ($destroyedatter>$sumatter)$destroyedatter=$sumatter;
@@ -218,16 +235,23 @@ for ($c=0; $c<$num; $c++){
 		}
 	}
 
-	//prozentualen verlust der verteidiger berechnen
+	//prozentualen verlust der verteidiger berechnen; die Flotten des verteidigten Sektors selbst verlieren durch
+	//Verteidigungsgitter und Schildgenerator weniger, Hilfsflotten anderer Sektoren nicht
+	$sp_faktor=(1-$sp_vert['prozent']/100)*($sp_vert['schild'] ? \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::SCHILD_FAKTOR : 1);
 	$vertdestroyeddeffer=0;
 	for ($i=0; $i<$anzdeffer; $i++){
 		if ($sumdeffer>0){
 			$deffer[$i][1]=$deffer[$i][0] / $sumdeffer;
 			$deffer[$i][1]=$destroyeddeffer * $deffer[$i][1];
+			if ($dsecid[$i]==$zsec) $deffer[$i][1]=$deffer[$i][1]*$sp_faktor;
 			$deffer[$i][1]=(int)$deffer[$i][1];
 			$vertdestroyeddeffer=$vertdestroyeddeffer+$deffer[$i][1];
 		}
 	}
+	//die Verluste der Verteidiger sind die Summe je Flotte, durch Gitter und Schild weniger als Angreifer/4
+	$destroyeddeffer=$vertdestroyeddeffer;
+	//ein scharfer Schildgenerator ist mit diesem Kampf verbraucht
+	if ($sp_vert['schild'] && $sumatter>0) $sp->schildVerbrauchen((int)$zsec);
 
 	/*
 	//schauen ob noch einheiten wegen rundungsfehlern vergessen worden sind

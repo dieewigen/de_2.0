@@ -2995,6 +2995,61 @@ CREATE TABLE `de_sector_voteout` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_sector_vs`
+-- Sektorprojekte und Kampfmittel aus den Vergessenen Systemen je Sektor (docs/sektorprojekte.md, SektorprojektService):
+-- Projektstufen, laufender Bau, Bestand der Kampfmittel und scharfe Wirkungen (Schild bis KT, Störsender bis WT)
+--
+
+CREATE TABLE `de_sector_vs` (
+  `sec_id` smallint(5) UNSIGNED NOT NULL,
+  `relais` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `raffinerie` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `werft` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `gitter` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `bau_projekt` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `bau_rest_wt` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `km_schild` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `km_nachbrenner` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `km_stoersender` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `km_enter` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `schild_bis_kt` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `stoersender_bis_wt` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `enter_aktiv` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`sec_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_sector_vs_lager`
+-- Sektor-VS-Lager: VS-Rohstoffe (3-12) und Handelswaren (14-18) je Sektor
+--
+
+CREATE TABLE `de_sector_vs_lager` (
+  `sec_id` smallint(5) UNSIGNED NOT NULL,
+  `item_id` smallint(5) UNSIGNED NOT NULL,
+  `menge` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`sec_id`, `item_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_sector_vs_einzahlung`
+-- Einzahlungen der Spieler ins Sektor-VS-Lager (Liste in der Sektorpolitik, nur aktuelle Mitglieder)
+--
+
+CREATE TABLE `de_sector_vs_einzahlung` (
+  `sec_id` smallint(5) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `item_id` smallint(5) UNSIGNED NOT NULL,
+  `menge` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`sec_id`, `user_id`, `item_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_sektor666`
 -- Sektor 666 erwacht: Zustand der Schläfer, eine Zeile mit id=1 (legt der Sektor666Service selbst an)
 --

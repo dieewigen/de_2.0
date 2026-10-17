@@ -670,6 +670,18 @@ if($sec_data['npc']==1){
 	}
 	if($basestr=='')$basestr='<span class="sec-none">nicht gebaut</span>';
 
+	//Sektorprojekte aus den Vergessenen Systemen, für alle Sektoren sichtbar (docs/sektorprojekte.md)
+	include_once 'inc/lang/'.$sv_server_lang.'_sektorprojekt.lang.php';
+	$sp_status=(new \DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService($GLOBALS['dbi']))->getStatus((int)$sector);
+	$projektstr='';
+	foreach(\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::PROJEKTE as $sp_id => $sp_spalte){
+		if($sp_status[$sp_spalte]>0){
+			$sp_pct=\DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService::PROZENT[$sp_id][$sp_status[$sp_spalte]];
+			$projektstr.='<span class="mod-chip" title="'.$sektorprojekt_lang['projekt'][$sp_id].' Stufe '.$sp_status[$sp_spalte].'&'.strtr($sektorprojekt_lang['projekt_wirkung'][$sp_id], array('{PCT}' => $sp_pct)).'">'.$sektorprojekt_lang['projekt'][$sp_id].' '.$sp_status[$sp_spalte].'</span>';
+		}
+	}
+	if($projektstr!='')$basestr.='<div class="sec-projekte" title="'.$sec_lang['sektorprojekte'].'">'.$projektstr.'</div>';
+
 	//Informationen, Sektorraumbasis und Sektorartefakte nebeneinander
 	if($sector>1 AND $anz>0){
 		$infostr='<table class="sec-info">'.

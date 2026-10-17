@@ -1,9 +1,12 @@
 <?php
 use DieEwigen\DE2\Model\Sperre;
+use DieEwigen\DE2\Session\CsrfToken;
+use DieEwigen\DE2\Model\Sektorprojekt\SektorprojektService;
 include "inc/header.inc.php";
 include "inc/artefakt.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_resource.lang.php';
 include 'inc/lang/'.$sv_server_lang.'_siegel.lang.php';
+include 'inc/lang/'.$sv_server_lang.'_sektorprojekt.lang.php';
 include 'inc/sabotage.inc.php';
 include "functions.php";
 
@@ -568,6 +571,33 @@ if (isset($_POST["mtr"]) || isset($_POST["dtr"]) || isset($_POST["itr"]) || isse
 }
 
 ///////////////////////////////////////////////////////////////
+// Einzahlung ins Sektor-VS-Lager: VS-Rohstoffe und Handelswaren für Sektorprojekte und Kampfmittel (docs/sektorprojekte.md)
+///////////////////////////////////////////////////////////////
+$sp = new SektorprojektService($GLOBALS['dbi']);
+if (isset($_POST['vs_trans']) && $sector > 1) {
+    if (!CsrfToken::check($_POST['token'] ?? '')) {
+        res_meldung('Die Sitzung ist abgelaufen, bitte noch einmal absenden.');
+    } elseif (Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])) {
+        $vs_wunsch = array();
+        foreach (SektorprojektService::ITEMS as $vs_item) {
+            $vs_wunsch[$vs_item] = max(0, intval($_POST['vs_tr_'.$vs_item] ?? 0));
+        }
+        $vs_eingezahlt = $sp->einzahlen((int)$sector, (int)$_SESSION['ums_user_id'], $vs_wunsch);
+        Sperre::loesen($GLOBALS['dbi'], $_SESSION['ums_user_id']);
+        if (empty($vs_eingezahlt)) {
+            res_meldung($sektorprojekt_lang['einzahlung_leer'], 'warn');
+        } else {
+            $vs_liste = $sp->postenText($vs_eingezahlt);
+            res_meldung(strtr($sektorprojekt_lang['einzahlung_ok'], array('{LISTE}' => $vs_liste)), 'ok');
+            //wie beim Sektorlager eine Nachricht an den SK
+            \DieEwigen\DE2\Model\Nachricht::anSpieler($GLOBALS['dbi'], $sp->skUserId((int)$sector), strtr($sektorprojekt_lang['news_einzahlung'], array('{NAME}' => $_SESSION['ums_spielername'], '{LISTE}' => $vs_liste)), 7);
+        }
+    } else {
+        res_meldung($resource_lang['releaselock3']);
+    }
+}
+
+///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // kollektoren bauen
 ///////////////////////////////////////////////////////////////
@@ -924,6 +954,39 @@ if (hasTech($pt, 3)) { //wenn planetare boerse vorhanden, dann ist eine einzahlu
         }
     }
     echo '</div></details>';
+    echo '</form>';
+    rahmen_unten();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Sektor-VS-Lager: Einzahlung von VS-Rohstoffen und Handelswaren, nur Posten mit Bestand beim Spieler oder im Lager
+//////////////////////////////////////////////////////////////////////////////
+if ($sector > 1 && hasTech($pt, 25)) {
+    $sp_lager = $sp->getLager((int)$sector);
+    $sp_namen = $sp->itemNamen();
+    $sp_eigen = loadPlayerStorage($_SESSION['ums_user_id']);
+    $sp_zeilen = '';
+    foreach (SektorprojektService::ITEMS as $sp_item) {
+        $sp_bestand = (int)($sp_eigen[$sp_item]['item_amount'] ?? 0);
+        if ($sp_bestand <= 0 && empty($sp_lager[$sp_item])) {
+            continue;
+        }
+        $sp_zeilen .= '<span>'.($sp_namen[$sp_item] ?? '#'.$sp_item).' <small class="bk-leise">'.res_zahl($sp_bestand).'</small></span><span class="bk-zahl">'.res_zahl($sp_lager[$sp_item] ?? 0).'</span>';
+        $sp_zeilen .= '<span class="bk-zahl"><input type="text" name="vs_tr_'.$sp_item.'" value="" maxlength="9" inputmode="numeric" autocomplete="off" class="mod-eingabe res-einzahlung"'.($sp_bestand > 0 ? '' : ' disabled').'></span>';
+    }
+    rahmen_oben($sektorprojekt_lang['lager']);
+    echo '<form action="resource.php" method="POST" class="mod res">';
+    echo '<input type="hidden" name="token" value="'.CsrfToken::get().'">';
+    if ($sp_zeilen == '') {
+        echo '<div class="mod-leer">'.$sektorprojekt_lang['lager_leer'].'</div>';
+    } else {
+        echo '<div class="res-sektorlager">';
+        echo '<span class="bk-spalte">'.$resource_lang['rohstoff'].' <small>(Dein Lager)</small></span><span class="bk-spalte bk-zahl">'.$sektorprojekt_lang['lager'].'</span><span class="bk-spalte bk-zahl">'.$sektorprojekt_lang['einzahlen'].'</span>';
+        echo $sp_zeilen;
+        echo '</div>';
+        echo '<div class="bk-fuss"><span class="bk-leise">'.$sektorprojekt_lang['lager_hinweis'].'</span>';
+        echo '<button type="submit" name="vs_trans" value="1" class="mod-btn">'.$resource_lang['transferieren'].'</button></div>';
+    }
     echo '</form>';
     rahmen_unten();
 }
