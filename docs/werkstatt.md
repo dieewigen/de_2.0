@@ -138,6 +138,26 @@ Umgesetzt und lokal geprüft: Würfelverteilung je Rang, Pechsträhnen-Regel, Sp
 
 Einspielen: Code und `database/updates/2026-10-17_werkstatt.sql`. Server 2 bekommt es mit seiner Folgerunde. Offen: Werte nach den ersten Kämpfen prüfen, die Deckel sind Konstanten.
 
-Patch Notes (Vorschlag):
+## Patch Notes (Text für die Spieler)
 
-> **Werkstatt des Basissterns.** Auf der Basisstern-Seite gibt es jetzt die Werkstatt. Dort schmiedest Du aus VS-Rohstoffen und Handelswaren Ausrüstung für vier Plätze: Panzerung, Schildkern, Waffenphalanx und Zielrechner. Jedes Stück hat eine zufällige Güte von Massenware bis Artefakt und zufällige Werte für Hülle, Schild, Schaden, kritische Treffer, Trefferchance, Dämpfung, Haltungsvorteil und Haltungsschutz. Jeder Wurf bringt Erfahrung, mit dem Rang der Werkstatt (1 bis 10) steigen die Chancen auf hohe Güte. Angelegte Stücke wirken in allen Battlegrounds, in GAMMA zählt je Platz das beste Stück der Allianz. Zerlegen gibt ein Zehntel der Rohstoffe und Erbauerstaub zurück, mit Staub veredelst Du einzelne Werte. Das Lager fasst 6 Stücke und lässt sich beliebig ausbauen. Der Kampfbericht zeigt die Ausrüstung beider Seiten. Alles dazu in der Hilfe unter Vergessene Systeme.
+**Update: Die Werkstatt des Basissterns**
+
+Wer den Basisstern erforscht hat, findet auf seiner Seite (Produktion, Reiter Basisstern) den neuen Abschnitt Werkstatt. Dort schmiedest Du aus VS-Rohstoffen und Handelswaren Ausrüstung für Deinen Basisstern. Sie wirkt in allen drei Battlegrounds.
+
+- Vier Plätze, vier Rezepte: Panzerung (Hülle) aus 3.000 Eisen, 1.500 Titan und 5 Handelswaren I; Schildkern (Schild) aus Mexit, Dulexit und Handelswaren II; Waffenphalanx (Schaden) aus Tekranit, Ylesenium und Handelswaren III; Zielrechner (Kritische Treffer) aus Serodium, Rowalganium und Handelswaren IV. Jeder Wurf kostet dieselben Mengen und ist sofort fertig.
+- Die Güte ist Glück: Massenware, Gute Ware, Seltene Ware, Mystische Ware oder Artefakt. Je höher die Güte, desto höher der Hauptwert und desto mehr Nebenwerte, bis zu vier. Mögliche Werte: Hülle, Schild, Schaden, Kritische Treffer, Trefferchance, Dämpfung, Haltungsvorteil und Haltungsschutz.
+- Rang: Jeder Wurf bringt Erfahrung, die Werkstatt steigt von Rang 1 bis Rang 10. Ein höherer Rang bringt bessere Chancen auf hohe Güte, höhere Mindestwerte und mehr Veredelungen. Jeder zehnte Wurf ist mindestens Gute Ware, jeder fünfzigste mindestens Seltene Ware.
+- Anlegen: Je Platz ist ein Stück angelegt, Anlegen und Ablegen kosten nichts. Über alle Stücke zusammen gelten Deckel: Hülle, Schild und Schaden je 40 %, Kritische Treffer +30, Trefferchance +15, Dämpfung 30 %, Haltungsvorteil +50, Haltungsschutz +33.
+- Zerlegen gibt ein Zehntel der Rohstoffe zurück und Erbauerstaub nach Güte. Mit Staub veredelst Du einzelne Werte eines Stücks um 0,65 % je Update, drei Updates je Rang und Eigenschaft.
+- Lager: 6 Plätze zu Beginn, beliebig oft um 2 Plätze ausbaubar. Die ersten acht Schritte kosten Schrittnummer mal Grundkosten, danach wird jeder Schritt um die Hälfte teurer.
+- GAMMA: Die Allianz kämpft je Platz mit dem Stück höchster Güte ihrer Teilnehmer, bei Gleichstand entscheidet das Los.
+- Kampfbericht: Hinter jedem Namen stehen vier Buchstaben (P S W Z) in der Farbe der Güte, grau ohne Stück. Der Tooltip zeigt die Summe der Werte. So siehst Du, womit Dein nächster Gegner antritt.
+- Stücke sind an Dich gebunden, verschenken oder tauschen geht nicht. Mit der neuen Runde beginnt die Werkstatt von vorn. Niemand muss schmieden, ein Basisstern ohne Ausrüstung kämpft wie bisher.
+
+Stufe und Haltungen des Basissterns, Weltraumhäfen, Rhythmus und Gewinne der Battlegrounds bleiben unverändert. Alle Details stehen in der Hilfe unter Vergessene Systeme.
+
+**Außerdem in diesem Update (VS-Rohstoffe)**
+
+- Sektorprojekte haben fünf Stufen statt drei. Stufe 4 kostet 20.000 Serodium, 10.000 Rowalganium und 20 Handelswaren IV (240 WT), Stufe 5 kostet 20.000 Sextagit, 10.000 Octagium und 20 Handelswaren V (288 WT). Hyperraumrelais und Sektorraffinerie wirken damit bis 25 %, Werftausbau und Verteidigungsgitter bis 50 %.
+- Hekates Aufträge wachsen mit dem Server: Die verlangten Mengen richten sich nach der mittleren VS-Förderung aller Spieler, bis zum 25-Fachen der Grundmenge. Die Belohnungen bleiben gleich.
+- Die Auktion verlangt neben den VS-Rohstoffen jetzt auch Handelswaren I bis V, Startpreis ein Fünftel des größten Lagers, mindestens 20 Stück. Zahl und Preisverfall der Auktionen bleiben unverändert.
