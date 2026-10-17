@@ -167,7 +167,7 @@ Das Spiel läuft mit zwei Tick-Typen; die Skripte prüfen selbst anhand von `$wt
 - **Datei:** `tickler/kt.php`
 - Bewegt Flotten (Flugzeiten, Ankünfte, Rückkehr)
 - Berechnet Kämpfe
-- Generiert Kampfberichte
+- Generiert Kampfberichte, seit Okt. 2026 mit dem Ablauf der Schüsse (`ablauf`) für „Kampf abspielen“ im Bericht
 - Verarbeitet Sabotageaktionen
 
 ### 9. Spezialisierungen
@@ -399,7 +399,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
 - `Model\Nachricht::anSpieler($db, $uid, $text, $typ)`: Nachricht an einen Spieler (`de_user_news`)
 - `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
-- `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds
+- `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `js/de_fn.js`)
 - `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
 - `Model\VSystem\Filter::ausCookies($_COOKIE)` / `passendeIds(...)`: VS-Filter der Übersicht für die Pfeile der Systemseite
 - `Session\CsrfToken`: siehe Sicherheit
@@ -568,6 +568,6 @@ Siehe Git-Tags für Release-Versionen:
 
 ---
 
-**Letzte Aktualisierung:** 15. Oktober 2026
+**Letzte Aktualisierung:** 17. Oktober 2026
 
 Für weitere Fragen siehe README.md oder kontaktiere das Entwicklerteam.

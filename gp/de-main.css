@@ -9493,6 +9493,132 @@ a.art-kachel-zurueck:hover::after {
   font-size: 11px;
 }
 
+.kb-ablauf {
+  margin-top: 8px;
+  padding: 8px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.kb-ab-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.kb-ab-zaehler {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: #8b949e;
+}
+
+.kb-ab-seiten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.kb-ab-seite {
+  --kb-ab-akzent: #ff8a5c;
+  min-width: 0;
+}
+
+.kb-ab-v {
+  --kb-ab-akzent: #5fb0ff;
+}
+
+.kb-ab-titel {
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--kb-ab-akzent);
+}
+
+.kb-ab-zeile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--kb-text);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.kb-ab-misch {
+  --kb-farbe: 150, 160, 170;
+  --kb-text: #c9d1d9;
+}
+
+.kb-ab-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.kb-ab-name small {
+  margin-left: 4px;
+  font-size: 10px;
+  color: #8b949e;
+}
+
+.kb-ab-balken {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.kb-ab-balken i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  transition: width 0.5s ease-out;
+}
+
+.kb-ab-gelaehmt {
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0 2px, transparent 2px 5px);
+}
+
+.kb-ab-zerstoert {
+  background: #ff6b6b;
+}
+
+.kb-ab-schuetze {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px var(--kb-ab-akzent);
+}
+
+.kb-ab-ziel {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.kb-ab-text {
+  min-height: 31px;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9da7b1;
+}
+.kb-ab-text b {
+  color: #ffffff;
+}
+
+.kb-ab-knoepfe {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
 #tt .ei {
   font-family: Roboto, Arial, Helvetica, sans-serif;
   font-size: 12px;

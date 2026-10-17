@@ -772,6 +772,18 @@ for ($c = 0; $c < $z; $c++) {
     $atter_awrest = $atter_awges;
     $deffer_awrest = $deffer_awges;
 
+    //Ablauf für "Kampf abspielen" im Kampfbericht (src/View/Kampfbericht.php): je Schuss [Phase, Seite, Schütze, Ziel, Anteil]
+    //in der Reihenfolge der Berechnung. Phase 1 EMP-Waffen (lähmen), 2 konventionelle Waffen (zerstören); Seite a Angreifer,
+    //v Verteidiger; Klassen 0-9 Schiffe, 10-14 Türme; Anteil in Prozent der getroffenen Klasse (Phase 1 vom Angriffswert,
+    //Phase 2 von den Hitpoints, Schüsse unter 0,1 % bleiben weg). Landet als 'ablauf' in jedem Bericht dieses Kampfes.
+    $kb_ablauf = array();
+    $kb_schuss = function ($phase, $seite, $von, $auf, $treffer, $gesamt) use (&$kb_ablauf) {
+        $anteil = $gesamt > 0 ? round($treffer * 100 / $gesamt, 1) : 0;
+        if ($anteil > 0) {
+            $kb_ablauf[] = array($phase, $seite, $von, $auf, $anteil);
+        }
+    };
+
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
 
@@ -799,6 +811,7 @@ for ($c = 0; $c < $z; $c++) {
                     //wert abziehen
                     if (($bw - $bw * $psext) >= $deffer_awrest[$bziel]) {
                         //alle schiffe der klasse werden geblockt
+                        $kb_schuss(1, 'a', $i, $bziel, $deffer_awrest[$bziel], $deffer_awges[$bziel]);
                         $bw = $bw - $deffer_awrest[$bziel];
                         $deffer_awrest[$bziel] = 0;
                         //echo '<br>BW2:'.$bw.' ';
@@ -806,6 +819,7 @@ for ($c = 0; $c < $z; $c++) {
 
                     } else {
                         //bw reicht nicht zum blocken aller schiffe
+                        $kb_schuss(1, 'a', $i, $bziel, $bw - $bw * $psext, $deffer_awges[$bziel]);
                         $deffer_awrest[$bziel] = $deffer_awrest[$bziel] - ($bw - $bw * $psext);
                         $bw = 0;
                         //echo '<br>BW3:'.$bw.' ';
@@ -841,10 +855,12 @@ for ($c = 0; $c < $z; $c++) {
                 //wert abziehen
                 if ($bw >= $atter_awrest[$bziel]) {
                     //alle schiffe der klasse werden geblockt
+                    $kb_schuss(1, 'v', $i, $bziel, $atter_awrest[$bziel], $atter_awges[$bziel]);
                     $bw = $bw - $atter_awrest[$bziel];
                     $atter_awrest[$bziel] = 0;
                 } else {
                     //bw reicht nicht zum blocken aller schiffe
+                    $kb_schuss(1, 'v', $i, $bziel, $bw, $atter_awges[$bziel]);
                     $atter_awrest[$bziel] = $atter_awrest[$bziel] - $bw;
                     $bw = 0;
 
@@ -1003,6 +1019,7 @@ for ($c = 0; $c < $z; $c++) {
                 //wert abziehen
                 if ($atter_awrest[$i] >= $deffer_hprest[$aziel]) {
                     //alle schiffe der klasse werden geblockt
+                    $kb_schuss(2, 'a', $i, $aziel, $deffer_hprest[$aziel], $deffer_hpges[$aziel]);
                     $atter_awrest[$i] = $atter_awrest[$i] - $deffer_hprest[$aziel];
                     $deffer_hprest[$aziel] = 0;
                     //echo '<br>BW2:'.$bw.' ';
@@ -1011,6 +1028,7 @@ for ($c = 0; $c < $z; $c++) {
                     ;
                 } else {
                     //aw reicht nicht zum zerst�ren aller schiffe
+                    $kb_schuss(2, 'a', $i, $aziel, $atter_awrest[$i], $deffer_hpges[$aziel]);
                     $deffer_hprest[$aziel] = $deffer_hprest[$aziel] - $atter_awrest[$i];
                     $atter_awrest[$i] = 0;
                     //echo '<br>BW3:'.$bw.' ';
@@ -1034,10 +1052,12 @@ for ($c = 0; $c < $z; $c++) {
                 //wert abziehen
                 if ($deffer_awrest[$i] >= $atter_hprest[$aziel]) {
                     //alle schiffe der klasse werden geblockt
+                    $kb_schuss(2, 'v', $i, $aziel, $atter_hprest[$aziel], $atter_hpges[$aziel]);
                     $deffer_awrest[$i] = $deffer_awrest[$i] - $atter_hprest[$aziel];
                     $atter_hprest[$aziel] = 0;
                 } else {
                     //aw reicht nicht zum zerst�ren aller schiffe
+                    $kb_schuss(2, 'v', $i, $aziel, $deffer_awrest[$i], $atter_hpges[$aziel]);
                     $atter_hprest[$aziel] = $atter_hprest[$aziel] - $deffer_awrest[$i];
                     $deffer_awrest[$i] = 0;
                     //echo '<br>BW3:'.$bw.' ';
@@ -1752,6 +1772,8 @@ for ($c = 0; $c < $z; $c++) {
     //rasse des deffers/t�rme
     $datenstring = $datenstring.($d_userdata[0][3] - 1).';';
     $kb_daten['target_rasse'] = $d_userdata[0][3] - 1;
+    //gegen NPC-Systeme lähmen die Angreifer nicht, der Ablauf im Bericht sagt das dazu
+    $kb_daten['npc'] = $npc;
 
     //die namen/systeme der atter/deffer
     $datenstring = $datenstring.$atterliste.';'.$defferliste.';';
@@ -2027,6 +2049,7 @@ for ($c = 0; $c < $z; $c++) {
         $kb_array['tuerme'] = $kb_tuerme;
         $kb_array['daten_spieler'] = $kb_daten_spieler;
         $kb_array['einheiten_spieler'] = $kb_einheiten_spieler;
+        $kb_array['ablauf'] = $kb_ablauf;
 
         /*
         echo '<br>ATTERSTRING: '.$atterstring;
@@ -2285,6 +2308,7 @@ for ($c = 0; $c < $z; $c++) {
             $kb_array['tuerme'] = $kb_tuerme;
             $kb_array['daten_spieler'] = $kb_daten_spieler;
             $kb_array['einheiten_spieler'] = $kb_einheiten_spieler;
+            $kb_array['ablauf'] = $kb_ablauf;
 
             /*
             echo '<br>ATTERSTRING: '.$atterstring;
@@ -2380,6 +2404,7 @@ for ($c = 0; $c < $z; $c++) {
         $kb_array['tuerme'] = $kb_tuerme;
         $kb_array['daten_spieler'] = $kb_daten_spieler;
         $kb_array['einheiten_spieler'] = $kb_einheiten_spieler;
+        $kb_array['ablauf'] = $kb_ablauf;
 
         /*
         echo '<br>ATTERSTRING: '.$atterstring;

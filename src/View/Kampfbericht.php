@@ -130,6 +130,53 @@ class Kampfbericht
         return '<tr><td>'.$label.'</td><td>'.$atext.'</td><td><div class="kb-anteil"><span class="kb-anteil-a" style="width: '.$pa.'%"></span><span class="kb-anteil-v" style="width: '.(100-$pa).'%"></span></div></td><td>'.$vtext.'</td><td class="kb-verh">'.$verh.'</td></tr>';
     }
 
+    //Ablauf zum Abspielen (Knopf "Kampf abspielen", Handler in js/de_fn.js): je Seite die Klassen mit Anzahl als Balken in der
+    //Rassenfarbe (Schiffe mehrerer Rassen in einer Klasse: Klassenname, grau), die Schüsse des Kampftick aus 'ablauf' (seit
+    //Okt. 2026, Aufbau in tickler/kt_systemkampf.php) als JSON in data-schritte. Berichte ohne Aufzeichnung bekommen keinen Kasten.
+    private static function ablauf($kbd, $rassennamen, $turmnamen, $klassen, $ergebnis){
+        $schritte=(isset($kbd['ablauf']) && is_array($kbd['ablauf'])) ? array_values($kbd['ablauf']) : array();
+        if(count($schritte)==0){
+            return '';
+        }
+        $sv_anz_schiffe=$GLOBALS['sv_anz_schiffe'];
+        $zeile=function($klasse, $name, $anzahl, $rasse){
+            return '<div class="kb-ab-zeile '.($rasse<0 ? 'kb-ab-misch' : 'kb-r'.$rasse).'" data-k="'.$klasse.'"><span class="kb-ab-name">'.$name.'<small>'.self::zahl($anzahl).'</small></span>'
+                .'<span class="kb-ab-balken"><i class="kb-ab-gelaehmt"></i><i class="kb-ab-zerstoert"></i></span></div>';
+        };
+        $spalten=array('a'=>'', 'v'=>'');
+        foreach(array('a'=>'einheiten_atter', 'v'=>'einheiten_deffer') as $s=>$key){
+            for($i=0;$i<$sv_anz_schiffe;$i++){
+                $anzahl=0;
+                $rassen=array();
+                for($r=0;$r<$GLOBALS['sv_anz_rassen'];$r++){
+                    if((int)($kbd[$key][0][$r][$i] ?? 0)>0){
+                        $anzahl+=(int)$kbd[$key][0][$r][$i];
+                        $rassen[]=$r;
+                    }
+                }
+                if($anzahl>0){
+                    $spalten[$s].=count($rassen)==1 ? $zeile($i, $rassennamen[$rassen[0]][$i], $anzahl, $rassen[0]) : $zeile($i, $klassen[$i] ?? '', $anzahl, -1);
+                }
+            }
+        }
+        $turmrasse=(int)($kbd['daten']['target_rasse'] ?? 0);
+        for($i=0;$i<$GLOBALS['sv_anz_tuerme'];$i++){
+            $anzahl=(int)($kbd['tuerme'][0][$i] ?? 0);
+            if($anzahl>0){
+                $spalten['v'].=$zeile($sv_anz_schiffe+$i, $turmnamen[$turmrasse][$i] ?? '', $anzahl, $turmrasse);
+            }
+        }
+        $hinweis=!empty($kbd['daten']['npc']) ? ' data-hinweis="Gegen die DX61a23 wirken die EMP-Waffen der Angreifer nicht."' : '';
+
+        return '<div class="kb-ablauf" id="kb-ablauf-'.self::$nr.'" hidden data-schritte="'.htmlspecialchars(json_encode($schritte), ENT_QUOTES, 'UTF-8').'" data-ergebnis="'.htmlspecialchars($ergebnis, ENT_QUOTES, 'UTF-8').'"'.$hinweis.'>'
+            .'<div class="kb-ab-kopf"><span class="mod-typ">Ablauf des Kampfes</span><span class="kb-ab-zaehler"></span></div>'
+            .'<div class="kb-ab-seiten"><div class="kb-ab-seite kb-ab-a"><div class="kb-ab-titel">Angreifer</div>'.$spalten['a'].'</div>'
+            .'<div class="kb-ab-seite kb-ab-v"><div class="kb-ab-titel">Verteidiger</div>'.$spalten['v'].'</div></div>'
+            .'<div class="kb-ab-text"></div>'
+            .'<div class="kb-ab-knoepfe"><button type="button" class="mod-btn mod-btn-leise kb-knopf" data-ab="lauf">Pause</button>'
+            .'<button type="button" class="mod-btn mod-btn-leise kb-knopf" data-ab="schritt">Schritt</button></div></div>';
+    }
+
     //Kampfbericht (de_user_news.typ 57): Kopf mit Ergebnis, beide Seiten, eigenes Ergebnis, dann die Einheiten wie im alten
     //Bericht mit Angreifer, Verteidiger und eigenen Einheiten nebeneinander (alle Einheiten der beteiligten Rassen, damit die
     //Klassen zeilenweise vergleichbar bleiben), zum Schluss die Statistik. Spielerwunsch vom 2026-10-15.
@@ -344,12 +391,16 @@ class Kampfbericht
             .'  '.$kbl_lang['verlorenepunkte'].': '.self::zahl($ges['a'][3]).' ('.self::prozent($ges['a'][3], $ges['a'][2]).') / '.self::zahl($ges['v'][3]).' ('.self::prozent($ges['v'][3], $ges['v'][2]).")\n"
             .'  Verlorene Hitpoints: '.number_format($quote['a'], 1, ',', '.').' % / '.number_format($quote['v'], 1, ',', '.')." %\n";
 
-        //Siegregel wie im alten Bericht, daneben die Knöpfe zum Kopieren und Teilen (data-kopieren/data-teilen, js/de_fn.js)
+        //Siegregel wie im alten Bericht, daneben die Knöpfe zum Kopieren, Teilen und Abspielen (data-kopieren/data-teilen/
+        //data-abspielen, js/de_fn.js); der Ablauf zum Abspielen folgt unter dem Fuß, nur bei Berichten mit Aufzeichnung
+        $ablauf=self::ablauf($kbd, $rassennamen, $turmnamen, $kbl_lang['klassen'] ?? array(),
+            $chip.'. Verluste an Hitpoints: '.$kbl_lang['angreifer'].' '.number_format($quote['a'], 1, ',', '.').' %, '.$kbl_lang['verteidiger'].' '.number_format($quote['v'], 1, ',', '.').' %.');
         $html.='<div class="kb-fuss"><details class="kb-regel"><summary>Wie wird der Sieger bestimmt?</summary><p>Es gewinnt die Seite, die weniger Hitpoints im Verhältnis zu ihren gesamten Hitpoints verloren hat. In den Hitpoints sind alle Boni eingerechnet.<br>'
             .'Verluste '.$kbl_lang['angreifer'].': '.number_format($quote['a'], 2, ',', '.').' %<br>Verluste '.$kbl_lang['verteidiger'].': '.number_format($quote['v'], 2, ',', '.').' %</p></details>'
             .'<div class="kb-knoepfe"><button type="button" class="mod-btn mod-btn-leise kb-knopf" data-kopieren="kb-quelle-'.self::$nr.'">Als Text kopieren</button>'
-            .'<button type="button" class="mod-btn mod-btn-leise kb-knopf" data-teilen="kb-quelle-'.self::$nr.'">WhatsApp</button></div>'
-            .'<textarea class="kb-quelle" id="kb-quelle-'.self::$nr.'" hidden readonly>'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'</textarea></div>';
+            .'<button type="button" class="mod-btn mod-btn-leise kb-knopf" data-teilen="kb-quelle-'.self::$nr.'">WhatsApp</button>'
+            .($ablauf!=='' ? '<button type="button" class="mod-btn mod-btn-leise kb-knopf" data-abspielen="kb-ablauf-'.self::$nr.'">Kampf abspielen</button>' : '').'</div>'
+            .'<textarea class="kb-quelle" id="kb-quelle-'.self::$nr.'" hidden readonly>'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'</textarea></div>'.$ablauf;
         $html.='</div>';
 
         return $html;

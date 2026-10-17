@@ -233,3 +233,150 @@ document.addEventListener('click', function(e){
     window.top.location.href = url;
   }
 });
+
+// "Kampf abspielen" (Kampfbericht): data-abspielen nennt die ID des Ablauf-Kastens aus src/View/Kampfbericht.php. Sein
+// data-schritte enthält die Schüsse des Kampftick als [Phase, Seite, Schütze, Ziel, Prozent] (Phase 1 EMP-Waffen lähmen,
+// Phase 2 konventionelle Waffen zerstören; Seite a Angreifer, v Verteidiger; Klassen 0-9 Schiffe, 10-14 Türme). Jeder
+// Schritt hebt Schütze und Ziel hervor und füllt beim Ziel den gelähmten bzw. zerstörten Anteil seines Balkens. Der Ablauf
+// läuft von selbst (nicht bei reduzierter Bewegung), "Pause" und "Schritt" steuern ihn, am Ende geht es von vorn.
+(function(){
+  var SEITE = {a: 'Angreifer', v: 'Verteidiger'};
+  var PHASE = {
+    1: 'Phase 1, EMP-Waffen: Jede Klasse lähmt gegnerische Klassen in fester Reihenfolge, mit jedem weiteren Ziel schwächer. Gelähmte Einheiten feuern in Phase 2 nicht.',
+    2: 'Phase 2, konventionelle Waffen: Alle nicht gelähmten Einheiten feuern gleichzeitig, jede Klasse in ihrer Reihenfolge auf die Trefferpunkte der gegnerischen Klassen.'
+  };
+  var reduziert = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ablauf(kasten){
+    if(kasten.kbAblauf){
+      return kasten.kbAblauf;
+    }
+    var schuesse = JSON.parse(kasten.getAttribute('data-schritte') || '[]');
+    var schritte = [];
+    [1, 2].forEach(function(p){
+      schritte.push({phase: p});
+      schuesse.forEach(function(s){
+        if(s[0] === p){
+          schritte.push({schuss: s});
+        }
+      });
+    });
+    schritte.push({ende: true});
+    var text = kasten.querySelector('.kb-ab-text');
+    var zaehler = kasten.querySelector('.kb-ab-zaehler');
+    var knopf = kasten.querySelector('[data-ab="lauf"]');
+    var zeilen = kasten.querySelectorAll('.kb-ab-zeile');
+    var stand = 0, uhr = null, laeuft = false;
+    var gegner = function(seite){
+      return seite === 'a' ? 'v' : 'a';
+    };
+    var zeile = function(seite, klasse){
+      return kasten.querySelector('.kb-ab-' + seite + ' [data-k="' + klasse + '"]');
+    };
+    var name = function(z){
+      return '<b>' + (z ? z.querySelector('.kb-ab-name').firstChild.textContent : '?') + '</b>';
+    };
+    // Zustand nach Schritt n: Balken aus allen Schüssen bis dahin, Hervorhebung und Text des Schritts
+    var zeigen = function(n){
+      stand = n;
+      var summe = {};
+      for(var i = 0; i <= n; i++){
+        var t = schritte[i].schuss;
+        if(t){
+          var k = gegner(t[1]) + t[3];
+          summe[k] = summe[k] || [0, 0];
+          summe[k][t[0] - 1] = Math.min(100, summe[k][t[0] - 1] + t[4]);
+        }
+      }
+      Array.prototype.forEach.call(zeilen, function(z){
+        var w = summe[(z.parentNode.classList.contains('kb-ab-v') ? 'v' : 'a') + z.getAttribute('data-k')] || [0, 0];
+        z.querySelector('.kb-ab-gelaehmt').style.width = w[0] + '%';
+        z.querySelector('.kb-ab-zerstoert').style.width = w[1] + '%';
+        z.classList.remove('kb-ab-schuetze', 'kb-ab-ziel');
+      });
+      var s = schritte[n].schuss;
+      if(s){
+        var von = zeile(s[1], s[2]), auf = zeile(gegner(s[1]), s[3]);
+        if(von){
+          von.classList.add('kb-ab-schuetze');
+        }
+        if(auf){
+          auf.classList.add('kb-ab-ziel');
+        }
+        text.innerHTML = name(von) + ' (' + SEITE[s[1]] + ') ' + (s[0] === 1 ? 'lähmt' : 'zerstört') + ' <b>' +
+          String(s[4]).replace('.', ',') + ' %</b> der ' + name(auf) + ' (' + SEITE[gegner(s[1])] + ').';
+      }else if(schritte[n].phase){
+        text.textContent = PHASE[schritte[n].phase] + (schritte[n].phase === 1 && kasten.getAttribute('data-hinweis') ? ' ' + kasten.getAttribute('data-hinweis') : '');
+      }else{
+        text.textContent = 'Ergebnis: ' + kasten.getAttribute('data-ergebnis');
+      }
+      zaehler.textContent = (n + 1) + ' / ' + schritte.length;
+      knopf.textContent = laeuft ? 'Pause' : (n >= schritte.length - 1 ? 'Von vorn' : 'Abspielen');
+    };
+    var anhalten = function(){
+      laeuft = false;
+      clearTimeout(uhr);
+      knopf.textContent = stand >= schritte.length - 1 ? 'Von vorn' : 'Abspielen';
+    };
+    var weiter = function(){
+      if(stand >= schritte.length - 1){
+        anhalten();
+        return;
+      }
+      zeigen(stand + 1);
+      uhr = setTimeout(weiter, schritte[stand].schuss ? 900 : 2000);
+    };
+    var starten = function(){
+      laeuft = true;
+      if(stand >= schritte.length - 1){
+        zeigen(0);
+      }
+      knopf.textContent = 'Pause';
+      clearTimeout(uhr);
+      uhr = setTimeout(weiter, schritte[stand].schuss ? 900 : 2000);
+    };
+    kasten.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('[data-ab]') : null;
+      if(!b){
+        return;
+      }
+      if(b.getAttribute('data-ab') === 'schritt'){
+        anhalten();
+        zeigen(stand >= schritte.length - 1 ? 0 : stand + 1);
+      }else if(laeuft){
+        anhalten();
+      }else{
+        starten();
+      }
+    });
+    kasten.kbAblauf = {zeigen: zeigen, starten: starten, anhalten: anhalten};
+    return kasten.kbAblauf;
+  }
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-abspielen]') : null;
+    if(!b){
+      return;
+    }
+    var kasten = document.getElementById(b.getAttribute('data-abspielen'));
+    if(!kasten){
+      return;
+    }
+    var a = ablauf(kasten);
+    if(kasten.hidden){
+      kasten.hidden = false;
+      b.textContent = 'Ablauf schließen';
+      a.zeigen(0);
+      if(!reduziert){
+        a.starten();
+      }
+      if(kasten.scrollIntoView){
+        kasten.scrollIntoView({block: 'nearest', behavior: reduziert ? 'auto' : 'smooth'});
+      }
+    }else{
+      a.anhalten();
+      kasten.hidden = true;
+      b.textContent = 'Kampf abspielen';
+    }
+  });
+})();

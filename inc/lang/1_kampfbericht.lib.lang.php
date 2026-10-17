@@ -11,6 +11,9 @@ $turmnamen['2'] = array ('Schwarm der Nestverteidiger', 'Sporendrüse', 'Lichtdr
 $turmnamen['3'] = array ('Larvenstock', 'Speichelbatterie', 'Bodenstachel', 'Giftstachelbatterie', 'Feuerstachelbatterie');
 $turmnamen['4'] = array ('Xinth-Base', 'EMP-Kanonen-Styx', 'X-Magma-Styx', 'Zermalmer-Styx', 'ER-Plasmawerfer-Styx');
 
+//Klassennamen für den Ablauf zum Abspielen, wenn eine Klasse auf einer Seite Schiffe mehrerer Rassen vereint
+$kbl_lang['klassen'] = array ('Jäger', 'Jagdboot', 'Zerstörer', 'Kreuzer', 'Schlachtschiff', 'Bomber', 'Transmitterschiff', 'Träger', 'Frachter', 'Titan');
+
 $kbl_lang['abgewehrt']='Der Angriff wurde abgewehrt und es wurden keine Kollektoren gestohlen.';
 $kbl_lang['col']='Kollektor';
 $kbl_lang['cols']='Kollektoren';
