@@ -9,6 +9,7 @@ $sv_bg = Battleground::DEFS;
 
 use DieEwigen\DE2\Model\Battleground\Haltung;
 use DieEwigen\DE2\Model\Battleground\Werkstatt;
+use DieEwigen\DE2\View\WerkstattKarte;
 use DieEwigen\DE2\Session\CsrfToken;
 include 'inc/lang/'.$sv_server_lang.'_werkstatt.lang.php';
 
@@ -97,11 +98,13 @@ if(hasTech($pt,159) && ($_SERVER['REQUEST_METHOD'] ?? '')==='POST'){
 			$ws_name=$ws_it ? Werkstatt::name($ws_it, $werkstatt_lang) : '';
 			$ws_fehler='';
 			$ws_text='';
+			$ws_neu_id=0;
 			switch($_POST['ws_aktion']){
 				case 'schmieden':
 					$ws_erg=$ws->schmieden($ws_uid, $ship, (int)($_POST['ws_platz'] ?? 0));
 					$ws_fehler=$ws_erg['fehler'];
 					if($ws_erg['ok']){
+						$ws_neu_id=(int)$ws_erg['item']['id'];
 						$ws_text=str_replace(array('{NAME}', '{WERTE}'), array(Werkstatt::name($ws_erg['item'], $werkstatt_lang), ws_werte_text($ws_erg['item'], $werkstatt_lang)), $werkstatt_lang['meldung']['geschmiedet']);
 						if($ws_erg['rang_neu']){
 							$ws_text.=str_replace('{RANG}', Werkstatt::rang($ship), $werkstatt_lang['meldung']['rang_neu']);
@@ -142,7 +145,7 @@ if(hasTech($pt,159) && ($_SERVER['REQUEST_METHOD'] ?? '')==='POST'){
 			}
 			saveSpecialShip($ws_uid, $ship);
 			Sperre::loesen($GLOBALS['dbi'], $ws_uid);
-			$_SESSION['ws_meldung']=($ws_fehler==='') ? array('ok', $ws_text) : array('fehler', $werkstatt_lang['fehler'][$ws_fehler] ?? $werkstatt_lang['fehler']['unbekannt']);
+			$_SESSION['ws_meldung']=($ws_fehler==='') ? array('ok', $ws_text, $ws_neu_id) : array('fehler', $werkstatt_lang['fehler'][$ws_fehler] ?? $werkstatt_lang['fehler']['unbekannt']);
 		}else{
 			$ss_ziel.='?fehler=sperre';
 		}
@@ -165,8 +168,10 @@ foreach($ss_meldungen as $ss_art => $ss_texte){
 }
 //Meldung der Werkstatt aus der Sitzung, einmal anzeigen
 $ws_meldung='';
+$ws_neu_id=0;
 if(isset($_SESSION['ws_meldung']) && is_array($_SESSION['ws_meldung'])){
 	$ws_meldung='<div class="mod-meldung mod-meldung-'.($_SESSION['ws_meldung'][0]==='ok' ? 'ok' : 'fehler').'">'.$_SESSION['ws_meldung'][1].'</div>';
+	$ws_neu_id=(int)($_SESSION['ws_meldung'][2] ?? 0);
 	unset($_SESSION['ws_meldung']);
 }
 
@@ -248,6 +253,12 @@ if(!hasTech($pt,159)){
 
 	$content.=rahmen_oben($werkstatt_lang['titel'],false);
 	$content.='<div class="einh mod ws">'.$ws_meldung;
+	$ws_ctx=array('lang' => $werkstatt_lang, 'token' => $ws_token, 'max_v' => $ws_max_v, 'angelegt' => $ws_angelegt, 'aktionen' => true);
+	//frisch geschmiedetes Stueck gross zeigen, blendet sich ein (View\WerkstattKarte)
+	$ws_neu=$ws_neu_id>0 ? $ws->item($ws_uid, $ws_neu_id) : null;
+	if($ws_neu){
+		$content.='<div class="ws-wurf ws-wurf-'.$ws_neu['guete'].'"><span class="mod-typ">'.$werkstatt_lang['wurf'].'</span>'.WerkstattKarte::html($ws_neu, $ws_ctx+array('neu' => true)).'</div>';
+	}
 	$content.='<div class="einh-kacheln">
 		<div class="ov-wert"><span class="mod-typ">'.$werkstatt_lang['rang'].'</span><b>'.$ws_rang.'</b><small>'.($ws_naechster>0 ? number_format((int)$ship->erfahrung, 0, ',', '.').' / '.$ws_naechster.' '.$werkstatt_lang['erfahrung'] : 'h&ouml;chster Rang').'</small></div>
 		<div class="ov-wert"><span class="mod-typ">'.$werkstatt_lang['staub'].'</span><b>'.number_format((int)$ship->staub, 0, ',', '.').'</b></div>
@@ -256,6 +267,12 @@ if(!hasTech($pt,159)){
 	</div>';
 	if($ws_naechster>0){
 		$content.='<div class="mod-balken ws-balken"><span style="width:'.min(100, round((int)$ship->erfahrung*100/$ws_naechster)).'%"></span></div>';
+		//was der naechste Rang bringt: Chancen auf Seltene, Mystische Ware und Artefakt
+		$ws_teaser=array();
+		foreach(array(2, 3, 4) as $ws_g){
+			$ws_teaser[]='<span class="ws-guete ws-guete-'.$ws_g.'">'.$werkstatt_lang['guete'][$ws_g].' '.Werkstatt::CHANCEN[$ws_rang][$ws_g].' &rarr; '.Werkstatt::CHANCEN[$ws_rang+1][$ws_g].' %</span>';
+		}
+		$content.='<div class="ws-teaser">'.strtr($werkstatt_lang['naechster_rang'], array('{RANG}' => $ws_rang+1)).': '.implode(' ', $ws_teaser).'</div>';
 	}
 
 	//Regeln, aufklappbar
@@ -310,27 +327,9 @@ if(!hasTech($pt,159)){
 	if(count($ws_items)==0){
 		$content.='<div class="mod-leer">'.$werkstatt_lang['keine_stuecke'].'</div>';
 	}else{
-		$content.='<div class="bk-liste">';
+		$content.='<div class="ws-karten">';
 		foreach($ws_items as $ws_it){
-			$ws_werte='';
-			$ws_optionen='';
-			foreach($ws_it['werte'] as $ws_k => $ws_eintrag){
-				$ws_v=(int)($ws_eintrag[1] ?? 0);
-				$ws_werte.='<span class="mod-chip'.($ws_k==Werkstatt::HAUPTWERT[$ws_it['platz']] ? ' ws-haupt' : '').'" title="'.$werkstatt_lang['kennzahl'][$ws_k].'&'.$werkstatt_lang['kennzahl_hilfe'][$ws_k].($ws_v>0 ? '<br>'.$ws_v.' Veredelungen' : '').'">'.$werkstatt_lang['kennzahl'][$ws_k].' <b>'.Werkstatt::wertText($ws_k, $ws_eintrag).'</b></span>';
-				if($ws_v<$ws_max_v){
-					$ws_optionen.='<option value="'.$ws_k.'">'.$werkstatt_lang['kennzahl'][$ws_k].' ('.$ws_v.'/'.$ws_max_v.', '.Werkstatt::veredelnKosten($ws_it['guete'], $ws_v).' Staub)</option>';
-				}
-			}
-			$content.='<div class="bk-zeile ws-zeile'.($ws_it['angelegt'] ? ' ws-angelegt' : '').'">';
-			$content.='<span class="bk-name"><span class="ws-guete ws-guete-'.$ws_it['guete'].'" title="'.$werkstatt_lang['guete'][$ws_it['guete']].'">'.$werkstatt_lang['platz_kurz'][$ws_it['platz']].'</span> '.Werkstatt::name($ws_it, $werkstatt_lang).($ws_it['angelegt'] ? ' <span class="mod-chip mod-chip-gruen">'.$werkstatt_lang['angelegt'].'</span>' : '').'</span>';
-			$content.='<span class="ws-werte">'.$ws_werte.'</span>';
-			$content.='<span class="ws-aktionen">';
-			$content.='<form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><button type="submit" name="ws_aktion" value="'.($ws_it['angelegt'] ? 'ablegen' : 'anlegen').'" class="mod-btn ally-btn-klein'.($ws_it['angelegt'] ? ' mod-btn-leise' : '').'">'.$werkstatt_lang[$ws_it['angelegt'] ? 'ablegen' : 'anlegen'].'</button></form>';
-			if($ws_optionen!=''){
-				$content.='<form method="post" action="specialship.php" class="ws-veredeln">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><select name="ws_kennzahl" class="mod-eingabe">'.$ws_optionen.'</select><button type="submit" name="ws_aktion" value="veredeln" class="mod-btn mod-btn-leise ally-btn-klein">'.$werkstatt_lang['veredeln'].'</button></form>';
-			}
-			$content.='<form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><button type="submit" name="ws_aktion" value="zerlegen" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Wirklich zerlegen?">'.$werkstatt_lang['zerlegen'].'</button></form>';
-			$content.='</span></div>';
+			$content.=WerkstattKarte::html($ws_it, $ws_ctx+array('neu' => $ws_it['id']==$ws_neu_id));
 		}
 		$content.='</div>';
 	}

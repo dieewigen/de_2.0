@@ -69,5 +69,13 @@ $werkstatt_lang = array(
     ),
     //Kampfbericht
     'bericht_ausruestung' => 'Ausrüstung',
+    //Beutekarten der Stücke (src/View/WerkstattKarte.php)
+    'wurf' => 'Dein Wurf',
+    'neu' => 'neu',
+    'frei' => 'freier Nebenwert',
+    'frei_hilfe' => 'Höhere Güte bringt mehr Nebenwerte, bis zu vier beim Artefakt.',
+    'vergleich' => 'Hauptwert gegenüber Deinem angelegten Stück',
+    'veredelungen' => 'Veredelungen',
+    'naechster_rang' => 'Auf Rang {RANG}',
 );
 ?>
