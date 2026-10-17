@@ -182,6 +182,10 @@ var chatcounter = 100;
 //Reiter in dieser Reihenfolge, Inhalt siehe $chat_kanaele oben
 var chatChannels = <?php echo json_encode($chat_kanaele, JSON_HEX_TAG | JSON_INVALID_UTF8_SUBSTITUTE) ?: '[]'; ?>;
 
+//Fehlertexte für den Worker (js/de_chat.js): Server nicht erreichbar bzw. Sitzung weg (abgemeldet, abgelaufen, Botschutz)
+var chatTexte = <?php echo json_encode(['verbindung' => $chat_lang['error_verbindung'], 'sitzung' => $chat_lang['error_sitzung']], JSON_HEX_TAG | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}'; ?>;
+var chatTimer = null;
+
 function show_chatmenu(channeltyp){
 	var menu = $('#chatchannelchanger').empty();
 	$.each(chatChannels, function(i, ch){
@@ -271,6 +275,12 @@ if (window.Worker) {
 	var worker = new Worker('js/de_chat.js?time=<?php echo time();?>');
 
 	worker.addEventListener('message', function(e) {
+		//Server nicht erreichbar oder Sitzung weg
+		if(e.data.error){
+			chat_fehler(e.data.error);
+			return;
+		}
+
 		if(e.data.output){
 			var chatcontent = $('#chatcontent');
 			//nur mitscrollen, wenn man unten war; wer hochgescrollt hat, bekommt stattdessen den Hinweisknopf
@@ -311,9 +321,25 @@ if (window.Worker) {
 		}
 	}, false);
 
-	setInterval(get_chatdata, 1000);
+	chatTimer = setInterval(get_chatdata, 1000);
 }else{
 	$('#chatcontent').html('<div class="chatline chat-error">Der Browser unterst&uuml;tzt keine Webworker, verwende bitte einen modernen Browser.</div>');
+}
+
+//Fehlerzeile anhängen, dieselbe Art nicht zweimal hintereinander. Ohne Sitzung (art 'sitzung') hört die Abfrage auf und das
+//Schreiben ist gesperrt; der Text enthält den Link zum Neuladen, danach zeigt die Seite den Grund (Login, Botschutz)
+function chat_fehler(art){
+	var chatcontent = $('#chatcontent');
+	var letzte = chatcontent.children().last();
+	if(letzte.attr('data-fehler') !== art){
+		var atBottom = chat_atbottom();
+		chatcontent.append($('<div class="chatline chat-error">').attr('data-fehler', art).html(chatTexte[art] || chatTexte.verbindung));
+		if(atBottom) chat_scrolldown();
+	}
+	if(art === 'sitzung'){
+		if(chatTimer) clearInterval(chatTimer);
+		$('#chatinputfield, #chatsend').prop('disabled', true);
+	}
 }
 
 function get_chatdata(){
@@ -340,7 +366,11 @@ function chat_input(){
 		//der Server hat den Channel umgestellt (z.B. keine Allianz mehr)
 		if(data[0].newchatchannel !== undefined) show_chatmenu(data[0].newchatchannel);
 		chatcounter = 100;
-	}, 'json').fail(restore);
+	}, 'json').fail(function(xhr, status){
+		restore();
+		//keine Chat-Daten als Antwort: die Sitzung ist weg; sonst war der Server nicht erreichbar
+		chat_fehler(status === 'parsererror' ? 'sitzung' : 'verbindung');
+	});
 
 	return false;
 }

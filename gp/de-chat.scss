@@ -116,6 +116,14 @@ $chat-channels: (
 #chatcontent .chat-error {
   color: #FF0000;
 }
+#chatcontent .chat-error a {
+  text-decoration: underline;
+}
+// ohne Sitzung gesperrt (chat_fehler in chat.php)
+#chatinputfield:disabled,
+#chatsend:disabled {
+  opacity: 0.5;
+}
 
 #chatcontent .chatline {
   padding: 1px 4px;

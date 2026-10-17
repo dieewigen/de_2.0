@@ -5,10 +5,13 @@ var busy=false;
 //die Fehlermeldung nur einmal zeigen, bis der Chat wieder erreichbar ist
 var errorShown=false;
 
-function postError(){
+//art 'verbindung': der Server antwortet nicht (Netz, Zeitüberschreitung, Serverfehler)
+//art 'sitzung': der Server antwortet, aber nicht mit Chat-Daten, sondern mit der Seite "Nicht eingeloggt" oder dem
+//Botschutz; die Texte dazu stehen in chat.php (chat_fehler)
+function postError(art){
 	if(errorShown) return;
 	errorShown=true;
-	self.postMessage({output: '<div class="chatline chat-error">Auf den Chat konnte nicht zugegriffen werden. &Uuml;berpr&uuml;fe bitte Deine Internetverbindung.</div>', infocenter: ''});
+	self.postMessage({error: art});
 }
 
 self.addEventListener('message', function(e) {
@@ -34,11 +37,11 @@ self.addEventListener('message', function(e) {
 			chatidallg=data[0].chatidallg;
 			self.postMessage(data[0]);
 		} else {
-			postError();
+			postError(xmlhttp.status == 200 ? 'sitzung' : 'verbindung');
 		}
 	};
-	xmlhttp.onerror = postError;
-	xmlhttp.ontimeout = postError;
+	xmlhttp.onerror = function() { postError('verbindung'); };
+	xmlhttp.ontimeout = function() { postError('verbindung'); };
 	xmlhttp.onloadend = function() {
 		busy=false;
 	};

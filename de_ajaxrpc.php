@@ -288,15 +288,17 @@ if(isset($_REQUEST['managechat']) && $_REQUEST['managechat']){
 		$row=$sorted[$i];
 		$row['titel']=$titel[(int)$row['owner_id']] ?? array();
 
-		//je nach Channel kommen verschiede Filter zur Auswahl
+		//Ignorieren gilt nur für Zeilen echter Spieler: Spielmeldungen (Sektorgebäude, Allianzbonus, Sektorstatus …) tragen
+		//die owner_id des Spielers, der sie ausgelöst hat, sollen aber auch dann erscheinen, wenn man ihn ignoriert
+		$von_spieler=chat_zeile_von_spieler($row);
 		if($row['channeltyp']==0){//Sektor
-			if(!in_array($row['owner_id'], $ignore_self)){
+			if(!$von_spieler || !in_array($row['owner_id'], $ignore_self)){
 				$output.=format_chat_output($row);
 			}
 		}elseif($row['channeltyp']==1){//Allianz
 			$output.=format_chat_output($row);
 		}elseif($row['channeltyp']==2 || $row['channeltyp']==3){//Server && Global
-			if(!in_array($row['owner_id'], $ignore_self) && !in_array($row['owner_id'], $ignore_global)){
+			if(!$von_spieler || (!in_array($row['owner_id'], $ignore_self) && !in_array($row['owner_id'], $ignore_global))){
 				$output.=format_chat_output($row);
 			}
 		}
@@ -395,6 +397,9 @@ function format_chat_output($row){
 		$link.='&ctyp='.intval($row['channeltyp']).'&cid='.intval($row['id']);
 	}
 	$link=htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
+	//in den Desktopansichten öffnet der Spieler in der Spielspalte (Frame "h"); mobil gibt es den nicht, dort öffnete
+	//der Link sonst ein neues Fenster
+	$target=(($_SESSION['ums_mobi'] ?? 0)==1) ? '' : ' target="h"';
 
 	$spielername=$row["spielername"];
 	//schauen ob es einen nachricht vom herold ist
@@ -407,10 +412,10 @@ function format_chat_output($row){
 
 	//schauen ob es ein emote ist
 	if(substr($row["message"], 0, 3)==='/me'){
-		$output.='<span class="chat-emote"><a class="chat-name" href="'.$link.'" target="h">'.$spielername.'</a>'.substr($row["message"], 3).'</span>';
+		$output.='<span class="chat-emote"><a class="chat-name" href="'.$link.'"'.$target.'>'.$spielername.'</a>'.substr($row["message"], 3).'</span>';
 	}else{
 		if($row["spielername"]!=''){
-			$output.='<a class="chat-name" href="'.$link.'" target="h">'.$spielername.'</a>';
+			$output.='<a class="chat-name" href="'.$link.'"'.$target.'>'.$spielername.'</a>';
 
 			if($row['spielername']=='odo'){
 				$output.='&#x1f37a;';
