@@ -8,7 +8,32 @@ include "functions.php";
 $sv_bg = Battleground::DEFS;
 
 use DieEwigen\DE2\Model\Battleground\Haltung;
+use DieEwigen\DE2\Model\Battleground\Werkstatt;
 use DieEwigen\DE2\Session\CsrfToken;
+include 'inc/lang/'.$sv_server_lang.'_werkstatt.lang.php';
+
+//Werte eines Stücks als Text, z. B. "Hülle +11 %, Dämpfung +3 %"
+function ws_werte_text($it, $lang){
+	$teile=array();
+	foreach($it['werte'] as $k => $eintrag){
+		$teile[]=$lang['kennzahl'][$k].' '.Werkstatt::wertText($k, $eintrag);
+	}
+	return implode(', ', $teile);
+}
+
+//Kosten als Text mit Lagerbestand, rot wenn er nicht reicht; $ps: loadPlayerStorage()
+function ws_kosten_text($kosten, $ps, &$reicht){
+	$reicht=true;
+	$teile=array();
+	foreach($kosten as $item => $menge){
+		$hat=(int)($ps[$item]['item_amount'] ?? 0);
+		if($hat<$menge){
+			$reicht=false;
+		}
+		$teile[]='<span class="'.($hat<$menge ? 'ms-fehlt' : '').'">'.number_format($menge, 0, ',', '.').' '.($ps[$item]['item_name'] ?? '#'.$item).'</span>';
+	}
+	return implode(' &middot; ', $teile);
+}
 
 $pt=loadPlayerTechs($_SESSION['ums_user_id']);
 
@@ -61,6 +86,66 @@ if(hasTech($pt,159) && ($_SERVER['REQUEST_METHOD'] ?? '')==='POST'){
 		}
 		saveSpecialShip($_SESSION['ums_user_id'], $ship);
 		$ss_ziel.='?ok=haltung';
+	}elseif(isset($_POST['ws_aktion']) && is_string($_POST['ws_aktion'])){
+		//Werkstatt: Rohstoffe und Staub aendern sich, deshalb in der Spielersperre; Meldung in die Sitzung, die Seite zeigt sie einmal
+		if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
+			$ws_uid=(int)$_SESSION['ums_user_id'];
+			$ws=new Werkstatt($GLOBALS['dbi']);
+			$ship=loadSpecialShip($ws_uid);
+			$ws_id=(int)($_POST['ws_id'] ?? 0);
+			$ws_it=$ws_id>0 ? $ws->item($ws_uid, $ws_id) : null;
+			$ws_name=$ws_it ? Werkstatt::name($ws_it, $werkstatt_lang) : '';
+			$ws_fehler='';
+			$ws_text='';
+			switch($_POST['ws_aktion']){
+				case 'schmieden':
+					$ws_erg=$ws->schmieden($ws_uid, $ship, (int)($_POST['ws_platz'] ?? 0));
+					$ws_fehler=$ws_erg['fehler'];
+					if($ws_erg['ok']){
+						$ws_text=str_replace(array('{NAME}', '{WERTE}'), array(Werkstatt::name($ws_erg['item'], $werkstatt_lang), ws_werte_text($ws_erg['item'], $werkstatt_lang)), $werkstatt_lang['meldung']['geschmiedet']);
+						if($ws_erg['rang_neu']){
+							$ws_text.=str_replace('{RANG}', Werkstatt::rang($ship), $werkstatt_lang['meldung']['rang_neu']);
+						}
+					}
+					break;
+				case 'anlegen':
+				case 'ablegen':
+					$ws_fehler=$_POST['ws_aktion']==='anlegen' ? $ws->anlegen($ws_uid, $ws_id) : $ws->ablegen($ws_uid, $ws_id);
+					$ws_text=str_replace('{NAME}', $ws_name, $werkstatt_lang['meldung'][$_POST['ws_aktion']==='anlegen' ? 'angelegt' : 'abgelegt']);
+					break;
+				case 'zerlegen':
+					$ws_erg=$ws->zerlegen($ws_uid, $ship, $ws_id);
+					$ws_fehler=$ws_erg['fehler'];
+					if($ws_fehler===''){
+						$ws_liste=array();
+						foreach($ws_erg['rueck'] as $ws_item => $ws_menge){
+							$ws_liste[]=number_format($ws_menge, 0, ',', '.').' '.($ps[$ws_item]['item_name'] ?? '#'.$ws_item);
+						}
+						$ws_rueck=$ws_liste ? str_replace('{LISTE}', implode(', ', $ws_liste), $werkstatt_lang['meldung']['zerlegt_rueck']) : '';
+						$ws_text=str_replace(array('{NAME}', '{STAUB}', '{RUECK}'), array($ws_name, $ws_erg['staub'], $ws_rueck), $werkstatt_lang['meldung']['zerlegt']);
+					}
+					break;
+				case 'veredeln':
+					$ws_k=(string)($_POST['ws_kennzahl'] ?? '');
+					$ws_fehler=$ws->veredeln($ws_uid, $ship, $ws_id, $ws_k);
+					if($ws_fehler===''){
+						$ws_it=$ws->item($ws_uid, $ws_id);
+						$ws_text=str_replace(array('{NAME}', '{KENNZAHL}', '{WERT}'), array($ws_name, $werkstatt_lang['kennzahl'][$ws_k], Werkstatt::wertText($ws_k, $ws_it['werte'][$ws_k])), $werkstatt_lang['meldung']['veredelt']);
+					}
+					break;
+				case 'lager':
+					$ws_fehler=$ws->lagerAusbauen($ws_uid, $ship);
+					$ws_text=str_replace('{PLAETZE}', Werkstatt::lagerPlaetze($ship), $werkstatt_lang['meldung']['lager']);
+					break;
+				default:
+					$ws_fehler='unbekannt';
+			}
+			saveSpecialShip($ws_uid, $ship);
+			Sperre::loesen($GLOBALS['dbi'], $ws_uid);
+			$_SESSION['ws_meldung']=($ws_fehler==='') ? array('ok', $ws_text) : array('fehler', $werkstatt_lang['fehler'][$ws_fehler] ?? $werkstatt_lang['fehler']['unbekannt']);
+		}else{
+			$ss_ziel.='?fehler=sperre';
+		}
 	}
 
 	header('Location: '.$ss_ziel, true, 303);
@@ -77,6 +162,12 @@ foreach($ss_meldungen as $ss_art => $ss_texte){
 	if(isset($_GET[$ss_art]) && is_string($_GET[$ss_art]) && isset($ss_texte[$_GET[$ss_art]])){
 		$ss_meldung='<div class="mod-meldung mod-meldung-'.$ss_art.'">'.$ss_texte[$_GET[$ss_art]].'</div>';
 	}
+}
+//Meldung der Werkstatt aus der Sitzung, einmal anzeigen
+$ws_meldung='';
+if(isset($_SESSION['ws_meldung']) && is_array($_SESSION['ws_meldung'])){
+	$ws_meldung='<div class="mod-meldung mod-meldung-'.($_SESSION['ws_meldung'][0]==='ok' ? 'ok' : 'fehler').'">'.$_SESSION['ws_meldung'][1].'</div>';
+	unset($_SESSION['ws_meldung']);
 }
 
 ?>
@@ -131,6 +222,121 @@ if(!hasTech($pt,159)){
 	</div>';
 
 
+	$content.=rahmen_unten(false);
+
+	////////////////////////////////////////
+	//Werkstatt des Basissterns (docs/werkstatt.md)
+	////////////////////////////////////////
+	$ws=new Werkstatt($GLOBALS['dbi']);
+	$ws_uid=(int)$_SESSION['ums_user_id'];
+	$ws_items=$ws->items($ws_uid);
+	$ws_rang=Werkstatt::rang($ship);
+	$ws_naechster=Werkstatt::naechsterRangXp($ship);
+	$ws_plaetze=Werkstatt::lagerPlaetze($ship);
+	$ws_belegt=0;
+	$ws_angelegt=array();
+	foreach($ws_items as $ws_it){
+		if($ws_it['angelegt']){
+			$ws_angelegt[$ws_it['platz']]=$ws_it;
+		}else{
+			$ws_belegt++;
+		}
+	}
+	$ws_summe=Werkstatt::summe($ws_angelegt);
+	$ws_max_v=Werkstatt::veredelnMax($ship);
+	$ws_token='<input type="hidden" name="token" value="'.CsrfToken::get().'">';
+
+	$content.=rahmen_oben($werkstatt_lang['titel'],false);
+	$content.='<div class="einh mod ws">'.$ws_meldung;
+	$content.='<div class="einh-kacheln">
+		<div class="ov-wert"><span class="mod-typ">'.$werkstatt_lang['rang'].'</span><b>'.$ws_rang.'</b><small>'.($ws_naechster>0 ? number_format((int)$ship->erfahrung, 0, ',', '.').' / '.$ws_naechster.' '.$werkstatt_lang['erfahrung'] : 'h&ouml;chster Rang').'</small></div>
+		<div class="ov-wert"><span class="mod-typ">'.$werkstatt_lang['staub'].'</span><b>'.number_format((int)$ship->staub, 0, ',', '.').'</b></div>
+		<div class="ov-wert"><span class="mod-typ">'.$werkstatt_lang['lager'].'</span><b>'.$ws_belegt.' / '.$ws_plaetze.'</b><small>'.count($ws_angelegt).' angelegt</small></div>
+		<div class="ov-wert"><span class="mod-typ">W&uuml;rfe</span><b>'.number_format((int)$ship->wuerfe, 0, ',', '.').'</b></div>
+	</div>';
+	if($ws_naechster>0){
+		$content.='<div class="mod-balken ws-balken"><span style="width:'.min(100, round((int)$ship->erfahrung*100/$ws_naechster)).'%"></span></div>';
+	}
+
+	//Regeln, aufklappbar
+	$content.='<details class="einh-regeln"><summary>So funktioniert die Werkstatt</summary>';
+	foreach($werkstatt_lang['regeln'] as $ws_absatz){
+		$content.='<p>'.$ws_absatz.'</p>';
+	}
+	$content.='<p>'.strtr($werkstatt_lang['veredeln_info'], array('{MAX}' => $ws_max_v)).'</p>';
+	$content.='<p>'.$werkstatt_lang['chancen'].': ';
+	$ws_chancen=array();
+	foreach(Werkstatt::CHANCEN[$ws_rang] as $ws_g => $ws_p){
+		$ws_chancen[]='<span class="ws-guete ws-guete-'.$ws_g.'">'.$werkstatt_lang['guete'][$ws_g].' '.$ws_p.' %</span>';
+	}
+	$content.=implode(' ', $ws_chancen).'</p></details>';
+
+	//Ausrüstung im Kampf: Summen gegen die Deckel
+	$content.='<div class="ws-abschnitt"><span class="mod-typ">'.$werkstatt_lang['im_kampf'].'</span><div class="ws-summe">';
+	foreach(Werkstatt::KENNZAHLEN as $ws_k){
+		$ws_einheit=in_array($ws_k, Werkstatt::PROZENT) ? ' %' : ' Pkt.';
+		$content.='<span class="mod-chip'.($ws_summe[$ws_k]>0 ? ' mod-chip-gruen' : '').'" title="'.$werkstatt_lang['kennzahl'][$ws_k].'&'.$werkstatt_lang['kennzahl_hilfe'][$ws_k].'<br>'.$werkstatt_lang['deckel'].': '.Werkstatt::DECKEL[$ws_k].$ws_einheit.'">'.$werkstatt_lang['kennzahl'][$ws_k].' <b>+'.number_format($ws_summe[$ws_k], $ws_summe[$ws_k]==floor($ws_summe[$ws_k]) ? 0 : 1, ',', '.').$ws_einheit.'</b></span>';
+	}
+	$content.='</div></div>';
+
+	//Rezepte
+	$content.='<div class="ws-abschnitt"><span class="mod-typ">'.$werkstatt_lang['rezepte'].'</span>';
+	$content.='<div class="bk-zeile ws-rezept bk-kopfzeile"><span>Platz</span><span>'.$werkstatt_lang['kosten'].'</span><span>Erf.</span><span></span></div><div class="bk-liste">';
+	$ws_lager_voll=$ws_belegt>=$ws_plaetze;
+	foreach(Werkstatt::REZEPT as $ws_platz => $ws_rezept){
+		$ws_kosten=ws_kosten_text($ws_rezept['kosten'], $ps, $ws_reicht);
+		$content.='<div class="bk-zeile ws-rezept"><span class="bk-name" title="'.$werkstatt_lang['platz'][$ws_platz].'&'.$werkstatt_lang['hauptwert'].': '.$werkstatt_lang['kennzahl'][Werkstatt::HAUPTWERT[$ws_platz]].'">'.$werkstatt_lang['platz'][$ws_platz].'<br><small class="bk-leise">'.$werkstatt_lang['kennzahl'][Werkstatt::HAUPTWERT[$ws_platz]].'</small></span>';
+		$content.='<span>'.$ws_kosten.'</span><span class="bk-zahl">'.$ws_rezept['xp'].'</span>';
+		if($ws_reicht && !$ws_lager_voll){
+			$content.='<span class="bk-status"><form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_aktion" value="schmieden"><input type="hidden" name="ws_platz" value="'.$ws_platz.'"><button type="submit" class="mod-btn ally-btn-klein">'.$werkstatt_lang['schmieden'].'</button></form></span>';
+		}else{
+			$content.='<span class="bk-status bk-leise">'.($ws_lager_voll ? 'Lager voll' : 'Rohstoffe fehlen').'</span>';
+		}
+		$content.='</div>';
+	}
+	$content.='</div>';
+	//Lager ausbauen
+	$ws_lagerkosten=ws_kosten_text(Werkstatt::lagerKosten((int)$ship->lager_stufe+1), $ps, $ws_reicht);
+	$content.='<div class="bk-zeile ws-rezept ws-lager"><span class="bk-name">'.$werkstatt_lang['lager_ausbauen'].'<br><small class="bk-leise">+'.Werkstatt::LAGER_SCHRITT.' Pl&auml;tze, Schritt '.((int)$ship->lager_stufe+1).'</small></span><span>'.$ws_lagerkosten.'</span><span></span>';
+	if($ws_reicht){
+		$content.='<span class="bk-status"><form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_aktion" value="lager"><button type="submit" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Wirklich?">'.$werkstatt_lang['lager_ausbauen'].'</button></form></span>';
+	}else{
+		$content.='<span class="bk-status bk-leise">Rohstoffe fehlen</span>';
+	}
+	$content.='</div></div>';
+
+	//Stücke: angelegte zuerst, dann das Lager
+	$content.='<div class="ws-abschnitt"><span class="mod-typ">Deine St&uuml;cke</span>';
+	if(count($ws_items)==0){
+		$content.='<div class="mod-leer">'.$werkstatt_lang['keine_stuecke'].'</div>';
+	}else{
+		$content.='<div class="bk-liste">';
+		foreach($ws_items as $ws_it){
+			$ws_werte='';
+			$ws_optionen='';
+			foreach($ws_it['werte'] as $ws_k => $ws_eintrag){
+				$ws_v=(int)($ws_eintrag[1] ?? 0);
+				$ws_werte.='<span class="mod-chip'.($ws_k==Werkstatt::HAUPTWERT[$ws_it['platz']] ? ' ws-haupt' : '').'" title="'.$werkstatt_lang['kennzahl'][$ws_k].'&'.$werkstatt_lang['kennzahl_hilfe'][$ws_k].($ws_v>0 ? '<br>'.$ws_v.' Veredelungen' : '').'">'.$werkstatt_lang['kennzahl'][$ws_k].' <b>'.Werkstatt::wertText($ws_k, $ws_eintrag).'</b></span>';
+				if($ws_v<$ws_max_v){
+					$ws_optionen.='<option value="'.$ws_k.'">'.$werkstatt_lang['kennzahl'][$ws_k].' ('.$ws_v.'/'.$ws_max_v.', '.Werkstatt::veredelnKosten($ws_it['guete'], $ws_v).' Staub)</option>';
+				}
+			}
+			$content.='<div class="bk-zeile ws-zeile'.($ws_it['angelegt'] ? ' ws-angelegt' : '').'">';
+			$content.='<span class="bk-name"><span class="ws-guete ws-guete-'.$ws_it['guete'].'" title="'.$werkstatt_lang['guete'][$ws_it['guete']].'">'.$werkstatt_lang['platz_kurz'][$ws_it['platz']].'</span> '.Werkstatt::name($ws_it, $werkstatt_lang).($ws_it['angelegt'] ? ' <span class="mod-chip mod-chip-gruen">'.$werkstatt_lang['angelegt'].'</span>' : '').'</span>';
+			$content.='<span class="ws-werte">'.$ws_werte.'</span>';
+			$content.='<span class="ws-aktionen">';
+			$content.='<form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><button type="submit" name="ws_aktion" value="'.($ws_it['angelegt'] ? 'ablegen' : 'anlegen').'" class="mod-btn ally-btn-klein'.($ws_it['angelegt'] ? ' mod-btn-leise' : '').'">'.$werkstatt_lang[$ws_it['angelegt'] ? 'ablegen' : 'anlegen'].'</button></form>';
+			if($ws_optionen!=''){
+				$content.='<form method="post" action="specialship.php" class="ws-veredeln">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><select name="ws_kennzahl" class="mod-eingabe">'.$ws_optionen.'</select><button type="submit" name="ws_aktion" value="veredeln" class="mod-btn mod-btn-leise ally-btn-klein">'.$werkstatt_lang['veredeln'].'</button></form>';
+			}
+			$content.='<form method="post" action="specialship.php">'.$ws_token.'<input type="hidden" name="ws_id" value="'.$ws_it['id'].'"><button type="submit" name="ws_aktion" value="zerlegen" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Wirklich zerlegen?">'.$werkstatt_lang['zerlegen'].'</button></form>';
+			$content.='</span></div>';
+		}
+		$content.='</div>';
+	}
+	$content.='</div>';
+
+	$content.='</div>';
 	$content.=rahmen_unten(false);
 
 }

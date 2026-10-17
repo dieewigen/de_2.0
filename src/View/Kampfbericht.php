@@ -60,7 +60,8 @@ class Kampfbericht
                         $eigen=true;
                     }
                     $gewonnen=($s==1) ? $sieger1 : !$sieger1;
-                    $seiten[]='<span class="bg-spieler '.($gewonnen ? 'bg-sieger' : 'bg-verlierer').'">'.$name.self::bgHaltung($p, $s).'</span>';
+                    //seit der Werkstatt (Okt. 2026) stehen die Güten der Ausrüstung je Platz als farbige Buchstaben dabei
+                    $seiten[]='<span class="bg-spieler '.($gewonnen ? 'bg-sieger' : 'bg-verlierer').'">'.$name.(string)($p['ausruestung'.$s] ?? '').self::bgHaltung($p, $s).'</span>';
                 }
                 if(count($seiten)==0){
                     continue;

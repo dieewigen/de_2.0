@@ -4294,6 +4294,26 @@ CREATE TABLE `de_user_bg_register` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `de_user_bs_item`
+-- Werkstatt des Basissterns (docs/werkstatt.md): geschmiedete Ausrüstung je Spieler; platz 1 Panzerung, 2 Schildkern,
+-- 3 Waffenphalanx, 4 Zielrechner; guete 0 Massenware bis 4 Artefakt; werte als JSON Kennzahl => [Wert, Veredelungen]
+--
+
+CREATE TABLE `de_user_bs_item` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `platz` tinyint(3) UNSIGNED NOT NULL,
+  `guete` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `werte` varchar(600) NOT NULL DEFAULT '',
+  `angelegt` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `wt` bigint(20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `de_user_build`
 --
 

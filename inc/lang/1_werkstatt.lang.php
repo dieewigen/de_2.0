@@ -1,0 +1,73 @@
+<?php
+//Die Werkstatt des Basissterns (src/Model/Battleground/Werkstatt.php, specialship.php, Kampfbericht der Battlegrounds)
+$werkstatt_lang = array(
+    'titel' => 'Werkstatt',
+    'platz' => array(1 => 'Panzerung', 2 => 'Schildkern', 3 => 'Waffenphalanx', 4 => 'Zielrechner'),
+    'platz_kurz' => array(1 => 'P', 2 => 'S', 3 => 'W', 4 => 'Z'),
+    'guete' => array(0 => 'Massenware', 1 => 'Gute Ware', 2 => 'Seltene Ware', 3 => 'Mystische Ware', 4 => 'Artefakt'),
+    //Name eines Stücks je Güte und Platz
+    'stueck' => array(
+        0 => array(1 => 'Einfache Panzerung', 2 => 'Einfacher Schildkern', 3 => 'Einfache Waffenphalanx', 4 => 'Einfacher Zielrechner'),
+        1 => array(1 => 'Gute Panzerung', 2 => 'Guter Schildkern', 3 => 'Gute Waffenphalanx', 4 => 'Guter Zielrechner'),
+        2 => array(1 => 'Seltene Panzerung', 2 => 'Seltener Schildkern', 3 => 'Seltene Waffenphalanx', 4 => 'Seltener Zielrechner'),
+        3 => array(1 => 'Mystische Panzerung', 2 => 'Mystischer Schildkern', 3 => 'Mystische Waffenphalanx', 4 => 'Mystischer Zielrechner'),
+        4 => array(1 => 'Artefakt-Panzerung', 2 => 'Artefakt-Schildkern', 3 => 'Artefakt-Waffenphalanx', 4 => 'Artefakt-Zielrechner'),
+    ),
+    'kennzahl' => array('huelle' => 'Hülle', 'schild' => 'Schild', 'schaden' => 'Schaden', 'krit' => 'Kritische Treffer', 'treffer' => 'Trefferchance', 'daempfung' => 'Dämpfung', 'vorteil' => 'Haltungsvorteil', 'schutz' => 'Haltungsschutz'),
+    'kennzahl_hilfe' => array(
+        'huelle' => 'mehr Hüllenstruktur', 'schild' => 'mehr Schutzschildenergie', 'schaden' => 'mehr Waffenschaden',
+        'krit' => 'Chance auf doppelten Schaden, heute 10 %', 'treffer' => 'Chance zu treffen, heute 80 %, höchstens 95 %',
+        'daempfung' => 'weniger erlittener Schaden', 'vorteil' => 'mehr Schaden, wenn die eigene Haltung überlegen ist (heute ×1,5)',
+        'schutz' => 'weniger Nachteil, wenn die eigene Haltung unterlegen ist (heute ×⅔)',
+    ),
+
+    'rang' => 'Rang',
+    'erfahrung' => 'Erfahrung',
+    'staub' => 'Erbauerstaub',
+    'lager' => 'Lager',
+    'lager_ausbauen' => 'Lager ausbauen',
+    'lager_voll_hinweis' => 'Das Lager ist voll. Zerlege oder lege Stücke an, oder baue es aus.',
+    'rezepte' => 'Schmieden',
+    'schmieden' => 'Schmieden',
+    'anlegen' => 'Anlegen',
+    'ablegen' => 'Ablegen',
+    'zerlegen' => 'Zerlegen',
+    'veredeln' => 'Veredeln',
+    'angelegt' => 'angelegt',
+    'keine_stuecke' => 'Noch keine Stücke. Schmiede eines, die Kosten stehen bei den Rezepten.',
+    'im_kampf' => 'Deine Ausrüstung im Kampf',
+    'deckel' => 'Deckel',
+    'hauptwert' => 'Hauptwert',
+    'kosten' => 'Kosten',
+    'xp_je_wurf' => 'Erfahrung je Wurf',
+    'chancen' => 'Chancen auf Deinem Rang',
+    'veredeln_info' => 'Veredeln: +0,65 % je Update auf eine Eigenschaft, höchstens {MAX} Updates je Eigenschaft auf Deinem Rang. Staub nach Güte, ab dem 11. Update doppelt, ab dem 21. vierfach.',
+    'regeln' => array(
+        'Die Werkstatt schmiedet Ausrüstung für Deinen Basisstern. Jeder Wurf kostet VS-Rohstoffe und Handelswaren und bringt Erfahrung, mit ihr steigt der Rang bis 10.',
+        'Die Güte eines Stücks ist Glück, das mit dem Rang besser wird: Massenware, Gute Ware, Seltene Ware, Mystische Ware, Artefakt. Höhere Güte heißt höherer Hauptwert und mehr Nebenwerte. Jeder zehnte Wurf ist mindestens Gute Ware, jeder fünfzigste mindestens Seltene Ware.',
+        'Je Platz ist ein Stück angelegt, es wirkt in allen Battlegrounds. Über alle Stücke zusammen gelten Deckel je Kennzahl. In GAMMA zählt je Platz das Stück höchster Güte unter den Teilnehmern der Allianz, bei Gleichstand das Los.',
+        'Zerlegen gibt Erbauerstaub und ein Zehntel der Rohstoffe zurück. Mit Staub veredelst Du einzelne Eigenschaften. Stücke sind an Dich gebunden, verschenken oder tauschen geht nicht, mit der neuen Runde beginnt die Werkstatt von vorn.',
+    ),
+    'meldung' => array(
+        'geschmiedet' => 'Geschmiedet: {NAME} mit {WERTE}.',
+        'rang_neu' => ' Deine Werkstatt hat Rang {RANG} erreicht.',
+        'angelegt' => '{NAME} angelegt.',
+        'abgelegt' => '{NAME} ins Lager gelegt.',
+        'zerlegt' => '{NAME} zerlegt: {STAUB} Erbauerstaub{RUECK}.',
+        'zerlegt_rueck' => ', zurück {LISTE}',
+        'veredelt' => '{NAME}: {KENNZAHL} veredelt, jetzt {WERT}.',
+        'lager' => 'Das Lager hat jetzt {PLAETZE} Plätze.',
+    ),
+    'fehler' => array(
+        'unbekannt' => 'Unbekannte Auswahl.',
+        'lager_voll' => 'Das Lager ist voll. Zerlege oder lege Stücke an, oder baue es aus.',
+        'rohstoffe' => 'Dafür fehlen Rohstoffe oder Handelswaren.',
+        'stueck' => 'Dieses Stück gibt es nicht mehr.',
+        'kennzahl' => 'Diese Eigenschaft hat das Stück nicht.',
+        'veredelt_max' => 'Diese Eigenschaft ist für Deinen Rang voll veredelt.',
+        'staub' => 'Zu wenig Erbauerstaub.',
+    ),
+    //Kampfbericht
+    'bericht_ausruestung' => 'Ausrüstung',
+);
+?>

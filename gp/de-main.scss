@@ -7071,6 +7071,112 @@ a.art-kachel-zurueck:hover::after {
 	gap: 4px;
 }
 
+// Werkstatt des Basissterns (specialship.php, Kampfbericht): Güten in den Farben der alten erweiterten Archäologie
+.ws-guete {
+	display: inline-block;
+	min-width: 18px;
+	padding: 1px 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.12);
+	font-size: 10px;
+	font-weight: 700;
+	text-align: center;
+	color: #ffffff;
+}
+
+.ws-guete-1 {
+	background: rgba(255, 255, 0, 0.16);
+	color: #ffef6b;
+}
+
+.ws-guete-2 {
+	background: rgba(0, 255, 0, 0.14);
+	color: #6dff6d;
+}
+
+.ws-guete-3 {
+	background: rgba(176, 46, 224, 0.24);
+	color: #dc96f7;
+}
+
+.ws-guete-4 {
+	background: rgba(46, 151, 224, 0.24);
+	color: #7fc6ff;
+}
+
+.ws-guete-leer {
+	background: rgba(255, 255, 255, 0.04);
+	color: #5c6670;
+}
+
+.ws-chips {
+	display: inline-flex;
+	gap: 2px;
+	margin-left: 4px;
+	vertical-align: middle;
+}
+
+.ws-balken {
+	margin-top: 6px;
+}
+
+.ws-abschnitt {
+	margin-top: 12px;
+}
+
+.ws-summe {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 6px;
+}
+
+// Rezepte und Lagerausbau: Platz, Kosten, Erfahrung, Knopf
+.ws-rezept {
+	grid-template-columns: 1fr 1.8fr 28px 110px;
+}
+
+.ws-lager {
+	margin-top: 6px;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+// Stücke: Name, Werte, Aktionen
+.ws-zeile {
+	grid-template-columns: 1fr 1.6fr 160px;
+}
+
+.ws-angelegt {
+	background: rgba(62, 207, 106, 0.06);
+}
+
+.ws-werte {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3px;
+}
+
+.ws-haupt b {
+	color: var(--akzent);
+}
+
+.ws-aktionen {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 4px;
+}
+
+.ws-veredeln {
+	display: flex;
+	gap: 4px;
+
+	.mod-eingabe {
+		max-width: 150px;
+		font-size: 10px;
+	}
+}
+
 // Sektorprojekte unter der Sektorraumbasis (sector.php)
 .sec-projekte {
 	display: flex;

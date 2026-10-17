@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__.'/../vendor/autoload.php';
 use DieEwigen\DE2\Model\Battleground\Haltung;
+use DieEwigen\DE2\Model\Battleground\Werkstatt;
+
+//Werkstatt des Basissterns: Ausrüstung der Teilnehmer wirkt im Kampf, der Bericht zeigt die Güten (docs/werkstatt.md)
+include_once __DIR__.'/../inc/lang/'.($GLOBALS['sv_server_lang'] ?? 1).'_werkstatt.lang.php';
+$werkstatt = new Werkstatt($GLOBALS['dbi']);
 
 echo '<hr>Battlegrounds<br><br>';
 
@@ -23,7 +28,7 @@ echo '<hr>';
 
 function doBattleGround($bg)
 {
-    global $bg_debug;
+    global $bg_debug, $werkstatt, $werkstatt_lang;
 
     $play_typ = 0; //Spieler-BG
 
@@ -69,6 +74,8 @@ function doBattleGround($bg)
         $player[$player_id]['ally_id'] = get_player_allyid($row['user_id']);
         $player[$player_id]['ally_tag'] = getAllytagByAllyid($player[$player_id]['ally_id']);
         $player[$player_id]['runde'] = -1;
+        //angelegte Ausrüstung: Summe der Kennzahlen und die Stücke je Platz
+        $player[$player_id]['ausruestung'] = $werkstatt->kampfwerte((int)$row['user_id']);
 
         //alle user_id in ein array packen
         $player_ids[] = $row['user_id'];
@@ -101,6 +108,7 @@ function doBattleGround($bg)
 
                     $allys[$ship_exist_id]['ship']->ship_level += $player[$p]['ship']->ship_level;
                     $allys[$ship_exist_id]['stimmen'][] = array($player[$p]['wahl'], $player[$p]['ship']->ship_level);
+                    $allys[$ship_exist_id]['mitglieder'][] = $player[$p]['user_id'];
 
                 } else {
                     echo 'neu';
@@ -111,6 +119,7 @@ function doBattleGround($bg)
                     $allys[$ally_id]['score'] =		getAllyBGScore($allys[$ally_id]['ally_id'], $bg);
                     $allys[$ally_id]['runde'] =		-1;
                     $allys[$ally_id]['stimmen'] =	array(array($player[$p]['wahl'], $player[$p]['ship']->ship_level));
+                    $allys[$ally_id]['mitglieder'] =	array($player[$p]['user_id']);
 
                     $ally_ids[] = $allys[$ally_id]['ally_id'];
                     $ally_id++;
@@ -118,9 +127,10 @@ function doBattleGround($bg)
             }
         }
 
-        //Haltung der Allianz: die Haltung mit den meisten Basisstern-Stufen
+        //Haltung der Allianz: die Haltung mit den meisten Basisstern-Stufen; Ausrüstung: je Platz das Stück höchster Güte
         for ($a = 0;$a < count($allys);$a++) {
             $allys[$a]['wahl'] = Haltung::mehrheit($allys[$a]['stimmen']);
+            $allys[$a]['ausruestung'] = $werkstatt->kampfwerteAllianz($allys[$a]['mitglieder']);
         }
     }
 
@@ -228,7 +238,10 @@ function doBattleGround($bg)
                             'wahl1' => $player_id1 > -1 ? $player[$player_id1]['wahl'] : 0,
                             'wahl2' => $player_id2 > -1 ? $player[$player_id2]['wahl'] : 0,
                             'haltung1' => $haltung[0],
-                            'haltung2' => $haltung[1]
+                            'haltung2' => $haltung[1],
+                            //Ausrüstung je Platz als farbige Buchstaben (Werkstatt)
+                            'ausruestung1' => $player_id1 > -1 ? Werkstatt::berichtChips($player[$player_id1]['ausruestung']['stuecke'], $werkstatt_lang, $player[$player_id1]['ausruestung']['summe']) : '',
+                            'ausruestung2' => $player_id2 > -1 ? Werkstatt::berichtChips($player[$player_id2]['ausruestung']['stuecke'], $werkstatt_lang, $player[$player_id2]['ausruestung']['summe']) : ''
                         );
 
                         //echo '<br>A:'.$winner_id;
@@ -361,7 +374,9 @@ function doBattleGround($bg)
                                 'wahl1' => $allys[$player_id1]['wahl'] ?? 0,
                                 'wahl2' => $allys[$player_id2]['wahl'] ?? 0,
                                 'haltung1' => $haltung[0],
-                                'haltung2' => $haltung[1]
+                                'haltung2' => $haltung[1],
+                                'ausruestung1' => isset($allys[$player_id1]['ausruestung']) ? Werkstatt::berichtChips($allys[$player_id1]['ausruestung']['stuecke'], $werkstatt_lang, $allys[$player_id1]['ausruestung']['summe']) : '',
+                                'ausruestung2' => isset($allys[$player_id2]['ausruestung']) ? Werkstatt::berichtChips($allys[$player_id2]['ausruestung']['stuecke'], $werkstatt_lang, $allys[$player_id2]['ausruestung']['summe']) : ''
                             );
                         }
 
@@ -447,26 +462,26 @@ function letSpecialShipFight($player_id1, $player_id2, $player, &$haltung = null
     //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////
 
-    $trefferwahrscheinlichkeit[0] = 80;
-    $trefferwahrscheinlichkeit[1] = 80;
+    //Ausrüstung aus der Werkstatt: gedeckelte Summen je Seite, ohne Stücke alles 0
+    $ausr[0] = $player[$player_id1]['ausruestung']['summe'] ?? Werkstatt::leereSumme();
+    $ausr[1] = $player[$player_id2]['ausruestung']['summe'] ?? Werkstatt::leereSumme();
 
-    $schadenssenkung[0] = 0;
-    $schadenssenkung[1] = 0;
+    for ($c = 0;$c <= 1;$c++) {
+        $trefferwahrscheinlichkeit[$c] = min(Werkstatt::KAMPF_TREFFER_MAX, Werkstatt::KAMPF_TREFFER + (int)round($ausr[$c]['treffer']));
+        $schadenssenkung[$c] = $ausr[$c]['daempfung'];
+        $critchance[$c] = Werkstatt::KAMPF_KRIT + (int)round($ausr[$c]['krit']);
+        $schaden_min[$c] = (int)round($enm[$c]->get_wp_min() * (1 + $ausr[$c]['schaden'] / 100));
+        $schaden_max[$c] = (int)round($enm[$c]->get_wp_max() * (1 + $ausr[$c]['schaden'] / 100));
+        $huelle_max[$c] = (int)round($enm[$c]->get_hp_max() * (1 + $ausr[$c]['huelle'] / 100));
+        $schild_max[$c] = (int)round($enm[$c]->get_shield_max() * (1 + $ausr[$c]['schild'] / 100));
+    }
 
-    $critchance[0] = 10;
-    $critchance[1] = 10;
-
-    $schaden_min[0] = $enm[0]->get_wp_min();
-    $schaden_max[0] = $enm[0]->get_wp_max();
-
-    $schaden_min[1] = $enm[1]->get_wp_min();
-    $schaden_max[1] = $enm[1]->get_wp_max();
-
-    //Haltungen: Zufall wird für jeden Kampf neu ausgewürfelt, die überlegene Haltung macht mehr Schaden
+    //Haltungen: Zufall wird für jeden Kampf neu ausgewürfelt, die überlegene Haltung macht mehr Schaden;
+    //Haltungsvorteil und Haltungsschutz aus der Ausrüstung verschieben die Faktoren
     $haltung[0] = Haltung::aufloesen((int)($player[$player_id1]['wahl'] ?? Haltung::ZUFALL));
     $haltung[1] = Haltung::aufloesen((int)($player[$player_id2]['wahl'] ?? Haltung::ZUFALL));
-    $schadensfaktor[0] = Haltung::schadensfaktor($haltung[0], $haltung[1]);
-    $schadensfaktor[1] = Haltung::schadensfaktor($haltung[1], $haltung[0]);
+    $schadensfaktor[0] = Werkstatt::haltungsfaktor($haltung[0], $haltung[1], $ausr[0]);
+    $schadensfaktor[1] = Werkstatt::haltungsfaktor($haltung[1], $haltung[0], $ausr[1]);
 
 
     //die daten der gegner anzeigen
@@ -474,15 +489,17 @@ function letSpecialShipFight($player_id1, $player_id2, $player, &$haltung = null
     '<table>
 	<tr><td>Einheit</td><td width="30%" class="c2">'.$player[$player_id1]['spielername'].'</td><td width="30%" class="c2">'.$player[$player_id2]['spielername'].'</td></tr>
 	<tr><td>Schiffstufe</td><td class="c2">'.number_format($enm[0]->ship_level, 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->ship_level, 0, "", ".").'</td></tr>
-	<tr><td>H&uuml;llenstruktur</td><td class="c2">'.number_format($enm[0]->get_hp_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_hp_max(), 0, "", ".").'</td></tr>
-	<tr><td>Schilde</td><td class="c2">'.number_format($enm[0]->get_shield_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_shield_max(), 0, "", ".").'</td></tr>
-	<tr><td>Waffen</td><td class="c2">'.number_format($enm[0]->get_wp_min(), 0, "", ".").' - '.number_format($enm[0]->get_wp_max(), 0, "", ".").'</td><td class="c2">'.number_format($enm[1]->get_wp_min(), 0, "", ".").' - '.number_format($enm[1]->get_wp_max(), 0, "", ".").'</td></tr>
+	<tr><td>H&uuml;llenstruktur</td><td class="c2">'.number_format($huelle_max[0], 0, "", ".").'</td><td class="c2">'.number_format($huelle_max[1], 0, "", ".").'</td></tr>
+	<tr><td>Schilde</td><td class="c2">'.number_format($schild_max[0], 0, "", ".").'</td><td class="c2">'.number_format($schild_max[1], 0, "", ".").'</td></tr>
+	<tr><td>Waffen</td><td class="c2">'.number_format($schaden_min[0], 0, "", ".").' - '.number_format($schaden_max[0], 0, "", ".").'</td><td class="c2">'.number_format($schaden_min[1], 0, "", ".").' - '.number_format($schaden_max[1], 0, "", ".").'</td></tr>
+	<tr><td>Treffer / Krit / D&auml;mpfung</td><td class="c2">'.$trefferwahrscheinlichkeit[0].' % / '.$critchance[0].' % / '.round($schadenssenkung[0]).' %</td><td class="c2">'.$trefferwahrscheinlichkeit[1].' % / '.$critchance[1].' % / '.round($schadenssenkung[1]).' %</td></tr>
 	<tr><td>Haltung</td><td class="c2">'.Haltung::name($haltung[0]).' (x'.round($schadensfaktor[0], 2).')</td><td class="c2">'.Haltung::name($haltung[1]).' (x'.round($schadensfaktor[1], 2).')</td></tr>
 	<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 	';
 
-    $hp[0] = $enm[0]->get_hp_max() + $enm[0]->get_shield_max();
-    $hp[1] = $enm[1]->get_hp_max() + $enm[1]->get_shield_max();
+    //Hüllenpool mit Hülle und Schild aus der Ausrüstung
+    $hp[0] = $huelle_max[0] + $schild_max[0];
+    $hp[1] = $huelle_max[1] + $schild_max[1];
 
     //$shield[0]=$enm[0]->get_shield_max();
     //$shield[1]=$enm[1]->get_shield_max();
@@ -503,8 +520,8 @@ function letSpecialShipFight($player_id1, $player_id2, $player, &$haltung = null
         $ausweichflag[0] = 0;
         $ausweichflag[1] = 0;
 
-        $schaden[0] = round(mt_rand($enm[0]->get_wp_min(), $enm[0]->get_wp_max()));
-        $schaden[1] = round(mt_rand($enm[1]->get_wp_min(), $enm[1]->get_wp_max()));
+        $schaden[0] = round(mt_rand($schaden_min[0], $schaden_max[0]));
+        $schaden[1] = round(mt_rand($schaden_min[1], $schaden_max[1]));
 
         for ($c = 0;$c <= 1;$c++) {
             //trefferwahrscheinlichkeit

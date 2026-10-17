@@ -103,6 +103,7 @@ DELETE FROM `de_user_scan`;
 DELETE FROM `de_user_scan_history`;
 DELETE FROM `de_user_setbounty`;
 DELETE FROM `de_user_special_ship`;
+DELETE FROM `de_user_bs_item`;
 DELETE FROM `de_user_storage`;
 DELETE FROM `de_user_techs`;
 DELETE FROM `de_user_trade`;

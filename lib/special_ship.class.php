@@ -13,6 +13,13 @@ class special_ship {
 	//alte gespeicherte Schiffe ohne diese Eigenschaft bekommen beim unserialize() den Standardwert
 	public $haltung=array(0, 0, 0);
 
+	//Werkstatt des Basissterns (DieEwigen\DE2\Model\Battleground\Werkstatt): Erfahrung für den Rang, Zahl der Würfe,
+	//Erbauerstaub und Ausbauschritte des Lagers; die Stücke selbst liegen in de_user_bs_item
+	public $erfahrung=0;
+	public $wuerfe=0;
+	public $staub=0;
+	public $lager_stufe=0;
+
     function __construct($user_id){
 		$this->user_id = intval($user_id);
     }
