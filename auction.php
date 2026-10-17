@@ -222,6 +222,9 @@ if (!hasTech($pt, 4)) {
                         $nummer=$cost[1]-2;
                         if($nummer<10){ $nummer='0'.$nummer;}
                         $filename = 'ele'.$nummer.'.gif';
+                    }elseif($cost[1]>=14 && $cost[1]<=18){
+                        //Handelswaren I-V: Symbol der Fabrik, die sie herstellt (Omega 24 bis Ypsilon 20, wie production.php)
+                        $filename = 'r/'.(38-$cost[1]).'_g.gif';
                     }
 
                     $preis_img = $filename;

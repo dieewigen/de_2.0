@@ -647,6 +647,7 @@ CREATE TABLE `de_hekate` (
   `period_nr` int(10) UNSIGNED NOT NULL DEFAULT 1,
   `period_start_wt` bigint(20) NOT NULL DEFAULT 1,
   `auftraege` varchar(1000) NOT NULL DEFAULT '',
+  `produktion_basis` double NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

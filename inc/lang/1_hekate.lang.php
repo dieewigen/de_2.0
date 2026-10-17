@@ -14,7 +14,7 @@ $hekate_lang['kein_zugang_npc']='Hekates Händler beachten Dich nicht.';
 
 //Aufträge
 $hekate_lang['titel_auftraege']='Aufträge dieser Periode';
-$hekate_lang['periode']='Hekates Händler schlagen in {WT} Wirtschaftsticks neue Aufträge an.';
+$hekate_lang['periode']='Hekates Händler schlagen in {WT} Wirtschaftsticks neue Aufträge an. Die Mengen wachsen mit der VS-Förderung des Servers.';
 $hekate_lang['regel']='Jeder Auftrag kann pro Periode einmal erfüllt werden. Hekates Gunst wirkt nur in den Vergessenen Systemen. Erhältst Du dieselbe Gunst erneut, verlängert sie sich, höchstens bis {MAX} Wirtschaftsticks im Voraus.';
 $hekate_lang['auftrag']='Auftrag {NR}';
 $hekate_lang['verlangt']='Verlangt';

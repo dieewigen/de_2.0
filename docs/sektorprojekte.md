@@ -23,22 +23,24 @@ Zwei Bausteine:
 
 ## Teil 1: Sektorprojekte
 
-Der SK baut Projekte im Reiter SK-Bau/Flotte, so wie Sektorgebäude: eines nach dem anderen, mit Bauzeit in WT. Jedes Projekt hat drei Stufen. Voraussetzung ist die Sektorraumbasis. Die Wirkung gilt für alle Mitglieder des Sektors, auch für die, die nichts eingezahlt haben, und auch für Spieler, die später in den Sektor kommen.
+Der SK baut Projekte im Reiter SK-Bau/Flotte, so wie Sektorgebäude: eines nach dem anderen, mit Bauzeit in WT. Jedes Projekt hat fünf Stufen. Voraussetzung ist die Sektorraumbasis. Die Wirkung gilt für alle Mitglieder des Sektors, auch für die, die nichts eingezahlt haben, und auch für Spieler, die später in den Sektor kommen.
 
-| Projekt | Wirkung je Stufe (1 / 2 / 3) |
+| Projekt | Wirkung je Stufe (1 bis 5) |
 |---|---|
-| Hyperraumrelais | Bauzeiten in den VS für alle Mitglieder −5 / −10 / −15 % |
-| Sektorraffinerie | Industrie-Ertrag in den VS für alle Mitglieder +5 / +10 / +15 % |
-| Werftausbau | Sektorraumschiffe 10 / 20 / 30 % günstiger, zusätzlich zur Spezialisierung |
-| Verteidigungsgitter | Verluste von Wachflotte und Sektorflotte bei der Verteidigung des eigenen Sektors −10 / −20 / −30 % |
+| Hyperraumrelais | Bauzeiten in den VS für alle Mitglieder −5 / −10 / −15 / −20 / −25 % |
+| Sektorraffinerie | Industrie-Ertrag in den VS für alle Mitglieder +5 / +10 / +15 / +20 / +25 % |
+| Werftausbau | Sektorraumschiffe 10 / 20 / 30 / 40 / 50 % günstiger, zusätzlich zur Spezialisierung |
+| Verteidigungsgitter | Verluste von Wachflotte und Sektorflotte bei der Verteidigung des eigenen Sektors −10 / −20 / −30 / −40 / −50 % |
 
-Vorschlag für Kosten und Bauzeit, gleich für alle vier Projekte:
+Kosten und Bauzeit, gleich für alle vier Projekte, die seltenen Rohstoffe kommen zuletzt:
 
 | Stufe | Kosten | Bauzeit |
 |---|---|---|
 | 1 | 20.000 Eisen, 10.000 Titan, 20 Handelswaren I | 96 WT |
 | 2 | 20.000 Mexit, 10.000 Dulexit, 20 Handelswaren II | 144 WT |
 | 3 | 20.000 Tekranit, 10.000 Ylesenium, 20 Handelswaren III | 192 WT |
+| 4 | 20.000 Serodium, 10.000 Rowalganium, 20 Handelswaren IV | 240 WT |
+| 5 | 20.000 Sextagit, 10.000 Octagium, 20 Handelswaren V | 288 WT |
 
 Dazu gilt:
 
@@ -87,6 +89,7 @@ Schreibt Eure Meinung ins Forum oder in den Discord. Je konkreter, desto besser.
 
 Teil 1 und Teil 2 sind seit dem 17. Oktober 2026 umgesetzt, mit den Vorschlagswerten von oben. Der Text oben gilt als Regelwerk, mit diesen Festlegungen aus der Umsetzung:
 
+- Die Projekte haben fünf statt drei Stufen. Die Stufen 4 und 5 kamen nach der Diskussion um Senken für die VS-Rohstoffe dazu, damit auch Serodium bis Octagium und Handelswaren IV und V einen Abnehmer haben.
 - Kampfmittel brauchen wie Sektorraumschiffe die Sektorraumwerft, Sektorprojekte die Sektorraumbasis.
 - Nachbrenner und Enterkommando wählt der SK als Häkchen beim Flottenbefehl; sie sind mit dem Start verbraucht, auch bei einem Rückruf. Das Enterkommando wirkt nur beim Angriff und nicht gegen Sektor 666.
 - Schildgenerator und Störsender schaltet der SK unter Kampfmittel scharf. Solange einer läuft, lässt sich kein zweiter einsetzen. Der Schild ist mit dem ersten Kampf im eigenen Sektor verbraucht.
@@ -96,11 +99,18 @@ Teil 1 und Teil 2 sind seit dem 17. Oktober 2026 umgesetzt, mit den Vorschlagswe
 - Die Projektstufen eines Sektors stehen für alle in der Sektoransicht unter der Sektorraumbasis. Bestand und Einzahlungen des Sektor-VS-Lagers stehen in der Sektorpolitik, Einzahlungen nur von aktuellen Mitgliedern.
 - Nicht umgesetzt: Sektor-Relikte in den Fundstücken und eine Heimatregion je Sektor (Punkte 3 und 4 der Diskussion).
 
+### Begleitende Änderungen als Senken für VS-Rohstoffe
+
+Aus derselben Diskussion, am selben Tag umgesetzt:
+
+- **Hekate skaliert am Median.** Bei jedem Periodenwechsel misst Hekate den Median der VS-Förderung je WT über alle Spieler, die in den VS fördern (dieselbe Messung wie der Eintrittspreis des Feldzugs). Der erste Median der Runde ab 100 je WT ist der Bezugswert, die Auftragsmengen werden mit Median ÷ Bezugswert vervielfacht, mindestens 1, höchstens 25. Handelswaren aufgerundet, die Beigabe auf volle Hundert. Die Belohnungen bleiben fest. Bezugswert in `de_hekate.produktion_basis`, Konstanten `BASIS_MIN` und `FAKTOR_MAX` im `HekateService`.
+- **Handelswaren als Auktionswährung.** Die Auktion verlangt ab WT 3.001 neben den zehn VS-Rohstoffen auch Handelswaren I bis V, Startpreis ein Fünftel des größten Lagers, mindestens 20 Stück (`createAuction()` in `functions.php`). Zahl und Preisverfall der Auktionen bleiben unverändert.
+
 ### Technik
 
 - Logik: `src/Model/Sektorprojekt/SektorprojektService.php`. Alle Stellschrauben sind Konstanten dort: `PROZENT` (Wirkung je Stufe), `STUFEN` (Kosten und Bauzeit), `KM_KOSTEN`, `KM_MAX`, `SCHILD_KT`, `STOERSENDER_WT`, `NACHBRENNER_KT`, `ENTER_FAKTOR`.
 - Texte: `inc/lang/1_sektorprojekt.lang.php`; Berichtzeilen in `inc/lang/1_kt.lang.php` (`sp_gitter`, `sp_schild`, `sp_enter`).
-- Tabellen: `de_sector_vs` (Stufen, laufender Bau, Kampfmittelbestand, Schild bis KT, Störsender bis WT, Enterkommando scharf), `de_sector_vs_lager`, `de_sector_vs_einzahlung`. Schema in `database/de.sql`, für laufende Server `database/updates/2026-10-17_sektorprojekte.sql`; Rundenreset in `tickler/wt_auto_reset.php` und `database/reset.sql`. Ohne die Tabellen laufen die Seiten weiter, die Bereiche bleiben leer.
+- Tabellen: `de_sector_vs` (Stufen, laufender Bau, Kampfmittelbestand, Schild bis KT, Störsender bis WT, Enterkommando scharf), `de_sector_vs_lager`, `de_sector_vs_einzahlung`, dazu die Spalte `de_hekate.produktion_basis`. Schema in `database/de.sql`, für laufende Server `database/updates/2026-10-17_sektorprojekte.sql`; Rundenreset in `tickler/wt_auto_reset.php` und `database/reset.sql`. Ohne die Tabellen laufen die Seiten weiter, die Bereiche bleiben leer.
 - Kampfmittel entstehen über `de_sector_build` mit `tech_id` 2 bis 5 (1 ist das Sektorraumschiff); `tickler/wt.php` schreibt fertige Aufträge in den Bestand und zählt die Projektbauzeit herunter (`processWt`).
 - Seiten: `bkmenu.php` (Projekte, Kampfmittel, Häkchen beim Flottenbefehl, Störsender und Kampfmittel im Scan; POST mit CSRF-Token und Spielersperre), `resource.php` (Einzahlen, Felder `vs_tr_<item_id>`, Nachricht an den SK), `politics.php`, `sector.php`, `map_mobile.php`.
 - Wirkung: `tickler/wt_manage_map.php` und `vs_bonus_info()` in `functions.php` (Raffinerie, Relais), `tickler/kt_sectorkampf.php` (Gitter, Schild, Enterkommando), `bkmenu.php` (Werftausbau, Nachbrenner).
@@ -122,12 +132,12 @@ Die Vergessenen Systeme sind heute Privatsache, am Rundenende hat fast jeder all
 Neues Lager je Sektor für VS-Rohstoffe und Handelswaren. Einzahlen unter Ressourcen wie heute ins Sektorlager. Einzahlungsliste in der Sektorpolitik für alle sichtbar. Nichts geht zurück. Nicht in Sektor 1.
 
 *1. Sektorprojekte*
-Baut der SK wie Sektorgebäude, eines nach dem anderen, braucht die Sektorraumbasis. Je 3 Stufen, wirkt für alle Mitglieder des Sektors.
-• Hyperraumrelais: VS-Bauzeiten -5/-10/-15 %
-• Sektorraffinerie: Industrie-Ertrag +5/+10/+15 %
-• Werftausbau: Sektorraumschiffe 10/20/30 % günstiger
-• Verteidigungsgitter: Verluste bei der Verteidigung des Sektors -10/-20/-30 %
-Kosten: Stufe 1 = 20.000 Eisen, 10.000 Titan, 20 Handelswaren I, 96 WT. Stufe 2 dasselbe mit Mexit, Dulexit, Handelswaren II in 144 WT. Stufe 3 mit Tekranit, Ylesenium, Handelswaren III in 192 WT.
+Baut der SK wie Sektorgebäude, eines nach dem anderen, braucht die Sektorraumbasis. Je 5 Stufen, wirkt für alle Mitglieder des Sektors.
+• Hyperraumrelais: VS-Bauzeiten -5 % je Stufe, bis -25 %
+• Sektorraffinerie: Industrie-Ertrag +5 % je Stufe, bis +25 %
+• Werftausbau: Sektorraumschiffe 10 % je Stufe günstiger, bis 50 %
+• Verteidigungsgitter: Verluste bei der Verteidigung des Sektors -10 % je Stufe, bis -50 %
+Kosten: Stufe 1 = 20.000 Eisen, 10.000 Titan, 20 Handelswaren I, 96 WT. Danach dasselbe mit den nächstseltenen Rohstoffen und Handelswaren II bis V, bis Stufe 5 mit Sextagit, Octagium und Handelswaren V in 288 WT.
 
 *2. Kampfmittel für die Sektorflotte*
 Fertigt der SK aus Handelswaren, 16 WT je Stück, höchstens 3 je Art. Werden beim Einsatz verbraucht.

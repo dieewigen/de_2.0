@@ -1,6 +1,9 @@
 -- Schemaänderung Oktober 2026 (Sektorprojekte und Kampfmittel aus den Vergessenen Systemen, docs/sektorprojekte.md),
--- auf beiden Servern einspielen. Die Tabellen stehen auch in de.sql. Ohne sie laufen die Seiten weiter, nur das
--- Sektor-VS-Lager, die Projekte und die Kampfmittel fehlen.
+-- auf beiden Servern einspielen. Alles steht auch in de.sql. Ohne die drei Tabellen laufen die Seiten weiter, nur das
+-- Sektor-VS-Lager, die Projekte und die Kampfmittel fehlen. Die Spalte produktion_basis braucht Hekate für die
+-- Skalierung der Auftragsmengen am Median der VS-Förderung.
+
+ALTER TABLE `de_hekate` ADD `produktion_basis` double NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS `de_sector_vs` (
   `sec_id` smallint(5) UNSIGNED NOT NULL,

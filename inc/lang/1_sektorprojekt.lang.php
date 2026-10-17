@@ -19,7 +19,7 @@ $sektorprojekt_lang = array(
         4 => 'Verluste von Wachflotte und Sektorflotte bei der Verteidigung des eigenen Sektors -{PCT} %',
     ),
     'projekt_kurz' => array(1 => 'VS-Bauzeit -{PCT} %', 2 => 'VS-Ertrag +{PCT} %', 3 => 'Sektorschiffe -{PCT} %', 4 => 'Verluste -{PCT} %'),
-    'projekt_hinweis' => 'Drei Stufen je Projekt, es entsteht immer nur eines gleichzeitig. Die Wirkung gilt für alle Mitglieder des Sektors bis zum Rundenende.',
+    'projekt_hinweis' => 'Fünf Stufen je Projekt, es entsteht immer nur eines gleichzeitig. Die Wirkung gilt für alle Mitglieder des Sektors bis zum Rundenende.',
     'projekt_erklaert' => 'So wirken die Projekte',
     'km_erklaert' => 'So wirken die Kampfmittel',
     'projekt_basis' => 'Voraussetzung für Sektorprojekte ist die Sektorraumbasis.',

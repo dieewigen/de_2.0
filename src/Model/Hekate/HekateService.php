@@ -14,6 +14,11 @@ use DieEwigen\DE2\Model\VsBonus\VsBonusService;
  * Die Perioden laufen in Wirtschaftsticks. Beim Rundenwechsel setzt sich der Zustand selbst zurück (wie beim
  * SiegelService) und leert dabei auch de_vs_bonus.
  *
+ * Die Mengen wachsen mit der VS-Förderung des Servers (wie der Eintrittspreis des Feldzugs): Bei jedem Periodenwechsel
+ * wird der Median der VS-Förderung je WT gemessen (FeldzugService::messeProduktion). Der erste Median der Runde ab
+ * BASIS_MIN ist der Bezugswert (de_hekate.produktion_basis), die Mengen werden mit Median ÷ Bezugswert vervielfacht,
+ * mindestens 1, höchstens FAKTOR_MAX. Die Belohnungen bleiben fest.
+ *
  * Kein Sperre::setzen(): map_system.php hält die Spielersperre für die ganze Seite.
  */
 class HekateService
@@ -55,16 +60,22 @@ class HekateService
         return is_array($vorlagen) && !empty($vorlagen) ? array_values($vorlagen) : self::AUFTRAEGE;
     }
 
+    //Skalierung der Mengen: Bezugswert ist der erste Median der VS-Förderung je WT ab BASIS_MIN, der Faktor steigt
+    //mit der Förderung bis höchstens FAKTOR_MAX
+    public const BASIS_MIN = 100;
+    public const FAKTOR_MAX = 25;
+
     /**
-     * Würfelt die Aufträge einer Periode.
+     * Würfelt die Aufträge einer Periode. $faktor vervielfacht die Mengen: Handelswaren aufgerundet, Beigabe auf volle Hundert.
      */
-    public static function generateAuftraege(): array
+    public static function generateAuftraege(float $faktor = 1.0): array
     {
+        $faktor = max(1.0, $faktor);
         $auftraege = [];
         foreach (self::getVorlagen() as $v) {
-            $waren = [[(int)$v['ware'], mt_rand((int)$v['min'], (int)$v['max'])]];
+            $waren = [[(int)$v['ware'], (int)ceil(mt_rand((int)$v['min'], (int)$v['max']) * $faktor)]];
             if (!empty($v['beigabe'])) {
-                $waren[] = [mt_rand((int)$v['beigabe'][0], (int)$v['beigabe'][1]), mt_rand(10, 30) * 100];
+                $waren[] = [mt_rand((int)$v['beigabe'][0], (int)$v['beigabe'][1]), (int)(round(mt_rand(10, 30) * $faktor) * 100)];
             }
             if (mt_rand(0, 1) === 0) {
                 $belohnung = ['palenium' => (int)$v['palenium']];
@@ -74,6 +85,26 @@ class HekateService
             $auftraege[] = ['waren' => $waren, 'belohnung' => $belohnung];
         }
         return $auftraege;
+    }
+
+    /**
+     * Aufträge einer neuen Periode samt Bezugswert: Median der VS-Förderung jetzt gegen den ersten Median der Runde ab
+     * BASIS_MIN. Ohne Messwert oder Bezugswert bleibt der Faktor 1.
+     *
+     * @return array{auftraege: array, basis: float, faktor: float}
+     */
+    private function neuePeriode(float $basis): array
+    {
+        try {
+            $produktion = (new \DieEwigen\DE2\Model\Feldzug\FeldzugService($this->db))->messeProduktion();
+        } catch (\Throwable $e) {
+            $produktion = 0.0;
+        }
+        if ($basis <= 0 && $produktion >= self::BASIS_MIN) {
+            $basis = $produktion;
+        }
+        $faktor = $basis > 0 ? min((float)self::FAKTOR_MAX, max(1.0, $produktion / $basis)) : 1.0;
+        return ['auftraege' => self::generateAuftraege($faktor), 'basis' => $basis, 'faktor' => $faktor];
     }
 
     public function getSpecialSystemData(): SpecialSystemData
@@ -109,7 +140,9 @@ class HekateService
         $row = $this->readState();
 
         if ((string)$row['round_start'] !== (string)$sys['rundenstart_datum'] || $wt < (int)$row['period_start_wt']) {
-            mysqli_execute_query($this->db, "UPDATE de_hekate SET round_start = ?, period_nr = period_nr + 1, period_start_wt = ?, auftraege = ? WHERE id = 1 AND period_nr = ?", [$sys['rundenstart_datum'], $wt, json_encode(self::generateAuftraege()), $row['period_nr']]);
+            //neue Runde: der Bezugswert der Skalierung beginnt von vorn
+            $neu = $this->neuePeriode(0.0);
+            mysqli_execute_query($this->db, "UPDATE de_hekate SET round_start = ?, period_nr = period_nr + 1, period_start_wt = ?, auftraege = ?, produktion_basis = ? WHERE id = 1 AND period_nr = ?", [$sys['rundenstart_datum'], $wt, json_encode($neu['auftraege']), $neu['basis'], $row['period_nr']]);
             if (mysqli_affected_rows($this->db) === 1) {
                 mysqli_execute_query($this->db, "DELETE FROM de_hekate_lieferung WHERE period_nr <= ?", [$row['period_nr']]);
                 //Hekates Gunst gilt nur in der Runde, in der sie erworben wurde
@@ -125,7 +158,7 @@ class HekateService
     private function readState(): array
     {
         $res = mysqli_execute_query($this->db, "SELECT * FROM de_hekate WHERE id = 1", []);
-        return mysqli_fetch_assoc($res) ?: ['round_start' => null, 'period_nr' => 1, 'period_start_wt' => 1, 'auftraege' => '[]'];
+        return mysqli_fetch_assoc($res) ?: ['round_start' => null, 'period_nr' => 1, 'period_start_wt' => 1, 'auftraege' => '[]', 'produktion_basis' => 0];
     }
 
     public function getPeriodNr(): int
@@ -255,9 +288,11 @@ class HekateService
 
         if ($wt >= (int)$state['period_start_wt'] + self::getDauer()) {
             $period = (int)$state['period_nr'];
-            $auftraege = self::generateAuftraege();
-            mysqli_execute_query($this->db, "UPDATE de_hekate SET period_nr = period_nr + 1, period_start_wt = ?, auftraege = ? WHERE id = 1 AND period_nr = ?", [$wt, json_encode($auftraege), $period]);
+            $neu = $this->neuePeriode((float)($state['produktion_basis'] ?? 0));
+            $auftraege = $neu['auftraege'];
+            mysqli_execute_query($this->db, "UPDATE de_hekate SET period_nr = period_nr + 1, period_start_wt = ?, auftraege = ?, produktion_basis = ? WHERE id = 1 AND period_nr = ?", [$wt, json_encode($auftraege), $neu['basis'], $period]);
             if (mysqli_affected_rows($this->db) === 1) {
+                echo 'Neue Periode, Mengenfaktor '.round($neu['faktor'], 2).' (Bezugswert '.round($neu['basis']).' je WT)<br>';
                 mysqli_execute_query($this->db, "DELETE FROM de_hekate_lieferung WHERE period_nr <= ?", [$period]);
 
                 //die Beigaben machen den Unterschied zur letzten Periode, daher nennt der Chat sie

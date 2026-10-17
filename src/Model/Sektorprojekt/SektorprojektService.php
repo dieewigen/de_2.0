@@ -21,19 +21,22 @@ class SektorprojektService
     public const WERFT = 3;
     public const GITTER = 4;
     public const PROJEKTE = [self::RELAIS => 'relais', self::RAFFINERIE => 'raffinerie', self::WERFT => 'werft', self::GITTER => 'gitter'];
-    public const MAX_STUFE = 3;
+    public const MAX_STUFE = 5;
     //Wirkung in Prozent, Index = Stufe
     public const PROZENT = [
-        self::RELAIS => [0, 5, 10, 15],
-        self::RAFFINERIE => [0, 5, 10, 15],
-        self::WERFT => [0, 10, 20, 30],
-        self::GITTER => [0, 10, 20, 30],
+        self::RELAIS => [0, 5, 10, 15, 20, 25],
+        self::RAFFINERIE => [0, 5, 10, 15, 20, 25],
+        self::WERFT => [0, 10, 20, 30, 40, 50],
+        self::GITTER => [0, 10, 20, 30, 40, 50],
     ];
-    //Kosten (item_id => Menge) und Bauzeit je Stufe, gleich für alle Projekte
+    //Kosten (item_id => Menge) und Bauzeit je Stufe, gleich für alle Projekte; die Stufen 4 und 5 sind die Senke für
+    //die seltenen Rohstoffe und Handelswaren IV und V
     public const STUFEN = [
         1 => ['kosten' => [3 => 20000, 4 => 10000, 14 => 20], 'wt' => 96],
         2 => ['kosten' => [5 => 20000, 6 => 10000, 15 => 20], 'wt' => 144],
         3 => ['kosten' => [7 => 20000, 8 => 10000, 16 => 20], 'wt' => 192],
+        4 => ['kosten' => [9 => 20000, 10 => 10000, 17 => 20], 'wt' => 240],
+        5 => ['kosten' => [11 => 20000, 12 => 10000, 18 => 20], 'wt' => 288],
     ];
 
     //Kampfmittel; die ID ist zugleich tech_id in de_sector_build

@@ -222,6 +222,18 @@ function createAuction($uid)
             }
             $cost_list[] = array('I', $r, $amount);
         }
+
+        //Handelswaren I bis V (14-18): ebenfalls ein Fünftel des größten Lagers, mindestens 20 Stück
+        for ($r = 14;$r <= 18;$r++) {
+            $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT MAX(item_amount) AS amount FROM de_user_storage WHERE item_id=?", [$r]);
+            $res = mysqli_fetch_array($db_daten);
+
+            $amount = (int)ceil($res['amount'] / 5);
+            if ($amount < 20) {
+                $amount = 20;
+            }
+            $cost_list[] = array('I', $r, $amount);
+        }
     }
 
 
