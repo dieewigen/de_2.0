@@ -535,25 +535,25 @@ class Werkstatt
         return $lang['stueck'][$it['guete']][$it['platz']].($v > 0 ? ' (+'.$v.' V)' : '');
     }
 
-    /** Vier Buchstaben für den Kampfbericht, je Platz in der Farbe der Güte; ohne Stück grau */
+    /**
+     * Vier Buchstaben für den Kampfbericht, je Platz in der Farbe der Güte, ohne Stück grau. Ein Tooltip für alle vier:
+     * je Buchstabe Platz und Güte, darunter die Summe der belegten Kennzahlen. Die Buchstaben selbst tragen keinen title,
+     * weil das Tooltip-Skript (setTooltip in js/de_fn.js) bei title-Elementen in title-Elementen nur eines von beiden zeigt.
+     */
     public static function berichtChips(array $stuecke, array $lang, array $summe = []): string
     {
         $html = '';
+        $zeilen = [];
         foreach (self::PLAETZE as $p) {
-            if (isset($stuecke[$p])) {
-                $g = $stuecke[$p]['guete'];
-                $html .= '<span class="ws-guete ws-guete-'.$g.'" title="'.$lang['platz'][$p].': '.$lang['guete'][$g].'">'.$lang['platz_kurz'][$p].'</span>';
-            } else {
-                $html .= '<span class="ws-guete ws-guete-leer" title="'.$lang['platz'][$p].': keine">'.$lang['platz_kurz'][$p].'</span>';
-            }
+            $g = isset($stuecke[$p]) ? (int)$stuecke[$p]['guete'] : null;
+            $html .= '<span class="ws-guete ws-guete-'.($g === null ? 'leer' : $g).'">'.$lang['platz_kurz'][$p].'</span>';
+            $zeilen[] = $lang['platz'][$p].': '.($g === null ? 'keine' : $lang['guete'][$g]);
         }
-        //Summe der Werte als Tooltip, nur belegte Kennzahlen
-        $title = '';
         foreach ($summe as $k => $v) {
             if ($v > 0 && isset($lang['kennzahl'][$k])) {
-                $title .= ($title === '' ? '' : '<br>').$lang['kennzahl'][$k].' '.self::wertText($k, [(float)$v, 0]);
+                $zeilen[] = $lang['kennzahl'][$k].' '.self::wertText($k, [(float)$v, 0]);
             }
         }
-        return '<span class="ws-chips"'.($title !== '' ? ' title="'.$lang['bericht_ausruestung'].'&'.$title.'"' : '').'>'.$html.'</span>';
+        return '<span class="ws-chips" title="'.$lang['bericht_ausruestung'].'&'.implode('<br>', $zeilen).'">'.$html.'</span>';
     }
 }

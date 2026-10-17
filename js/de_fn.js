@@ -3,31 +3,31 @@ $( document ).ready(function() {
 });
 
 function setTooltip(){
-    var targets = $('[title]'),
-        target  = false,
-        tooltip = false,
-        title   = false;
- 
+    var targets = $('[title]');
+
     targets.unbind('mouseenter mouseleave touchstart');
     targets.bind('mouseenter', function()
     {
-        target  = $(this);
-        tip     = target.attr('title');
-        if (tip) {
-            tip = tip.replace('&', '<br>');
-        }
-        
+        // target, tooltip und tip gehören zu diesem einen Element. Früher teilten alle Handler dieselben Variablen: Bei
+        // title-Elementen in title-Elementen (etwa die Ausrüstungs-Buchstaben im Battleground-Bericht) stellte das
+        // Verlassen des inneren den title des äußeren wieder her, der innere ging verloren, und der Browser zeigte den
+        // rohen title samt <br> an.
+        var target  = $(this),
+            titel   = target.attr('title'),
+            tip     = titel ? titel.replace('&', '<br>') : titel,
+            tooltip;
+
         // Entferne vorhandene Tooltips
         $('#tt').remove();
-        
+
         tooltip = $('<div id="tt"></div>');
- 
+
         if(!tip || tip == '')
             return false;
- 
+
         target.removeAttr('title');
-        target.data('original-title', tip); // Titel sicher speichern
-        
+        target.data('original-title', titel); // Titel unverändert sichern, remove_tooltip stellt ihn wieder her
+
         tooltip.css('opacity', 0)
                .html(tip)
                .appendTo('body');

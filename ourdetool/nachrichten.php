@@ -46,6 +46,14 @@ if ($uid > 0) {
     $db_daten_sec = mysqli_execute_query($GLOBALS['dbi'], "SELECT spielername, sector, system, rasse FROM de_user_data WHERE user_id=?", [$uid]);
     $rew = mysqli_fetch_array($db_daten_sec);
 
+    //Das Admintool hat kein Tooltip-Skript: Die Umbrüche der Spiel-Tooltips (erstes & als Überschrift, <br>) werden
+    //echte Umbrüche, damit der Browser-Tooltip der Kampfberichte keinen HTML-Code zeigt
+    $tooltip_umbrueche = function ($html) {
+        return preg_replace_callback('/ title="([^"]*)"/', function ($m) {
+            return ' title="'.str_replace('<br>', '&#10;', preg_replace('/&(?![A-Za-z#][A-Za-z0-9]*;)/', '&#10;', $m[1], 1)).'"';
+        }, $html);
+    };
+
     while ($row = mysqli_fetch_array($db_daten)) { //jeder gefundene datensatz wird ausgegeben
         $t = $row["time"];
         $n = $row["typ"];
@@ -86,9 +94,9 @@ if ($uid > 0) {
             echo '</tr>';
             echo '<tr>';
             if ($n == 57) {
-                echo '<td>' . '<br>' . Kampfbericht::v1($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte) . '</td>';
+                echo '<td>' . '<br>' . $tooltip_umbrueche(Kampfbericht::v1($row["text"], $rew["rasse"], $rew["spielername"], $rew["sector"], $rew["system"], $schiffspunkte)) . '</td>';
             } elseif ($n == 70) {
-                echo '<td>' . '<br>' . Kampfbericht::bg($row["text"]) . '</td>';
+                echo '<td>' . '<br>' . $tooltip_umbrueche(Kampfbericht::bg($row["text"])) . '</td>';
             }
             echo '</tr>';
         }
