@@ -103,7 +103,7 @@ if(!hasTech($pt,159)){
 
 	$ship_upgrade_cost=($ship->ship_level+1)*100;
 
-	$content.=rahmen_oben('BASISSTERN',false);
+	$content.=rahmen_oben('Basisstern',false);
 
 	//Werte des Basissterns als Kacheln
 	$content.='
@@ -140,7 +140,7 @@ if(!hasTech($pt,159)){
 	$content.='<br>'.\DieEwigen\DE2\View\FehlendeTechnologie::karte(159);
 }else{
 
-	$content.=rahmen_oben('BATTLEGROUNDS',false);
+	$content.=rahmen_oben('Battlegrounds',false);
 
 	$ship=loadSpecialShip($_SESSION['ums_user_id']);
 
@@ -231,7 +231,7 @@ if(!hasTech($pt,159)){
 
 //die einzelnen BGs durchgehen
 for($i=0;$i<3;$i++){
-	$content.=rahmen_oben('BATTLEGROUND '.($i+1).' GEWINNER',false);
+	$content.=rahmen_oben('Battleground '.($i+1).': Gewinner',false);
 	$content.='<div class="einh mod">';
 
 	$play_typ=0; //Spieler-BG
@@ -243,7 +243,7 @@ for($i=0;$i<3;$i++){
 	$zeilen='';
 	if($play_typ==0){
 		//Spieler-BG
-		$kopf='<div class="einh-rang prod-kopf"><span class="prod-zahl">Platz</span><span>Spieler</span><span class="prod-zahl">BASISSTERN-Stufe</span><span class="prod-zahl">Siege</span></div>';
+		$kopf='<div class="einh-rang prod-kopf"><span class="prod-zahl">Platz</span><span>Spieler</span><span class="prod-zahl">Basisstern-Stufe</span><span class="prod-zahl">Siege</span></div>';
 
 		//Spielerdaten laden
 		$sql="SELECT * FROM `de_user_data` WHERE bgscore".$i." > 1 ORDER BY bgscore".$i." DESC;";

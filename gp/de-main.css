@@ -105,19 +105,6 @@ h1 {
   font-weight: normal;
 }
 
-.info_box {
-  overflow: hidden;
-  width: 592px;
-  border: 1px solid #2f2f2f;
-  background-color: rgba(0, 0, 0, 0.8);
-  text-align: center;
-  padding: 10px;
-}
-
-.font-size16 {
-  font-size: 16px;
-}
-
 .tal {
   text-align: left;
 }
@@ -363,6 +350,9 @@ h1 {
   text-align: left;
   color: #FFFFFF;
   background: #222222;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
   position: absolute;
   z-index: 100;
   padding: 15px;
@@ -444,11 +434,11 @@ a.btn:visited {
   width: 542px;
   height: 24px;
   background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
-  border: 1px solid #4a9eff;
+  border: 1px solid var(--akzent);
   border-radius: 2px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 8px rgba(74, 158, 255, 0.2), 0 0 12px rgba(74, 158, 255, 0.1);
+  box-shadow: inset 0 0 8px var(--akzent-weich), 0 0 12px var(--akzent-weich);
 }
 #gameProgressBar .scifi-progress-container::before {
   content: "";
@@ -457,7 +447,7 @@ a.btn:visited {
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(74, 158, 255, 0.05) 3px, rgba(74, 158, 255, 0.05) 6px);
+  background: repeating-linear-gradient(90deg, transparent, transparent 3px, color-mix(in srgb, var(--akzent) 5%, transparent) 3px, color-mix(in srgb, var(--akzent) 5%, transparent) 6px);
   pointer-events: none;
 }
 #gameProgressBar .scifi-progress-bar {
@@ -467,8 +457,8 @@ a.btn:visited {
   overflow: hidden;
 }
 #gameProgressBar .progress-normal {
-  background: linear-gradient(90deg, #001844 0%, #0066cc 50%, #4a9eff 100%);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 25%, #000) 0%, color-mix(in srgb, var(--akzent) 70%, #000) 50%, var(--akzent) 100%);
+  box-shadow: 0 0 8px var(--akzent-mittel);
 }
 #gameProgressBar .progress-medium {
   background: linear-gradient(90deg, #442200 0%, #cc7700 50%, #ffaa44 100%);
@@ -493,8 +483,8 @@ a.btn:visited {
   position: absolute;
   width: 6px;
   height: 6px;
-  border: 1px solid #4a9eff;
-  background: #001844;
+  border: 1px solid var(--akzent);
+  background: color-mix(in srgb, var(--akzent) 25%, #000);
   opacity: 0.7;
 }
 #gameProgressBar .scifi-corner.top-left {
@@ -954,30 +944,74 @@ a.mod.mobil-menue:hover {
   color: #8b949e;
 }
 
-.helper-nav .helper-btn,
-.helper-nav a.helper-btn:link,
-.helper-nav a.helper-btn:visited {
-  display: inline-block;
-  min-width: 90px;
-  margin: 0 6px;
-  padding: 5px 12px;
-  border: 1px solid #777777;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.6);
-  font-size: 15px;
-  text-decoration: none;
+.ber {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  width: 572px;
+  font-size: 13px;
+  line-height: 1.45;
 }
-.helper-nav a.helper-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+
+.ber-bild {
+  grid-row: 1/3;
+  align-self: start;
+  border-radius: 10px;
 }
-.helper-nav .helper-btn-aus {
-  color: #666666;
-  border-color: #444444;
+
+.mod .ber-text a,
+.mod .ber-text a:link,
+.mod .ber-text a:visited {
+  font: inherit;
+  color: var(--akzent);
+  text-decoration: underline;
+}
+
+.ber-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  align-self: end;
+}
+
+.ber-zaehler {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.mod .ber-nav .ber-aus,
+.mod .ber-nav .ber-aus:hover {
+  opacity: 0.45;
+  border-color: var(--akzent);
+  background: var(--akzent-weich);
+  box-shadow: none;
   cursor: default;
 }
-.helper-nav .helper-zaehler {
-  font-size: 13px;
-  color: #aaaaaa;
+
+.mod .ber-nav .mod-btn-leise.ber-aus,
+.mod .ber-nav .mod-btn-leise.ber-aus:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rl-hinweis {
+  width: 598px;
+  margin: 6px auto 0;
+  text-align: left;
+}
+.rl-hinweis .mod-meldung {
+  margin-bottom: 6px;
+}
+.rl-hinweis .mod-hinweis {
+  margin-bottom: 0;
+}
+.rl-hinweis .mod-meldung a,
+.rl-hinweis .mod-meldung a:link,
+.rl-hinweis .mod-meldung a:visited {
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
 }
 
 :root {
@@ -986,6 +1020,23 @@ a.mod.mobil-menue:hover {
   --akzent-mittel: rgba(51, 153, 255, 0.35);
 }
 
+:focus-visible:not(iframe) {
+  outline: 2px solid var(--akzent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
 body.theme-rasse1 {
   --akzent: #3399FF;
   --akzent-weich: rgba(51, 153, 255, 0.16);
@@ -10311,8 +10362,9 @@ body.theme-rasse1.mobile a.btn:hover {
 }
 
 body.theme-rasse1.desktop {
-  background-image: url(g/bgr1_1.jpg);
-  background-repeat: repeat;
+  background-color: #000;
+  background-image: linear-gradient(to bottom, transparent 560px, #000 768px), url(g/bgr1_1.jpg);
+  background-repeat: repeat-x;
   background-attachment: fixed;
 }
 
@@ -10470,8 +10522,9 @@ body.theme-rasse2.mobile a.btn:hover {
 }
 
 body.theme-rasse2.desktop {
-  background-image: url(g/bgr2_1.jpg);
-  background-repeat: repeat;
+  background-color: #000;
+  background-image: linear-gradient(to bottom, transparent 560px, #000 768px), url(g/bgr2_1.jpg);
+  background-repeat: repeat-x;
   background-attachment: fixed;
 }
 
@@ -10629,8 +10682,9 @@ body.theme-rasse3.mobile a.btn:hover {
 }
 
 body.theme-rasse3.desktop {
-  background-image: url(g/bgr3_1.jpg);
-  background-repeat: repeat;
+  background-color: #000;
+  background-image: linear-gradient(to bottom, transparent 560px, #000 768px), url(g/bgr3_1.jpg);
+  background-repeat: repeat-x;
   background-attachment: fixed;
 }
 
@@ -10788,8 +10842,9 @@ body.theme-rasse4.mobile a.btn:hover {
 }
 
 body.theme-rasse4.desktop {
-  background-image: url(g/bgr4_1.jpg);
-  background-repeat: repeat;
+  background-color: #000;
+  background-image: linear-gradient(to bottom, transparent 560px, #000 768px), url(g/bgr4_1.jpg);
+  background-repeat: repeat-x;
   background-attachment: fixed;
 }
 

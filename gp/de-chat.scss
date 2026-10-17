@@ -178,6 +178,9 @@ $chat-channels: (
   font-size: 13px;
   color: #FFFFFF;
   background: #222222;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
   pointer-events: none;
 }
 #tt:after {
@@ -206,6 +209,15 @@ $chat-channels: (
   right: 10px;
   left: auto;
   margin: 0;
+}
+
+// Bewegung aus, wenn das Betriebssystem es wünscht (gleiche Regel in de-main.scss)
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 // Tagestrenner ("Heute", "Gestern", Datum)
@@ -421,8 +433,9 @@ body.mobile #chatcontent a { font-size: inherit; }
 
   // Desktop-Variante: ersetzt nur den Hintergrund gemäß Originaldateien
   body.theme-#{$name}.desktop {
-    // Komplettes Background-Shorthand + Fallback-Farbe
-    background: #000 url(#{$img}) -620px 0 / auto repeat fixed;
+    // Planetenbild (1024 x 768) wie in der Spielspalte um 620 px versetzt; nur einmal in der Höhe, darunter läuft es
+    // in Schwarz aus (gleiche Regel in de-main.scss)
+    background: linear-gradient(to bottom, transparent 560px, #000 768px) fixed, #000 url(#{$img}) -620px 0 / auto repeat-x fixed;
   }
 }
  

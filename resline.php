@@ -378,9 +378,8 @@ if($show_trade_reminder==1 && !$flag_ang_big_iframe && ($_SESSION['de_frameset']
 	//abgeschlossene Missionen, deren Lohn noch nicht abgeholt ist
 	$trade_offen = mysqli_fetch_assoc(mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(*) AS anzahl FROM de_user_mission WHERE end_time<? AND get_reward=0 AND user_id=?", [time(), $_SESSION['ums_user_id']]));
 	if($trade_offen['anzahl']>0){
-		echo '<div class="info_box text3" style="margin-top: 6px;">
-	Es gibt abgeschlossene <a href="missions.php">Missionen</a>.<br>
-	<span style="font-size: 10px;">Unter Optionen -> "Missionshilfe aktivieren" kann die Information eingeblendet/ausgeblendet werden.</span></div><br>';
+		echo '<div class="mod rl-hinweis"><div class="mod-meldung mod-meldung-ok">Es gibt abgeschlossene <a href="missions.php">Missionen</a>.</div>
+	<div class="mod-hinweis">Ein- und ausblenden unter Optionen &rarr; &bdquo;Missionshilfe aktivieren&ldquo;.</div></div><br>';
 	}
 }
 

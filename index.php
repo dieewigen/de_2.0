@@ -362,25 +362,18 @@ if (isset($_REQUEST['loginkey']) && $_REQUEST['loginkey'] != '') {
 		</head>';
     echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi']==1) ? 'mobile' : 'desktop').'">';
 
-    echo '
-		<div style="width: 100%;">
-			<div class="info_box text3" style="margin: 30px auto 0 auto; font-size: 14px;">';
+    //Karte wie nach dem Abmelden (urlaub.php, geloescht.php): Block .bc-seite in gp/de-main.scss
+    echo '<div class="mod bc-seite">
+	<div class="bc-kopf"><span class="mod-typ">Die Ewigen</span><b>Nicht eingeloggt</b></div>';
 
     if ($fehlermsg != '') {
-        echo '<div style="color: #FF0000; margin-top: 20px;">'.$fehlermsg.'</div>';
+        echo '<div class="mod-meldung mod-meldung-fehler">'.$fehlermsg.'</div>';
     }
 
-    echo '
-				<div style="color: #FF0000; margin-bottom: 25px; margin-top: 20px;">
-					Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.
-				</div>
-
-				<div style="color: #00FF00; margin-bottom: 20px;">
-					Du kannst das Fenster/Tab jetzt schließen, oder die zentrale Accountverwaltung <a href="'.$sv_link[1].'">öffnen</a>
-				<div>
-
-			</div>
-		</div>
+    echo '<div class="mod-meldung mod-meldung-warn">Du bist nicht eingeloggt. Logge Dich bitte &uuml;ber die zentrale Accountverwaltung neu ein.</div>
+	<p class="bc-text">Du kannst das Fenster jetzt schlie&szlig;en oder die zentrale Accountverwaltung &ouml;ffnen.</p>
+	<div class="bc-aktionen"><a href="'.$sv_link[1].'" class="mod-btn">Zur Accountverwaltung</a></div>
+</div>
 	</body>
 </html>';
     exit;

@@ -670,26 +670,26 @@ class Berater
           $html.=rahmen_oben('Fluxurion der Berater', false);
 
           //min-height statt fester Höhe, damit lange Texte nicht unter die Buttons laufen; unten Platz für die Buttons
-          $html.='<div class="cell" style="width: 570px; min-height: 256px; padding-bottom: 46px; box-sizing: border-box; font-size: 14px; position: relative;">';
-          $html.='<div style="float: left;"><img src="gp/g/berater'.$helper_picid.'.png" border="0"></div>';
-          $html.=$helper_msg;
+          //Karte im Stil der Spielseiten (Block .ber in gp/de-main.scss): Bild links, Text rechts, Knöpfe unten rechts
+          $html.='<div class="mod ber"><img src="gp/g/berater'.$helper_picid.'.png" class="ber-bild" alt="">';
+          $html.='<div class="ber-text">'.$helper_msg.'</div>';
 
           //zurück/weiter als Buttons (gut zu treffen, auch am Handy); deaktiviert, wenn es in die Richtung nicht weitergeht
-          $html.='<div class="helper-nav" style="position: absolute; bottom: 6px; right: 0px; width: 442px; text-align: center;">';
+          $html.='<div class="ber-nav">';
           //SCRIPT_NAME statt PHP_SELF, das über PATH_INFO fremdes HTML enthalten kann
           $helper_self = htmlspecialchars(basename($_SERVER['SCRIPT_NAME']), ENT_QUOTES, 'UTF-8');
           if($_SESSION['helperid']>0){
-            $html.='<a href="'.$helper_self.'?helperdo=-1" class="helper-btn">&lsaquo; zur&uuml;ck</a>';
+            $html.='<a href="'.$helper_self.'?helperdo=-1" class="mod-btn mod-btn-leise">&lsaquo; zur&uuml;ck</a>';
           }else{
-            $html.='<span class="helper-btn helper-btn-aus">&lsaquo; zur&uuml;ck</span>';
+            $html.='<span class="mod-btn mod-btn-leise ber-aus">&lsaquo; zur&uuml;ck</span>';
           }
-          $html.='<span class="helper-zaehler">'.($_SESSION['helperid']+1).'/'.($helper_progress+1).'</span>';
+          $html.='<span class="ber-zaehler">'.($_SESSION['helperid']+1).'/'.($helper_progress+1).'</span>';
           if($_SESSION['helperid']<$helper_progress){
-            $html.='<a href="'.$helper_self.'?helperdo=1" class="helper-btn">weiter &rsaquo;</a>';
+            $html.='<a href="'.$helper_self.'?helperdo=1" class="mod-btn">weiter &rsaquo;</a>';
           }else{
             //Schritt 34 ist der letzte Hinweis, davor fehlt noch die erledigte Aufgabe
             $helper_titel=($_SESSION['helperid']>=34) ? 'Das war der letzte Hinweis.' : 'Erledige zuerst die Aufgabe, dann geht es weiter.';
-            $html.='<span class="helper-btn helper-btn-aus" title="'.$helper_titel.'">weiter &rsaquo;</span>';
+            $html.='<span class="mod-btn ber-aus" title="'.$helper_titel.'">weiter &rsaquo;</span>';
           }
           $html.='</div>';
 

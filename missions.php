@@ -408,7 +408,9 @@ echo '<body class="theme-rasse'.$_SESSION['ums_rasse'].' '.(($_SESSION['ums_mobi
 
 if(isset($sv_deactivate_missions) && $sv_deactivate_missions==1){
 	include "resline.php";
-	echo '<br><div class="info_box text2">Auf diesem Server sind Missionen deaktiviert.</div>';
+	rahmen_oben('Missionen');
+	echo '<div class="mis mod"><div class="mod-leer">Auf diesem Server sind Missionen deaktiviert.</div></div>';
+	rahmen_unten();
 
 	die('</body></html>');
 }

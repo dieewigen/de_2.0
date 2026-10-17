@@ -131,7 +131,9 @@ if (($se == $sector || $zIsMetaOrAlly ) && $znpc == 2) {
         }
 
         if (!$alienRow) {
-            echo '<div class="info_box font-size16">Alien nicht gefunden.</div>';
+            rahmen_oben($details_lang['title']);
+            echo '<div class="mod det"><div class="mod-leer">Alien nicht gefunden.</div></div>';
+            rahmen_unten();
             die('</body></html>');
         }
 
@@ -316,13 +318,10 @@ if (($se == $sector || $zIsMetaOrAlly ) && $znpc == 2) {
 }elseif ($znpc == 2) {
     //NPC vom anderen Sektor, keine Details anzeigen
 
-    die('
-            <div class="info_box font-size16">
-                Es stehen keine Informationen zur Verfügung.
-            </div>
-        </body>
-    </html>
-    ');
+    rahmen_oben($details_lang['detailsvon'].$rew['spielername']);
+    echo '<div class="mod det"><div class="mod-leer">Es stehen keine Informationen zur Verf&uuml;gung.</div></div>';
+    rahmen_unten();
+    die('</body></html>');
 }
 
 ////////////////////////////////////////////////////////
