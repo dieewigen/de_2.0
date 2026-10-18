@@ -388,8 +388,21 @@ body.app {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--akzent);
+  color: #ffffff;
   filter: drop-shadow(0 0 5px var(--akzent));
+}
+.app-signal .app-signal-neu::after,
+.app-signal:link .app-signal-neu::after,
+.app-signal:visited .app-signal-neu::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--akzent);
+  box-shadow: 0 0 0 2px #0a0e14;
 }
 .app-signal:hover,
 .app-signal:link:hover,

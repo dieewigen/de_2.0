@@ -264,14 +264,28 @@ body.app {
 		height: var(--app-signal);
 	}
 
+	// Neues: weißes Symbol mit Leuchten in der Rassenfarbe und einem Punkt oben rechts. Nicht die Rassenfarbe allein, denn bei
+	// den Ishtar ist sie grau wie der Ruhezustand.
 	.app-signal-neu {
 		position: absolute;
 		inset: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--akzent);
+		color: #ffffff;
 		filter: drop-shadow(0 0 5px var(--akzent));
+
+		&::after {
+			content: '';
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			width: 9px;
+			height: 9px;
+			border-radius: 50%;
+			background: var(--akzent);
+			box-shadow: 0 0 0 2px #0a0e14;
+		}
 	}
 
 	&:hover {
