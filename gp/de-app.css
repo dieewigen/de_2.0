@@ -2,6 +2,7 @@ body.app {
   --app-nav-breite: 224px;
   --app-chat-breite: 360px;
   --app-kopf-hoehe: 58px;
+  --app-signal: 32px;
   display: grid;
   grid-template-columns: var(--app-nav-breite) minmax(0, 1fr) var(--app-chat-breite);
   grid-template-rows: var(--app-kopf-hoehe) minmax(0, 1fr);
@@ -172,31 +173,41 @@ body.app.app-chat-zu .app-chat-griff {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 34px;
+  width: calc(var(--app-signal) + 14px);
+  height: calc(var(--app-signal) + 6px);
   border-radius: 8px;
+  color: #6b7682;
   cursor: pointer;
+}
+.app-signal .app-ico,
+.app-signal:link .app-ico,
+.app-signal:visited .app-ico {
+  width: var(--app-signal);
+  height: var(--app-signal);
+  stroke-width: 1.6;
 }
 .app-signal img,
 .app-signal:link img,
 .app-signal:visited img {
-  width: 30px;
-  max-height: 26px;
-  height: auto;
-  object-fit: contain;
+  width: var(--app-signal);
+  height: var(--app-signal);
 }
 .app-signal .app-signal-neu,
 .app-signal:link .app-signal-neu,
 .app-signal:visited .app-signal-neu {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--akzent);
+  filter: drop-shadow(0 0 5px var(--akzent));
 }
 .app-signal:hover,
 .app-signal:link:hover,
 .app-signal:visited:hover {
   background: rgba(255, 255, 255, 0.06);
+  color: #aab4c0;
 }
 
 .app-zeiten {

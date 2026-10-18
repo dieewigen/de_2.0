@@ -16,6 +16,8 @@ body.app {
 	--app-nav-breite: 224px;
 	--app-chat-breite: 360px;
 	--app-kopf-hoehe: 58px;
+	// Größe der Signale in der Kopfleiste (Hyperfunk, Nachrichten, Allianzbonus, Infocenter)
+	--app-signal: 32px;
 	display: grid;
 	grid-template-columns: var(--app-nav-breite) minmax(0, 1fr) var(--app-chat-breite);
 	grid-template-rows: var(--app-kopf-hoehe) minmax(0, 1fr);
@@ -177,7 +179,8 @@ body.app.app-chat-zu {
 	color: #ff6b6b;
 }
 
-// Signale: Hyperfunk, Nachrichten, Allianzbonus, Infocenter; die Rassenfarbe liegt als zweites Bild über dem grauen
+// Signale: Hyperfunk und Nachrichten als Symbole (grau, bei Neuem in der Rassenfarbe darüber), Allianzbonus und
+// Infocenter als Bilder in derselben Höhe
 .app-signale {
 	display: flex;
 	gap: 2px;
@@ -191,27 +194,36 @@ body.app.app-chat-zu {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 40px;
-	height: 34px;
+	width: calc(var(--app-signal) + 14px);
+	height: calc(var(--app-signal) + 6px);
 	border-radius: 8px;
+	color: #6b7682;
 	cursor: pointer;
 
+	.app-ico {
+		width: var(--app-signal);
+		height: var(--app-signal);
+		stroke-width: 1.6;
+	}
+
 	img {
-		width: 30px;
-		max-height: 26px;
-		height: auto;
-		object-fit: contain;
+		width: var(--app-signal);
+		height: var(--app-signal);
 	}
 
 	.app-signal-neu {
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--akzent);
+		filter: drop-shadow(0 0 5px var(--akzent));
 	}
 
 	&:hover {
 		background: rgba(255, 255, 255, 0.06);
+		color: #aab4c0;
 	}
 }
 

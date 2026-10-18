@@ -122,8 +122,9 @@ function app_link($seite, $klasse, $inhalt, $titel = '')
 
 		//Signale: neue Hyperfunknachrichten und Nachrichten, Allianzbonus, Infocenter zu Technologien und Missionen
 		echo '<div class="app-signale">';
-		echo app_link('hyperfunk.php?l=new', 'app-signal', '<img src="gp/g/hyper.png" alt=""><img id="tb_hyper_img" class="app-signal-neu" src="gp/g/'.$_SESSION['ums_rasse'].'_hyper.png" alt="" style="display: none;" title="'.$resline_lang['restipnewhyperdesc'].'">', 'Hyperfunk');
-		echo app_link('sysnews.php', 'app-signal', '<img src="gp/g/news.png" alt=""><img id="tb_news_img" class="app-signal-neu" src="gp/g/'.$_SESSION['ums_rasse'].'_news.png" alt="" style="display: none;" title="'.$resline_lang['restipnewnewsdesc'].'">', 'Nachrichten');
+		//Hyperfunk und Nachrichten als Symbole: grau, bei Neuem legt sich dasselbe Symbol in der Rassenfarbe darüber (tb_hyper_img, tb_news_img)
+		echo app_link('hyperfunk.php?l=new', 'app-signal', '<svg class="app-ico"><use href="#i-hyperfunk"/></svg><span id="tb_hyper_img" class="app-signal-neu" style="display: none;"><svg class="app-ico"><use href="#i-hyperfunk"/></svg></span>', 'Hyperfunk');
+		echo app_link('sysnews.php', 'app-signal', '<svg class="app-ico"><use href="#i-nachrichten"/></svg><span id="tb_news_img" class="app-signal-neu" style="display: none;"><svg class="app-ico"><use href="#i-nachrichten"/></svg></span>', 'Nachrichten');
 		echo app_link('ally_dailygift.php', 'app-signal app-signal-leer', '<img id="tb_daily_img" class="rounded-borders pulse-icon" src="gp/g/icon15.png" alt="" style="display: none;">', $resline_lang['dailyallygiftdesc']);
 		echo app_link('ang_techs.php', 'app-signal app-signal-leer', '<img id="tb_infocenter_technology" class="rounded-borders" src="gp/g/icon16.png" alt="" style="display: none;" rel="tooltip">');
 		echo app_link('missions.php', 'app-signal app-signal-leer', '<img id="tb_infocenter_missions" class="rounded-borders" src="gp/g/icon14.png" alt="" style="display: none;" rel="tooltip">');
