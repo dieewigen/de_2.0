@@ -17,7 +17,7 @@ body.mobile .rahmen {
   border: 1px solid rgba(160, 200, 255, 0.14);
   border-radius: 10px;
   corner-shape: bevel;
-  background: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
+  background: linear-gradient(160deg, #0d131b 0%, #080c11 60%);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 

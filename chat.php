@@ -54,9 +54,9 @@ if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
 }
 
 echo '</head>';
-//in der Desktop-Ansicht (dm.php) steht der Chat als Leiste neben der Spielseite und bekommt die dunkle Fläche statt des
-//Planetenbilds (body.desktop.app in gp/de-chat.scss); Classic (de_frameset.php) behält das Bild
-$chat_app = ($pageType === 'desktop' && empty($_SESSION['de_frameset'])) ? ' app' : '';
+//Klasse app = neue Optik des Chats (body.app in gp/de-chat.scss): in der Desktop-Ansicht (dm.php, Leiste neben der Spielseite)
+//und in der neuen mobilen Darstellung (View\Mobil); Classic (de_frameset.php) und die bisherige Mobilansicht behalten den alten Stil
+$chat_app = (($pageType === 'desktop' && empty($_SESSION['de_frameset'])) || ($pageType === 'mobile' && \DieEwigen\DE2\View\Mobil::neu())) ? ' app' : '';
 echo '<body bgcolor="#000000" style="overflow:hidden;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.$pageType.$chat_app.'">';
 
 if($pageType==='mobile'){

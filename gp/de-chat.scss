@@ -448,6 +448,236 @@ body.mobile #chatcontent a { font-size: inherit; }
 }
  
 
-// In der Desktop-Ansicht (dm.php) steht der Chat als Leiste neben der Spielseite; chat.php setzt dort die Klasse app, und
-// statt des Planetenbilds gilt die dunkle Fläche der Leiste (schlägt body.theme-rasseN.desktop, gleiche Spezifität, steht später)
-body.desktop.app { background: #0b0f15; }
+// ------------------------------------------------------------
+// Neue Optik (Klasse app am body, gesetzt in chat.php: Desktop-Ansicht dm.php und neue mobile Darstellung): ruhige Fläche
+// statt Zellmuster, Roboto, Nachrichtentext hell, die Kanalfarbe nur am Namen und als Strich links, Reiter als Chips,
+// Eingabe und Senden wie die Bausteine der Spielseiten (--akzent kommt aus dem Theme oben). Classic und die bisherige
+// Mobilansicht haben kein app und bleiben wie bisher.
+// ------------------------------------------------------------
+$chat-kanaele-neu: (
+  0: #e8eef6,
+  1: #5fe08a,
+  2: #4a91fc,
+  3: #ffad5d
+);
+
+body.app {
+  background: #0b0f15;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+
+  #container.cellbg {
+    background: #0b0f15;
+    color: #c9d1d9;
+  }
+
+  #chatcontent {
+    padding: 8px 10px 10px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #c9d1d9;
+  }
+
+  // Zeile: heller Text, Kanalfarbe als Strich links und am Namen
+  #chatcontent .chatline,
+  #chatcontent .chatline a {
+    color: #c9d1d9;
+  }
+
+  #chatcontent .chatline {
+    position: relative;
+    margin: 1px 0;
+    padding: 3px 8px 3px 11px;
+    border-radius: 6px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: 2px;
+      width: 2px;
+      border-radius: 1px;
+      opacity: 0.7;
+    }
+  }
+
+  #chatcontent .chatline:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  @each $typ, $col in $chat-kanaele-neu {
+    #chatcontent .chat-ch#{$typ}::before {
+      background: $col;
+    }
+
+    #chatcontent .chat-ch#{$typ} .chat-name {
+      color: $col;
+    }
+
+    #chatchannelchanger .chat-ch#{$typ} {
+      color: $col;
+    }
+  }
+
+  #chatcontent .chat-time {
+    margin-right: 3px;
+    font-size: 11px;
+    color: #6b7682;
+    opacity: 1;
+  }
+
+  #chatcontent .chat-tag {
+    padding: 0 5px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
+    opacity: 0.9;
+  }
+
+  #chatcontent .chat-name {
+    font-weight: 600;
+  }
+
+  #chatcontent .chat-emote,
+  #chatcontent .chat-emote a,
+  #chatcontent .chat-emote .chat-name {
+    color: #ff9a4d;
+    font-style: italic;
+  }
+
+  #chatcontent .chat-herold {
+    color: #f0c24b;
+  }
+
+  #chatcontent .chat-error,
+  #chatcontent .chat-error a {
+    color: #ff8a8a;
+  }
+
+  #chatcontent .chat-day {
+    margin: 10px 0 4px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7682;
+
+    &::before,
+    &::after {
+      border-top-color: rgba(160, 200, 255, 0.12);
+    }
+  }
+
+  // Eingabebereich
+  #chatinput {
+    padding: 8px 10px 10px;
+    background: linear-gradient(180deg, #0d1218, #0b0f15);
+    border-top: 1px solid rgba(160, 200, 255, 0.14);
+  }
+
+  #chatchannelchanger {
+    gap: 6px;
+  }
+
+  #chatchannelchanger .chatchannel {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    opacity: 0.8;
+  }
+
+  #chatchannelchanger .chatchannel:hover {
+    border-color: currentColor;
+    opacity: 1;
+  }
+
+  #chatchannelchanger .chatchannel.active {
+    border-color: currentColor;
+    background: color-mix(in srgb, currentColor 18%, transparent);
+    font-weight: 600;
+    opacity: 1;
+  }
+
+  #chatchannelchanger .chatchannel.chat-aus {
+    opacity: 0.35;
+  }
+
+  #chatinput .chat-inputrow {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  #chatinput #chatinputfield {
+    height: 34px;
+    padding: 6px 10px;
+    font: 13px Roboto, Arial, Helvetica, sans-serif;
+    color: #ffffff;
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 7px;
+    corner-shape: bevel;
+  }
+
+  #chatinput #chatinputfield:focus {
+    border-color: var(--akzent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--akzent) 25%, transparent);
+  }
+
+  #chatinput #chatinputfield::placeholder {
+    color: #6b7682;
+    opacity: 1;
+  }
+
+  #chatinput #chatsend {
+    height: 34px;
+    padding: 0 14px;
+    font: 700 12px Roboto, Arial, Helvetica, sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: color-mix(in srgb, var(--akzent) 16%, transparent);
+    border: 1px solid var(--akzent);
+    border-radius: 7px;
+    corner-shape: bevel;
+  }
+
+  #chatinput #chatsend:hover {
+    background: color-mix(in srgb, var(--akzent) 35%, transparent);
+  }
+
+  .chat-newmsgs {
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+  }
+}
+
+// neue mobile Darstellung: Kopfzeile wie die Kopfleiste, größere Schrift und Eingabe für den Daumen (ab 16 px zoomt iOS nicht)
+body.mobile.app {
+  #chatheader {
+    padding: 10px;
+    border: 0;
+    border-bottom: 1px solid rgba(160, 200, 255, 0.14);
+    background: #0d1218;
+    font: 500 15px Roboto, Arial, Helvetica, sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  #chatcontent {
+    font-size: 15px;
+  }
+
+  #chatchannelchanger .chatchannel {
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+
+  #chatinput #chatinputfield,
+  #chatinput #chatsend {
+    height: 44px;
+    font-size: 16px;
+  }
+}

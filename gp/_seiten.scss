@@ -6,7 +6,8 @@
 $rand: rgba(160, 200, 255, 0.14);
 $rand-zart: rgba(160, 200, 255, 0.1);
 $flaeche: linear-gradient(145deg, #161f29, #0d1218 60%);
-$karte: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
+// Kartenfläche: fast so dunkel wie die alte Bausteinfläche (.mod rgba(6,9,14,.9)), damit Violett (Artefakte) und Grau lesbar bleiben
+$karte: linear-gradient(160deg, #0d131b 0%, #080c11 60%);
 $radius: 10px;
 $schrift: Roboto, Arial, Helvetica, sans-serif;
 $inhalt-breite: 1040px;
