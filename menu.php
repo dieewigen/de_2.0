@@ -191,7 +191,7 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
 	}
 
     if ($_COOKIE['deactivate_swipe'] != 1) {
-		$swipeHint = '<div class="swipe-hint">Swipe ◀ ▶ zum Wechseln</div>';
+		$swipeHint = '<div class="swipe-hint">Wischen: nach rechts Men&uuml;, nach links Chat</div>';
         echo '<script>
 function swipedetect(el, cb){
   let sx, sy, st;

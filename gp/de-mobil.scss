@@ -208,13 +208,16 @@ body.mobile .mob-kopf {
 
 	.mob-zeiten {
 		display: flex;
-		gap: 10px;
-		color: #c9d1d9;
+		gap: 12px;
+		color: #d8e9ff;
+		font-size: 13px;
+		font-weight: 500;
 		font-variant-numeric: tabular-nums;
 
 		small {
 			margin-right: 4px;
-			font-size: 9px;
+			font-size: 10px;
+			font-weight: 500;
 			letter-spacing: 0.08em;
 			text-transform: uppercase;
 			color: #8b949e;
@@ -305,17 +308,6 @@ body.mobile .spz-optionen {
 
 body.mobile .art-raster {
 	grid-template-columns: repeat(8, minmax(0, 1fr));
-}
-// Kopfleiste: der Hinweis auf die Wischgesten (nur wenn sie an sind) steht in einer eigenen Zeile unter Zeiten und Flotten
-body.mobile .mob-kopf .mob-unten {
-	flex-wrap: wrap;
-	row-gap: 3px;
-}
-
-body.mobile .mob-kopf .mob-wisch {
-	flex: 1 0 100%;
-	font-size: 10px;
-	color: #6b7682;
 }
 
 // Reihen, die für 580 px gebaut sind, brechen um statt zu quetschen: Knopfreihen, Köpfe mit Bild, Text und Knopf,
@@ -417,6 +409,12 @@ body.mobile .ss-eta,
 body.mobile .ss-eigen,
 body.mobile .ss-liste-zeilen {
 	min-width: 480px;
+}
+// Botschutz (inc/session.inc.php): die Rechenaufgabe ist ein 500-px-Bild im Link .bc-bild; am Handy schrumpft der Link auf
+// die Breite der Karte, das Bild skaliert mit (width: 100%, height: auto in de-main.scss)
+body.mobile .bc-bild {
+	width: auto;
+	max-width: 500px;
 }
 // sehr schmale Geräte: der Schriftzug neben dem Logo weicht den Signalen
 @media (max-width: 374px) {

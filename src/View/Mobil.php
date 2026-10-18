@@ -12,8 +12,7 @@ class Mobil
     }
 
     //Kopfleiste; die Werte stellt resline.php zusammen: rasse, rohstoffe (fünf kurze Zahlen), namen (fünf Rohstoffnamen), punkte,
-    //zeit, wt, kt, verteidiger und angreifer (kurze Zahl oder ''), hyperfunk, nachrichten und geschenk (true bei Neuem),
-    //wischen (true, wenn die Wischgesten an sind: dann steht unten der Hinweis, wohin sie führen)
+    //zeit, wt, kt, verteidiger und angreifer (kurze Zahl oder ''), hyperfunk, nachrichten und geschenk (true bei Neuem)
     public static function kopf(array $w): string
     {
         $h = Symbole::sprite();
@@ -37,7 +36,6 @@ class Mobil
             .'<a href="sinfo.php" class="mob-zeiten"><span><small>Zeit</small>'.$w['zeit'].'</span><span><small>WT</small>'.$w['wt'].'</span><span><small>KT</small>'.$w['kt'].'</span></a>'
             .($w['verteidiger'] !== '' ? '<a href="secstatus.php" class="mob-flotte mob-gut"><img src="gp/g/icon6.png" alt="">'.$w['verteidiger'].'</a>' : '')
             .($w['angreifer'] !== '' ? '<a href="secstatus.php" class="mob-flotte mob-gefahr"><img src="gp/g/icon7.png" alt="">'.$w['angreifer'].'</a>' : '')
-            .($w['wischen'] ? '<span class="mob-wisch">Wischen: nach rechts Men&uuml;, nach links Chat</span>' : '')
             .'</div></header>';
 
         return $h;
