@@ -14,7 +14,7 @@ $_SESSION['ic_last_refresh']=0;
 $chat_width = max(250, isset($_COOKIE['chat_width']) ? intval($_COOKIE['chat_width']) : 400);
 $chat_height = max(250, isset($_COOKIE['chat_height']) ? intval($_COOKIE['chat_height']) : 400);
 $chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
-//Breite der Spielspalte aus dem Cookie (Griff am rechten Rand, dm_spalte_start unten); ohne Cookie gilt die Standardbreite aus gp/de-dm.scss
+//Breite der Spielspalte aus dem Cookie (Griff am rechten Rand, dm_spalte_start unten); ohne Cookie gelten die 620 px aus gp/de-dm.scss
 $spalte_breite = isset($_COOKIE['spalte_breite']) ? min(1400, intval($_COOKIE['spalte_breite'])) : 0;
 
 ?>

@@ -155,10 +155,10 @@ body.desktop {
 // ------------------------------------------------------------
 // dm.php selbst: Spielspalte mit einstellbarer Breite
 // ------------------------------------------------------------
-// Standardbreite je nach Fenster zwischen 620 px (wie früher) und 1000 px; eine gespeicherte Breite (Cookie spalte_breite)
-// setzt dm.php als --dm-spalte am body
+// Standardbreite 620 px wie früher, damit die Karte dahinter sichtbar bleibt; breiter wird die Spalte nur, wenn der
+// Spieler den Griff zieht (Cookie spalte_breite, dm.php setzt sie als --dm-spalte am body)
 body.template {
-	--dm-spalte: clamp(620px, 45vw, 1000px);
+	--dm-spalte: 620px;
 }
 
 #iframe_main_container {

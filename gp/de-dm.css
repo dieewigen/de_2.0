@@ -140,7 +140,7 @@ body.desktop #gameProgressBar .scifi-progress-container {
 }
 
 body.template {
-  --dm-spalte: clamp(620px, 45vw, 1000px);
+  --dm-spalte: 620px;
 }
 
 #iframe_main_container {
