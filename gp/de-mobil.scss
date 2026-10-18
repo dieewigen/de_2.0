@@ -328,10 +328,6 @@ body.mobile .spz-optionen {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-body.mobile .art-raster {
-	grid-template-columns: repeat(8, minmax(0, 1fr));
-}
-
 // Reihen, die für 580 px gebaut sind, brechen um statt zu quetschen: Knopfreihen, Köpfe mit Bild, Text und Knopf,
 // Kollektorenbau, Einsatzfelder des Geheimdienstes, Werkstatt-Köpfe
 body.mobile .ov-links,

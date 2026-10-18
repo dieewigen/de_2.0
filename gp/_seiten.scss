@@ -151,4 +151,11 @@ $titel: 'Michroma', Roboto, Arial, Helvetica, sans-serif;
 			width: auto;
 		}
 	}
+
+	// Artefaktplätze: so viele je Reihe, wie Bild (46 px) und Stufenpunkte Platz haben, mindestens 60 px je Platz; am Handy
+	// fünf, in der Spaltenbreite von Classic acht, in der breiten Mitte der Desktop-Ansicht entsprechend mehr. Die Reihenfolge
+	// der Plätze (data-i) bleibt, nur der Umbruch wandert.
+	#{$w} .art-raster {
+		grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+	}
 }

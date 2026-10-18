@@ -110,6 +110,10 @@ body.mobile #gameProgressBar .scifi-progress-container {
   width: auto;
 }
 
+body.mobile .art-raster {
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -395,10 +399,6 @@ body.mobile .auk-karte {
 
 body.mobile .spz-optionen {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-body.mobile .art-raster {
-  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 body.mobile .ov-links,

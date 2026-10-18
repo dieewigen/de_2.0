@@ -174,6 +174,10 @@ body.desktop #gameProgressBar .scifi-progress-container {
   width: auto;
 }
 
+body.desktop .art-raster {
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+}
+
 @media (min-width: 1000px) {
   body.desktop:has(.ov-einheit) > div[align=center] {
     max-width: 1360px;
