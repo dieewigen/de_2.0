@@ -1,0 +1,611 @@
+body.app {
+  --app-nav-breite: 224px;
+  --app-chat-breite: 360px;
+  --app-kopf-hoehe: 58px;
+  display: grid;
+  grid-template-columns: var(--app-nav-breite) minmax(0, 1fr) var(--app-chat-breite);
+  grid-template-rows: var(--app-kopf-hoehe) minmax(0, 1fr);
+  grid-template-areas: "kopf kopf kopf" "nav inhalt chat";
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background: #070a0f;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 13px !important;
+  color: #c9d1d9;
+}
+
+body.app.app-nav-schmal {
+  --app-nav-breite: 64px;
+}
+
+body.app.app-chat-zu {
+  grid-template-columns: var(--app-nav-breite) minmax(0, 1fr) 0;
+}
+body.app.app-chat-zu .app-chat-griff {
+  display: none;
+}
+
+.app-ico {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-kopf {
+  grid-area: kopf;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 10px;
+  border-bottom: 1px solid rgba(160, 200, 255, 0.14);
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px), radial-gradient(ellipse at 12% 0%, #0f1a26 0%, #05070a 70%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.app-kopf::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--akzent) 20%, var(--akzent) 80%, transparent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.app-marke,
+.app-marke:link,
+.app-marke:visited {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 8px;
+  color: #e8eef6;
+  text-decoration: none;
+  cursor: pointer;
+}
+.app-marke img,
+.app-marke:link img,
+.app-marke:visited img {
+  width: 40px;
+  height: 40px;
+}
+.app-marke b,
+.app-marke:link b,
+.app-marke:visited b {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.app-marke small,
+.app-marke:link small,
+.app-marke:visited small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #8b949e;
+}
+.app-marke:hover b,
+.app-marke:link:hover b,
+.app-marke:visited:hover b {
+  text-shadow: 0 0 8px var(--akzent);
+}
+
+.app-werte {
+  display: flex;
+  gap: 6px;
+}
+
+.app-wert,
+.app-wert:link,
+.app-wert:visited {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  min-width: 96px;
+  padding: 0 10px 0 6px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 8px;
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  color: #d8e9ff;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.app-wert img,
+.app-wert:link img,
+.app-wert:visited img {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+}
+.app-wert b,
+.app-wert:link b,
+.app-wert:visited b {
+  font-weight: 500;
+}
+.app-wert:hover,
+.app-wert:link:hover,
+.app-wert:visited:hover {
+  border-color: var(--akzent);
+  box-shadow: var(--dm-glow);
+  color: #ffffff;
+}
+
+.app-wert-flotte {
+  min-width: 0;
+}
+
+.app-wert .app-gut {
+  color: #5fe08a;
+}
+
+.app-wert .app-gefahr {
+  color: #ff6b6b;
+}
+
+.app-signale {
+  display: flex;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.app-signal,
+.app-signal:link,
+.app-signal:visited {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.app-signal img,
+.app-signal:link img,
+.app-signal:visited img {
+  width: 30px;
+  max-height: 26px;
+  height: auto;
+  object-fit: contain;
+}
+.app-signal .app-signal-neu,
+.app-signal:link .app-signal-neu,
+.app-signal:visited .app-signal-neu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.app-signal:hover,
+.app-signal:link:hover,
+.app-signal:visited:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-zeiten {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 0 6px;
+  margin-left: auto;
+  padding: 5px 10px 2px;
+  border-right: 1px solid rgba(160, 200, 255, 0.1);
+  border-left: 1px solid rgba(160, 200, 255, 0.1);
+  line-height: 1.15;
+  cursor: pointer;
+}
+.app-zeiten .mod-typ {
+  font-size: 9px;
+}
+.app-zeiten b {
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: #d8e9ff;
+}
+.app-zeiten:hover b {
+  color: #ffffff;
+  text-shadow: 0 0 6px var(--akzent);
+}
+.app-zeiten .dm-zeiten-modus {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  width: 30px;
+  height: 5px;
+  border: 1px solid rgba(160, 200, 255, 0.5);
+  border-radius: 4px;
+  background: rgba(160, 200, 255, 0.18);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+.app-zeiten .dm-zeiten-modus:hover, .app-zeiten.dm-zeiten-countdown .dm-zeiten-modus {
+  border-color: var(--akzent);
+  background: var(--akzent);
+  box-shadow: var(--dm-glow);
+}
+.app-zeiten b.dm-zeit-bald {
+  color: #ff767e;
+  animation: app-blinken 1s linear infinite;
+}
+
+@keyframes app-blinken {
+  50% {
+    opacity: 0.3;
+  }
+}
+.app-kopf-knopf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 8px;
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  color: #aab4c0;
+  cursor: pointer;
+  appearance: none;
+}
+.app-kopf-knopf:hover {
+  border-color: var(--akzent);
+  box-shadow: var(--dm-glow);
+  color: #ffffff;
+}
+
+body.app-chat-zu .app-kopf-knopf-chat {
+  border-color: var(--akzent);
+  color: #ffffff;
+}
+
+.app-nav {
+  grid-area: nav;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  padding: 10px 8px;
+  border-right: 1px solid rgba(160, 200, 255, 0.14);
+  background: linear-gradient(180deg, #0c1219 0%, #080b10 100%);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.app-nav hr {
+  flex: none;
+  margin: 6px 6px;
+  border: 0;
+  border-top: 1px solid rgba(160, 200, 255, 0.1);
+}
+
+.app-nav-punkt,
+.app-nav-punkt:link,
+.app-nav-punkt:visited {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #aab4c0;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+  transition: background 0.15s, color 0.15s;
+}
+.app-nav-punkt::before,
+.app-nav-punkt:link::before,
+.app-nav-punkt:visited::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--akzent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.app-nav-punkt:hover,
+.app-nav-punkt:link:hover,
+.app-nav-punkt:visited:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.app-nav-punkt.app-aktiv,
+.app-nav-punkt.app-aktiv:link,
+.app-nav-punkt.app-aktiv:visited {
+  background: var(--akzent-weich);
+  color: #ffffff;
+}
+.app-nav-punkt.app-aktiv::before,
+.app-nav-punkt.app-aktiv:link::before,
+.app-nav-punkt.app-aktiv:visited::before {
+  opacity: 1;
+}
+
+.app-nav-punkt.app-nav-gefahr:hover {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff8a8a;
+}
+
+.app-nav-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-nav-hinweis {
+  display: none;
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.app-neu .app-nav-hinweis {
+  display: inline-block;
+  background: var(--akzent-weich);
+  box-shadow: 0 0 0 1px var(--akzent);
+  color: #ffffff;
+}
+
+.app-gut .app-nav-hinweis {
+  display: inline-block;
+  background: rgba(62, 207, 106, 0.14);
+  color: #5fe08a;
+}
+
+.app-warn .app-nav-hinweis {
+  display: inline-block;
+  background: rgba(255, 170, 60, 0.14);
+  color: #ffb45c;
+}
+
+.app-gefahr .app-nav-hinweis {
+  display: inline-block;
+  background: rgba(255, 107, 107, 0.16);
+  color: #ff6b6b;
+  animation: app-puls 1.6s ease-in-out infinite;
+}
+
+@keyframes app-puls {
+  50% {
+    opacity: 0.55;
+  }
+}
+.app-nav-fuss {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(160, 200, 255, 0.1);
+}
+
+body.app-nav-schmal .app-nav {
+  padding: 10px 6px;
+}
+body.app-nav-schmal .app-nav-punkt {
+  justify-content: center;
+  padding: 0;
+}
+body.app-nav-schmal .app-nav-text {
+  display: none;
+}
+body.app-nav-schmal .app-nav-hinweis {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0;
+}
+body.app-nav-schmal .app-nav-schalter .app-ico {
+  transform: rotate(180deg);
+}
+
+.app-inhalt {
+  grid-area: inhalt;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: #0a0e14;
+}
+.app-inhalt > #iframe_map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.app-inhalt > #iframe_main_container {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #0a0e14;
+}
+.app-inhalt > #iframe_main_container > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.app-inhalt > #iframe_main_container_big {
+  display: none !important;
+}
+
+.app-karte-knoepfe {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.app-karte-knopf,
+.app-karte-knopf:link,
+.app-karte-knopf:visited {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 8px;
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  color: #d8e9ff;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+}
+.app-karte-knopf .app-ico,
+.app-karte-knopf:link .app-ico,
+.app-karte-knopf:visited .app-ico {
+  width: 16px;
+  height: 16px;
+  color: var(--akzent);
+}
+.app-karte-knopf:hover,
+.app-karte-knopf:link:hover,
+.app-karte-knopf:visited:hover {
+  border-color: var(--akzent);
+  box-shadow: var(--dm-glow);
+  color: #ffffff;
+}
+
+.app-chat {
+  grid-area: chat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid rgba(160, 200, 255, 0.14);
+  background: #0b0f15;
+  overflow: hidden;
+}
+.app-chat > iframe {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+}
+
+body.app-chat-zu .app-chat {
+  border-left: 0;
+}
+
+.app-chat-kopf {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid rgba(160, 200, 255, 0.14);
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  color: #e8eef6;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.app-chat-kopf .app-ico {
+  color: var(--akzent);
+}
+.app-chat-kopf span {
+  flex: 1 1 auto;
+}
+
+.app-chat-zu-knopf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #8b949e;
+  cursor: pointer;
+  appearance: none;
+}
+.app-chat-zu-knopf .app-ico {
+  width: 16px;
+  height: 16px;
+}
+.app-chat-zu-knopf:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.app-chat-griff {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  z-index: 3;
+  width: 7px;
+  cursor: ew-resize;
+}
+.app-chat-griff::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: transparent;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.app-chat-griff:hover::before, body.dm-zieht .app-chat-griff::before {
+  width: 3px;
+  background: var(--akzent);
+  box-shadow: var(--dm-glow);
+}

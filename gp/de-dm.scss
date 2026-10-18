@@ -152,6 +152,32 @@ body.desktop {
 	}
 }
 
+// Übersicht als Dashboard: ab 1000 px Seitenbreite (App-Oberfläche oder breit gezogene Spalte) stehen die Rahmen in zwei
+// Spalten; Kommunikationssperre, Berater und Hinweise (.mod außerhalb der Rahmen) laufen über beide. Erkannt an der
+// Schiffsliste .ov-einheit, die nur overview.php ausgibt (die Kacheln .ov-wert nutzen viele Seiten)
+@media (min-width: 1000px) {
+	body.desktop:has(.ov-einheit) > div[align="center"] {
+		max-width: 1360px;
+		margin: 0 auto;
+		columns: 2;
+		column-gap: 14px;
+
+		> .rahmen {
+			max-width: none;
+			break-inside: avoid;
+		}
+
+		> .mod {
+			column-span: all;
+		}
+
+		// Abstandhalter aus resline.php (Desktop-Ansicht), sonst beginnt die erste Spalte 10 px tiefer als die zweite
+		> div[style="height: 10px;"] {
+			display: none;
+		}
+	}
+}
+
 // ------------------------------------------------------------
 // dm.php selbst: Spielspalte mit einstellbarer Breite
 // ------------------------------------------------------------

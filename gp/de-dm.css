@@ -139,6 +139,24 @@ body.desktop #gameProgressBar .scifi-progress-container {
   width: auto;
 }
 
+@media (min-width: 1000px) {
+  body.desktop:has(.ov-einheit) > div[align=center] {
+    max-width: 1360px;
+    margin: 0 auto;
+    columns: 2;
+    column-gap: 14px;
+  }
+  body.desktop:has(.ov-einheit) > div[align=center] > .rahmen {
+    max-width: none;
+    break-inside: avoid;
+  }
+  body.desktop:has(.ov-einheit) > div[align=center] > .mod {
+    column-span: all;
+  }
+  body.desktop:has(.ov-einheit) > div[align=center] > div[style="height: 10px;"] {
+    display: none;
+  }
+}
 body.template {
   --dm-spalte: 620px;
 }
