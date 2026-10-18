@@ -17,6 +17,19 @@ $radius: 10px;
 $schrift: Roboto, Arial, Helvetica, sans-serif;
 $inhalt-breite: 1040px;
 
+// Titelschrift: Michroma (SIL Open Font License, Text in gp/fonts/Michroma-OFL.txt), selbst gehostet wie Roboto. Eckig und
+// breit wie die Kartenschrift de1, aber bei 12 px lesbar. Nur für Rahmentitel, Marke und Chat-Kopf, nie für Fließtext.
+@font-face {
+	font-family: 'Michroma';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(fonts/Michroma.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+$titel: 'Michroma', Roboto, Arial, Helvetica, sans-serif;
+
 // Rassenfarbe für die Hülle: dm.php hat body.template.rasseN (die Spielseiten body.theme-rasseN aus de-main.scss)
 $rassen: (1: #3399FF, 2: #A6A6A6, 3: #DE3939, 4: #ED951E);
 
@@ -96,9 +109,10 @@ body.desktop .rahmen-kopf {
 
 	> .cellu {
 		background: none;
-		font-size: 14px;
-		font-weight: 600;
-		letter-spacing: 0.01em;
+		font-family: $titel;
+		font-size: 12px;
+		font-weight: 400;
+		letter-spacing: 0.05em;
 		color: #e8eef6;
 	}
 }
@@ -285,9 +299,10 @@ body.app {
 
 	b {
 		display: block;
-		font-size: 13px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
+		font-family: $titel;
+		font-size: 12px;
+		font-weight: 400;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 	}
 
@@ -879,6 +894,10 @@ body.app.app-nav-schmal {
 
 	span {
 		flex: 1 1 auto;
+		font-family: $titel;
+		font-size: 11px;
+		font-weight: 400;
+		letter-spacing: 0.08em;
 	}
 }
 

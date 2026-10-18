@@ -402,6 +402,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
 - `Model\Nachricht::anSpieler($db, $uid, $text, $typ)`: Nachricht an einen Spieler (`de_user_news`)
 - `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
+- `View\Symbole::sprite()`: SVG-Sprite der Strichsymbole (`<svg class="app-ico"><use href="#i-karte"/></svg>`) für die Desktop-Ansicht dm.php und die mobile Kommandokonsole menu.php; Titelschrift Michroma (OFL) liegt in gp/fonts, nur für Rahmentitel, Marke und Konsolentitel
 - `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `js/de_fn.js`)
 - `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
 - `Model\VSystem\Filter::ausCookies($_COOKIE)` / `passendeIds(...)`: VS-Filter der Übersicht für die Pfeile der Systemseite

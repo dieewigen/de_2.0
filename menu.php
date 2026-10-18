@@ -81,11 +81,13 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
   -webkit-font-smoothing:antialiased;
 }
 .menu-wrap{max-width:960px;margin:0 auto;padding:clamp(12px,3vw,30px);}
+@font-face{font-family:"Michroma";font-style:normal;font-weight:400;font-display:swap;src:url(gp/fonts/Michroma.woff2) format("woff2");}
 .menu-title{
   margin:0 0 18px;
-  font-size:clamp(1.3rem,4.2vw,2.1rem);
-  letter-spacing:.08em;
-  font-weight:600;
+  font-family:"Michroma",system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:clamp(1rem,3.4vw,1.5rem);
+  letter-spacing:.14em;
+  font-weight:400;
   text-transform:uppercase;
   background:linear-gradient(90deg,var(--accent),#fff);
   -webkit-background-clip:text;
@@ -119,10 +121,14 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
   transition:border-color .25s, color .25s, transform .18s, background .4s, box-shadow .25s;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04),0 2px 6px rgba(0,0,0,.65);
 }
-.menu-btn::before{
-  content:attr(data-icon);
-  font-size:1.7rem;
-  line-height:1;
+.menu-ico{
+  width:1.7rem;
+  height:1.7rem;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
   color:var(--accent);
   filter:drop-shadow(0 0 6px rgba(255,255,255,0.25));
   transition:transform .45s;
@@ -146,7 +152,7 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
   transform:translateY(-3px);
   box-shadow:var(--glow);
 }
-.menu-btn:hover::before{transform:scale(1.1) rotate(5deg);}
+.menu-btn:hover .menu-ico{transform:scale(1.1) rotate(5deg);}
 .menu-btn.danger{--accent:var(--danger);}
 .menu-btn.danger:hover{box-shadow:0 0 10px rgba(255,80,80,.6),0 0 22px rgba(255,80,80,.35);}
 @media(hover:none){
@@ -176,7 +182,7 @@ html,body{margin:0;padding:0;min-height:100dvh;background:
 @keyframes menu-puls{50%{opacity:.55;}}
 </style>
 </head>
-<body>';
+<body>'.\DieEwigen\DE2\View\Symbole::sprite();
 
 	$swipeHint = '';
 
@@ -215,27 +221,27 @@ document.addEventListener("DOMContentLoaded",()=>{
     echo '<div class="menu-wrap">
   <h1 class="menu-title">Kommandokonsole</h1>
   <nav class="menu-grid">
-    <a class="menu-btn" data-icon="💬" href="chat.php">DE-Chat</a>
-    <a class="menu-btn" data-icon="🛰" href="overview.php">&Uuml;bersicht</a>
-    <a class="menu-btn" data-icon="📡" href="hyperfunk.php">'.$menu_lang['eintrag_2'].$hinweis('hyperfunk.php').'</a>
-    <a class="menu-btn" data-icon="🗞" href="sysnews.php">'.$menu_lang['eintrag_3'].$hinweis('sysnews.php').'</a>
-    <a class="menu-btn" data-icon="⚛" href="ang_techs.php">Technologien'.$hinweis('ang_techs.php').'</a>
-    <a class="menu-btn" data-icon="🧬" href="specialization.php">Spezialisierung</a>
-    <a class="menu-btn" data-icon="⛃" href="resource.php">'.$menu_lang['eintrag_6'].'</a>
-    <a class="menu-btn" data-icon="✧" href="artefacts.php">'.$menu_lang['eintrag_18'].'</a>
-    <a class="menu-btn" data-icon="⚖" href="auction.php">Auktion</a>
-    <a class="menu-btn" data-icon="✪" href="missions.php">Missionen'.$hinweis('missions.php').'</a>'.
-    ($sv_deactivate_vsystems!=1?'<a class="menu-btn" data-icon="✸" href="map_mobile.php">V-Systeme</a>':'').'
-    <a class="menu-btn" data-icon="🏭" href="production.php">'.$menu_lang['eintrag_8'].'</a>
-    <a class="menu-btn" data-icon="🚀" href="military.php">Flotten</a>
-    <a class="menu-btn" data-icon="🕵️" href="secret.php">'.$menu_lang['eintrag_11'].'</a>
-    <a class="menu-btn" data-icon="⌬" href="sector.php">'.$menu_lang['eintrag_12'].'</a>
-    <a class="menu-btn" data-icon="🛸" href="secstatus.php">'.$menu_lang['eintrag_13'].$hinweis('secstatus.php').'</a>
-    <a class="menu-btn" data-icon="∞" href="allymain.php">'.$menu_lang['eintrag_16'].$hinweis('allymain.php').'</a>
-    <a class="menu-btn" data-icon="📊" href="statistics.php">'.$menu_lang['eintrag_21'].'</a>
-    <a class="menu-btn" data-icon="★" href="toplist.php">'.$menu_lang['eintrag_22'].'</a>
-    <a class="menu-btn" data-icon="⚙" href="options.php">'.$menu_lang['eintrag_24'].'</a>
-    <a class="menu-btn danger" data-icon="🚪" href="index.php?logout=1">'.$menu_lang['eintrag_29'].'</a>
+    <a class="menu-btn" href="chat.php"><svg class="menu-ico"><use href="#i-chat"/></svg>DE-Chat</a>
+    <a class="menu-btn" href="overview.php"><svg class="menu-ico"><use href="#i-uebersicht"/></svg>&Uuml;bersicht</a>
+    <a class="menu-btn" href="hyperfunk.php"><svg class="menu-ico"><use href="#i-hyperfunk"/></svg>'.$menu_lang['eintrag_2'].$hinweis('hyperfunk.php').'</a>
+    <a class="menu-btn" href="sysnews.php"><svg class="menu-ico"><use href="#i-nachrichten"/></svg>'.$menu_lang['eintrag_3'].$hinweis('sysnews.php').'</a>
+    <a class="menu-btn" href="ang_techs.php"><svg class="menu-ico"><use href="#i-technologien"/></svg>Technologien'.$hinweis('ang_techs.php').'</a>
+    <a class="menu-btn" href="specialization.php"><svg class="menu-ico"><use href="#i-spezialisierung"/></svg>Spezialisierung</a>
+    <a class="menu-btn" href="resource.php"><svg class="menu-ico"><use href="#i-ressourcen"/></svg>'.$menu_lang['eintrag_6'].'</a>
+    <a class="menu-btn" href="artefacts.php"><svg class="menu-ico"><use href="#i-artefakte"/></svg>'.$menu_lang['eintrag_18'].'</a>
+    <a class="menu-btn" href="auction.php"><svg class="menu-ico"><use href="#i-auktion"/></svg>Auktion</a>
+    <a class="menu-btn" href="missions.php"><svg class="menu-ico"><use href="#i-missionen"/></svg>Missionen'.$hinweis('missions.php').'</a>'.
+    ($sv_deactivate_vsystems!=1?'<a class="menu-btn" href="map_mobile.php"><svg class="menu-ico"><use href="#i-vsysteme"/></svg>V-Systeme</a>':'').'
+    <a class="menu-btn" href="production.php"><svg class="menu-ico"><use href="#i-produktion"/></svg>'.$menu_lang['eintrag_8'].'</a>
+    <a class="menu-btn" href="military.php"><svg class="menu-ico"><use href="#i-flotten"/></svg>Flotten</a>
+    <a class="menu-btn" href="secret.php"><svg class="menu-ico"><use href="#i-geheimdienst"/></svg>'.$menu_lang['eintrag_11'].'</a>
+    <a class="menu-btn" href="sector.php"><svg class="menu-ico"><use href="#i-sektor"/></svg>'.$menu_lang['eintrag_12'].'</a>
+    <a class="menu-btn" href="secstatus.php"><svg class="menu-ico"><use href="#i-sektorstatus"/></svg>'.$menu_lang['eintrag_13'].$hinweis('secstatus.php').'</a>
+    <a class="menu-btn" href="allymain.php"><svg class="menu-ico"><use href="#i-allianz"/></svg>'.$menu_lang['eintrag_16'].$hinweis('allymain.php').'</a>
+    <a class="menu-btn" href="statistics.php"><svg class="menu-ico"><use href="#i-statistik"/></svg>'.$menu_lang['eintrag_21'].'</a>
+    <a class="menu-btn" href="toplist.php"><svg class="menu-ico"><use href="#i-rangliste"/></svg>'.$menu_lang['eintrag_22'].'</a>
+    <a class="menu-btn" href="options.php"><svg class="menu-ico"><use href="#i-optionen"/></svg>'.$menu_lang['eintrag_24'].'</a>
+    <a class="menu-btn danger" href="index.php?logout=1"><svg class="menu-ico"><use href="#i-logout"/></svg>'.$menu_lang['eintrag_29'].'</a>
   </nav>
   '.$swipeHint.'
 </div>
