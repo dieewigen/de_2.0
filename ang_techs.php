@@ -85,10 +85,6 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 	//die Rohstoffleiste steht im großen Fenster der Desktop-Version links statt zentriert
 	$flag_ang_big_iframe=true;
 
-	//close-button
-	if($_SESSION['ums_mobi']!=1 && $_SESSION['desktop_version']==0){
-		$content.='<img onclick="closeIframeMain();" src="gp/g/close_icon.png" class="tc-schliessen" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
-	}
 
 	///////////////////////////////////////////////////////////////////
 	// soll eine Technologie abgebrochen werden?

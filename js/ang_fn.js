@@ -1,4 +1,3 @@
-var iframe_big_content_filename;
 
 function ang_countdown(seconds, target_id, playsound, on_finish) {
   // current timestamp.
@@ -389,36 +388,19 @@ function reset_map(){
 	document.getElementById('iframe_map').contentDocument.location.reload(true);
 }
 
+//Technologien liefen früher in einem großen Fenster über der ganzen Karte; seit Okt. 2026 öffnen sie sich wie jede Seite in
+//der Mitte der Desktop-Ansicht (dm.php), der Aufruf aus functions.php (parent.switch_iframe_main_container_big) bleibt
 function switch_iframe_main_container_big(file){
-	$('#iframe_main_container_big').html('<iframe src="'+file+'" id="iframe_main_big" name="iframe_main_big" scrolling="no" height="100%" width="100%" frameBorder="0"></iframe>');
-	$('#iframe_main_container_big').css('display','');
-	$('#iframe_main_container').css('display','none');
-	$('#iframe_main_container_closer, #dm_spalte_griff').css('display','none');
-	iframe_big_content_filename=file;
+	switch_iframe_main_container(file);
 }
 
+//Spielseite in der Mitte der Desktop-Ansicht öffnen; aus einer Seite heraus über parent.document
 function switch_iframe_main_container(file){
-	if($('#iframe_main_container').length>0){
-		$('#iframe_main_container').html('<iframe src="'+file+'" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe>');
-		$('#iframe_main_container').css('display','');
-		$('#iframe_main_container_closer, #dm_spalte_griff').css('display','');
-
-		$('#iframe_main_container_big').css('display','none');
-	}else{
-		$('#iframe_main_container', parent.document).html('<iframe src="'+file+'" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe>');
-		$('#iframe_main_container', parent.document).css('display','');
-		$('#iframe_main_container_big', parent.document).css('display','none');		
-		$('#iframe_main_container_closer, #dm_spalte_griff', parent.document).css('display','');
-	}
-	
-	
-	iframe_big_content_filename=file;
-	
+	var doc = $('#iframe_main_container').length>0 ? document : parent.document;
+	$('#iframe_main_container', doc).html('<iframe src="'+file+'" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe>').css('display','');
 }
 
+//Spielseite schließen, dahinter liegt die Karte
 function closeIframeMain(){
 	$("#iframe_main_container", parent.document).css("display", "none");
-	$('#iframe_main_container_closer, #dm_spalte_griff').css('display','none');
-
-	$("#iframe_main_container_big", parent.document).css("display", "none");
 }

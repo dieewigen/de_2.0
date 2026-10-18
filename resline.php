@@ -274,10 +274,7 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 		echo '$("#tb_deffer", parent.document).html("'.$gev_desktop_short.'");';
 		echo '$("#tb_deffer", parent.document).attr("title", "'.number_format(floor($gev_desktop_long), 0,"",".").'");';
 
-		echo '$("#tb_deffer_img_grey", parent.document).css("display","none");';
-
 	}else{//es gibt keine Deffer
-		echo '$("#tb_deffer_img_grey", parent.document).css("display","");';
 		echo '$("#tb_deffer", parent.document).css("display","none");';
 		echo '$("#tb_deffer_img", parent.document).css("display","none");';
 	}
@@ -288,11 +285,8 @@ if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 		echo '$("#tb_atter", parent.document).css("display","");';
 		echo '$("#tb_atter", parent.document).html("'.$gea_desktop_short.'");';
 		echo '$("#tb_atter", parent.document).attr("title", "'.number_format(floor($gea_desktop_long), 0,"",".").'");';
-		
-		echo '$("#tb_atter_img_grey", parent.document).css("display","none");';
 
 	}else{//es gibt keine Atter
-		echo '$("#tb_atter_img_grey", parent.document).css("display","");';
 		echo '$("#tb_atter", parent.document).css("display","none");';
 		
 		echo '$("#tb_atter_img", parent.document).css("display","none");';

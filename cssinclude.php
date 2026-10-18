@@ -23,12 +23,12 @@ echo '<link rel="stylesheet" type="text/css" href="gp/de-main.css?'.filemtime($_
 echo '<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>';
 echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js').'"></script>';
 
-//Desktop-Ansicht (dm.php): die Spielseiten bekommen gp/de-dm.css als zweite Stilebene (Karten statt Bildzellen-Rahmen, Breite
-//der Spielspalte); Classic (de_frameset.php) und Mobil bleiben bei gp/de-main.css allein. In der Spielspalte (Rahmen "h")
-//liegt die Seite auf der Karte: html.dm-rahmen gibt ihr dort den durchscheinenden Hintergrund; per Script, weil jede Seite
-//ihr <html> selbst schreibt (den App-Marker html.app setzt Seitenkopf::zubehoer())
+//Desktop-Ansicht (dm.php): die Spielseiten bekommen gp/de-desktop.css als zweite Stilebene (Karten statt Bildzellen-Rahmen,
+//Breite der Mitte); Classic (de_frameset.php) und Mobil bleiben bei gp/de-main.css allein. In der Mitte (Rahmen "h") liegt
+//die Seite auf der Galaxie: html.dm-rahmen gibt ihr dort den durchscheinenden Hintergrund; per Script, weil jede Seite ihr
+//<html> selbst schreibt
 if(!empty($_SESSION['new_desktop_version']) && empty($_SESSION['de_frameset']) && $_SESSION['ums_mobi']!=1){
-	echo '<link rel="stylesheet" type="text/css" href="gp/de-dm.css?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-dm.css').'">';
+	echo '<link rel="stylesheet" type="text/css" href="gp/de-desktop.css?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-desktop.css').'">';
 	echo '<script>if(window.parent!==window && window.name==="h"){document.documentElement.classList.add("dm-rahmen");}</script>';
 }
 

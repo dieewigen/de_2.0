@@ -30,7 +30,7 @@ de2/
 ├── docs/                    # Texte: Regeln (feldzug.md), Bestandsaufnahmen und Übergaben (extension-uebernahme.md)
 ├── gp/                      # Grafiken, Styles (CSS/SCSS)
 │   ├── de-main.scss        # Haupt-Stylesheet
-│   ├── de-dm.scss          # Desktop-Ansicht (dm.php): Karten statt Bildzellen-Rahmen, Breite der Spielspalte
+│   ├── de-desktop.scss     # Desktop-Ansicht „Standard“ (dm.php): Hülle und Spielseiten darin, nur dort geladen
 │   ├── de-chat.scss        # Chat-Stylesheet
 │   ├── de-map.scss         # Karten-Stylesheet
 │   └── g/                  # Grafik-Assets
@@ -67,6 +67,7 @@ de2/
 │   └── wt.php              # Wirtschafts-Tick (Ressourcen, Punkte)
 ├── vendor/                  # Composer-Dependencies, nicht im Git
 ├── composer.json            # PHP-Abhängigkeiten
+├── dm.php                   # Desktop-Ansicht „Standard“: Kopfleiste, Navigation, Spielseite in der Mitte (Rahmen h), Chat; Classic ist de_frameset.php
 ├── functions.php            # Gemeinsame Funktionen, lädt vendor/autoload.php
 └── index.php               # Haupteinstiegspunkt
 ```
@@ -367,7 +368,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
 CSS wird aus SCSS generiert (Dart Sass, `npm install -g sass`). Die eingecheckten CSS-Dateien werden aber nicht einfach neu erzeugt:
 - `gp/de-main.css` weicht in der Farbschreibweise von einem frischen Sass-Lauf ab. Änderungen deshalb als Differenz einspielen: den Stand vor und nach der SCSS-Änderung kompilieren und nur den Unterschied übertragen.
 - `gp/de-chat.css` entsteht komprimiert aus `gp/de-chat.scss` (`--style=compressed`).
-- `gp/de-dm.css` (Desktop-Ansicht) wird frisch kompiliert: `sass --style=expanded --no-source-map gp/de-dm.scss gp/de-dm.css`. Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
+- `gp/de-desktop.css` (Desktop-Ansicht) wird frisch kompiliert: `sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css`. Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
 - `gp/de-map.css` stammt aus einem anderen Compiler (eine Zeile); neue Regeln nur anhängen.
 
 ```bash
@@ -395,7 +396,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `createTitleForUser($owner_id, $title)`: Erstellt Spieler-Titel
 - `mail_smtp($to, $subject, $body)`: Versendet E-Mails
 - `getArtefactAmountByUserId($uid, $art_id)`: Artefakt-Anzahl
-- `rahmen_oben($titel)` / `rahmen_unten()`: Seitenrahmen (etwa 580 px Innenbreite; in der Desktop-Ansicht eine Karte in Spaltenbreite, `gp/de-dm.scss`); mit `false` als letztem Parameter geben sie HTML zurück statt es auszugeben
+- `rahmen_oben($titel)` / `rahmen_unten()`: Seitenrahmen (etwa 580 px Innenbreite; in der Desktop-Ansicht eine Karte in voller Breite der Mitte, `gp/de-desktop.scss`); mit `false` als letztem Parameter geben sie HTML zurück statt es auszugeben
 
 ### In src/ (Auswahl)
 - `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
@@ -570,6 +571,6 @@ Siehe Git-Tags für Release-Versionen:
 
 ---
 
-**Letzte Aktualisierung:** 17. Oktober 2026
+**Letzte Aktualisierung:** 18. Oktober 2026
 
 Für weitere Fragen siehe README.md oder kontaktiere das Entwicklerteam.

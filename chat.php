@@ -54,7 +54,10 @@ if(isset($_SESSION['ums_mobi']) && $_SESSION['ums_mobi']==1){
 }
 
 echo '</head>';
-echo '<body bgcolor="#000000" style="overflow:hidden;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.$pageType.'">';
+//in der Desktop-Ansicht (dm.php) steht der Chat als Leiste neben der Spielseite und bekommt die dunkle Fläche statt des
+//Planetenbilds (body.desktop.app in gp/de-chat.scss); Classic (de_frameset.php) behält das Bild
+$chat_app = ($pageType === 'desktop' && empty($_SESSION['de_frameset'])) ? ' app' : '';
+echo '<body bgcolor="#000000" style="overflow:hidden;" class="theme-rasse'.$_SESSION['ums_rasse'].' '.$pageType.$chat_app.'">';
 
 if($pageType==='mobile'){
 	echo '<div class="chat-wrapper">';
