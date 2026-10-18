@@ -482,6 +482,93 @@ body.mobile .bc-bild {
   max-width: 500px;
 }
 
+@media (min-width: 560px) {
+  body.mobile .ov-werte {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  body.mobile .ally-kacheln,
+  body.mobile .einh-kacheln {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  body.mobile .bk-lager {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  body.mobile .sec-unten {
+    grid-template-columns: 46fr 30fr 24fr;
+  }
+  body.mobile .einh-reihen {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  body.mobile .auk-karte {
+    grid-template-columns: minmax(0, 1fr) 190px;
+  }
+  body.mobile .mod .spz-opt {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  body.mobile .bk-energie {
+    grid-template-columns: 130px repeat(4, minmax(0, 1fr));
+  }
+  body.mobile .bk-label,
+  body.mobile .bk-spalte {
+    font-size: 10px;
+  }
+  body.mobile .mob-kopf .mob-oben {
+    height: 42px;
+  }
+  body.mobile .mob-kopf .mob-knopf {
+    width: 46px;
+    height: 38px;
+  }
+  body.mobile .mob-kopf .mob-marke img {
+    width: 34px;
+    height: 34px;
+  }
+  body.mobile .mob-kopf .mob-marke b {
+    font-size: 13px;
+  }
+  body.mobile .mob-kopf .mob-signal {
+    width: 42px;
+    height: 38px;
+  }
+  body.mobile .mob-kopf .mob-signal .app-ico,
+  body.mobile .mob-kopf .mob-signal img {
+    width: 30px;
+    height: 30px;
+  }
+  body.mobile .mob-kopf .mob-werte {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  body.mobile .mob-kopf .mob-wert {
+    height: 32px;
+    padding: 0 5px 0 4px;
+    font-size: 13px;
+  }
+  body.mobile .mob-kopf .mob-wert img {
+    width: 18px;
+    height: 18px;
+  }
+  body.mobile .mob-kopf .mob-unten {
+    font-size: 13px;
+  }
+  body.mobile .mob-kopf .mob-zeiten {
+    gap: 16px;
+    font-size: 15px;
+  }
+  body.mobile .mob-kopf .mob-zeiten small {
+    font-size: 11px;
+  }
+  body.mobile .mob-kopf .mob-flotte {
+    font-size: 13px;
+  }
+  body.mobile .mob-kopf .mob-flotte img {
+    width: 16px;
+    height: 16px;
+  }
+}
 @media (max-width: 374px) {
   body.mobile .mob-kopf .mob-marke b {
     display: none;

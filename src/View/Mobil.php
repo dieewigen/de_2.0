@@ -4,11 +4,18 @@ namespace DieEwigen\DE2\View;
 //Neue mobile Darstellung (Okt. 2026): Kopfleiste mit Menü, Signalen, Rohstoffen und Zeiten statt der Bitmap-Rohstoffleiste,
 //Seiten in Gerätebreite (gp/de-mobil.scss). Abschaltbar in den Optionen über das Cookie mobil_alt (bisherige Darstellung mit
 //620-px-Viewport und Rohstoffleiste); cssinclude.php (Viewport, Stylesheet) und resline.php (Kopfleiste) fragen neu() ab.
+//Das Cookie mobil_kompakt=1 behält die neue Darstellung, aber mit dem 620-px-Viewport wie bisher: alles passt auf eine
+//Seite, verkleinert, ohne seitliches Rollen (Wunsch von Spielern, die die Dichte der alten Ansicht gewohnt sind).
 class Mobil
 {
     public static function neu(): bool
     {
         return (int)($_SESSION['ums_mobi'] ?? 0) === 1 && empty($_COOKIE['mobil_alt']);
+    }
+
+    public static function kompakt(): bool
+    {
+        return self::neu() && !empty($_COOKIE['mobil_kompakt']);
     }
 
     //Kopfleiste; die Werte stellt resline.php zusammen: rasse, rohstoffe (fünf kurze Zahlen), namen (fünf Rohstoffnamen), punkte,

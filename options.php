@@ -220,11 +220,14 @@ if (isset($_REQUEST['set_deactivate_swipe'])) {
     $_COOKIE['deactivate_swipe'] = $value;
 }
 
-//mobile Darstellung: 1 = bisherige (Rohstoffleiste, 620-px-Viewport), sonst die neue Kopfleiste in Gerätebreite (View\Mobil)
-if (isset($_REQUEST['set_mobil_alt'])) {
-    $value = intval($_REQUEST['set_mobil_alt']);
-    echo opt_cookie_skript('mobil_alt', $value);
-    $_COOKIE['mobil_alt'] = $value;
+//mobile Darstellung: 1 = bisherige (Rohstoffleiste, 620-px-Viewport), sonst die neue Kopfleiste in Gerätebreite (View\Mobil);
+//mobil_kompakt=1 zeigt die neue Darstellung im 620-px-Viewport (alles auf einer Seite, verkleinert)
+foreach (array('set_mobil_alt' => 'mobil_alt', 'set_mobil_kompakt' => 'mobil_kompakt') as $parameter => $cookie) {
+    if (isset($_REQUEST[$parameter])) {
+        $value = intval($_REQUEST[$parameter]);
+        echo opt_cookie_skript($cookie, $value);
+        $_COOKIE[$cookie] = $value;
+    }
 }
 
 if (isset($_REQUEST['desktop_version'])) {
@@ -326,7 +329,12 @@ if ($_COOKIE['deactivate_swipe'] == 0) {
 }
 
 if (empty($_COOKIE['mobil_alt'])) {
-    echo '<div class="opt-zeile"><span>Mobile Darstellung: <span class="mod-chip mod-chip-gruen">Neu</span> <small>(Kopfleiste, Seiten in Ger&auml;tebreite)</small></span><a href="options.php?set_mobil_alt=1" class="mod-btn mod-btn-leise ally-btn-klein">Zur bisherigen wechseln</a></div>';
+    echo '<div class="opt-zeile"><span>Mobile Darstellung: <span class="mod-chip mod-chip-gruen">Neu</span> <small>(Kopfleiste statt Rohstoffleiste)</small></span><a href="options.php?set_mobil_alt=1" class="mod-btn mod-btn-leise ally-btn-klein">Zur bisherigen wechseln</a></div>';
+    if (empty($_COOKIE['mobil_kompakt'])) {
+        echo '<div class="opt-zeile"><span>Seitenbreite (Mobil): <span class="mod-chip mod-chip-gruen">Ger&auml;tebreite</span> <small>(gr&ouml;&szlig;ere Schrift, breite Tabellen rollen seitlich)</small></span><a href="options.php?set_mobil_kompakt=1" class="mod-btn mod-btn-leise ally-btn-klein">Kompakt</a></div>';
+    } else {
+        echo '<div class="opt-zeile"><span>Seitenbreite (Mobil): <span class="mod-chip">Kompakt</span> <small>(alles auf einer Seite, verkleinert wie bisher)</small></span><a href="options.php?set_mobil_kompakt=0" class="mod-btn mod-btn-leise ally-btn-klein">Ger&auml;tebreite</a></div>';
+    }
 } else {
     echo '<div class="opt-zeile"><span>Mobile Darstellung: <span class="mod-chip">Bisherige</span> <small>(Rohstoffleiste)</small></span><a href="options.php?set_mobil_alt=0" class="mod-btn mod-btn-leise ally-btn-klein">Zur neuen wechseln</a></div>';
 }

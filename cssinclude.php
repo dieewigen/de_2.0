@@ -12,10 +12,10 @@ if(!isset($_SESSION['ums_mobi'])){
 
 require_once __DIR__.'/vendor/autoload.php';
 
-//Mobil: die neue Darstellung (View\Mobil, abschaltbar in den Optionen) läuft in Gerätebreite, die bisherige im festen
-//620-px-Viewport, den der Browser auf die Bildschirmbreite verkleinert
+//Mobil: die neue Darstellung (View\Mobil, abschaltbar in den Optionen) läuft in Gerätebreite, kompakt oder bisherig im festen
+//620-px-Viewport, den der Browser auf die Bildschirmbreite verkleinert (alles auf einer Seite)
 if($_SESSION['ums_mobi']==1){
-	echo \DieEwigen\DE2\View\Mobil::neu() ? '<meta name="viewport" content="width=device-width, initial-scale=1">' : '<meta name="viewport" content="width=620">';
+	echo (\DieEwigen\DE2\View\Mobil::neu() && !\DieEwigen\DE2\View\Mobil::kompakt()) ? '<meta name="viewport" content="width=device-width, initial-scale=1">' : '<meta name="viewport" content="width=620">';
 }
 
 //Browser-Zubehör: Favicon, Startbildschirm-Symbol, Farbe der Browserleiste am Handy (src/View/Seitenkopf.php)

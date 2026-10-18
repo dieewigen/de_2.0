@@ -416,6 +416,120 @@ body.mobile .bc-bild {
 	width: auto;
 	max-width: 500px;
 }
+// Ab 560 px Layoutbreite: die kompakte Variante (Cookie mobil_kompakt, Viewport 620 px wie bisher) und Tablets. Die Seiten
+// haben Platz für die Mehrspalten-Layouts der Desktop-Ansicht, die Kopfleiste steht in einer Zeile; die Schrift ist etwas
+// größer, weil der Browser die 620 px auf die Bildschirmbreite verkleinert
+@media (min-width: 560px) {
+	body.mobile .ov-werte {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	body.mobile .ally-kacheln,
+	body.mobile .einh-kacheln {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	body.mobile .bk-lager {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+
+	body.mobile .sec-unten {
+		grid-template-columns: 46fr 30fr 24fr;
+	}
+
+	body.mobile .einh-reihen {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	}
+
+	body.mobile .auk-karte {
+		grid-template-columns: minmax(0, 1fr) 190px;
+	}
+
+	body.mobile .mod .spz-opt {
+		flex-direction: row;
+		justify-content: flex-start;
+		gap: 8px;
+		padding: 6px 8px;
+		text-align: left;
+	}
+
+	body.mobile .bk-energie {
+		grid-template-columns: 130px repeat(4, minmax(0, 1fr));
+	}
+
+	body.mobile .bk-label,
+	body.mobile .bk-spalte {
+		font-size: 10px;
+	}
+
+	body.mobile .mob-kopf {
+		.mob-oben {
+			height: 42px;
+		}
+
+		.mob-knopf {
+			width: 46px;
+			height: 38px;
+		}
+
+		.mob-marke img {
+			width: 34px;
+			height: 34px;
+		}
+
+		.mob-marke b {
+			font-size: 13px;
+		}
+
+		.mob-signal {
+			width: 42px;
+			height: 38px;
+
+			.app-ico,
+			img {
+				width: 30px;
+				height: 30px;
+			}
+		}
+
+		.mob-werte {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+		}
+
+		.mob-wert {
+			height: 32px;
+			padding: 0 5px 0 4px;
+			font-size: 13px;
+
+			img {
+				width: 18px;
+				height: 18px;
+			}
+		}
+
+		.mob-unten {
+			font-size: 13px;
+		}
+
+		.mob-zeiten {
+			gap: 16px;
+			font-size: 15px;
+
+			small {
+				font-size: 11px;
+			}
+		}
+
+		.mob-flotte {
+			font-size: 13px;
+
+			img {
+				width: 16px;
+				height: 16px;
+			}
+		}
+	}
+}
 // sehr schmale Geräte: der Schriftzug neben dem Logo weicht den Signalen
 @media (max-width: 374px) {
 	body.mobile .mob-kopf .mob-marke b {
