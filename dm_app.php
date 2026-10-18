@@ -162,20 +162,20 @@ function app_link($seite, $klasse, $inhalt, $titel = '')
 
 	<main class="app-inhalt">
 		<?php //die Karte liegt immer hinter der Spielseite; "Karte" in der Navigation oder Esc schließt die Seite (closeIframeMain) ?>
-		<iframe src="map.php" id="iframe_map" title="Karte"></iframe>
+		<iframe src="map.php" id="iframe_map"></iframe>
 		<nav class="app-karte-knoepfe">
 			<button type="button" class="app-karte-knopf" onclick="document.getElementById('iframe_map').contentWindow.location.reload()"><svg class="app-ico"><use href="#i-aktualisieren"/></svg>Karte aktualisieren</button>
 			<?php if ($vs_aktiv) { echo app_link('map_mobile.php', 'app-karte-knopf', '<svg class="app-ico"><use href="#i-liste"/></svg>VS-&Uuml;bersicht', 'Vergessene Systeme (VS) als Liste'); } ?>
 			<button type="button" class="app-karte-knopf" onclick="reset_map()" title="Karte auf den Heimatsektor zentrieren"><svg class="app-ico"><use href="#i-heimat"/></svg>Heimatsektor</button>
 		</nav>
-		<div id="iframe_main_container"><iframe src="overview.php" id="iframe_main" name="h" title="Spielseite"></iframe></div>
+		<div id="iframe_main_container"><iframe src="overview.php" id="iframe_main" name="h"></iframe></div>
 		<?php //bleibt für ang_fn.js vorhanden; Technologien laufen in der App in der normalen Mitte (switch_iframe_main_container_big unten) ?>
 		<div id="iframe_main_container_big" style="display: none;"></div>
 	</main>
 
 	<aside class="app-chat">
 		<div class="app-chat-kopf"><svg class="app-ico"><use href="#i-chat"/></svg><span>Chat</span><button type="button" class="app-chat-zu-knopf" onclick="app_chat_umschalten()" title="Chat ausblenden"><svg class="app-ico"><use href="#i-schliessen"/></svg></button></div>
-		<iframe src="chat.php" id="iframe_chat" name="c" title="Chat"></iframe>
+		<iframe src="chat.php" id="iframe_chat" name="c"></iframe>
 		<div class="app-chat-griff" title="Breite des Chats &auml;ndern"></div>
 	</aside>
 

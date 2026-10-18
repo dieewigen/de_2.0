@@ -447,3 +447,7 @@ body.mobile #chatcontent a { font-size: inherit; }
   }
 }
  
+
+// In der App-Oberfläche (dm_app.php) steht der Chat als Leiste neben der Spielseite; Seitenkopf::zubehoer() setzt dort
+// html.app, und statt des Planetenbilds gilt die dunkle Fläche der Leiste (schlägt body.theme-rasseN.desktop)
+html.app body.desktop { background: #0b0f15; }

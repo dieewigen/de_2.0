@@ -26,7 +26,7 @@ echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCU
 //Desktop-Ansicht (dm.php): die Spielseiten bekommen gp/de-dm.css als zweite Stilebene (Karten statt Bildzellen-Rahmen, Breite
 //der Spielspalte); Classic (de_frameset.php) und Mobil bleiben bei gp/de-main.css allein. In der Spielspalte (Rahmen "h")
 //liegt die Seite auf der Karte: html.dm-rahmen gibt ihr dort den durchscheinenden Hintergrund; per Script, weil jede Seite
-//ihr <html> selbst schreibt
+//ihr <html> selbst schreibt (den App-Marker html.app setzt Seitenkopf::zubehoer())
 if(!empty($_SESSION['new_desktop_version']) && empty($_SESSION['de_frameset']) && $_SESSION['ums_mobi']!=1){
 	echo '<link rel="stylesheet" type="text/css" href="gp/de-dm.css?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-dm.css').'">';
 	echo '<script>if(window.parent!==window && window.name==="h"){document.documentElement.classList.add("dm-rahmen");}</script>';

@@ -35,6 +35,11 @@ body.desktop.tc-body {
 	padding: 0;
 }
 
+// in der App-Oberfläche (dm_app.php, html.app aus cssinclude.php) gibt es kein großes Fenster, das Kreuz zum Schließen entfällt
+html.app .tc-schliessen {
+	display: none;
+}
+
 // Seitenrahmen (rahmen_oben/rahmen_unten in functions.php) als Karte statt der Bildzellen: Titel links mit Akzentbalken
 // in der Rassenfarbe, Inhalt direkt auf der Karte, keine Fußleiste
 body.desktop .rahmen {

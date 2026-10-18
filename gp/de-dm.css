@@ -42,6 +42,10 @@ body.desktop.tc-body {
   padding: 0;
 }
 
+html.app .tc-schliessen {
+  display: none;
+}
+
 body.desktop .rahmen {
   display: block;
   max-width: 1040px;

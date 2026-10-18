@@ -87,7 +87,7 @@ if(Sperre::setzen($GLOBALS['dbi'], $_SESSION['ums_user_id'])){
 
 	//close-button
 	if($_SESSION['ums_mobi']!=1 && $_SESSION['desktop_version']==0){
-		$content.='<img onclick="closeIframeMain();" src="gp/g/close_icon.png" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
+		$content.='<img onclick="closeIframeMain();" src="gp/g/close_icon.png" class="tc-schliessen" style="position: absolute; right: 1px; height: 26px; margin-top: 2px; width: auto; cursor: pointer;" alt="Fenster schlie&szlig;en" title="Fenster schlie&szlig;en">';
 	}
 
 	///////////////////////////////////////////////////////////////////
