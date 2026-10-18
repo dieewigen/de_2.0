@@ -10,15 +10,23 @@ if(!isset($_SESSION['ums_mobi'])){
 	$_SESSION['ums_mobi']=0;
 }
 
+require_once __DIR__.'/vendor/autoload.php';
+
+//Mobil: die neue Darstellung (View\Mobil, abschaltbar in den Optionen) läuft in Gerätebreite, die bisherige im festen
+//620-px-Viewport, den der Browser auf die Bildschirmbreite verkleinert
 if($_SESSION['ums_mobi']==1){
-	echo '<meta name="viewport" content="width=620">';
+	echo \DieEwigen\DE2\View\Mobil::neu() ? '<meta name="viewport" content="width=device-width, initial-scale=1">' : '<meta name="viewport" content="width=620">';
 }
 
 //Browser-Zubehör: Favicon, Startbildschirm-Symbol, Farbe der Browserleiste am Handy (src/View/Seitenkopf.php)
-require_once __DIR__.'/vendor/autoload.php';
 echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']);
 
 echo '<link rel="stylesheet" type="text/css" href="gp/de-main.css?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-main.css').'">';
+
+//neue mobile Darstellung: zweite Stilebene wie bei der Desktop-Ansicht (Karten, Gerätebreite, Kopfleiste)
+if(\DieEwigen\DE2\View\Mobil::neu()){
+	echo '<link rel="stylesheet" type="text/css" href="gp/de-mobil.css?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-mobil.css').'">';
+}
 
 echo '<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>';
 echo '<script type="text/javascript" src="js/de_fn.js?'.filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js').'"></script>';

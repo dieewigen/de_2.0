@@ -1,0 +1,314 @@
+// Neue mobile Darstellung (Okt. 2026, src/View/Mobil.php): Kopfleiste statt Bitmap-Rohstoffleiste, Seiten in Gerätebreite.
+// Geladen über cssinclude.php nur in Mobilsitzungen ohne das Cookie mobil_alt (Optionen „Mobile Darstellung“); die bisherige
+// Darstellung bleibt bei gp/de-main.css mit 620-px-Viewport. Karten, Breiten und Titelschrift der Spielseiten kommen aus
+// gp/_seiten.scss wie in der Desktop-Ansicht. Die Regeln stehen unter body.mobile, weil die Themen in de-main.scss zwei Klassen
+// tragen (body.theme-rasseN.mobile) und deren Linkregeln (body.theme-rasseN a:link) sonst gewinnen.
+//   sass --style=expanded --no-source-map gp/de-mobil.scss gp/de-mobil.css
+@use 'seiten' as *;
+
+@include seiten('body.mobile');
+
+// Seite: dunkle Fläche statt Schwarz, schmale Ränder. de-main.scss macht body.mobile zur Flex-Spalte über 100dvh; als
+// Flex-Element dürfte die Mitte nicht schmaler werden als ihre breiteste Tabelle und zöge die ganze Seite auf, darum Block.
+body.mobile {
+	display: block;
+	height: auto;
+	min-height: 100dvh;
+}
+
+@each $n in 1, 2, 3, 4 {
+	body.theme-rasse#{$n}.mobile {
+		padding: 0 8px 24px;
+		background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+	}
+}
+
+// Karten mit weniger Innenabstand; breite Tabellen rollen innerhalb der Karte, statt die Seite zu sprengen
+body.mobile .rahmen {
+	margin-bottom: 10px;
+}
+
+body.mobile .rahmen-kopf {
+	min-height: 38px;
+	padding: 6px 12px 6px 16px;
+}
+
+body.mobile .rahmen-inhalt {
+	padding: 4px 4px 6px;
+	overflow-x: auto;
+}
+
+// Berater und Missionshinweis aus resline.php stehen frei auf der Seite
+body.mobile .ber,
+body.mobile .rl-hinweis {
+	margin-bottom: 10px;
+}
+
+// ------------------------------------------------------------
+// Kopfleiste (View\Mobil::kopf): oben Menü, Marke, Signale und Chat, darunter Rohstoffe und Punkte, unten Zeiten und Flotten.
+// Über die ganze Breite (gegen den Seitenrand gerechnet), Look wie die Kopfleiste der Desktop-Ansicht.
+// ------------------------------------------------------------
+body.mobile .mob-kopf {
+	margin: 0 -8px 10px;
+	padding: 6px 8px 8px;
+	border-bottom: 1px solid $rand;
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px),
+		radial-gradient(ellipse at 12% 0%, #0f1a26 0%, #05070a 70%);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+	font-family: $schrift;
+	text-align: left;
+
+	// die Linkregeln der Themen (Farbe, 14 px, Unterstreichung) gelten in der Leiste nicht
+	a,
+	a:link,
+	a:visited,
+	a:hover {
+		font-size: inherit;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.app-ico {
+		flex: none;
+		width: 20px;
+		height: 20px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.mob-zeile {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.mob-oben {
+		height: 38px;
+	}
+
+	.mob-knopf {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		width: 40px;
+		height: 34px;
+		border: 1px solid $rand;
+		border-radius: 7px;
+		corner-shape: bevel;
+		background: $flaeche;
+		color: #c9d1d9;
+	}
+
+	.mob-marke {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex: 1 1 auto;
+		min-width: 0;
+		color: #e8eef6;
+
+		img {
+			width: 30px;
+			height: 30px;
+		}
+
+		b {
+			font-family: $titel;
+			font-size: 11px;
+			font-weight: 400;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			white-space: nowrap;
+		}
+	}
+
+	.mob-signale {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+	}
+
+	// Hyperfunk und Nachrichten grau, bei Neuem in der Rassenfarbe; Allianzbonus als Bild
+	.mob-signal {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 34px;
+		color: #6b7682;
+
+		.app-ico {
+			width: 26px;
+			height: 26px;
+			stroke-width: 1.6;
+		}
+
+		img {
+			width: 26px;
+			height: 26px;
+			border-radius: 6px;
+		}
+	}
+
+	.mob-neu {
+		color: var(--akzent);
+		filter: drop-shadow(0 0 5px var(--akzent));
+	}
+
+	// Rohstoffe und Punkte: sechs Felder in zwei Reihen zu dreien, alle auf einen Blick
+	.mob-werte {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 4px;
+		margin-top: 6px;
+	}
+
+	.mob-wert {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		min-width: 0;
+		height: 28px;
+		padding: 0 6px 0 4px;
+		border: 1px solid $rand;
+		border-radius: 6px;
+		corner-shape: bevel;
+		background: $flaeche;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+		color: #d8e9ff;
+		font-size: 11px;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+
+		img {
+			width: 16px;
+			height: 16px;
+			border-radius: 4px;
+		}
+
+		b {
+			overflow: hidden;
+			font-weight: 500;
+			text-overflow: ellipsis;
+		}
+	}
+
+	// Zeiten links, Flotten im System rechts (nur wenn welche unterwegs sind)
+	.mob-unten {
+		margin-top: 6px;
+		font-size: 11px;
+		color: #9da7b1;
+	}
+
+	.mob-zeiten {
+		display: flex;
+		gap: 10px;
+		color: #c9d1d9;
+		font-variant-numeric: tabular-nums;
+
+		small {
+			margin-right: 4px;
+			font-size: 9px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #8b949e;
+		}
+	}
+
+	.mob-flotte {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		margin-left: auto;
+		padding: 1px 7px;
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 600;
+
+		img {
+			width: 14px;
+			height: 14px;
+			border-radius: 3px;
+		}
+
+		+ .mob-flotte {
+			margin-left: 6px;
+		}
+	}
+
+	.mob-gut {
+		background: rgba(62, 207, 106, 0.14);
+		color: #5fe08a;
+	}
+
+	.mob-gefahr {
+		background: rgba(255, 107, 107, 0.16);
+		color: #ff6b6b;
+	}
+}
+
+// Dichte Listen und Tabellen sind für etwa 580 px gebaut: sie behalten eine Mindestbreite und rollen innerhalb der Karte
+// (overflow-x an .rahmen-inhalt), statt ihre Spalten auf Buchstabenbreite zu quetschen
+body.mobile .prod-liste,
+body.mobile .sec-table,
+body.mobile .mil-raster,
+body.mobile .res-kosten-liste,
+body.mobile .rec-liste,
+body.mobile .einh-tabelle,
+body.mobile .stat-tabelle,
+body.mobile .kb-tabelle {
+	min-width: 560px;
+}
+
+body.mobile .tl-tabelle {
+	min-width: 480px;
+}
+// Reiterleisten über den Karten (Produktion/Recycling, Allianz, Nachrichten …): Bilder weg, Beschriftung ohne Umbruch,
+// bei Platznot rollt die Leiste seitlich
+body.mobile .einh-navi,
+body.mobile .ally-navi,
+body.mobile .pol-navi,
+body.mobile .sn-navi,
+body.mobile .tl-unternavi {
+	overflow-x: auto;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+body.mobile .mod .einh-reiter {
+	flex: 1 0 auto;
+	padding: 6px 8px;
+	white-space: nowrap;
+
+	img {
+		display: none;
+	}
+}
+// Karten und Raster, die für 580 px ausgelegt sind: Auktionskarte (Ware links, Kasse rechts) untereinander; die drei
+// Spezialisierungen je Stufe und die acht Artefaktplätze je Reihe dürfen schmaler werden als ihr Inhalt
+body.mobile .auk-karte {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+body.mobile .spz-optionen {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.mobile .art-raster {
+	grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+// sehr schmale Geräte: der Schriftzug neben dem Logo weicht den Signalen
+@media (max-width: 374px) {
+	body.mobile .mob-kopf .mob-marke b {
+		display: none;
+	}
+}

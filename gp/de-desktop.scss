@@ -1,35 +1,14 @@
 // Desktop-Ansicht „Standard“ (dm.php): Hülle (Kopfleiste, Navigation links, Mitte mit der Karte dahinter, Chat rechts) und
 // die Spielseiten darin (Karten statt Bildzellen-Rahmen, Breite der Mitte, Galaxie als Bühne). Geladen von dm.php selbst
-// und über cssinclude.php von jeder Spielseite in einer Desktop-Sitzung; Classic (de_frameset.php) und Mobil laden nur
-// gp/de-main.css und sehen weiter aus wie bisher. gp/de-main.css liegt immer darunter (Schrift, Bildlaufleisten, Bausteine).
+// und über cssinclude.php von jeder Spielseite in einer Desktop-Sitzung; Classic (de_frameset.php) bleibt bei
+// gp/de-main.css, die neue mobile Darstellung hat gp/de-mobil.scss; die Regeln der Spielseiten teilen sich beide in gp/_seiten.scss. gp/de-main.css liegt immer darunter (Schrift, Bildlaufleisten, Bausteine).
 //   sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css
 // Die Regeln für Spielseiten stehen unter body.desktop, weil die Themen in de-main.scss (body.theme-rasseN …) zwei Klassen
 // tragen und sonst gewinnen würden; die Rassenfarbe kommt dort als --akzent. Die Hülle (body.app) bekommt sie hier selbst.
 // Flächen, Ränder und abgeschrägte Ecken (corner-shape: Chrome und Edge ab 139, sonst rund) in Anlehnung an Stellaris, ohne Glanz.
 
 @use 'sass:color';
-
-$rand: rgba(160, 200, 255, 0.14);
-$rand-zart: rgba(160, 200, 255, 0.1);
-$flaeche: linear-gradient(145deg, #161f29, #0d1218 60%);
-$karte: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
-$radius: 10px;
-$schrift: Roboto, Arial, Helvetica, sans-serif;
-$inhalt-breite: 1040px;
-
-// Titelschrift: Michroma (SIL Open Font License, Text in gp/fonts/Michroma-OFL.txt), selbst gehostet wie Roboto. Eckig und
-// breit wie die Kartenschrift de1, aber bei 12 px lesbar. Nur für Rahmentitel, Marke und Chat-Kopf, nie für Fließtext.
-@font-face {
-	font-family: 'Michroma';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url(fonts/Michroma.woff2) format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-$titel: 'Michroma', Roboto, Arial, Helvetica, sans-serif;
-
+@use 'seiten' as *;
 // Rassenfarbe für die Hülle: dm.php hat body.template.rasseN (die Spielseiten body.theme-rasseN aus de-main.scss)
 $rassen: (1: #3399FF, 2: #A6A6A6, 3: #DE3939, 4: #ED951E);
 
@@ -58,133 +37,8 @@ $rassen: (1: #3399FF, 2: #A6A6A6, 3: #DE3939, 4: #ED951E);
 		background: rgba(7, 10, 15, 0.62);
 	}
 }
-
-// Technologien füllen die Mitte ohne Rand (.tc-fenster ist absolut gesetzt)
-body.desktop.tc-body {
-	padding: 0;
-}
-
-// Seitenrahmen (rahmen_oben/rahmen_unten in functions.php) als Karte statt der Bildzellen: Titel links mit Akzentbalken
-// in der Rassenfarbe, Inhalt direkt auf der Karte, keine Fußleiste
-// Ecken abgeschrägt wie bei Stellaris (corner-shape kennen Chrome und Edge ab 139, sonst bleiben die Ecken rund), oben eine
-// hauchdünne helle Kante
-body.desktop .rahmen {
-	display: block;
-	max-width: $inhalt-breite;
-	margin: 0 auto 14px;
-	border: 1px solid $rand;
-	border-radius: $radius;
-	corner-shape: bevel;
-	background: $karte;
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-// der Abstand zwischen den Rahmen kommt aus dem Außenabstand, nicht mehr aus dem <br> von rahmen_unten()
-body.desktop .rahmen + br {
-	display: none;
-}
-
-body.desktop .rahmen-kopf {
-	position: relative;
-	min-height: 42px;
-	padding: 8px 16px 8px 20px;
-	border-bottom: 1px solid rgba(160, 200, 255, 0.1);
-	border-radius: $radius $radius 0 0;
-	corner-shape: bevel;
-	background: rgba(255, 255, 255, 0.025);
-	font-family: $schrift;
-	text-align: left;
-
-	&::before {
-		content: '';
-		position: absolute;
-		top: 11px;
-		bottom: 11px;
-		left: 0;
-		width: 3px;
-		border-radius: 0 2px 2px 0;
-		background: var(--akzent);
-		box-shadow: 0 0 8px var(--akzent-mittel);
-	}
-
-	> .cellu {
-		background: none;
-		font-family: $titel;
-		font-size: 12px;
-		font-weight: 400;
-		letter-spacing: 0.05em;
-		color: #e8eef6;
-	}
-}
-
-body.desktop .rahmen-inhalt {
-	padding: 6px 6px 8px;
-	background: none;
-	font-family: $schrift;
-	font-size: 13px;
-	color: #c9d1d9;
-
-	// die dunkle Fläche der Bausteine ist im Rahmen überflüssig, die Karte ist selbst die Fläche
-	> .mod {
-		background: transparent;
-	}
-}
-
-body.desktop .rahmen::after {
-	display: none;
-}
-
-// Breite: die Blöcke folgen der Mitte statt der festen 572 bis 607 px aus de-main.scss; Blöcke außerhalb der
-// Rahmen (Reiterleisten, Meldungen, Berichte, Berater) bekommen dieselbe Höchstbreite wie die Rahmen
-body.desktop {
-	.mod,
-	.sec-navi,
-	.ov-sperre,
-	.geh-berichte,
-	.prod-sabotage,
-	.einh-navi,
-	.ally-navi,
-	.ally-meldung,
-	.mil-meldungen,
-	.pol-meldungen,
-	.ss-leiste,
-	.tl-unternavi,
-	.sn-navi,
-	.hfl,
-	.hfl-karte,
-	.ber,
-	.rl-hinweis {
-		width: auto;
-	}
-
-	// ohne den Technologiebaum (.tc), der die Mitte in voller Breite nutzt
-	.mod:not(.rahmen-inhalt .mod):not(.tc) {
-		max-width: $inhalt-breite;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	// Reiterleisten über den Rahmen mit demselben Rand wie die Karten
-	.ally-navi,
-	.einh-navi,
-	.pol-navi,
-	.sn-navi,
-	.tl-unternavi,
-	.sec-navi {
-		border: 1px solid $rand;
-	}
-
-	// etwas größere Grundschrift als die 12 px der schmalen Spalte; Chips, Typzeilen und Knöpfe behalten ihre Größen,
-	// der Technologiebaum seine dichte Darstellung
-	.mod:not(.tc) {
-		font-size: 13px;
-	}
-
-	// Rundenfortschritt auf der Übersicht über die ganze Kartenbreite statt fester 542 px
-	#gameProgressBar .scifi-progress-container {
-		width: auto;
-	}
-}
+// Karten, Breiten und Grundschrift der Spielseiten (gp/_seiten.scss, geteilt mit der mobilen Darstellung)
+@include seiten('body.desktop');
 
 // Übersicht als Dashboard: ab 1000 px Seitenbreite (die Mitte der Desktop-Ansicht) stehen die Rahmen in zwei
 // Spalten; Kommunikationssperre, Berater und Hinweise (.mod außerhalb der Rahmen) laufen über beide. Erkannt an der

@@ -110,12 +110,15 @@ $show_trade_reminder=$rowresline['trade_reminder'];
 /////////////////////////////////////////////////////////////
 $deactivate_touch_menu=0;
 if($_SESSION['ums_mobi']==1){
-	//Menüleiste: Antippen öffnet das Menü; sind die Wischgesten an, steht rechts, wohin sie führen
-	echo '<a href="menu.php" class="mod mobil-menue"><span class="mobil-menue-symbol"></span><span class="mobil-menue-titel">Men&uuml;</span>';
-	if(!isset($_COOKIE['deactivate_swipe']) || $_COOKIE['deactivate_swipe']!=1){
-		echo '<span class="mobil-menue-hinweis">Wischen nach rechts: Men&uuml;<br>Wischen nach links: Chat</span>';
+	//bisherige Darstellung: Menüleiste über der Rohstoffleiste; in der neuen Darstellung (View\Mobil) sitzt das Menü in der Kopfleiste
+	if(!\DieEwigen\DE2\View\Mobil::neu()){
+		//Menüleiste: Antippen öffnet das Menü; sind die Wischgesten an, steht rechts, wohin sie führen
+		echo '<a href="menu.php" class="mod mobil-menue"><span class="mobil-menue-symbol"></span><span class="mobil-menue-titel">Men&uuml;</span>';
+		if(!isset($_COOKIE['deactivate_swipe']) || $_COOKIE['deactivate_swipe']!=1){
+			echo '<span class="mobil-menue-hinweis">Wischen nach rechts: Men&uuml;<br>Wischen nach links: Chat</span>';
+		}
+		echo '</a>';
 	}
-	echo '</a>';
 
 
 	if(isset($_COOKIE['deactivate_swipe']) && $_COOKIE['deactivate_swipe']==1){
@@ -195,7 +198,23 @@ if(!isset($_SESSION['de_frameset'])){
 	$_SESSION['de_frameset']=0;
 }
 
-if($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
+if(\DieEwigen\DE2\View\Mobil::neu()){
+	//neue mobile Darstellung: Kopfleiste mit Menü, Signalen, Rohstoffen und Zeiten (src/View/Mobil.php)
+	echo \DieEwigen\DE2\View\Mobil::kopf(array(
+		'rasse' => (int)$_SESSION['ums_rasse'],
+		'rohstoffe' => array(formatMasseinheit(floor($restyp01)), formatMasseinheit(floor($restyp02)), formatMasseinheit(floor($restyp03)), formatMasseinheit(floor($restyp04)), formatMasseinheit(floor($restyp05))),
+		'namen' => array($resline_lang['restipres01'], $resline_lang['restipres02'], $resline_lang['restipres03'], $resline_lang['restipres04'], $resline_lang['restipres05']),
+		'punkte' => formatMasseinheit($punkte),
+		'zeit' => date("H:i"),
+		'wt' => $lastWT,
+		'kt' => $lastKT,
+		'verteidiger' => $gevflag > 0 ? $gev_desktop_short : '',
+		'angreifer' => $geaflag > 0 ? $gea_desktop_short : '',
+		'hyperfunk' => isset($newtrans) && $newtrans == 1,
+		'nachrichten' => isset($newnews) && $newnews == 1,
+		'geschenk' => $resline_dailyallygift == 1,
+	));
+}elseif($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	//hauptgrafik laden
 	echo '<div id="resmain" align="center">';
 	//rohstoffe

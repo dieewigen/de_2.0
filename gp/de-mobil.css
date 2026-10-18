@@ -1,0 +1,388 @@
+@font-face {
+  font-family: "Michroma";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/Michroma.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+body.mobile.tc-body {
+  padding: 0;
+}
+
+body.mobile .rahmen {
+  display: block;
+  max-width: 1040px;
+  margin: 0 auto 14px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 10px;
+  corner-shape: bevel;
+  background: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+body.mobile .rahmen + br {
+  display: none;
+}
+
+body.mobile .rahmen-kopf {
+  position: relative;
+  min-height: 42px;
+  padding: 8px 16px 8px 20px;
+  border-bottom: 1px solid rgba(160, 200, 255, 0.1);
+  border-radius: 10px 10px 0 0;
+  corner-shape: bevel;
+  background: rgba(255, 255, 255, 0.025);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  text-align: left;
+}
+body.mobile .rahmen-kopf::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  bottom: 11px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--akzent);
+  box-shadow: 0 0 8px var(--akzent-mittel);
+}
+body.mobile .rahmen-kopf > .cellu {
+  background: none;
+  font-family: "Michroma", Roboto, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: #e8eef6;
+}
+
+body.mobile .rahmen-inhalt {
+  padding: 6px 6px 8px;
+  background: none;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #c9d1d9;
+}
+body.mobile .rahmen-inhalt > .mod {
+  background: transparent;
+}
+
+body.mobile .rahmen::after {
+  display: none;
+}
+
+body.mobile .mod,
+body.mobile .sec-navi,
+body.mobile .ov-sperre,
+body.mobile .geh-berichte,
+body.mobile .prod-sabotage,
+body.mobile .einh-navi,
+body.mobile .ally-navi,
+body.mobile .ally-meldung,
+body.mobile .mil-meldungen,
+body.mobile .pol-meldungen,
+body.mobile .ss-leiste,
+body.mobile .tl-unternavi,
+body.mobile .sn-navi,
+body.mobile .hfl,
+body.mobile .hfl-karte,
+body.mobile .ber,
+body.mobile .rl-hinweis {
+  width: auto;
+}
+body.mobile .mod:not(.rahmen-inhalt .mod):not(.tc) {
+  max-width: 1040px;
+  margin-left: auto;
+  margin-right: auto;
+}
+body.mobile .ally-navi,
+body.mobile .einh-navi,
+body.mobile .pol-navi,
+body.mobile .sn-navi,
+body.mobile .tl-unternavi,
+body.mobile .sec-navi {
+  border: 1px solid rgba(160, 200, 255, 0.14);
+}
+body.mobile .mod:not(.tc) {
+  font-size: 13px;
+}
+body.mobile #gameProgressBar .scifi-progress-container {
+  width: auto;
+}
+
+body.mobile {
+  display: block;
+  height: auto;
+  min-height: 100dvh;
+}
+
+body.theme-rasse1.mobile {
+  padding: 0 8px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+body.theme-rasse2.mobile {
+  padding: 0 8px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+body.theme-rasse3.mobile {
+  padding: 0 8px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+body.theme-rasse4.mobile {
+  padding: 0 8px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+body.mobile .rahmen {
+  margin-bottom: 10px;
+}
+
+body.mobile .rahmen-kopf {
+  min-height: 38px;
+  padding: 6px 12px 6px 16px;
+}
+
+body.mobile .rahmen-inhalt {
+  padding: 4px 4px 6px;
+  overflow-x: auto;
+}
+
+body.mobile .ber,
+body.mobile .rl-hinweis {
+  margin-bottom: 10px;
+}
+
+body.mobile .mob-kopf {
+  margin: 0 -8px 10px;
+  padding: 6px 8px 8px;
+  border-bottom: 1px solid rgba(160, 200, 255, 0.14);
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px), radial-gradient(ellipse at 12% 0%, #0f1a26 0%, #05070a 70%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  text-align: left;
+}
+body.mobile .mob-kopf a,
+body.mobile .mob-kopf a:link,
+body.mobile .mob-kopf a:visited,
+body.mobile .mob-kopf a:hover {
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+body.mobile .mob-kopf .app-ico {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.mobile .mob-kopf .mob-zeile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.mobile .mob-kopf .mob-oben {
+  height: 38px;
+}
+body.mobile .mob-kopf .mob-knopf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 34px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 7px;
+  corner-shape: bevel;
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  color: #c9d1d9;
+}
+body.mobile .mob-kopf .mob-marke {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #e8eef6;
+}
+body.mobile .mob-kopf .mob-marke img {
+  width: 30px;
+  height: 30px;
+}
+body.mobile .mob-kopf .mob-marke b {
+  font-family: "Michroma", Roboto, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+body.mobile .mob-kopf .mob-signale {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+body.mobile .mob-kopf .mob-signal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 34px;
+  color: #6b7682;
+}
+body.mobile .mob-kopf .mob-signal .app-ico {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.6;
+}
+body.mobile .mob-kopf .mob-signal img {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+body.mobile .mob-kopf .mob-neu {
+  color: var(--akzent);
+  filter: drop-shadow(0 0 5px var(--akzent));
+}
+body.mobile .mob-kopf .mob-werte {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+body.mobile .mob-kopf .mob-wert {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 6px 0 4px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 6px;
+  corner-shape: bevel;
+  background: linear-gradient(145deg, #161f29, #0d1218 60%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #d8e9ff;
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+body.mobile .mob-kopf .mob-wert img {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+body.mobile .mob-kopf .mob-wert b {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+body.mobile .mob-kopf .mob-unten {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9da7b1;
+}
+body.mobile .mob-kopf .mob-zeiten {
+  display: flex;
+  gap: 10px;
+  color: #c9d1d9;
+  font-variant-numeric: tabular-nums;
+}
+body.mobile .mob-kopf .mob-zeiten small {
+  margin-right: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+body.mobile .mob-kopf .mob-flotte {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+body.mobile .mob-kopf .mob-flotte img {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+body.mobile .mob-kopf .mob-flotte + .mob-flotte {
+  margin-left: 6px;
+}
+body.mobile .mob-kopf .mob-gut {
+  background: rgba(62, 207, 106, 0.14);
+  color: #5fe08a;
+}
+body.mobile .mob-kopf .mob-gefahr {
+  background: rgba(255, 107, 107, 0.16);
+  color: #ff6b6b;
+}
+
+body.mobile .prod-liste,
+body.mobile .sec-table,
+body.mobile .mil-raster,
+body.mobile .res-kosten-liste,
+body.mobile .rec-liste,
+body.mobile .einh-tabelle,
+body.mobile .stat-tabelle,
+body.mobile .kb-tabelle {
+  min-width: 560px;
+}
+
+body.mobile .tl-tabelle {
+  min-width: 480px;
+}
+
+body.mobile .einh-navi,
+body.mobile .ally-navi,
+body.mobile .pol-navi,
+body.mobile .sn-navi,
+body.mobile .tl-unternavi {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+body.mobile .einh-navi::-webkit-scrollbar,
+body.mobile .ally-navi::-webkit-scrollbar,
+body.mobile .pol-navi::-webkit-scrollbar,
+body.mobile .sn-navi::-webkit-scrollbar,
+body.mobile .tl-unternavi::-webkit-scrollbar {
+  display: none;
+}
+
+body.mobile .mod .einh-reiter {
+  flex: 1 0 auto;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+body.mobile .mod .einh-reiter img {
+  display: none;
+}
+
+body.mobile .auk-karte {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.mobile .spz-optionen {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.mobile .art-raster {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+@media (max-width: 374px) {
+  body.mobile .mob-kopf .mob-marke b {
+    display: none;
+  }
+}

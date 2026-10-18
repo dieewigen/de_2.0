@@ -220,6 +220,13 @@ if (isset($_REQUEST['set_deactivate_swipe'])) {
     $_COOKIE['deactivate_swipe'] = $value;
 }
 
+//mobile Darstellung: 1 = bisherige (Rohstoffleiste, 620-px-Viewport), sonst die neue Kopfleiste in Gerätebreite (View\Mobil)
+if (isset($_REQUEST['set_mobil_alt'])) {
+    $value = intval($_REQUEST['set_mobil_alt']);
+    echo opt_cookie_skript('mobil_alt', $value);
+    $_COOKIE['mobil_alt'] = $value;
+}
+
 if (isset($_REQUEST['desktop_version'])) {
     $value = intval($_REQUEST['desktop_version']);
     echo opt_cookie_skript('desktop_version', $value);
@@ -316,6 +323,12 @@ if ($_COOKIE['deactivate_swipe'] == 0) {
     echo '<div class="opt-zeile"><span>Wischgesten (Mobilversion): <span class="mod-chip mod-chip-gruen">an</span></span><a href="options.php?set_deactivate_swipe=1" class="mod-btn mod-btn-leise ally-btn-klein">Ausschalten</a></div>';
 } else {
     echo '<div class="opt-zeile"><span>Wischgesten (Mobilversion): <span class="mod-chip">aus</span></span><a href="options.php?set_deactivate_swipe=0" class="mod-btn mod-btn-leise ally-btn-klein">Einschalten</a></div>';
+}
+
+if (empty($_COOKIE['mobil_alt'])) {
+    echo '<div class="opt-zeile"><span>Mobile Darstellung: <span class="mod-chip mod-chip-gruen">Neu</span> <small>(Kopfleiste, Seiten in Ger&auml;tebreite)</small></span><a href="options.php?set_mobil_alt=1" class="mod-btn mod-btn-leise ally-btn-klein">Zur bisherigen wechseln</a></div>';
+} else {
+    echo '<div class="opt-zeile"><span>Mobile Darstellung: <span class="mod-chip">Bisherige</span> <small>(Rohstoffleiste)</small></span><a href="options.php?set_mobil_alt=0" class="mod-btn mod-btn-leise ally-btn-klein">Zur neuen wechseln</a></div>';
 }
 
 echo '</div>';

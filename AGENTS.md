@@ -31,6 +31,8 @@ de2/
 ├── gp/                      # Grafiken, Styles (CSS/SCSS)
 │   ├── de-main.scss        # Haupt-Stylesheet
 │   ├── de-desktop.scss     # Desktop-Ansicht „Standard“ (dm.php): Hülle und Spielseiten darin, nur dort geladen
+│   ├── de-mobil.scss       # neue mobile Darstellung (View\Mobil): Kopfleiste, Gerätebreite; abschaltbar (Cookie mobil_alt)
+│   ├── _seiten.scss        # geteilte Regeln der Spielseiten (Karten, Breiten, Titelschrift) für de-desktop und de-mobil
 │   ├── de-chat.scss        # Chat-Stylesheet
 │   ├── de-map.scss         # Karten-Stylesheet
 │   └── g/                  # Grafik-Assets
@@ -368,7 +370,7 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
 CSS wird aus SCSS generiert (Dart Sass, `npm install -g sass`). Die eingecheckten CSS-Dateien werden aber nicht einfach neu erzeugt:
 - `gp/de-main.css` weicht in der Farbschreibweise von einem frischen Sass-Lauf ab. Änderungen deshalb als Differenz einspielen: den Stand vor und nach der SCSS-Änderung kompilieren und nur den Unterschied übertragen.
 - `gp/de-chat.css` entsteht komprimiert aus `gp/de-chat.scss` (`--style=compressed`).
-- `gp/de-desktop.css` (Desktop-Ansicht) wird frisch kompiliert: `sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css`. Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
+- `gp/de-desktop.css` (Desktop-Ansicht) und `gp/de-mobil.css` (neue mobile Darstellung) werden frisch kompiliert: `sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css` bzw. `… gp/de-mobil.scss gp/de-mobil.css`; beide binden `gp/_seiten.scss` ein (Karten, Breiten, Titelschrift der Spielseiten als Mixin `seiten($wurzel)`). Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
 - `gp/de-map.css` stammt aus einem anderen Compiler (eine Zeile); neue Regeln nur anhängen.
 
 ```bash
@@ -402,6 +404,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
 - `Model\Nachricht::anSpieler($db, $uid, $text, $typ)`: Nachricht an einen Spieler (`de_user_news`)
 - `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
+- `View\Mobil::neu()` / `kopf($werte)`: neue mobile Darstellung (Kopfleiste mit Menü, Signalen, Rohstoffen, Zeiten; Seiten in Gerätebreite), aktiv in Mobilsitzungen ohne das Cookie `mobil_alt` (Optionen „Mobile Darstellung“); cssinclude.php wählt danach Viewport und Stylesheet, resline.php die Kopfleiste statt der Rohstoffleiste
 - `View\Symbole::sprite()`: SVG-Sprite der Strichsymbole (`<svg class="app-ico"><use href="#i-karte"/></svg>`) für die Desktop-Ansicht dm.php und die mobile Kommandokonsole menu.php; Titelschrift Michroma (OFL) liegt in gp/fonts, nur für Rahmentitel, Marke und Konsolentitel
 - `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `js/de_fn.js`)
 - `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
