@@ -129,7 +129,7 @@ function showHiddenInfo(id){
 
 // Zwei-Klick-Bestätigung für Links mit data-bestaetigen="Text" (z. B. Auktionen, Artefakte) statt confirm():
 // der erste Klick zeigt den Text und färbt den Knopf um, der zweite Klick (auch als Doppelklick) führt den Link aus,
-// nach 4 Sekunden ohne zweiten Klick geht der Knopf zurück
+// nach 8 Sekunden ohne zweiten Klick geht der Knopf zurück (4 waren für langsames Lesen am Handy zu knapp)
 (function(){
   var bereit = null, text = '', uhr = null;
   function zurueck(){
@@ -161,7 +161,7 @@ function showHiddenInfo(id){
     b.classList.add('mod-btn-bereit');
     b.textContent = b.getAttribute('data-bestaetigen');
     clearTimeout(uhr);
-    uhr = setTimeout(zurueck, 4000);
+    uhr = setTimeout(zurueck, 8000);
   });
 })();
 
