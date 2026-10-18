@@ -450,8 +450,9 @@ body.mobile #chatcontent a { font-size: inherit; }
 
 // ------------------------------------------------------------
 // Neue Optik (Klasse app am body, gesetzt in chat.php: Desktop-Ansicht dm.php und neue mobile Darstellung): ruhige Fläche
-// statt Zellmuster, Roboto, Nachrichtentext hell, die Kanalfarbe nur am Namen und als Strich links, Reiter als Chips,
-// Eingabe und Senden wie die Bausteine der Spielseiten (--akzent kommt aus dem Theme oben). Classic und die bisherige
+// statt Zellmuster, Roboto, Nachrichtentext hell, die Kanalfarbe nur am Namen (ein Strich links verwirrte), Reiter als Chips,
+// Eingabe und Senden wie die Bausteine der Spielseiten, Rand und Knopf in der Farbe des gewählten Kanals (chat.php setzt
+// chat-chN an Feld und Knopf; der User wollte das farbige Feld ausdrücklich behalten). Classic und die bisherige
 // Mobilansicht haben kein app und bleiben wie bisher.
 // ------------------------------------------------------------
 $chat-kanaele-neu: (
@@ -477,28 +478,16 @@ body.app {
     color: #c9d1d9;
   }
 
-  // Zeile: heller Text, Kanalfarbe als Strich links und am Namen
+  // Zeile: heller Text, Kanalfarbe nur am Namen
   #chatcontent .chatline,
   #chatcontent .chatline a {
     color: #c9d1d9;
   }
 
   #chatcontent .chatline {
-    position: relative;
     margin: 1px 0;
-    padding: 3px 8px 3px 11px;
+    padding: 3px 8px;
     border-radius: 6px;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 7px;
-      bottom: 7px;
-      left: 2px;
-      width: 2px;
-      border-radius: 1px;
-      opacity: 0.7;
-    }
   }
 
   #chatcontent .chatline:hover {
@@ -506,15 +495,13 @@ body.app {
   }
 
   @each $typ, $col in $chat-kanaele-neu {
-    #chatcontent .chat-ch#{$typ}::before {
-      background: $col;
-    }
-
     #chatcontent .chat-ch#{$typ} .chat-name {
       color: $col;
     }
 
-    #chatchannelchanger .chat-ch#{$typ} {
+    #chatchannelchanger .chat-ch#{$typ},
+    #chatinput #chatinputfield.chat-ch#{$typ},
+    #chatinput #chatsend.chat-ch#{$typ} {
       color: $col;
     }
   }
@@ -612,25 +599,26 @@ body.app {
     margin-top: 8px;
   }
 
+  // Feld und Knopf tragen die Kanalfarbe als Textfarbe (Klasse chat-chN oben); Rand, Fokusring und Knopffläche leiten sich
+  // daraus ab, der getippte Text bleibt in der Kanalfarbe wie bisher
   #chatinput #chatinputfield {
     height: 34px;
     padding: 6px 10px;
     font: 13px Roboto, Arial, Helvetica, sans-serif;
-    color: #ffffff;
     background: #0d1117;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
     border-radius: 7px;
     corner-shape: bevel;
   }
 
   #chatinput #chatinputfield:focus {
-    border-color: var(--akzent);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--akzent) 25%, transparent);
+    border-color: currentColor;
+    box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 25%, transparent);
   }
 
   #chatinput #chatinputfield::placeholder {
-    color: #6b7682;
-    opacity: 1;
+    color: currentColor;
+    opacity: 0.45;
   }
 
   #chatinput #chatsend {
@@ -639,15 +627,14 @@ body.app {
     font: 700 12px Roboto, Arial, Helvetica, sans-serif;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #ffffff;
-    background: color-mix(in srgb, var(--akzent) 16%, transparent);
-    border: 1px solid var(--akzent);
+    background: color-mix(in srgb, currentColor 16%, transparent);
+    border: 1px solid currentColor;
     border-radius: 7px;
     corner-shape: bevel;
   }
 
   #chatinput #chatsend:hover {
-    background: color-mix(in srgb, var(--akzent) 35%, transparent);
+    background: color-mix(in srgb, currentColor 32%, transparent);
   }
 
   .chat-newmsgs {
