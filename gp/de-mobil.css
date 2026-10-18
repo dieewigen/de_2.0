@@ -329,13 +329,13 @@ body.mobile .mob-kopf .mob-gefahr {
   color: #ff6b6b;
 }
 
-body.mobile .prod-liste,
+body.mobile .prod-zeile,
+body.mobile .rec-zeile,
+body.mobile .pol-zeile,
+body.mobile .bk-zeile,
 body.mobile .sec-table,
 body.mobile .mil-raster,
 body.mobile .res-kosten-liste,
-body.mobile .rec-liste,
-body.mobile .einh-tabelle,
-body.mobile .stat-tabelle,
 body.mobile .kb-tabelle {
   min-width: 560px;
 }
@@ -379,6 +379,110 @@ body.mobile .spz-optionen {
 
 body.mobile .art-raster {
   grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+body.mobile .mob-kopf .mob-unten {
+  flex-wrap: wrap;
+  row-gap: 3px;
+}
+
+body.mobile .mob-kopf .mob-wisch {
+  flex: 1 0 100%;
+  font-size: 10px;
+  color: #6b7682;
+}
+
+body.mobile .ov-links,
+body.mobile .sn-fuss,
+body.mobile .art-kopf,
+body.mobile .res-kolli,
+body.mobile .geh-einheiten,
+body.mobile .geh-einheit,
+body.mobile .ws-kopf {
+  flex-wrap: wrap;
+}
+
+body.mobile .ov-links .mod-btn,
+body.mobile .ov-links .mod-btn:link,
+body.mobile .ov-links .mod-btn:visited {
+  flex: 1 1 30%;
+}
+
+body.mobile .art-kopf-text,
+body.mobile .res-kolli-rechts {
+  flex: 1 1 200px;
+}
+
+body.mobile .geh-einheit {
+  flex: 1 1 100%;
+}
+
+body.mobile .geh-feld {
+  flex: 1 1 auto;
+}
+
+body.mobile .ws-titel {
+  flex: 1 1 100%;
+}
+
+body.mobile .ov-werte,
+body.mobile .ally-kacheln,
+body.mobile .einh-kacheln,
+body.mobile .bk-lager {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.mobile .sec-unten,
+body.mobile .einh-reihen {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.mobile .mod .spz-opt {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+body.mobile .spz-kurz {
+  white-space: normal;
+}
+
+body.mobile .bk-energie {
+  grid-template-columns: 84px repeat(4, minmax(0, 1fr));
+}
+
+body.mobile .bk-label,
+body.mobile .bk-spalte {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+body.mobile .bk-prozent .mod-eingabe {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 4px;
+}
+
+body.mobile .res-bau,
+body.mobile .art-flotte {
+  flex-wrap: wrap;
+}
+
+body.mobile .einh-karte,
+body.mobile .ss-system {
+  overflow-x: auto;
+}
+
+body.mobile .einh-werte,
+body.mobile .ss-flotte,
+body.mobile .ss-eta,
+body.mobile .ss-eigen,
+body.mobile .ss-liste-zeilen {
+  min-width: 480px;
 }
 
 @media (max-width: 374px) {

@@ -213,6 +213,7 @@ if(\DieEwigen\DE2\View\Mobil::neu()){
 		'hyperfunk' => isset($newtrans) && $newtrans == 1,
 		'nachrichten' => isset($newnews) && $newnews == 1,
 		'geschenk' => $resline_dailyallygift == 1,
+		'wischen' => $deactivate_touch_menu != 1,
 	));
 }elseif($_SESSION['ums_mobi']==1 || $_SESSION['de_frameset']==1){
 	//hauptgrafik laden
