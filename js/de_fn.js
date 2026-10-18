@@ -136,6 +136,8 @@ function showHiddenInfo(id){
     if(bereit){
       bereit.classList.remove('mod-btn-bereit');
       bereit.innerHTML = text;
+      bereit.style.minWidth = '';
+      bereit.style.minHeight = '';
       bereit = null;
     }
   }
@@ -152,6 +154,10 @@ function showHiddenInfo(id){
     zurueck();
     bereit = b;
     text = b.innerHTML;
+    // Größe festhalten: der kürzere Bestätigungstext darf den Knopf nicht schrumpfen lassen, sonst rutscht er (in
+    // umbrechenden Reihen sogar in eine andere Zeile) und der zweite Klick geht daneben
+    b.style.minWidth = b.offsetWidth + 'px';
+    b.style.minHeight = b.offsetHeight + 'px';
     b.classList.add('mod-btn-bereit');
     b.textContent = b.getAttribute('data-bestaetigen');
     clearTimeout(uhr);
