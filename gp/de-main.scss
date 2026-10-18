@@ -1497,6 +1497,16 @@ a.mod.mobil-menue:hover {
 	pointer-events: none;
 }
 
+// Touch: zwei schnelle Tipps auf den Knopf sind zwei Klicks und kein Doppeltipp-Zoom; im festen 620-px-Viewport (bisherige
+// mobile Darstellung, kompakte Darstellung) käme der zweite Klick sonst nie an, der Browser zoomt stattdessen. Dort bläht
+// Chrome Android außerdem Text in breiten Blöcken auf: der kürzere Bestätigungstext würde größer als die Beschriftung, der
+// Knopf wächst und rutscht; text-size-adjust nimmt den Knopf davon aus
+.mod [data-bestaetigen] {
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
 // Eingabefelder; eigene Klasse, da das Theme input/select mit höherer Spezifität einfärbt
 .mod .mod-eingabe {
 	padding: 6px 8px;

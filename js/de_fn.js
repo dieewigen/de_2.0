@@ -163,6 +163,33 @@ function showHiddenInfo(id){
     b.classList.add('mod-btn-bereit');
     b.textContent = b.getAttribute('data-bestaetigen');
   });
+  // Touch: der zweite Tipp auf den bereiten Knopf führt schon beim Loslassen aus. Deutet der Browser zwei schnelle Tipps als
+  // Doppeltipp-Zoom (fester 620-px-Viewport), käme sonst kein zweiter Klick an; der Tipp selbst wird nicht mehr zum Klick.
+  // Ein Wischen, das über dem Knopf endet, zählt nicht (Fingerweg über 12 px).
+  var tippX = 0, tippY = 0;
+  document.addEventListener('touchstart', function(e){
+    var p = e.changedTouches && e.changedTouches[0];
+    tippX = p ? p.clientX : 0;
+    tippY = p ? p.clientY : 0;
+  }, {passive: true});
+  document.addEventListener('touchend', function(e){
+    var b = e.target.closest ? e.target.closest('[data-bestaetigen]') : null;
+    if(!b || bereit !== b || b.classList.contains('mod-btn-laeuft')){
+      return;
+    }
+    var p = e.changedTouches && e.changedTouches[0];
+    if(p && (Math.abs(p.clientX - tippX) > 12 || Math.abs(p.clientY - tippY) > 12)){
+      return;
+    }
+    e.preventDefault();
+    if(b.tagName === 'A' && b.href){
+      b.classList.add('mod-btn-laeuft');
+      window.location.href = b.href;
+    }else{
+      // Knopf in einem Formular: der künstliche Klick trifft oben auf bereit === b und lässt das Absenden zu
+      b.click();
+    }
+  }, {passive: false});
 })();
 
 // Esc in der Desktop-Ansicht (dm.php): die Spielseiten laufen in iframes, darum reichen sie die Taste an dm_esc() der

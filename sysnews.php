@@ -350,7 +350,7 @@ $nummer = mysqli_num_rows($db_archiv);
 
 echo '<div class="sn-fuss">';
 echo '<form action="sysnews.php" method="post"><button type="submit" name="mailnews" value="Nachrichten herunterladen" class="mod-btn mod-btn-leise"'.($nummer == "0" ? ' disabled' : '').'>Nachrichten herunterladen</button></form>';
-echo '<a href="sysnews.php?a=d" class="mod-btn mod-btn-gefahr" data-bestaetigen="Wirklich l&ouml;schen?">Gelesene Nachrichten l&ouml;schen</a>';
+echo '<a href="sysnews.php?a=d" class="mod-btn mod-btn-gefahr" data-bestaetigen="Wirklich l&ouml;schen?">Gelesene l&ouml;schen</a>';
 echo '</div>';
 
 echo '</div>';
