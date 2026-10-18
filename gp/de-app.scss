@@ -139,9 +139,10 @@ body.app.app-chat-zu {
 	min-width: 96px;
 	padding: 0 10px 0 6px;
 	border: 1px solid $rand;
-	border-radius: 8px;
+	border-radius: 7px;
+	corner-shape: bevel;
 	background: $flaeche;
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	color: #d8e9ff;
 	font-size: 13px;
 	font-weight: 500;
@@ -298,7 +299,8 @@ body.app.app-chat-zu {
 	height: 34px;
 	padding: 0;
 	border: 1px solid $rand;
-	border-radius: 8px;
+	border-radius: 7px;
+	corner-shape: bevel;
 	background: $flaeche;
 	color: #aab4c0;
 	cursor: pointer;
@@ -328,16 +330,21 @@ body.app-chat-zu .app-kopf-knopf-chat {
 	min-height: 0;
 	padding: 10px 8px;
 	border-right: 1px solid $rand;
-	background: linear-gradient(180deg, #0c1219 0%, #080b10 100%);
+	// sanfte Lichtführung: oben in der Mitte etwas heller, zu den Rändern dunkler (statt Scanlines)
+	background:
+		radial-gradient(ellipse 120% 55% at 50% 0%, rgba(160, 200, 255, 0.055) 0%, transparent 70%),
+		linear-gradient(180deg, #0c1219 0%, #080b10 100%);
 	overflow-x: hidden;
 	overflow-y: auto;
 	scrollbar-width: thin;
 
+	// Trennlinien laufen an den Enden aus
 	hr {
 		flex: none;
-		margin: 6px 6px;
+		height: 1px;
+		margin: 6px 4px;
 		border: 0;
-		border-top: 1px solid $rand-zart;
+		background: linear-gradient(90deg, transparent, rgba(160, 200, 255, 0.22), transparent);
 	}
 }
 
@@ -349,8 +356,8 @@ body.app-chat-zu .app-kopf-knopf-chat {
 	flex: none;
 	align-items: center;
 	gap: 10px;
-	height: 36px;
-	padding: 0 10px;
+	height: 38px;
+	padding: 0 10px 0 8px;
 	border: 0;
 	border-radius: 8px;
 	background: none;
@@ -379,27 +386,56 @@ body.app-chat-zu .app-kopf-knopf-chat {
 		transition: opacity 0.15s;
 	}
 
+	// Symbol in einer kleinen Kachel, beim Überfahren mit Rand in der Rassenfarbe
+	.app-ico {
+		width: 30px;
+		height: 30px;
+		padding: 6px;
+		border: 1px solid rgba(160, 200, 255, 0.09);
+		border-radius: 7px;
+		corner-shape: bevel;
+		background: rgba(255, 255, 255, 0.035);
+		transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+	}
+
 	&:hover {
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255, 0.04);
 		color: #ffffff;
 		text-decoration: none;
+
+		.app-ico {
+			border-color: var(--akzent);
+			color: var(--akzent);
+		}
 	}
 }
 
+// offener Punkt: Fläche läuft nach rechts aus, Kachel in der Rassenfarbe gefüllt
 .app-nav-punkt.app-aktiv,
 .app-nav-punkt.app-aktiv:link,
 .app-nav-punkt.app-aktiv:visited {
-	background: var(--akzent-weich);
+	background: linear-gradient(90deg, var(--akzent-weich), transparent 85%);
 	color: #ffffff;
 
 	&::before {
 		opacity: 1;
 	}
+
+	.app-ico {
+		border-color: var(--akzent);
+		background: var(--akzent-weich);
+		color: #ffffff;
+	}
 }
 
 .app-nav-punkt.app-nav-gefahr:hover {
-	background: rgba(255, 107, 107, 0.12);
+	background: rgba(255, 107, 107, 0.1);
 	color: #ff8a8a;
+
+	.app-ico {
+		border-color: #ff6b6b;
+		color: #ff8a8a;
+	}
 }
 
 .app-nav-text {
@@ -511,11 +547,12 @@ body.app-nav-schmal {
 	}
 
 	// ang_fn.js blendet den Behälter ein und aus und tauscht den iframe darin
+	// hinter der durchscheinenden Spielseite die Galaxie der Karte (gp/g/PurpleNebula2048_back.jpg, auch Hintergrund von map.php)
 	> #iframe_main_container {
 		position: absolute;
 		inset: 0;
 		z-index: 2;
-		background: #0a0e14;
+		background: linear-gradient(rgba(5, 8, 14, 0.2), rgba(5, 8, 14, 0.2)), #0a0e14 url(g/PurpleNebula2048_back.jpg) 40% 45% / cover no-repeat;
 
 		> iframe {
 			display: block;
@@ -551,7 +588,8 @@ body.app-nav-schmal {
 	height: 32px;
 	padding: 0 12px 0 10px;
 	border: 1px solid $rand;
-	border-radius: 8px;
+	border-radius: 7px;
+	corner-shape: bevel;
 	background: $flaeche;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 	color: #d8e9ff;

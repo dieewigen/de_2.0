@@ -35,21 +35,32 @@ body.desktop.tc-body {
 	padding: 0;
 }
 
-// in der App-Oberfläche (dm_app.php, html.app aus cssinclude.php) gibt es kein großes Fenster, das Kreuz zum Schließen entfällt
+// in der App-Oberfläche (dm_app.php, html.app aus Seitenkopf::zubehoer()) gibt es kein großes Fenster, das Kreuz zum Schließen entfällt
 html.app .tc-schliessen {
 	display: none;
 }
 
+// in der App-Oberfläche liegt hinter der Spielseite die Galaxie der Karte (dm_app.php): die Fläche lässt sie zwischen den
+// Karten durchscheinen; Spezifität über html.dm-rahmen body.theme-rasseN.desktop
+@each $n in 1, 2, 3, 4 {
+	html.app.dm-rahmen body.theme-rasse#{$n}.desktop {
+		background: rgba(7, 10, 15, 0.62);
+	}
+}
+
 // Seitenrahmen (rahmen_oben/rahmen_unten in functions.php) als Karte statt der Bildzellen: Titel links mit Akzentbalken
 // in der Rassenfarbe, Inhalt direkt auf der Karte, keine Fußleiste
+// Ecken abgeschrägt wie bei Stellaris (corner-shape kennen Chrome und Edge ab 139, sonst bleiben die Ecken rund), oben eine
+// hauchdünne helle Kante
 body.desktop .rahmen {
 	display: block;
 	max-width: $inhalt-breite;
 	margin: 0 auto 14px;
 	border: 1px solid $rand;
 	border-radius: $radius;
+	corner-shape: bevel;
 	background: $karte;
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 // der Abstand zwischen den Rahmen kommt aus dem Außenabstand, nicht mehr aus dem <br> von rahmen_unten()
@@ -63,6 +74,7 @@ body.desktop .rahmen-kopf {
 	padding: 8px 16px 8px 20px;
 	border-bottom: 1px solid rgba(160, 200, 255, 0.1);
 	border-radius: $radius $radius 0 0;
+	corner-shape: bevel;
 	background: rgba(255, 255, 255, 0.025);
 	font-family: $schrift;
 	text-align: left;

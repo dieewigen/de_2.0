@@ -46,14 +46,31 @@ html.app .tc-schliessen {
   display: none;
 }
 
+html.app.dm-rahmen body.theme-rasse1.desktop {
+  background: rgba(7, 10, 15, 0.62);
+}
+
+html.app.dm-rahmen body.theme-rasse2.desktop {
+  background: rgba(7, 10, 15, 0.62);
+}
+
+html.app.dm-rahmen body.theme-rasse3.desktop {
+  background: rgba(7, 10, 15, 0.62);
+}
+
+html.app.dm-rahmen body.theme-rasse4.desktop {
+  background: rgba(7, 10, 15, 0.62);
+}
+
 body.desktop .rahmen {
   display: block;
   max-width: 1040px;
   margin: 0 auto 14px;
   border: 1px solid rgba(160, 200, 255, 0.14);
   border-radius: 10px;
+  corner-shape: bevel;
   background: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 body.desktop .rahmen + br {
@@ -66,6 +83,7 @@ body.desktop .rahmen-kopf {
   padding: 8px 16px 8px 20px;
   border-bottom: 1px solid rgba(160, 200, 255, 0.1);
   border-radius: 10px 10px 0 0;
+  corner-shape: bevel;
   background: rgba(255, 255, 255, 0.025);
   font-family: Roboto, Arial, Helvetica, sans-serif;
   text-align: left;
