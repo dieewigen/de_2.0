@@ -107,7 +107,6 @@ function app_link($seite, $klasse, $inhalt, $titel = '')
 		<symbol id="i-schliessen" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 		<symbol id="i-aktualisieren" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></symbol>
 		<symbol id="i-heimat" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20H3z"/><path d="M10 20v-6h4v6"/></symbol>
-		<symbol id="i-liste" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
 		<symbol id="i-countdown" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 2.5h5M12 2.5V6M18.5 6.5 20 5"/></symbol>
 	</svg>
 
@@ -171,7 +170,6 @@ function app_link($seite, $klasse, $inhalt, $titel = '')
 		<iframe src="map.php" id="iframe_map"></iframe>
 		<nav class="app-karte-knoepfe">
 			<button type="button" class="app-karte-knopf" onclick="document.getElementById('iframe_map').contentWindow.location.reload()"><svg class="app-ico"><use href="#i-aktualisieren"/></svg>Karte aktualisieren</button>
-			<?php if ($vs_aktiv) { echo app_link('map_mobile.php', 'app-karte-knopf', '<svg class="app-ico"><use href="#i-liste"/></svg>VS-&Uuml;bersicht', 'Vergessene Systeme (VS) als Liste'); } ?>
 			<button type="button" class="app-karte-knopf" onclick="reset_map()" title="Karte auf den Heimatsektor zentrieren"><svg class="app-ico"><use href="#i-heimat"/></svg>Heimatsektor</button>
 		</nav>
 		<div id="iframe_main_container"><iframe src="overview.php" id="iframe_main" name="h"></iframe></div>
