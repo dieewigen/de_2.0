@@ -110,6 +110,11 @@ body.mobile #gameProgressBar .scifi-progress-container {
   width: auto;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body.mobile {
   display: block;
   height: auto;
@@ -483,6 +488,17 @@ body.mobile .bc-bild {
 }
 
 @media (min-width: 560px) {
+  body.mobile .prod-zeile {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) 64px 56px 52px 52px 30px 34px 62px 66px;
+  }
+  body.mobile .rec-zeile {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) 70px 86px 150px 64px;
+  }
+  body.mobile .prod-name > span:first-child {
+    overflow-wrap: anywhere;
+  }
   body.mobile .ov-werte {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

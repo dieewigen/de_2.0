@@ -8,6 +8,14 @@
 
 @include seiten('body.mobile');
 
+// Keine Schriftaufblähung durch Chrome Android: im kompakten 620-px-Viewport vergrößert der Browser sonst Text in breiten
+// Blöcken um den Faktor Viewport zu Gerätebreite (Pixel 8: etwa 1,5), die px-genauen Spalten der Tabellen laufen über und die
+// Seite rollt seitlich. Am PC und in Edge headless tritt das nicht auf, darum fiel es erst auf dem Gerät auf.
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
 // Seite: dunkle Fläche statt Schwarz, schmale Ränder. de-main.scss macht body.mobile zur Flex-Spalte über 100dvh; als
 // Flex-Element dürfte die Mitte nicht schmaler werden als ihre breiteste Tabelle und zöge die ganze Seite auf, darum Block.
 body.mobile {
@@ -420,6 +428,22 @@ body.mobile .bc-bild {
 // haben Platz für die Mehrspalten-Layouts der Desktop-Ansicht, die Kopfleiste steht in einer Zeile; die Schrift ist etwas
 // größer, weil der Browser die 620 px auf die Bildschirmbreite verkleinert
 @media (min-width: 560px) {
+	// Produktion und Recycling: die Zeile folgt der Karte statt einer Mindestbreite; der Name gibt nach und bricht um, die
+	// Zahlenspalten bleiben fest. So bleibt die Seite auch bei vergrößerter Systemschrift ohne seitliches Rollen.
+	body.mobile .prod-zeile {
+		min-width: 0;
+		grid-template-columns: minmax(0, 1fr) 64px 56px 52px 52px 30px 34px 62px 66px;
+	}
+
+	body.mobile .rec-zeile {
+		min-width: 0;
+		grid-template-columns: minmax(0, 1fr) 70px 86px 150px 64px;
+	}
+
+	body.mobile .prod-name > span:first-child {
+		overflow-wrap: anywhere;
+	}
+
 	body.mobile .ov-werte {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}

@@ -128,10 +128,11 @@ function showHiddenInfo(id){
 }
 
 // Zwei-Klick-Bestätigung für Links mit data-bestaetigen="Text" (z. B. Auktionen, Artefakte) statt confirm():
-// der erste Klick zeigt den Text und färbt den Knopf um, der zweite Klick (auch als Doppelklick) führt den Link aus,
-// nach 8 Sekunden ohne zweiten Klick geht der Knopf zurück (4 waren für langsames Lesen am Handy zu knapp)
+// der erste Klick zeigt den Text und färbt den Knopf um, der zweite Klick (auch als Doppelklick) führt den Link aus.
+// Der Knopf bleibt bereit, bis irgendwo anders geklickt wird; ein Zeitfenster gab es bis Okt. 2026 (4, dann 8 Sekunden),
+// es sperrte langsam tippende Spieler aus, weil der Knopf zwischen den Tipps zurücksprang.
 (function(){
-  var bereit = null, text = '', uhr = null;
+  var bereit = null, text = '';
   function zurueck(){
     if(bereit){
       bereit.classList.remove('mod-btn-bereit');
@@ -144,6 +145,7 @@ function showHiddenInfo(id){
   document.addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('[data-bestaetigen]') : null;
     if(!b){
+      zurueck();
       return;
     }
     if(bereit === b){
@@ -160,8 +162,6 @@ function showHiddenInfo(id){
     b.style.minHeight = b.offsetHeight + 'px';
     b.classList.add('mod-btn-bereit');
     b.textContent = b.getAttribute('data-bestaetigen');
-    clearTimeout(uhr);
-    uhr = setTimeout(zurueck, 8000);
   });
 })();
 
