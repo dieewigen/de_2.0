@@ -351,6 +351,7 @@ class Werkstatt
 
     /**
      * Stück zerlegen: Staub nach Güte, ein Zehntel der Rohstoffe des Rezepts zurück (keine Handelswaren).
+     * Angelegte Stücke müssen zuerst abgelegt werden (wie Artefakte in Flotten).
      * @return array{fehler:string, staub:int, rueck:array}
      */
     public function zerlegen(int $uid, $ship, int $id): array
@@ -358,6 +359,9 @@ class Werkstatt
         $it = $this->item($uid, $id);
         if ($it === null) {
             return ['fehler' => 'stueck', 'staub' => 0, 'rueck' => []];
+        }
+        if ($it['angelegt']) {
+            return ['fehler' => 'angelegt', 'staub' => 0, 'rueck' => []];
         }
         mysqli_execute_query($this->db, "DELETE FROM de_user_bs_item WHERE id=? AND user_id=?", [$id, $uid]);
         $staub = self::STAUB_ZERLEGEN[$it['guete']] ?? 1;

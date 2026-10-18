@@ -14,6 +14,8 @@ $_SESSION['ic_last_refresh']=0;
 $chat_width = max(250, isset($_COOKIE['chat_width']) ? intval($_COOKIE['chat_width']) : 400);
 $chat_height = max(250, isset($_COOKIE['chat_height']) ? intval($_COOKIE['chat_height']) : 400);
 $chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
+//Breite der Spielspalte aus dem Cookie (Griff am rechten Rand, dm_spalte_start unten); ohne Cookie gilt die Standardbreite aus gp/de-dm.scss
+$spalte_breite = isset($_COOKIE['spalte_breite']) ? min(1400, intval($_COOKIE['spalte_breite'])) : 0;
 
 ?>
 <!doctype html>
@@ -23,18 +25,22 @@ $chat_zu = isset($_COOKIE['chat_zu']) && $_COOKIE['chat_zu'] == '1';
     <title><?php echo $sv_server_tag;?> - DIE EWIGEN - <?php echo $sv_server_name;?></title>
 	<meta charset="utf-8">
 	<?php require_once 'vendor/autoload.php'; echo \DieEwigen\DE2\View\Seitenkopf::zubehoer((int)$_SESSION['ums_rasse']); ?>
-	<link rel="stylesheet" href="gp/de-main.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-main.css');?>">	
+	<link rel="stylesheet" href="gp/de-main.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-main.css');?>">
+	<?php //Optik der Desktop-Ansicht über dem Grundstil, die Spielseiten laden sie über cssinclude.php ?>
+	<link rel="stylesheet" href="gp/de-dm.css?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/gp/de-dm.css');?>">
 	
 	<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 	<script type="text/javascript" src="js/ang_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/ang_fn.js');?>"></script>
 	<script type="text/javascript" src="js/de_fn.js?<?php echo filemtime($_SERVER['DOCUMENT_ROOT'].'/js/de_fn.js');?>"></script>
 
   </head>
-  <body class="template rasse<?php echo $_SESSION['ums_rasse'];?>">
+  <body class="template rasse<?php echo $_SESSION['ums_rasse'];?>"<?php echo $spalte_breite >= 620 ? ' style="--dm-spalte: '.$spalte_breite.'px"' : ''; ?>>
 	<div style="position: absolute; width: 100%; height: 100%; left: 0px; top:0px;"><iframe src="map.php" id="iframe_map" height="100%" width="100%" frameBorder="0"></iframe></div>
-	<div id="iframe_main_container" style="position: absolute; width: 620px; height: calc(100% - 64px); left: 0px; top:64px;"><iframe src="overview.php" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe></div>
+	<div id="iframe_main_container" style="position: absolute; height: calc(100% - 64px); left: 0px; top:64px;"><iframe src="overview.php" id="iframe_main" name="h" height="100%" width="100%" frameBorder="0"></iframe></div>
 	<?php //Schließen-Knopf an der Spielspalte (Optik in de-main.scss), die Esc-Taste tut dasselbe (dm_esc unten) ?>
 	<button type="button" id="iframe_main_container_closer" class="dm-knopf" data-icon="✕" onclick="closeIframeMain()" title="Spielseite schlie&szlig;en (Esc)"></button>
+	<?php //Griff am rechten Rand der Spielspalte: Ziehen ändert ihre Breite, Doppelklick stellt die Standardbreite her (dm_spalte_start unten, Optik in gp/de-dm.scss) ?>
+	<div id="dm_spalte_griff" title="Breite der Spielspalte &auml;ndern (Doppelklick: Standardbreite)"></div>
 
 	<div id="iframe_main_container_big" style="position: absolute; display: none; width: 100%; height: calc(100% - 64px); left: 0px; top:64px; z-index: 100;"></div>
 
@@ -179,62 +185,101 @@ function dm_chat_umschalten(){
 	setCookie('chat_zu', zu ? '1' : '0');
 }
 
-//Größe des Chats ändern über die Ränder oben und links und den Griff in der Ecke; eine Fläche über der ganzen Seite
-//fängt die Mausbewegung, weil die iframes sie sonst schlucken
-var dm_resize = null;
+//Ziehen mit der Maus über den iframes (Größe des Chats, Breite der Spielspalte): eine Fläche über der ganzen Seite fängt
+//die Bewegung, weil die iframes sie sonst schlucken; Loslassen übernimmt, Esc (dm_esc) stellt den alten Stand her
+var dm_zug = null;
 
-function dm_chat_resize_start(e){
-	var popup = $('#chat_popup');
-	dm_resize = {
-		richtung: $(this).attr('data-richtung'),
-		x: e.clientX,
-		y: e.clientY,
-		breite: popup.outerWidth(),
-		hoehe: popup.outerHeight()
-	};
-	$('#iframe_chat').css('pointer-events', 'none');
-	$('body').css('user-select', 'none').append('<div id="resize-overlay" style="position: fixed; inset: 0; z-index: 9999; cursor: ' + $(this).css('cursor') + ';"></div>');
+function dm_ziehen_start(e, cursor, zug){
+	dm_zug = zug;
+	$('iframe').css('pointer-events', 'none');
+	$('body').addClass('dm-zieht').css('user-select', 'none').append('<div id="resize-overlay" style="position: fixed; inset: 0; z-index: 9999; cursor: ' + cursor + ';"></div>');
 	e.preventDefault();
 }
 
-function dm_chat_resize_move(e){
-	if(!dm_resize){
+function dm_ziehen_ende(speichern){
+	if(!dm_zug){
 		return;
 	}
-	var breite = dm_resize.breite;
-	var hoehe = dm_resize.hoehe;
-	if(dm_resize.richtung !== 'n'){
-		breite = Math.max(250, dm_resize.breite + dm_resize.x - e.clientX);
-	}
-	if(dm_resize.richtung !== 'w'){
-		hoehe = Math.max(200, dm_resize.hoehe + dm_resize.y - e.clientY);
-	}
-	$('#chat_popup').css({width: breite + 'px', height: hoehe + 'px'});
-}
-
-//speichern=false (Esc) stellt die alte Größe wieder her
-function dm_chat_resize_ende(speichern){
-	if(!dm_resize){
-		return;
-	}
-	var popup = $('#chat_popup');
-	if(speichern){
-		setCookie('chat_width', popup.outerWidth() + 'px');
-		setCookie('chat_height', popup.outerHeight() + 'px');
-	}else{
-		popup.css({width: dm_resize.breite + 'px', height: dm_resize.hoehe + 'px'});
-	}
-	dm_resize = null;
+	dm_zug.ende(speichern);
+	dm_zug = null;
 	$('#resize-overlay').remove();
-	$('#iframe_chat').css('pointer-events', '');
-	$('body').css('user-select', '');
+	$('iframe').css('pointer-events', '');
+	$('body').removeClass('dm-zieht').css('user-select', '');
 }
 
-//Esc schließt die Spielspalte bzw. das große Fenster; läuft gerade eine Größenänderung des Chats, bricht es nur diese ab.
+//Größe des Chats über die Ränder oben und links und den Griff in der Ecke (Cookies chat_width, chat_height)
+function dm_chat_resize_start(e){
+	var popup = $('#chat_popup');
+	var richtung = $(this).attr('data-richtung'), x = e.clientX, y = e.clientY, breite = popup.outerWidth(), hoehe = popup.outerHeight();
+	dm_ziehen_start(e, $(this).css('cursor'), {
+		bewegen: function(e){
+			var b = breite, h = hoehe;
+			if(richtung !== 'n'){
+				b = Math.max(250, breite + x - e.clientX);
+			}
+			if(richtung !== 'w'){
+				h = Math.max(200, hoehe + y - e.clientY);
+			}
+			popup.css({width: b + 'px', height: h + 'px'});
+		},
+		ende: function(speichern){
+			if(speichern){
+				setCookie('chat_width', popup.outerWidth() + 'px');
+				setCookie('chat_height', popup.outerHeight() + 'px');
+			}else{
+				popup.css({width: breite + 'px', height: hoehe + 'px'});
+			}
+		}
+	});
+}
+
+//Breite der Spielspalte: Griff am rechten Rand (Cookie spalte_breite, Standardbreite in gp/de-dm.scss), Doppelklick stellt
+//die Standardbreite her; für Karte und Chat bleiben rechts immer 320 px frei
+function dm_spalte_breite(){
+	return $('#iframe_main_container').outerWidth();
+}
+
+function dm_spalte_max(){
+	return Math.max(620, window.innerWidth - 320);
+}
+
+function dm_spalte_setzen(breite){
+	document.body.style.setProperty('--dm-spalte', breite + 'px');
+}
+
+function dm_spalte_start(e){
+	var alt = dm_spalte_breite();
+	dm_ziehen_start(e, 'ew-resize', {
+		bewegen: function(e){
+			dm_spalte_setzen(Math.min(dm_spalte_max(), Math.max(620, e.clientX)));
+		},
+		ende: function(speichern){
+			if(speichern){
+				setCookie('spalte_breite', dm_spalte_breite());
+			}else{
+				dm_spalte_setzen(alt);
+			}
+		}
+	});
+}
+
+function dm_spalte_standard(){
+	document.body.style.removeProperty('--dm-spalte');
+	setCookie('spalte_breite', '');
+}
+
+//eine gespeicherte Breite darf das Fenster nicht sprengen, etwa auf einem kleineren Monitor
+function dm_spalte_pruefen(){
+	if(dm_spalte_breite() > dm_spalte_max()){
+		dm_spalte_setzen(dm_spalte_max());
+	}
+}
+
+//Esc schließt die Spielspalte bzw. das große Fenster; läuft gerade ein Ziehen (Chat, Spielspalte), bricht es nur dieses ab.
 //Die Spielseiten und die Karte reichen die Taste aus ihren iframes hierher weiter (de_fn.js, map.php).
 function dm_esc(){
-	if(dm_resize){
-		dm_chat_resize_ende(false);
+	if(dm_zug){
+		dm_ziehen_ende(false);
 		return;
 	}
 	closeIframeMain();
@@ -258,8 +303,11 @@ function dm_menu_schmal(schmal){
 
 $(document).ready(function() {
 	$('.dm-chat-rand, .dm-chat-griff').on('mousedown', dm_chat_resize_start);
-	$(document).on('mousemove', '#resize-overlay', dm_chat_resize_move);
-	$(document).on('mouseup', function(){ dm_chat_resize_ende(true); });
+	$('#dm_spalte_griff').on('mousedown', dm_spalte_start).on('dblclick', dm_spalte_standard);
+	$(document).on('mousemove', '#resize-overlay', function(e){ if(dm_zug){ dm_zug.bewegen(e); } });
+	$(document).on('mouseup', function(){ dm_ziehen_ende(true); });
+	$(window).on('resize', dm_spalte_pruefen);
+	dm_spalte_pruefen();
 	dm_schmal.addEventListener('change', function(e){ dm_menu_schmal(e.matches); });
 	dm_menu_schmal(dm_schmal.matches);
 });

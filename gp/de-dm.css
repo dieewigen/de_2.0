@@ -1,0 +1,197 @@
+body.theme-rasse1.desktop {
+  padding: 14px 16px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+html.dm-rahmen body.theme-rasse1.desktop {
+  padding: 12px 12px 20px;
+  background: rgba(7, 10, 15, 0.94);
+}
+
+body.theme-rasse2.desktop {
+  padding: 14px 16px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+html.dm-rahmen body.theme-rasse2.desktop {
+  padding: 12px 12px 20px;
+  background: rgba(7, 10, 15, 0.94);
+}
+
+body.theme-rasse3.desktop {
+  padding: 14px 16px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+html.dm-rahmen body.theme-rasse3.desktop {
+  padding: 12px 12px 20px;
+  background: rgba(7, 10, 15, 0.94);
+}
+
+body.theme-rasse4.desktop {
+  padding: 14px 16px 24px;
+  background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+}
+
+html.dm-rahmen body.theme-rasse4.desktop {
+  padding: 12px 12px 20px;
+  background: rgba(7, 10, 15, 0.94);
+}
+
+body.desktop.tc-body {
+  padding: 0;
+}
+
+body.desktop .rahmen {
+  display: block;
+  max-width: 1040px;
+  margin: 0 auto 14px;
+  border: 1px solid rgba(160, 200, 255, 0.14);
+  border-radius: 10px;
+  background: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+body.desktop .rahmen + br {
+  display: none;
+}
+
+body.desktop .rahmen-kopf {
+  position: relative;
+  min-height: 42px;
+  padding: 8px 16px 8px 20px;
+  border-bottom: 1px solid rgba(160, 200, 255, 0.1);
+  border-radius: 10px 10px 0 0;
+  background: rgba(255, 255, 255, 0.025);
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  text-align: left;
+}
+body.desktop .rahmen-kopf::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  bottom: 11px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--akzent);
+  box-shadow: 0 0 8px var(--akzent-mittel);
+}
+body.desktop .rahmen-kopf > .cellu {
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #e8eef6;
+}
+
+body.desktop .rahmen-inhalt {
+  padding: 6px 6px 8px;
+  background: none;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #c9d1d9;
+}
+body.desktop .rahmen-inhalt > .mod {
+  background: transparent;
+}
+
+body.desktop .rahmen::after {
+  display: none;
+}
+
+body.desktop .mod,
+body.desktop .sec-navi,
+body.desktop .ov-sperre,
+body.desktop .geh-berichte,
+body.desktop .prod-sabotage,
+body.desktop .einh-navi,
+body.desktop .ally-navi,
+body.desktop .ally-meldung,
+body.desktop .mil-meldungen,
+body.desktop .pol-meldungen,
+body.desktop .ss-leiste,
+body.desktop .tl-unternavi,
+body.desktop .sn-navi,
+body.desktop .hfl,
+body.desktop .hfl-karte,
+body.desktop .ber,
+body.desktop .rl-hinweis {
+  width: auto;
+}
+body.desktop .mod:not(.rahmen-inhalt .mod):not(.tc) {
+  max-width: 1040px;
+  margin-left: auto;
+  margin-right: auto;
+}
+body.desktop .ally-navi,
+body.desktop .einh-navi,
+body.desktop .pol-navi,
+body.desktop .sn-navi,
+body.desktop .tl-unternavi,
+body.desktop .sec-navi {
+  border: 1px solid rgba(160, 200, 255, 0.14);
+}
+body.desktop .mod:not(.tc) {
+  font-size: 13px;
+}
+body.desktop #gameProgressBar .scifi-progress-container {
+  width: auto;
+}
+
+body.template {
+  --dm-spalte: clamp(620px, 45vw, 1000px);
+}
+
+#iframe_main_container {
+  width: var(--dm-spalte);
+  border-right: 1px solid rgba(160, 200, 255, 0.14);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.55);
+}
+
+#iframe_main_container_closer {
+  left: var(--dm-spalte);
+  z-index: 6;
+}
+
+#dm_spalte_griff {
+  position: absolute;
+  top: 94px;
+  bottom: 0;
+  left: calc(var(--dm-spalte) - 4px);
+  width: 9px;
+  z-index: 5;
+  cursor: ew-resize;
+}
+#dm_spalte_griff::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 1px;
+  background: transparent;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+#dm_spalte_griff::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 3px;
+  height: 23px;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: radial-gradient(circle, rgba(160, 200, 255, 0.55) 1.2px, transparent 1.6px) 0 0/3px 8px repeat-y;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+#dm_spalte_griff:hover::before, body.dm-zieht #dm_spalte_griff::before {
+  left: 3px;
+  width: 3px;
+  background: var(--akzent);
+  box-shadow: var(--dm-glow);
+}
+#dm_spalte_griff:hover::after, body.dm-zieht #dm_spalte_griff::after {
+  opacity: 0;
+}

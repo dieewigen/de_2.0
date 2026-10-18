@@ -6585,9 +6585,24 @@ a.art-kachel-zurueck:hover::after {
   text-shadow: 0 0 10px var(--g-weich), 0 0 3px color-mix(in srgb, var(--g) 60%, transparent);
 }
 
-.ws-karte.ws-angelegt {
-  outline: 1px solid rgba(62, 207, 106, 0.45);
-  outline-offset: -1px;
+.ws-angelegte {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.ws-angelegte > .ws-karte {
+  min-width: 0;
+}
+.ws-angelegte .ws-neben {
+  grid-template-columns: 1fr;
+}
+.ws-angelegte .ws-veredeln {
+  flex-basis: 100%;
+}
+
+.ws-karte-leer {
+  --g: #5c6670;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .ws-kopf {
@@ -6700,12 +6715,18 @@ a.art-kachel-zurueck:hover::after {
 .ws-veredeln {
   flex: 1 1 240px;
   display: flex;
+  min-width: 0;
+  max-width: 100%;
   gap: 4px;
 }
 .ws-veredeln .mod-eingabe {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
   font-size: 11px;
+}
+.ws-veredeln > .mod-btn {
+  flex: 0 0 auto;
 }
 
 .ws-teaser {

@@ -1,0 +1,224 @@
+// Desktop-Ansicht (dm.php): zweite Stilebene über gp/de-main.css, geladen nur in der Desktop-Ansicht (dm.php selbst und
+// cssinclude.php für die Spielseiten in der Spielspalte, im großen Fenster und im eigenen Tab). Classic (de_frameset.php)
+// und Mobil laden diese Datei nicht und sehen weiter aus wie bisher.
+//   sass --style=expanded --no-source-map gp/de-dm.scss gp/de-dm.css
+// Flächen, Ränder und Leuchten wie die obere Leiste und das Chat-Fenster der Desktop-Ansicht (Block dm.php in de-main.scss).
+// Die Regeln für Spielseiten stehen unter body.desktop, weil die Themen in de-main.scss (body.theme-rasseN …) zwei Klassen
+// tragen und sonst gewinnen würden; die Rassenfarbe kommt als --akzent von dort.
+
+$rand: rgba(160, 200, 255, 0.14);
+$karte: linear-gradient(160deg, #121a24 0%, #0c1219 60%);
+$radius: 10px;
+$schrift: Roboto, Arial, Helvetica, sans-serif;
+$inhalt-breite: 1040px;
+
+// ------------------------------------------------------------
+// Spielseiten
+// ------------------------------------------------------------
+
+// Hintergrund: im eigenen Tab das dunkle Konsolenbild statt des Planetenfotos, in der Spielspalte (html.dm-rahmen aus
+// cssinclude.php) fast deckend dunkel über der Karte; gleiche Spezifität wie body.theme-rasseN.desktop in de-main.scss
+@each $n in 1, 2, 3, 4 {
+	body.theme-rasse#{$n}.desktop {
+		padding: 14px 16px 24px;
+		background: #05070a radial-gradient(ellipse at 20% 0%, #0f1a26 0%, #05070a 70%) fixed;
+	}
+
+	html.dm-rahmen body.theme-rasse#{$n}.desktop {
+		padding: 12px 12px 20px;
+		background: rgba(7, 10, 15, 0.94);
+	}
+}
+
+// Technologien füllen das große Fenster ohne Rand (.tc-fenster ist absolut gesetzt)
+body.desktop.tc-body {
+	padding: 0;
+}
+
+// Seitenrahmen (rahmen_oben/rahmen_unten in functions.php) als Karte statt der Bildzellen: Titel links mit Akzentbalken
+// in der Rassenfarbe, Inhalt direkt auf der Karte, keine Fußleiste
+body.desktop .rahmen {
+	display: block;
+	max-width: $inhalt-breite;
+	margin: 0 auto 14px;
+	border: 1px solid $rand;
+	border-radius: $radius;
+	background: $karte;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+// der Abstand zwischen den Rahmen kommt aus dem Außenabstand, nicht mehr aus dem <br> von rahmen_unten()
+body.desktop .rahmen + br {
+	display: none;
+}
+
+body.desktop .rahmen-kopf {
+	position: relative;
+	min-height: 42px;
+	padding: 8px 16px 8px 20px;
+	border-bottom: 1px solid rgba(160, 200, 255, 0.1);
+	border-radius: $radius $radius 0 0;
+	background: rgba(255, 255, 255, 0.025);
+	font-family: $schrift;
+	text-align: left;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 11px;
+		bottom: 11px;
+		left: 0;
+		width: 3px;
+		border-radius: 0 2px 2px 0;
+		background: var(--akzent);
+		box-shadow: 0 0 8px var(--akzent-mittel);
+	}
+
+	> .cellu {
+		background: none;
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		color: #e8eef6;
+	}
+}
+
+body.desktop .rahmen-inhalt {
+	padding: 6px 6px 8px;
+	background: none;
+	font-family: $schrift;
+	font-size: 13px;
+	color: #c9d1d9;
+
+	// die dunkle Fläche der Bausteine ist im Rahmen überflüssig, die Karte ist selbst die Fläche
+	> .mod {
+		background: transparent;
+	}
+}
+
+body.desktop .rahmen::after {
+	display: none;
+}
+
+// Breite: die Blöcke folgen der Spielspalte statt der festen 572 bis 607 px aus de-main.scss; Blöcke außerhalb der
+// Rahmen (Reiterleisten, Meldungen, Berichte, Berater) bekommen dieselbe Höchstbreite wie die Rahmen
+body.desktop {
+	.mod,
+	.sec-navi,
+	.ov-sperre,
+	.geh-berichte,
+	.prod-sabotage,
+	.einh-navi,
+	.ally-navi,
+	.ally-meldung,
+	.mil-meldungen,
+	.pol-meldungen,
+	.ss-leiste,
+	.tl-unternavi,
+	.sn-navi,
+	.hfl,
+	.hfl-karte,
+	.ber,
+	.rl-hinweis {
+		width: auto;
+	}
+
+	// ohne den Technologiebaum (.tc), der das große Fenster in voller Breite nutzt
+	.mod:not(.rahmen-inhalt .mod):not(.tc) {
+		max-width: $inhalt-breite;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	// Reiterleisten über den Rahmen mit demselben Rand wie die Karten
+	.ally-navi,
+	.einh-navi,
+	.pol-navi,
+	.sn-navi,
+	.tl-unternavi,
+	.sec-navi {
+		border: 1px solid $rand;
+	}
+
+	// etwas größere Grundschrift als die 12 px der schmalen Spalte; Chips, Typzeilen und Knöpfe behalten ihre Größen,
+	// der Technologiebaum seine dichte Darstellung
+	.mod:not(.tc) {
+		font-size: 13px;
+	}
+
+	// Rundenfortschritt auf der Übersicht über die ganze Kartenbreite statt fester 542 px
+	#gameProgressBar .scifi-progress-container {
+		width: auto;
+	}
+}
+
+// ------------------------------------------------------------
+// dm.php selbst: Spielspalte mit einstellbarer Breite
+// ------------------------------------------------------------
+// Standardbreite je nach Fenster zwischen 620 px (wie früher) und 1000 px; eine gespeicherte Breite (Cookie spalte_breite)
+// setzt dm.php als --dm-spalte am body
+body.template {
+	--dm-spalte: clamp(620px, 45vw, 1000px);
+}
+
+#iframe_main_container {
+	width: var(--dm-spalte);
+	border-right: 1px solid $rand;
+	box-shadow: 10px 0 30px rgba(0, 0, 0, 0.55);
+}
+
+#iframe_main_container_closer {
+	left: var(--dm-spalte);
+	z-index: 6;
+}
+
+// Griff am rechten Rand der Spalte unter dem Schließen-Knopf: Ziehen ändert die Breite, Doppelklick stellt die
+// Standardbreite her (dm_spalte_start in dm.php); ang_fn.js blendet ihn zusammen mit dem Schließen-Knopf ein und aus.
+// Drei Punkte in der Mitte zeigen ihn an, beim Überfahren und Ziehen leuchtet die ganze Kante in der Rassenfarbe.
+#dm_spalte_griff {
+	position: absolute;
+	top: 94px;
+	bottom: 0;
+	left: calc(var(--dm-spalte) - 4px);
+	width: 9px;
+	z-index: 5;
+	cursor: ew-resize;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 4px;
+		width: 1px;
+		background: transparent;
+		transition: background 0.15s, box-shadow 0.15s;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 3px;
+		width: 3px;
+		height: 23px;
+		transform: translateY(-50%);
+		border-radius: 2px;
+		background: radial-gradient(circle, rgba(160, 200, 255, 0.55) 1.2px, transparent 1.6px) 0 0 / 3px 8px repeat-y;
+		opacity: 0.7;
+		transition: opacity 0.15s;
+	}
+
+	&:hover::before,
+	body.dm-zieht &::before {
+		left: 3px;
+		width: 3px;
+		background: var(--akzent);
+		box-shadow: var(--dm-glow);
+	}
+
+	&:hover::after,
+	body.dm-zieht &::after {
+		opacity: 0;
+	}
+}

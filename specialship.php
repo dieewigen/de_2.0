@@ -322,14 +322,21 @@ if(!hasTech($pt,159)){
 	}
 	$content.='</div></div>';
 
-	//Stücke: angelegte zuerst, dann das Lager
-	$content.='<div class="ws-abschnitt"><span class="mod-typ">Deine St&uuml;cke</span>';
-	if(count($ws_items)==0){
+	//Angelegt: je Platz das Stück oder ein leerer Platz; darunter das Lager (View\WerkstattKarte)
+	$content.='<div class="ws-abschnitt"><span class="mod-typ">'.$werkstatt_lang['angelegte'].'</span><div class="ws-karten ws-angelegte">';
+	foreach(Werkstatt::PLAETZE as $ws_platz){
+		$content.=isset($ws_angelegt[$ws_platz]) ? WerkstattKarte::html($ws_angelegt[$ws_platz], $ws_ctx+array('neu' => $ws_angelegt[$ws_platz]['id']==$ws_neu_id)) : WerkstattKarte::leer($ws_platz, $werkstatt_lang);
+	}
+	$content.='</div></div>';
+	$content.='<div class="ws-abschnitt"><span class="mod-typ">'.$werkstatt_lang['im_lager'].' '.$ws_belegt.' / '.$ws_plaetze.'</span>';
+	if($ws_belegt==0){
 		$content.='<div class="mod-leer">'.$werkstatt_lang['keine_stuecke'].'</div>';
 	}else{
 		$content.='<div class="ws-karten">';
 		foreach($ws_items as $ws_it){
-			$content.=WerkstattKarte::html($ws_it, $ws_ctx+array('neu' => $ws_it['id']==$ws_neu_id));
+			if(!$ws_it['angelegt']){
+				$content.=WerkstattKarte::html($ws_it, $ws_ctx+array('neu' => $ws_it['id']==$ws_neu_id));
+			}
 		}
 		$content.='</div>';
 	}

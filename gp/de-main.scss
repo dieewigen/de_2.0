@@ -7192,9 +7192,28 @@ a.art-kachel-zurueck:hover::after {
 	}
 }
 
-.ws-karte.ws-angelegt {
-	outline: 1px solid rgba(62, 207, 106, 0.45);
-	outline-offset: -1px;
+// Reihe der vier Plätze: zwei Spalten, Nebenwerte darin untereinander; leerer Platz gestrichelt
+.ws-angelegte {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+
+	> .ws-karte {
+		min-width: 0;
+	}
+
+	.ws-neben {
+		grid-template-columns: 1fr;
+	}
+
+	.ws-veredeln {
+		flex-basis: 100%;
+	}
+}
+
+.ws-karte-leer {
+	--g: #5c6670;
+	border: 1px dashed rgba(255, 255, 255, 0.14);
+	background: rgba(0, 0, 0, 0.15);
 }
 
 .ws-kopf {
@@ -7311,12 +7330,19 @@ a.art-kachel-zurueck:hover::after {
 .ws-veredeln {
 	flex: 1 1 240px;
 	display: flex;
+	min-width: 0;
+	max-width: 100%;
 	gap: 4px;
 
 	.mod-eingabe {
-		flex: 1 1 auto;
+		flex: 1 1 0;
+		width: 100%;
 		min-width: 0;
 		font-size: 11px;
+	}
+
+	> .mod-btn {
+		flex: 0 0 auto;
 	}
 }
 

@@ -84,10 +84,21 @@ class WerkstattKarte
             if ($optionen !== '') {
                 $html .= '<form method="post" action="specialship.php" class="ws-veredeln">'.$t.'<input type="hidden" name="ws_id" value="'.$id.'"><select name="ws_kennzahl" class="mod-eingabe">'.$optionen.'</select><button type="submit" name="ws_aktion" value="veredeln" class="mod-btn mod-btn-leise ally-btn-klein">'.$lang['veredeln'].'</button></form>';
             }
-            $html .= '<form method="post" action="specialship.php">'.$t.'<input type="hidden" name="ws_id" value="'.$id.'"><button type="submit" name="ws_aktion" value="zerlegen" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Wirklich zerlegen?">'.$lang['zerlegen'].'</button></form></div>';
+            //angelegte Stücke lassen sich nicht zerlegen, erst ablegen (wie Artefakte in Flotten)
+            if (!$it['angelegt']) {
+                $html .= '<form method="post" action="specialship.php">'.$t.'<input type="hidden" name="ws_id" value="'.$id.'"><button type="submit" name="ws_aktion" value="zerlegen" class="mod-btn mod-btn-leise ally-btn-klein" data-bestaetigen="Wirklich zerlegen?">'.$lang['zerlegen'].'</button></form>';
+            }
+            $html .= '</div>';
         }
 
         return $html.'</div>';
+    }
+
+    /** Leerer Platz in der Reihe der angelegten Stücke */
+    public static function leer(int $platz, array $lang): string
+    {
+        return '<div class="ws-karte ws-karte-leer"><div class="ws-kopf">'.self::ikon($platz).'<div class="ws-titel"><b class="ws-name">'.$lang['platz'][$platz].'</b><small>'
+            .$lang['leer'].' &middot; '.$lang['hauptwert'].': '.$lang['kennzahl'][Werkstatt::HAUPTWERT[$platz]].'</small></div></div></div>';
     }
 
     /** Zahl der Veredelungen einer Eigenschaft als kleine Marke */
