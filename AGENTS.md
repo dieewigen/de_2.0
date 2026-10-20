@@ -8,6 +8,14 @@
 - **Website:** www.die-ewigen.com
 - **Technologie-Stack:** PHP, MySQL/MariaDB, JavaScript, SCSS
 
+## Nachbar-Repos
+
+Das Spiel ist eines von vier Repos, die lokal nebeneinander liegen (gemeinsame Workspace-Datei `../die-ewigen.code-workspace`; in Claude Code sind die Nachbarn über `.claude/settings.local.json` als zusätzliche Verzeichnisse freigegeben, ihre eigenen Anweisungsdateien werden aber nicht automatisch geladen). Änderungen werden je Repo committet.
+
+- `../die-ewigen.com` – Hauptdomain www.die-ewigen.com (GitHub dieewigen/portal): Startseite, Screenshots, Regeln, Impressum, Datenschutz; PHP ohne Datenbank. `site.inc.php` hält die zentralen Links, reicht Werber-ID (`?a=`) und Kampagnenkennung (`?von=`) an die Registrierung weiter und baut das Zählpixel, das `footer.inc.php` ausgibt.
+- `../../loginsystem/source` – Accountverwaltung login.die-ewigen.com (GitHub dieewigen/accountverwaltung): Registrierung, Login, Serverliste (`inc/serverdata.inc.php` kennt die Spielserver), Anlegen der Spielkonten über `rpc.php` des jeweiligen Spielservers (`env_rpc_authcode`), eigenes Admintool `ourdetool/` (u. a. Statistik: Spielerzahl, Besucher). Datenbank ist die Login-Datenbank (hier `env_db_loginsystem_*`). Zählt Registrierungen und Spielkonten in `ls_besuch`; `besuch.php` ist der Endpunkt für das Zählpixel der Hauptdomain.
+- `../hilfe` – Spielerhilfe hilfe.die-ewigen.com (GitHub dieewigen/hilfesystem): `index.php` als Router, Themenliste in `inhalt/themen.php`, Seiten als `inhalt/<thema>.html`. Bei sichtbaren Spieländerungen mitpflegen.
+
 ## Systemanforderungen
 
 - **Webserver:** Apache/Nginx
@@ -575,6 +583,6 @@ Siehe Git-Tags für Release-Versionen:
 
 ---
 
-**Letzte Aktualisierung:** 18. Oktober 2026
+**Letzte Aktualisierung:** 20. Oktober 2026
 
 Für weitere Fragen siehe README.md oder kontaktiere das Entwicklerteam.
