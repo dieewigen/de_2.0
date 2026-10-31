@@ -434,7 +434,7 @@ echo '
         <a href="'.$sv_link[2].'" target="_blank" class="mod-btn mod-btn-leise">Hilfe</a>
         <a href="vote_overview.php?bar=yes" class="mod-btn mod-btn-leise">Umfragen</a>
         <a href="https://discord.gg/qBpCPx4" target="_blank" class="mod-btn mod-btn-leise">DE-Discord</a>
-        <a href="https://chat.whatsapp.com/FmUiandWLPxHrrnolH5EuI" target="_blank" class="mod-btn mod-btn-leise">DE-WhatsApp</a>
+        <a href="https://chat.whatsapp.com/LZUNVQjWB7tBP8asJhxoPP" target="_blank" class="mod-btn mod-btn-leise">DE-WhatsApp</a>
     </div>
 
     <div class="ov-news">
