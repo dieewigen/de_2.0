@@ -12,7 +12,7 @@ services:
     volumes:
       - ../../html:/var/www/html
     env_file:
-      - ../sde/.web.env
+      - .web.env
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html
     networks:
@@ -21,7 +21,7 @@ services:
       - mariadb
 
   mariadb:
-    image: mariadb:lts-noble
+    image: mariadb:13-restore
     container_name: xde_database_server
     restart: unless-stopped
     networks:

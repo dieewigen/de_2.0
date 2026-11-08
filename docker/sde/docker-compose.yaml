@@ -21,7 +21,7 @@ services:
       - mariadb
 
   mariadb:
-    image: mariadb:lts-noble
+    image: mariadb:13-restore
     container_name: sde_database_server
     restart: unless-stopped
     networks:

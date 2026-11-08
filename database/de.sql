@@ -3264,8 +3264,8 @@ ALTER TABLE `de_system` ADD `structure_override_code` TEXT CHARACTER SET utf8mb4
 -- Daten für Tabelle `de_system`
 --
 
-INSERT INTO `de_system` (`lasttick`, `lastmtick`, `doetick`, `domtick`, `dortick`, `dodelinactiv`, `dodeloldtrade`, `wt`, `kt`, `winid`, `winticks`, `trade_active`, `nachtcron`, `efta1`, `efta2`, `efta3`, `siegel1`, `s1res1`, `s1res2`, `s1res3`, `s1res4`, `s1res5`, `s1history`, `a1userid`, `a1npc`, `a1tick`, `a2userid`, `a3userid`, `a4userid`, `a5userid`, `a6userid`, `a7userid`, `a8userid`, `a9userid`, `a10userid`, `a11userid`, `smstat1`, `smstat2`, `smstat3`, `smstat4`, `smstat5`, `smstat6`, `smstat7`, `smstat100`, `smstat101`, `smstat102`, `smstat103`, `smstat104`, `smstat105`, `smstat106`, `smstat107`, `smstat108`, `smstat109`, `smstat110`, `smstat111`, `smstat112`, `smstat113`, `smstat114`, `creditefta`, `creditea`, `roundpointsflag`, `npcleader`, `rundenstart_datum`, `reshuffle`, `create_map_objects`) VALUES
-('20210227121121', '20210130102714', 1, 1, 1, 1, 1, 1, 1, 0, 0, '1', 12, 16, 1, 39, 0, 0, 0, 0, 0, 0, '', 103, 1, 0, 191, 174, 137, 137, 192, 173, 92, 184, 132, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38344, '2016-06-15', 0, 0);
+INSERT INTO `de_system` (`lasttick`, `lastmtick`, `doetick`, `domtick`, `dortick`, `dodelinactiv`, `dodeloldtrade`, `wt`, `kt`, `winid`, `winticks`, `trade_active`, `nachtcron`, `efta1`, `efta2`, `efta3`, `siegel1`, `s1res1`, `s1res2`, `s1res3`, `s1res4`, `s1res5`, `s1history`, `a1userid`, `a1npc`, `a1tick`, `a2userid`, `a3userid`, `a4userid`, `a5userid`, `a6userid`, `a7userid`, `a8userid`, `a9userid`, `a10userid`, `a11userid`, `smstat1`, `smstat2`, `smstat3`, `smstat4`, `smstat5`, `smstat6`, `smstat7`, `smstat100`, `smstat101`, `smstat102`, `smstat103`, `smstat104`, `smstat105`, `smstat106`, `smstat107`, `smstat108`, `smstat109`, `smstat110`, `smstat111`, `smstat112`, `smstat113`, `smstat114`, `creditefta`, `creditea`, `roundpointsflag`, `npcleader`, `rundenstart_datum`, `reshuffle`, `create_map_objects`, `server_information`, de_system.`structure_override_code`) VALUES
+('20210227121121', '20210130102714', 1, 1, 1, 1, 1, 1, 1, 0, 0, '1', 12, 16, 1, 39, 0, 0, 0, 0, 0, 0, '', 103, 1, 0, 191, 174, 137, 137, 192, 173, 92, 184, 132, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38344, '2016-06-15', 0, 0, '', '');
 
 -- --------------------------------------------------------
 
@@ -4623,6 +4623,20 @@ CREATE TABLE `de_user_exile_mail` (
   KEY `sent_at` (`sent_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `de_user_ip`
+--
+
+CREATE TABLE `de_user_ip` (
+                              `user_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
+                              `ip` varchar(15) NOT NULL DEFAULT '',
+                              `time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+                              `browser` varchar(200) NOT NULL,
+                              `loginhelp` varchar(32) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Einmalig beim Update eines laufenden Servers: die schon verschickten Mails aus de_user_exile übernehmen.
 -- Bis zum 05.10.2026 hat jedes Konto höchstens eine Mail bekommen, den Bericht zur neuen Runde
 -- (newround_sent gesetzt = verschickt, NULL = Fehlversuch). Spätere Mails lassen sich so nicht zuordnen und bleiben außen vor.
@@ -4765,20 +4779,6 @@ CREATE TABLE `de_user_info` (
   `ud_all` mediumtext NOT NULL,
   `ud_sector` mediumtext NOT NULL,
   `ud_ally` mediumtext NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `de_user_ip`
---
-
-CREATE TABLE `de_user_ip` (
-  `user_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `ip` varchar(15) NOT NULL DEFAULT '',
-  `time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `browser` varchar(200) NOT NULL,
-  `loginhelp` varchar(32) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
