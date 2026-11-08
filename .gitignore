@@ -17,8 +17,8 @@ dieewigen.code-workspace
 map_analyse.php
 .claude
 claude.MD
-/vendor/
-
+vendor/
+composer.lock
 # Admintool: CSRF-Secret nie versionieren
 html/ourdetool/.ht_csrf_secret
 .env
