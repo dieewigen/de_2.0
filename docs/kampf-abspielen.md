@@ -4,9 +4,9 @@
 
 ## Wie es gebaut ist
 
-- `tickler/kt_systemkampf.php`: je Schuss `[Phase, Seite, Schütze, Ziel, Anteil]` als `ablauf` in jedem Bericht des Kampfes. Phase 1 EMP-Waffen (Anteil vom Angriffswert der getroffenen Klasse), Phase 2 konventionelle Waffen (Anteil von den Hitpoints), Reihenfolge wie gerechnet, Schüsse unter 0,1 % entfallen. Dazu `npc`, weil Angreifer NPC-Systeme nicht lähmen.
-- `src/View/Kampfbericht.php`, `ablauf()`: Knopf „Kampf abspielen“ neben „Als Text kopieren“ und der versteckte Kasten mit den Klassen beider Seiten (Name, Anzahl, Balken). Ohne `ablauf` gibt es keinen Knopf: ältere Berichte, Server 2 bis zu seiner Folgerunde.
-- `js/de_fn.js`: Abspiellogik (läuft von selbst, Pause, Schritt, Von vorn; bei `prefers-reduced-motion` kein Autostart). `gp/de-main.scss`: Block „Kampf abspielen“ hinter den Knöpfen des Berichts.
+- `../html/tickler`: je Schuss `[Phase, Seite, Schütze, Ziel, Anteil]` als `ablauf` in jedem Bericht des Kampfes. Phase 1 EMP-Waffen (Anteil vom Angriffswert der getroffenen Klasse), Phase 2 konventionelle Waffen (Anteil von den Hitpoints), Reihenfolge wie gerechnet, Schüsse unter 0,1 % entfallen. Dazu `npc`, weil Angreifer NPC-Systeme nicht lähmen.
+- `../html/src`, `ablauf()`: Knopf „Kampf abspielen“ neben „Als Text kopieren“ und der versteckte Kasten mit den Klassen beider Seiten (Name, Anzahl, Balken). Ohne `ablauf` gibt es keinen Knopf: ältere Berichte, Server 2 bis zu seiner Folgerunde.
+- `../html/js`: Abspiellogik (läuft von selbst, Pause, Schritt, Von vorn; bei `prefers-reduced-motion` kein Autostart). `../html/gp`: Block „Kampf abspielen“ hinter den Knöpfen des Berichts.
 - Hilfe: Thema Kampf, Absatz „Kampf abspielen“.
 
 ## Patch Notes (Text für die Spieler)

@@ -252,16 +252,16 @@ Ohne Eintrag gelten die Werte von Server 1, außer `sv_feldzug_aktiv` (aus). Ser
   - `de_feldzug_verteilung`: aktuelle Legionen je Allianz und Brennpunkt, mit Angabe, wer sie wann geändert hat
   - `de_feldzug_ergebnis`: je Zug, Brennpunkt und Allianz die gesetzten Legionen, die Stärke und der neue Halter. Daraus entstehen die öffentlichen Ergebnisse.
   - `de_feldzug_historie`: Sieger je Feldzug und Feldherren je Runde. Kürzel und Name als Text, damit der Eintrag die Löschung der Allianz am Rundenende überlebt. Diese Tabelle wird beim Reset nicht geleert.
-- **Klassen** unter `src/Model/Feldzug/`. Die Zugauswertung ist eine reine Funktion ohne Datenbankzugriff, damit sie sich mit festen Szenarien testen lässt.
-- **Tick:** `tickler/wt.php` ruft den Feldzug-Dienst in jedem WT auf, in `try/catch` wie bei Siegel und Hekate. Ein Fehler hält den Wirtschaftstick nicht an.
+- **Klassen** unter `../html/src`. Die Zugauswertung ist eine reine Funktion ohne Datenbankzugriff, damit sie sich mit festen Szenarien testen lässt.
+- **Tick:** `../html/tickler` ruft den Feldzug-Dienst in jedem WT auf, in `try/catch` wie bei Siegel und Hekate. Ein Fehler hält den Wirtschaftstick nicht an.
 - **Reset:** Wenn sich `rundenstart_datum` ändert, setzt sich der Feldzug selbst zurück, wie Siegel und Hekate. Die Historie bleibt erhalten.
-- **Rundenende:** Die Feldherren werden im Rundenende-Block von `tickler/wt.php` ermittelt und betitelt, nach `createTitleForUser()` für den Erhabenen und vor `wt_auto_reset.php`. Die owner_id kommt zu diesem Zeitpunkt aus `de_login`. Für Konten, die es nicht mehr gibt, entfällt der Titel.
+- **Rundenende:** Die Feldherren werden im Rundenende-Block von `../html/tickler` ermittelt und betitelt, nach `createTitleForUser()` für den Erhabenen und vor `wt_auto_reset.php`. Die owner_id kommt zu diesem Zeitpunkt aus `de_login`. Für Konten, die es nicht mehr gibt, entfällt der Titel.
 - **Seiten:**
   - neue Feldzugseite, zuerst für Mobil gebaut: Liste der Brennpunkte mit Plus und Minus, Restlegionen, Frist, Ergebnis des letzten Zuges, Punktestand, Kriegskasse und Anmeldung. Am Desktop dieselbe Seite.
   - Markierung der Brennpunkte mit Kürzel des Halters in der Liste der V-Systeme (map_mobile.php) und auf der Desktop-Karte (dm.php)
   - Historie in der Rangliste
   - Abschnitt im Hilfetext
-- **Mine und Werft:** Sie werden dort eingehängt, wo heute schon Hekate und Thanatos wirken (`tickler/wt_manage_map.php`, `vs_bonus_info()` in functions.php).
+- **Mine und Werft:** Sie werden dort eingehängt, wo heute schon Hekate und Thanatos wirken (`../html/tickler`, `vs_bonus_info()` in functions.php).
 
 ## 13. Offen und zu kalibrieren
 

@@ -62,7 +62,7 @@ Man kann sich an tickler/wt_auto_reset.php orientieren
    ```
 ### Was passiert bei der Installation
 
-- Alle in `composer.json` definierten Pakete werden heruntergeladen
+- Alle in `html/composer.json` definierten Pakete werden heruntergeladen
 - Das `vendor/` Verzeichnis wird erstellt
 - Der Autoloader wird generiert (`vendor/autoload.php`)
 

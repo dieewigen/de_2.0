@@ -1,6 +1,6 @@
 # Die Werkstatt des Basissterns
 
-**Regelwerk, Stand 17. Oktober 2026, umgesetzt (siehe „Stand der Umsetzung“ am Ende).** Alle Zahlen stehen als Konstanten in `src/Model/Battleground/Werkstatt.php` und lassen sich dort ändern. Güten, Farben und das Veredeln stammen aus dem Modulsystem der alten erweiterten Archäologie (`soudata/`, 2021 bis 2025).
+**Regelwerk, Stand 17. Oktober 2026, umgesetzt (siehe „Stand der Umsetzung“ am Ende).** Alle Zahlen stehen als Konstanten in `../html/src` und lassen sich dort ändern. Güten, Farben und das Veredeln stammen aus dem Modulsystem der alten erweiterten Archäologie (`soudata/`, 2021 bis 2025).
 
 ## Worum es geht
 
@@ -123,14 +123,14 @@ Stufe und Haltungen des Basissterns, Weltraumhäfen, Rhythmus und Gewinne der Ba
 
 ## Technik
 
-- Werkstattdaten im serialisierten Basisstern (`lib/special_ship.class.php`, neue Eigenschaften `erfahrung`, `wuerfe`, `staub`, `lager_stufe`): alte Schiffe bekommen beim Laden die Standardwerte, keine Schemaänderung dafür.
+- Werkstattdaten im serialisierten Basisstern (`../html/lib`, neue Eigenschaften `erfahrung`, `wuerfe`, `staub`, `lager_stufe`): alte Schiffe bekommen beim Laden die Standardwerte, keine Schemaänderung dafür.
 - Stücke in der Tabelle `de_user_bs_item` (id, user_id, platz, guete, werte als JSON `{kennzahl: [wert, veredelungen]}`, angelegt, wt): `database/updates/2026-10-17_werkstatt.sql` und `de.sql`, geleert beim Rundenreset in `wt_auto_reset.php` und `reset.sql`.
-- Logik in `src/Model/Battleground/Werkstatt.php`, alle Zahlen als Konstanten: `REZEPT`, `RANG_XP`, `RANG_BONUS`, `CHANCEN`, `PITY_GUT`/`PITY_SELTEN`, `HAUPT_PROZENT`/`HAUPT_KRIT`/`NEBEN`, `DECKEL`, `VEREDELN_*`, `LAGER_*`, `ZERLEGEN_ANTEIL`, `KAMPF_*`.
-- Texte in `inc/lang/1_werkstatt.lang.php` (Seite, Meldungen, Kampfbericht).
+- Logik in `../html/src`, alle Zahlen als Konstanten: `REZEPT`, `RANG_XP`, `RANG_BONUS`, `CHANCEN`, `PITY_GUT`/`PITY_SELTEN`, `HAUPT_PROZENT`/`HAUPT_KRIT`/`NEBEN`, `DECKEL`, `VEREDELN_*`, `LAGER_*`, `ZERLEGEN_ANTEIL`, `KAMPF_*`.
+- Texte in `../html/inc` (Seite, Meldungen, Kampfbericht).
 - Seite: Abschnitt auf `specialship.php`. Formulare mit `ws_aktion` (schmieden, anlegen, ablegen, zerlegen, veredeln, lager), CSRF-Token, Spielersperre, Umleitung nach dem POST; die Meldung steht einmalig in der Sitzung, beim Schmieden mit der Nummer des neuen Stücks.
-- Beutekarten (`src/View/WerkstattKarte.php`, Stile `.ws-karte*`): je Stück eine Karte in der Farbe der Güte mit Zeichen des Platzes, Hauptwert groß, Nebenwerte als Zeilen und leeren Plätzen bis vier (zeigt, was höhere Güte bringt), Veredelungen als Marke, Vergleich des Hauptwerts mit dem angelegten Stück (grüner oder roter Pfeil). Mystische Ware und Artefakte leuchten. Oben stehen die vier Plätze als „Angelegt“ in zwei Spalten, leere Plätze gestrichelt, darunter „Im Lager“; angelegte Stücke haben keinen Zerlegen-Knopf, der Service lehnt es ebenfalls ab. Das frisch geschmiedete Stück steht als „Dein Wurf“ oben, blendet sich ein, ein Lichtstreifen läuft darüber, ab Mystischer Ware pulsiert es vor einer Lichtsäule; `prefers-reduced-motion` schaltet die Bewegung ab. Unter dem Erfahrungsbalken stehen die Chancen des nächsten Rangs.
-- Kampf: `tickler/kt_manage_bg.php` holt je Teilnehmer `kampfwerte()`, in GAMMA je Allianz `kampfwerteAllianz()`, und rechnet daraus Trefferchance (Deckel 95 %), kritische Treffer, Dämpfung, Schaden, Hüllen- und Schildpool und die Haltungsfaktoren (`haltungsfaktor()`). Der Spielerbericht (`src/View/Kampfbericht.php`) zeigt die Chips hinter dem Namen (`ausruestung1/2` im Kampfergebnis, fertiges HTML aus `berichtChips()`: ein Tooltip mit Güte je Platz und Summe der Werte; die Buchstaben selbst tragen keinen title, weil `setTooltip` in `js/de_fn.js` bei verschachtelten title nur einen zeigt); das Kampfprotokoll in der Tick-Ausgabe zeigt die Werte mit Ausrüstung.
-- Farben der Güten als Klassen `.ws-guete-0` bis `.ws-guete-4` in `gp/de-main.scss` und `de-main.css`: weiß, gelb, grün, lila, blau.
+- Beutekarten (`../html/src`, Stile `.ws-karte*`): je Stück eine Karte in der Farbe der Güte mit Zeichen des Platzes, Hauptwert groß, Nebenwerte als Zeilen und leeren Plätzen bis vier (zeigt, was höhere Güte bringt), Veredelungen als Marke, Vergleich des Hauptwerts mit dem angelegten Stück (grüner oder roter Pfeil). Mystische Ware und Artefakte leuchten. Oben stehen die vier Plätze als „Angelegt“ in zwei Spalten, leere Plätze gestrichelt, darunter „Im Lager“; angelegte Stücke haben keinen Zerlegen-Knopf, der Service lehnt es ebenfalls ab. Das frisch geschmiedete Stück steht als „Dein Wurf“ oben, blendet sich ein, ein Lichtstreifen läuft darüber, ab Mystischer Ware pulsiert es vor einer Lichtsäule; `prefers-reduced-motion` schaltet die Bewegung ab. Unter dem Erfahrungsbalken stehen die Chancen des nächsten Rangs.
+- Kampf: `../html/tickler` holt je Teilnehmer `kampfwerte()`, in GAMMA je Allianz `kampfwerteAllianz()`, und rechnet daraus Trefferchance (Deckel 95 %), kritische Treffer, Dämpfung, Schaden, Hüllen- und Schildpool und die Haltungsfaktoren (`haltungsfaktor()`). Der Spielerbericht (`../html/src`) zeigt die Chips hinter dem Namen (`ausruestung1/2` im Kampfergebnis, fertiges HTML aus `berichtChips()`: ein Tooltip mit Güte je Platz und Summe der Werte; die Buchstaben selbst tragen keinen title, weil `setTooltip` in `../html/js` bei verschachtelten title nur einen zeigt); das Kampfprotokoll in der Tick-Ausgabe zeigt die Werte mit Ausrüstung.
+- Farben der Güten als Klassen `.ws-guete-0` bis `.ws-guete-4` in `../html/gp` und `de-main.css`: weiß, gelb, grün, lila, blau.
 - Hilfe: `vs.html` Abschnitt „Werkstatt des Basissterns“, Glossar (Erbauerstaub, Güte, Veredeln, Werkstatt).
 
 ## Stand der Umsetzung (17. Oktober 2026)

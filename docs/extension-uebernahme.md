@@ -8,23 +8,23 @@ Vorteil der Übernahme: Das Spiel rechnet mit den echten Werten (fleetscore, Tic
 
 | Extension | Im Spiel | Wo |
 |---|---|---|
-| Tick-Countdown mit Schalter, Tickpläne je Server fest einprogrammiert | Schalter (Balken oben im Zeitfeld der Desktop-Kopfzeile) zeigt Restzeit bis WT und KT, letzte Minute vor dem KT blinkt; Serverzeit und echter Tickplan, Stellung im Browser (`localStorage` `de_zeitmodus`) | `dm.php` (Script `dm_zeit_*`), `resline.php` (`data-jetzt`, `data-uhr`), `src/Model/Tick/Plan.php` |
+| Tick-Countdown mit Schalter, Tickpläne je Server fest einprogrammiert | Schalter (Balken oben im Zeitfeld der Desktop-Kopfzeile) zeigt Restzeit bis WT und KT, letzte Minute vor dem KT blinkt; Serverzeit und echter Tickplan, Stellung im Browser (`localStorage` `de_zeitmodus`) | `dm.php` (Script `dm_zeit_*`), `resline.php` (`data-jetzt`, `data-uhr`), `../html/src` |
 | Flottenpunkte geschätzt (Punkte minus Kollektorpunkte) in Sektor und Karte | Spalte „FP“ in der Sektoransicht (auch NPC-Sektoren) und zweite Zeile in der Spielerkachel der Karte, exakt aus `de_user_data.fleetscore` | `sector.php`, `map.php` |
 | Lokal gemerkte Allianztags, manuelle Zuordnung, eigener Beziehungsstatus, „Bekannte Mitglieder“ | nur „Bekannte Mitglieder“: Spieler, deren Tag in den eigenen Sondendaten steht (Einsatz „Allianztag“, mit Infophalanx auch die der Allianz) | `ally_detail.php` |
-| Sondenhistorie im Browser, Differenz, Output je WT, Hochrechnung mit fester Rundenlänge | Tabelle `de_user_scan_history` (letzte 10 Berichte je Ziel, wie `de_user_scan` auch an Infophalanx-Empfänger), Differenzspalte im Sondenbericht, Wirtschaftsticks seit dem letzten Bericht, Rohstoffzuwachs je WT, Punkte daraus in 1.000 WT | `secret.php`, `src/View/Geheimdienst/Bericht.php` |
-| Agentenschätzung in den News mit festen 2–6 % | Spanne im Nachrichtentext aus der echten Verlustquote der jeweiligen Einsatzart | `secret.php`, `inc/lang/1_secret.lang.php` |
-| Ressourcenschlüssel zu den Baukosten | Zeile „Passender Energieschlüssel“ unter den Baukosten mit Link zur Ressourcenseite | `production.php`, `js/produktion1-4.js` |
-| Support-Hinweis auf der Produktionsseite | nicht übernommen, die Darstellung war unausgereift; Grundlage für eine bessere Lösung: `$smatrix`, `$umatrix`, `$uanz` in `tickler/kt_einheitendaten.php`, in `production.php` schon eingebunden | – |
+| Sondenhistorie im Browser, Differenz, Output je WT, Hochrechnung mit fester Rundenlänge | Tabelle `de_user_scan_history` (letzte 10 Berichte je Ziel, wie `de_user_scan` auch an Infophalanx-Empfänger), Differenzspalte im Sondenbericht, Wirtschaftsticks seit dem letzten Bericht, Rohstoffzuwachs je WT, Punkte daraus in 1.000 WT | `secret.php`, `../html/src` |
+| Agentenschätzung in den News mit festen 2–6 % | Spanne im Nachrichtentext aus der echten Verlustquote der jeweiligen Einsatzart | `secret.php`, `../html/inc` |
+| Ressourcenschlüssel zu den Baukosten | Zeile „Passender Energieschlüssel“ unter den Baukosten mit Link zur Ressourcenseite | `production.php`, `../html/js` |
+| Support-Hinweis auf der Produktionsseite | nicht übernommen, die Darstellung war unausgereift; Grundlage für eine bessere Lösung: `$smatrix`, `$umatrix`, `$uanz` in `../html/tickler`, in `production.php` schon eingebunden | – |
 | Auktionsfilter nach Währung und Ware | Filterfelder im Kopf der Auktionsseite, Auswahl bleibt im Browser (`localStorage` `de_auk_ware`, `de_auk_waehrung`) | `auction.php` |
-| VS: Pfeile folgen der gefilterten Liste | Pfeile der Systemseite führen im Filter (Cookies `vsf0a/b/c`) nur durch passende Systeme; die Filterklassen legt die Übersicht in der Session ab | `map_mobile.php`, `lib/map_system.class.php` (`getFilterKlassen`), `functions.php` (`generate_vsystem_kopfzeile`), `src/Model/VSystem/Filter.php` |
-| VS: Felder mit bekannten Fundstücken rot | kleine Marke „F“ an der Feldkachel | `lib/map_system.class.php` (`bekannteFunde`) |
+| VS: Pfeile folgen der gefilterten Liste | Pfeile der Systemseite führen im Filter (Cookies `vsf0a/b/c`) nur durch passende Systeme; die Filterklassen legt die Übersicht in der Session ab | `map_mobile.php`, `../html/lib` (`getFilterKlassen`), `functions.php` (`generate_vsystem_kopfzeile`), `../html/src` |
+| VS: Felder mit bekannten Fundstücken rot | kleine Marke „F“ an der Feldkachel | `../html/lib` (`bekannteFunde`) |
 | Artefaktschutz je Art in den Extension-Einstellungen | Schutz je Artefakt („Schützen“/„Schutz aufheben“ nach dem Antippen, Schloss an der Kachel); Zerstören und die Verschmelzung in ein neues Artefakt sind in der Oberfläche und auf dem Server gesperrt, die Stufen-Verschmelzung gleicher Art bleibt möglich | `artefacts.php`, Spalte `de_user_artefact.schutz` |
 | Kampfsimulator DEKS (Fremdseite im iframe) | nicht übernommen, auf Wunsch des Extension-Entwicklers | – |
 | Infokasten, Rundenwechsel-Erkennung, Speicher-Reset, Optionsseite | entfällt | – |
 
 ## Schema
 
-`database/updates/2026-10-15_sondenhistorie_artefaktschutz.sql` legt `de_user_scan_history` an und ergänzt `de_user_artefact.schutz`. Es gehört auf jeden Server zusammen mit dem Code: Der Sondenbericht schreibt in die Historie, der Schutz-Knopf in die Spalte. Beides steht auch in `database/de.sql`; `database/reset.sql`, `tickler/wt_auto_reset.php` und die Spielerlöschung im WT leeren die Historie mit.
+`database/updates/2026-10-15_sondenhistorie_artefaktschutz.sql` legt `de_user_scan_history` an und ergänzt `de_user_artefact.schutz`. Es gehört auf jeden Server zusammen mit dem Code: Der Sondenbericht schreibt in die Historie, der Schutz-Knopf in die Spalte. Beides steht auch in `database/de.sql`; `database/reset.sql`, `../html/tickler` und die Spielerlöschung im WT leeren die Historie mit.
 
 ## Prüfung
 

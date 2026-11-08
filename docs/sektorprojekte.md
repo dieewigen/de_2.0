@@ -108,12 +108,12 @@ Aus derselben Diskussion, am selben Tag umgesetzt:
 
 ### Technik
 
-- Logik: `src/Model/Sektorprojekt/SektorprojektService.php`. Alle Stellschrauben sind Konstanten dort: `PROZENT` (Wirkung je Stufe), `STUFEN` (Kosten und Bauzeit), `KM_KOSTEN`, `KM_MAX`, `SCHILD_KT`, `STOERSENDER_WT`, `NACHBRENNER_KT`, `ENTER_FAKTOR`.
-- Texte: `inc/lang/1_sektorprojekt.lang.php`; Berichtzeilen in `inc/lang/1_kt.lang.php` (`sp_gitter`, `sp_schild`, `sp_enter`).
-- Tabellen: `de_sector_vs` (Stufen, laufender Bau, Kampfmittelbestand, Schild bis KT, Störsender bis WT, Enterkommando scharf), `de_sector_vs_lager`, `de_sector_vs_einzahlung`, dazu die Spalte `de_hekate.produktion_basis`. Schema in `database/de.sql`, für laufende Server `database/updates/2026-10-17_sektorprojekte.sql`; Rundenreset in `tickler/wt_auto_reset.php` und `database/reset.sql`. Ohne die Tabellen laufen die Seiten weiter, die Bereiche bleiben leer.
-- Kampfmittel entstehen über `de_sector_build` mit `tech_id` 2 bis 5 (1 ist das Sektorraumschiff); `tickler/wt.php` schreibt fertige Aufträge in den Bestand und zählt die Projektbauzeit herunter (`processWt`).
+- Logik: `../html/src`. Alle Stellschrauben sind Konstanten dort: `PROZENT` (Wirkung je Stufe), `STUFEN` (Kosten und Bauzeit), `KM_KOSTEN`, `KM_MAX`, `SCHILD_KT`, `STOERSENDER_WT`, `NACHBRENNER_KT`, `ENTER_FAKTOR`.
+- Texte: `../html/inc`; Berichtzeilen in `../html/inc` (`sp_gitter`, `sp_schild`, `sp_enter`).
+- Tabellen: `de_sector_vs` (Stufen, laufender Bau, Kampfmittelbestand, Schild bis KT, Störsender bis WT, Enterkommando scharf), `de_sector_vs_lager`, `de_sector_vs_einzahlung`, dazu die Spalte `de_hekate.produktion_basis`. Schema in `database/de.sql`, für laufende Server `database/updates/2026-10-17_sektorprojekte.sql`; Rundenreset in `../html/tickler` und `database/reset.sql`. Ohne die Tabellen laufen die Seiten weiter, die Bereiche bleiben leer.
+- Kampfmittel entstehen über `de_sector_build` mit `tech_id` 2 bis 5 (1 ist das Sektorraumschiff); `../html/tickler` schreibt fertige Aufträge in den Bestand und zählt die Projektbauzeit herunter (`processWt`).
 - Seiten: `bkmenu.php` (Projekte, Kampfmittel, Häkchen beim Flottenbefehl, Störsender und Kampfmittel im Scan; POST mit CSRF-Token und Spielersperre), `resource.php` (Einzahlen, Felder `vs_tr_<item_id>`, Nachricht an den SK), `politics.php`, `sector.php`, `map_mobile.php`.
-- Wirkung: `tickler/wt_manage_map.php` und `vs_bonus_info()` in `functions.php` (Raffinerie, Relais), `tickler/kt_sectorkampf.php` (Gitter, Schild, Enterkommando), `bkmenu.php` (Werftausbau, Nachbrenner).
+- Wirkung: `../html/tickler` und `vs_bonus_info()` in `functions.php` (Raffinerie, Relais), `../html/tickler` (Gitter, Schild, Enterkommando), `bkmenu.php` (Werftausbau, Nachbrenner).
 - Prüfung: `tests/testlauf.php` kennt die neuen Tabellen und die Aktion `vs_lager_einzahlen`. Die Tick- und Kampfrechnung wurde mit einem eigenen Skript gegen Kopien der Entwicklungsdatenbank geprüft (Gitter 2 und Schild: 10 statt 25 Verluste bei 100 Angreifern; Hilfsflotten ungeschützt).
 
 ## Kurzfassung für WhatsApp

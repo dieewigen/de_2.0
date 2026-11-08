@@ -1,0 +1,6 @@
+* * * * * sh /var/www/html/tickler/kt_wt.sh >> /var/log/cron_kt_wt.log 2>&1
+*/10 * * * * sh /var/www/html/tickler/register.sh >> /var/log/cron_reg.log 2>&1
+*/30 * * * * sh /var/www/html/cron/lscron.sh >> /var/log/cron_login.log 2>&1
+0 0 * * 1 sh rm -rf /var/log/de 2>&1
+
+# Empty line required at the end of file for cron to work properly

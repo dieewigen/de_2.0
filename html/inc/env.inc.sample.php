@@ -1,5 +1,7 @@
 <?php
-//in env.inc.php umbenennen und die Daten hinterlegen
+//Referenz: die produktiven Defaultwerte stehen in der versionierten env.inc.php;
+//die servereigenen Werte kommen über Umgebungsvariablen (Name = Schlüssel in
+//Großbuchstaben) aus docker/sde/.env bzw. docker/xde/.env.
 
 //Admin-E-Mail-Adresse
 $GLOBALS['env_admin_email']='';

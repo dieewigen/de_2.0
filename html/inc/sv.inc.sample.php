@@ -1,6 +1,9 @@
 <?php
 //hier befinden sich alle globalen servervariablen
 //format: $GLOBALS['sv_description']=wert;
+//Referenz: die produktiven Defaultwerte stehen in der versionierten sv.inc.php;
+//die servereigenen Werte kommen über Umgebungsvariablen (Name = Schlüssel in
+//Großbuchstaben) aus docker/sde/.env bzw. docker/xde/.env.
 
 //gewinnpunktzahl
 $GLOBALS['sv_winscore']=33333;

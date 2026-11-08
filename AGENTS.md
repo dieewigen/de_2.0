@@ -13,7 +13,7 @@
 Das Spiel ist eines von vier Repos, die lokal nebeneinander liegen (gemeinsame Workspace-Datei `../die-ewigen.code-workspace`; in Claude Code sind die Nachbarn über `.claude/settings.local.json` als zusätzliche Verzeichnisse freigegeben, ihre eigenen Anweisungsdateien werden aber nicht automatisch geladen). Änderungen werden je Repo committet.
 
 - `../die-ewigen.com` – Hauptdomain www.die-ewigen.com (GitHub dieewigen/portal): Startseite, Screenshots, Regeln, Impressum, Datenschutz; PHP ohne Datenbank. `site.inc.php` hält die zentralen Links, reicht Werber-ID (`?a=`) und Kampagnenkennung (`?von=`) an die Registrierung weiter und baut das Zählpixel, das `footer.inc.php` ausgibt.
-- `../../loginsystem/source` – Accountverwaltung login.die-ewigen.com (GitHub dieewigen/accountverwaltung): Registrierung, Login, Serverliste (`inc/serverdata.inc.php` kennt die Spielserver), Anlegen der Spielkonten über `rpc.php` des jeweiligen Spielservers (`env_rpc_authcode`), eigenes Admintool `ourdetool/` (u. a. Statistik: Spielerzahl, Besucher). Datenbank ist die Login-Datenbank (hier `env_db_loginsystem_*`). Zählt Registrierungen und Spielkonten in `ls_besuch`; `besuch.php` ist der Endpunkt für das Zählpixel der Hauptdomain.
+- `../../loginsystem/source` – Accountverwaltung login.die-ewigen.com (GitHub dieewigen/accountverwaltung): Registrierung, Login, Serverliste (`html/inc` kennt die Spielserver), Anlegen der Spielkonten über `rpc.php` des jeweiligen Spielservers (`env_rpc_authcode`), eigenes Admintool `html/ourdetool` (u. a. Statistik: Spielerzahl, Besucher). Datenbank ist die Login-Datenbank (hier `env_db_loginsystem_*`). Zählt Registrierungen und Spielkonten in `ls_besuch`; `besuch.php` ist der Endpunkt für das Zählpixel der Hauptdomain.
 - `../hilfe` – Spielerhilfe hilfe.die-ewigen.com (GitHub dieewigen/hilfesystem): `index.php` als Router, Themenliste in `inhalt/themen.php`, Seiten als `inhalt/<thema>.html`. Bei sichtbaren Spieländerungen mitpflegen.
 
 ## Systemanforderungen
@@ -45,8 +45,8 @@ de2/
 │   ├── de-map.scss         # Karten-Stylesheet
 │   └── g/                  # Grafik-Assets
 ├── inc/                     # Konfiguration und ältere Include-Dateien
-│   ├── env.inc.php         # Umgebungsvariablen (DB-Zugänge, Mail), nicht im Git
-│   ├── sv.inc.php          # Server-Variablen (Spielkonfiguration), nicht im Git
+│   ├── env.inc.php         # Umgebungsvariablen (DB-Zugänge, Mail); Defaultwerte, überschreibbar über .env
+│   ├── sv.inc.php          # Server-Variablen (Spielkonfiguration); Defaultwerte, überschreibbar über .env
 │   ├── session.inc.php     # Session-Management
 │   ├── header.inc.php      # Standard-Header
 │   ├── lang/               # Sprachdateien (Deutsch/Englisch)
@@ -161,10 +161,10 @@ Ressourcen werden durch Kollektoren generiert, die Energie in Materie umwandeln.
   - Grab des Ra (Anti-Agentenabwehr)
 
 ### 8. Tick-System
-Das Spiel läuft mit zwei Tick-Typen; die Skripte prüfen selbst anhand von `$wts`/`$kts` in `sv.inc.php`, ob Tickzeit ist. Dazu kommt der NPC-Tick (`tickler/ki_tick.php`) im Takt des WT.
+Das Spiel läuft mit zwei Tick-Typen; die Skripte prüfen selbst anhand von `$wts`/`$kts` in `sv.inc.php`, ob Tickzeit ist. Dazu kommt der NPC-Tick (`html/tickler`) im Takt des WT.
 
 #### Wirtschaftstick (WT)
-- **Datei:** `tickler/wt.php`
+- **Datei:** `html/tickler`
 - Ausführung: Alle 15 Minuten (konfigurierbar)
 - Funktionen:
   - Ressourcenproduktion
@@ -176,7 +176,7 @@ Das Spiel läuft mit zwei Tick-Typen; die Skripte prüfen selbst anhand von `$wt
   - Erhabenen-Prüfung
 
 #### Kampftick (KT)
-- **Datei:** `tickler/kt.php`
+- **Datei:** `html/tickler`
 - Bewegt Flotten (Flugzeiten, Ankünfte, Rückkehr)
 - Berechnet Kämpfe
 - Generiert Kampfberichte, seit Okt. 2026 mit dem Ablauf der Schüsse (`ablauf`) für „Kampf abspielen“ im Bericht
@@ -250,35 +250,39 @@ Das ultimative Spielziel:
 ## Konfiguration
 
 ### Umgebungsvariablen (inc/env.inc.php)
+`html/inc/env.inc.php` ist versioniert und trägt die Defaultwerte (Zugangsdaten, SMTP, Webhooks, RPC-Authcode, API-Key). Jeder Wert wird über eine Umgebungsvariable überschrieben, deren Name der PHP-Schlüssel in Großbuchstaben ist (z. B. `ENV_DB_DIEEWIGEN_HOST`); fehlt die Variable oder ist sie leer, gilt der Default. Auf den Docker-Servern kommen die Variablen aus `docker/sde/.web.env` bzw. `docker/sde/.web.env` (`env_file` im docker-compose). Gelesen wird zentral über `DieEwigen\DE2\Config\EnvLoader` (html/src/Config/EnvLoader.php, `getenv()`-basiert).
+
 ```php
 // Spiel-Datenbank
-$GLOBALS['env_db_dieewigen_host'] = 'localhost';
-$GLOBALS['env_db_dieewigen_user'] = 'root';
-$GLOBALS['env_db_dieewigen_password'] = '';
-$GLOBALS['env_db_dieewigen_database'] = 'de_game';
+$GLOBALS['env_db_dieewigen_host'] = EnvLoader::str('ENV_DB_DIEEWIGEN_HOST', '');
+$GLOBALS['env_db_dieewigen_user'] = EnvLoader::str('ENV_DB_DIEEWIGEN_USER', '');
+$GLOBALS['env_db_dieewigen_password'] = EnvLoader::str('ENV_DB_DIEEWIGEN_PASSWORD', '');
+$GLOBALS['env_db_dieewigen_database'] = EnvLoader::str('ENV_DB_DIEEWIGEN_DATABASE', '');
 // ebenso env_db_loginsystem_* (Accountverwaltung: globaler Chat, Titel) und env_db_logging_* (Aktionsprotokoll)
-$GLOBALS['env_mail_server'] = 'smtp.example.com';   // SMTP für mail_smtp(), dazu env_mail_user/-password/-noreply
-$GLOBALS['env_admin_email'] = 'admin@example.com';
-// vollständige Liste: inc/env.inc.sample.php
+$GLOBALS['env_mail_server'] = EnvLoader::str('ENV_MAIL_SERVER', '');   // SMTP für mail_smtp(), dazu env_mail_user/-password/-noreply
+$GLOBALS['env_admin_email'] = EnvLoader::str('ENV_ADMIN_EMAIL', '');
+// vollständige Liste: inc/env.inc.php (Referenz: inc/env.inc.sample.php)
 ```
 
 ### Server-Variablen (inc/sv.inc.php)
-Wichtige Einstellungen:
+Wie bei env.inc.php: `html/inc/sv.inc.php` ist versioniert mit Defaultwerten, jede Variable überschreibbar über ihre Großschreibungs-Variante (z. B. `SV_SERVER_NAME`), Werte aus `docker/sde/.web.env` bzw. `docker/sde/.web.env`.
+
 ```php
-$sv_server_name = 'Die Ewigen';              // Servername
-$sv_server_tag = '[DE]';                     // Server-Tag
-$sv_maxsystem = 40;                          // Max Systeme pro Sektor
-$sv_anz_rassen = 4;                          // Anzahl Rassen
-$sv_kollieertrag = 100;                      // Kollektor-Ertrag
-$sv_winscore = 10000;                        // Punkte für Erhabenen
-$sv_benticks = 96;                           // Ticks zum Sieg
-$sv_ewige_runde = 0;                         // Ewige Runde aktiv?
-$sv_hardcore = 0;                            // Hardcore-Modus?
-$wts = [                                     // WT-Ausführungszeiten
-    0 => [0, 15, 30, 45],
-    // ... weitere Stunden
-];
+$GLOBALS['sv_server_name'] = EnvLoader::str('SV_SERVER_NAME', 'Die Ewigen');   // Servername
+$GLOBALS['sv_server_tag'] = EnvLoader::str('SV_SERVER_TAG', 'SDE');            // Server-Tag
+$GLOBALS['sv_maxsystem'] = EnvLoader::int('SV_MAXSYSTEM', 40);                // Max Systeme pro Sektor
+$GLOBALS['sv_anz_rassen'] = EnvLoader::int('SV_ANZ_RASSEN', 4);               // Anzahl Rassen
+$GLOBALS['sv_kollieertrag'] = EnvLoader::int('SV_KOLLIEERTRAG', 100);         // Kollektor-Ertrag
+$GLOBALS['sv_winscore'] = EnvLoader::int('SV_WINSCORE', 10000);               // Punkte für Erhabenen
+$GLOBALS['sv_benticks'] = EnvLoader::int('SV_BENTICKS', 96);                  // Ticks zum Sieg
+$GLOBALS['sv_ewige_runde'] = EnvLoader::int('SV_EWIGE_RUNDE', 0);             // Ewige Runde aktiv?
+$GLOBALS['sv_hardcore'] = EnvLoader::int('SV_HARDCORE', 0);                   // Hardcore-Modus?
 ```
+
+Besonderheiten der Tickpläne und optionalen Werte:
+- `WTS` (eine Komma-Liste, z. B. `0,15,30,45`) füllt alle 24 Stunden von `$wts`; `$kts` kommt stundenweise aus `KTS_0` bis `KTS_23` (leer = Default in sv.inc.php).
+- Optionale Systeme (botcheck, Siegel, Hekate/Thanatos, Feldzug, S666) setzen `EnvLoader::optional(...)` nur, wenn die Umgebungsvariable gesetzt ist; sonst bleiben die `??`-Standardwerte im Spielcode gelten. Komplexe Werte (`SV_HEKATE_AUFTRAEGE`, `SV_S666_BEUTE`) sind JSON.
+- Arrays sind Komma-Listen (`SV_PLAN_GRUNDERTRAG=1000,125,75,50`), Boolesche `1/0`, Floats mit Punkt oder Komma.
 
 ## Installation und Setup
 
@@ -304,11 +308,7 @@ mysql -u root -p de_game < database/de.sql
 ```
 
 ### 5. Konfiguration anpassen
-```bash
-cp inc/env.inc.sample.php inc/env.inc.php
-cp inc/sv.inc.sample.php inc/sv.inc.php
-# Dateien bearbeiten und Zugangsdaten eintragen
-```
+`html/inc/env.inc.php` und `html/inc/sv.inc.php` sind versioniert und tragen die Defaultwerte. Servereigene Werte (Zugangsdaten, SMTP, Webhooks, Servername …) stehen in der .env-Datei des Servers (Docker: `docker/sde/.web.env` bzw. `docker/sde/.web.env`, nicht versioniert); die Umgebungsvariable heißt wie der PHP-Schlüssel in Großbuchstaben. Die `*.inc.sample.php` sind Referenz für die vollständige Schlüssel-Liste.
 
 ### 6. NPC-Accounts generieren
 ```bash
@@ -317,7 +317,7 @@ php ki/generiereaccounts.php
 Wichtig: `$sv_maxsystem` in `sv.inc.php` muss groß genug sein!
 
 ### 7. Cron-Jobs einrichten
-Für Produktionsserver (Linux), minütlich; die Skripte prüfen selbst, ob Tickzeit ist. Sie binden ihre Dateien relativ ein und müssen deshalb im Ordner `tickler/` starten:
+Für Produktionsserver (Linux), minütlich; die Skripte prüfen selbst, ob Tickzeit ist. Sie binden ihre Dateien relativ ein und müssen deshalb im Ordner `html/tickler` starten:
 ```bash
 * * * * * cd /pfad/zu/de2/tickler && /usr/bin/php runtick.php
 ```
@@ -330,7 +330,7 @@ Für Windows (Task Scheduler):
 ## Entwicklung
 
 ### PSR-4 Autoloading
-Moderne Klassen liegen unter `src/` und verwenden den Namespace `DieEwigen\DE2`:
+Moderne Klassen liegen unter `html/src` und verwenden den Namespace `DieEwigen\DE2`:
 
 ```php
 <?php
@@ -369,17 +369,17 @@ $result = mysqli_execute_query($GLOBALS['dbi'],
 );
 ```
 
-- `mysqli_query` steht nur noch bei Befehlen ohne Parameter (LOCK/UNLOCK TABLES, SHOW), in `api/` und in den generischen Wrappern des Admintools.
+- `mysqli_query` steht nur noch bei Befehlen ohne Parameter (LOCK/UNLOCK TABLES, SHOW), in `html/api` und in den generischen Wrappern des Admintools.
 - Spalten- und Tabellennamen (z. B. `"restyp0".$restyp`) bleiben verkettet, nur Werte werden Platzhalter; IN-Listen bekommen einen Platzhalter je Element.
 - Prepared Statements liefern Zahlenspalten als int/float, nicht als String.
 - Aktionen, die Rohstoffe oder Einheiten ändern, laufen in der Spielersperre: `Sperre::setzen($GLOBALS['dbi'], $uid)` … `Sperre::loesen($GLOBALS['dbi'], $uid)` (`DieEwigen\DE2\Model\Sperre`).
 
 ### SCSS-Kompilierung
 CSS wird aus SCSS generiert (Dart Sass, `npm install -g sass`). Die eingecheckten CSS-Dateien werden aber nicht einfach neu erzeugt:
-- `gp/de-main.css` weicht in der Farbschreibweise von einem frischen Sass-Lauf ab. Änderungen deshalb als Differenz einspielen: den Stand vor und nach der SCSS-Änderung kompilieren und nur den Unterschied übertragen.
-- `gp/de-chat.css` entsteht komprimiert aus `gp/de-chat.scss` (`--style=compressed`).
-- `gp/de-desktop.css` (Desktop-Ansicht) und `gp/de-mobil.css` (neue mobile Darstellung) werden frisch kompiliert: `sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css` bzw. `… gp/de-mobil.scss gp/de-mobil.css`; beide binden `gp/_seiten.scss` ein (Karten, Breiten, Titelschrift der Spielseiten als Mixin `seiten($wurzel)`). Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
-- `gp/de-map.css` stammt aus einem anderen Compiler (eine Zeile); neue Regeln nur anhängen.
+- `html/gp` weicht in der Farbschreibweise von einem frischen Sass-Lauf ab. Änderungen deshalb als Differenz einspielen: den Stand vor und nach der SCSS-Änderung kompilieren und nur den Unterschied übertragen.
+- `html/gp` entsteht komprimiert aus `html/gp` (`--style=compressed`).
+- `html/gp` (Desktop-Ansicht) und `html/gp` (neue mobile Darstellung) werden frisch kompiliert: `sass --style=expanded --no-source-map gp/de-desktop.scss gp/de-desktop.css` bzw. `… gp/de-mobil.scss gp/de-mobil.css`; beide binden `html/gp` ein (Karten, Breiten, Titelschrift der Spielseiten als Mixin `seiten($wurzel)`). Nur dm.php und cssinclude.php in einer Desktop-Sitzung laden es; Classic und Mobil bleiben bei `de-main.css` und dürfen sich nicht ändern.
+- `html/gp` stammt aus einem anderen Compiler (eine Zeile); neue Regeln nur anhängen.
 
 ```bash
 sass --style=expanded --no-source-map gp/de-main.scss /tmp/vorher.css    # vor der Änderung
@@ -388,7 +388,7 @@ diff -u /tmp/vorher.css /tmp/nachher.css | patch gp/de-main.css
 ```
 
 ### JavaScript
-Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js` …) und hängen `filemtime` als Versionsparameter an. Die `*.min.js` im Ordner lädt keine Seite.
+Die Seiten binden die unminifizierten Dateien ein (`html/js`, `html/js` …) und hängen `filemtime` als Versionsparameter an. Die `*.min.js` im Ordner lädt keine Seite.
 
 ### Ablage von Texten und Schemaänderungen
 - Texte zu Umbauten (Bestandsaufnahme, Übergabe, Regeln) nach `docs/` als Markdown, eine Datei je Thema.
@@ -406,7 +406,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `createTitleForUser($owner_id, $title)`: Erstellt Spieler-Titel
 - `mail_smtp($to, $subject, $body)`: Versendet E-Mails
 - `getArtefactAmountByUserId($uid, $art_id)`: Artefakt-Anzahl
-- `rahmen_oben($titel)` / `rahmen_unten()`: Seitenrahmen (etwa 580 px Innenbreite; in der Desktop-Ansicht eine Karte in voller Breite der Mitte, `gp/de-desktop.scss`); mit `false` als letztem Parameter geben sie HTML zurück statt es auszugeben
+- `rahmen_oben($titel)` / `rahmen_unten()`: Seitenrahmen (etwa 580 px Innenbreite; in der Desktop-Ansicht eine Karte in voller Breite der Mitte, `html/gp`); mit `false` als letztem Parameter geben sie HTML zurück statt es auszugeben
 
 ### In src/ (Auswahl)
 - `Model\Sperre::setzen($db, $uid)` / `loesen($db, $uid)`: Spielersperre um Aktionen
@@ -414,7 +414,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `View\FehlendeTechnologie::karte($techId)`: Hinweis „Fehlende Technologie“
 - `View\Mobil::neu()` / `kopf($werte)`: neue mobile Darstellung (Kopfleiste mit Menü, Signalen, Rohstoffen, Zeiten; Seiten in Gerätebreite), aktiv in Mobilsitzungen ohne das Cookie `mobil_alt` (Optionen „Mobile Darstellung“); `kompakt()` = zusätzlich Cookie `mobil_kompakt` (Optionen „Seitenbreite (Mobil)“: 620-px-Viewport wie bisher statt Gerätebreite); cssinclude.php wählt danach Viewport und Stylesheet, resline.php die Kopfleiste statt der Rohstoffleiste
 - `View\Symbole::sprite()`: SVG-Sprite der Strichsymbole (`<svg class="app-ico"><use href="#i-karte"/></svg>`) für die Desktop-Ansicht dm.php und die mobile Kommandokonsole menu.php; Titelschrift Michroma (OFL) liegt in gp/fonts, nur für Rahmentitel, Marke und Konsolentitel
-- `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `js/de_fn.js`)
+- `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `html/js`)
 - `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
 - `Model\VSystem\Filter::ausCookies($_COOKIE)` / `passendeIds(...)`: VS-Filter der Übersicht für die Pfeile der Systemseite
 - `Session\CsrfToken`: siehe Sicherheit
@@ -428,8 +428,8 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 
 ## API-Endpunkte
 
-Das Projekt verfügt über eine REST-API unter `api/`:
-- `api/index.php`: API-Router
+Das Projekt verfügt über eine REST-API unter `html/api`:
+- `html/api`: API-Router
 - Authentifizierung über Session oder Token
 - JSON-Responses
 
@@ -440,7 +440,7 @@ Das Projekt verfügt über eine REST-API unter `api/`:
 1. **Normaler Reset** (Ende der Runde)
    - Alle Spieler-Daten zurücksetzen
    - Neue Runde startet
-   - Skript: `tickler/wt_auto_reset.php`
+   - Skript: `html/tickler`
 
 2. **Spieler-Reset** (Ewige Runde)
    - Nur Erhabener wird zurückgesetzt
@@ -454,7 +454,7 @@ Das Projekt verfügt über eine REST-API unter `api/`:
 ## Sicherheit
 
 ### Session-Management
-- Sessions in `inc/session.inc.php`
+- Sessions in `html/inc`
 - `$_SESSION['ums_user_id']`: Aktuelle User-ID
 - `$_SESSION['ums_rasse']`: Spieler-Rasse
 - `$_SESSION['ums_mobi']`: Mobile-Modus
@@ -470,7 +470,7 @@ Das Projekt verfügt über eine REST-API unter `api/`:
 ### CSRF-Schutz
 - `DieEwigen\DE2\Session\CsrfToken`: ein Token je Sitzung; `CsrfToken::get()` für ein verstecktes Formularfeld `token`, `CsrfToken::query()` für Links, `CsrfToken::check($_POST['token'] ?? '')` beim Auswerten
 - bisher nur in feldzug.php, specialship.php und einigen Allianzseiten (ally_kick, ally_leader, ally_members); die übrigen Formulare sind noch ungeschützt
-- das Admintool hat ein eigenes Verfahren (Secret in `ourdetool/.ht_csrf_secret`, nicht im Git)
+- das Admintool hat ein eigenes Verfahren (Secret in `html/ourdetool`, nicht im Git)
 
 ## Testing
 
@@ -509,7 +509,7 @@ php tests/testlauf.php seite 1 recycling.php POST recyclingbutton=1 e81=5 t81=82
 - Bei langsamen Queries: `EXPLAIN` verwenden
 
 ### Caching
-- Toplist-Cache: `cache/toplist/`
+- Toplist-Cache: `html/cache`
 - Bilder-Cache für generierte Grafiken
 - Bei Änderungen Cache leeren
 
@@ -522,8 +522,8 @@ php tests/testlauf.php seite 1 recycling.php POST recyclingbutton=1 e81=5 t81=82
 
 ### Legacy-Code
 - Viele Dateien sind noch prozedural
-- Schrittweise Umstellung auf OOP/PSR-4: gemeinsame Bausteine als Klasse unter `src/`, keine neuen `inc/*.inc.php`
-- `lib/map_system.class.php` (mit den Sonder-Systemen) und `lib/special_ship.class.php` bleiben vorerst in `lib/`: Ihre Objekte liegen serialisiert in `de_map_objects.data` und `de_user_special_ship.data`, ein neuer Klassenname macht diese Daten unlesbar. Der Umzug nach `src/` geht deshalb nur zum Rundenstart, wenn beide Tabellen neu aufgebaut werden.
+- Schrittweise Umstellung auf OOP/PSR-4: gemeinsame Bausteine als Klasse unter `html/src`, keine neuen `html/inc`
+- `html/lib` (mit den Sonder-Systemen) und `html/lib` bleiben vorerst in `html/lib`: Ihre Objekte liegen serialisiert in `de_map_objects.data` und `de_user_special_ship.data`, ein neuer Klassenname macht diese Daten unlesbar. Der Umzug nach `html/src` geht deshalb nur zum Rundenstart, wenn beide Tabellen neu aufgebaut werden.
 
 ### Sicherheit
 - Passwort-Hashing modernisieren (zu `password_hash()`)

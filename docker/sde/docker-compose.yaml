@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sde_php_app
+    restart: always
+    ports:
+      - "9081:80"
+    volumes:
+      - ../../html:/var/www/html
+    env_file:
+      - .web.env
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+    networks:
+      - app-network
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:lts-noble
+    container_name: sde_database_server
+    restart: unless-stopped
+    networks:
+      - app-network
+    ports:
+      - "127.0.0.1:3306:3310"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
+
+networks:
+  app-network:
+    external: true
