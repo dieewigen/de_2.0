@@ -3,6 +3,8 @@ include "inc/header.inc.php";
 include 'inc/lang/'.$sv_server_lang.'_overview.lang.php';
 include 'inc/achievement.inc.php';
 include "functions.php";
+include_once 'inc/userartefact.inc.php';
+include_once 'lib/map_system_defs.inc.php';
 
 ?>
 <!DOCTYPE HTML>
@@ -60,6 +62,9 @@ $rang = $rangnamen[$rang_nr];
 //die Anzahl von erfoschen "Vergessenen Systemen" auslesen
 $db_daten = mysqli_execute_query($GLOBALS['dbi'], "SELECT user_id FROM de_user_map WHERE user_id=?", [$_SESSION['ums_user_id']]);
 $anz_vergessene_systeme_erforscht = mysqli_num_rows($db_daten);
+
+//fertige Stufen der VS-Gebäude ab Stufe 5 für die Errungenschaften „Stufe 5“ und „Stufe 10“; Stufen im Bau zählen erst nach dem Ausbau
+$vs_gebaeude_stufen = array_column(\DieEwigen\DE2\Model\VSystem\Ausbau::gebaeude($GLOBALS['dbi'], $_SESSION['ums_user_id'], 5), 'stufe');
 
 
 //zu den Agenten kommen noch die Agenten dazu die auf einer Mission sind
@@ -785,9 +790,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards18;
 
-            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 5 AND user_id=?;", [$_SESSION['ums_user_id']]);
-            $rowx = mysqli_fetch_array($db_datenx);
-            $zielwert = $rowx['anzahl'];
+            $zielwert = count(array_filter($vs_gebaeude_stufen, fn($s) => $s >= 5));
 
             $do_calc = 1;
             $text1 = $ov_lang['ac_ziel18_1'];
@@ -798,10 +801,7 @@ for ($ac = 0;$ac < $achievement_anz;$ac++) {
             $ac_akt = $ac_daten[$ac_table_field];
             $rewards = $rewards19;
 
-            $db_datenx = mysqli_execute_query($GLOBALS['dbi'], "SELECT COUNT(user_id) AS anzahl FROM de_user_map_bldg WHERE bldg_level >= 10 AND user_id=?;", [$_SESSION['ums_user_id']]);
-            $rowx = mysqli_fetch_array($db_datenx);
-            $zielwert = $rowx['anzahl'];
-
+            $zielwert = count(array_filter($vs_gebaeude_stufen, fn($s) => $s >= 10));
 
             $do_calc = 1;
             $text1 = $ov_lang['ac_ziel19_1'];

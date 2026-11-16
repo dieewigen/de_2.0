@@ -368,7 +368,9 @@ class map_system{
 						//Ausbau läuft
 						$content.='<div class="ms-zeile"><span class="mod-chip mod-chip-warn">Ausbau auf Stufe '.($this->playerBldg[$bldg_index]['bldg_level']).'/'.count($GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_cost']).'</span>';
 						$content.=' <span class="bk-leise">'.\DieEwigen\DE2\View\RealTime::until($this->playerBldg[$bldg_index]['bldg_time']).'</span></div>';
-						$akt_level=$this->playerBldg[$bldg_index]['bldg_level']-1;
+						//fertige Stufe, auch wenn mehrere Ausbauten angehängt sind
+						$akt_level=\DieEwigen\DE2\Model\VSystem\Ausbau::fertigeStufe($this->playerBldg[$bldg_index]['bldg_level'], $this->playerBldg[$bldg_index]['bldg_time'],
+							$GLOBALS['map_buildings'][$this->playerBldg[$bldg_index]['bldg_id']]['bldg_time']*$GLOBALS['tech_build_time_faktor']*$GLOBALS['duration_factor']);
 					}else{
 						//wird nicht ausgebaut
 						$akt_level=$this->playerBldg[$bldg_index]['bldg_level'];

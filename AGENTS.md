@@ -417,6 +417,7 @@ Die Seiten binden die unminifizierten Dateien ein (`js/de_fn.js`, `js/ang_fn.js`
 - `View\Kampfbericht::v1(...)` / `bg(...)`: Kampfberichte der Flotten und Battlegrounds; Berichte mit `ablauf` bekommen den Knopf „Kampf abspielen“ (Kasten aus `ablauf()`, Abspiellogik in `js/de_fn.js`)
 - `Model\Tick\Plan::naechster($plan)` / `anzahlZwischen($plan, $von, $bis)`: nächster Tick und Tickzahl zwischen zwei Zeiten aus `$wts`/`$kts` (Serverinfo, Countdown in dm.php, Sondenhistorie)
 - `Model\VSystem\Filter::ausCookies($_COOKIE)` / `passendeIds(...)`: VS-Filter der Übersicht für die Pfeile der Systemseite
+- `Model\VSystem\Ausbau::gebaeude($db, $uid)` / `fertigeStufe(...)`: fertige Stufe der VS-Gebäude; `bldg_level` in `de_user_map_bldg` ist beim Bau schon die Zielstufe (Fabrikkapazität, Erfolge, Stufenliste der Systemseite)
 - `Session\CsrfToken`: siehe Sicherheit
 
 ### In inc/allyjobs.inc.php

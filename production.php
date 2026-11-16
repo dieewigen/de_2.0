@@ -533,14 +533,16 @@ echo '</form>';
 // Waren/Handelsgüter/Itemproduktion
 /////////////////////////////////////////////////
 if(!isset($sv_deactivate_vsystems) || $sv_deactivate_vsystems!=1){
+	//Fabrikkapazität = Summe der fertigen Fabrikstufen, Stufen im Bau zählen erst nach dem Ausbau
 	$factory_max_capacity=array();
-	for($g=0;$g<count($GLOBALS['map_buildings']);$g++){
-		if(isset($GLOBALS['map_buildings'][$g]['factory_id'])){
-			$result  = mysqli_execute_query($GLOBALS['dbi'], "SELECT SUM(bldg_level) AS anzahl FROM de_user_map_bldg WHERE user_id=? AND bldg_id=?;", [$_SESSION['ums_user_id'], $g]);
-			$row     = mysqli_fetch_array($result);
-			$anzahl = $row["anzahl"];
-
-			$factory_max_capacity[$GLOBALS['map_buildings'][$g]['factory_id']]=intval($anzahl);
+	foreach($GLOBALS['map_buildings'] as $bldg){
+		if(isset($bldg['factory_id'])){
+			$factory_max_capacity[$bldg['factory_id']]=0;
+		}
+	}
+	foreach(\DieEwigen\DE2\Model\VSystem\Ausbau::gebaeude($GLOBALS['dbi'], $_SESSION['ums_user_id']) as $bldg){
+		if(isset($GLOBALS['map_buildings'][$bldg['bldg_id']]['factory_id'])){
+			$factory_max_capacity[$GLOBALS['map_buildings'][$bldg['bldg_id']]['factory_id']]+=$bldg['stufe'];
 		}
 	}
 
