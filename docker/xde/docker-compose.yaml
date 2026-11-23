@@ -21,7 +21,7 @@ services:
       - mariadb
 
   mariadb:
-    image: mariadb:13-restore
+    image: mariadb:13-resolute
     container_name: xde_database_server
     restart: unless-stopped
     networks:
