@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p /var/logs/de
+
 # Start the cron service
 service cron start
 
