@@ -1,4 +1,4 @@
-cd /var/www/http/tickler/
+cd /var/www/html/tickler/
 php kt.php > /var/logs/de/kt_`date "+%Y_%m%d_%H%M"`.txt
 php wt.php > /var/logs/de/wt_`date "+%Y_%m%d_%H%M"`.txt
 php ki_rptick.php > /var/logs/de/ki_rp_`date "+%Y_%m%d_%H%M"`.txt
