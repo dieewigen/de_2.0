@@ -497,7 +497,7 @@ php tests/testlauf.php aufnehmen nachher     # nach der Änderung
 php tests/testlauf.php vergleich vorher nachher
 php tests/testlauf.php seite 1 recycling.php POST recyclingbutton=1 e81=5 t81=82   # eine Seite einzeln
 ```
-- Jeder Fall beginnt mit frischen Kopien (`de_test`, `de_test_login`); die echten Datenbanken bleiben unberührt, Mails gehen ins Leere.
+- Jeder Fall beginnt mit frischen Kopien (`de_test`, `de_test_login`); die echten Datenbanken bleiben unberührt, Mails und Discord-Meldungen (Webhooks aus `env.inc.php` und der Allianzen) gehen ins Leere.
 - Testspieler, Seiten und Aktionen stehen oben in der Datei (`TL_SPIELER`, `TL_SEITEN`, `TL_AKTIONEN`); bei einer anderen Entwicklungsdatenbank die Spieler-IDs anpassen.
 - Nur Kommandozeile und lokal: Webaufrufe liefern nichts, `tests/.htaccess` sperrt den Ordner.
 - Die Ticks sind nicht abgedeckt. `wt.php` nie komplett zum Testen starten, der WT verschickt Mails.
