@@ -17,6 +17,8 @@ COPY crontab /etc/cron.d/php-cron
 RUN chmod 0644 /etc/cron.d/php-cron \
     && crontab /etc/cron.d/php-cron \
     && mkdir -p /var/log/de \
+    && mkdir -p /var/www/botcheck \
+    && chown www-data:www-data /var/www/botcheck \
     && touch /var/log/cron_reg.log \
     && touch /var/log/cron_kt_wt.log
 
