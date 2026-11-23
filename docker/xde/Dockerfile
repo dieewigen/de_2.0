@@ -16,6 +16,7 @@ RUN a2enmod rewrite
 COPY crontab /etc/cron.d/php-cron
 RUN chmod 0644 /etc/cron.d/php-cron \
     && crontab /etc/cron.d/php-cron \
+    && mkdir -p /var/logs/de \
     && touch /var/log/cron_reg.log \
     && touch /var/log/cron_kt_wt.log
 
