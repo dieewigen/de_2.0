@@ -25,8 +25,10 @@ $feldzug_lang['preis_text']='<b>{PREIS}</b> von jedem der zehn VS-Rohstoffe (Eis
 $feldzug_lang['angemeldet_titel']='Angemeldete Allianzen';
 $feldzug_lang['angemeldet_keine']='Noch hat sich keine Allianz angemeldet.';
 $feldzug_lang['eigene_titel']='Deine Allianz';
-$feldzug_lang['eigene_angemeldet']='Deine Allianz ist angemeldet (von {NAME}).';
+$feldzug_lang['eigene_angemeldet']='Angemeldet von {NAME}.';
 $feldzug_lang['eigene_nicht_angemeldet']='Deine Allianz ist noch nicht angemeldet.';
+$feldzug_lang['eigene_bereit']='Deine Allianz ist angemeldet und startbereit.';
+$feldzug_lang['eigene_nicht_bereit']='Deine Allianz ist angemeldet, aber <b>noch nicht startbereit</b>. Ändert sich das bis zum Start nicht, nimmt sie an diesem Feldzug nicht teil.';
 $feldzug_lang['eigene_berechtigt']='Berechtigte Mitglieder: <b>{N}</b>';
 $feldzug_lang['eigene_kasse_ok']='Die Kriegskasse reicht für den Eintritt.';
 $feldzug_lang['eigene_kasse_fehlt']='In der Kriegskasse fehlen noch: {LISTE}';
@@ -34,6 +36,7 @@ $feldzug_lang['eigene_posten']='Anmelden können Mitglieder mit Posten: Leader, 
 $feldzug_lang['eigene_spaet']='Du bist erst nach Beginn des Aufrufs beigetreten und zählst bei diesem Feldzug nicht als Teilnehmer.';
 $feldzug_lang['knopf_anmelden']='Allianz anmelden';
 $feldzug_lang['knopf_abmelden']='Anmeldung zurückziehen';
+$feldzug_lang['knopf_abmelden_sicher']='Wirklich zurückziehen?';
 $feldzug_lang['bedingungen']='Dabei ist am Ende des Aufrufs jede angemeldete Allianz mit mindestens einem berechtigten Mitglied und genug in der Kriegskasse. Berechtigt ist, wer schon zu Beginn des Aufrufs Mitglied war, ein aktives Konto hat und nicht in Sektor 1 steht. Mit weniger als zwei Allianzen fällt der Feldzug aus.';
 
 //Kampf
@@ -51,7 +54,11 @@ $feldzug_lang['rest']='Noch zu verteilen: <b>{REST}</b> von {GESAMT} Legionen';
 $feldzug_lang['knopf_verteilen']='Verteilung speichern';
 $feldzug_lang['geaendert']='Zuletzt geändert von {NAME} im WT {WT}.';
 $feldzug_lang['nur_posten']='Legionen verteilen dürfen Mitglieder mit Posten. Du siehst die Verteilung Deiner Allianz.';
-$feldzug_lang['nicht_dabei']='Deine Allianz nimmt an diesem Feldzug nicht teil.';
+//eigene Allianz nicht dabei: ohne Anmeldung, sonst nach Status der Anmeldung (1 = Feldzug, der vor Nov. 2026 begann)
+$feldzug_lang['nicht_dabei']='Deine Allianz war für diesen Feldzug nicht angemeldet.';
+$feldzug_lang['nicht_dabei_1']='Deine Allianz war angemeldet, ist aber nicht dabei: Beim Start war nicht jede Voraussetzung erfüllt (der Eintrittspreis von jedem der zehn VS-Rohstoffe in der Kriegskasse, mindestens ein berechtigtes Mitglied).';
+$feldzug_lang['nicht_dabei_3']='Deine Allianz war angemeldet, ist aber nicht dabei: Beim Start hatte sie kein berechtigtes Mitglied.';
+$feldzug_lang['nicht_dabei_4']='Deine Allianz war angemeldet, ist aber nicht dabei: Beim Start reichte die Kriegskasse nicht für den Eintrittspreis. Welche Rohstoffe fehlten, steht in der Allianzhistorie.';
 $feldzug_lang['stehend']='Die Verteilung bleibt stehen, bis sie jemand ändert. Ausgewertet wird am Ende jedes Zuges.';
 
 $feldzug_lang['ergebnis_titel']='Ergebnis von Zug {ZUG}';
@@ -87,7 +94,7 @@ $feldzug_lang['regeln']='<p>Ein Feldzug beginnt mit dem <b>Aufruf</b> ({AUFRUF} 
 <p>Jeder gehaltene Brennpunkt bringt in jedem Zug seine Kontrollpunkte, sie werden sofort als Rundensiegartefakte gutgeschrieben ({QP} je Kontrollpunkt). Wer am Ende die meisten Kontrollpunkte hat, gewinnt den Feldzug. Die Allianz mit den meisten Siegen der Runde stellt die Feldherren: Alle Teilnehmer ihrer gewonnenen Feldzüge erhalten einen dauerhaften Titel.</p>';
 
 //Meldungen nach Aktionen
-$feldzug_lang['ok_angemeldet']='Deine Allianz ist für den Feldzug angemeldet.';
+$feldzug_lang['ok_angemeldet']='Die Anmeldung ist gespeichert.';
 $feldzug_lang['ok_abgemeldet']='Die Anmeldung wurde zurückgezogen.';
 $feldzug_lang['ok_verteilt']='Die Verteilung der Legionen wurde gespeichert.';
 $feldzug_lang['ok_gespendet']='Die Spende ist in der Kriegskasse.';
@@ -111,6 +118,7 @@ $feldzug_lang['ov_aufruf']='<b><a href="feldzug.php">Aufruf zum Feldzug {NR}</a>
 $feldzug_lang['ov_kampf']='<b><a href="feldzug.php">Feldzug {NR}</a></b>: Zug {ZUG} von {ZUEGE}, Auswertung in {WT} WT';
 $feldzug_lang['ov_eigene']=', Deine Allianz Platz {PLATZ} ({KP} Kontrollpunkte)';
 $feldzug_lang['ov_angemeldet']=', Deine Allianz ist angemeldet';
+$feldzug_lang['ov_nicht_bereit']=', Deine Allianz ist angemeldet, aber <b>noch nicht startbereit</b>';
 $feldzug_lang['vs_link']='Zum Feldzug';
 $feldzug_lang['vs_hinweis']='Brennpunkte des Feldzugs sind markiert, alle stehen auf der Feldzugseite.';
 $feldzug_lang['vs_boni_mine']='Feldzug: Mine, Industrie +10 %';
@@ -129,3 +137,9 @@ $feldzug_lang['chat_feldherren']='<b>{TAG} stellt die Feldherren dieser Runde</b
 $feldzug_lang['ally_zug']='Feldzug, Zug {ZUG}:';
 $feldzug_lang['ally_erobert']='Wir halten jetzt {BP}.';
 $feldzug_lang['ally_verloren']='{BP} ist an {TAG} gefallen.';
+//Allianzhistorie und Allianzchat: Anmeldung, Rückzug und was beim Start aus der Anmeldung wurde
+$feldzug_lang['ally_angemeldet']='Feldzug {NR}: Die Allianz wurde von <i>{NAME}</i> angemeldet.';
+$feldzug_lang['ally_abgemeldet']='Feldzug {NR}: <i>{NAME}</i> hat die Anmeldung zurückgezogen.';
+$feldzug_lang['ally_raus_3']='Feldzug {NR}: Die Allianz ist nicht dabei, beim Start hatte sie kein berechtigtes Mitglied.';
+$feldzug_lang['ally_raus_4']='Feldzug {NR}: Die Allianz ist nicht dabei, beim Start fehlte in der Kriegskasse der Eintrittspreis ({LISTE}).';
+$feldzug_lang['ally_ausgefallen']='Feldzug {NR} fällt aus. Für den neuen Aufruf muss die Allianz neu angemeldet werden.';

@@ -600,7 +600,8 @@ CREATE TABLE `de_feldzug_mitglied` (
 
 --
 -- Tabellenstruktur für Tabelle `de_feldzug_teilnehmer`
--- status: 1 angemeldet, 2 dabei (Eintrittspreis bezahlt); Kürzel und Name als Text
+-- status: 1 angemeldet, 2 dabei (Eintrittspreis bezahlt), beim Start nicht zugelassen: 3 kein berechtigtes Mitglied,
+-- 4 Kriegskasse reichte nicht; Kürzel und Name als Text
 --
 
 CREATE TABLE `de_feldzug_teilnehmer` (

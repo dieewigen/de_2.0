@@ -22,9 +22,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     } elseif (!FeldzugService::istAktiv()) {
         $fz_key = 'fehler_aus';
     } elseif (isset($_POST['anmelden'])) {
-        [$fz_ok, $fz_key] = $fzs->anmelden($uid);
+        [$fz_ok, $fz_key] = $fzs->anmelden($uid, $feldzug_lang);
     } elseif (isset($_POST['abmelden'])) {
-        [$fz_ok, $fz_key] = $fzs->anmelden($uid, true);
+        [$fz_ok, $fz_key] = $fzs->anmelden($uid, $feldzug_lang, true);
     } elseif (isset($_POST['verteilen'])) {
         $fz_legionen = array();
         foreach ((array)($_POST['leg'] ?? array()) as $fz_bp => $fz_n) {
@@ -134,18 +134,21 @@ if (!FeldzugService::istAktiv()) {
                     $fz_eigen_angemeldet = $fz_t;
                 }
             }
+            $fz_berechtigte = $fzs->zaehleBerechtigte($fz_id, $fz_eigene['ally_id']);
+            $fz_fehlt = array();
+            $fz_namen = loadPlayerStorage($uid);
+            foreach ($fzs->kasseFehlt($fz_eigene['ally_id'], (int)$fz['preis']) as $fz_item => $fz_menge) {
+                $fz_fehlt[] = fz_zahl($fz_menge).' '.$fz_namen[$fz_item]['item_name'];
+            }
             echo '<div class="ally-abschnitt"><div class="mod-typ">'.$feldzug_lang['eigene_titel'].' '.html_text($fz_eigene['allytag']).'</div>';
+            //die Anmeldung allein reicht nicht: deutlich zeigen, ob die Allianz so beim Start dabei wäre
+            if ($fz_eigen_angemeldet !== null) {
+                $fz_bereit = $fz_berechtigte > 0 && empty($fz_fehlt);
+                echo '<div class="mod-meldung mod-meldung-'.($fz_bereit ? 'ok' : 'warn').'">'.$feldzug_lang[$fz_bereit ? 'eigene_bereit' : 'eigene_nicht_bereit'].'</div>';
+            }
             echo '<ul class="fz-liste-punkte">';
             echo '<li>'.($fz_eigen_angemeldet !== null ? strtr($feldzug_lang['eigene_angemeldet'], array('{NAME}' => html_text($fz_eigen_angemeldet['angemeldet_von']))) : $feldzug_lang['eigene_nicht_angemeldet']).'</li>';
-            echo '<li>'.strtr($feldzug_lang['eigene_berechtigt'], array('{N}' => $fzs->zaehleBerechtigte($fz_id, $fz_eigene['ally_id']))).'</li>';
-            $fz_fehlt = array();
-            $fz_kasse = $fzs->getKasse($fz_eigene['ally_id']);
-            $fz_namen = loadPlayerStorage($uid);
-            foreach (FeldzugService::ITEMS as $fz_item) {
-                if ($fz_kasse[$fz_item] < (int)$fz['preis']) {
-                    $fz_fehlt[] = fz_zahl((int)$fz['preis'] - $fz_kasse[$fz_item]).' '.$fz_namen[$fz_item]['item_name'];
-                }
-            }
+            echo '<li>'.strtr($feldzug_lang['eigene_berechtigt'], array('{N}' => $fz_berechtigte)).'</li>';
             echo '<li>'.(empty($fz_fehlt) ? $feldzug_lang['eigene_kasse_ok'] : strtr($feldzug_lang['eigene_kasse_fehlt'], array('{LISTE}' => implode(', ', $fz_fehlt)))).'</li>';
             if (!$fzs->istBerechtigt($fz_id, $uid)) {
                 echo '<li>'.$feldzug_lang['eigene_spaet'].'</li>';
@@ -154,7 +157,8 @@ if (!FeldzugService::istAktiv()) {
             if ($fz_eigene['posten']) {
                 echo '<form method="post" action="feldzug.php" class="fz-knopfzeile"><input type="hidden" name="token" value="'.CsrfToken::get().'">';
                 if ($fz_eigen_angemeldet !== null) {
-                    echo '<button type="submit" name="abmelden" value="1" class="mod-btn mod-btn-leise">'.$feldzug_lang['knopf_abmelden'].'</button>';
+                    //Zwei-Klick-Bestätigung: der Knopf steht nach dem Anmelden dort, wo eben noch „Allianz anmelden“ stand
+                    echo '<button type="submit" name="abmelden" value="1" class="mod-btn mod-btn-leise" data-bestaetigen="'.$feldzug_lang['knopf_abmelden_sicher'].'">'.$feldzug_lang['knopf_abmelden'].'</button>';
                 } else {
                     echo '<button type="submit" name="anmelden" value="1" class="mod-btn">'.$feldzug_lang['knopf_anmelden'].'</button>';
                 }
@@ -175,6 +179,15 @@ if (!FeldzugService::istAktiv()) {
         $fz_verteilung = $fz_dabei ? $fzs->getVerteilung($fz_id, $fz_eigene['ally_id']) : array();
         $fz_darf = $fz_dabei && $fz_eigene['posten'];
         $fz_gesamt = FeldzugService::getLegionen();
+        //alle Anmeldungen: Kürzel für das Ergebnis, Status der eigenen für den Hinweis, warum die Allianz nicht dabei ist
+        $fz_tags = array();
+        $fz_eigen_status = 0;
+        foreach ($fzs->getTeilnehmer($fz_id) as $fz_t) {
+            $fz_tags[(int)$fz_t['ally_id']] = $fz_t['allytag'];
+            if ($fz_eigene !== null && (int)$fz_t['ally_id'] === $fz_eigene['ally_id']) {
+                $fz_eigen_status = (int)$fz_t['status'];
+            }
+        }
 
         echo '<div class="ally-abschnitt"><div class="mod-typ">'.$feldzug_lang['brennpunkte_titel'].'</div>';
         if ($fz_darf) {
@@ -224,7 +237,9 @@ if (!FeldzugService::istAktiv()) {
             }
             echo '<div class="fz-leise">'.($fz_darf ? $feldzug_lang['stehend'] : $feldzug_lang['nur_posten']).'</div>';
         } elseif ($fz_eigene !== null) {
-            echo '<div class="fz-leise">'.$feldzug_lang['nicht_dabei'].'</div>';
+            echo isset($feldzug_lang['nicht_dabei_'.$fz_eigen_status])
+                ? '<div class="mod-meldung mod-meldung-warn fz-abstand">'.$feldzug_lang['nicht_dabei_'.$fz_eigen_status].'</div>'
+                : '<div class="fz-leise">'.$feldzug_lang['nicht_dabei'].'</div>';
         }
         if ($fz_darf) {
             echo '</form>';
@@ -233,10 +248,6 @@ if (!FeldzugService::istAktiv()) {
 
         //Ergebnis des letzten Zuges, für alle sichtbar
         $fz_zug = (int)$fz['zug'];
-        $fz_tags = array();
-        foreach ($fzs->getTeilnehmer($fz_id) as $fz_t) {
-            $fz_tags[(int)$fz_t['ally_id']] = $fz_t['allytag'];
-        }
         echo '<div class="ally-abschnitt"><div class="mod-typ">'.($fz_zug > 0 ? strtr($feldzug_lang['ergebnis_titel'], array('{ZUG}' => $fz_zug)) : $feldzug_lang['ergebnis_titel_leer']).'</div>';
         if ($fz_zug < 1) {
             echo '<div class="fz-leise">'.$feldzug_lang['ergebnis_leer'].'</div>';

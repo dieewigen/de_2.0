@@ -401,7 +401,8 @@ try {
             if ($fz_ov_eigene !== null) {
                 foreach ($fz_ov->getTeilnehmer((int)$fz_ov_fz['id']) as $fz_ov_t) {
                     if ((int)$fz_ov_t['ally_id'] === $fz_ov_eigene['ally_id']) {
-                        $fz_ov_text .= $feldzug_lang['ov_angemeldet'];
+                        //die Anmeldung allein reicht nicht: Kriegskasse und berechtigtes Mitglied zählen beim Start
+                        $fz_ov_text .= $feldzug_lang[$fz_ov->startHindernis((int)$fz_ov_fz['id'], $fz_ov_eigene['ally_id'], (int)$fz_ov_fz['preis']) > 0 ? 'ov_nicht_bereit' : 'ov_angemeldet'];
                     }
                 }
             }

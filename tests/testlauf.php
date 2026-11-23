@@ -13,7 +13,7 @@
 //Ist der Code schon geändert, die Basis nach "git stash" aufnehmen und danach "git stash pop" ausführen.
 //Jeder Fall beginnt mit frischen Kopien der Spiel- und der Login-Datenbank (TL_TESTDB, TL_TESTDB_LOGIN; sie bleiben zum
 //Nachsehen stehen). Die Seite landet in den Kopien, weil das Werkzeug die Datenbanknamen aus inc/env.inc.php überschreibt,
-//bevor die Seite die Datei mit include_once lädt; greift das nicht, bricht es ab. Mails gehen ins Leere, mt_rand ist fest
+//bevor die Seite die Datei mit include_once lädt; greift das nicht, bricht es ab. Mails und Discord gehen ins Leere, mt_rand ist fest
 //eingestellt, damit zwei Läufe vergleichbar sind. Nicht abgedeckt: die Ticks (der WT verschickt Mails) und das
 //Aktionsprotokoll (bei sv_log_player_actions=1 schreibt inccon.php in die echte Protokoll-Datenbank).
 
@@ -83,6 +83,8 @@ if (($argv[1] ?? '') === '_lauf') {
     $GLOBALS['env_db_dieewigen_database'] = TL_TESTDB;
     $GLOBALS['env_db_loginsystem_database'] = TL_TESTDB_LOGIN;
     $GLOBALS['env_mail_server'] = 'smtp.invalid';
+    //Discord: keine Webhooks des Servers; die der Allianzen leert tl_kopieren in der Kopie
+    $GLOBALS['webhooks'] = [];
     //die Seiten laden env.inc.php mit include_once; ist sie für PHP schon geladen, bleiben die Testnamen stehen
     include_once 'inc/env.inc.php';
     if ($GLOBALS['env_db_dieewigen_database'] !== TL_TESTDB || $GLOBALS['env_db_loginsystem_database'] !== TL_TESTDB_LOGIN) {
@@ -183,6 +185,10 @@ function tl_kopieren(): void
             if ($t['groesse'] < 10485760) {
                 $db->query("INSERT INTO `$ziel`.`{$t['name']}` SELECT * FROM `$quelle`.`{$t['name']}`");
             }
+        }
+        //Discord-Webhooks der Allianzen leeren, sonst gingen Meldungen im Allianzchat an echte Kanäle
+        if ($welche === 'spiel') {
+            $db->query("UPDATE `$ziel`.`de_allys` SET discord_bot=''");
         }
         $db->close();
     }

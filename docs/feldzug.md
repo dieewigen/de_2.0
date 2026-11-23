@@ -18,7 +18,7 @@ Stand: umgesetzt am 08.10.2026 (Entwurf vom 05.10.2026, überarbeitet zu Brennpu
 Bei der Umsetzung am 08.10.2026 entschieden:
 - **Questpunkte:** Die Kontrollpunkte fließen voll in `de_allys.questpoints`. Erfolgreiche Allianzen erreichen damit auch die Stufen des täglichen Allianzbonus schneller. Das ist bewusst so.
 - **Markierung:** Brennpunkte werden in der Liste der V-Systeme und auf der Desktop-Karte nur markiert, wenn der Spieler das System dort ohnehin sieht. Alle Brennpunkte stehen auf der Feldzugseite.
-- **Sparsame Meldungen:** Die Sammelmeldung je Zug geht nur in den Serverchat im Spiel. An Discord gehen nur Aufruf, Start, Ausfall, Sieg und Feldherren. Der Allianzchat bekommt nur bei gewonnenem oder verlorenem Brennpunkt eine Meldung.
+- **Sparsame Meldungen:** Die Sammelmeldung je Zug geht nur in den Serverchat im Spiel. An Discord gehen nur Aufruf, Start, Ausfall, Sieg und Feldherren. Der Allianzchat bekommt nur bei gewonnenem oder verlorenem Brennpunkt eine Meldung, seit November 2026 außerdem zur eigenen Anmeldung (siehe „Rückmeldung zur Anmeldung“ in Abschnitt 5).
 - **Einstieg:** Reiter „Feldzug“ in der Allianz-Navigation (nur bei eingeschaltetem Feldzug), Zeile auf der Übersicht, Link in der Liste der V-Systeme. Das Menü bleibt unverändert.
 - **Laufender Feldzug zum Rundenende:** Er hat keinen Sieger, nur abgeschlossene Feldzüge zählen für die Feldherren.
 - **Mine und Werft** wirken nur während der Kampfphase.
@@ -108,6 +108,15 @@ Eine Allianz kann teilnehmen, wenn am Ende des Aufrufs drei Dinge erfüllt sind:
 2. Die Allianz hat mindestens **1 berechtigtes Mitglied**. Einzelspieler mit eigener Allianz können also mitmachen. Berechtigt ist, wer ein Mensch ist (kein NPC), ein aktives Konto hat, in einem Sektor größer als 1 steht und **seit Beginn des Aufrufs** Mitglied der Allianz ist. Eine Allianz, die erst während des Aufrufs gegründet wird, kann deshalb erst beim nächsten Feldzug mitmachen.
 3. Die **Kriegskasse** enthält den Eintrittspreis.
 
+### Rückmeldung zur Anmeldung
+
+Ergänzt im November 2026 nach einer Spielermeldung („angemeldet, trotzdem nicht dabei, kein Protokoll“). Bis dahin fiel eine angemeldete Allianz, der beim Start etwas fehlte, ohne jede Meldung heraus.
+
+- **Vor dem Start:** Die Anmeldung allein reicht nicht. Feldzugseite und Übersicht zeigen einer angemeldeten Allianz während des Aufrufs, ob sie startbereit ist („angemeldet und startbereit“ oder „angemeldet, aber noch nicht startbereit“ mit dem, was fehlt).
+- **Beim Start:** Eine angemeldete Allianz, die nicht zugelassen wird, erfährt den Grund im Allianzchat und in der Allianzhistorie (bei der Kriegskasse mit den Namen der fehlenden Rohstoffe). Die Feldzugseite zeigt ihn während der ganzen Kampfphase. Der Grund steht als Status an der Anmeldung (Abschnitt 12).
+- **Protokoll:** Anmeldung und Rückzug stehen mit dem Namen des Mitglieds in der Allianzhistorie und im Allianzchat.
+- **Rückzug:** „Anmeldung zurückziehen“ braucht einen zweiten Klick zur Bestätigung. Der Knopf steht nach dem Anmelden dort, wo eben noch „Allianz anmelden“ stand.
+
 ### Kriegskasse und Eintrittspreis
 
 - Die Kriegskasse ist das Allianzlager, das es schon gibt. Aus dem Allianzlager gibt es keine Auszahlung, damit lassen sich darüber keine Rohstoffe zwischen Spielern verschieben.
@@ -126,7 +135,7 @@ Eine Allianz kann teilnehmen, wenn am Ende des Aufrufs drei Dinge erfüllt sind:
 ### Teilnehmerzahl
 
 - Ein Feldzug braucht **mindestens 2** Allianzen. Jede Allianz, die die Voraussetzungen erfüllt, ist dabei. Eine Obergrenze gibt es nicht, die Zahl der Brennpunkte wächst mit.
-- Mit weniger als 2 Allianzen fällt der Feldzug aus. Es wird nichts abgebucht, und ein neuer Aufruf beginnt.
+- Mit weniger als 2 Allianzen fällt der Feldzug aus. Es wird nichts abgebucht, und ein neuer Aufruf beginnt. Eine Anmeldung gilt nur für ihren Aufruf und geht nicht in den neuen mit, sonst bliebe eine Allianz ohne gefüllte Kasse dauerhaft angemeldet. Die angemeldeten Allianzen bekommen den Hinweis, sich neu anzumelden.
 - Die berechtigten Mitglieder beim Start werden als **Teilnehmer** gespeichert. Das ist wichtig für den Titel.
 
 ## 6. Legionen verteilen
@@ -247,7 +256,7 @@ Ohne Eintrag gelten die Werte von Server 1, außer `sv_feldzug_aktiv` (aus). Ser
 - **Neue Tabellen** in `database/de.sql`. Sie sind abwärtskompatibel, Server 2 läuft mit ihnen auch, solange er das Update noch nicht hat.
   - `de_feldzug`: Feldzug, Phase, Start-WT, aktueller Zug, Eintrittspreis, gemessene Produktion. Die Produktion beim ersten Aufruf ist der Bezugswert der Runde.
   - `de_feldzug_brennpunkt`: Brennpunkte mit System (map_id), Name als Text, Wert, Rolle und Halter
-  - `de_feldzug_teilnehmer`: Allianz, Kontrollpunkte, Platz, dazu Kürzel und Name als Text
+  - `de_feldzug_teilnehmer`: Allianz, Kontrollpunkte, Platz, dazu Kürzel und Name als Text. `status`: 1 angemeldet, 2 dabei, beim Start nicht zugelassen: 3 kein berechtigtes Mitglied, 4 Kriegskasse reichte nicht (`FeldzugService::startHindernis()` prüft das für Kampfstart, Feldzugseite und Übersicht)
   - `de_feldzug_mitglied`: Teilnehmer beim Start (user_id)
   - `de_feldzug_verteilung`: aktuelle Legionen je Allianz und Brennpunkt, mit Angabe, wer sie wann geändert hat
   - `de_feldzug_ergebnis`: je Zug, Brennpunkt und Allianz die gesetzten Legionen, die Stärke und der neue Halter. Daraus entstehen die öffentlichen Ergebnisse.

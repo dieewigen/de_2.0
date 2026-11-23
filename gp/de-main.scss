@@ -11321,8 +11321,11 @@ body.mobile {
 	body.theme-#{$name}.mobile {
 		background-color: #000;
 
-		// Mobile hat explizit A:hover definiert
-		a:hover {
+		// Mobile hat explizit A:hover definiert; nicht für die Knöpfe der Bausteine (.mod-btn): am Handy ist schon das Antippen
+		// ein Überfahren, der Knopf wuchs mit 14 px Arial, rutschte in knappen Reihen in die nächste Zeile, und der Klick ging
+		// daneben (Zerstören im Artefaktgebäude in Gerätebreite). :where hält die Spezifität, sonst schlüge die Regel die
+		// Ausnahmen in de-mobil.scss (Kopfleiste)
+		a:hover:where(:not(.mod-btn)) {
 			font-family: arial, geneva, helvetica, sans-serif;
 			font-size: 14px;
 			text-decoration: underline;

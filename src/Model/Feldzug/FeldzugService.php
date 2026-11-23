@@ -1,6 +1,8 @@
 <?php
 namespace DieEwigen\DE2\Model\Feldzug;
 
+use DieEwigen\DE2\Model\Alliance\Allianz;
+
 /**
  * Feldzug um die Vergessenen Systeme: Wettstreit der Allianzen um Brennpunkte (Regelwerk: docs/feldzug.md).
  *
@@ -23,6 +25,9 @@ class FeldzugService
 
     public const TEILNEHMER_ANGEMELDET = 1;
     public const TEILNEHMER_DABEI = 2;
+    //angemeldet, beim Start aber nicht zugelassen: kein berechtigtes Mitglied bzw. Kriegskasse reichte nicht
+    public const TEILNEHMER_OHNE_MITGLIED = 3;
+    public const TEILNEHMER_KASSE_FEHLT = 4;
 
     //VS-Rohstoffe Eisen (3) bis Octagium (12) für Eintrittspreis und Kriegskasse
     public const ITEMS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -264,16 +269,21 @@ class FeldzugService
         $preis = (int)$fz['preis'];
         $wt = $this->getWt();
 
-        //wer erfüllt am Ende des Aufrufs alle Voraussetzungen?
+        //wer erfüllt am Ende des Aufrufs alle Voraussetzungen? Wer nicht, erfährt nach dem Phasenwechsel den Grund
         $dabei = [];
+        $raus = [];
         foreach ($this->getTeilnehmer($id) as $t) {
             $ally = (int)$t['ally_id'];
             $res = mysqli_execute_query($this->db, "SELECT id, allytag, allyname FROM de_allys WHERE id = ?", [$ally]);
             $allyRow = mysqli_fetch_assoc($res);
-            if (!$allyRow || $this->zaehleBerechtigte($id, $ally) < 1 || !$this->kasseReicht($ally, $preis)) {
+            if (!$allyRow) {
                 continue;
             }
-            $dabei[$ally] = $allyRow;
+            if ($this->startHindernis($id, $ally, $preis) > 0) {
+                $raus[$ally] = $allyRow;
+            } else {
+                $dabei[$ally] = $allyRow;
+            }
         }
 
         $anzahl = count($dabei) + self::getExtraBrennpunkte();
@@ -285,6 +295,11 @@ class FeldzugService
                 return;
             }
             $this->chatServer(strtr($lang['chat_ausgefallen'], ['{NR}' => (int)$fz['nr'], '{N}' => count($dabei)]), true);
+            $this->nichtDabeiMelden($fz, $raus, $lang);
+            //Anmeldungen gelten nur für diesen Aufruf, im neuen muss sich jede Allianz wieder anmelden
+            foreach ($raus + $dabei as $ally => $allyRow) {
+                $this->allyMelden($ally, $allyRow['allytag'], strtr($lang['ally_ausgefallen'], ['{NR}' => (int)$fz['nr']]));
+            }
             $this->neuLaden();
             $this->aufrufEroeffnen((int)$fz['nr'] + 1, $lang);
             return;
@@ -294,6 +309,7 @@ class FeldzugService
         if (mysqli_affected_rows($this->db) !== 1) {
             return;
         }
+        $this->nichtDabeiMelden($fz, $raus, $lang);
 
         //Eintrittspreis abbuchen, Teilnehmer und berechtigte Mitglieder markieren
         foreach ($dabei as $ally => $allyRow) {
@@ -315,6 +331,36 @@ class FeldzugService
 
         $tags = array_map(fn($a) => $a['allytag'], $dabei);
         $this->chatServer(strtr($lang['chat_start'], ['{NR}' => (int)$fz['nr'], '{ALLYS}' => implode(', ', $tags), '{N}' => $anzahl, '{ZUEGE}' => self::getKampfZuege()]), true);
+    }
+
+    /**
+     * Angemeldete Allianzen, die beim Start eine Voraussetzung nicht erfüllen: Grund am Teilnehmer festhalten (die
+     * Feldzugseite zeigt ihn) und der Allianz melden, bei der Kriegskasse mit den fehlenden Rohstoffen.
+     *
+     * @param array $raus [ally_id => Zeile aus de_allys]
+     */
+    private function nichtDabeiMelden(array $fz, array $raus, array $lang): void
+    {
+        if (empty($raus)) {
+            return;
+        }
+        $res = mysqli_execute_query($this->db, "SELECT item_id, item_name FROM de_item_data WHERE item_id BETWEEN 3 AND 12 ORDER BY item_id", []);
+        $namen = array_column(mysqli_fetch_all($res, MYSQLI_ASSOC), 'item_name', 'item_id');
+        foreach ($raus as $ally => $allyRow) {
+            $hindernis = $this->startHindernis((int)$fz['id'], $ally, (int)$fz['preis']);
+            mysqli_execute_query($this->db, "UPDATE de_feldzug_teilnehmer SET status = ? WHERE feldzug_id = ? AND ally_id = ?", [$hindernis, (int)$fz['id'], $ally]);
+            $liste = implode(', ', array_intersect_key($namen, $this->kasseFehlt($ally, (int)$fz['preis'])));
+            $this->allyMelden($ally, $allyRow['allytag'], strtr($lang['ally_raus_'.$hindernis], ['{NR}' => (int)$fz['nr'], '{LISTE}' => $liste]));
+        }
+    }
+
+    /**
+     * Meldung an eine Allianz: Allianzhistorie (das Protokoll für Anmeldung, Rückzug und Start) und Allianzchat.
+     */
+    private function allyMelden(int $ally, string $tag, string $text): void
+    {
+        Allianz::historie($this->db, $tag, $text);
+        \insert_chat_msg($ally, 1, '', '<span style="color: #e67e22;">'.$text.'</span>');
     }
 
     /**
@@ -526,9 +572,11 @@ class FeldzugService
     }
 
     /**
+     * Allianz anmelden oder die Anmeldung zurückziehen; beides steht danach mit Namen in Allianzhistorie und -chat.
+     *
      * @return array [bool ok, string Schlüssel der Meldung]
      */
-    public function anmelden(int $uid, bool $abmelden = false): array
+    public function anmelden(int $uid, array $lang, bool $abmelden = false): array
     {
         $fz = $this->getAktuell();
         if ($this->tickSperre()) {
@@ -541,12 +589,20 @@ class FeldzugService
         if ($ally === null || !$ally['posten']) {
             return [false, 'fehler_posten'];
         }
+        //gemeldet wird nur, wenn sich wirklich etwas geändert hat (kein zweiter Eintrag bei doppeltem Absenden)
+        $werte = ['{NR}' => (int)$fz['nr'], '{NAME}' => \html_text($ally['spielername'])];
         if ($abmelden) {
             mysqli_execute_query($this->db, "DELETE FROM de_feldzug_teilnehmer WHERE feldzug_id = ? AND ally_id = ? AND status = ?", [(int)$fz['id'], $ally['ally_id'], self::TEILNEHMER_ANGEMELDET]);
+            if (mysqli_affected_rows($this->db) === 1) {
+                $this->allyMelden($ally['ally_id'], $ally['allytag'], strtr($lang['ally_abgemeldet'], $werte));
+            }
             return [true, 'ok_abgemeldet'];
         }
         mysqli_execute_query($this->db, "INSERT IGNORE INTO de_feldzug_teilnehmer (feldzug_id, ally_id, allytag, allyname, status, angemeldet_von) VALUES (?, ?, ?, ?, ?, ?)",
             [(int)$fz['id'], $ally['ally_id'], $ally['allytag'], $ally['allyname'], self::TEILNEHMER_ANGEMELDET, mb_substr((string)$ally['spielername'], 0, 30)]);
+        if (mysqli_affected_rows($this->db) === 1) {
+            $this->allyMelden($ally['ally_id'], $ally['allytag'], strtr($lang['ally_angemeldet'], $werte));
+        }
         return [true, 'ok_angemeldet'];
     }
 
@@ -664,14 +720,30 @@ class FeldzugService
         return $kasse;
     }
 
-    public function kasseReicht(int $ally, int $preis): bool
+    /**
+     * Was der Kriegskasse zum Eintrittspreis fehlt: [item_id => Fehlmenge], leer wenn sie reicht.
+     */
+    public function kasseFehlt(int $ally, int $preis): array
     {
-        foreach ($this->getKasse($ally) as $menge) {
+        $fehlt = [];
+        foreach ($this->getKasse($ally) as $item => $menge) {
             if ($menge < $preis) {
-                return false;
+                $fehlt[$item] = $preis - $menge;
             }
         }
-        return true;
+        return $fehlt;
+    }
+
+    /**
+     * Was einer angemeldeten Allianz zum Start fehlt: 0 (startbereit), TEILNEHMER_OHNE_MITGLIED oder
+     * TEILNEHMER_KASSE_FEHLT. Eine Stelle für den Kampfstart, die Feldzugseite und die Übersicht.
+     */
+    public function startHindernis(int $feldzugId, int $ally, int $preis): int
+    {
+        if ($this->zaehleBerechtigte($feldzugId, $ally) < 1) {
+            return self::TEILNEHMER_OHNE_MITGLIED;
+        }
+        return empty($this->kasseFehlt($ally, $preis)) ? 0 : self::TEILNEHMER_KASSE_FEHLT;
     }
 
     /**
