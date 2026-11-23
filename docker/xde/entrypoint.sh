@@ -1,6 +1,8 @@
 #!/bin/bash
 
-printenv | grep -v '^_=' | sed 's/^\([^=]*\)=\(.*\)$/export \1="\2"/' > /etc/container.env
+printenv | grep -v '^_=' | while IFS='=' read -r k v; do
+    printf 'export %s=%q\n' "$k" "$v"
+done > /etc/container.env
 chmod 600 /etc/container.env
 
 # Start the cron service
